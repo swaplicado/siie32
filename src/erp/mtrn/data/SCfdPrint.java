@@ -32,12 +32,14 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCurrency;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModDataUtils;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
@@ -96,6 +98,23 @@ public class SCfdPrint {
     }
     
     /**
+     * Get business partner name when available name is empty.
+     * @param client GUI client interface.
+     * @param availableName Availabe business partner name.
+     * @param bizPartnerId Business partner ID.
+     * @return  Business partner name.
+     */
+    private static String getBizPartnerName(final SClientInterface client, final String availableName, final int bizPartnerId) {
+        String name = availableName;
+        
+        if (name.isEmpty()) {
+            name = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.DESCRIPTION_NAME);
+        }
+        
+        return name;
+    }
+    
+    /**
      * Computes report.
      * @param cfd
      * @param reportType
@@ -104,9 +123,10 @@ public class SCfdPrint {
      * @param copies
      * @throws Exception 
      */
-    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int copies) throws Exception {
+    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int copies, final String path) throws Exception {
         JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, reportType, map);
-
+        String sPdfFileName;
+        
         switch (printMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
                 JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
@@ -115,8 +135,14 @@ public class SCfdPrint {
                 break;
                 
             case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+                sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
                 sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+                
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH:
+                sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+                sPdfFileName = path + "/" + sPdfFileName + ".pdf";
                 JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
                 break;
                 
@@ -400,7 +426,7 @@ public class SCfdPrint {
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFD, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFD, map, printMode, 1, null);
     }
 
     /**
@@ -667,7 +693,7 @@ public class SCfdPrint {
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI, map, printMode, 1, null);
     }
     
     /**
@@ -943,7 +969,7 @@ public class SCfdPrint {
                     paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                     paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                     paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                    paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
                     
                     paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
@@ -1069,9 +1095,17 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1, null);
     }
     
+    /**
+     * Prints CFDI 4.0.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
     public void printCfdi40(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
         // CFDI's header:
         
@@ -1218,14 +1252,39 @@ public class SCfdPrint {
 
         // Emisor:
 
+        int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+        switch(value) {
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                paramsMap.put("sEmiNombre", emisor.getProperName());
+                break;
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                paramsMap.put("sEmiNombre", emisor.getBizPartnerFiscal());
+                break;
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                paramsMap.put("sEmiNombre", emisor.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                        emisor.getProperName() : emisor.getBizPartnerFiscal());
+                break;
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
 
         // Receptor:
 
+        switch(value) {
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                paramsMap.put("sRecNombreOpc", receptor.getProperName());
+                break;
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                paramsMap.put("sRecNombreOpc", receptor.getBizPartnerFiscal());
+                break;
+            case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                paramsMap.put("sRecNombreOpc", receptor.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                        receptor.getProperName() : receptor.getBizPartnerFiscal());
+                break;
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
         paramsMap.put("sRecRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString()));
         paramsMap.put("sCfdUsoCFDI", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, comprobante.getEltReceptor().getAttUsoCFDI().getString()));
@@ -1317,7 +1376,6 @@ public class SCfdPrint {
                     paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
                     paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
                     paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
-                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                     
                     cfd.ver3.ccp20.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
                     paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
@@ -1339,7 +1397,85 @@ public class SCfdPrint {
                     paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                     paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                     paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                    paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());  
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    for (cfd.ver3.ccp20.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                }
+                else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
+                    cfd.ver4.ccp30.DElementCartaPorte ccp = (cfd.ver4.ccp30.DElementCartaPorte) element;
+                    SDbBillOfLading bol = new SDbBillOfLading();
+                    bol.read(miClient.getSession(), new int[] { dps.getDbmsDataCfdBol().getFkBillOfLadingId_n() });
+                    
+                    paramsMap.put("bCcp", true);
+                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                    paramsMap.put("sIdCcp", ccp.getAttIdCCP().getString());
+                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+                    
+                    for (cfd.ver4.ccp30.DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                        cfd.ver4.ccp30.DElementDomicilio dom = ub.getEltDomicilio();
+                        if (!dom.getAttLocalidad().getString().isEmpty()) {
+                            dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        }
+                        if (!dom.getAttMunicipio().getString().isEmpty()) {
+                            dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        }
+                        dom.getAttEstado().setString(dom.getAttEstado().getString());
+                        dom.getAttPais().setString(dom.getAttPais().getString());
+                    }
+                    
+                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                    paramsMap.put("sCcpLogisticaInversa", ccp.getEltMercancias().getAttLogisticaInversaRecoleccionDevolucion().getString());
+                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+                    
+                    cfd.ver4.ccp30.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                    paramsMap.put("dCcpPesoVeh", aut.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                    if (aut.getEltRemolques() != null) {
+                        int i = 1;
+                        for (cfd.ver4.ccp30.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                            i++;
+                        }
+                    }
+                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    for (cfd.ver4.ccp30.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
             }
         }
@@ -1461,7 +1597,452 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40, paramsMap, printMode, 1, null);
+    }
+    
+    /**
+     * Prints CFDI 4.0 in english.
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @param dps DPS
+     * @throws java.lang.Exception
+     * XXX 2018-01-12 (Sergio Flores): normalize these parameters because CFD is contained in DPS! WTF!
+     */
+    public void printCfdi40Eng(final erp.mtrn.data.SDataCfd cfd, final int printMode, final erp.mtrn.data.SDataDps dps) throws java.lang.Exception {
+        // CFDI's header:
+        
+        SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+        String sDocTotal = SLibUtilities.translateValueToText(dps.getTotalCy_r(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), dps.getFkLanguajeId(), currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix());
+        String sDocType = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey());
+        
+        if (sDocType.contains("CTE.")) {
+            sDocType = SLibUtilities.textTrim(sDocType.substring(0, sDocType.indexOf("CTE.")));
+        }
+    
+        Map<String, Object> paramsMap = miClient.createReportParams();
+
+        paramsMap.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
+        paramsMap.put("nPkYearId", cfd.getFkDpsYearId_n());
+        paramsMap.put("nPkDocId", cfd.getFkDpsDocId_n());
+        paramsMap.put("sDocTipo", "INVOICE");
+        paramsMap.put("bDocEsMonedaLocal", miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() }));
+        paramsMap.put("dDocSubtotalProvisional", dps.getSubtotalProvisionalCy_r());
+        paramsMap.put("dDocDescuento", dps.getDiscountDocCy_r());
+        paramsMap.put("dDocSubtotal", dps.getSubtotalCy_r());
+        paramsMap.put("dDocTotal", dps.getTotalCy_r());
+        paramsMap.put("sDocTotalConLetra", sDocTotal);
+        paramsMap.put("sDocCadenaOriginal", cfd.getStringSigned());
+        paramsMap.put("bIsAnnulled", dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        paramsMap.put("bIsDeleted", dps.getIsDeleted());
+        
+        // CFDI's emisor:
+
+        SDataBizPartner emisor = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
+        SDataBizPartnerBranch emisorBranch = emisor.getDbmsBizPartnerBranchHq();
+        SDataBizPartnerBranchAddress emisorBranchAddress = emisorBranch.getDbmsBizPartnerBranchAddressOfficial();
+        SDataBizPartnerBranch emisorBranchIssue = dps.getFkCompanyBranchId() == emisorBranch.getPkBizPartnerBranchId() ? null : emisor.getDbmsBizPartnerBranch(new int[] { dps.getFkCompanyBranchId() });
+        SDataBizPartnerBranchAddress emisorBranchAddressIssue = dps.getFkCompanyBranchId() == emisorBranch.getPkBizPartnerBranchId() ? null : emisorBranchIssue.getDbmsBizPartnerBranchAddressOfficial();
+        
+        paramsMap.put("sEmiDomCalle", emisorBranchAddress.getStreet());
+        paramsMap.put("sEmiDomNoExteriorOpc", emisorBranchAddress.getStreetNumberExt());
+        paramsMap.put("sEmiDomNoInteriorOpc", emisorBranchAddress.getStreetNumberInt());
+        paramsMap.put("sEmiDomColoniaOpc", emisorBranchAddress.getNeighborhood().toUpperCase());
+        paramsMap.put("sEmiDomLocalidadOpc", emisorBranchAddress.getLocality().toUpperCase());
+        paramsMap.put("sEmiDomReferenciaOpc", emisorBranchAddress.getReference());
+        paramsMap.put("sEmiDomMunicipio", emisorBranchAddress.getCounty().toUpperCase());
+        paramsMap.put("sEmiDomEstado", emisorBranchAddress.getState().toUpperCase());
+        paramsMap.put("sEmiDomPais", emisorBranchAddress.getDbmsDataCountry().getCountry().toUpperCase());
+        paramsMap.put("sEmiDomCodigoPostal", emisorBranchAddress.getZipCode());
+        paramsMap.put("nFkEmiAddressFormatTypeId_n", emisorBranch.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED ? emisorBranch.getFkAddressFormatTypeId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n());
+        
+        String sTelsEmiDom = "";
+        
+        if (emisorBranch.getDbmsBizPartnerBranchContacts().size() > 0) {
+            SDataBizPartnerBranchContact contact = emisorBranch.getDbmsBizPartnerBranchContacts().get(0);
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+            sTelsEmiDom += (sTelsEmiDom.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+        }
+        
+        paramsMap.put("sTelEmiDom", sTelsEmiDom);
+        paramsMap.put("sWeb", emisor.getWeb());
+
+        if (emisorBranchIssue != null) {
+            paramsMap.put("sEmiExpCalleOpc", emisorBranchAddressIssue.getStreet());
+            paramsMap.put("sEmiExpNoExteriorOpc", emisorBranchAddressIssue.getStreetNumberExt());
+            paramsMap.put("sEmiExpNoInteriorOpc", emisorBranchAddressIssue.getStreetNumberInt());
+            paramsMap.put("sEmiExpColoniaOpc", emisorBranchAddressIssue.getNeighborhood().toUpperCase());
+            paramsMap.put("sEmiExpLocalidadOpc", emisorBranchAddressIssue.getLocality().toUpperCase());
+            paramsMap.put("sEmiExpReferenciaOpc", emisorBranchAddressIssue.getReference());
+            paramsMap.put("sEmiExpMunicipioOpc", emisorBranchAddressIssue.getCounty().toUpperCase());
+            paramsMap.put("sEmiExpEstadoOpc", emisorBranchAddressIssue.getState().toUpperCase());
+            paramsMap.put("sEmiExpPais", emisorBranchAddressIssue.getDbmsDataCountry().getCountry().toUpperCase());
+            paramsMap.put("sEmiExpCodigoPostalOpc", emisorBranchAddressIssue.getZipCode());
+            
+            String sTelsEmiExp = "";
+
+            if (emisorBranchIssue.getDbmsBizPartnerBranchContacts().size() > 0) {
+                SDataBizPartnerBranchContact contact = emisorBranchIssue.getDbmsBizPartnerBranchContacts().get(0);
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone01().length() == 0 ? "" : ", ") + contact.getAuxTelephone01();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone02().length() == 0 ? "" : ", ") + contact.getAuxTelephone02();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getAuxTelephone03().length() == 0 ? "" : ", ") + contact.getAuxTelephone03();
+                sTelsEmiExp += (sTelsEmiExp.length() == 0 || contact.getEmail01().length() == 0 ? "" : ", ") + contact.getEmail01();
+            }
+
+            paramsMap.put("sTelEmiExp", sTelsEmiExp);
+        }
+
+        SDataBizPartnerBranchContact contact = emisorBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : emisorBranch.getDbmsBizPartnerBranchContacts().get(1);
+
+        paramsMap.put("sManagerFinance", contact == null ? "" : SLibUtilities.textTrim(contact.getContactPrefix() + " " + contact.getFirstname() + " " + contact.getLastname()));
+        
+        // CFDI's receptor:
+
+        SDataBizPartner receptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+        SDataBizPartnerBranch receptorBranch = receptor.getDbmsBizPartnerBranch(new int[] { dps.getFkBizPartnerBranchId() });
+        SDataBizPartnerBranchAddress receptorBranchAddress = receptorBranch.getDbmsBizPartnerBranchAddressOfficial();
+        SDataBizPartnerBranchAddress receptorBranchAddressDelivery = dps.getFkBizPartnerBranchAddressId() == 1 ? null : receptorBranch.getDbmsBizPartnerBranchAddress(new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() });
+        boolean isLocalLanguage = dps.getFkLanguajeId() == miClient.getSessionXXX().getParamsErp().getFkLanguageId();
+        
+        paramsMap.put("sRecDomCalleOpc", receptorBranchAddress.getStreet());
+        paramsMap.put("sRecDomNoExteriorOpc", receptorBranchAddress.getStreetNumberExt());
+        paramsMap.put("sRecDomNoInteriorOpc", receptorBranchAddress.getStreetNumberInt());
+        paramsMap.put("sRecDomColoniaOpc", receptorBranchAddress.getNeighborhood());
+        paramsMap.put("sRecDomLocalidadOpc", receptorBranchAddress.getLocality());
+        paramsMap.put("sRecDomReferenciaOpc", receptorBranchAddress.getReference());
+        paramsMap.put("sRecDomMunicipioOpc", receptorBranchAddress.getCounty());
+        paramsMap.put("sRecDomEstadoOpc", receptorBranchAddress.getState().toUpperCase());
+        paramsMap.put("sRecDomPais", (isLocalLanguage ? receptorBranchAddress.getDbmsDataCountry().getCountry() : receptorBranchAddress.getDbmsDataCountry().getCountryLan()).toUpperCase());
+        paramsMap.put("sRecDomCodigoPostalOpc", receptorBranchAddress.getZipCode());
+        paramsMap.put("nFkRecAddressFormatTypeId_n", receptorBranch.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED ? receptorBranch.getFkAddressFormatTypeId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n());
+        
+        if (receptorBranchAddressDelivery != null) {
+            paramsMap.put("sRecEnt", receptorBranchAddressDelivery.getAddress());
+            paramsMap.put("sRecEntCalleOpc", receptorBranchAddressDelivery.getStreet());
+            paramsMap.put("sRecEntNoExteriorOpc", receptorBranchAddressDelivery.getStreetNumberExt());
+            paramsMap.put("sRecEntNoInteriorOpc", receptorBranchAddressDelivery.getStreetNumberInt());
+            paramsMap.put("sRecEntColoniaOpc", receptorBranchAddressDelivery.getNeighborhood());
+            paramsMap.put("sRecEntLocalidadOpc", receptorBranchAddressDelivery.getLocality());
+            paramsMap.put("sRecEntReferenciaOpc", receptorBranchAddressDelivery.getReference());
+            paramsMap.put("sRecEntMunicipioOpc", receptorBranchAddressDelivery.getCounty());
+            paramsMap.put("sRecEntEstadoOpc", receptorBranchAddressDelivery.getState().toUpperCase());
+            paramsMap.put("sRecEntPais", (isLocalLanguage ? receptorBranchAddressDelivery.getDbmsDataCountry().getCountry() : receptorBranchAddressDelivery.getDbmsDataCountry().getCountryLan()).toUpperCase());
+            paramsMap.put("sRecEntCodigoPostalOpc", receptorBranchAddressDelivery.getZipCode());
+        }
+        
+        // Comprobante:
+
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+        cfd.ver40.DElementComprobante comprobante = DCfdUtils.getCfdi40(cfd.getDocXml());
+
+        paramsMap.put("sCfdVersion", "" + comprobante.getVersion());
+        paramsMap.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
+        paramsMap.put("sCfdFolio", comprobante.getAttFolio().getString());
+        paramsMap.put("sCfdFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        paramsMap.put("sCfdSello", comprobante.getAttSello().getString());
+        paramsMap.put("sCfdFormaDePago", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, comprobante.getAttFormaPago().getString()));
+        paramsMap.put("sCfdNoCertificado", comprobante.getAttNoCertificado().getString());
+        paramsMap.put("sCfdCondicionesDePagoOpc", comprobante.getAttCondicionesDePago().getString());
+        paramsMap.put("dCfdSubTotal", comprobante.getAttSubTotal().getDouble());
+        paramsMap.put("dCfdTotal", comprobante.getAttTotal().getDouble());
+        paramsMap.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, comprobante.getAttMetodoPago().getString()));
+        paramsMap.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
+        paramsMap.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getString());
+        paramsMap.put("sCfdExportacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_EXP, comprobante.getAttExportacion().getString()));
+        paramsMap.put("bCfdImpuestos", comprobante.getEltOpcImpuestos() != null);
+
+        // Emisor:
+
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
+        paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
+
+        // Receptor:
+
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        
+        paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
+        paramsMap.put("sRecRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString()));
+        paramsMap.put("sCfdUsoCFDI", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, comprobante.getEltReceptor().getAttUsoCFDI().getString()));
+
+        // Stamp:
+
+        String sello = "";
+        
+        if (comprobante.getEltOpcComplemento() != null) {
+            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                    cfd.ver40.DElementTimbreFiscalDigital tfd = (cfd.ver40.DElementTimbreFiscalDigital) element;
+                    paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
+                    paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
+                    paramsMap.put("sCfdiSelloCFD", sello = tfd.getAttSelloCFD().getString());
+                    paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
+                    paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
+                    paramsMap.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                    paramsMap.put("sCfdiLeyenda", tfd.getAttLeyenda().getString());
+                }
+                else if (element.getName().compareTo("cce11:ComercioExterior") == 0) {
+                    cfd.ver3.cce11.DElementComercioExterior cce = (cfd.ver3.cce11.DElementComercioExterior) element;
+                    String incoterm = cce.getAttIncoterm().getString() + " - " + SModDataUtils.getCatalogNameByCode(miClient.getSession(), SModConsts.LOGS_INC, cce.getAttIncoterm().getString());
+                    paramsMap.put("bCceComplemento", true);
+                    paramsMap.put("sCceComplemento", cce.getElementForXml());
+                    paramsMap.put("sCceVersion", cce.getAttVersion().getString());
+                    paramsMap.put("sCceTipoOperacion", cce.getAttTipoOperacion().getString());
+                    paramsMap.put("sCceClavePedimento", cce.getAttClaveDePedimento().getString());
+                    paramsMap.put("sCceCertificadoOrigen", DCce11Catalogs.CertificadoOrigen.get(cce.getAttCertificadoOrigen().getInteger() + ""));
+                    paramsMap.put("sCceOrigenMercancia", cce.getEltEmisor().getEltDomicilio().getAttPais().getString());
+                    paramsMap.put("sCceIncoterm", incoterm);
+                    if (cce.getEltDestinatario() != null) {
+                        cfd.ver3.cce11.DElementTipoDomicilioInt dom = cce.getEltDestinatario().getEltDomicilio();
+                        paramsMap.put("bCceDestinatario", true);
+                        paramsMap.put("sCceDestNoRegistro", cce.getEltDestinatario().getAttNumRegIdTrib().getString().isEmpty() ? "-" : cce.getEltDestinatario().getAttNumRegIdTrib().getString());
+                        paramsMap.put("sCceDestNombre", cce.getEltDestinatario().getAttNombre().getString().isEmpty() ? "-" : cce.getEltDestinatario().getAttNombre().getString());
+                        paramsMap.put("sCceDestCalle", dom.getAttCalle().getString().isEmpty() ? "-" : dom.getAttCalle().getString());
+                        paramsMap.put("sCceDestNoExterior", dom.getAttNoExterior().getString().isEmpty() ? "-" : dom.getAttNoExterior().getString());
+                        paramsMap.put("sCceDestNoInterior", dom.getAttNoInterior().getString().isEmpty() ? "-" : dom.getAttNoInterior().getString());
+                        paramsMap.put("sCceDestColonia", dom.getAttColonia().getString().isEmpty() ? "-" : dom.getAttColonia().getString());
+                        paramsMap.put("sCceDestLocalidad", dom.getAttLocalidad().getString().isEmpty() ? "-" : dom.getAttLocalidad().getString());
+                        paramsMap.put("sCceDestReferencia", dom.getAttReferencia().getString().isEmpty() ? "-" : dom.getAttReferencia().getString());
+                        paramsMap.put("sCceDestMunicipio", dom.getAttMunicipio().getString().isEmpty() ? "-" : dom.getAttMunicipio().getString());
+                        paramsMap.put("sCceDestEstado", dom.getAttEstado().getString().isEmpty() ? "-" : dom.getAttEstado().getString());
+                        paramsMap.put("sCceDestPais", dom.getAttPais().getString().isEmpty() ? "-" : dom.getAttPais().getString());
+                        paramsMap.put("sCceDestCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
+                    }
+                    if (cce.getEltReceptor() != null) {
+                        cfd.ver3.cce11.DElementTipoDomicilioInt dom = cce.getEltReceptor().getEltDomicilio();
+                        paramsMap.put("bCceReceptor", true);
+                        paramsMap.put("sCceRecCalle", dom.getAttCalle().getString().isEmpty() ? "-" : dom.getAttCalle().getString());
+                        paramsMap.put("sCceRecNoExterior", dom.getAttNoExterior().getString().isEmpty() ? "-" : dom.getAttNoExterior().getString());
+                        paramsMap.put("sCceRecNoInterior", dom.getAttNoInterior().getString().isEmpty() ? "-" : dom.getAttNoInterior().getString());
+                        paramsMap.put("sCceRecColonia", dom.getAttColonia().getString().isEmpty() ? "-" : dom.getAttColonia().getString());
+                        paramsMap.put("sCceRecLocalidad", dom.getAttLocalidad().getString().isEmpty() ? "-" : dom.getAttLocalidad().getString());
+                        paramsMap.put("sCceRecReferencia", dom.getAttReferencia().getString().isEmpty() ? "-" : dom.getAttReferencia().getString());
+                        paramsMap.put("sCceRecMunicipio", dom.getAttMunicipio().getString().isEmpty() ? "-" : dom.getAttMunicipio().getString());
+                        paramsMap.put("sCceRecEstado", dom.getAttEstado().getString().isEmpty() ? "-" : dom.getAttEstado().getString());
+                        paramsMap.put("sCceRecPais", dom.getAttPais().getString().isEmpty() ? "-" : dom.getAttPais().getString());
+                        paramsMap.put("sCceRecCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
+                    }
+                }
+                else if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
+                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                    SDbBillOfLading bol = new SDbBillOfLading();
+                    bol.read(miClient.getSession(), new int[] { dps.getDbmsDataCfdBol().getFkBillOfLadingId_n() });
+                    
+                    paramsMap.put("bCcp", true);
+                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+                    
+                    for (DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                        DElementDomicilio dom = ub.getEltDomicilio();
+                        if (!dom.getAttLocalidad().getString().isEmpty()) {
+                            dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        }
+                        if (!dom.getAttMunicipio().getString().isEmpty()) {
+                            dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        }
+                        dom.getAttEstado().setString(dom.getAttEstado().getString());
+                        dom.getAttPais().setString(dom.getAttPais().getString());
+                    }
+                    
+                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+                    
+                    cfd.ver3.ccp20.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                    if (aut.getEltRemolques() != null) {
+                        int i = 1;
+                        for (cfd.ver3.ccp20.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                            i++;
+                        }
+                    }
+                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                }
+            }
+        }
+        
+        // QR Code:
+
+        /* IMPORTANT (sflores, 2014-01-15):
+         * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
+         *
+         * biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
+         * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+         */
+
+        // params needed by erp.server.SSessionServer.requestFillReport() to generate QR code:
+        
+        paramsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi40Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi40Consts.STAMP_LAST_CHARS, sello.length()));
+        
+        // Aditional info (formerly Addenda1's info):
+
+        double dTotalPesoBruto = 0;
+        double dTotalPesoNeto = 0;
+        
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (entry.isAccountable()) {
+                dTotalPesoBruto += entry.getWeightGross();
+                dTotalPesoNeto += entry.getMass();
+            }
+        }
+
+        paramsMap.put("sAddClaveMoneda", dps.getDbmsCurrencyKey());
+        paramsMap.put("dAddTipoDeCambio", dps.getExchangeRate());
+        paramsMap.put("nAddDiasDeCredito", dps.getDaysOfCredit());
+        paramsMap.put("sAddEmbarque", "");
+        paramsMap.put("sAddOrdenDeEmbarque", "");
+        paramsMap.put("sAddOrdenDeCompra", dps.getNumberReference());
+        paramsMap.put("sAddContrato", dps.getAuxCfdParams().getContrato());
+        paramsMap.put("sAddPedido", dps.getAuxCfdParams().getPedido());
+        paramsMap.put("sAddFactura", dps.getAuxCfdParams().getFactura());
+        paramsMap.put("sAddCliente", dps.getAuxCfdParams().getReceptor().getDbmsCategorySettingsCus().getKey());
+        paramsMap.put("sAddSucursal", dps.getFkCompanyBranchId());
+        paramsMap.put("sAddAgente",  dps.getFkSalesAgentId_n());
+        paramsMap.put("sAddRuta", dps.getAuxCfdParams().getRuta());
+        paramsMap.put("sAddChofer", dps.getDriver());
+        paramsMap.put("sAddPlacas", dps.getPlate());
+        paramsMap.put("sAddBoleto", dps.getTicket());
+        paramsMap.put("sAddIncoterm", dps.getFkIncotermId() == SModSysConsts.LOGS_INC_NA ? "" : dps.getDbmsIncotermCode());
+        paramsMap.put("dAddPesoBruto", dTotalPesoBruto);
+        paramsMap.put("dAddPesoNeto", dTotalPesoNeto);
+        paramsMap.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
+        paramsMap.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
+
+        SimpleDateFormat dateFormatLong = new SimpleDateFormat("dd 'de' MMMMM 'de' yyyy");
+        
+        paramsMap.put("sAddPagFecha", dateFormatLong.format(dps.getDate()).toUpperCase());
+        paramsMap.put("sAddPagFechaDeVencimiento", dateFormatLong.format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+        paramsMap.put("dAddPagImporte", dps.getTotalCy_r());
+        paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
+        paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
+         
+        // adds related CFDI's:
+        if (comprobante.getEltOpcCfdiRelacionados() != null) {
+            for (cfd.ver40.DElementCfdiRelacionados cfdi : comprobante.getEltOpcCfdiRelacionados()) {
+                cfdi.getAttTipoRelacion().setString(catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, cfdi.getAttTipoRelacion().getString()));
+                cfdi.getAllUuidRelatedString();
+            }
+            paramsMap.put("oCfdiRelacionados", comprobante.getEltOpcCfdiRelacionados());
+        }
+        
+        // adds product/service and unit keys from XML:
+        
+        ArrayList<String> productKeys = new ArrayList<>();
+        ArrayList<String> unitKeys = new ArrayList<>();
+        
+        for (cfd.ver40.DElementConcepto clave : comprobante.getEltConceptos().getEltConceptos()) {
+            productKeys.add(clave.getAttClaveProdServ().getString());
+            unitKeys.add(clave.getAttClaveUnidad().getString());
+        }
+        
+        paramsMap.put("saCfdiProdServKeys", productKeys);
+        paramsMap.put("saCfdiUnitKeys",  unitKeys);
+        
+        // add leyend of reliable exporter when needed:
+        
+        String numberExporter = emisor.getDbmsCategorySettingsCo().getNumberExporter();
+        
+        if (!receptor.isDomestic(miClient) && !numberExporter.isEmpty() && !numberExporter.equals("0")) {
+            SDataBizPartnerBranch branch = emisorBranchIssue != null ? emisorBranchIssue : emisorBranch;
+            SDataBizPartnerBranchAddress address = emisorBranchAddressIssue != null ? emisorBranchAddressIssue : emisorBranchAddress;
+            SDataBizPartnerBranchContact admor = branch.getDbmsBizPartnerBranchContactByType(SDataConstantsSys.BPSS_TP_CON_ADM, false);
+            
+            String leyend = "\"The exporter of the products covered by this document " + numberExporter + " declares that, "
+                    + "except where otherwise clearly indicated, these products are of " + SLibUtils.textProperCase(address.getDbmsDataCountry().getCountry()) + " preferential origin"
+                     + ".\"";
+            String placeAddress = 
+                    SLibUtils.textProperCase(address.getLocality()) + ", "
+                    + SLibUtils.textProperCase(address.getState()) + ", "
+                    + SLibUtils.textProperCase(address.getDbmsDataCountry().getCountry()) + ", "
+                    + "a " + dateFormatLong.format(dps.getDate());
+            String company = emisor.getBizPartner();
+            
+            paramsMap.put("sCceExportadorLeyenda", leyend);
+            paramsMap.put("sCceExportadorLugarFecha", placeAddress);
+            paramsMap.put("sCceExportadorEmpresa", company);
+            
+            /* XXX 2020-07-24, Sergio Flores: Código temporal para impresión de la leyenda correspondiente a Japón:
+            paramsMap.put("sCceExportadorLeyenda", "The exporter of the goods covered by this document (Authorization No. MXJPN/0201-2019) declares that, except where otherwise clearly indicated, these goods are of Mexico preferential origin under Mexico-Japan EPA.");
+            paramsMap.put("sCceExportadorLugarFecha", "Morelia, Michoacan, Mexico, July 22, 2020");
+            //paramsMap.put("sCceExportadorEmpresa", company);
+            */
+            
+            if (admor != null) {
+                paramsMap.put("sCceExportadorResponsable", SLibUtils.textProperCase(admor.getContact()));
+                paramsMap.put("sCceExportadorResponsableCargo", "Legal Representative");
+                
+                /* XXX 2020-07-24, Sergio Flores: Código temporal para impresión de la leyenda correspondiente a Japón:
+                //paramsMap.put("sCceExportadorResponsable", SLibUtils.textProperCase(admor.getContact()));
+                paramsMap.put("sCceExportadorResponsableCargo", "Legal Representative");
+                */
+            }
+        }
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_ENG, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -1552,7 +2133,7 @@ public class SCfdPrint {
         // Provide XML for temporary tables and data for printing in method erp.server.SSessionServer.requestFillReport():
         paramsMap.put("xml", cfd.getDocXml());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, paramsMap, printMode, 1, null);
     }
     
     /**
@@ -1598,14 +2179,58 @@ public class SCfdPrint {
         
         // Emisor:
         
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
         
         // Receptor:
         
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sRecDomicilioFiscal", comprobante.getEltReceptor().getAttDomicilioFiscalReceptor().getString());
         paramsMap.put("sRecResidenciaFiscal", comprobante.getEltReceptor().getAttResidenciaFiscal().getString());
         paramsMap.put("sRecNumRegIdTrib", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
@@ -1661,8 +2286,9 @@ public class SCfdPrint {
         // Provide XML for temporary tables and data for printing in method erp.server.SSessionServer.requestFillReport():
         paramsMap.put("xml", cfd.getDocXml());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, paramsMap, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_40_CRP_20, paramsMap, printMode, 1, null);
     }
+    
     /**
      * Prints payroll CFDI 3.2 with complement 1.1.
      * @param cfd
@@ -1954,7 +2580,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies, null);
     }
     
     /**
@@ -2285,7 +2911,7 @@ public class SCfdPrint {
             }
         }
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, map, printMode, numCopies, null);
     }
     
     /**
@@ -2293,12 +2919,13 @@ public class SCfdPrint {
      * @param cfd
      * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
      * @param numCopies
+     * @param path
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
      * @throws java.lang.Exception 
      */
     @Deprecated
     @SuppressWarnings("deprecation")
-    public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final int payrollCfdVersion) throws java.lang.Exception {
+    public void printPayrollReceipt33_12(final SDataCfd cfd, final int printMode, final int numCopies, final String path, final int payrollCfdVersion) throws java.lang.Exception {
         String sql = "";
         SDataFormerPayroll formerPayroll = null;
         SDataFormerPayrollEmp formerPayrollEmp = null;
@@ -2374,7 +3001,7 @@ public class SCfdPrint {
         
         paramsMap.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         paramsMap.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
-        paramsMap.put("ReceptorNombre", receptor.getAttNombre().getString());
+        paramsMap.put("ReceptorNombre", getBizPartnerName(miClient, receptor.getAttNombre().getString(), cfd.getFkPayrollReceiptEmployeeId_n()));
         paramsMap.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
         paramsMap.put("nPkPayrollId", payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
         paramsMap.put("NominaNumTipo", payrollCfdVersion == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (formerPayroll.getNumber() + " " + formerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
@@ -2689,7 +3316,7 @@ public class SCfdPrint {
         
         paramsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi33Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi33Consts.STAMP_LAST_CHARS, sello.length()));
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, paramsMap, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_33, paramsMap, printMode, numCopies, path);
     }
     
     /**
@@ -2697,10 +3324,11 @@ public class SCfdPrint {
      * @param cfd
      * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
      * @param numCopies
+     * @param path 
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
      * @throws java.lang.Exception 
      */
-    public void printPayrollReceipt40_12(final SDataCfd cfd, final int printMode, final int numCopies, final int payrollCfdVersion) throws java.lang.Exception {
+    public void printPayrollReceipt40_12(final SDataCfd cfd, final int printMode, final int numCopies, final String path, final int payrollCfdVersion) throws java.lang.Exception {
         String sql = "";
         SDataFormerPayroll formerPayroll = null;
         SDataFormerPayrollEmp formerPayrollEmp = null;
@@ -2776,7 +3404,7 @@ public class SCfdPrint {
         
         paramsMap.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         paramsMap.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
-        paramsMap.put("ReceptorNombre", receptor.getAttNombre().getString());
+        paramsMap.put("ReceptorNombre", getBizPartnerName(miClient, receptor.getAttNombre().getString(), cfd.getFkPayrollReceiptEmployeeId_n()));
         paramsMap.put("ReceptorRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, receptor.getAttRegimenFiscalReceptor().getString()));
         paramsMap.put("ReceptorDomicilioFiscal", receptor.getAttDomicilioFiscalReceptor().getString());
         paramsMap.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
@@ -3095,9 +3723,8 @@ public class SCfdPrint {
         
         paramsMap.put("sSelloCfdiUltDig", sello.isEmpty() ? SLibUtils.textRepeat("0", DCfdi40Consts.STAMP_LAST_CHARS) : sello.substring(sello.length() - DCfdi40Consts.STAMP_LAST_CHARS, sello.length()));
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40, paramsMap, printMode, numCopies);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL_40, paramsMap, printMode, numCopies, path);
     }
-    
     
     /**
      * Prints bill of lading CFDI 3.3 with complement 2.0
@@ -3109,7 +3736,7 @@ public class SCfdPrint {
      */
     @Deprecated
     @SuppressWarnings("deprecation")
-    public void printBolReceip33_20(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
+    public void printBolReceip33(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         
         // Comprobante:
@@ -3174,7 +3801,7 @@ public class SCfdPrint {
                         break;
                         
                     case "cartaporte20:CartaPorte":
-                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
                     
                         paramsMap.put("bCcp", true);
                         paramsMap.put("sCcpComplemento", ccp.getElementForXml());
@@ -3220,7 +3847,7 @@ public class SCfdPrint {
                         paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                         paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                         paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                        paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
 
                         paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 
@@ -3266,7 +3893,7 @@ public class SCfdPrint {
      * @param bol
      * @throws java.lang.Exception 
      */
-    public void printBolReceip40_20(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
+    public void printBolReceip40(final SClientInterface client, final SDataCfd cfd, final int printMode, final SDbBillOfLading bol) throws java.lang.Exception {
         Map<String, Object> paramsMap = miClient.createReportParams();
         
         // Comprobante:
@@ -3294,14 +3921,58 @@ public class SCfdPrint {
         
         // Emisor:
         
+        int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (idEmisor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sEmiNombre", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
-        paramsMap.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
         paramsMap.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
         
         // Receptor:
         
+        int idReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", SLibConsts.UNDEFINED);
+        if (comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_NAC) || 
+                comprobante.getEltReceptor().getAttRfc().getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        else if (idReceptor != 0) {
+            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { idReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            int value = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES));
+            switch(value) {
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getProperName());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscal());
+                    break;
+                case SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE:
+                    paramsMap.put("sRecNombreOpc", bizPartner.getBizPartnerFiscalPolicy().equals(SDataBizPartner.CFD_ORG_NAMES_FULL_NAME + "") ?
+                            bizPartner.getProperName() : bizPartner.getBizPartnerFiscal());
+                    break;
+            }
+        }
+        else {
+            paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
+        }
+        
         paramsMap.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
-        paramsMap.put("sRecNombreOpc", comprobante.getEltReceptor().getAttNombre().getString());
         paramsMap.put("sFiscalId", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
         paramsMap.put("sRecResidenciaFiscal", comprobante.getEltReceptor().getAttResidenciaFiscal().getString());
         paramsMap.put("sRecNumRegIdTrib", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
@@ -3332,7 +4003,7 @@ public class SCfdPrint {
                         break;
                         
                     case "cartaporte20:CartaPorte":
-                    cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        cfd.ver3.ccp20.DElementCartaPorte ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
                     
                         paramsMap.put("bCcp", true);
                         paramsMap.put("sCcpComplemento", ccp.getElementForXml());
@@ -3378,9 +4049,84 @@ public class SCfdPrint {
                         paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
                         paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
                         paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
-                        paramsMap.put("sCcpPrima", aut.getEltSeguros().getAttPrimaSeguro().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                        
+                        for (cfd.ver3.ccp20.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                            if (f.getAttTipoFigura().getString().equals("01")) {
+                                paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                                paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                                paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                                paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                                paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                            }
+                        }
 
                         paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                
+                        break;
+                        
+                    case "cartaporte30:CartaPorte":
+                        cfd.ver4.ccp30.DElementCartaPorte ccp30 = (cfd.ver4.ccp30.DElementCartaPorte) element;
+                    
+                        paramsMap.put("bCcp", true);
+                        paramsMap.put("sIdCcp", ccp30.getAttIdCCP().getString());
+                        paramsMap.put("sCcpComplemento", ccp30.getElementForXml());
+                        paramsMap.put("sCcpVersion", ccp30.getAttVersion().getString());
+                        paramsMap.put("sCcpTranspInternac", ccp30.getAttTransInternac().getString());
+                        paramsMap.put("dCcpTotalDistRec", ccp30.getAttTotalDistRec().getDouble());
+
+                        for (cfd.ver4.ccp30.DElementUbicacion ub : ccp30.getEltUbicaciones().getEltUbicaciones()) {
+                            cfd.ver4.ccp30.DElementDomicilio dom = ub.getEltDomicilio();
+                            if (!dom.getAttLocalidad().getString().isEmpty()) {
+                                dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                            }
+                            if (!dom.getAttMunicipio().getString().isEmpty()) {
+                                dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                            }
+                            dom.getAttEstado().setString(dom.getAttEstado().getString());
+                            dom.getAttPais().setString(dom.getAttPais().getString());
+                        }
+
+                        paramsMap.put("oCcpUbicaciones", ccp30.getEltUbicaciones().getEltUbicaciones());
+                        paramsMap.put("dCcpPesoBrutoTotal", ccp30.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                        paramsMap.put("sCcpUnidadPeso", ccp30.getEltMercancias().getAttUnidadPeso().getString());
+                        paramsMap.put("nCcpNoTotalMercancias", ccp30.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                        paramsMap.put("oCcpMercancias", ccp30.getEltMercancias().getEltMercancias());
+
+                        cfd.ver4.ccp30.DElementAutotransporte aut30 = ccp30.getEltMercancias().getEltAutotransporte();
+                        paramsMap.put("sCcpPermSCT", aut30.getAttPermSCT().getString());
+                        paramsMap.put("sCcpNumPermSCT", aut30.getAttNumPermisoSCT().getString());
+                        paramsMap.put("sCcpConfVeh", aut30.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                        paramsMap.put("sCcpPlacaVM", aut30.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                        paramsMap.put("nCcpAnio", aut30.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                        paramsMap.put("dCcpPesoVeh", aut30.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                        if (aut30.getEltRemolques() != null) {
+                            int i = 1;
+                            for (cfd.ver4.ccp30.DElementRemolque rem : aut30.getEltRemolques().getEltRemolques()) {
+                                paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                                paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                                i++;
+                            }
+                        }
+                        paramsMap.put("sCcpAsegRespCivil", aut30.getEltSeguros().getAttAseguraRespCivil().getString());
+                        paramsMap.put("sCcpPolRespCivil", aut30.getEltSeguros().getAttPolizaRespCivil().getString());
+                        paramsMap.put("sCcpAsegMedAmbiente", aut30.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                        paramsMap.put("sCcpPolMedAmbiente", aut30.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                        paramsMap.put("sCcpAsegCarga", aut30.getEltSeguros().getAttAseguraCarga().getString());
+                        paramsMap.put("sCcpPolCarga", aut30.getEltSeguros().getAttPolizaCarga().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut30.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                        
+                        for (cfd.ver4.ccp30.DElementTiposFigura f : ccp30.getEltFiguraTransporte().getEltTiposFigura()) {
+                            if (f.getAttTipoFigura().getString().equals("01")) {
+                                paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                                paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                                paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                                paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                                paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                            }
+                        }
+
+                        paramsMap.put("oCcpFiguraTransp", ccp30.getEltFiguraTransporte().getEltTiposFigura());
                 
                         break;
                         
@@ -3512,6 +4258,6 @@ public class SCfdPrint {
         map.put("sCfdiSelloSAT", nodeChild.getTextContent());
         map.put("nPkCfdId", cfd.getPkCfdId());
         
-        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map, printMode, 1);
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map, printMode, 1, null);
     }
 }

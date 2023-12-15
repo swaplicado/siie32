@@ -69,4 +69,14 @@ public abstract class SHrsFormerConsts {
      * Monthly payroll.
      */
     public static final String PAY_MON = "MENSUAL";
+
+    /**
+     * Unknown payroll abbreviated.
+     */
+    public static final String PAY_UNK_ABB = "XXX";
+
+    /**
+     * Unknown payroll.
+     */
+    public static final String PAY_UNK = "DESCONOCIDO";
 }

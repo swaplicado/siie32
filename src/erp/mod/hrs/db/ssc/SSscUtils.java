@@ -130,7 +130,7 @@ public abstract class SSscUtils {
                     + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
                     + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act  "
                     + "AND emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
-                    + "and pr.id_emp = 5062 " // Renglón para pruebas por empleados, no remover
+//                    + "AND pr.id_emp = 1907 " // Renglón para pruebas por empleados, no remover
                     + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -263,6 +263,10 @@ public abstract class SSscUtils {
                                 amountExempt = resultSet.getDouble("pre.amt_exem");
                                 break;
                             case SModSysConsts.HRSS_TP_EAR_VAC_BONUS: // Prima vacacional
+                                amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
+                                amountExempt = resultSet.getDouble("pre.amt_exem");
+                                break;
+                            case SModSysConsts.HRSS_TP_EAR_SCHO: // Beca alfabetización
                                 amountTaxed = resultSet.getDouble("pre.amt_taxa") ;
                                 amountExempt = resultSet.getDouble("pre.amt_exem");
                                 break;
@@ -488,7 +492,7 @@ public abstract class SSscUtils {
         return daysCalendarPeriod;
     }
     
-    public static boolean leapYear (final int year) {
+    public static boolean leapYear(final int year) {
         GregorianCalendar calendar = new GregorianCalendar();
         boolean bLeapYear = false;
         
@@ -498,7 +502,7 @@ public abstract class SSscUtils {
         return bLeapYear;
     }
     
-     public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
+    public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
        String yearAnti = String.valueOf(SHrsUtils.getEmployeeSeniority(dateBenefits, dateCutoff));
        String monthAnti = String.valueOf(SHrsUtils.getEmployeeSeniorityAntMonth(dateBenefits, dateCutoff));
        String antiquityCompleteResult = yearAnti + "." + monthAnti;

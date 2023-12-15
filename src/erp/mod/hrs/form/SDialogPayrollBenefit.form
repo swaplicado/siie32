@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="title" type="java.lang.String" value="Agregar prestaci&#xf3;n"/>
   </Properties>
@@ -16,7 +16,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,94,0,0,2,-128"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,-62,0,0,3,32"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
@@ -46,7 +46,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
-            <Property name="rows" type="int" value="11"/>
+            <Property name="rows" type="int" value="14"/>
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
@@ -57,20 +57,39 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlBenefit">
+                <Component class="javax.swing.JLabel" name="jlBenefitType">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Prestaci&#xf3;n:"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Tipo prestaci&#xf3;n:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextBenefit">
+                <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextBenefitType">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="text" type="java.lang.String" value="TEXT"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[300, 23]"/>
+                      <Dimension value="[315, 23]"/>
                     </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPaymentDaily">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="Pago diario:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurPaymentDaily">
+                  <Properties>
+                    <Property name="toolTipText" type="java.lang.String" value="Monto pagado"/>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -82,25 +101,111 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDateBenefit">
+                <Component class="javax.swing.JLabel" name="jlDateBenefits">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Inicio beneficios:"/>
+                    <Property name="text" type="java.lang.String" value="Inicio prestaciones:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateBenefitDate">
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateBenefits">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlDateLastHire">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="&#xda;ltima alta:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateLastHire">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlDateLastDismissal_n">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Fecha &#xfa;ltima baja:"/>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="&#xda;ltima baja:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateLastDismissal_n">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel6">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlBenefitsComp">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo c&#xe1;lculo prestaci&#xf3;n:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[150, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="jtfBenefitsComp">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="text" type="java.lang.String" value="TEXT"/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[200, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel3">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlAnniversary">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Aniversario:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[150, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JSpinner" name="jsAnniversary">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[75, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="jtfAnniversaryYear">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="horizontalAlignment" type="int" value="11"/>
+                    <Property name="text" type="java.lang.String" value="2000"/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[50, 23]"/>
+                    </Property>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -111,15 +216,62 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDateBase">
+                <Component class="javax.swing.JLabel" name="jlPeriod">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Fecha base:"/>
+                    <Property name="text" type="java.lang.String" value="Per&#xed;odo prestaci&#xf3;n:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateBaseDate">
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDatePeriodStart">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPeriodSep">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="-"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[10, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDatePeriodEnd">
+                  <Properties>
+                    <Property name="toolTipText" type="java.lang.String" value="Fecha corte predeterminada"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPayroll">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="Per&#xed;odo n&#xf3;mina:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDatePayrollStart">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPayrollSep">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="-"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[10, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDatePayrollEnd">
+                  <Properties>
+                    <Property name="toolTipText" type="java.lang.String" value="Fecha corte predeterminada"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -132,9 +284,12 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlDateCutoff">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Fecha corte:"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Fecha corte:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -153,24 +308,31 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Antig&#xfc;edad:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntSeniority">
+                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntSeniorityYears">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[50, 23]"/>
+                    </Property>
+                  </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlSeniorityYear">
+                <Component class="javax.swing.JLabel" name="jlSeniorityYears">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="a&#xf1;os"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[23, 23]"/>
+                      <Dimension value="[30, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntSeniorityDays">
                   <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
+                      <Dimension value="[50, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -178,7 +340,18 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="d&#xed;as"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[23, 23]"/>
+                      <Dimension value="[25, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlSeniorityHelp">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="(Del inicio de prestaciones a la fecha de corte)"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -191,22 +364,25 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDaysElapsed">
+                <Component class="javax.swing.JLabel" name="jlElapsedDays">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="D&#xed;as transcurridos:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntDaysElapsed">
+                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntElapsedDays">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabel1">
+                <Component class="javax.swing.JLabel" name="jlElapsedDays2">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="(desde la &apos;fecha base&apos; hasta la &apos;fecha corte&apos;)"/>
+                    <Property name="text" type="java.lang.String" value="(Del inicio del per&#xed;odo a la fecha de corte)"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[250, 23]"/>
                     </Property>
@@ -214,35 +390,46 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="jPanel3">
+            <Container class="javax.swing.JPanel" name="jPanel16">
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                 <Property name="alignment" type="int" value="0"/>
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlAnniversary">
+                <Component class="javax.swing.JLabel" name="jlBenefitProp">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Aniversario:"/>
+                    <Property name="text" type="java.lang.String" value="Parte proporcional:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[150, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitProp">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlBenefitProp1">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="(Del inicio del per&#xed;odo a la fecha de corte)"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[250, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlVacationBonusPct">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="Prima vacacional:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[125, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jsAnniversary">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecVacationBonusPct">
                   <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntBenefitYear">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value=""/>
-                    <Property name="toolTipText" type="java.lang.String" value="A&#xf1;o aniversario"/>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
-                    </Property>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -254,34 +441,32 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlBenefitTableDaysToPay">
+                <Component class="javax.swing.JLabel" name="jlBenefitGained">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto:"/>
+                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto ganados:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntBenefitTableDaysToPay">
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountPayable">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitGainedDays">
                   <Properties>
-                    <Property name="toolTipText" type="java.lang.String" value="Monto pagable"/>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlBenefitTableBonusPercentage">
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurBenefitGainedAmount">
                   <Properties>
-                    <Property name="horizontalAlignment" type="int" value="0"/>
-                    <Property name="text" type="java.lang.String" value="Prima:"/>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[50, 23]"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlBenefitGained1">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                     </Property>
-                  </Properties>
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitTableBonusPercentage">
-                  <Properties>
+                    <Property name="text" type="java.lang.String" value="(Del aniversario especificado)"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[75, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -294,30 +479,60 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDaysPayed">
+                <Component class="javax.swing.JLabel" name="jlBenefitPaid">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto pagados:"/>
+                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto gozados:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecDaysPayed">
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountPayed">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitPaidDays">
                   <Properties>
-                    <Property name="toolTipText" type="java.lang.String" value="Monto pagado"/>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabel2">
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurBenefitPaidAmount">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlBenefitPayed1">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="(correspondientes a la antig&#xfc;edad elegida)"/>
+                    <Property name="text" type="java.lang.String" value="(Del aniversario especificado)"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[235, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel17">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlBenefitPending">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto pendientes:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[150, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitPendingDays">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurBenefitPendingAmount">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -329,40 +544,57 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDaysToPay">
+                <Component class="javax.swing.JLabel" name="jlBenefitToPay">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto por pagar:"/>
+                    <Property name="text" type="java.lang.String" value="D&#xed;as y monto a pagar:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecDaysToPay">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitToPayDays">
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountToPay">
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurBenefitToPayAmount">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlPay">
                   <Properties>
-                    <Property name="toolTipText" type="java.lang.String" value="Monto por pagar"/>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" value="Pagar:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[50, 23]"/>
+                    </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jbPayProportional">
+                <Component class="javax.swing.JButton" name="jbPayProp">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Pagar proporcional"/>
+                    <Property name="text" type="java.lang.String" value="Lo proporcional"/>
                     <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                       <Insets value="[2, 2, 2, 2]"/>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[110, 23]"/>
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jbPayPending">
+                <Component class="javax.swing.JButton" name="jbPayPend">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Pagar remanente"/>
+                    <Property name="text" type="java.lang.String" value="Lo pendiente"/>
                     <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                       <Insets value="[2, 2, 2, 2]"/>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[110, 23]"/>
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="jbPayAll">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Lo ganado"/>
+                    <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                      <Insets value="[2, 2, 2, 2]"/>
+                    </Property>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -375,19 +607,22 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDaysPending">
+                <Component class="javax.swing.JLabel" name="jlBenefitResidue">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="D&#xed;as y monto remanente:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[125, 23]"/>
+                      <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecDaysPending">
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountPending">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecBenefitResidueDays">
                   <Properties>
-                    <Property name="toolTipText" type="java.lang.String" value="Monto remanente"/>
+                    <Property name="editable" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurBenefitResidueAmount">
+                  <Properties>
+                    <Property name="editable" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>

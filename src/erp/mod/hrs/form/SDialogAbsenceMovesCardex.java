@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
     protected SDbAbsence moAbsence;
@@ -96,7 +96,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Incidencia:"));
         jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployeeName.setText("Empleado:");
         jlEmployeeName.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -108,7 +108,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
         jPanel4.add(jPanel7);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceClass.setText("Clase incidencia:");
         jlAbsenceClass.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -128,7 +128,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
         jPanel4.add(jPanel2);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:");
         jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -156,7 +156,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Días:"));
         jPanel6.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEffectiveDays.setText("Efectivos:");
         jlEffectiveDays.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -166,7 +166,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
         jPanel6.add(jPanel11);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAppliedDays.setText("Aplicados:");
         jlAppliedDays.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -176,7 +176,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
         jPanel6.add(jPanel13);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlApplyDays.setText("Por aplicar:");
         jlApplyDays.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -190,7 +190,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
         jPanel1.add(jPanel12, java.awt.BorderLayout.NORTH);
 
-        jpPayments.setBorder(javax.swing.BorderFactory.createTitledBorder("Pagos:"));
+        jpPayments.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimientos de la incidencia:"));
         jpPayments.setLayout(new java.awt.BorderLayout());
         jPanel1.add(jpPayments, java.awt.BorderLayout.CENTER);
 
@@ -263,7 +263,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
         moFields.addField(moIntApplyDays);
         */
 
-        moGridAbsenceMoves = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Movimientos de la incidencia") {
+        moGridAbsenceMoves = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Movimientos incidencia") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -271,7 +271,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_YEAR, "Ejercicio", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_CAL_MONTH, "Período", 50));

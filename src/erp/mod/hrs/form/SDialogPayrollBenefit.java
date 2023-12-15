@@ -4,22 +4,26 @@
  */
 package erp.mod.hrs.form;
 
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SDbEmployeeBenefitTables;
+import erp.mod.hrs.db.SDbEmployeeBenefitTablesAnnum;
+import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsBenefit;
-import erp.mod.hrs.db.SHrsBenefitParams;
-import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
+import erp.mod.hrs.db.SHrsBenefitUtils;
+import erp.mod.hrs.db.SHrsBenefitsManager;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceipt;
-import erp.mod.hrs.db.SHrsUtils;
+import erp.mod.hrs.utils.SAnniversary;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
@@ -37,6 +41,7 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldDecimal;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
@@ -44,25 +49,24 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionListener, ChangeListener, FocusListener {
+    
+    public static final int PARAMS = 1;
 
     protected SHrsReceipt moHrsReceipt;
-    protected SHrsEmployeeDays moHrsEmployeeDays;
-    protected SDbEarning moEarning;
-    protected SDbEmployee moEmployee;
-    protected SDbBenefitTable moBenefitTable;
-    protected SDbBenefitTable moBenefitTableAux;
-    protected Date mtDateCutoff;
-    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
-    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarysAux;
-    protected SHrsBenefit moHrsBenefit;
-    protected ArrayList<SHrsBenefit> maHrsBenefits;
+    protected SHrsBenefitsManager moHrsBenefitsManager;
+    protected SDbPayrollReceipt moPayrollReceipt;
+    protected SDbPayroll moPayroll;
     
-    protected int mnBenefitAnnivLimit;
-    protected int mnBenefitDaysAnniv;
-    protected int mnBenefitYear;
-
+    protected SHrsEmployeeDays moHrsEmployeeDays;
+    protected SDbEmployee moEmployee;
+    protected SDbEarning moEarning;
+    protected boolean mbIsBenefitCompByCalendarYear;
+    protected boolean mbIsBenefitVacationBonus;
+    
+    protected SAnniversary moAnniversaryReceipt;
+    
     /**
-     * Creates new form SDialogHrsBenefit
+     * Creates new form SDialogPayrollBenefit
      * @param client
      * @param formType
      * @param title
@@ -85,101 +89,212 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
-        jlBenefit = new javax.swing.JLabel();
-        moTextBenefit = new sa.lib.gui.bean.SBeanFieldText();
+        jlBenefitType = new javax.swing.JLabel();
+        moTextBenefitType = new sa.lib.gui.bean.SBeanFieldText();
+        jlPaymentDaily = new javax.swing.JLabel();
+        moCurPaymentDaily = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel12 = new javax.swing.JPanel();
-        jlDateBenefit = new javax.swing.JLabel();
-        moDateBenefitDate = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateBenefits = new javax.swing.JLabel();
+        moDateBenefits = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateLastHire = new javax.swing.JLabel();
+        moDateLastHire = new sa.lib.gui.bean.SBeanFieldDate();
         jlDateLastDismissal_n = new javax.swing.JLabel();
         moDateLastDismissal_n = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel6 = new javax.swing.JPanel();
+        jlBenefitsComp = new javax.swing.JLabel();
+        jtfBenefitsComp = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        jlAnniversary = new javax.swing.JLabel();
+        jsAnniversary = new javax.swing.JSpinner();
+        jtfAnniversaryYear = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
-        jlDateBase = new javax.swing.JLabel();
-        moDateBaseDate = new sa.lib.gui.bean.SBeanFieldDate();
+        jlPeriod = new javax.swing.JLabel();
+        moDatePeriodStart = new sa.lib.gui.bean.SBeanFieldDate();
+        jlPeriodSep = new javax.swing.JLabel();
+        moDatePeriodEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        jlPayroll = new javax.swing.JLabel();
+        moDatePayrollStart = new sa.lib.gui.bean.SBeanFieldDate();
+        jlPayrollSep = new javax.swing.JLabel();
+        moDatePayrollEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel14 = new javax.swing.JPanel();
         jlDateCutoff = new javax.swing.JLabel();
         moDateCutoff = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel9 = new javax.swing.JPanel();
         jlSeniority = new javax.swing.JLabel();
-        moIntSeniority = new sa.lib.gui.bean.SBeanFieldInteger();
-        jlSeniorityYear = new javax.swing.JLabel();
+        moIntSeniorityYears = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlSeniorityYears = new javax.swing.JLabel();
         moIntSeniorityDays = new sa.lib.gui.bean.SBeanFieldInteger();
         jlSeniorityDays = new javax.swing.JLabel();
+        jlSeniorityHelp = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
-        jlDaysElapsed = new javax.swing.JLabel();
-        moIntDaysElapsed = new sa.lib.gui.bean.SBeanFieldInteger();
-        jLabel1 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jlAnniversary = new javax.swing.JLabel();
-        jsAnniversary = new javax.swing.JSpinner();
-        moIntBenefitYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlElapsedDays = new javax.swing.JLabel();
+        moIntElapsedDays = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlElapsedDays2 = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
+        jlBenefitProp = new javax.swing.JLabel();
+        moDecBenefitProp = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlBenefitProp1 = new javax.swing.JLabel();
+        jlVacationBonusPct = new javax.swing.JLabel();
+        moDecVacationBonusPct = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel4 = new javax.swing.JPanel();
-        jlBenefitTableDaysToPay = new javax.swing.JLabel();
-        moIntBenefitTableDaysToPay = new sa.lib.gui.bean.SBeanFieldInteger();
-        moCurAmountPayable = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jlBenefitTableBonusPercentage = new javax.swing.JLabel();
-        moDecBenefitTableBonusPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlBenefitGained = new javax.swing.JLabel();
+        moDecBenefitGainedDays = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurBenefitGainedAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlBenefitGained1 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
-        jlDaysPayed = new javax.swing.JLabel();
-        moDecDaysPayed = new sa.lib.gui.bean.SBeanFieldDecimal();
-        moCurAmountPayed = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jLabel2 = new javax.swing.JLabel();
+        jlBenefitPaid = new javax.swing.JLabel();
+        moDecBenefitPaidDays = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurBenefitPaidAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlBenefitPayed1 = new javax.swing.JLabel();
+        jPanel17 = new javax.swing.JPanel();
+        jlBenefitPending = new javax.swing.JLabel();
+        moDecBenefitPendingDays = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurBenefitPendingAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel5 = new javax.swing.JPanel();
-        jlDaysToPay = new javax.swing.JLabel();
-        moDecDaysToPay = new sa.lib.gui.bean.SBeanFieldDecimal();
-        moCurAmountToPay = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jbPayProportional = new javax.swing.JButton();
-        jbPayPending = new javax.swing.JButton();
+        jlBenefitToPay = new javax.swing.JLabel();
+        moDecBenefitToPayDays = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurBenefitToPayAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlPay = new javax.swing.JLabel();
+        jbPayProp = new javax.swing.JButton();
+        jbPayPend = new javax.swing.JButton();
+        jbPayAll = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
-        jlDaysPending = new javax.swing.JLabel();
-        moDecDaysPending = new sa.lib.gui.bean.SBeanFieldDecimal();
-        moCurAmountPending = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlBenefitResidue = new javax.swing.JLabel();
+        moDecBenefitResidueDays = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurBenefitResidueAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
 
         setTitle("Agregar prestación");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBenefit.setText("Prestación:");
-        jlBenefit.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel13.add(jlBenefit);
+        jlBenefitType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlBenefitType.setText("Tipo prestación:");
+        jlBenefitType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jlBenefitType);
 
-        moTextBenefit.setText("sBeanFieldText1");
-        moTextBenefit.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel13.add(moTextBenefit);
+        moTextBenefitType.setEditable(false);
+        moTextBenefitType.setText("TEXT");
+        moTextBenefitType.setPreferredSize(new java.awt.Dimension(315, 23));
+        jPanel13.add(moTextBenefitType);
+
+        jlPaymentDaily.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPaymentDaily.setText("Pago diario:");
+        jlPaymentDaily.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlPaymentDaily);
+
+        moCurPaymentDaily.setToolTipText("Monto pagado");
+        moCurPaymentDaily.setEditable(false);
+        jPanel13.add(moCurPaymentDaily);
 
         jPanel2.add(jPanel13);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBenefit.setText("Inicio beneficios:");
-        jlDateBenefit.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel12.add(jlDateBenefit);
-        jPanel12.add(moDateBenefitDate);
+        jlDateBenefits.setText("Inicio prestaciones:");
+        jlDateBenefits.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlDateBenefits);
 
-        jlDateLastDismissal_n.setText("Fecha última baja:");
+        moDateBenefits.setEditable(false);
+        jPanel12.add(moDateBenefits);
+
+        jlDateLastHire.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDateLastHire.setText("Última alta:");
+        jlDateLastHire.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlDateLastHire);
+
+        moDateLastHire.setEditable(false);
+        jPanel12.add(moDateLastHire);
+
+        jlDateLastDismissal_n.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDateLastDismissal_n.setText("Última baja:");
         jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlDateLastDismissal_n);
+
+        moDateLastDismissal_n.setEditable(false);
         jPanel12.add(moDateLastDismissal_n);
 
         jPanel2.add(jPanel12);
 
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBenefitsComp.setText("Tipo cálculo prestación:");
+        jlBenefitsComp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jlBenefitsComp);
+
+        jtfBenefitsComp.setEditable(false);
+        jtfBenefitsComp.setText("TEXT");
+        jtfBenefitsComp.setFocusable(false);
+        jtfBenefitsComp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel6.add(jtfBenefitsComp);
+
+        jPanel2.add(jPanel6);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAnniversary.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlAnniversary.setText("Aniversario:*");
+        jlAnniversary.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(jlAnniversary);
+
+        jsAnniversary.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jsAnniversary);
+
+        jtfAnniversaryYear.setEditable(false);
+        jtfAnniversaryYear.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAnniversaryYear.setText("2000");
+        jtfAnniversaryYear.setFocusable(false);
+        jtfAnniversaryYear.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel3.add(jtfAnniversaryYear);
+
+        jPanel2.add(jPanel3);
+
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateBase.setText("Fecha base:");
-        jlDateBase.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel11.add(jlDateBase);
-        jPanel11.add(moDateBaseDate);
+        jlPeriod.setText("Período prestación:");
+        jlPeriod.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel11.add(jlPeriod);
+
+        moDatePeriodStart.setEditable(false);
+        jPanel11.add(moDatePeriodStart);
+
+        jlPeriodSep.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPeriodSep.setText("-");
+        jlPeriodSep.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel11.add(jlPeriodSep);
+
+        moDatePeriodEnd.setToolTipText("Fecha corte predeterminada");
+        moDatePeriodEnd.setEditable(false);
+        jPanel11.add(moDatePeriodEnd);
+
+        jlPayroll.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPayroll.setText("Período nómina:");
+        jlPayroll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jlPayroll);
+
+        moDatePayrollStart.setEditable(false);
+        jPanel11.add(moDatePayrollStart);
+
+        jlPayrollSep.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPayrollSep.setText("-");
+        jlPayrollSep.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel11.add(jlPayrollSep);
+
+        moDatePayrollEnd.setToolTipText("Fecha corte predeterminada");
+        moDatePayrollEnd.setEditable(false);
+        jPanel11.add(moDatePayrollEnd);
 
         jPanel2.add(jPanel11);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCutoff.setText("Fecha corte:");
-        jlDateCutoff.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlDateCutoff.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlDateCutoff.setText("Fecha corte:*");
+        jlDateCutoff.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel14.add(jlDateCutoff);
         jPanel14.add(moDateCutoff);
 
@@ -188,121 +303,163 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSeniority.setText("Antigüedad:");
-        jlSeniority.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlSeniority.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlSeniority);
-        jPanel9.add(moIntSeniority);
 
-        jlSeniorityYear.setText("años");
-        jlSeniorityYear.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel9.add(jlSeniorityYear);
+        moIntSeniorityYears.setEditable(false);
+        moIntSeniorityYears.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel9.add(moIntSeniorityYears);
 
-        moIntSeniorityDays.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlSeniorityYears.setText("años");
+        jlSeniorityYears.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel9.add(jlSeniorityYears);
+
+        moIntSeniorityDays.setEditable(false);
+        moIntSeniorityDays.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(moIntSeniorityDays);
 
         jlSeniorityDays.setText("días");
-        jlSeniorityDays.setPreferredSize(new java.awt.Dimension(23, 23));
+        jlSeniorityDays.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel9.add(jlSeniorityDays);
+
+        jlSeniorityHelp.setForeground(java.awt.Color.gray);
+        jlSeniorityHelp.setText("(Del inicio de prestaciones a la fecha de corte)");
+        jlSeniorityHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel9.add(jlSeniorityHelp);
 
         jPanel2.add(jPanel9);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysElapsed.setText("Días transcurridos:");
-        jlDaysElapsed.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel8.add(jlDaysElapsed);
-        jPanel8.add(moIntDaysElapsed);
+        jlElapsedDays.setText("Días transcurridos:");
+        jlElapsedDays.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlElapsedDays);
 
-        jLabel1.setForeground(java.awt.Color.gray);
-        jLabel1.setText("(desde la 'fecha base' hasta la 'fecha corte')");
-        jLabel1.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel8.add(jLabel1);
+        moIntElapsedDays.setEditable(false);
+        jPanel8.add(moIntElapsedDays);
+
+        jlElapsedDays2.setForeground(java.awt.Color.gray);
+        jlElapsedDays2.setText("(Del inicio del período a la fecha de corte)");
+        jlElapsedDays2.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel8.add(jlElapsedDays2);
 
         jPanel2.add(jPanel8);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAnniversary.setText("Aniversario:");
-        jlAnniversary.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel3.add(jlAnniversary);
+        jlBenefitProp.setText("Parte proporcional:*");
+        jlBenefitProp.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jlBenefitProp);
+        jPanel16.add(moDecBenefitProp);
 
-        jsAnniversary.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jsAnniversary);
+        jlBenefitProp1.setForeground(java.awt.Color.gray);
+        jlBenefitProp1.setText("(Del inicio del período a la fecha de corte)");
+        jlBenefitProp1.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel16.add(jlBenefitProp1);
 
-        moIntBenefitYear.setText("");
-        moIntBenefitYear.setToolTipText("Año aniversario");
-        moIntBenefitYear.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(moIntBenefitYear);
+        jlVacationBonusPct.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlVacationBonusPct.setText("Prima vacacional:");
+        jlVacationBonusPct.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel16.add(jlVacationBonusPct);
 
-        jPanel2.add(jPanel3);
+        moDecVacationBonusPct.setEditable(false);
+        jPanel16.add(moDecVacationBonusPct);
+
+        jPanel2.add(jPanel16);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBenefitTableDaysToPay.setText("Días y monto:");
-        jlBenefitTableDaysToPay.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel4.add(jlBenefitTableDaysToPay);
-        jPanel4.add(moIntBenefitTableDaysToPay);
+        jlBenefitGained.setText("Días y monto ganados:");
+        jlBenefitGained.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jlBenefitGained);
 
-        moCurAmountPayable.setToolTipText("Monto pagable");
-        jPanel4.add(moCurAmountPayable);
+        moDecBenefitGainedDays.setEditable(false);
+        jPanel4.add(moDecBenefitGainedDays);
 
-        jlBenefitTableBonusPercentage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlBenefitTableBonusPercentage.setText("Prima:");
-        jlBenefitTableBonusPercentage.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel4.add(jlBenefitTableBonusPercentage);
+        moCurBenefitGainedAmount.setEditable(false);
+        jPanel4.add(moCurBenefitGainedAmount);
 
-        moDecBenefitTableBonusPercentage.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(moDecBenefitTableBonusPercentage);
+        jlBenefitGained1.setForeground(java.awt.Color.gray);
+        jlBenefitGained1.setText("(Del aniversario especificado)");
+        jlBenefitGained1.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel4.add(jlBenefitGained1);
 
         jPanel2.add(jPanel4);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysPayed.setText("Días y monto pagados:");
-        jlDaysPayed.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel10.add(jlDaysPayed);
-        jPanel10.add(moDecDaysPayed);
+        jlBenefitPaid.setText("Días y monto gozados:");
+        jlBenefitPaid.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jlBenefitPaid);
 
-        moCurAmountPayed.setToolTipText("Monto pagado");
-        jPanel10.add(moCurAmountPayed);
+        moDecBenefitPaidDays.setEditable(false);
+        jPanel10.add(moDecBenefitPaidDays);
 
-        jLabel2.setForeground(java.awt.Color.gray);
-        jLabel2.setText("(correspondientes a la antigüedad elegida)");
-        jLabel2.setPreferredSize(new java.awt.Dimension(235, 23));
-        jPanel10.add(jLabel2);
+        moCurBenefitPaidAmount.setEditable(false);
+        jPanel10.add(moCurBenefitPaidAmount);
+
+        jlBenefitPayed1.setForeground(java.awt.Color.gray);
+        jlBenefitPayed1.setText("(Del aniversario especificado)");
+        jlBenefitPayed1.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel10.add(jlBenefitPayed1);
 
         jPanel2.add(jPanel10);
 
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBenefitPending.setText("Días y monto pendientes:");
+        jlBenefitPending.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(jlBenefitPending);
+
+        moDecBenefitPendingDays.setEditable(false);
+        jPanel17.add(moDecBenefitPendingDays);
+
+        moCurBenefitPendingAmount.setEditable(false);
+        jPanel17.add(moCurBenefitPendingAmount);
+
+        jPanel2.add(jPanel17);
+
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysToPay.setText("Días y monto por pagar:");
-        jlDaysToPay.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel5.add(jlDaysToPay);
-        jPanel5.add(moDecDaysToPay);
+        jlBenefitToPay.setText("Días y monto a pagar:*");
+        jlBenefitToPay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlBenefitToPay);
+        jPanel5.add(moDecBenefitToPayDays);
+        jPanel5.add(moCurBenefitToPayAmount);
 
-        moCurAmountToPay.setToolTipText("Monto por pagar");
-        jPanel5.add(moCurAmountToPay);
+        jlPay.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPay.setText("Pagar:");
+        jlPay.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel5.add(jlPay);
 
-        jbPayProportional.setText("Pagar proporcional");
-        jbPayProportional.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbPayProportional.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel5.add(jbPayProportional);
+        jbPayProp.setText("Lo proporcional");
+        jbPayProp.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbPayProp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jbPayProp);
 
-        jbPayPending.setText("Pagar remanente");
-        jbPayPending.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbPayPending.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel5.add(jbPayPending);
+        jbPayPend.setText("Lo pendiente");
+        jbPayPend.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbPayPend.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jbPayPend);
+
+        jbPayAll.setText("Lo ganado");
+        jbPayAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbPayAll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jbPayAll);
 
         jPanel2.add(jPanel5);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysPending.setText("Días y monto remanente:");
-        jlDaysPending.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel15.add(jlDaysPending);
-        jPanel15.add(moDecDaysPending);
+        jlBenefitResidue.setText("Días y monto remanente:");
+        jlBenefitResidue.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jlBenefitResidue);
 
-        moCurAmountPending.setToolTipText("Monto remanente");
-        jPanel15.add(moCurAmountPending);
+        moDecBenefitResidueDays.setEditable(false);
+        jPanel15.add(moDecBenefitResidueDays);
+
+        moCurBenefitResidueAmount.setEditable(false);
+        jPanel15.add(moCurBenefitResidueAmount);
 
         jPanel2.add(jPanel15);
 
@@ -312,8 +469,6 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -321,120 +476,175 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbPayPending;
-    private javax.swing.JButton jbPayProportional;
+    private javax.swing.JButton jbPayAll;
+    private javax.swing.JButton jbPayPend;
+    private javax.swing.JButton jbPayProp;
     private javax.swing.JLabel jlAnniversary;
-    private javax.swing.JLabel jlBenefit;
-    private javax.swing.JLabel jlBenefitTableBonusPercentage;
-    private javax.swing.JLabel jlBenefitTableDaysToPay;
-    private javax.swing.JLabel jlDateBase;
-    private javax.swing.JLabel jlDateBenefit;
+    private javax.swing.JLabel jlBenefitGained;
+    private javax.swing.JLabel jlBenefitGained1;
+    private javax.swing.JLabel jlBenefitPaid;
+    private javax.swing.JLabel jlBenefitPayed1;
+    private javax.swing.JLabel jlBenefitPending;
+    private javax.swing.JLabel jlBenefitProp;
+    private javax.swing.JLabel jlBenefitProp1;
+    private javax.swing.JLabel jlBenefitResidue;
+    private javax.swing.JLabel jlBenefitToPay;
+    private javax.swing.JLabel jlBenefitType;
+    private javax.swing.JLabel jlBenefitsComp;
+    private javax.swing.JLabel jlDateBenefits;
     private javax.swing.JLabel jlDateCutoff;
     private javax.swing.JLabel jlDateLastDismissal_n;
-    private javax.swing.JLabel jlDaysElapsed;
-    private javax.swing.JLabel jlDaysPayed;
-    private javax.swing.JLabel jlDaysPending;
-    private javax.swing.JLabel jlDaysToPay;
+    private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlElapsedDays;
+    private javax.swing.JLabel jlElapsedDays2;
+    private javax.swing.JLabel jlPay;
+    private javax.swing.JLabel jlPaymentDaily;
+    private javax.swing.JLabel jlPayroll;
+    private javax.swing.JLabel jlPayrollSep;
+    private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlPeriodSep;
     private javax.swing.JLabel jlSeniority;
     private javax.swing.JLabel jlSeniorityDays;
-    private javax.swing.JLabel jlSeniorityYear;
+    private javax.swing.JLabel jlSeniorityHelp;
+    private javax.swing.JLabel jlSeniorityYears;
+    private javax.swing.JLabel jlVacationBonusPct;
     private javax.swing.JSpinner jsAnniversary;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountPayable;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountPayed;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountPending;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountToPay;
-    private sa.lib.gui.bean.SBeanFieldDate moDateBaseDate;
-    private sa.lib.gui.bean.SBeanFieldDate moDateBenefitDate;
+    private javax.swing.JTextField jtfAnniversaryYear;
+    private javax.swing.JTextField jtfBenefitsComp;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBenefitGainedAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBenefitPaidAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBenefitPendingAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBenefitResidueAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBenefitToPayAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentDaily;
+    private sa.lib.gui.bean.SBeanFieldDate moDateBenefits;
     private sa.lib.gui.bean.SBeanFieldDate moDateCutoff;
     private sa.lib.gui.bean.SBeanFieldDate moDateLastDismissal_n;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitTableBonusPercentage;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPayed;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPending;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysToPay;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitTableDaysToPay;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitYear;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntDaysElapsed;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntSeniority;
+    private sa.lib.gui.bean.SBeanFieldDate moDateLastHire;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePayrollEnd;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePayrollStart;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePeriodStart;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitGainedDays;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitPaidDays;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitPendingDays;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitProp;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitResidueDays;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitToPayDays;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecVacationBonusPct;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntElapsedDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntSeniorityDays;
-    private sa.lib.gui.bean.SBeanFieldText moTextBenefit;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntSeniorityYears;
+    private sa.lib.gui.bean.SBeanFieldText moTextBenefitType;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 800, 500);
         
         mbFirstActivation = true;
 
         jbSave.setText("Aceptar");
 
-        moTextBenefit.setTextSettings(SGuiUtils.getLabelName(jlDateBase.getText()), 150);
-        moDateBenefitDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBenefit.getText()), true);
-        moDateLastDismissal_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastDismissal_n.getText()), false);
-        moDateBaseDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBase.getText()), true);
-        moDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
-        moIntSeniority.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority), SGuiConsts.GUI_TYPE_INT, false);
-        moIntSeniorityDays.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority), SGuiConsts.GUI_TYPE_INT, false);
-        moIntDaysElapsed.setIntegerSettings(SGuiUtils.getLabelName(jlAnniversary.getText()), SGuiConsts.GUI_TYPE_INT, false);
-        moIntBenefitYear.setIntegerSettings(SGuiUtils.getLabelName(jlAnniversary.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
-        moIntBenefitTableDaysToPay.setIntegerSettings(SGuiUtils.getLabelName(jlBenefitTableDaysToPay.getText()), SGuiConsts.GUI_TYPE_INT, false);
-        moCurAmountPayable.setCompoundFieldSettings(miClient);
-        moCurAmountPayable.getField().setDecimalSettings(SGuiUtils.getLabelName(moCurAmountPayable.getToolTipText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moDecBenefitTableBonusPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitTableBonusPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moDecDaysPayed.setDecimalSettings(SGuiUtils.getLabelName(jlDaysPayed.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
-        moCurAmountPayed.setCompoundFieldSettings(miClient);
-        moCurAmountPayed.getField().setDecimalSettings(SGuiUtils.getLabelName(moCurAmountPayed.getToolTipText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moDecDaysToPay.setDecimalSettings(SGuiUtils.getLabelName(jlDaysToPay.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
-        moCurAmountToPay.setCompoundFieldSettings(miClient);
-        moCurAmountToPay.getField().setDecimalSettings(SGuiUtils.getLabelName(moCurAmountToPay.getToolTipText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moDecDaysPending.setDecimalSettings(SGuiUtils.getLabelName(jlDaysPending.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
-        moCurAmountPending.setCompoundFieldSettings(miClient);
-        moCurAmountPending.getField().setDecimalSettings(SGuiUtils.getLabelName(moCurAmountPending.getToolTipText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moTextBenefitType.setTextSettings(SGuiUtils.getLabelName(jlPeriod.getText()), 250);
+        moCurPaymentDaily.setCompoundFieldSettings(miClient);
+        moCurPaymentDaily.getField().setDecimalSettings(SGuiUtils.getLabelName(jlPaymentDaily), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDateBenefits.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBenefits), false);
+        moDateLastHire.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastHire), false);
+        moDateLastDismissal_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastDismissal_n), false);
+        moDatePeriodStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlPeriod), false);
+        moDatePeriodEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlPeriod), false);
+        moDatePayrollStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlPayroll), false);
+        moDatePayrollEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlPayroll), false);
         
-        moFields.addField(moTextBenefit);
-        moFields.addField(moDateBenefitDate);
-        moFields.addField(moDateLastDismissal_n);
-        moFields.addField(moDateBaseDate);
+        moDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff), true); // editable
+        moIntSeniorityYears.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority) + " " + jlSeniorityYears.getText(), SGuiConsts.GUI_TYPE_INT, false);
+        moIntSeniorityDays.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority) + " " + jlSeniorityDays.getText(), SGuiConsts.GUI_TYPE_INT, false);
+        moIntElapsedDays.setIntegerSettings(SGuiUtils.getLabelName(jlElapsedDays.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moDecBenefitProp.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitProp), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true); // editable
+        moDecVacationBonusPct.setDecimalSettings(SGuiUtils.getLabelName(jlVacationBonusPct), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
+        
+        moDecBenefitGainedDays.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitGained), SGuiConsts.GUI_TYPE_DEC_QTY, false);
+        moCurBenefitGainedAmount.setCompoundFieldSettings(miClient);
+        moCurBenefitGainedAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlBenefitGained), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecBenefitPaidDays.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitPaid), SGuiConsts.GUI_TYPE_DEC_QTY, false);
+        moCurBenefitPaidAmount.setCompoundFieldSettings(miClient);
+        moCurBenefitPaidAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlBenefitPaid), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecBenefitPendingDays.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitPending), SGuiConsts.GUI_TYPE_DEC_QTY, false);
+        moCurBenefitPendingAmount.setCompoundFieldSettings(miClient);
+        moCurBenefitPendingAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlBenefitPending), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecBenefitToPayDays.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitToPay), SGuiConsts.GUI_TYPE_DEC_QTY, true); // editable
+        moCurBenefitToPayAmount.setCompoundFieldSettings(miClient);
+        moCurBenefitToPayAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlBenefitToPay), SGuiConsts.GUI_TYPE_DEC_AMT, true); // editable
+        moDecBenefitResidueDays.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitResidue), SGuiConsts.GUI_TYPE_DEC_QTY, false);
+        moCurBenefitResidueAmount.setCompoundFieldSettings(miClient);
+        moCurBenefitResidueAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlBenefitResidue), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        
+        //moFields.addField(moTextBenefitType);
+        //moFields.addField(moCurPaymentDaily.getField());
+        //moFields.addField(moDateBenefits);
+        //moFields.addField(moDateLastHire);
+        //moFields.addField(moDateLastDismissal_n);
+        //moFields.addField(moDatePeriodStart);
+        //moFields.addField(moDatePeriodEnd);
+        //moFields.addField(moDatePayrollStart);
+        //moFields.addField(moDatePayrollEnd);
+        
         moFields.addField(moDateCutoff);
-        moFields.addField(moIntSeniority);
-        moFields.addField(moIntSeniorityDays);
-        moFields.addField(moIntDaysElapsed);
-        moFields.addField(moIntBenefitYear);
-        moFields.addField(moIntBenefitTableDaysToPay);
-        moFields.addField(moCurAmountPayable.getField());
-        moFields.addField(moDecBenefitTableBonusPercentage);
-        moFields.addField(moDecDaysPayed);
-        moFields.addField(moCurAmountPayed.getField());
-        moFields.addField(moDecDaysToPay);
-        moFields.addField(moCurAmountToPay.getField());
-        moFields.addField(moDecDaysPending);
-        moFields.addField(moCurAmountPending.getField());
+        //moFields.addField(moIntSeniorityYears);
+        //moFields.addField(moIntSeniorityDays);
+        //moFields.addField(moIntElapsedDays);
+        //moFields.addField(moDecBenefitProp);
+        //moFields.addField(moDecVacationBonusPct);
+        
+        //moFields.addField(moDecBenefitGainedDays);
+        //moFields.addField(moCurBenefitGainedAmount.getField());
+        //moFields.addField(moDecBenefitPaidDays);
+        //moFields.addField(moCurBenefitPaidAmount.getField());
+        //moFields.addField(moDecBenefitPendingDays);
+        //moFields.addField(moCurBenefitPendingAmount.getField());
+        moFields.addField(moDecBenefitToPayDays);
+        moFields.addField(moCurBenefitToPayAmount.getField());
+        //moFields.addField(moDecBenefitResidueDays);
+        //moFields.addField(moCurBenefitResidueAmount.getField());
 
         moFields.setFormButton(jbSave);
 
-        moDateBaseDate.setValue(miClient.getSession().getCurrentDate());
-        
-        moTextBenefit.setEditable(false);
-        moDateBenefitDate.setEditable(false);
+        moTextBenefitType.setEditable(false);
+        moCurPaymentDaily.setEditable(false);
+        moDateBenefits.setEditable(false);
+        moDateLastHire.setEditable(false);
         moDateLastDismissal_n.setEditable(false);
-        moDateBaseDate.setEditable(false);
-        moIntSeniority.setEditable(false);
+        moDatePeriodStart.setEditable(false);
+        moDatePeriodEnd.setEditable(false);
+        moDatePayrollStart.setEditable(false);
+        moDatePayrollEnd.setEditable(false);
+        
+        moIntSeniorityYears.setEditable(false);
         moIntSeniorityDays.setEditable(false);
-        moIntDaysElapsed.setEditable(false);
-        moIntBenefitYear.setEditable(false);
-        moIntBenefitTableDaysToPay.setEditable(false);
-        moCurAmountPayable.getField().setEditable(false);
-        moDecBenefitTableBonusPercentage.setEditable(false);
-        moDecDaysPayed.setEditable(false);
-        moCurAmountPayed.getField().setEditable(false);
-        moDecDaysPending.setEditable(false);
-        moCurAmountPending.getField().setEditable(false);
+        moIntElapsedDays.setEditable(false);
+        moDecBenefitProp.setEditable(false);
+        moDecVacationBonusPct.setEditable(false);
+        
+        moDecBenefitGainedDays.setEditable(false);
+        moCurBenefitGainedAmount.setEditable(false);
+        moDecBenefitPaidDays.setEditable(false);
+        moCurBenefitPaidAmount.setEditable(false);
+        moDecBenefitPendingDays.setEditable(false);
+        moCurBenefitPendingAmount.setEditable(false);
+        moDecBenefitResidueDays.setEditable(false);
+        moCurBenefitResidueAmount.setEditable(false);
+        
+        jsAnniversary.setModel(new SpinnerNumberModel(1, 1, SDbEmployeeBenefitTables.MAX_ANNUMS, 1));
 
-        reloadCatalogues();
         addAllListeners();
     }
     
@@ -446,383 +656,269 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void enableFields() {
-        jbPayProportional.setEnabled((Integer) jsAnniversary.getValue() > moIntSeniority.getValue());
+    /**
+     * Show information of payroll, receipt and employee:
+     */
+    private void showPayrollReceiptAndEmployee() {
+        moTextBenefitType.setValue((String) miClient.getSession().readField(SModConsts.HRSS_TP_BEN, new int[] { moEarning.getFkBenefitTypeId() }, SDbRegistry.FIELD_NAME));
+        jtfBenefitsComp.setText(SHrsBenefitUtils.getBenefitCompDescription(SHrsBenefitUtils.getBenefitCompFromBenefitType(moEarning.getFkBenefitTypeId())));
+        
+        moCurPaymentDaily.getField().setValue(moPayrollReceipt.getPaymentDaily());
+        moDateBenefits.setValue(moPayrollReceipt.getDateBenefits());
+        moDateLastHire.setValue(moPayrollReceipt.getDateLastHire());
+        moDateLastDismissal_n.setValue(moPayrollReceipt.isActive() ? null : moPayrollReceipt.getDateLastDismissal_n());
+        
+        moDatePayrollStart.setValue(moPayroll.getDateStart());
+        moDatePayrollEnd.setValue(moPayroll.getDateEnd());
+        
+        if (mbIsBenefitVacationBonus) {
+            jlVacationBonusPct.setEnabled(true);
+        }
+        else {
+            jlVacationBonusPct.setEnabled(false);
+        }
     }
     
-    private void setDateBaseDate(final Date dateCutOff, final int benefitAnn) {
-        if (mnFormType == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
-            if (moEmployee.getDateBenefits().compareTo(SLibTimeUtils.getBeginOfYear(dateCutOff)) >= 0) {
-                moDateBaseDate.setValue(moEmployee.getDateBenefits());
+    /**
+     * Initialize default Anniversary from payroll receipt.
+     */
+    private void initAnniversaryFromReceipt() {
+        Date cutoff = null;
+        
+        if (moPayrollReceipt.isActive()) { // is employee active in receipt?
+            cutoff = moPayroll.getDateEnd();
+        }
+        else {
+            cutoff = moPayrollReceipt.getDateLastDismissal_n();
+        }
+        
+        moAnniversaryReceipt = new SAnniversary(moPayrollReceipt.getDateBenefits(), cutoff);
+        
+        jsAnniversary.setValue(moAnniversaryReceipt.getCurrentAnniversary());
+        
+        computeAnniversary();
+    }
+    
+    /**
+     * Compute anniversary from user input.
+     */
+    private void computeAnniversary() {
+        // render benefit period and set corresponding cutoff:
+        
+        int anniversary = (Integer) jsAnniversary.getValue();
+        int anniversaryYear = moEmployee.getAnniversaryYear(anniversary);
+        Date periodStart = null;
+        Date periodEnd = null;
+        
+        jtfAnniversaryYear.setText("" + anniversaryYear);
+        
+        if (mbIsBenefitCompByCalendarYear) {
+            periodStart = SLibTimeUtils.createDate(anniversaryYear, 1, 1); // start from corresponding calendar year
+            
+            if (anniversary == moAnniversaryReceipt.getCurrentAnniversary()) {
+                periodEnd = moAnniversaryReceipt.getPeriodCutoff().toDate(); // end limited to receipt cutoff
             }
             else {
-                moDateBaseDate.setValue(SLibTimeUtils.getBeginOfYear(dateCutOff));
+                periodEnd = SLibTimeUtils.createDate(anniversaryYear, 12, 31); // end from corresponding calendar year
             }
         }
         else {
-            moDateBaseDate.setValue(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnn, 0, 0));
-        }
-    }
-    
-    private void setBenefitAnniv(final int benefitAnniv) {
-        moIntSeniority.setValue(benefitAnniv);
-        moIntSeniorityDays.setValue(SLibTimeUtils.countPeriodDays(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0), mtDateCutoff));
-        moIntDaysElapsed.setValue(SLibTimeUtils.countPeriodDays(moDateBaseDate.getValue(), mtDateCutoff));
-    }
-    
-    private void loadBenefitTables(SDbBenefitTable benefitTable, SDbBenefitTable benefitTableAux) throws Exception {
-        if (benefitTable == null) {
-            moBenefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), 
-                    moEarning.getPkEarningId(), 
-                    moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                    mtDateCutoff);
-        }
-        else {
-            moBenefitTable = benefitTable;
-            if (moBenefitTable == null) {
-                throw new Exception("No existe tabla de prestaciones adecuada para la fecha de corte.");
-            }
-        }
-        
-        if (benefitTableAux == null && mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            int tableAuxId = SHrsUtils.getRecentBenefitTable(miClient.getSession(), 
-                    SModSysConsts.HRSS_TP_BEN_VAC, 
-                    moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                    mtDateCutoff);
-            moBenefitTableAux = moHrsReceipt.getHrsPayroll().getBenefitTable(tableAuxId);
-        }
-        else {
-            moBenefitTableAux = benefitTableAux;
-        }
-        
-        if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON && moBenefitTableAux == null) {
-            throw new Exception("No existe tabla de prestaciones adecuada para la fecha de corte.");
-        }
-        
-        maBenefitTableAnniversarys = moHrsReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTable.getPkBenefitId());
-        
-        if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            maBenefitTableAnniversarysAux = moHrsReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTableAux.getPkBenefitId());
-        }
-    }
-    
-    private void actionPerformedPayProportional() {
-        boolean isLeapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(mtDateCutoff)[0]);
-
-        moDecDaysToPay.setValue((moIntBenefitTableDaysToPay.getValue() - moDecDaysPayed.getValue()) * ((double) moIntDaysElapsed.getValue() / (double) (SHrsConsts.YEAR_DAYS + (isLeapYear ? 1 : 0))));
-        computeBenefitToPay();
-
-        moDecDaysToPay.requestFocusInWindow();
-    }
-    
-    private void actionPerformedPayPending() {
-        computeBenefitToPayWithPending();
-
-        moDecDaysToPay.requestFocusInWindow();
-    }
-    
-    private void focusLostDateCutOff() throws Exception {
-        mtDateCutoff = moDateCutoff.getValue();
-        
-        if (mtDateCutoff == null) {
-            moDateCutoff.requestFocus();
-            throw new Exception(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'.");
-        }
-        else {
-            int benefitAnniv = SHrsUtils.getEmployeeSeniority(moEmployee.getDateBenefits(), mtDateCutoff);
-
-            setDateBaseDate(mtDateCutoff, benefitAnniv);
-
-            if (mtDateCutoff.compareTo(moDateBaseDate.getValue()) < 0) {
-                moDateCutoff.requestFocus();
-                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
-            }
-            else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismissal_n.getValue()) > 0) {
-                moDateCutoff.requestFocus();
-                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismissal_n) + "'.");
+            periodStart = moEmployee.getAnniversaryDate(anniversary); // start from corresponding anniversary
+            
+            if (anniversary == moAnniversaryReceipt.getCurrentAnniversary()) {
+                periodEnd = moAnniversaryReceipt.getPeriodCutoff().toDate(); // end limited to receipt cutoff
             }
             else {
-                setBenefitAnniv(benefitAnniv);
-
-                try {
-                    loadBenefitTables(null, null);
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-                jsAnniversary.setValue(benefitAnniv == 0 ? 1 : (Integer) benefitAnniv);
-                enableFields();
+                periodEnd = SLibTimeUtils.addDate(moEmployee.getAnniversaryDate(anniversary + 1), 0, 0, -1); // end from corresponding anniversary
             }
         }
-    }
-    
-    private void focusLostDaysToPay() {
-        computeBenefitToPay();
-    }
-    
-    private void focusLostAmountToPay() {
-        computeBenefitPending();
-    }
-    
-    private double getCalculatedBenefit() {
-        return moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moDecDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue());
-    }
-    
-    private void computeBenefitPayable() {
-        moCurAmountPayable.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moIntBenefitTableDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue()));
         
-        computeBenefitPending();
-    }
-    
-    private void computeBenefitToPay() {
-        moCurAmountToPay.getField().setValue(getCalculatedBenefit());
+        if (periodStart.before(moPayrollReceipt.getDateBenefits())) {
+            periodStart = moPayrollReceipt.getDateBenefits();
+        }
         
-        computeBenefitPending();
-    }
-    
-    private void computeBenefitToPayWithPending() {
-        double daysPending = moIntBenefitTableDaysToPay.getValue() <= moDecDaysPayed.getValue() ? 0d : moIntBenefitTableDaysToPay.getValue() - moDecDaysPayed.getValue();
-        double benefitPending = moCurAmountPayable.getField().getValue() <= moCurAmountPayed.getField().getValue() ? 0d : moCurAmountPayable.getField().getValue() - moCurAmountPayed.getField().getValue();
+        if (!moPayrollReceipt.isActive() && moPayrollReceipt.getDateLastDismissal_n() != null && periodEnd.after(moPayrollReceipt.getDateLastDismissal_n())) {
+            periodEnd = moPayrollReceipt.getDateLastDismissal_n();
+        }
         
-        moDecDaysToPay.setValue(daysPending);
-        moCurAmountToPay.getField().setValue(benefitPending);
+        moDatePeriodStart.setValue(periodStart);
+        moDatePeriodEnd.setValue(periodEnd);
+        moDateCutoff.setValue(periodEnd);
         
-        computeBenefitPending();
-    }
-    
-    private void computeBenefitPending() {
-        double daysPending = SLibUtils.round(moIntBenefitTableDaysToPay.getValue() - moDecDaysPayed.getValue() - moDecDaysToPay.getValue(), SLibUtils.getDecimalFormatQuantity().getMaximumFractionDigits());
-        moDecDaysPending.setValue(daysPending == -0 ? 0 : daysPending); // sometimes, when there is not remnants, pending days is -0 (negative zero)!
-        moCurAmountPending.getField().setValue(SLibUtils.roundAmount(moCurAmountPayable.getField().getValue() - moCurAmountPayed.getField().getValue() - moCurAmountToPay.getField().getValue()));
-    }
-    
-    private void actionStateChangeAnniversary() {
-        moIntBenefitYear.setValue(SLibTimeUtils.digestYear(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), (Integer) jsAnniversary.getValue() - 1, 0, 0))[0]);
-        readHrsBenefitAcummulate((Integer) jsAnniversary.getValue());
-        enableFields();
-    }
-    
-    private void readHrsBenefit() {
-        int benefitAnniv = SHrsUtils.getEmployeeSeniority(moEmployee.getDateBenefits(), mtDateCutoff);
-
-        if (!moEmployee.isActive()) {
-            if (mtDateCutoff.compareTo(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)) > 0) {
-                mnBenefitAnnivLimit = benefitAnniv + 1;
-            }
-            else {
-                mnBenefitAnnivLimit = benefitAnniv;
-            }
-            moDateLastDismissal_n.setValue(moEmployee.getDateLastDismissal_n());
-        }
-        else {
-            mnBenefitAnnivLimit = 100;
-        }
-
-        moTextBenefit.setText(moBenefitTable.getName());
-        moDateBenefitDate.setValue(moEmployee.getDateBenefits());
-
-        moDateCutoff.setValue(mtDateCutoff);
-        setDateBaseDate(mtDateCutoff, benefitAnniv);
-
-        setBenefitAnniv(benefitAnniv);
-
-        jsAnniversary.setModel(new SpinnerNumberModel(1, 1, mnBenefitAnnivLimit, 1));
-        jsAnniversary.setValue(benefitAnniv == 0 ? 1 : (Integer) benefitAnniv);
-
-        if (benefitAnniv == 0) {
-            actionStateChangeAnniversary();
-            actionPerformedPayProportional();
-        }
-        else {
-            actionStateChangeAnniversary();
-        }
-    }
-    
-    private void readHrsBenefitAcummulate(int seniority) {
-        boolean found = false;
-        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
-        SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
+        computeCutoff();
+        
+        // render information of benefit:
         
         try {
-            mnBenefitYear = SLibTimeUtils.digestYear(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), seniority - 1, 0, 0))[0];
+            SDbEmployeeBenefitTablesAnnum annumBenefitVac = null; // if current benefit type is vacation bonus
+            SDbEmployeeBenefitTablesAnnum annumBenefit = moHrsBenefitsManager.getBenefitAnnum(moEarning.getFkBenefitTypeId(), anniversary);
+            SHrsBenefit hrsBenefitPaid = moHrsBenefitsManager.getBenefitPaid(moEarning.getFkBenefitTypeId(), anniversaryYear, anniversary);
             
-            // Read benefits accumulated by benefit type:
-            
-            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, maBenefitTableAnniversarysAux, moHrsReceipt.getPayrollReceipt().getPaymentDaily());
-            
-            // Obtain benefit table row more appropiate for seniority:
-            if (moBenefitTable != null) {
-                for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversarys) {
-                    if (anniversary.getBenefitAnn() <= seniority) {
-                        benefitTableAnniversary = anniversary;
-                    }
-                }
-            }
-            
-            // Obtain benefit table row more appropiate for seniority, it's for vacation bonus:
-            
-            if (moBenefitTableAux != null) {
-                if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                    for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversarysAux) {
-                        if (anniversary.getBenefitAnn() <= seniority) {
-                            benefitTableAnniversaryAux = anniversary;
-                        }
-                    }
-                }
-            }
-            
-            for (SHrsBenefit hrsBenefit : maHrsBenefits) {  // XXX Sergio Flores, 2018-07-11: It is not necessary to iterate this array, allways has only one element, if any!
-                hrsBenefit.setValuePayedReceipt(moHrsReceipt.getBenefitValue(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
-                hrsBenefit.setAmountPayedReceipt(moHrsReceipt.getBenefitAmount(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
-            }
-            
-            if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                moIntBenefitTableDaysToPay.setValue(benefitTableAnniversaryAux == null ? 0 : (int) benefitTableAnniversaryAux.getValue());
-                moDecBenefitTableBonusPercentage.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
+            if (mbIsBenefitVacationBonus) {
+                annumBenefitVac = moHrsBenefitsManager.getBenefitAnnum(SModSysConsts.HRSS_TP_BEN_VAC, anniversary);
+                moDecVacationBonusPct.setValue(annumBenefit.getBenefitBonusPct());
+                
+                moDecBenefitGainedDays.setValue((double) annumBenefitVac.getBenefitDays());
+                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, annumBenefitVac.getBenefitDays(), annumBenefit.getBenefitBonusPct()));
             }
             else {
-                moIntBenefitTableDaysToPay.setValue(benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue());
-                moDecBenefitTableBonusPercentage.setValue(benefitTableAnniversary == null ? 0d : 1d);
+                annumBenefitVac = null;
+                moDecVacationBonusPct.setValue(1d);
+                
+                moDecBenefitGainedDays.setValue((double) annumBenefit.getBenefitDays());
+                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, annumBenefit.getBenefitDays(), 1d));
             }
             
-            for (SHrsBenefit hrsBenefit : maHrsBenefits) {  // XXX Sergio Flores, 2018-07-11: It is not necessary to iterate this array, allways has only one element, if any!
-                if (SLibUtils.compareKeys(hrsBenefit.getBenefitKey(), new int[] { mnFormType, seniority, mnBenefitYear })) {
-                    moDecDaysPayed.setValue(hrsBenefit.getValuePayed() + hrsBenefit.getValuePayedReceipt());
-                    moCurAmountPayed.getField().setValue(hrsBenefit.getAmountPayed() + hrsBenefit.getAmountPayedReceipt());
-                    moDecDaysToPay.setValue(hrsBenefit.getValuePending() <= 0 ? 0 : hrsBenefit.getValuePending());
-                    computeBenefitToPay();
-                    found = true;
-                    break;
-                }
+            if (hrsBenefitPaid == null) {
+                moDecBenefitPaidDays.setValue(0d);
+                moCurBenefitPaidAmount.getField().setValue(0d);
+            }
+            else {
+                moDecBenefitPaidDays.setValue(hrsBenefitPaid.getPaidDays());
+                moCurBenefitPaidAmount.getField().setValue(hrsBenefitPaid.getPaidAmount());
             }
             
-            if (!found) {
-                moDecDaysPayed.setValue(0d);
-                moDecDaysToPay.setValue(moIntBenefitTableDaysToPay.getValue());
-                computeBenefitToPay();
-            }
-            
-            computeBenefitPayable();
+            moDecBenefitPendingDays.setValue(moDecBenefitGainedDays.getValue() - moDecBenefitPaidDays.getValue());
+            moCurBenefitPendingAmount.getField().setValue(moCurBenefitGainedAmount.getField().getValue() - moCurBenefitPaidAmount.getField().getValue());
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
     }
     
-    private void createHrsBenefit() {
-        moHrsBenefit = new SHrsBenefit(mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear, moDecBenefitTableBonusPercentage.getValue());
-        
-        for (SHrsBenefit hrsBenefit : maHrsBenefits) {
-            if (SLibUtils.compareKeys(hrsBenefit.getBenefitKey(), new int[] { mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear })) {
-                moHrsBenefit.setValue(hrsBenefit.getValue());
-                moHrsBenefit.setValuePayed(hrsBenefit.getValuePayed());
-                moHrsBenefit.setAmount(hrsBenefit.getAmount());
-                moHrsBenefit.setAmountPayed(hrsBenefit.getAmountPayed());
-                break;
-            }
+    /**
+     * Compute cutoff from user input.
+     */
+    private void computeCutoff() {
+        SAnniversary anniversaryCutoff;
+        SAnniversary anniversaryBenefit;
+    
+        if (moDateCutoff.getValue() == null) {
+            anniversaryCutoff = null;
+            moIntSeniorityYears.setValue(0);
+            moIntSeniorityDays.setValue(0);
+            
+            anniversaryBenefit = null;
+            moIntElapsedDays.setValue(0);
+            moDecBenefitProp.setValue(0d);
         }
-        
-        moHrsBenefit.setValuePayedReceipt(moDecDaysToPay.getValue());
-        moHrsBenefit.setAmountPayedReceipt(moCurAmountToPay.getField().getValue());
-        moHrsBenefit.setAmountPayedReceiptSys(getCalculatedBenefit());
+        else {
+            anniversaryCutoff = moEmployee.createAnniversary(moDateCutoff.getValue());
+            moIntSeniorityYears.setValue(anniversaryCutoff.getElapsedYears());
+            moIntSeniorityDays.setValue(anniversaryCutoff.getElapsedYearDaysForBenefits());
+            
+            anniversaryBenefit = new SAnniversary(moDatePeriodStart.getValue(), moDateCutoff.getValue());
+            moIntElapsedDays.setValue(anniversaryBenefit.getElapsedYearDaysForBenefits());
+            moDecBenefitProp.setValue(anniversaryBenefit.getCurrentAnniversaryPropPartForBenefits());
+        }
     }
+    
+    private double calculateBenefitToBePayedAmount() {
+        double bonusPct = mbIsBenefitVacationBonus ? moDecVacationBonusPct.getValue() : 1d;
+        return moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moDecBenefitToPayDays.getValue(), bonusPct);
+    }
+    
+    private void computeBenefitToBePayedAmount() {
+        moCurBenefitToPayAmount.getField().setValue(calculateBenefitToBePayedAmount());
+        
+        computeBenefitResidue();
+    }
+    
+    private void computeBenefitResidue() {
+        double days = moDecBenefitPendingDays.getValue() - moDecBenefitToPayDays.getValue();
+        double amount = moCurBenefitPendingAmount.getField().getValue() - moCurBenefitToPayAmount.getField().getValue();
+        moDecBenefitResidueDays.setValue(days > 0d ? days : 0d);
+        moCurBenefitResidueAmount.getField().setValue(amount > 0 ? amount : 0d);
+    }
+    
+    private SHrsBenefit createHrsBenefit() {
+        int benefitAnniversary = (Integer) jsAnniversary.getValue();
+        int benefitYear = moEmployee.getAnniversaryYear(benefitAnniversary);
+        
+        SHrsBenefit hrsBenefit = new SHrsBenefit(moEarning.getFkBenefitTypeId(), benefitAnniversary, benefitYear);
+        
+        hrsBenefit.setBenefitBonusPct(moDecVacationBonusPct.getValue());
+        
+        hrsBenefit.setReceiptDays(moDecBenefitToPayDays.getValue());
+        hrsBenefit.setReceiptAmount(moCurBenefitToPayAmount.getField().getValue());
+        
+        return hrsBenefit;
+    }
+    
+    /*
+     * Methods for listeners:
+     */
+
+    private void actionPerformedPayProp() {
+        moDecBenefitToPayDays.setValue(moDecBenefitPendingDays.getValue() * moDecBenefitProp.getValue());
+        computeBenefitToBePayedAmount();
+        
+        moDecBenefitToPayDays.requestFocusInWindow();
+    }
+    
+    private void actionPerformedPayPend() {
+        moDecBenefitToPayDays.setValue(moDecBenefitPendingDays.getValue());
+        computeBenefitToBePayedAmount();
+        
+        moDecBenefitToPayDays.requestFocusInWindow();
+    }
+    
+    private void actionPerformedPayAll() {
+        moDecBenefitToPayDays.setValue(moDecBenefitGainedDays.getValue());
+        computeBenefitToBePayedAmount();
+        
+        moDecBenefitToPayDays.requestFocusInWindow();
+    }
+    
+    private void stateChangedAnniversary() {
+        computeAnniversary();
+    }
+    
+    private void focusLostCutoff() {
+        computeCutoff();
+    }
+    
+    private void focusLostBenefitToBePayedDays() {
+        computeBenefitToBePayedAmount();
+    }
+    
+    private void focusLostBenefitToBePayedAmount() {
+        computeBenefitResidue();
+    }
+    
+    /*
+     * Overriden listeners:
+     */
 
     @Override
     public void reloadCatalogues() {
-        
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public SGuiValidation validateForm() {
-        String msg = "";
         SGuiValidation validation = moFields.validateFields();
+        DecimalFormat formatDays = SLibUtils.getDecimalFormatQuantity();
 
-        try {
-            if (validation.isValid()) {
-                createHrsBenefit();
-                
-                if (mtDateCutoff.compareTo(moDateBaseDate.getValue()) < 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
-                    validation.setComponent(moDateCutoff);
-                }
-                else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismissal_n.getValue()) > 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismissal_n) + "'.");
-                    validation.setComponent(moDateCutoff);
-                }
-                else if ((Integer) jsAnniversary.getValue() == 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAnniversary) + "'.");
-                    validation.setComponent(((JSpinner.NumberEditor) jsAnniversary.getEditor()).getTextField());
-                }
-                
-                if (validation.isValid() && moEarning.isBasedOnUnits()) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAY, SHrsBenefit.VALIDATION_BENEFIT_TYPE);
-                    
-                    if (!msg.isEmpty()) {
-                        validation.setMessage(msg);
-                        validation.setComponent(moDecDaysToPay);
-                    }
-                }
-                
-                if (validation.isValid()) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAY_TOTAL, SHrsBenefit.VALIDATION_BENEFIT_TYPE);
-                    
-                    if (!msg.isEmpty()) {
-                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                            validation.setMessage(msg);
-                            validation.setComponent(moDecDaysToPay);
-                        }
-                    }
-                }
-                
-                if (validation.isValid()) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TABLE, SHrsBenefit.VALIDATION_BENEFIT_TYPE);
-                    
-                    if (!msg.isEmpty()) {
-                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                            validation.setMessage(msg);
-                            validation.setComponent(moDecDaysToPay);
-                        }
-                    }
-                }
-
-                if (validation.isValid() && (!moEarning.isBasedOnUnits() || moDecDaysToPay.getValue() != 0)) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAY, 0);
-                    
-                    if (!msg.isEmpty()) {
-                        validation.setMessage(msg);
-                        validation.setComponent(moCurAmountToPay.getField().getComponent());
-                    }
-                }
-                
-                if (validation.isValid() && (!moEarning.isBasedOnUnits() || moDecDaysToPay.getValue() != 0)) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAY_TOTAL, 0);
-                    
-                    if (!msg.isEmpty()) {
-                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                            validation.setMessage(msg);
-                            validation.setComponent(moCurAmountToPay.getField().getComponent());
-                        }
-                    }
-                }
-                
-                if (validation.isValid()) {
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAID_AMOUNT_SYS, 0);
-
-                    if (!msg.isEmpty()) {
-                        if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                            validation.setMessage(msg);
-                            validation.setComponent(moCurAmountToPay.getField().getComponent());
-                        }
-                    }
-                }
+        if (validation.isValid()) {
+            if (moDateCutoff.getValue().before(moEmployee.getDateBenefits())) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "', " + SLibUtils.DateFormatDate.format(moDateCutoff.getValue()) + "," + 
+                        SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + " '" + SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()) + "'.");
+                validation.setComponent(moDateCutoff);
             }
-            
-            if (validation.isValid()) {
-                createHrsBenefit();
+            else if (!moEmployee.isActive() && moEmployee.getDateLastDismissal_n() != null && moDateCutoff.getValue().after(moEmployee.getDateLastDismissal_n())) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "', " + SLibUtils.DateFormatDate.format(moDateCutoff.getValue()) + "," + 
+                        SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " '" + SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismissal_n()) + "'.");
+                validation.setComponent(moDateCutoff);
             }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
+            else if (moDecBenefitToPayDays.getValue() > moDecBenefitPendingDays.getValue() && miClient.showMsgBoxConfirm(
+                    "Los días a pagar (" + formatDays.format(moDecBenefitToPayDays.getValue()) + ") "
+                            + "son mayores a los días pendientes (" + formatDays.format(moDecBenefitPendingDays.getValue()) + ").\n"
+                            + "Debería corregir los días a pagar u optar por continuar y transgredir la prestación.\n"
+                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecBenefitToPayDays.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + " " + formatDays.format(moDecBenefitPendingDays.getValue()) + ".");
+                validation.setComponent(moDecBenefitToPayDays);
+            }
         }
         
         return validation;
@@ -830,22 +926,28 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
 
     @Override
     public void addAllListeners() {
+        jbPayProp.addActionListener(this);
+        jbPayPend.addActionListener(this);
+        jbPayAll.addActionListener(this);
+        
         jsAnniversary.addChangeListener(this);
+        
         moDateCutoff.getComponent().addFocusListener(this);
-        moDecDaysToPay.addFocusListener(this);
-        moCurAmountToPay.getField().getComponent().addFocusListener(this);
-        jbPayProportional.addActionListener(this);
-        jbPayPending.addActionListener(this);
+        moDecBenefitToPayDays.addFocusListener(this);
+        moCurBenefitToPayAmount.getField().getComponent().addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        jbPayProp.removeActionListener(this);
+        jbPayPend.removeActionListener(this);
+        jbPayAll.removeActionListener(this);
+        
         jsAnniversary.removeChangeListener(this);
+        
         moDateCutoff.getComponent().removeFocusListener(this);
-        moDecDaysToPay.removeFocusListener(this);
-        moCurAmountToPay.getField().getComponent().removeFocusListener(this);
-        jbPayProportional.removeActionListener(this);
-        jbPayPending.removeActionListener(this);
+        moDecBenefitToPayDays.removeFocusListener(this);
+        moCurBenefitToPayAmount.getField().getComponent().removeFocusListener(this);
     }
 
     @Override
@@ -861,26 +963,27 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     @Override
     public void setValue(final int type, final Object value) {
         switch (type) {
-            case SGuiConsts.PARAM_ROWS:
-                SHrsBenefitParams params = (SHrsBenefitParams) value;
-                moHrsReceipt = params.getHrsReceipt();
-                moHrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
-                moEarning = params.getEarning();
-                moEmployee = params.getHrsReceipt().getHrsEmployee().getEmployee();
-                moBenefitTable = params.getBenefitTable();
-                moBenefitTableAux = params.getBenefitTableAux();
-                mtDateCutoff = params.getDateCutOff();
+            case PARAMS:
+                moFields.resetFields();
                 
-                try {
-                    loadBenefitTables(params.getBenefitTable(), params.getBenefitTableAux());
-                    readHrsBenefit();
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
+                Params params = (Params) value;
+                moHrsReceipt = params.HrsReceipt;
+                moHrsBenefitsManager = params.HrsReceipt.getHrsBenefitsManager();
+                moPayrollReceipt = moHrsReceipt.getPayrollReceipt();
+                moPayroll = moHrsReceipt.getHrsPayroll().getPayroll();
+                
+                moHrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
+                moEmployee = params.HrsReceipt.getHrsEmployee().getEmployee();
+                moEarning = params.Earning;
+                mbIsBenefitCompByCalendarYear = SHrsBenefitUtils.getBenefitCompFromBenefitType(moEarning.getFkBenefitTypeId()) == SHrsConsts.BEN_COMP_CALENDAR_YEAR;
+                mbIsBenefitVacationBonus = moEarning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON;
+                
+                showPayrollReceiptAndEmployee();
+                initAnniversaryFromReceipt();
                 break;
                 
             default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
     }
 
@@ -889,10 +992,11 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         Object value = null;
         
         switch (type) {
-            case SGuiConsts.PARAM_ROWS:
-                value = moHrsBenefit;
+            case SModConsts.HRS_BEN:
+                value = createHrsBenefit();
                 break;
             default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
         
         return value;        
@@ -903,11 +1007,14 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         if (evt.getSource() instanceof JButton) {
             JButton button = (JButton) evt.getSource();
 
-            if (button == jbPayProportional) {
-                actionPerformedPayProportional();
+            if (button == jbPayProp) {
+                actionPerformedPayProp();
             }
-            else if (button == jbPayPending) {
-                actionPerformedPayPending();
+            else if (button == jbPayPend) {
+                actionPerformedPayPend();
+            }
+            else if (button == jbPayAll) {
+                actionPerformedPayAll();
             }
         }
     }
@@ -918,38 +1025,45 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
             JSpinner spinner = (JSpinner) e.getSource();
 
             if (spinner == jsAnniversary) {
-                actionStateChangeAnniversary();
+                stateChangedAnniversary();
             }
         }
     }
 
     @Override
     public void focusGained(FocusEvent e) {
+        
     }
 
     @Override
     public void focusLost(FocusEvent evt) {
         if (evt.getSource() instanceof JFormattedTextField) {
-            JFormattedTextField formattedTextField = (JFormattedTextField) evt.getSource();
-
-            if (formattedTextField == moDateCutoff.getComponent()) {
-                try {
-                    focusLostDateCutOff();
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
+            JFormattedTextField field = (JFormattedTextField) evt.getSource();
+            
+            if (field == moDateCutoff.getComponent()) {
+                focusLostCutoff();
             }
         }
-        else if (evt.getSource() instanceof JTextField) {
+        else if (evt.getSource() instanceof SBeanFieldDecimal) {
             JTextField textField = (JTextField) evt.getSource();
 
-            if (textField == moDecDaysToPay) {
-                focusLostDaysToPay();
+            if (textField == moDecBenefitToPayDays) {
+                focusLostBenefitToBePayedDays();
             }
-            else if (textField == moCurAmountToPay.getField()) {
-                focusLostAmountToPay();
+            else if (textField == moCurBenefitToPayAmount.getField()) {
+                focusLostBenefitToBePayedAmount();
             }
+        }
+    }
+    
+    public class Params {
+        
+        public SHrsReceipt HrsReceipt;
+        public SDbEarning Earning;
+        
+        public Params(final SHrsReceipt hrsReceipt, final SDbEarning earning) {
+            HrsReceipt = hrsReceipt;
+            Earning = earning;
         }
     }
 }

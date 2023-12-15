@@ -22,8 +22,10 @@ public class SRowPayrollEmployee implements SGridRow {
     protected String msNumber;
     protected String msName;
     protected boolean mbActive;
-    protected int mnRecruitmentSchemaTypeId;
-    protected String msRecruitmentSchemaType;
+    protected int mnEmployeeRecruitmentSchemaTypeId;
+    protected String msEmployeeRecruitmentSchemaType;
+    protected int mnReceiptRecruitmentSchemaTypeId;
+    protected String msReceiptRecruitmentSchemaType;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
     protected int mnBankId;
@@ -44,8 +46,10 @@ public class SRowPayrollEmployee implements SGridRow {
         msNumber = "";
         msName = "";
         mbActive = false;
-        mnRecruitmentSchemaTypeId = 0;
-        msRecruitmentSchemaType = "";
+        mnEmployeeRecruitmentSchemaTypeId = 0;
+        msEmployeeRecruitmentSchemaType = "";
+        mnReceiptRecruitmentSchemaTypeId = 0;
+        msReceiptRecruitmentSchemaType = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
         mnBankId = 0;
@@ -66,8 +70,10 @@ public class SRowPayrollEmployee implements SGridRow {
         msNumber = row.getNumber();
         msName = row.getName();
         mbActive = row.isActive();
-        mnRecruitmentSchemaTypeId = row.getRecruitmentSchemaTypeId();
-        msRecruitmentSchemaType = row.getRecruitmentSchemaType();
+        mnEmployeeRecruitmentSchemaTypeId = row.getEmployeeRecruitmentSchemaTypeId();
+        msEmployeeRecruitmentSchemaType = row.getEmployeeRecruitmentSchemaType();
+        mnReceiptRecruitmentSchemaTypeId = row.getReceiptRecruitmentSchemaTypeId();
+        msReceiptRecruitmentSchemaType = row.getReceiptRecruitmentSchemaType();
         mdTotalEarnings = row.getTotalEarnings();
         mdTotalDeductions = row.getTotalDeductions();
         mnBankId = row.getBankId();
@@ -83,8 +89,10 @@ public class SRowPayrollEmployee implements SGridRow {
     public void setNumber(String s) { msNumber = s; }
     public void setName(String s) { msName = s; }
     public void setActive(boolean b) { mbActive = b; }
-    public void setRecruitmentSchemaTypeId(int n) { mnRecruitmentSchemaTypeId = n; }
-    public void setRecruitmentSchemaType(String s) { msRecruitmentSchemaType = s; }
+    public void setEmployeeRecruitmentSchemaTypeId(int n) { mnEmployeeRecruitmentSchemaTypeId = n; }
+    public void setEmployeeRecruitmentSchemaType(String s) { msEmployeeRecruitmentSchemaType = s; }
+    public void setReceiptRecruitmentSchemaTypeId(int n) { mnReceiptRecruitmentSchemaTypeId = n; }
+    public void setReceiptRecruitmentSchemaType(String s) { msReceiptRecruitmentSchemaType = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
     public void setBankId(int n) { mnBankId = n; }
@@ -99,8 +107,10 @@ public class SRowPayrollEmployee implements SGridRow {
     public String getNumber() { return msNumber; }
     public String getName() { return msName; }
     public boolean isActive() { return mbActive; }
-    public int getRecruitmentSchemaTypeId() { return mnRecruitmentSchemaTypeId; }
-    public String getRecruitmentSchemaType() { return msRecruitmentSchemaType; }
+    public int getEmployeeRecruitmentSchemaTypeId() { return mnEmployeeRecruitmentSchemaTypeId; }
+    public String getEmployeeRecruitmentSchemaType() { return msEmployeeRecruitmentSchemaType; }
+    public int getReceiptRecruitmentSchemaTypeId() { return mnReceiptRecruitmentSchemaTypeId; }
+    public String getReceiptRecruitmentSchemaType() { return msReceiptRecruitmentSchemaType; }
     public double getTotalEarnings() { return mdTotalEarnings; }
     public double getTotalDeductions() { return mdTotalDeductions; }
     public int getBankId() { return mnBankId; }
@@ -171,18 +181,18 @@ public class SRowPayrollEmployee implements SGridRow {
                         value = mbActive;
                         break;
                     case 3:
-                        value = msRecruitmentSchemaType;
+                        value = SHrsUtils.getRecruitmentSchemaIcon(mnEmployeeRecruitmentSchemaTypeId);
                         break;
                     case 4:
-                        value = SHrsUtils.getRecruitmentSchemaIcon(mnRecruitmentSchemaTypeId);
+                        value = msEmployeeRecruitmentSchemaType;
                         break;
                     default:
+                        // nothing
                 }
                 break;
                 
             case CASE_RECEIPT:
                 if (mbShowRecruitmentSchemaIcon) {
-                    
                     switch(row) {
                         case 0:
                             value = msName;
@@ -191,7 +201,7 @@ public class SRowPayrollEmployee implements SGridRow {
                             value = msNumber;
                             break;
                         case 2:
-                            value = SHrsUtils.getRecruitmentSchemaIcon(mnRecruitmentSchemaTypeId);
+                            value = SHrsUtils.getRecruitmentSchemaIcon(mnReceiptRecruitmentSchemaTypeId);
                             break;
                         case 3:
                             value = mdTotalEarnings;
@@ -209,6 +219,7 @@ public class SRowPayrollEmployee implements SGridRow {
                             value = msBankAccount;
                             break;
                         default:
+                            // nothing
                     }
                 }
                 else {
@@ -235,11 +246,13 @@ public class SRowPayrollEmployee implements SGridRow {
                             value = msBankAccount;
                             break;
                         default:
+                            // nothing
                     }
                 }
                 break;
                 
             default:
+                // nothing
         }
 
         return value;

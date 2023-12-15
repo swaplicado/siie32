@@ -32,6 +32,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msCfdUuid;         // used in creation of SDataCfd
     private java.lang.String msCancellationStatus;              // used in creation of SDataCfd
     private java.lang.String msAcknowledgmentCancellationXml;   // used in creation of SDataCfd
+    private int mnComplementVersion;                            // used in creation of SDataCfd
     private boolean mbIsCfdConsistent;          // used in creation of SDataCfd
     private int mnFkCfdTypeId;                  // used in creation of SDataCfd
     private int mnFkXmlTypeId;                  // used in creation of SDataCfd
@@ -87,6 +88,7 @@ public final class SCfdPacket implements java.io.Serializable {
         msCfdUuid = "";
         msCancellationStatus = "";
         msAcknowledgmentCancellationXml = "";
+        mnComplementVersion = 0;
         mbIsCfdConsistent = true;
         mnFkCfdTypeId = 0 ;
         mnFkXmlTypeId = 0 ;
@@ -141,6 +143,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setCfdUuid(java.lang.String s) { msCfdUuid = s; }
     public void setCancellationStatus(java.lang.String s) { msCancellationStatus = s; }
     public void setAcknowledgmentCancellationXml(java.lang.String s) { msAcknowledgmentCancellationXml = s; }
+    public void setComplementVersion(int n) { mnComplementVersion = n; }
     public void setIsCfdConsistent(boolean b) { mbIsCfdConsistent = b; }
     public void setFkCfdTypeId(int n) { mnFkCfdTypeId = n; }
     public void setFkXmlTypeId(int n) { mnFkXmlTypeId = n; }
@@ -195,6 +198,7 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getCfdUuid() { return msCfdUuid; }
     public java.lang.String getCancellationStatus() { return msCancellationStatus; }
     public java.lang.String getAcknowledgmentCancellationXml() { return msAcknowledgmentCancellationXml; }
+    public int getComplementVersion() { return mnComplementVersion; }
     public boolean getIsCfdConsistent() { return mbIsCfdConsistent; }
     public int getFkCfdTypeId() { return mnFkCfdTypeId; }
     public int getFkXmlTypeId() { return mnFkXmlTypeId; }
@@ -292,6 +296,7 @@ public final class SCfdPacket implements java.io.Serializable {
         //cfd...
         cfd.setCancellationStatus(msCancellationStatus);
         cfd.setAcknowledgmentCancellationXml(msAcknowledgmentCancellationXml);
+        cfd.setComplementVersion(mnComplementVersion);
         //cfd...
         cfd.setIsConsistent(mbIsCfdConsistent);
         cfd.setFkCfdTypeId(mnFkCfdTypeId);

@@ -612,7 +612,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
-
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -768,7 +768,6 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         requiredCfd();
         
         if (mbRegistryNew) {
-            computePrimaryKey(session);
             mbUpdatable = true;
             mbDisableable = true;
             mbDeletable = true;

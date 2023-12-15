@@ -33,6 +33,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Edwin Carmona
  */
 public class SDialogCalculatedBonus extends SBeanFormDialog {
+    
     protected SDbAbsence moAbsence;
     private SGridPaneForm moGridBonusRows;
     private HashMap<Integer, ArrayList<SEarnConfiguration>> lBonusConfigRows;

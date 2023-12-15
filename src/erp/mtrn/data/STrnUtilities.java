@@ -36,7 +36,6 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
-import erp.mod.hrs.db.SHrsUtils;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -45,12 +44,8 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -60,18 +55,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.MessagingException;
-import javax.swing.JFileChooser;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -145,7 +133,7 @@ public abstract class STrnUtilities {
 
         sql = "SELECT id_lot FROM trn_lot " +
                 "WHERE b_del = 0 AND id_item = " + itemId + " AND id_unit = " + unitId + " AND " +
-                "lot = '" + lot + "' ";
+                "lot = '" + lot + "' "; 
 
         resulSet = client.getSession().getStatement().executeQuery(sql);
         if (resulSet.next()) {
@@ -621,7 +609,7 @@ public abstract class STrnUtilities {
         return SLibUtilities.belongsTo(iogTypeKey, new int[][] {
             SDataConstantsSys.TRNS_TP_IOG_OUT_PUR_PUR, SDataConstantsSys.TRNS_TP_IOG_IN_SAL_SAL });
     }
-
+    
     /**
      * @param iogTypeKey IOG type key. Constants defined in SDataConstantsSys.
      */
@@ -1453,47 +1441,37 @@ public abstract class STrnUtilities {
         SDataBizPartnerBranchAddress oAddress = null;
 
         diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, key, SLibConstants.EXEC_MODE_VERBOSE);
-        String fileName = (".pdf");
-        
-        client.getFileChooser().setSelectedFile(new File(fileName));
-        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+        oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB_ADD, new int [] { diog.getFkCompanyBranchId(), 1}, SLibConstants.EXEC_MODE_SILENT);
 
-            try {
-            cursor = client.getFrame().getCursor();
-            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        try {
+        cursor = client.getFrame().getCursor();
+        client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            map = client.createReportParams();
-            map.put("nPkYearId", diog.getPkYearId());
-            map.put("nPkDocId", diog.getPkDocId());
-            map.put("sCalle", oAddress.getStreet());
-            map.put("sNoExterior", oAddress.getStreetNumberExt());
-            map.put("sNoInterior", oAddress.getStreetNumberInt());
-            map.put("sColonia", oAddress.getNeighborhood());
-            map.put("sLocalidad", oAddress.getLocality());
-            map.put("sReferencia", oAddress.getReference());
-            map.put("sMunicipio", oAddress.getCounty());
-            map.put("sEstado", oAddress.getState());
-            map.put("sPais", oAddress.getDbmsDataCountry().getCountry());
-            map.put("sCodigoPostal", oAddress.getZipCode());
+        map = client.createReportParams();
+        map.put("nPkYearId", diog.getPkYearId());
+        map.put("nPkDocId", diog.getPkDocId());
+        map.put("sCalle", oAddress.getStreet());
+        map.put("sNoExterior", oAddress.getStreetNumberExt());
+        map.put("sNoInterior", oAddress.getStreetNumberInt());
+        map.put("sColonia", oAddress.getNeighborhood());
+        map.put("sLocalidad", oAddress.getLocality());
+        map.put("sReferencia", oAddress.getReference());
+        map.put("sMunicipio", oAddress.getCounty());
+        map.put("sEstado", oAddress.getState());
+        map.put("sPais", oAddress.getDbmsDataCountry().getCountry());
+        map.put("sCodigoPostal", oAddress.getZipCode());
 
-            jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DIOG, map);
-            JRExporter exporter = new JRPdfExporter();
-            exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(file));
-            exporter.exportReport();
-            
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(STrnUtilities.class.getName(), e);
-            }
-        
-            finally {
-            client.getFrame().setCursor(cursor);
-            } 
+        jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DIOG, map);
+        jasperViewer = new JasperViewer(jasperPrint, false);
+        jasperViewer.setTitle("Impresión de entrada a almacén");
+        jasperViewer.setVisible(true);
+
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(STrnUtilities.class.getName(), e);
         }
     }
-    
+     
     public static String getMailToSendForOrder(final SClientInterface client, final int[] keyDoc) throws Exception {
         String mailToSend = "";
         SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
@@ -1651,7 +1629,16 @@ public abstract class STrnUtilities {
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                     bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
-                    userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    //Si es un pedido mandar el correo del institucional
+                    if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                        userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        if (userMail.isEmpty()) {
+                            userMail = mms.getUser();
+                        }
+                    }
+                    else {
+                        userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                    }
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
@@ -1863,7 +1850,10 @@ public abstract class STrnUtilities {
                         + body 
                         + computeMailFooterEndTable();
                 
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc);
+                SMailSender sender = null;
+                Map<String, String> images = null;
+                Date sentDate = null;
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, images, sentDate);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -1887,6 +1877,7 @@ public abstract class STrnUtilities {
      * @throws javax.mail.MessagingException
      * @throws java.sql.SQLException
      */
+    @SuppressWarnings("deprecation")
     public static boolean sendMailCfd(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final int contactType, final int bizPartnerId, final int bizPartnerBranchId, boolean catchExceptions) throws MessagingException, SQLException, SMailException, Exception {
         boolean send = false;
         
@@ -2004,6 +1995,18 @@ public abstract class STrnUtilities {
                     
                     File pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                     
+                    if (!pdfFile.exists() && cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                        // crear el pdf en caso de ser de nómina
+                        SCfdPrint cfdPrint = new SCfdPrint(client);
+                        if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, SLibConsts.UNDEFINED, null, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        }
+                        else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
+                            cfdPrint.printPayrollReceipt40_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, SLibConsts.UNDEFINED, null, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                        }
+                        pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
+                    }
+                    
                     if (!pdfFile.exists()) {
                         throw new SMailException("El archivo PDF no existe.");
                     }
@@ -2016,6 +2019,14 @@ public abstract class STrnUtilities {
                     
                     if (!isCancelled) {
                         xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                        if (!xmlFile.exists() && cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                            // crear el xml en caso de ser de nómina
+                            xmlFile.createNewFile();
+                            try (FileWriter fw = new FileWriter(xmlFile)) {
+                                fw.write(cfd.getDocXml());
+                            }
+                        }
+                        
                         if (!xmlFile.exists()) {
                             throw new SMailException("El archivo XML no existe.");
                         }
@@ -2042,6 +2053,12 @@ public abstract class STrnUtilities {
 
                     mail.send();
                     send = true;
+                    
+                    if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                        pdfFile.delete();
+                        xmlFile.delete();
+                    }
+                    
                     SCfdUtils.insertCfdSendLog(client, cfd, mails, false);
                 }
             }
@@ -3177,10 +3194,19 @@ public abstract class STrnUtilities {
      * @param requestedRecipientsBcc Recipients blind carbon copy for mail.
      * @param body Mail body.
      * @param subjectComplement Mail subject complement. Can be null or empty.
+     * @param senderReceived In case be null the object sender is created
+     * @param imagesMap
+     * @param sentDate
      * @throws java.lang.Exception
      */
-    public static void sendMail(final SClientInterface client, final int mmsType, final String body, final String subjectComplement, 
-            final ArrayList<String> requestedRecipientsTo, final ArrayList<String> requestedRecipientsCc, final ArrayList<String> requestedRecipientsBcc) throws Exception {
+    public static void sendMail(final SClientInterface client, final int mmsType, 
+                                final String body, final String subjectComplement, 
+                                final ArrayList<String> requestedRecipientsTo, 
+                                final ArrayList<String> requestedRecipientsCc, 
+                                final ArrayList<String> requestedRecipientsBcc, 
+                                SMailSender senderReceived,
+                                final Map<String, String> imagesMap,
+                                final Date sentDate) throws Exception {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         SDbMms mms = getMms(client, mmsType);
@@ -3199,7 +3225,7 @@ public abstract class STrnUtilities {
                 }
                 
                 if (requestedRecipientsCc != null && !requestedRecipientsCc.isEmpty()) {
-                    for(String recipient: recipientsCc) {
+                    for(String recipient: requestedRecipientsCc) {
                         recipientsCc.addAll(Arrays.asList(SLibUtils.textExplode(recipient, ";")));
                     }
                 }
@@ -3221,9 +3247,28 @@ public abstract class STrnUtilities {
             }
             else {
                 try {
-                    SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    SMailSender sender;
+                    if (senderReceived == null) {
+                        sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    }
+                    else {
+                        sender = senderReceived;
+                    }
                     String subject = mms.getTextSubject() + (subjectComplement != null && !subjectComplement.isEmpty() ? " " + SLibUtils.textTrim(subjectComplement) : "");
-                    new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc).send();
+                    SMail oMail = null;
+                    if (imagesMap != null && !imagesMap.isEmpty()) {
+                        oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
+                        oMail.getInlineImages().putAll(imagesMap);
+                    }
+                    else {
+                        oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
+                    }
+                    
+                    if (sentDate != null) {
+                        oMail.setSentDate(sentDate);
+                    }
+                    
+                    oMail.send();
                 } 
                 catch (Exception e) {
                     SLibUtilities.renderException(STrnUtilities.class.getName(), e);
@@ -3609,24 +3654,34 @@ public abstract class STrnUtilities {
         Statement statement = null;
         String sql = "";
         int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
-        
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
-            sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fk_fid_item_ref_n_old, fk_fid_item_ref_n_new, fid_usr_edit, ts_edit) "
-                        + "VALUES (" + pkYearId + ", "
-                        + "" + pkDocId + ", "
-                        + "" + moDpsEntry.getPkEntryId() + ", " 
-                        + "" + histEty + ", "
-                        + "'" + moDpsEntry.getConceptKey() + "', "
-                        + "'" + conceptKeyNew + "', "
-                        + "'" + moDpsEntry.getConcept() + "', "
-                        + "'" + conceptNew + "', "
-                        + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
-                        + "'" + itemRef + "', "
-                        + "" + miClient.getSession().getUser().getPkUserId() + ", "
-                        + " NOW()); ");
-       
+        int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+        
+        sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
+                    + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+                    + "VALUES (" + pkYearId + ", "
+                    + "" + pkDocId + ", "
+                    + "" + moDpsEntry.getPkEntryId() + ", " 
+                    + "" + histEty + ", "
+                    + "'" + moDpsEntry.getConceptKey() + "', "
+                    + "'" + conceptKeyNew + "', "
+                    + "'" + moDpsEntry.getConcept() + "', "
+                    + "'" + conceptNew + "', "
+                    + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
+                    + "'" + itemRef + "', "
+
+                    + "'" + moDpsEntry.getFkItemId()+ "', "
+                    + "'" + moDpsEntry.getFkItemId() + "', "
+                    + "'" + moDpsDoc[0][0] + "', "
+                    + "'" + moDpsDoc[0][1] + "', "
+                    + "'" + moDpsDoc[0][2] + "', "
+
+                    + "" + miClient.getSession().getUser().getPkUserId() + ", "
+                    + " NOW()); ");
+           
         statement.executeUpdate(sql);
+        
         
     }
     
@@ -3638,7 +3693,7 @@ public abstract class STrnUtilities {
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
         int dpsLength = dpsDoc.length;
-
+        
         for (int i = 0; i < dpsLength; i++) {
             sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
                     + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
@@ -4067,6 +4122,24 @@ public abstract class STrnUtilities {
 
         
        return dpsDoc;
+    }
+    
+    public static int[][] getDpsTpDps(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {
+        ResultSet resultSet;
+        String sql = "";
+        int[][] dpsTpDoc = new int[1][3];
+        
+        sql  = "SELECT * FROM trn_dps WHERE id_year = " + pkYearId + " and id_doc = " + pkDocId + ";";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        
+            while(resultSet.next()) {
+                dpsTpDoc[0][0] = resultSet.getInt("fid_ct_dps");
+                dpsTpDoc[0][1] = resultSet.getInt("fid_cl_dps");
+                dpsTpDoc[0][2] = resultSet.getInt("fid_tp_dps");
+            }
+            
+        return dpsTpDoc;
+        
     }
 
     public static int[][] getDpsRelatedIdPurchaseOrders(SClientInterface miClient, int pkYearId, int pkDocId) throws SQLException {

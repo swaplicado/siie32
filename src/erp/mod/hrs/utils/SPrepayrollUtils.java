@@ -5,8 +5,10 @@
  */
 package erp.mod.hrs.utils;
 
+import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
+import erp.mod.hrs.db.SHrsPayrollUtils;
 import erp.mod.hrs.link.utils.SDay;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
 import java.sql.ResultSet;
@@ -250,10 +252,6 @@ public class SPrepayrollUtils {
             cons.setAuxIsClockSourced(true);
             cons.setParentAbsence(abs);
             
-            cons.setAuxNumber(abs.getNumber());
-            cons.setAuxDateStart(abs.getDateStart());
-            cons.setAuxDateEnd(abs.getDateEnd());
-            
             consms.add(cons);
         }
         
@@ -324,5 +322,29 @@ public class SPrepayrollUtils {
         catch (SQLException ex) {
             Logger.getLogger(SPrepayrollUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Determina si el bono en cuestión requiere pagos previos para otorgarse
+     * 
+     * @param session
+     * @param idBonus
+     * 
+     * @return 
+     */
+    public static boolean isWithPreviousPayment(SGuiSession session, final int idBonus) {
+        String query = "SELECT b_pre_pay FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_BONUS) + " WHERE id_bonus = " + idBonus + ";";
+        
+        try {
+            ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
+            if (resultSet.next()) {
+                return resultSet.getBoolean("b_pre_pay");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SHrsPayrollUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
     }
 }

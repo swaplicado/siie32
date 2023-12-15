@@ -164,8 +164,10 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
     public double getChargedVatTax(int[] typeTax) {
         double tax = 0;
         for (SDataReceiptPaymentPayTax payTax : maDbmsReceiptPaymentPayTaxes) {
-            if (payTax.getRate() == typeTax[0] * 0.01 && payTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                tax += (typeTax[1] == VALUE_BASE ? payTax.getBase() : payTax.getTax()) * mdExchangeRate;
+            if (!payTax.getFactorCode().equals("E")) {
+                if (payTax.getRate() == typeTax[0] * 0.01 && payTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                    tax += (typeTax[1] == VALUE_BASE ? payTax.getBase() : payTax.getTax()) * mdExchangeRate;
+                }
             }
         }
         return tax;

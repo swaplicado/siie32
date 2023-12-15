@@ -7,7 +7,6 @@ package erp.server;
 import erp.SClient;
 import erp.SParamsApp;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataConnectionMonitor;
 import erp.lib.data.SDataDatabase;
@@ -59,8 +58,11 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
     private SDataConnectionMonitor moConnectionMonitor;
 
     public SServer() throws RemoteException {
-        TimeZone.setDefault(SLibTimeUtilities.SysTimeZone);
-
+        if (readParamsServer()) {
+            TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone(moParamsApp.getTimeZone()));
+            SLibUtils.restoreDateFormats(zone);
+            TimeZone.setDefault(zone);
+        }
         mbIsActive = false;
         moDatetimeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
@@ -284,7 +286,7 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
             System.out.println("Reading Server Parameters...");
             if (readParamsServer()) {
                 System.out.println("Server Parameters read!");
-
+ 
                 System.out.println("Launching RMI Registry...");
                 if (launchRmiRegistry()) {
                     System.out.println("RMI Registry launched!...");

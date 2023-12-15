@@ -8,6 +8,7 @@ package erp.mfin.data;
 import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
@@ -15,7 +16,12 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataCfd;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -27,6 +33,7 @@ import sa.lib.SLibUtils;
  * - erp.util.imp.ImportAccountingRecordsMicroSip
  * - erp.mod.hrs.db.SHrsFinUtils
  * - erp.mfin.data.SDataRecord
+ * Also update any change to class members in methods encodeJson() and decodeJson()!
  * All of them execute raw SQL queries, insertions or updates.
  */
 
@@ -38,7 +45,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     
     public static final int LEN_CONCEPT = 100;
     public static final int LEN_REFERENCE = 15;
-
+    
     protected int mnPkYearId;
     protected int mnPkPeriodId;
     protected int mnPkBookkeepingCenterId;
@@ -110,7 +117,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
-
+    
     protected java.lang.String msDbmsAccount;
     protected java.lang.String msDbmsAccountComplement;
     protected java.lang.String msDbmsCostCenter_n;
@@ -143,6 +150,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected int mnAuxCheckNumber;
     protected java.util.Date mtAuxDateCfd;
 
+    protected erp.mfin.data.SDataRecord moParentRecord;
+
     /**
      * Overrides java.lang.Object.clone() function.
      */
@@ -150,6 +159,10 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         super(SDataConstants.FIN_REC_ETY);
         reset();
     }
+    
+    /*
+     * Private methods
+     */
     
     private void sanitizeData() {
         if (msConcept.length() > LEN_CONCEPT) {
@@ -160,6 +173,72 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         }
     }
 
+    /**
+     * Get text for account complement.
+     * WARNING: Consider that all DBMS descriptions should first be retrieved!
+     * @param accountSystemType
+     * @return 
+     */
+    private java.lang.String getAccountComplement(final int accountSystemType) {
+        String accountComplement = "";
+        
+        switch (accountSystemType) {
+            case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                accountComplement = msDbmsBizPartner;
+                break;
+
+            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
+                accountComplement = msDbmsEntity;
+                break;
+
+            case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
+                accountComplement = msDbmsEntity + (msDbmsItem.isEmpty() ? "" : ", " + msDbmsItem);
+                break;
+
+            case SDataConstantsSys.FINS_TP_ACC_SYS_PUR:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_SAL:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ:
+                accountComplement = msDbmsItem;
+                break;
+
+            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
+            case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
+                accountComplement = msDbmsTax;
+                break;
+
+            default:
+        }
+        
+        return accountComplement;
+    }
+    
+    private void readCheck(final java.sql.Statement statement) throws Exception {
+        mnAuxCheckNumber = 0;
+        moDbmsCheck = null;
+        
+        if (mnFkCheckWalletId_n != 0 && mnFkCheckId_n != 0) {
+            SDataCheck check = new SDataCheck();
+            if (check.read(new int[] { mnFkCheckWalletId_n, mnFkCheckId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            }
+            else {
+                mnAuxCheckNumber = check.getNumber();
+                if (mnFkSystemMoveCategoryIdXXX == SDataConstantsSys.FINS_CT_SYS_MOV_CASH) {
+                    moDbmsCheck = check;
+                }
+            }
+        }
+    }
+
+    /*
+     * Public methods
+     */
+    
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkPeriodId(int n) { mnPkPeriodId = n; }
     public void setPkBookkeepingCenterId(int n) { mnPkBookkeepingCenterId = n; }
@@ -323,16 +402,16 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsItemAux(java.lang.String s) { msDbmsItemAux = s; }
     public void setDbmsTax(java.lang.String s) { msDbmsTax = s; }
     public void setDbmsDps(java.lang.String s) { msDbmsDps = s; }
-    public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
-    public void setDbmsIndirectXmlFilesNumber(int i) { mnDbmsIndirectXmlFilesNumber = i; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
     public void setDbmsCheck(erp.mfin.data.SDataCheck o) { moDbmsCheck = o; }
+    public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
+    public void setDbmsIndirectXmlFilesNumber(int i) { mnDbmsIndirectXmlFilesNumber = i; }
     public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
     public void setDbmsDataIndirectCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataIndirectCfd = a; }
     public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
-
+    
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
     public java.lang.String getDbmsAccountComplement() { return msDbmsAccountComplement; }
     public java.lang.String getDbmsCostCenter_n() { return msDbmsCostCenter_n; }
@@ -352,12 +431,12 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsItemAux() { return msDbmsItemAux; }
     public java.lang.String getDbmsTax() { return msDbmsTax; }
     public java.lang.String getDbmsDps() { return msDbmsDps; }
-    public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
-    public int getDbmsIndirectXmlFilesNumber() { return mnDbmsIndirectXmlFilesNumber; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mfin.data.SDataCheck getDbmsCheck() { return moDbmsCheck; }
+    public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
+    public int getDbmsIndirectXmlFilesNumber() { return mnDbmsIndirectXmlFilesNumber; }
     public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfd() { return maDbmsDataCfd; }
     public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataIndirectCfd() { return maDbmsDataIndirectCfd; }
     public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
@@ -367,6 +446,10 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
 
     public int getAuxCheckNumber() { return mnAuxCheckNumber; }
     public java.util.Date getAuxDateCfd() { return mtAuxDateCfd; }
+    
+    public void setParentRecord(erp.mfin.data.SDataRecord o) { moParentRecord = o; }
+
+    public erp.mfin.data.SDataRecord getParentRecord() { return moParentRecord; }
 
     public int[] getKeyCompanyBranch() { return new int[] { mnFkCompanyBranchId_n }; }
     public int[] getKeyCompanyBranchEntity() { return new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n }; }
@@ -519,34 +602,32 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         msDbmsItemAux = "";
         msDbmsTax = "";
         msDbmsDps = "";
+        moDbmsCheck = null;
+        
         mnDbmsXmlFilesNumber = 0;
         mnDbmsIndirectXmlFilesNumber = 0;
-        moDbmsCheck = null;
         maDbmsDataCfd = new HashSet<>();
         maDbmsDataIndirectCfd = new HashSet<>();
         maAuxDataCfdToDel = new HashSet<>();
 
         mnAuxCheckNumber = 0;
         mtAuxDateCfd = null;
+        
+        //moParentRecord = null; // prevent from clearing this member
     }
 
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         Object[] key = (Object[]) pk;
         String sql = "";
-        String compEntity = "";
-        String compBizPartner = "";
-        String compItem = "";
-        String compTax = "";
         ResultSet resultSet = null;
-        SDataCheck check = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
             sql = "SELECT re.*, a.acc, a.fid_tp_acc_sys, cu.cur_key, mtp.tp_acc_mov, mcl.cl_acc_mov, mcls.cls_acc_mov, d.num, d.num_ser, " +
-                    "smcl.name, smtp.name, un.usr, ue.usr, ud.usr, c.cc, e.code, e.ent, b.bp, bcls.bp_key, bclc.bp_key, i.item_key, i.item, ia.item_key, ia.item, t.tax " +
+                    "smcl.name, smtp.name, un.usr, ue.usr, ud.usr, c.cc, e.code, e.ent, b.bp, bcls.bp_key, bclc.bp_key, i.item_key, i.item, ia.item_key, ia.item, t.tax, dpstp.code " +
                     "FROM fin_rec_ety AS re " +
                     "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc " +
                     "INNER JOIN erp.cfgu_cur AS cu ON re.fid_cur = cu.id_cur " +
@@ -567,6 +648,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     "LEFT OUTER JOIN erp.itmu_item AS i ON re.fid_item_n = i.id_item " +
                     "LEFT OUTER JOIN erp.itmu_item AS ia ON re.fid_item_aux_n = ia.id_item " +
                     "LEFT OUTER JOIN erp.finu_tax AS t ON re.fid_tax_bas_n = t.id_tax_bas AND re.fid_tax_n = t.id_tax " +
+                    "LEFT OUTER JOIN erp.trnu_tp_dps dpstp ON dpstp.id_ct_dps = d.fid_ct_dps AND dpstp.id_cl_dps = d.fid_cl_dps AND dpstp.id_tp_dps = d.fid_tp_dps " +
                     "WHERE re.id_year = " + key[0] + " AND re.id_per = " + key[1] + " AND " +
                     "re.id_bkc = " + key[2] + " AND re.id_tp_rec = '" + key[3] + "' AND " +
                     "re.id_num = " + key[4] + " AND re.id_ety = " + key[5] + " ";
@@ -674,21 +756,20 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     msDbmsEntity = "";
                 }
 
+                msDbmsBizPartner = resultSet.getString("b.bp");
+                if (resultSet.wasNull()) {
+                    msDbmsBizPartner = "";
+                }
+                
                 switch (mnFkSystemAccountClassId) {
                     case SModSysConsts.FINS_CL_SYS_ACC_BPR_SUP:
                         msDbmsBizPartnerCode = resultSet.getString("bcls.bp_key");
-                        msDbmsBizPartner = resultSet.getString("b.bp");
                         break;
                     case SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS:
                         msDbmsBizPartnerCode = resultSet.getString("bclc.bp_key");
-                        msDbmsBizPartner = resultSet.getString("b.bp");
                         break;
                     default:
                         msDbmsBizPartnerCode = "";
-                        msDbmsBizPartner = resultSet.getString("b.bp");
-                        if (resultSet.wasNull()) {
-                            msDbmsBizPartner = "";
-                        }
                 }
 
                 msDbmsItemCode = resultSet.getString("i.item_key");
@@ -719,78 +800,15 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 String dpsSeries = resultSet.getString("d.num_ser");
                 String dpsNumber = resultSet.getString("d.num");
                 if (dpsSeries != null && dpsNumber != null) {
-                    msDbmsDps = STrnUtils.formatDocNumber(dpsSeries, dpsNumber);
+                    msDbmsDps = resultSet.getString("dpstp.code") + " " + STrnUtils.formatDocNumber(dpsSeries, dpsNumber);
                 }
                 else {
                     msDbmsDps = "";
                 }
 
-                compBizPartner = resultSet.getString("b.bp");
-                if (resultSet.wasNull()) {
-                    compBizPartner = "";
-                }
-
-                compEntity = resultSet.getString("e.ent");
-                if (resultSet.wasNull()) {
-                    compEntity = "";
-                }
-
-                compItem = resultSet.getString("i.item");
-                if (resultSet.wasNull()) {
-                    compItem = "";
-                }
-
-                compTax = resultSet.getString("t.tax");
-                if (resultSet.wasNull()) {
-                    compTax = "";
-                }
-
-                switch (resultSet.getInt("a.fid_tp_acc_sys")) {
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                        msDbmsAccountComplement = compBizPartner;
-                        break;
-
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
-                        msDbmsAccountComplement = compEntity;
-                        break;
-
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
-                        msDbmsAccountComplement = compEntity + (compItem.isEmpty() ? "" : ", " + compItem);
-                        break;
-
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_PUR:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_SAL:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ:
-                        msDbmsAccountComplement = compItem;
-                        break;
-
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT:
-                    case SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT:
-                        msDbmsAccountComplement = compTax;
-                        break;
-
-                    default:
-                }
-
-                // Read entry's bank check, if any:
-
-                if (mnFkCheckWalletId_n != 0 && mnFkCheckId_n != 0) {
-                    check = new SDataCheck();
-                    if (check.read(new int[] { mnFkCheckWalletId_n, mnFkCheckId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    else {
-                        mnAuxCheckNumber = check.getNumber();
-                        if (mnFkSystemMoveCategoryIdXXX == SDataConstantsSys.FINS_CT_SYS_MOV_CASH) {
-                            moDbmsCheck = check;
-                        }
-                    }
-                }
+                int accountSystemType = resultSet.getInt("a.fid_tp_acc_sys");
+                msDbmsAccountComplement = getAccountComplement(accountSystemType);
+                readCheck(statement);
 
                 // CFD de manera directa: 
                 
@@ -1243,5 +1261,400 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     @Override
     public void setRowValueAt(Object value, int col) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public String encodeJson(erp.client.SClientInterface client) throws ParseException, Exception {
+        JSONObject jsonEntry = new JSONObject();
+        
+        jsonEntry.put("id_year", mnPkYearId);
+        jsonEntry.put("id_per", mnPkPeriodId);
+        jsonEntry.put("id_bkc", mnPkBookkeepingCenterId);
+        jsonEntry.put("id_tp_rec", msPkRecordTypeId);
+        jsonEntry.put("id_num", mnPkNumberId);
+        jsonEntry.put("id_ety", mnPkEntryId);
+        jsonEntry.put("concept", msConcept);
+        jsonEntry.put("ref", msReference);
+        jsonEntry.put("b_ref_tax", mbIsReferenceTax);
+        jsonEntry.put("debit", mdDebit);
+        jsonEntry.put("credit", mdCredit);
+        jsonEntry.put("exc_rate", mdExchangeRate);
+        jsonEntry.put("exc_rate_sys", mdExchangeRateSystem);
+        jsonEntry.put("debit_cur", mdDebitCy);
+        jsonEntry.put("credit_cur", mdCreditCy);
+        jsonEntry.put("units", mdUnits);
+        jsonEntry.put("usr_id", mnUserId);
+        jsonEntry.put("sort_pos", mnSortingPosition);
+        jsonEntry.put("occ_fiscal_id", msOccasionalFiscalId);
+        jsonEntry.put("b_exc_diff", mbIsExchangeDifference);
+        jsonEntry.put("b_sys", mbIsSystem);
+        jsonEntry.put("b_del", mbIsDeleted);
+        jsonEntry.put("fid_acc", msFkAccountIdXXX);
+        jsonEntry.put("fk_acc", mnFkAccountId);
+        jsonEntry.put("fk_cc_n", mnFkCostCenterId_n);
+        jsonEntry.put("fid_tp_acc_mov", mnFkAccountingMoveTypeId);
+        jsonEntry.put("fid_cl_acc_mov", mnFkAccountingMoveClassId);
+        jsonEntry.put("fid_cls_acc_mov", mnFkAccountingMoveSubclassId);
+        jsonEntry.put("fid_cl_sys_mov", mnFkSystemMoveClassId);
+        jsonEntry.put("fid_tp_sys_mov", mnFkSystemMoveTypeId);
+        jsonEntry.put("fid_cl_sys_acc", mnFkSystemAccountClassId);
+        jsonEntry.put("fid_tp_sys_acc", mnFkSystemAccountTypeId);
+        jsonEntry.put("fid_ct_sys_mov_xxx", mnFkSystemMoveCategoryIdXXX);
+        jsonEntry.put("fid_tp_sys_mov_xxx", mnFkSystemMoveTypeIdXXX);
+        jsonEntry.put("fid_cur", mnFkCurrencyId);
+        jsonEntry.put("fid_cc_n", msFkCostCenterIdXXX_n);
+        jsonEntry.put("fid_check_wal_n", mnFkCheckWalletId_n);
+        jsonEntry.put("fid_check_n", mnFkCheckId_n);
+        jsonEntry.put("fid_bp_nr", mnFkBizPartnerId_nr);
+        jsonEntry.put("fid_bpb_n", mnFkBizPartnerBranchId_n);
+        jsonEntry.put("fid_ct_ref_n", mnFkReferenceCategoryId_n);
+        jsonEntry.put("fid_cob_n", mnFkCompanyBranchId_n);
+        jsonEntry.put("fid_ent_n", mnFkEntityId_n);
+        jsonEntry.put("fid_plt_cob_n", mnFkPlantCompanyBranchId_n);
+        jsonEntry.put("fid_plt_ent_n", mnFkPlantEntityId_n);
+        jsonEntry.put("fid_tax_bas_n", mnFkTaxBasicId_n);
+        jsonEntry.put("fid_tax_n", mnFkTaxId_n);
+        jsonEntry.put("fid_year_n", mnFkYearId_n);
+        jsonEntry.put("fid_dps_year_n", mnFkDpsYearId_n);
+        jsonEntry.put("fid_dps_doc_n", mnFkDpsDocId_n);
+        jsonEntry.put("fid_dps_adj_year_n", mnFkDpsAdjustmentYearId_n);
+        jsonEntry.put("fid_dps_adj_doc_n", mnFkDpsAdjustmentDocId_n);
+        jsonEntry.put("fid_diog_year_n", mnFkDiogYearId_n);
+        jsonEntry.put("fid_diog_doc_n", mnFkDiogDocId_n);
+        jsonEntry.put("fid_mfg_year_n", mnFkMfgYearId_n);
+        jsonEntry.put("fid_mfg_ord_n", mnFkMfgOrdId_n);
+        jsonEntry.put("fid_cfd_n", mnFkCfdId_n);
+        jsonEntry.put("fid_cost_gic_n", mnFkCostGicId_n);
+        jsonEntry.put("fid_payroll_n", mnFkPayrollFormerId_n);
+        jsonEntry.put("fid_pay_n", mnFkPayrollId_n);
+        jsonEntry.put("fid_item_n", mnFkItemId_n);
+        jsonEntry.put("fid_item_aux_n", mnFkItemAuxId_n);
+        jsonEntry.put("fid_unit_n", mnFkUnitId_n);
+        jsonEntry.put("fid_bkk_year_n", mnFkBookkeepingYearId_n);
+        jsonEntry.put("fid_bkk_num_n", mnFkBookkeepingNumberId_n);
+        jsonEntry.put("fid_usr_new", mnFkUserNewId);
+        jsonEntry.put("fid_usr_edit", mnFkUserEditId);
+        jsonEntry.put("fid_usr_del", mnFkUserDeleteId);
+        jsonEntry.put("ts_new", SLibUtils.DbmsDateFormatDatetime.format(mtUserNewTs != null ? mtUserNewTs : new Date()));
+        jsonEntry.put("ts_edit", SLibUtils.DbmsDateFormatDatetime.format(mtUserEditTs != null ? mtUserEditTs : new Date()));
+        jsonEntry.put("ts_del", SLibUtils.DbmsDateFormatDatetime.format(mtUserDeleteTs != null ? mtUserDeleteTs : new Date()));
+        
+        return jsonEntry.toJSONString();
+    }
+    
+    @Override
+    public void decodeJson(erp.client.SClientInterface client, java.lang.String json) throws ParseException, Exception {
+        reset();
+        
+        // recover data:
+        
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonEntry = (JSONObject) jsonParser.parse(json);
+        
+        mnPkYearId = new Long((long) jsonEntry.get("id_year")).intValue();
+        mnPkPeriodId = new Long((long) jsonEntry.get("id_per")).intValue();
+        mnPkBookkeepingCenterId = new Long((long) jsonEntry.get("id_bkc")).intValue();
+        msPkRecordTypeId = (java.lang.String) jsonEntry.get("id_tp_rec");
+        mnPkNumberId = new Long((long) jsonEntry.get("id_num")).intValue();
+        mnPkEntryId = new Long((long) jsonEntry.get("id_ety")).intValue();
+        msConcept = (java.lang.String) jsonEntry.get("concept");
+        msReference = (java.lang.String) jsonEntry.get("ref");
+        mbIsReferenceTax = (boolean) jsonEntry.get("b_ref_tax");
+        mdDebit = (double) jsonEntry.get("debit");
+        mdCredit = (double) jsonEntry.get("credit");
+        mdExchangeRate = (double) jsonEntry.get("exc_rate");
+        mdExchangeRateSystem = (double) jsonEntry.get("exc_rate_sys");
+        mdDebitCy = (double) jsonEntry.get("debit_cur");
+        mdCreditCy = (double) jsonEntry.get("credit_cur");
+        mdUnits = (double) jsonEntry.get("units");
+        mnUserId = new Long((long) jsonEntry.get("usr_id")).intValue();
+        mnSortingPosition = new Long((long) jsonEntry.get("sort_pos")).intValue();
+        msOccasionalFiscalId = (java.lang.String) jsonEntry.get("occ_fiscal_id");
+        mbIsExchangeDifference = (boolean) jsonEntry.get("b_exc_diff");
+        mbIsSystem = (boolean) jsonEntry.get("b_sys");
+        mbIsDeleted = (boolean) jsonEntry.get("b_del");
+        msFkAccountIdXXX = (java.lang.String) jsonEntry.get("fid_acc");
+        mnFkAccountId = new Long((long) jsonEntry.get("fk_acc")).intValue();
+        mnFkCostCenterId_n = new Long((long) jsonEntry.get("fk_cc_n")).intValue();
+        mnFkAccountingMoveTypeId = new Long((long) jsonEntry.get("fid_tp_acc_mov")).intValue();
+        mnFkAccountingMoveClassId = new Long((long) jsonEntry.get("fid_cl_acc_mov")).intValue();
+        mnFkAccountingMoveSubclassId = new Long((long) jsonEntry.get("fid_cls_acc_mov")).intValue();
+        mnFkSystemMoveClassId = new Long((long) jsonEntry.get("fid_cl_sys_mov")).intValue();
+        mnFkSystemMoveTypeId = new Long((long) jsonEntry.get("fid_tp_sys_mov")).intValue();
+        mnFkSystemAccountClassId = new Long((long) jsonEntry.get("fid_cl_sys_acc")).intValue();
+        mnFkSystemAccountTypeId = new Long((long) jsonEntry.get("fid_tp_sys_acc")).intValue();
+        mnFkSystemMoveCategoryIdXXX = new Long((long) jsonEntry.get("fid_ct_sys_mov_xxx")).intValue();
+        mnFkSystemMoveTypeIdXXX = new Long((long) jsonEntry.get("fid_tp_sys_mov_xxx")).intValue();
+        mnFkCurrencyId = new Long((long) jsonEntry.get("fid_cur")).intValue();
+        msFkCostCenterIdXXX_n = (java.lang.String) jsonEntry.get("fid_cc_n");
+        mnFkCheckWalletId_n = new Long((long) jsonEntry.get("fid_check_wal_n")).intValue();
+        mnFkCheckId_n = new Long((long) jsonEntry.get("fid_check_n")).intValue();
+        mnFkBizPartnerId_nr = new Long((long) jsonEntry.get("fid_bp_nr")).intValue();
+        mnFkBizPartnerBranchId_n = new Long((long) jsonEntry.get("fid_bpb_n")).intValue();
+        mnFkReferenceCategoryId_n = new Long((long) jsonEntry.get("fid_ct_ref_n")).intValue();
+        mnFkCompanyBranchId_n = new Long((long) jsonEntry.get("fid_cob_n")).intValue();
+        mnFkEntityId_n = new Long((long) jsonEntry.get("fid_ent_n")).intValue();
+        mnFkPlantCompanyBranchId_n = new Long((long) jsonEntry.get("fid_plt_cob_n")).intValue();
+        mnFkPlantEntityId_n = new Long((long) jsonEntry.get("fid_plt_ent_n")).intValue();
+        mnFkTaxBasicId_n = new Long((long) jsonEntry.get("fid_tax_bas_n")).intValue();
+        mnFkTaxId_n = new Long((long) jsonEntry.get("fid_tax_n")).intValue();
+        mnFkYearId_n = new Long((long) jsonEntry.get("fid_year_n")).intValue();
+        mnFkDpsYearId_n = new Long((long) jsonEntry.get("fid_dps_year_n")).intValue();
+        mnFkDpsDocId_n = new Long((long) jsonEntry.get("fid_dps_doc_n")).intValue();
+        mnFkDpsAdjustmentYearId_n = new Long((long) jsonEntry.get("fid_dps_adj_year_n")).intValue();
+        mnFkDpsAdjustmentDocId_n = new Long((long) jsonEntry.get("fid_dps_adj_doc_n")).intValue();
+        mnFkDiogYearId_n = new Long((long) jsonEntry.get("fid_diog_year_n")).intValue();
+        mnFkDiogDocId_n = new Long((long) jsonEntry.get("fid_diog_doc_n")).intValue();
+        mnFkMfgYearId_n = new Long((long) jsonEntry.get("fid_mfg_year_n")).intValue();
+        mnFkMfgOrdId_n = new Long((long) jsonEntry.get("fid_mfg_ord_n")).intValue();
+        mnFkCfdId_n = new Long((long) jsonEntry.get("fid_cfd_n")).intValue();
+        mnFkCostGicId_n = new Long((long) jsonEntry.get("fid_cost_gic_n")).intValue();
+        mnFkPayrollFormerId_n = new Long((long) jsonEntry.get("fid_payroll_n")).intValue();
+        mnFkPayrollId_n = new Long((long) jsonEntry.get("fid_pay_n")).intValue();
+        mnFkItemId_n = new Long((long) jsonEntry.get("fid_item_n")).intValue();
+        mnFkItemAuxId_n = new Long((long) jsonEntry.get("fid_item_aux_n")).intValue();
+        mnFkUnitId_n = new Long((long) jsonEntry.get("fid_unit_n")).intValue();
+        mnFkBookkeepingYearId_n = new Long((long) jsonEntry.get("fid_bkk_year_n")).intValue();
+        mnFkBookkeepingNumberId_n = new Long((long) jsonEntry.get("fid_bkk_num_n")).intValue();
+        mnFkUserNewId = new Long((long) jsonEntry.get("fid_usr_new")).intValue();
+        mnFkUserEditId = new Long((long) jsonEntry.get("fid_usr_edit")).intValue();
+        mnFkUserDeleteId = new Long((long) jsonEntry.get("fid_usr_del")).intValue();
+        mtUserNewTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonEntry.get("ts_new"));
+        mtUserEditTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonEntry.get("ts_edit"));
+        mtUserDeleteTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonEntry.get("ts_del"));
+        
+        // check if registry is new:
+        
+        mbIsRegistryNew = mnPkEntryId == 0;
+        
+        // recover DBMS data:
+        
+        HashMap<String, Object> tempMap;
+        String key;
+        String value;
+        String[] values;
+        
+        // account (name):
+        
+        tempMap = moParentRecord.getTempMap(SDataConstants.FIN_ACC);
+        
+        key = msFkAccountIdXXX;
+        value = (String) tempMap.get(key);
+        if (value == null) {
+            value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FIN_ACC, new Object[] { msFkAccountIdXXX }, SLibConstants.DESCRIPTION_NAME);
+            tempMap.put(key, value);
+        }
+        
+        msDbmsAccount = value;
+        
+        // cost center (name):
+        
+        if (!msFkCostCenterIdXXX_n.isEmpty()) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.FIN_CC);
+            
+            key = msFkCostCenterIdXXX_n;
+            value = (String) tempMap.get(key);
+            if (value == null) {
+                value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FIN_CC, new Object[] { msFkCostCenterIdXXX_n }, SLibConstants.DESCRIPTION_NAME);
+                tempMap.put(key, value);
+            }
+            
+            msDbmsCostCenter_n = value;
+        }
+        
+        // currency (code):
+        
+        tempMap = moParentRecord.getTempMap(SDataConstants.CFGU_CUR);
+        
+        key = "" + mnFkCurrencyId;
+        value = (String) tempMap.get(key);
+        if (value == null) {
+            value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.CFGU_CUR, new int[] { mnFkCurrencyId }, SLibConstants.DESCRIPTION_CODE);
+            tempMap.put(key, value);
+        }
+        
+        msDbmsCurrencyKey = value;
+        
+        // accounting movement subclass, class and type (names):
+        
+        tempMap = moParentRecord.getTempMap(SDataConstants.FINS_CLS_ACC_MOV);
+        
+        key = SLibUtils.textKey(new int[] { mnFkAccountingMoveTypeId, mnFkAccountingMoveClassId, mnFkAccountingMoveSubclassId });
+        values = (String[]) tempMap.get(key);
+        if (values == null) {
+            values = new String[] {
+                SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINS_TP_ACC_MOV, new int[] { mnFkAccountingMoveTypeId }, SLibConstants.DESCRIPTION_NAME),
+                SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINS_CL_ACC_MOV, new int[] { mnFkAccountingMoveTypeId, mnFkAccountingMoveClassId }, SLibConstants.DESCRIPTION_NAME),
+                SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINS_CLS_ACC_MOV, new int[] { mnFkAccountingMoveTypeId, mnFkAccountingMoveClassId, mnFkAccountingMoveSubclassId }, SLibConstants.DESCRIPTION_NAME)
+            };
+            tempMap.put(key, values);
+        }
+        
+        msDbmsAccountingMoveType = values[0];
+        msDbmsAccountingMoveClass = values[1];
+        msDbmsAccountingMoveSubclass = values[2];
+        
+        // system movement type and class (names):
+        
+        tempMap = moParentRecord.getTempMap(SDataConstants.FINS_TP_SYS_MOV_32);
+        
+        key = SLibUtils.textKey(new int[] { mnFkSystemMoveClassId, mnFkSystemMoveTypeId });
+        values = (String[]) tempMap.get(key);
+        if (values == null) {
+            values = new String[] {
+                SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINS_CL_SYS_MOV_32, new int[] { mnFkSystemMoveClassId }, SLibConstants.DESCRIPTION_NAME),
+                SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINS_TP_SYS_MOV_32, new int[] { mnFkSystemMoveClassId, mnFkSystemMoveTypeId }, SLibConstants.DESCRIPTION_NAME)
+            };
+            tempMap.put(key, values);
+        }
+        
+        msDbmsSystemMoveClass = values[0];
+        msDbmsSystemMoveType = values[1];
+        
+        // company-branch entity (code and name):
+        
+        if (mnFkCompanyBranchId_n != 0 && mnFkEntityId_n != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.CFGU_COB_ENT);
+            
+            key = SLibUtils.textKey(new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n });
+            values = (String[]) tempMap.get(key);
+            if (values == null) {
+                values = new String[] {
+                    SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.CFGU_COB_ENT, new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n }, SLibConstants.DESCRIPTION_CODE),
+                    SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.CFGU_COB_ENT, new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n }, SLibConstants.DESCRIPTION_NAME)
+                };
+                tempMap.put(key, values);
+            }
+            
+            msDbmsEntityCode = values[0];
+            msDbmsEntity = values[1];
+        }
+        
+        // business partner (code and name):
+        
+        if (mnFkBizPartnerId_nr != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.BPSU_BP);
+            
+            key = "" + mnFkBizPartnerId_nr;
+            values = (String[]) tempMap.get(key);
+            if (values == null) {
+                values = new String[] {
+                    mnFkReferenceCategoryId_n == 0 ? "" + mnFkBizPartnerId_nr : SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP_CT, new int[] { mnFkBizPartnerId_nr, mnFkReferenceCategoryId_n }, SLibConstants.DESCRIPTION_CODE),
+                    SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { mnFkBizPartnerId_nr }, SLibConstants.DESCRIPTION_NAME)
+                };
+                tempMap.put(key, values);
+            }
+            
+            msDbmsBizPartnerCode = values[0];
+            msDbmsBizPartner = values[1];
+        }
+        
+        // item and auxiliar item (code and name):
+        
+        if (mnFkItemId_n != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.ITMU_ITEM);
+            
+            key = "" + mnFkItemId_n;
+            values = (String[]) tempMap.get(key);
+            if (values == null) {
+                values = new String[] {
+                    SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.ITMU_ITEM, new int[] { mnFkItemId_n }, SLibConstants.DESCRIPTION_CODE),
+                    SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.ITMU_ITEM, new int[] { mnFkItemId_n }, SLibConstants.DESCRIPTION_NAME)
+                };
+                tempMap.put(key, values);
+            }
+            
+            msDbmsItemCode = values[0];
+            msDbmsItem = values[1];
+            
+            if (mnFkItemAuxId_n != 0) {
+                key = "" + mnFkItemAuxId_n;
+                values = (String[]) tempMap.get(key);
+                if (values == null) {
+                    values = new String[] {
+                        SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.ITMU_ITEM, new int[] { mnFkItemAuxId_n }, SLibConstants.DESCRIPTION_CODE),
+                        SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.ITMU_ITEM, new int[] { mnFkItemAuxId_n }, SLibConstants.DESCRIPTION_NAME)
+                    };
+                    tempMap.put(key, values);
+                }
+                
+                msDbmsItemAuxCode = values[0];
+                msDbmsItemAux = values[1];
+            }
+        }
+        
+        // tax (name):
+        
+        if (mnFkTaxBasicId_n != 0 && mnFkTaxId_n != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.FINU_TAX);
+            
+            key = SLibUtils.textKey(new int[] { mnFkTaxBasicId_n, mnFkTaxId_n });
+            value = (String) tempMap.get(key);
+            if (value == null) {
+                value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FINU_TAX, new int[] { mnFkTaxBasicId_n, mnFkTaxId_n }, SLibConstants.DESCRIPTION_NAME);
+                tempMap.put(key, value);
+            }
+            
+            msDbmsTax = value;
+        }
+        
+        // document:
+        
+        if (mnFkDpsYearId_n != 0 && mnFkDpsDocId_n != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.TRN_DPS);
+            
+            key = SLibUtils.textKey(new int[] { mnFkDpsYearId_n, mnFkDpsDocId_n });
+            value = (String) tempMap.get(key);
+            if (value == null) {
+                value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.TRN_DPS, new int[] { mnFkDpsYearId_n, mnFkDpsDocId_n }, SLibConstants.DESCRIPTION_NAME);
+                tempMap.put(key, value);
+            }
+            
+            msDbmsDps = value;
+        }
+        
+        // user new, edit and delete (name):
+        
+        if (mnFkUserNewId != 0 || mnFkUserEditId != 0 || mnFkUserDeleteId != 0) {
+            tempMap = moParentRecord.getTempMap(SDataConstants.USRU_USR);
+            
+            if (mnFkUserNewId != 0) {
+                key = "" + mnFkUserNewId;
+                value = (String) tempMap.get(key);
+                if (value == null) {
+                    value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { mnFkUserNewId }, SLibConstants.DESCRIPTION_NAME);
+                    tempMap.put(key, value);
+                }
+                
+                msDbmsUserNew = value;
+            }
+            
+            if (mnFkUserEditId != 0) {
+                key = "" + mnFkUserEditId;
+                value = (String) tempMap.get(key);
+                if (value == null) {
+                    value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { mnFkUserEditId }, SLibConstants.DESCRIPTION_NAME);
+                    tempMap.put(key, value);
+                }
+                
+                msDbmsUserEdit = value;
+            }
+            
+            if (mnFkUserDeleteId != 0) {
+                key = "" + mnFkUserDeleteId;
+                value = (String) tempMap.get(key);
+                if (value == null) {
+                    value = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { mnFkUserDeleteId }, SLibConstants.DESCRIPTION_NAME);
+                    tempMap.put(key, value);
+                }
+                
+                msDbmsUserDelete = value;
+            }
+        }
+        
+        int accountSystemType = (int) SDataReadDescriptions.getField(client, SDataConstants.FIN_ACC, new Object[] { msFkAccountIdXXX }, SLibConstants.FIELD_TYPE);
+        msDbmsAccountComplement = getAccountComplement(accountSystemType);
+        readCheck(client.getSession().getStatement());
     }
 }

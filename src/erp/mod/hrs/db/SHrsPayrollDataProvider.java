@@ -213,10 +213,6 @@ public class SHrsPayrollDataProvider {
         return registries;
     }
     
-    private ArrayList<SHrsBenefitTableAnniversary> createBenefitTableAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        return SHrsUtils.createBenefitTablesAnniversaries(benefitTables);
-    }
-
     private ArrayList<SDbMwzTypeWage> readMwzTypeWages() throws Exception {
         ArrayList<SDbMwzTypeWage> registries = new ArrayList<>();
 
@@ -378,22 +374,22 @@ public class SHrsPayrollDataProvider {
         return registries;
     }
 
-    private ArrayList<SHrsReceipt> createHrsReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
+    private ArrayList<SHrsReceipt> readHrsReceipts(final SHrsPayroll hrsPayroll) throws Exception {
+        SDbPayroll payroll = hrsPayroll.getPayroll();
         ArrayList<SHrsReceipt> hrsReceipts = new ArrayList<>();
 
-        if (!isNew) {
+        if (!payroll.isRegistryNew()) {
             String sql = "SELECT id_emp " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " " +
-                    "WHERE id_pay = " + payrollId + " AND NOT b_del " +
+                    "WHERE id_pay = " + payroll.getPkPayrollId() + " AND NOT b_del " +
                     "ORDER BY id_emp;";
 
             try (ResultSet resultSet = moSession.getStatement().getConnection().createStatement().executeQuery(sql)) {
                 while (resultSet.next()) {
                     SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
-                    payrollReceipt.read(moSession, new int[] { payrollId, resultSet.getInt(1) });
+                    payrollReceipt.read(moSession, new int[] { payroll.getPkPayrollId(), resultSet.getInt("id_emp") });
                     
-                    SHrsReceipt hrsReceipt = new SHrsReceipt();
-                    hrsReceipt.setHrsPayroll(hrsPayroll);
+                    SHrsReceipt hrsReceipt = new SHrsReceipt(hrsPayroll);
                     
                     // Obtain payroll receipt earnings:
                     
@@ -429,12 +425,13 @@ public class SHrsPayrollDataProvider {
                         }
                     }
                     
-                    // Create employee:
+                    // create HRS employee:
+                    SHrsEmployee hrsEmployee = createHrsEmployee(hrsPayroll, hrsReceipt, payrollReceipt.getPkEmployeeId());
                     
-                    SHrsEmployee hrsEmployee = createHrsEmployee(hrsPayroll, isCopy ? 0 : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(),
-                            hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(), hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd());
-                    hrsEmployee.setHrsReceipt(hrsReceipt);
+                    // asign HRS employee to HRS receipt:
                     hrsReceipt.setHrsEmployee(hrsEmployee);
+                    
+                    // asign payroll receipt to HRS receipt:
                     hrsReceipt.setPayrollReceipt(payrollReceipt);
                     
                     hrsReceipts.add(hrsReceipt);
@@ -739,27 +736,29 @@ public class SHrsPayrollDataProvider {
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             if (resultSet.next()) {
-                if (resultSet.getInt(1) == 0) {
+                if (payrollId == 0 || resultSet.getInt(1) == 0) {
                     // el empleado no tiene recibo en la nómina aún:
+                    // obtener la categoría de su esquema de contratación ya sea de su membresía en la empresa o de su propio registro...
                     
-                    sql = "SELECT trs.rec_sche_cat "
+                    sql = "SELECT COALESCE(trsem.rec_sche_cat, trse.rec_sche_cat) AS _rec_sche_cat "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
                             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
-                            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trse ON trse.id_tp_rec_sche = e.fk_tp_rec_sche "
+                            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trsem ON trsem.id_tp_rec_sche = em.fk_tp_rec_sche_n "
                             + "WHERE e.id_emp = " + employeeId + " AND NOT e.b_del;";
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID = " + employeeId + ".");
                         }
                         else {
-                            category = resultSet1.getInt("trs.rec_sche_cat");
+                            category = resultSet1.getInt("_rec_sche_cat");
                         }
                     }
                 }
                 else {
                     // el empleado ya tiene recibo en la nómina:
+                    // obtener la categoría de su esquema de contratación directamente de su recibo...
                     
                     sql = "SELECT trs.rec_sche_cat "
                             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
@@ -768,7 +767,7 @@ public class SHrsPayrollDataProvider {
 
                     try (ResultSet resultSet1 = miStatement.executeQuery(sql)) {
                         if (!resultSet1.next()) {
-                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID=" + employeeId + ", nómina ID=" + payrollId + ".");
+                            throw new Exception("No fue posible determinar la categoría del régimen de contratación del empleado ID = " + employeeId + ", nómina ID = " + payrollId + ".");
                         }
                         else {
                             category = resultSet1.getInt("trs.rec_sche_cat");
@@ -867,8 +866,8 @@ public class SHrsPayrollDataProvider {
         return moSession;
     }
 
-    public SHrsPayroll createHrsPayroll(final SDbConfig config, final SDbWorkingDaySettings workingDaySettings, final SDbPayroll payroll, final boolean isCopy) throws Exception {
-        SHrsPayroll hrsPayroll = new SHrsPayroll(this, config, workingDaySettings, payroll);
+    public SHrsPayroll createHrsPayroll(final SDbConfig moduleConfig, final SDbWorkingDaySettings workingDaySettings, final SDbPayroll payroll) throws Exception {
+        SHrsPayroll hrsPayroll = new SHrsPayroll(moduleConfig, workingDaySettings, payroll, this);
 
         // Adjustments by loan type:
         hrsPayroll.getLoanTypeAdjustments().addAll(readLoanTypeAdjustment());
@@ -891,12 +890,6 @@ public class SHrsPayrollDataProvider {
         // SS Contribution tables:
         hrsPayroll.getSsContributionTables().addAll(readSsContributionTables());
         
-        // Benefit tables:
-        hrsPayroll.getBenefitTables().addAll(readBenefitTables());
-        
-        // Benefit tables:
-        hrsPayroll.getHrsBenefitTablesAnniversarys().addAll(createBenefitTableAnniversarys((readBenefitTables())));
-
         // MWZ type wages:
         hrsPayroll.getMwzTypeWages().addAll(readMwzTypeWages());
 
@@ -916,7 +909,7 @@ public class SHrsPayrollDataProvider {
         hrsPayroll.getEmployees().addAll(readEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
 
         // Receipts:
-        hrsPayroll.getHrsReceipts().addAll(createHrsReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
+        hrsPayroll.getHrsReceipts().addAll(readHrsReceipts(hrsPayroll));
         
         // Earning computation types:
         populateDescriptionsMap(SModConsts.HRSS_TP_EAR_COMP, SDbRegistry.FIELD_CODE, hrsPayroll.getEarningComputationTypesMap());
@@ -927,45 +920,38 @@ public class SHrsPayrollDataProvider {
         return hrsPayroll;
     }
 
-    public SHrsEmployee computeEmployee(final SHrsEmployee srcHrsEmployee, final int payrollId, final int employeeId, 
-            final int payrollYear, final int payrollYearPeriod, final int fiscalYear, final Date dateStart, final Date dateEnd) throws Exception {
-        SHrsEmployee newHrsEmployee = new SHrsEmployee(payrollYear, payrollYearPeriod, dateStart, dateEnd);
-
-        newHrsEmployee.setEmployee(srcHrsEmployee.getEmployee());
-        newHrsEmployee.setHrsReceipt(srcHrsEmployee.getHrsReceipt());
-        newHrsEmployee.getLoans().addAll(readEmployeeLoans(employeeId));
-        newHrsEmployee.getHrsLoans().addAll(createEmployeeHrsLoans(newHrsEmployee.getLoans(), payrollId));
-        newHrsEmployee.getAbsences().addAll(readEmployeeAbsences(employeeId));
-        newHrsEmployee.getAbsenceConsumptions().addAll(readEmployeeAbsencesConsumptions(newHrsEmployee.getAbsences(), payrollId));
-        newHrsEmployee.getEmployeeHireLogs().addAll(readEmployeeHireLogs(employeeId, dateStart, dateEnd));
+    public SHrsEmployee createHrsEmployee(final SHrsPayroll hrsPayroll, final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
+        SDbPayroll payroll = hrsPayroll.getPayroll(); // convenience variable
+        int payrollId = payroll.getPkPayrollId();
+        int fiscalYear = payroll.getFiscalYear();
+        int periodYear = payroll.getPeriodYear();
+        Date dateStart = payroll.getDateStart();
+        Date dateEnd = payroll.getDateEnd();
+        
+        SHrsEmployee hrsEmployee = new SHrsEmployee(hrsPayroll, hrsReceipt, employeeId);
+        hrsEmployee.getLoans().addAll(readEmployeeLoans(employeeId));
+        hrsEmployee.getHrsLoans().addAll(createEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));
+        hrsEmployee.getAbsences().addAll(readEmployeeAbsences(employeeId));
+        hrsEmployee.getAbsenceConsumptions().addAll(readEmployeeAbsencesConsumptions(hrsEmployee.getAbsences(), payrollId));
+        hrsEmployee.getEmployeeHireLogs().addAll(readEmployeeHireLogs(employeeId, dateStart, dateEnd));
 
         Date annualStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
         Date annualEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
-        int recruitmentSchemaCat = srcHrsEmployee.getEmployee().getXtaEffectiveRecruitmentSchemaCat(); // convenience variable
+        SDbEmployee employee = hrsEmployee.getEmployee();
+        int recruitmentSchemaCat = employee.getXtaEffectiveRecruitmentSchemaCat();
 
-        newHrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(readEmployeeHireLogs(employeeId, annualStart, annualEnd), annualStart, annualEnd));
-        newHrsEmployee.setAnnualTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_STD, payrollId));
-        newHrsEmployee.setAnnualTaxableEarningArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_ART_174, payrollId));
-        newHrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX, payrollId));
-        newHrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX_SUB, payrollId));
+        hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(readEmployeeHireLogs(employeeId, annualStart, annualEnd), annualStart, annualEnd));
+        hrsEmployee.setAnnualTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_STD, payrollId));
+        hrsEmployee.setAnnualTaxableEarningArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_ART_174, payrollId));
+        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX, payrollId));
+        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX_SUB, payrollId));
 
-        newHrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(newHrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
-        newHrsEmployee.setBusinessDays(getEmployeeBusinessDays(newHrsEmployee.getEmployeeHireLogs(), srcHrsEmployee.getEmployee().getFkPaymentTypeId(), dateStart, dateEnd));
-        newHrsEmployee.setSeniority(SHrsUtils.getEmployeeSeniority(srcHrsEmployee.getEmployee().getDateBenefits(), dateEnd));
-        newHrsEmployee.addAllYearHrsAccumulatedEarnigs(createEmployeeAccumulatedEarnings(employeeId, payrollYear, dateEnd, false, payrollId)); // by earning ID
-        newHrsEmployee.addAllYearHrsAccumulatedEarnigsByType(createEmployeeAccumulatedEarnings(employeeId, payrollYear, dateEnd, true, payrollId)); // by earning type
-        newHrsEmployee.addAllYearHrsAccumulatedDeductions(createEmployeeAccumulatedDeductions(employeeId, payrollYear, dateEnd, false, payrollId)); // by deduction ID
-        newHrsEmployee.addAllYearHrsAccumulatedDeductionsByType(createEmployeeAccumulatedDeductions(employeeId, payrollYear, dateEnd, true, payrollId)); // by deduction type
-
-        return newHrsEmployee;
-    }
-
-    public SHrsEmployee createHrsEmployee(final SHrsPayroll hrsPayroll, final int payrollId, final int employeeId, 
-            final int payrollYear, final int payrollYearPeriod, final int fiscalYear, final Date dateStart, final Date dateEnd) throws Exception {
-        SHrsEmployee hrsEmployee = new SHrsEmployee(payrollYear, payrollYearPeriod, dateStart, dateEnd);
-        
-        hrsEmployee.setEmployee(hrsPayroll.getEmployee(employeeId));
-        hrsEmployee = computeEmployee(hrsEmployee, payrollId, employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd);
+        hrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
+        hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), employee.getFkPaymentTypeId(), dateStart, dateEnd));
+        hrsEmployee.addAllYearHrsAccumulatedEarnigs(createEmployeeAccumulatedEarnings(employeeId, periodYear, dateEnd, false, payrollId)); // by earning ID
+        hrsEmployee.addAllYearHrsAccumulatedEarnigsByType(createEmployeeAccumulatedEarnings(employeeId, periodYear, dateEnd, true, payrollId)); // by earning type
+        hrsEmployee.addAllYearHrsAccumulatedDeductions(createEmployeeAccumulatedDeductions(employeeId, periodYear, dateEnd, false, payrollId)); // by deduction ID
+        hrsEmployee.addAllYearHrsAccumulatedDeductionsByType(createEmployeeAccumulatedDeductions(employeeId, periodYear, dateEnd, true, payrollId)); // by deduction type
 
         return hrsEmployee;
     }

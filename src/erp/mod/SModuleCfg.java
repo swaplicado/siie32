@@ -8,10 +8,12 @@ package erp.mod;
 import erp.mod.cfg.db.SDbCompanyBranchEntity;
 import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
+import erp.mod.cfg.db.SDbDocument;
 import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
 import erp.mod.cfg.form.SFormFunctionalArea;
+import erp.mod.cfg.view.SViewAuthorizations;
 import erp.mod.cfg.view.SViewFunctionalArea;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -63,6 +65,9 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_SHIFT:
                 registry = new SDbShift();
+                break;
+            case SModConsts.CFGU_DOC:
+                registry = new SDbDocument();
                 break;
             case SModConsts.LOCU_CTY:
                 registry = new SDbCountry();
@@ -129,12 +134,23 @@ public class SModuleCfg extends SGuiModule {
                 /* Use of other parameters:
                  * subtype = Filter: Entity category ID. Can be 'SLibConsts.UNDEFINED' meaning that all categories are requested.
                  */
-                settings = new SGuiCatalogueSettings("Entidad", 2, 1);
-                sql = "SELECT id_cob AS " + SDbConsts.FIELD_ID + "1, id_ent AS " + SDbConsts.FIELD_ID + "2, ent AS " + SDbConsts.FIELD_ITEM + ", " +
-                        "id_cob AS " + SDbConsts.FIELD_FK + "1 " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
-                        "ORDER BY id_cob, id_ent, ent ";
+                if (params == null) {
+                    settings = new SGuiCatalogueSettings("Entidad", 2, 1);
+                    sql = "SELECT id_cob AS " + SDbConsts.FIELD_ID + "1, id_ent AS " + SDbConsts.FIELD_ID + "2, ent AS " + SDbConsts.FIELD_ITEM + ", " +
+                            "id_cob AS " + SDbConsts.FIELD_FK + "1 " +
+                            "FROM " + SModConsts.TablesMap.get(type) + " " +
+                            "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
+                            "ORDER BY id_cob, id_ent, ent ";
+                }
+                else { // Requisicion de materiales, relacionado a entidad de consumo
+                    settings = new SGuiCatalogueSettings("Almacén", 2, 1);
+                    sql = "SELECT v.id_cob AS " + SDbConsts.FIELD_ID + "1, v.id_ent AS " + SDbConsts.FIELD_ID + "2, v.ent AS " + SDbConsts.FIELD_ITEM + ", " +
+                            "v.id_cob AS " + SDbConsts.FIELD_FK + "1 " +
+                            "FROM " + SModConsts.TablesMap.get(type) + " AS v " +
+                            "INNER JOIN trn_mat_cons_ent_whs AS c ON v.id_cob = c.id_cob AND v.id_ent = c.id_whs " +
+                            "WHERE NOT b_del AND c.id_mat_cons_ent = " + params.getType() + " " + 
+                            "ORDER BY v.id_cob, v.id_ent, v.ent ";
+                }
                 break;
             case SModConsts.CFGU_CUR:
                 settings = new SGuiCatalogueSettings("Moneda", 1, 1, SLibConsts.DATA_TYPE_TEXT);
@@ -182,6 +198,9 @@ public class SModuleCfg extends SGuiModule {
         switch (type) {
             case SModConsts.CFGU_FUNC:
                 view = new SViewFunctionalArea(miClient, "Áreas funcionales");
+                break;
+            case SModConsts.CFGU_AUTHORN_STEP:
+                view = new SViewAuthorizations(miClient, "Autorizaciones");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

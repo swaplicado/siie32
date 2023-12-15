@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.hrs.utils.SPrepayrollUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -124,6 +125,14 @@ public class SDialogPayrollConditionalEarnings extends SBeanFormDialog implement
     
     public int getCurrentBonus() {
         return moBonusKey.getSelectedItem().getPrimaryKey()[0];
+    }
+    
+    public String getCurrentBonusText() {
+        return moBonusKey.getSelectedItem().getItem();
+    }
+    
+    public boolean getWithPreviousPayments() {
+        return SPrepayrollUtils.isWithPreviousPayment(miClient.getSession(), moBonusKey.getSelectedItem().getPrimaryKey()[0]);
     }
     
     @Override

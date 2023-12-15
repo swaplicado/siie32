@@ -16,7 +16,9 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
+import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
@@ -31,11 +33,16 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.hrs.db.SDbAccountingPayroll;
-import erp.mod.hrs.db.SDbAccountingPayrollEmployee;
+import erp.mod.hrs.db.SDbAccountingPayrollReceipt;
+import erp.mod.hrs.db.SDbCfgAccountingDepartment;
+import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SDbPackCostCenters;
+import erp.mod.hrs.db.SDbPackExpenses;
+import erp.mod.hrs.db.SDbPackExpensesItem;
 import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFinUtils;
-import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.mod.utils.SDialogMessages;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -47,17 +54,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
+import sa.lib.SLibProrationUtils;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -70,27 +81,50 @@ import sa.lib.srv.SSrvConsts;
  */
 public class SDialogPayrollAccounting extends JDialog implements ActionListener {
     
+    private static final int CONCEPT_TYPE_EAR = 1;
+    private static final int CONCEPT_TYPE_DED = 2;
     private static final int JOURNAL_VOUCHER_COLS = 5;
     private static final int JOURNAL_VOUCHER_COLS_INDEX = 8;
     
     private int mnFormResult;
     private boolean mbFirstTime;
-    private java.util.Vector<erp.lib.form.SFormField> mvFields;
-    private java.text.SimpleDateFormat moDateFormat;
 
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STablePane moTablePaneEmpAvailable;
     private erp.lib.table.STablePane moTablePaneEmpSelected;
-    private java.lang.String msPayType;
-    private java.lang.String msPayTypeAbbr;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mfin.data.SDataRecord moCurrentRecord;
     private erp.mhrs.data.SDataFormerPayroll moFormerPayroll;
-    private java.util.Vector<java.lang.Object[]> mvRecords; // idx 0: record registry (SDataRecord); idx 1: selected employees (Vector<Integer>)
+    private java.util.ArrayList<RecordEmployees> maRecordEmployeeses;
+    private int mnParamPayrollAccProcess;
+    private int mnNewMoveId;
+    private int mnLastEntryId;
+    private double mdRecordEarnings;
+    private double mdRecordDeductions;
+    private double mdTotalDebit;
+    private double mdTotalCredit;
+    private double mdTotalNetSelected;
     
     private SDbPayroll moPayroll;
     private SDbAccountingPayroll moAccountingPayroll;
-
+    
+    private HashMap<Integer, String> moAccountStrIdsMap; // key: numeric ID of account; value: string ID of account
+    private HashMap<Integer, String> moCostCenterStrIdsMap; // key: numeric ID of cost center; value: string ID of cost center
+    private HashMap<String, SDataAccount> moAccountsMap; // key: string ID of account; value: account
+    private HashMap<String, SDataAccount> moLedgerAccountsMap; // key: string ID of ledger account; value: ledger account
+    
+    private HashMap<Integer, Integer> moDepartmentsPackCostCentersMap; // key: ID of department; value: ID of pack of cost centers
+    private HashMap<Integer, Integer> moEmployeesPackCostCentersMap; // key: ID of employee; value: ID of pack of cost centers
+    private HashMap<Integer, SDbPackCostCenters> moPackCostCentersMap; // key: ID of pack of cost centers; value: pack of cost centers
+    private HashMap<Integer, SDbPackExpenses> moPackExpensesMap; // key: ID of pack of expenses; value: pack of expenses
+    private HashMap<Integer, Department> moDepartmentsMap; // key: ID of department; value: department
+    private HashMap<Integer, Employee> moEmployeesMap; // key: ID of employee; value: employee
+    private HashMap<Integer, Integer> moEmployeesDepartmentsMap; // key: ID of employee; value: ID of department
+    private HashMap<Integer, SDbCfgAccountingDepartment> moDepartmentsCfgAccountingMap; // key: ID of department; value: configuration of accounting
+    private HashMap<Integer, Boolean> moAccountsCostCenterRequiredMap; // key: numeric ID of account; value: flag for cost center required
+    private HashMap<Integer, Boolean> moAccountsBizPartnerRequiredMap; // key: numeric ID of account; value: flag for business partner required
+    private HashMap<String, Integer> moRecordsLastEntryIdMap; // key: PK of record as string; value: last entry ID for record
+    
     /** Creates new form SDialogPayrollAccounting
      * @param client
      * @param payroll
@@ -129,6 +163,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jtfPayrollNotes = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
+        jpJournalVoucher = new javax.swing.JPanel();
         jpAccountingRecord = new javax.swing.JPanel();
         jlRecord = new javax.swing.JLabel();
         jtfRecordDate = new javax.swing.JTextField();
@@ -141,6 +176,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jlBankFilter = new javax.swing.JLabel();
         jcbBankFilter = new javax.swing.JComboBox();
         jlBankFilterHint = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jckAccountingGradual = new javax.swing.JCheckBox();
+        jPanel11 = new javax.swing.JPanel();
         jpEmployeesAvailable = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         jpEmployeesSelected = new javax.swing.JPanel();
@@ -241,7 +280,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalles de la contabilización de la nómina:"));
         jPanel4.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel8.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jpJournalVoucher.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
         jpAccountingRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -285,11 +326,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jlDummy3.setPreferredSize(new java.awt.Dimension(122, 23));
         jpAccountingRecord.add(jlDummy3);
 
-        jPanel8.add(jpAccountingRecord);
+        jpJournalVoucher.add(jpAccountingRecord);
 
         jpPaymentType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBankFilter.setText("Filtro banco:");
+        jlBankFilter.setText("Filtrar banco:");
         jlBankFilter.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPaymentType.add(jlBankFilter);
 
@@ -297,29 +338,48 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jpPaymentType.add(jcbBankFilter);
 
         jlBankFilterHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlBankFilterHint.setText("(al seleccionar empleados)");
-        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlBankFilterHint.setText("(El filtro sólo aplica al usar la opción agregar todos los recibos, '>>')");
+        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(375, 23));
         jpPaymentType.add(jlBankFilterHint);
 
-        jPanel8.add(jpPaymentType);
+        jpJournalVoucher.add(jpPaymentType);
+
+        jPanel8.add(jpJournalVoucher, java.awt.BorderLayout.CENTER);
+
+        jPanel9.setLayout(new java.awt.GridLayout(2, 1));
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckAccountingGradual.setText("Contabilizar gradualmente");
+        jckAccountingGradual.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckAccountingGradual.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jckAccountingGradual.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel10.add(jckAccountingGradual);
+
+        jPanel9.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel9.add(jPanel11);
+
+        jPanel8.add(jPanel9, java.awt.BorderLayout.EAST);
 
         jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados pendientes:"));
+        jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos pendientes de contabilizar:"));
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(450, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlTotalAvailables.setText("Empleados pendientes...");
+        jlTotalAvailables.setText("Recibos pendientes...");
         jlTotalAvailables.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
         jPanel4.add(jpEmployeesAvailable, java.awt.BorderLayout.LINE_START);
 
-        jpEmployeesSelected.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados seleccionados:"));
+        jpEmployeesSelected.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos seleccionados para contabilizar:"));
         jpEmployeesSelected.setPreferredSize(new java.awt.Dimension(475, 100));
         jpEmployeesSelected.setLayout(new java.awt.BorderLayout());
 
-        jlTotalSelected.setText("Empleados seleccionados...");
+        jlTotalSelected.setText("Recibos seleccionados...");
         jlTotalSelected.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesSelected.add(jlTotalSelected, java.awt.BorderLayout.SOUTH);
 
@@ -401,8 +461,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
 
-        mvFields = new Vector<>();
-
         moTablePaneEmpAvailable = new STablePaneGrid(miClient);
         moTablePaneEmpAvailable.setDoubleClickAction(this, "actionAdd");
         jpEmployeesAvailable.add(moTablePaneEmpAvailable, BorderLayout.CENTER);
@@ -411,20 +469,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         moTablePaneEmpSelected.setDoubleClickAction(this, "actionRemove");
         jpEmployeesSelected.add(moTablePaneEmpSelected, BorderLayout.CENTER);
 
-        moDateFormat = new SimpleDateFormat("yyyyMMdd");
-        moAccountingPayroll = new SDbAccountingPayroll();
-
-        msPayType = "";
-        msPayTypeAbbr = "";
         moDialogRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moFormerPayroll = null;
         moCurrentRecord = null;
-        mvRecords = new Vector<>();
 
         i = 0;
         aoTableColumns = new STableColumnForm[8];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
@@ -443,7 +495,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         i = 0;
         aoTableColumns = new STableColumnForm[13];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
@@ -472,6 +524,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
+        
+        try {
+            mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
     private void windowActivated() {
@@ -484,7 +543,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
             else {
                 try {
-                    populatePayroll();
+                    showPayroll();
                     jbPickRecord.requestFocus();
                 }
                 catch (Exception e) {
@@ -506,19 +565,20 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             amountSelected = SLibUtils.roundAmount(amountSelected + ((SRowEmployee) moTablePaneEmpSelected.getTableRow(row)).getPayment());
         }
         
-        jlTotalAvailables.setText("Empleados pendientes: " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpAvailable.getTableGuiRowCount()) + " | "
+        jlTotalAvailables.setText("Recibos pendientes: " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpAvailable.getTableGuiRowCount()) + " | "
                 + "Monto pendiente: $" + SLibUtils.getDecimalFormatAmount().format(amountAvailable) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
-        jlTotalSelected.setText("Empleados seleccionados:  " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpSelected.getTableGuiRowCount()) + " | "
+        
+        jlTotalSelected.setText("Recibos seleccionados:  " + SLibUtils.DecimalFormatInteger.format(moTablePaneEmpSelected.getTableGuiRowCount()) + " | "
                 + "Monto seleccionado: $" + SLibUtils.getDecimalFormatAmount().format(amountSelected) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
     }
     
     @SuppressWarnings("unchecked")
-    private void populatePayroll() {
+    private void showPayroll() {
         // Display payroll:
 
-        jtfPayrollPeriod.setText(moPayroll.getPeriodYear() + "-" + SLibUtils.DecimalFormatCalendarMonth.format(moPayroll.getPeriod()));
-        jtfPayrollNumber.setText((moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + moPayroll.getNumber());
-        jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(moPayroll.getDateStart()) + " - " + SLibUtils.DateFormatDate.format(moPayroll.getDateEnd()));
+        jtfPayrollPeriod.setText(moPayroll.composePayrollPeriod());
+        jtfPayrollNumber.setText(moPayroll.composePayrollNumber());
+        jtfPayrollDates.setText(moPayroll.composePayrollDates());
         jtfPayrollNotes.setText(moPayroll.getNotes());
         jtfPayrollNet.setText(SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()));
 
@@ -527,88 +587,74 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jtfPayrollDates.setCaretPosition(0);
         jtfPayrollNotes.setCaretPosition(0);
         jtfPayrollNet.setCaretPosition(0);
+        
+        jckAccountingGradual.setEnabled(!moPayroll.isAccounting()); // once payroll is bookkept this setting cannot be changed
+        jckAccountingGradual.setSelected(moPayroll.isAccountingGradual());
 
         try {
-            Statement statement = miClient.getSession().getStatement();
+            // Prepare payroll registry:
 
-            String sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, fk_tp_pay_sht, b_clo " +
-                    "FROM hrs_pay " +
-                    "WHERE id_pay = " + moPayroll.getPkPayrollId() + " ";
+            moFormerPayroll = new SDataFormerPayroll();
+            moFormerPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
+            moFormerPayroll.setYear(moPayroll.getPeriodYear());
+            moFormerPayroll.setPeriod(moPayroll.getPeriod());
+            moFormerPayroll.setNumber(moPayroll.getNumber());
+            moFormerPayroll.setType(moPayroll.getPaymentType());
+            moFormerPayroll.setNote(SLibUtils.textLeft(moPayroll.getNotes(), 100));
+            moFormerPayroll.setDateBegin(moPayroll.getDateStart());
+            moFormerPayroll.setDateEnd(moPayroll.getDateEnd());
+            moFormerPayroll.setDatePayment(moPayroll.getDateEnd());
+            moFormerPayroll.setDebit_r(0);
+            moFormerPayroll.setCredit_r(0);
+            moFormerPayroll.setIsRegular(moPayroll.isPayrollNormal());
+            moFormerPayroll.setIsClosed(moPayroll.isClosed());
+            moFormerPayroll.setIsDeleted(false);
+            moFormerPayroll.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            moFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moFormerPayroll.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
 
-            ResultSet resultSet = statement.executeQuery(sql);
-            if (!resultSet.next()) {
-                throw new Exception("No fue posible leer el registro de la nómina.");
-            }
-            else {
-                // Prepare payroll registry:
+            // Prepare bank filter:
 
-                switch (moPayroll.getFkPaymentTypeId()) {
-                    case SModSysConsts.HRSS_TP_PAY_WEE:
-                        msPayType = SHrsFormerConsts.PAY_WEE;
-                        msPayTypeAbbr = SHrsFormerConsts.PAY_WEE_ABB;
-                        break;
-                    case SModSysConsts.HRSS_TP_PAY_FOR:
-                        msPayType = SHrsFormerConsts.PAY_FOR;
-                        msPayTypeAbbr = SHrsFormerConsts.PAY_FOR_ABB;
-                        break;
-                    default:
-                }
+            HashSet<String> banksSet = new HashSet<>();
+            boolean isEmptyBankAdded = false;
 
-                moFormerPayroll = new SDataFormerPayroll();
-                moFormerPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
-                moFormerPayroll.setYear(moPayroll.getPeriodYear());
-                moFormerPayroll.setPeriod(moPayroll.getPeriod());
-                moFormerPayroll.setNumber(moPayroll.getNumber());
-                moFormerPayroll.setType(msPayType);
-                moFormerPayroll.setNote(SLibUtils.textLeft(moPayroll.getNotes(), 100));
-                moFormerPayroll.setDateBegin(moPayroll.getDateStart());
-                moFormerPayroll.setDateEnd(moPayroll.getDateEnd());
-                moFormerPayroll.setDatePayment(moPayroll.getDateEnd());
-                moFormerPayroll.setDebit_r(0);
-                moFormerPayroll.setCredit_r(0);
-                moFormerPayroll.setIsRegular(moPayroll.isPayrollNormal());
-                moFormerPayroll.setIsClosed(moPayroll.isClosed());
-                moFormerPayroll.setIsDeleted(false);
-                moFormerPayroll.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                moFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-                moFormerPayroll.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                
-                // Prepare bank filter:
-                
-                HashSet<String> banksSet = new HashSet<>();
-                boolean isEmptyBankAdded = false;
+            // Show pending payroll receipts:
 
-                // Display payroll data:
+            String sql = "SELECT bp.bp, emp.id_emp, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, dep.name, dep.code, dep.id_dep, "
+                    + "p.fk_tp_pay, pr.ear_r, pr.ded_r, pr.pay_r, pr.pay_day_r, pr.day_wrk, pr.day_not_wrk_r, pr.day_pad, "
+                    + "tpsal.name, tpsal.code, tpemp.name, tpemp.code, tpwrk.name, tpwrk.code, COALESCE(bnk.name, '') AS _bank "
+                    + "FROM hrs_pay AS p "
+                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                    + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
+                    + "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep "
+                    + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp "
+                    + "INNER JOIN erp.hrss_tp_sal AS tpsal ON tpsal.id_tp_sal = pr.fk_tp_sal "
+                    + "INNER JOIN erp.hrsu_tp_emp AS tpemp ON tpemp.id_tp_emp = pr.fk_tp_emp "
+                    + "INNER JOIN erp.hrsu_tp_wrk AS tpwrk ON tpwrk.id_tp_wrk = pr.fk_tp_wrk "
+                    + "LEFT OUTER JOIN erp.hrss_bank AS bnk ON emp.fk_bank_n = bnk.id_bank "
+                    + "WHERE p.id_pay = " + moPayroll.getPkPayrollId() + " AND NOT pr.b_del AND "
+                    + "pr.id_emp NOT IN (" // exclude payroll receipts already bookkept
+                        + "SELECT apr.id_emp "
+                        + "FROM hrs_acc_pay AS ap "
+                        + "INNER JOIN hrs_acc_pay_rcp AS apr ON apr.id_pay = ap.id_pay AND apr.id_acc = ap.id_acc "
+                        + "WHERE ap.id_pay = " + moPayroll.getPkPayrollId() + " AND NOT ap.b_del ORDER BY apr.id_emp) "
+                    + "ORDER BY bp.bp, emp.id_emp ";
 
-                sql = "SELECT bp.bp, emp.id_emp, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, dep.name, dep.code, dep.id_dep, " +
-                        "p.fk_tp_pay, pr.ear_r, pr.ded_r, pr.pay_r, pr.pay_day_r, pr.day_wrk, pr.day_not_wrk_r, pr.day_pad, " +
-                        "tpsal.name, tpsal.code, tpemp.name, tpemp.code, tpwrk.name, tpwrk.code, COALESCE(bnk.name, '') AS _bank " +
-                        "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
-                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
-                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp " +
-                        "INNER JOIN erp.hrss_tp_sal AS tpsal ON tpsal.id_tp_sal = pr.fk_tp_sal " +
-                        "INNER JOIN erp.hrsu_tp_emp AS tpemp ON tpemp.id_tp_emp = pr.fk_tp_emp " +
-                        "INNER JOIN erp.hrsu_tp_wrk AS tpwrk ON tpwrk.id_tp_wrk = pr.fk_tp_wrk " +
-                        "LEFT OUTER JOIN erp.hrss_bank AS bnk ON emp.fk_bank_n = bnk.id_bank " +
-                        "WHERE p.id_pay = " + moPayroll.getPkPayrollId() + " AND NOT pr.b_del " +
-                        "ORDER BY bp.bp, emp.id_emp ";
-
-                resultSet = statement.executeQuery(sql);
+            try (Statement statement = miClient.getSession().getStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SRowEmployee row = new SRowEmployee();
 
                     row.setPrimaryKey(new int[] { resultSet.getInt("emp.id_emp") });
-                    row.getValues().add(resultSet.getString("bp.bp"));
-                    row.getValues().add(resultSet.getInt("_emp_num"));
-                    row.getValues().add(resultSet.getString("dep.name"));
-                    row.getValues().add(resultSet.getString("dep.code"));
-                    row.getValues().add(resultSet.getDouble("pr.ear_r"));
-                    row.getValues().add(resultSet.getDouble("pr.ded_r"));
-                    row.getValues().add(resultSet.getDouble("pr.pay_r"));
-                    row.getValues().add(resultSet.getString("_bank"));
-                    
+                    row.getValues().add(resultSet.getString("bp.bp")); // 0
+                    row.getValues().add(resultSet.getInt("_emp_num")); // 1
+                    row.getValues().add(resultSet.getString("dep.name")); // 2
+                    row.getValues().add(resultSet.getString("dep.code")); // 3
+                    row.getValues().add(resultSet.getDouble("pr.ear_r")); // 4
+                    row.getValues().add(resultSet.getDouble("pr.ded_r")); // 5
+                    row.getValues().add(resultSet.getDouble("pr.pay_r")); // 6
+                    row.getValues().add(resultSet.getString("_bank")); // 7
+
                     row.setEmployeeCategory(resultSet.getString("tpwrk.code"));
                     row.setEmployeeType(resultSet.getString("tpemp.code"));
                     row.setSalaryType(SLibUtils.textLeft(resultSet.getString("tpsal.name"), 3)); // system's catalog, name can be truncated to length of 3
@@ -622,9 +668,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     row.setFkPaymentSystemTypeId(0); // attribute is obsolete!
 
                     moTablePaneEmpAvailable.addTableRow(row);
-                    
+
                     // Process bank filter:
-                    
+
                     if (row.getBank().isEmpty()) {
                         if (!isEmptyBankAdded) {
                             isEmptyBankAdded = true;
@@ -638,15 +684,15 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                 moTablePaneEmpAvailable.renderTableRows();
                 moTablePaneEmpAvailable.setTableRowSelection(0);
-                
+
                 // Set bank filter:
-                
+
                 Object[] banksArray = banksSet.toArray();
                 Arrays.sort(banksArray);
-                
+
                 jcbBankFilter.removeAllItems();
                 jcbBankFilter.addItem("- " + SUtilConsts.TXT_SELECT + " " + SGuiUtils.getLabelName(jlBankFilter) + " -");
-                
+
                 for (Object bank : banksArray) {
                     jcbBankFilter.addItem(bank);
                 }
@@ -659,93 +705,108 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
 
-    private boolean readRecord(Object key) {
-        moCurrentRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, key, SLibConstants.EXEC_MODE_VERBOSE);
-        return true;
-    }
-
-    private void renderRecord() {
-        if (moCurrentRecord == null) {
-            jtfRecordDate.setText("");
-            jtfRecordBranch.setText("");
-            jtfRecordNumber.setText("");
-        }
-        else {
-            jtfRecordDate.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moCurrentRecord.getDate()));
-            jtfRecordBkc.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_BKC, new int[] { moCurrentRecord.getPkBookkeepingCenterId() }, SLibConstants.DESCRIPTION_CODE));
-            jtfRecordBranch.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BPB, new int[] { moCurrentRecord.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
-            jtfRecordNumber.setText(moCurrentRecord.getPkRecordTypeId() + "-" + moCurrentRecord.getPkNumberId());
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    private void initPayrollRecords() {
-        boolean add = false;
-        Object[] recordKey = null;
-        Vector<Integer> employees = null;
-        SDataRecord record = null;
-        SDataFormerPayrollEmp formerPayrollEmp = null;
-        SRowEmployee row = null;
-
-        mvRecords.clear();
+    private void prepareRecordEmployeesForAccounting() throws Exception {
+        mnNewMoveId = 0;
+        mnLastEntryId = 0;
+        mdTotalDebit = 0;
+        mdTotalCredit = 0;
+        mdTotalNetSelected = 0;
+        
+        moAccountStrIdsMap = new HashMap<>();
+        moCostCenterStrIdsMap = new HashMap<>();
+        moAccountsMap = new HashMap<>();
+        moLedgerAccountsMap = new HashMap<>();
+        
+        moDepartmentsPackCostCentersMap = new HashMap<>();
+        moEmployeesPackCostCentersMap = new HashMap<>();
+        moPackCostCentersMap = new HashMap<>();
+        moPackExpensesMap = new HashMap<>();
+        moDepartmentsMap = new HashMap<>();
+        moEmployeesMap = new HashMap<>();
+        moEmployeesDepartmentsMap = new HashMap<>();
+        moDepartmentsCfgAccountingMap = new HashMap<>();
+        moAccountsCostCenterRequiredMap = new HashMap<>();
+        moAccountsBizPartnerRequiredMap = new HashMap<>();
+        moRecordsLastEntryIdMap = new HashMap<>();
+        
         moFormerPayroll.getDbmsDataFormerPayrollEmps().clear();
         moFormerPayroll.getDbmsDataFormerPayrollMoves().clear();
         moFormerPayroll.getAuxDataRecords().clear();
         
-        moAccountingPayroll.setRegistryNew(true);
-        moAccountingPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
-        moAccountingPayroll.getChildAccountingPayrollEmployees().clear();
+        moAccountingPayroll = null;
+        
+        if (jckAccountingGradual.isSelected()) {
+            moAccountingPayroll = SHrsFinUtils.getLastAccountingPayroll(miClient.getSession(), moPayroll.getPkPayrollId());
+            
+            if (moAccountingPayroll != null) {
+                moAccountingPayroll.getChildReceipts().clear(); // preserve from being altered all payroll receipts already bookkept
+            }
+        }
+        
+        if (moAccountingPayroll == null) {
+            moAccountingPayroll = new SDbAccountingPayroll();
+            moAccountingPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
+            moAccountingPayroll.setAuxAccountingGradual(jckAccountingGradual.isSelected());
+        }
+        
+        maRecordEmployeeses = new ArrayList<>();
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
-            add = true;
-            row = (SRowEmployee) moTablePaneEmpSelected.getTableRow(i);
-            recordKey = (Object[]) row.getData();
+            SRowEmployee rowEmployee = (SRowEmployee) moTablePaneEmpSelected.getTableRow(i);
+            Object[] recordKey = (Object[]) rowEmployee.getData(); // record primary key is in Data member, WTF!
+            boolean add = true;
+            ArrayList<Integer> employeeIds = null;
 
-            for (Object[] records : mvRecords) {
-                if (SLibUtilities.compareKeys(((SDataRecord) records[0]).getPrimaryKey(), recordKey)) {
+            for (RecordEmployees recordEmployees : maRecordEmployeeses) {
+                if (SLibUtilities.compareKeys(recordEmployees.Record.getPrimaryKey(), recordKey)) {
                     add = false;
-                    employees = (Vector<Integer>) records[1];
+                    employeeIds = recordEmployees.EmployeeIds;
+                    break;
                 }
             }
-
+            
             if (add) {
-                record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, recordKey, SLibConstants.EXEC_MODE_VERBOSE);
-                for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
-                    if (entry.getFkPayrollId_n() == moPayroll.getPkPayrollId() && !entry.getIsDeleted()) {
-                        entry.setIsDeleted(true);
-                        entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-                        entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, recordKey, SLibConstants.EXEC_MODE_VERBOSE);
+                
+                if (!jckAccountingGradual.isSelected()) {
+                    for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
+                        if (entry.getFkPayrollId_n() == moPayroll.getPkPayrollId() && !entry.getIsDeleted()) {
+                            entry.setIsDeleted(true);
+                            entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                            entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                        }
                     }
                 }
 
-                employees = new Vector<>();
-                employees.add(((int[]) row.getPrimaryKey())[0]);
-
-                mvRecords.add(new Object[] { record, employees });
+                employeeIds = new ArrayList<>();
+                maRecordEmployeeses.add(new RecordEmployees(record, employeeIds));
             }
-            else {
-                employees.add(((int[]) row.getPrimaryKey())[0]);
-            }
+            
+            employeeIds.add(((int[]) rowEmployee.getPrimaryKey())[0]);
 
-            formerPayrollEmp = new SDataFormerPayrollEmp();
+            SDataFormerPayrollEmp formerPayrollEmp = new SDataFormerPayrollEmp();
             formerPayrollEmp.setPkPayrollId(moPayroll.getPkPayrollId());
-            formerPayrollEmp.setPkEmployeeId(((int[]) row.getPrimaryKey())[0]);
-            formerPayrollEmp.setEmployee((String) row.getValues().get(0));
-            formerPayrollEmp.setDepartment((String) row.getValues().get(2));
-            formerPayrollEmp.setDepartmentKey((String) row.getValues().get(3));
-            formerPayrollEmp.setEmployeeCategory(row.getEmployeeCategory());
-            formerPayrollEmp.setEmployeeType(row.getEmployeeType());
-            formerPayrollEmp.setSalaryType(row.getSalaryType());
-            formerPayrollEmp.setDebit((Double) row.getValues().get(4));
-            formerPayrollEmp.setCredit((Double) row.getValues().get(5));
-            formerPayrollEmp.setSalary(row.getSalary());
-            formerPayrollEmp.setDaysNotWorked(row.getDaysNotWorked());
-            formerPayrollEmp.setDaysWorked(row.getDaysWorked());
-            formerPayrollEmp.setDaysPayed(row.getDaysPayed());
+            formerPayrollEmp.setPkEmployeeId(((int[]) rowEmployee.getPrimaryKey())[0]);
+            formerPayrollEmp.setEmployee((String) rowEmployee.getValues().get(0));
+            formerPayrollEmp.setDepartment((String) rowEmployee.getValues().get(2));
+            formerPayrollEmp.setDepartmentKey((String) rowEmployee.getValues().get(3));
+            formerPayrollEmp.setEmployeeCategory(rowEmployee.getEmployeeCategory());
+            formerPayrollEmp.setEmployeeType(rowEmployee.getEmployeeType());
+            formerPayrollEmp.setSalaryType(rowEmployee.getSalaryType());
+            formerPayrollEmp.setDebit((Double) rowEmployee.getValues().get(4));
+            formerPayrollEmp.setCredit((Double) rowEmployee.getValues().get(5));
+            
+            mdTotalNetSelected = SLibUtils.roundAmount(mdTotalNetSelected + (Double) rowEmployee.getValues().get(6));
+            
+            formerPayrollEmp.setSalary(rowEmployee.getSalary());
+            formerPayrollEmp.setDaysNotWorked(rowEmployee.getDaysNotWorked());
+            formerPayrollEmp.setDaysWorked(rowEmployee.getDaysWorked());
+            formerPayrollEmp.setDaysPayed(rowEmployee.getDaysPayed());
             formerPayrollEmp.setNumberSeries(SHrsConsts.CFD_SERIES);
             formerPayrollEmp.setNumber(0);
             formerPayrollEmp.setIsDeleted(false);
-            formerPayrollEmp.setFkBizPartnerId_n(row.getFkBizPartnerId());
+            formerPayrollEmp.setFkBizPartnerId_n(rowEmployee.getFkBizPartnerId());
             formerPayrollEmp.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
             formerPayrollEmp.setFkYearId((Integer) recordKey[0]);
             formerPayrollEmp.setFkPeriodId((Integer) recordKey[1]);
@@ -755,23 +816,316 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
             moFormerPayroll.getDbmsDataFormerPayrollEmps().add(formerPayrollEmp);
             
-            moAccountingPayroll.getChildAccountingPayrollEmployees().add(row.getAccountingPayrollEmployee());
+            moAccountingPayroll.getChildReceipts().add(rowEmployee.getAccountingPayrollReceipt());
         }
     }
 
-    private java.lang.String composeEmployeeQuery(java.util.Vector<java.lang.Integer> employees) {
+    private String getAccountStrId(final int accountId) {
+        String accountStrId = moAccountStrIdsMap.get(accountId);
+        
+        if (accountStrId == null) {
+            accountStrId = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), accountId);
+            moAccountStrIdsMap.put(accountId, accountStrId);
+        }
+        
+        return accountStrId;
+    }
+    
+    private String getCostCenterStrId(final int costCenterId) {
+        String costCenterStrId = moCostCenterStrIdsMap.get(costCenterId);
+        
+        if (costCenterStrId == null) {
+            costCenterStrId = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), costCenterId);
+            moCostCenterStrIdsMap.put(costCenterId, costCenterStrId);
+        }
+        
+        return costCenterStrId;
+    }
+    
+    private SDataAccount getAccount(final String accountStrId) {
+        SDataAccount account = moAccountsMap.get(accountStrId);
+        
+        if (account == null) {
+            account = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { accountStrId }, SLibConstants.EXEC_MODE_VERBOSE);
+            moAccountsMap.put(accountStrId, account);
+        }
+        
+        return account;
+    }
+    
+    private SDataAccount getLedgerAccount(final SDataAccount account) {
+        SDataAccount ledgerAccount = account.getDeep() == 1 ? account : moLedgerAccountsMap.get(account.getDbmsPkAccountMajorIdXXX());
+        
+        if (ledgerAccount == null) {
+            ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+            moLedgerAccountsMap.put(account.getDbmsPkAccountMajorIdXXX(), ledgerAccount);
+        }
+        
+        return ledgerAccount;
+    }
+            
+    private int getPackCostCentersForDepartment(final int departmentId) throws Exception {
+        Integer packCostCentersId = moDepartmentsPackCostCentersMap.get(departmentId);
+
+        if (packCostCentersId == null) {
+            packCostCentersId = SHrsFinUtils.getSuitablePackCostCentersIdForDepartment(miClient.getSession(), departmentId, moPayroll.getDateEnd());
+            moDepartmentsPackCostCentersMap.put(departmentId, packCostCentersId);
+        }
+        
+        return packCostCentersId;
+    }
+    
+    private int getPackCostCentersForEmployee(final int employeeId) throws Exception {
+        Integer packCostCentersId = moEmployeesPackCostCentersMap.get(employeeId);
+
+        if (packCostCentersId == null) {
+            packCostCentersId = SHrsFinUtils.getSuitablePackCostCentersIdForEmployee(miClient.getSession(), employeeId, moPayroll.getDateEnd());
+            moEmployeesPackCostCentersMap.put(employeeId, packCostCentersId);
+        }
+        
+        return packCostCentersId;
+    }
+    
+    private SDbPackCostCenters getPackCostCenters(final int packCostCentersId) throws Exception {
+        SDbPackCostCenters packCostCenters = moPackCostCentersMap.get(packCostCentersId);
+        
+        if (packCostCenters == null) {
+            packCostCenters = (SDbPackCostCenters) miClient.getSession().readRegistry(SModConsts.HRS_PACK_CC, new int[] { packCostCentersId });
+            moPackCostCentersMap.put(packCostCentersId, packCostCenters);
+        }
+        
+        return packCostCenters;
+    }
+    
+    private SDbPackExpenses getPackExpenses(final int packExpensesId) throws Exception {
+        SDbPackExpenses packExpenses = moPackExpensesMap.get(packExpensesId);
+        
+        if (packExpenses == null) {
+            packExpenses = (SDbPackExpenses) miClient.getSession().readRegistry(SModConsts.HRSU_PACK_EXP, new int[] { packExpensesId });
+            moPackExpensesMap.put(packExpensesId, packExpenses);
+        }
+        
+        return packExpenses;
+    }
+    
+    private Department getDepartment(final int departmentId) throws Exception {
+        Department department = null;
+        
+        if (departmentId != 0) {
+            department = moDepartmentsMap.get(departmentId);
+
+            if (department == null) {
+                department = new Department(departmentId, 
+                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { departmentId }, SDbRegistry.FIELD_NAME), 
+                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { departmentId }, SDbRegistry.FIELD_CODE));
+                moDepartmentsMap.put(departmentId, department);
+            }
+        }
+        
+        return department;
+    }
+    
+    private Employee getEmployee(final int employeeId) throws Exception {
+        Employee employee = null;
+        
+        if (employeeId != 0) {
+            employee = moEmployeesMap.get(employeeId);
+
+            if (employee == null) {
+                employee = new Employee(employeeId, 
+                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { employeeId }, SDbRegistry.FIELD_NAME), 
+                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { employeeId }, SDbRegistry.FIELD_CODE), 
+                        (int) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { employeeId }, SDbEmployee.FIELD_BRANCH_HQ));
+                moEmployeesMap.put(employeeId, employee);
+            }
+        }
+        
+        return employee;
+    }
+    
+    private int getEmployeeDepartmentId(final int employeeId) throws Exception {
+        Integer departmentId = 0;
+        
+        if (employeeId != 0) {
+            departmentId = moEmployeesDepartmentsMap.get(employeeId);
+
+            if (departmentId == null) {
+                departmentId = moPayroll.getChildPayrollReceipt(employeeId).getFkDepartmentId();
+                moEmployeesDepartmentsMap.put(employeeId, departmentId);
+            }
+        }
+        
+        return departmentId;
+    }
+    
+    private SDbCfgAccountingDepartment getCfgAccountingForDepartment(final int departmentId) throws Exception {
+        SDbCfgAccountingDepartment cfgAccounting = null;
+        
+        if (departmentId != 0) {
+            cfgAccounting = moDepartmentsCfgAccountingMap.get(departmentId);
+
+            if (cfgAccounting == null) {
+                cfgAccounting = (SDbCfgAccountingDepartment) miClient.getSession().readRegistry(SModConsts.HRS_CFG_ACC_DEP, new int[] { departmentId });
+                if (!cfgAccounting.isRegistryNew()) {
+                    moDepartmentsCfgAccountingMap.put(departmentId, cfgAccounting);
+                }
+                else {
+                    cfgAccounting = null;
+                }
+            }
+        }
+        
+        return cfgAccounting;
+    }
+    
+    private boolean isCostCenterRequiredForAccount(final int accountId) throws Exception {
+        Boolean isRequired = false;
+        
+        if (accountId != 0) {
+            isRequired = moAccountsCostCenterRequiredMap.get(accountId);
+
+            if (isRequired == null) {
+                isRequired = SHrsFinUtils.checkIfAccountRequiresCostCenter(miClient.getSession(), accountId);
+                moAccountsCostCenterRequiredMap.put(accountId, isRequired);
+            }
+        }
+        
+        return isRequired;
+    }
+    
+    private boolean isBizPartnerRequiredForAccount(final int accountId) throws Exception {
+        Boolean isRequired = false;
+        
+        if (accountId != 0) {
+            isRequired = moAccountsBizPartnerRequiredMap.get(accountId);
+
+            if (isRequired == null) {
+                isRequired = SHrsFinUtils.checkIfAccountRequiresBizPartner(miClient.getSession(), accountId);
+                moAccountsBizPartnerRequiredMap.put(accountId, isRequired);
+            }
+        }
+        
+        return isRequired;
+    }
+    
+    private int getLastEntryIdForRecord(final SDataRecord record) throws Exception {
+        Integer lastEntryId = 0;
+        
+        if (record != null) {
+            lastEntryId = moRecordsLastEntryIdMap.get(record.getRecordPrimaryKey());
+
+            if (lastEntryId == null) {
+                lastEntryId = record.getDbmsRecordEntries().size();
+                moRecordsLastEntryIdMap.put(record.getRecordPrimaryKey(), lastEntryId);
+            }
+        }
+        
+        return lastEntryId;
+    }
+    
+    private void preserveLastEntryIdForRecord(final SDataRecord record) {
+        moRecordsLastEntryIdMap.put(record.getRecordPrimaryKey(), mnLastEntryId);
+    }
+    
+    /**
+     * Get total of earning for required parameters.
+     * @param conceptType Concept type: earning or deduction. (Constants declared in this class: CONCEPT_TYPE_...)
+     * @param conceptId ID of earning or deduction.
+     * @param statement DBMS statement.
+     * @param sqlEmployeeIds SQL list of required employee IDs to be processed.
+     * @param sqlEmployeeIdsToExclude SQL list of required employee IDs to be excluded.
+     * @param departmentId ID of deparment. Can be omitted with zero value.
+     * @param employeeId ID of employee. Can be omitted with zero value.
+     * @return
+     * @throws Exception 
+     */
+    private double getConceptAmount(final int conceptType, final int conceptId, final Statement statement, final String sqlEmployeeIds, final String sqlEmployeeIdsToExclude, final int departmentId, final int employeeId) throws Exception {
+        double total = 0;
         String sql = "";
-
-        for (Integer employee : employees) {
-            sql += (sql.length() == 0 ? "" : ", ") + employee;
+        
+        switch (conceptType) {
+            case CONCEPT_TYPE_EAR:
+                sql = "SELECT COALESCE(SUM(pre.amt_r), 0.0) AS _amt_r "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlEmployeeIds + ") AND pre.fk_ear = " + conceptId + " "
+                        + (departmentId == 0 ? "" : "AND pr.fk_dep = " + departmentId + " ")
+                        + (employeeId == 0 ? "" : "AND pr.id_emp = " + employeeId + " ")
+                        + (sqlEmployeeIdsToExclude.isEmpty() ? "" : "AND pr.id_emp NOT IN (" + sqlEmployeeIdsToExclude + ")");
+                break;
+                
+            case CONCEPT_TYPE_DED:
+                sql = "SELECT COALESCE(SUM(prd.amt_r), 0.0) AS _amt_r "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlEmployeeIds + ") AND prd.fk_ded = " + conceptId + " "
+                        + (departmentId == 0 ? "" : "AND pr.fk_dep = " + departmentId + " ")
+                        + (employeeId == 0 ? "" : "AND pr.id_emp = " + employeeId + " ")
+                        + (sqlEmployeeIdsToExclude.isEmpty() ? "" : "AND pr.id_emp NOT IN (" + sqlEmployeeIdsToExclude + ")");
+                break;
+                
+            default:
+                // nothing
         }
-
-        return sql;
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                total = resultSet.getDouble(1);
+            }
+        }
+        
+        return total;
+    }
+    
+    private ArrayList<Integer> getIntersection(final ArrayList<Integer> elementsToCheck, final ArrayList<Integer> listOfElements) {
+        ArrayList<Integer> intersection = new ArrayList<>();
+        
+        for (int element : elementsToCheck) {
+            if (listOfElements.contains(element)) {
+                intersection.add(element);
+            }
+        }
+        
+        return intersection;
+    }
+    
+    private double[] getEmployeesAmounts(final ArrayList<Integer> employeeIds) {
+        double ear = 0;
+        double ded = 0;
+        
+        for (Integer employeeId : employeeIds) {
+            SDbPayrollReceipt receipt = moPayroll.getChildPayrollReceipt(employeeId);
+            ear = SLibUtils.roundAmount(ear + receipt.getEarnings_r());
+            ded = SLibUtils.roundAmount(ded + receipt.getDeductions_r());
+        }
+        
+        return new double[] { ear, ded };
     }
 
-    private erp.mfin.data.SDataRecordEntry createRecordEntry(java.lang.Object recordPk, java.lang.String concept,
-            double debit, double credit, java.lang.String accountId, java.lang.String costCenterId,
-            int itemId, int bpId, int bpbId, int[] taxKey, int[] sysAccountTypeKey, int[] sysMoveTypeKey, int[] sysMoveTypeKeyXXX) {
+    /**
+     * Create record entry.
+     * Increments current record's last entry ID.
+     * @param recordPk
+     * @param concept
+     * @param debit
+     * @param credit
+     * @param accountId
+     * @param costCenterId
+     * @param itemId
+     * @param bizPartnerId
+     * @param bizPartnerBranchId
+     * @param taxKey
+     * @param sysAccountTypeKey
+     * @param sysMoveTypeKey
+     * @param sysMoveTypeKeyXXX
+     * @return 
+     */
+    private SDataRecordEntry createRecordEntry(final Object recordPk, final String concept, final double debit, final double credit, final String accountId, final String costCenterId,
+            final int itemId, final int bizPartnerId, final int bizPartnerBranchId, final int[] taxKey, final int[] sysAccountTypeKey, final int[] sysMoveTypeKey, final int[] sysMoveTypeKeyXXX) {
         SDataRecordEntry entry = new SDataRecordEntry();
 
         entry.setPkYearId((Integer) ((Object[]) recordPk)[0]);
@@ -809,8 +1163,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         entry.setFkCostCenterIdXXX_n(costCenterId);
         entry.setFkCheckWalletId_n(0);
         entry.setFkCheckId_n(0);
-        entry.setFkBizPartnerId_nr(bpId);
-        entry.setFkBizPartnerBranchId_n(bpbId);
+        entry.setFkBizPartnerId_nr(bizPartnerId);
+        entry.setFkBizPartnerBranchId_n(bizPartnerBranchId);
         entry.setFkReferenceCategoryId_n(0);
         entry.setFkCompanyBranchId_n(0);
         entry.setFkEntityId_n(0);
@@ -829,545 +1183,1094 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         entry.setFkItemAuxId_n(0);
         entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        
+        mnLastEntryId++;
 
         return entry;
     }
 
-    @SuppressWarnings("unchecked")
-    private void computePayroll() throws java.lang.Exception {
-        int nType = 0;
-        int nMoveId = 0;
-        int nEntryId = 0;
-        int nResult = 0;
+    /**
+     * Compute record entry.
+     * NOTE: Invoke this method after computeFormerPayrollMove().
+     * @param accountingRecordType
+     * @param record
+     * @param accountId
+     * @param costCenterId
+     * @param itemId
+     * @param bizPartnerId
+     * @param bizPartnerBranchId
+     * @param taxKey
+     * @param conceptType
+     * @param conceptName
+     * @param referenceName
+     * @param referenceCode
+     * @param amount
+     * @return 
+     */
+    private SDataRecordEntry computeRecordEntry(final int accountingRecordType, final SDataRecord record, final int accountId, 
+            final int costCenterId, final int itemId, final int bizPartnerId, final int bizPartnerBranchId, final int[] taxKey, 
+            final int conceptType, final String conceptName, final String referenceName, final String referenceCode, final double amount) {
+        double debit = 0;
+        double credit = 0;
+        String entryConcept = "";
+
+        switch (accountingRecordType) {
+            case SModSysConsts.HRSS_TP_ACC_GBL: // global link
+                entryConcept = moPayroll.composePayrollNumber() + "; " + conceptName;
+                break;
+            case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
+            case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
+                entryConcept = moPayroll.composePayrollNumber() + "; " + conceptName + "; " + referenceCode + ". " + referenceName;
+                break;
+            default:
+                // nothing
+        }
+        
+        entryConcept = SLibUtilities.textLeft(entryConcept, SDataRecordEntry.LEN_CONCEPT);
+
+        switch (conceptType) {
+            case CONCEPT_TYPE_EAR:
+                if (amount >= 0d) {
+                    debit = amount;
+                    credit = 0;
+                }
+                else {
+                    debit = 0;
+                    credit = -amount;
+                }
+                
+                mdRecordEarnings = SLibUtils.roundAmount(mdRecordEarnings + amount);
+                break;
+                
+            case CONCEPT_TYPE_DED:
+                if (amount >= 0d) {
+                    debit = 0;
+                    credit = amount;
+                }
+                else {
+                    debit = -amount;
+                    credit = 0;
+                }
+                
+                mdRecordDeductions = SLibUtils.roundAmount(mdRecordDeductions + amount);
+                break;
+                
+            default:
+                // nothing
+        }
+
+
+        mdTotalDebit = SLibUtils.roundAmount(mdTotalDebit + debit);
+        mdTotalCredit = SLibUtils.roundAmount(mdTotalCredit + credit);
+
+        // Set up account:
+
+        String accountStrId = "";
+        String costCenterStrId = "";
         int[] anSysAccountTypeKey = null;
         int[] anSysMoveTypeKey = null;
         int[] anSysMoveTypeKeyXXX = null;
-        String sql = "";
-        String conceptType = "";
-        String sEmployees = "";
-        Statement oStatementCfg = null;
-        ResultSet oResultSetCfg = null;
-        Statement oStatementRec = null;
-        ResultSet oResultSetRec = null;
-        SServerRequest oRequest = null;
-        SServerResponse oResponse = null;
-        SDataRecord oRecord = null;
-        SDataFormerPayrollMove oPayrollMove = null;
 
-        double totalDebit = 0;
-        double totalCredit = 0;
+        if (accountId != 0) {
+            accountStrId = getAccountStrId(accountId);
+
+            SDataAccount account = getAccount(accountStrId);
+            SDataAccount ledgerAccount = getLedgerAccount(account);
+
+            switch (ledgerAccount.getFkAccountSystemTypeId()) {
+                case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
+                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
+                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
+                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
+                    break;
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
+                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
+                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
+                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+                    break;
+                case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
+                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
+                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
+                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
+                    break;
+                case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
+                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
+                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
+                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
+                    break;
+                default:
+                    anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+                    anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                    anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+            }
+        }
+        else {
+            anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
+            anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+            anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+        }
+
+        // Set up cost center:
+
+        if (costCenterId != 0) {
+            costCenterStrId = getCostCenterStrId(costCenterId);
+        }
+
+        // Create record entry:
+
+        SDataRecordEntry entry = createRecordEntry(record.getPrimaryKey(), entryConcept, debit, credit, accountStrId, costCenterStrId, 
+                itemId, bizPartnerId, bizPartnerBranchId, taxKey, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX);
         
-        HashMap<Integer, String> accountPksMap = new HashMap<>();
-        HashMap<String, SDataAccount> accountsMap = new HashMap<>();
-        HashMap<String, SDataAccount> ledgerAccountsMap = new HashMap<>();
-        HashMap<Integer, String> costCenterPksMap = new HashMap<>();
+        return entry;
+    }
 
-        oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
-        oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
-        SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, "Inconvenientes y omisiones de configuración de contabilización", "Lista de inconvenientes y omisiones de configuración de contabilización:");
+    /**
+     * Compute former payroll movement.
+     * Increments new move ID and adds one to current record's last entry ID.
+     * NOTE: Invoke this method before computeRecordEntry().
+     * @param conceptType
+     * @param conceptId
+     * @param concept
+     * @param referenceId
+     * @param referenceName
+     * @param referenceCode
+     * @param amount
+     * @param record
+     * @return 
+     */
+    private SDataFormerPayrollMove computeFormerPayrollMove(final int conceptType, final int conceptId, final String concept, 
+            final int referenceId, final String referenceName, final String referenceCode, final double amount, final SDataRecord record) {
+        SDataFormerPayrollMove move = new SDataFormerPayrollMove();
         
-        if (SHrsFinUtils.validateAccountingSettingsForPayroll(miClient.getSession(), moPayroll.getPkPayrollId())) {
-            initPayrollRecords();
+        move.setPkPayrollId(moPayroll.getPkPayrollId());
+        move.setPkMoveId(++mnNewMoveId);
+        move.setType(conceptType);
+        move.setTransactionId(conceptId);
+        move.setTransaction(concept);
+        move.setReferenceId(referenceId);
+        move.setReference(referenceName);
+        move.setReferenceKey(referenceCode);
+        move.setAmount(amount);
+        move.setFkYearId(record.getPkYearId());
+        move.setFkPeriodId(record.getPkPeriodId());
+        move.setFkBookkeepingCenterId(record.getPkBookkeepingCenterId());
+        move.setFkRecordTypeId(record.getPkRecordTypeId());
+        move.setFkNumberId(record.getPkNumberId());
+        move.setFkEntryId(mnLastEntryId + 1);
+        
+        return move;
+    }
 
-            for (Object[] records : mvRecords) {
-                oRecord = (SDataRecord) records[0];
-                sEmployees = composeEmployeeQuery((Vector<Integer>) records[1]);
+    /**
+     * Compute concept for accounting dynamic.
+     * @param accountingRecordType Accounting record type: global, department or employee. (Constants declared in class <code>SModSysConsts</code>: HRSS_TP_ACC_...)
+     * @param conceptType Concept type: earning or deduction. (Constants declared in this class: CONCEPT_TYPE_...)
+     * @param conceptDepartmentId Concept's department ID. Can be zero.
+     * @param conceptEmployeeId Concept's employee ID. Can be zero.
+     * @param statement DBMS statement.
+     * @param statementAux DBMS auxiliar statement.
+     * @param sql SQL select statement.
+     * @param sqlEmployeeIds SQL list of required employee IDs to be processed.
+     * @param employeeIdsWithPackCostCenters Array of employee IDs with pack of cost centers.
+     * @param record Journal voucher.
+     * @throws Exception 
+     */
+    private void computeConceptAccountingDynamic(final int accountingRecordType, final int conceptType, final Statement statement, final Statement statementAux, 
+            final String sql, final String sqlEmployeeIds, final ArrayList<Integer> employeeIdsWithPackCostCenters, final SDataRecord record) throws Exception {
+        int conceptId = 0; // earning or deduction ID
+        String conceptName = ""; // name of earning or deduction
+        String conceptNameAbbr = ""; // abbreviated name of earning or deduction
+        String sqlEmployeeIdsWithPackCostCenters = StringUtils.join(employeeIdsWithPackCostCenters, ",");
+        
+        ResultSet resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            // process each earning or deduction:
+
+            // retrieve earning or deduction info only once when needed:
+            
+            if (conceptId != resultSet.getInt("_cpt_id")) {
+                conceptId = resultSet.getInt("_cpt_id"); // ID
+                conceptName = resultSet.getString("_cpt_name"); // name
+                conceptNameAbbr = resultSet.getString("_cpt_name_abbr"); // abbreviated name
+            }
+            
+            // set effective department, employee, pack of cost centers and item as needed:
+            
+            int effDepartmentId = 0;
+            int effEmployeeId = 0;
+            int effPackCostCentersId = 0;
+            int effItemId = 0;
+            int[] effTaxKey = new int[] { resultSet.getInt("_tax_bas_id"), resultSet.getInt("_tax_tax_id") };
+            
+            switch (accountingRecordType) {
+                case SModSysConsts.HRSS_TP_ACC_GBL:
+                    effDepartmentId = 0;
+                    effEmployeeId = 0;
+                    effPackCostCentersId = resultSet.getInt("_pack_cc_id"); // earning's or deductions's own pack
+                    break;
+                    
+                case SModSysConsts.HRSS_TP_ACC_DEP:
+                    effDepartmentId = resultSet.getInt("_dep_id");
+                    effEmployeeId = 0;
+                    effPackCostCentersId = getPackCostCentersForDepartment(effDepartmentId);
+                    break;
+                    
+                case SModSysConsts.HRSS_TP_ACC_EMP:
+                    effDepartmentId = resultSet.getInt("_dep_id");
+                    effEmployeeId = resultSet.getInt("_emp_id");
+                    effPackCostCentersId = getPackCostCentersForEmployee(effEmployeeId);
+                    if (effPackCostCentersId == 0) {
+                        effPackCostCentersId = getPackCostCentersForDepartment(effDepartmentId);
+                    }
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+            
+            // process accounting:
+
+            int accountId = resultSet.getInt("_acc_id"); // bookkeeping account
+            int effBizPartnerId = 0;
+            int effBizPartnerBranchId = 0;
+            
+            if (isBizPartnerRequiredForAccount(accountId)) {
+                switch (accountingRecordType) {
+                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                    case SModSysConsts.HRSS_TP_ACC_DEP:
+                        effBizPartnerId = resultSet.getInt("_bp_id");
+                        effBizPartnerBranchId = resultSet.getInt("_bpb_id");
+                        break;
+
+                    case SModSysConsts.HRSS_TP_ACC_EMP:
+                        SDbCfgAccountingDepartment cfgAccountingDepartment = getCfgAccountingForDepartment(effDepartmentId);
+                        if (cfgAccountingDepartment.getFkBizPartnerId_n() == 0) {
+                            // configuration of department does not have a business partner, use employee by default:
+                            effBizPartnerId = resultSet.getInt("_emp_id");
+                            effBizPartnerBranchId = resultSet.getInt("_empb_id");
+                        }
+                        else {
+                            // configuration of department has been set with a business partner:
+                            effBizPartnerId = resultSet.getInt("_bp_id");
+                            effBizPartnerBranchId = resultSet.getInt("_bpb_id");
+                        }
+                        break;
+
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+            }
+            
+            ArrayList<PayrollAmount> payrollAmounts = new ArrayList<>();
+            
+            if (!isCostCenterRequiredForAccount(accountId)) {
+                // account does not required cost center:
+
+                double amount = getConceptAmount(conceptType, conceptId, statementAux, sqlEmployeeIds, "", effDepartmentId, effEmployeeId);
+                if (amount != 0) {
+                    payrollAmounts.add(new PayrollAmount(effDepartmentId, effEmployeeId, SModSysConsts.HRS_PACK_CC_NA, amount));
+                }
+            }
+            else {
+                // account requires cost center:
+
+                // get total amount for employees who do not require a pack of cost centers:
+
+                double amount = getConceptAmount(conceptType, conceptId, statementAux, sqlEmployeeIds, sqlEmployeeIdsWithPackCostCenters, effDepartmentId, effEmployeeId);
+                if (amount != 0) {
+                    payrollAmounts.add(new PayrollAmount(effDepartmentId, effEmployeeId, effPackCostCentersId, amount));
+                }
+
+                // get amount for each employee who requires a pack of cost centers, only when is adequate:
+
+                for (int employeeId : employeeIdsWithPackCostCenters) {
+                    boolean proceedWithEmployeeAmount = 
+                            accountingRecordType == SModSysConsts.HRSS_TP_ACC_GBL || // in global type there is only one iteration per each earning or deduction, so proceed
+                            accountingRecordType == SModSysConsts.HRSS_TP_ACC_EMP || // in employee type there is only one iteration per employee, so proceed 
+                            (accountingRecordType == SModSysConsts.HRSS_TP_ACC_DEP && effDepartmentId == getEmployeeDepartmentId(employeeId)); // in department type proceed only if current iteration is of employee's department
+                    
+                    if (proceedWithEmployeeAmount) {
+                        amount = getConceptAmount(conceptType, conceptId, statementAux, sqlEmployeeIds, "", effDepartmentId, employeeId);
+                        if (amount != 0) {
+                            payrollAmounts.add(new PayrollAmount(0, employeeId, getPackCostCentersForEmployee(employeeId), amount));
+                        }
+                    }
+                }
                 
-                nEntryId = oRecord.getDbmsRecordEntries().size();
+                // effective item:
                 
-                /*
-                iteration #1: processing of perceptions;
-                iteration #2: processing of deductions.
-                */
-
-                for (nType = 1; nType <= 2; nType++) {
-                    if (nType == 1) {
-                        /* Perception:
-                         * Accountable link level:
-                         * 1. Global
-                         * 2. By department
-                         * 3. By employee
-                         */
-                        
-                        conceptType = "percepción";
-
-                        sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ear AS _id_concept, 0 AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "'' AS _ref_code, '' AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
-                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "UNION "
-                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ear AS _id_concept, pr.fk_dep AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "d.code AS _ref_code, d.name AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
-                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
-                                + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "UNION "
-                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ear AS _id_concept, pr.id_emp AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "e.num AS _ref_code, b.bp AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
-                                + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
-                                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
-                                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
+                int packExpensesId = resultSet.getInt("_pack_exp_id");
+                
+                if (packExpensesId != SModSysConsts.HRSU_PACK_EXP_NA) {
+                    SDbPackExpenses packExpenses = getPackExpenses(packExpensesId);
+                    SDbPackExpensesItem packExpensesItem = packExpenses.getChildItem(resultSet.getInt("_tp_exp_id"));
+                    if (packExpensesItem != null) {
+                        effItemId = packExpensesItem.getFkItemId();
                     }
                     else {
-                        /* Deduction:
-                         * Accountable link level:
-                         * 1. Global
-                         * 2. By department
-                         * 3. By employee
-                         */
-                        
-                        conceptType = "deducción";
-
-                        sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ded AS _id_concept, 0 AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "'' AS _ref_code, '' AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
-                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "UNION "
-                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ded AS _id_concept, pr.fk_dep AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "d.code AS _ref_code, d.name AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
-                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
-                                + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "UNION "
-                                + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ded AS _id_concept, pr.id_emp AS _id_ref, "
-                                + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
-                                + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
-                                + "e.num AS _ref_code, b.bp AS _ref "
-                                + "FROM hrs_pay AS p "
-                                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                                + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
-                                + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
-                                + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
-                                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
-                                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
-                                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
-                                + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sEmployees + ") "
-                                + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
+                        throw new Exception("No existe el tipo de gasto '" + (String) miClient.getSession().readField(SModConsts.HRSU_TP_EXP, new int[] { resultSet.getInt("_tp_exp_id") }, SDbRegistry.FIELD_NAME)+ "' "
+                                + "para el paquete de gastos '" + packExpenses.getName() + "'.");
                     }
+                }
+            }
 
-                    oResultSetCfg = oStatementCfg.executeQuery(sql);
+            // create payroll moves and journal voucher entries:
+            
+            double total = 0;
+            double amount = resultSet.getDouble("_amt");
+            System.out.println("- orig. " + conceptName + ": " + SLibUtils.getDecimalFormatAmount().format(amount));
+
+            for (PayrollAmount payrollAmount : payrollAmounts) {
+                int referenceId = 0;
+                String referenceName = "";
+                String referenceCode = "";
+
+                if (payrollAmount.isEmployeeWithSuitablePackCostCenters()) {
+                    // employee with suitable pack of cost centers:
                     
-                    while (oResultSetCfg.next()) {
-                        int accountingType = oResultSetCfg.getInt("_tp_acc");
-                        int conceptId = oResultSetCfg.getInt("_id_concept");
-                        String conceptCode = oResultSetCfg.getString("_concept_code");
-                        String concept = oResultSetCfg.getString("_concept");
-                        String conceptAbbr = oResultSetCfg.getString("_concept_abbr");
-                        int referenceId = oResultSetCfg.getInt("_id_ref");
-                        String referenceCode = oResultSetCfg.getString("_ref_code");
-                        String reference = oResultSetCfg.getString("_ref");
-                        int accountId = oResultSetCfg.getInt("fk_acc");
-                        int costCenterId = oResultSetCfg.getInt("fk_cc_n");
-                        int itemId = oResultSetCfg.getInt("fk_item_n");
-                        int bizPartnerId = oResultSetCfg.getInt("fk_bp_n");
-                        int taxBasicId = oResultSetCfg.getInt("fk_tax_bas_n");
-                        int taxTaxId = oResultSetCfg.getInt("fk_tax_tax_n");
+                    Employee employee = getEmployee(payrollAmount.EmployeeId);
 
-                        String message = "La configuración de contabilización de la " + conceptType + " código '" + conceptCode + "', '" + concept + "' ('" + conceptAbbr + "'), ";
-                        
-                        switch (accountingType) {
-                            case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                                message += "del ámbito global, tiene un problema:\n";
-                                break;
-                            case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                                message += "del departamento código '" + referenceCode + "', '" + reference + "', tiene un problema:\n";
-                                break;
-                            case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                                message += "del empleado clave '" + referenceCode + "', '" + reference + "', tiene un problema:\n";
-                                break;
-                            default:
-                                // do nothing
-                        }
+                    referenceId = employee.EmployeeId;
+                    referenceName = employee.Name;
+                    referenceCode = employee.Number;
+                    
+                    effBizPartnerId = employee.EmployeeId;
+                    effBizPartnerBranchId = employee.BranchId;
+                }
+                else {
+                    // nominal case:
+                    
+                    switch (accountingRecordType) {
+                        case SModSysConsts.HRSS_TP_ACC_GBL:
+                            // default values already set
+                            break;
 
-                        // Validate account:
-
-                        if (accountId == 0) {
-                            messages.appendMessage(message + "La 'cuenta contable' no ha sido especificada aún.");
-                        }
-                        else {
-                            try {
-                                // validates account and, if necessary, cost center:
-                                SHrsFinUtils.validateAccount(miClient.getSession(), accountId, costCenterId, bizPartnerId, itemId, taxBasicId, taxTaxId);
+                        case SModSysConsts.HRSS_TP_ACC_DEP:
+                            if (payrollAmount.DepartmentId != 0 && payrollAmount.DepartmentId == resultSet.getInt("_dep_id")) {
+                                referenceId = payrollAmount.DepartmentId;
+                                referenceName = resultSet.getString("_dep_name");
+                                referenceCode = resultSet.getString("_dep_code");
                             }
-                            catch (Exception e) {
-                                messages.appendMessage(message + e.getMessage());
-                            }
-                        }
+                            break;
 
-                        // Validate item:
+                        case SModSysConsts.HRSS_TP_ACC_EMP:
+                            if (payrollAmount.EmployeeId != 0 && payrollAmount.EmployeeId == resultSet.getInt("_emp_id")) {
+                                referenceId = payrollAmount.EmployeeId;
+                                referenceName = resultSet.getString("_emp_name");
+                                referenceCode = resultSet.getString("_emp_num");
+                            }
+                            break;
 
-                        SDataItem item = null;
-                        
-                        if (itemId > 0) {
-                            item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
-                            
-                            if (item == null) {
-                                messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") no existe.");
-                            }
-                            else if (item.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") está eliminado.");
-                            }
-                        }
+                        default:
+                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                    }
+                }
 
-                        // Validate business partner:
+                // payroll move:
+                
+                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptName, 
+                        referenceId, referenceName, referenceCode, payrollAmount.Amount, record));
 
-                        SDataBizPartner bizPartner = null;
-                        
-                        if (bizPartnerId == 0) {
-                            if (accountingType == SModSysConsts.HRSS_TP_ACC_EMP) {
-                                messages.appendMessage(message + "El 'asociado de negocios' no ha sido especificado aún.");
-                            }
-                        }
-                        else {
-                            bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
-                            
-                            if (bizPartner == null) {
-                                messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") no existe.");
-                            }
-                            else if (bizPartner.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") está eliminado.");
-                            }
-                        }
+                // journal voucher:
 
-                        // Validate tax:
+                if (payrollAmount.PackCostCentersId == SModSysConsts.HRS_PACK_CC_NA) {
+                    // direct amount, cost centers are not needed:
 
-                        SDataTax tax = null;
-                        
-                        if (taxBasicId != 0 && taxTaxId != 0) {
-                            tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { taxBasicId, taxTaxId }, SLibConstants.EXEC_MODE_VERBOSE);
-                            
-                            if (tax == null) {
-                                messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") no existe.");
-                            }
-                            else if (tax.getIsDeleted()) {
-                                messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") está eliminado.");
-                            }
-                        }
+                    record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
+                            0, 0, effBizPartnerId, effBizPartnerBranchId, effTaxKey, 
+                            conceptType, conceptNameAbbr, referenceName, referenceCode, payrollAmount.Amount));
+                }
+                else {
+                    // prorate amount, cost centers may be needed:
 
-                        if (nType == 1) {
+                    SDbPackCostCenters packCostCenters = getPackCostCenters(payrollAmount.PackCostCentersId);
+                    double[] proratedAmounts = SLibProrationUtils.prorateAmount(payrollAmount.Amount, packCostCenters.getProrationPercentages());
+
+                    for (int i = 0; i < packCostCenters.getChildCostCenters().size(); i++) {
+                        record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
+                                packCostCenters.getChildCostCenters().get(i).getPkCostCenterId(), effItemId, effBizPartnerId, effBizPartnerBranchId, effTaxKey, 
+                                conceptType, conceptNameAbbr, referenceName, referenceCode, proratedAmounts[i]));
+                    }
+                }
+                
+                total = SLibUtils.roundAmount(total + payrollAmount.Amount);
+            }
+            
+            System.out.println("  total " + conceptName + ": " + SLibUtils.getDecimalFormatAmount().format(total) + (SLibUtils.compareAmount(amount, total) ? "" : " !!!"));
+        }
+    }
+    
+    /**
+     * Validate and complete accounting after at the end of the original or dynamic processing.
+     * @throws Exception 
+     */
+    private void validateAndCompleteAccounting() throws Exception {
+        // Validate payroll accounting:
+
+        if (jckAccountingGradual.isSelected()) {
+            if (SLibUtils.roundAmount(mdTotalDebit - mdTotalCredit) != SLibUtils.roundAmount(mdTotalNetSelected)) {
+                
+                throw new Exception("¡Hay una diferencia entre el total neto a contabilizar, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalNetSelected) +", y "
+                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalDebit - mdTotalCredit) +"!");
+            }
+        }
+        else {
+            if (SLibUtils.roundAmount(mdTotalDebit - mdTotalCredit) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
+                throw new Exception("¡Hay una diferencia entre el total neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
+                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalDebit - mdTotalCredit) +"!");
+            }
+        }
+
+        // Save accounting records where each payroll receipt was registered:
+
+        moAccountingPayroll.save(miClient.getSession());
+
+        // Save payroll accounting:
+
+        moFormerPayroll.setDebit_r(mdTotalDebit);
+        moFormerPayroll.setCredit_r(mdTotalCredit);
+        moFormerPayroll.setIsAuxAccountingGradual(jckAccountingGradual.isSelected());
+
+        SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+        request.setPacket(moFormerPayroll);
+        SServerResponse response = miClient.getSessionXXX().request(request);
+
+        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+            throw new Exception(response.getMessage());
+        }
+        else {
+            int result = response.getResultType();
+            if (result != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
+            }
+        }
+
+        // Notify GUI:
+
+        miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
+        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_SIE_PAY);
+        ((SClient) miClient).getSession().notifySuscriptors(SModConsts.HRS_SIE_PAY);
+
+        miClient.showMsgBoxInformation("Los recibos de nómina seleccionados han sido contabilizados.");
+    }
+
+    private void saveAccountingOriginal() throws Exception {
+        SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, 
+                "Inconvenientes y omisiones de configuración de contabilización", 
+                "Lista de inconvenientes y omisiones de configuración de contabilización:");
+        
+        try (Statement statementCfg = miClient.getSession().getStatement().getConnection().createStatement(); Statement statementRec = miClient.getSession().getStatement().getConnection().createStatement()) {
+            if (SHrsFinUtils.validateAccountingSettingsOriginal(miClient.getSession(), moPayroll.getPkPayrollId())) {
+                prepareRecordEmployeesForAccounting();
+
+                for (RecordEmployees recordEmployees : maRecordEmployeeses) {
+                    SDataRecord record = recordEmployees.Record;
+                    
+                    // get last entry ID for current record:
+                    mnLastEntryId = getLastEntryIdForRecord(record);
+                    
+                    String sql;
+                    String sqlRecordEmployeeIds = StringUtils.join(recordEmployees.EmployeeIds, ",");
+                    String conceptTypeName = "";
+
+                    // process first earnings, then deductions:
+                    
+                    /*
+                    iteration #1: processing of perceptions;
+                    iteration #2: processing of deductions.
+                    */
+
+                    for (int conceptType = CONCEPT_TYPE_EAR; conceptType <= CONCEPT_TYPE_DED; conceptType++) {
+                        if (conceptType == CONCEPT_TYPE_EAR) {
                             /* Perception:
                              * Accountable link level:
                              * 1. Global
-                             * 2. By departatment
+                             * 2. By department
                              * 3. By employee
                              */
 
-                            conceptType = "percepción";
-                            
-                            sql = "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY e.id_ear, e.name_abbr " +
-                                    "UNION " +
-                                    "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
-                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ")" +
-                                    (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") + 
-                                    "GROUP BY e.id_ear, e.name_abbr, dep.id_dep, dep.name, dep.code " +
-                                    "UNION " +
-                                    "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
-                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
-                                    "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " + 
-                                    ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
-                                    "GROUP BY e.id_ear, e.name_abbr, bp.id_bp, bp.bp " +
-                                    "ORDER BY f_tp_acc_rec, id_ear, f_ref;";
+                            conceptTypeName = "percepción";
+
+                            sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ear AS _id_concept, 0 AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "'' AS _ref_code, '' AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "UNION "
+                                    + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ear AS _id_concept, pr.fk_dep AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "d.code AS _ref_code, d.name AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
+                                    + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "UNION "
+                                    + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ear AS _id_concept, pr.id_emp AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "e.num AS _ref_code, b.bp AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ear AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ear AS c ON c.id_ear = prc.fk_ear AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ear AS ac ON ac.id_ear = prc.fk_ear AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
+                                    + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
+                                    + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
                         }
                         else {
                             /* Deduction:
                              * Accountable link level:
                              * 1. Global
-                             * 2. By departatment
+                             * 2. By department
                              * 3. By employee
                              */
-                            
-                            conceptType = "deducción";
 
-                            sql = "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
-                                    "GROUP BY d.id_ded, d.name_abbr " +
-                                    "UNION " +
-                                    "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ")" +
-                                    (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") +
-                                    "GROUP BY d.id_ded, d.name_abbr, dep.id_dep, dep.name, dep.code " +
-                                    "UNION " +
-                                    "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
-                                    "FROM hrs_pay AS p " +
-                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                    "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                                    "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
-                                    "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
-                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                    "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sEmployees + ") " +
-                                    ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
-                                    "GROUP BY d.id_ded, d.name_abbr, bp.id_bp, bp.bp " +
-                                    "ORDER BY f_tp_acc_rec, id_ded, f_ref;";
+                            conceptTypeName = "deducción";
+
+                            sql = "SELECT " + SModSysConsts.HRSS_TP_ACC_GBL + " AS _tp_acc, c.id_ded AS _id_concept, 0 AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "'' AS _ref_code, '' AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND ac.id_ref = 0 "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "UNION "
+                                    + "SELECT " + SModSysConsts.HRSS_TP_ACC_DEP + " AS _tp_acc, c.id_ded AS _id_concept, pr.fk_dep AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "d.code AS _ref_code, d.name AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND ac.id_ref = pr.fk_dep "
+                                    + "LEFT OUTER JOIN erp.hrsu_dep AS d ON d.id_dep = pr.fk_dep "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "UNION "
+                                    + "SELECT " + SModSysConsts.HRSS_TP_ACC_EMP + " AS _tp_acc, c.id_ded AS _id_concept, pr.id_emp AS _id_ref, "
+                                    + "c.code AS _concept_code, c.name AS _concept, c.name_abbr AS _concept_abbr, "
+                                    + "ac.fk_acc, ac.fk_cc_n, ac.fk_item_n, ac.fk_bp_n, ac.fk_tax_bas_n, ac.fk_tax_tax_n, "
+                                    + "e.num AS _ref_code, b.bp AS _ref "
+                                    + "FROM hrs_pay AS p "
+                                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                                    + "INNER JOIN hrs_pay_rcp_ded AS prc ON prc.id_pay = pr.id_pay AND prc.id_emp = pr.id_emp "
+                                    + "INNER JOIN hrs_ded AS c ON c.id_ded = prc.fk_ded AND c.fk_tp_acc_cfg = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                    + "LEFT OUTER JOIN hrs_acc_ded AS ac ON ac.id_ded = prc.fk_ded AND ac.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND ac.id_ref = pr.id_emp "
+                                    + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = pr.id_emp "
+                                    + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = pr.id_emp "
+                                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prc.b_del AND (ac.b_del IS NULL OR NOT ac.b_del) AND "
+                                    + "p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                    + "ORDER BY _tp_acc, _concept, _concept_code, _id_concept, _ref, _ref_code, _id_ref;";
                         }
 
-                        oResultSetRec = oStatementRec.executeQuery(sql);
-                        while (oResultSetRec.next()) {
-                            int accountingRecordType = oResultSetRec.getInt("f_tp_acc_rec");
-                            referenceId = oResultSetRec.getInt("f_id_ref");
-                            reference = oResultSetRec.getString("f_ref");
-                            referenceCode = oResultSetRec.getString("f_ref_cve");
-                            double amount = oResultSetRec.getDouble("f_amt");
-                            double debit = 0;
-                            double credit = 0;
+                        ResultSet resultSetCfg = statementCfg.executeQuery(sql);
+                        while (resultSetCfg.next()) {
+                            int accountingType = resultSetCfg.getInt("_tp_acc");
+                            int conceptId = resultSetCfg.getInt("_id_concept");
+                            String conceptCode = resultSetCfg.getString("_concept_code");
+                            String concept = resultSetCfg.getString("_concept");
+                            String conceptAbbr = resultSetCfg.getString("_concept_abbr");
+                            int referenceId = resultSetCfg.getInt("_id_ref");
+                            String referenceCode = resultSetCfg.getString("_ref_code");
+                            String referenceName = resultSetCfg.getString("_ref");
+                            int accountId = resultSetCfg.getInt("fk_acc");
+                            int costCenterId = resultSetCfg.getInt("fk_cc_n");
+                            int itemId = resultSetCfg.getInt("fk_item_n");
+                            int bizPartnerId = resultSetCfg.getInt("fk_bp_n");
+                            int taxBasicId = resultSetCfg.getInt("fk_tax_bas_n");
+                            int taxTaxId = resultSetCfg.getInt("fk_tax_tax_n");
 
-                            // Set up record entry:
-                            
-                            String entryConcept = "";
+                            String message = "La configuración de contabilización de la " + conceptTypeName + " código '" + conceptCode + "', '" + concept + "' ('" + conceptAbbr + "'), ";
 
-                            switch (accountingRecordType) {
+                            switch (accountingType) {
                                 case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                                    entryConcept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + conceptAbbr;
+                                    message += "del ámbito global, tiene un problema:\n";
                                     break;
                                 case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                                    entryConcept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + conceptAbbr + "; " + referenceCode + ". " + reference;
+                                    message += "del departamento código '" + referenceCode + "', '" + referenceName + "', tiene un problema:\n";
                                     break;
                                 case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                                    entryConcept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + conceptAbbr + "; " + referenceCode + ". " + reference;
+                                    message += "del empleado clave '" + referenceCode + "', '" + referenceName + "', tiene un problema:\n";
                                     break;
                                 default:
-                                    // do nothing
+                                    // nothing
                             }
 
-                            if (nType == 1) {
-                                if (amount >= 0d) {
-                                    debit = amount;
-                                    credit = 0;
+                            // Validate account:
+
+                            if (accountId == 0) {
+                                messages.appendMessage(message + "La 'cuenta contable' no ha sido especificada aún.");
+                            }
+                            else {
+                                try {
+                                    // validates account and, if necessary, cost center:
+                                    SHrsFinUtils.validateAccount(miClient.getSession(), accountId, costCenterId, bizPartnerId, itemId, taxBasicId, taxTaxId);
                                 }
-                                else {
-                                    debit = 0;
-                                    credit = -amount;
+                                catch (Exception e) {
+                                    messages.appendMessage(message + e.getMessage());
+                                }
+                            }
+
+                            // Validate item:
+
+                            SDataItem item = null;
+
+                            if (itemId > 0) {
+                                item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
+
+                                if (item == null) {
+                                    messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") no existe.");
+                                }
+                                else if (item.getIsDeleted()) {
+                                    messages.appendMessage(message + "El registro del 'ítem' (ID: " + itemId + ") está eliminado.");
+                                }
+                            }
+
+                            // Validate business partner:
+
+                            SDataBizPartner bizPartner = null;
+
+                            if (bizPartnerId == 0) {
+                                if (accountingType == SModSysConsts.HRSS_TP_ACC_EMP) {
+                                    messages.appendMessage(message + "El 'asociado de negocios' no ha sido especificado aún.");
                                 }
                             }
                             else {
-                                if (amount >= 0d) {
-                                    debit = 0;
-                                    credit = amount;
+                                bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
+
+                                if (bizPartner == null) {
+                                    messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") no existe.");
                                 }
-                                else {
-                                    debit = -amount;
-                                    credit = 0;
+                                else if (bizPartner.getIsDeleted()) {
+                                    messages.appendMessage(message + "El registro del 'asociado de negocios' (ID: " + bizPartnerId + ") está eliminado.");
                                 }
                             }
 
-                            totalDebit = SLibUtils.roundAmount(totalDebit + debit);
-                            totalCredit = SLibUtils.roundAmount(totalCredit + credit);
-                            
-                            // Set up account:
+                            // Validate tax:
 
-                            String accountPk = "";
-                            
-                            if (accountId != 0) {
-                                accountPk = accountPksMap.get(accountId);
-                                
-                                if (accountPk == null) {
-                                    accountPk = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), accountId);
-                                    accountPksMap.put(accountId, accountPk);
-                                }
-                                
-                                SDataAccount account = accountsMap.get(accountPk);
-                                if (account == null) {
-                                    account = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
-                                    accountsMap.put(account.getPkAccountIdXXX(), account);
-                                }
+                            SDataTax tax = null;
 
-                                SDataAccount ledgerAccount = account.getDeep() == 1 ? account : ledgerAccountsMap.get(account.getDbmsPkAccountMajorId());
-                                if (ledgerAccount == null) {
-                                    ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
-                                    ledgerAccountsMap.put(ledgerAccount.getPkAccountIdXXX(), ledgerAccount);
-                                }
+                            if (taxBasicId != 0 && taxTaxId != 0) {
+                                tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { taxBasicId, taxTaxId }, SLibConstants.EXEC_MODE_VERBOSE);
 
-                                switch (ledgerAccount.getFkAccountSystemTypeId()) {
-                                    case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
-                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
-                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;
-                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
-                                        break;
-                                    case SDataConstantsSys.FINS_TP_ACC_SYS_CUS:
-                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL;
-                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_ADJ;
-                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
-                                        break;
-                                    case SDataConstantsSys.FINS_TP_ACC_SYS_CDR:
-                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL;
-                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_ADJ;
-                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CDR;
-                                        break;
-                                    case SDataConstantsSys.FINS_TP_ACC_SYS_DBR:
-                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL;
-                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_ADJ;
-                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR;
-                                        break;
-                                    default:
-                                        anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                        anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
-                                        anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+                                if (tax == null) {
+                                    messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") no existe.");
                                 }
+                                else if (tax.getIsDeleted()) {
+                                    messages.appendMessage(message + "El registro del 'impuesto' (ID: " + taxBasicId + "-" + taxTaxId + ") está eliminado.");
+                                }
+                            }
+
+                            if (conceptType == CONCEPT_TYPE_EAR) {
+                                /* Perception:
+                                 * Accountable link level:
+                                 * 1. Global
+                                 * 2. By departatment
+                                 * 3. By employee
+                                 */
+
+                                conceptTypeName = "percepción";
+
+                                sql = "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") " +
+                                        "GROUP BY e.id_ear, e.name_abbr " +
+                                        "UNION " +
+                                        "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ")" +
+                                        (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") + 
+                                        "GROUP BY e.id_ear, e.name_abbr, dep.id_dep, dep.name, dep.code " +
+                                        "UNION " +
+                                        "SELECT e.fk_tp_acc_rec AS f_tp_acc_rec, e.id_ear, e.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, '' AS f_ref_cve, SUM(pre.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND e.id_ear = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") " + 
+                                        ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
+                                        "GROUP BY e.id_ear, e.name_abbr, bp.id_bp, bp.bp " +
+                                        "ORDER BY f_tp_acc_rec, id_ear, f_ref;";
                             }
                             else {
-                                anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT : SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
-                                anSysMoveTypeKeyXXX = SDataConstantsSys.FINS_TP_SYS_MOV_NA;
+                                /* Deduction:
+                                 * Accountable link level:
+                                 * 1. Global
+                                 * 2. By departatment
+                                 * 3. By employee
+                                 */
+
+                                conceptTypeName = "deducción";
+
+                                sql = "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, 0 AS f_id_ref, '' AS f_ref, '' AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") " +
+                                        "GROUP BY d.id_ded, d.name_abbr " +
+                                        "UNION " +
+                                        "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, dep.id_dep AS f_id_ref, dep.name AS f_ref, dep.code AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ")" +
+                                        (accountingType == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND dep.id_dep = " + referenceId + " ") : "") +
+                                        "GROUP BY d.id_ded, d.name_abbr, dep.id_dep, dep.name, dep.code " +
+                                        "UNION " +
+                                        "SELECT d.fk_tp_acc_rec AS f_tp_acc_rec, d.id_ded, d.name_abbr, bp.id_bp AS f_id_ref, bp.bp AS f_ref, emp.num AS f_ref_cve, SUM(prd.amt_r) AS f_amt " +
+                                        "FROM hrs_pay AS p " +
+                                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                        "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                        "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
+                                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                                        "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
+                                        "AND d.id_ded = " + conceptId + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") " +
+                                        ((accountingType == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (accountingType == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND dep.id_dep = " + referenceId + " ") : "") +
+                                        "GROUP BY d.id_ded, d.name_abbr, bp.id_bp, bp.bp " +
+                                        "ORDER BY f_tp_acc_rec, id_ded, f_ref;";
                             }
 
-                            // Set up cost center:
-                            
-                            String costCenterPk = "";
-                                    
-                            if (costCenterId != 0) {
-                                costCenterPk = costCenterPksMap.get(costCenterId);
+                            ResultSet resultSetRec = statementRec.executeQuery(sql);
+                            while (resultSetRec.next()) {
+                                int accountingRecordType = resultSetRec.getInt("f_tp_acc_rec");
+                                referenceId = resultSetRec.getInt("f_id_ref");
+                                referenceName = resultSetRec.getString("f_ref");
+                                referenceCode = resultSetRec.getString("f_ref_cve");
+                                double amount = resultSetRec.getDouble("f_amt");
+
+                                // Create former payroll move:
+
+                                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, concept, 
+                                        referenceId, referenceName, referenceCode, amount, record));
                                 
-                                if (costCenterPk == null) {
-                                    costCenterPk = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), costCenterId);
-                                    costCenterPksMap.put(costCenterId, costCenterPk);
-                                }
-                            }
-                            
-                            // Create record entry:
-        
-                            oRecord.getDbmsRecordEntries().add(createRecordEntry(oRecord.getPrimaryKey(), SLibUtilities.textLeft(entryConcept, 100),
-                                    debit, credit, accountPk, costCenterPk, itemId,
-                                    bizPartner == null ? 0 : bizPartner.getPkBizPartnerId(),
-                                    bizPartner == null ? 0 : bizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId(),
-                                    new int[] { taxBasicId, taxTaxId }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
+                                // Create record entry:
 
-                            // Create payroll move:
+                                int bpId = bizPartner == null ? 0 : bizPartner.getPkBizPartnerId();
+                                int bpbId = bizPartner == null ? 0 : bizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId();
 
-                            oPayrollMove = new SDataFormerPayrollMove();
-                            oPayrollMove.setPkPayrollId(moPayroll.getPkPayrollId());
-                            oPayrollMove.setPkMoveId(++nMoveId);
-                            oPayrollMove.setType(nType);
-                            oPayrollMove.setTransactionId(conceptId);
-                            oPayrollMove.setTransaction(conceptAbbr);
-                            oPayrollMove.setReferenceId(referenceId);
-                            oPayrollMove.setReference(reference);
-                            oPayrollMove.setReferenceKey(referenceCode);
-                            oPayrollMove.setAmount(amount);
-                            oPayrollMove.setFkYearId(oRecord.getPkYearId());
-                            oPayrollMove.setFkPeriodId(oRecord.getPkPeriodId());
-                            oPayrollMove.setFkBookkeepingCenterId(oRecord.getPkBookkeepingCenterId());
-                            oPayrollMove.setFkRecordTypeId(oRecord.getPkRecordTypeId());
-                            oPayrollMove.setFkNumberId(oRecord.getPkNumberId());
-                            oPayrollMove.setFkEntryId(++nEntryId);
+                                record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
+                                        costCenterId, itemId, bpId, bpbId, new int[] { taxBasicId, taxTaxId }, 
+                                        conceptType, conceptAbbr, referenceName, referenceCode, amount));
 
-                            moFormerPayroll.getDbmsDataFormerPayrollMoves().add(oPayrollMove);
-                        } // end record
-                    } // end configuration
-                } // end processing of perceptions and deductions
-
-                moFormerPayroll.getAuxDataRecords().add(oRecord);
+                            } // end record
+                        } // end configuration
+                    } // end processing of perceptions and deductions
+                    
+                    // add record for further processing:
+                    moFormerPayroll.getAuxDataRecords().add(record);
+                    
+                    // reserve last entry ID for current record:
+                    preserveLastEntryIdForRecord(record);
+                }
             }
         }
-        
+
         if (messages.getMessagesCount() > 0) {
             if (messages.getMessagesCount() == 1) {
                 throw new Exception(messages.getMessages()); // throw exception with a simple message
             }
             else {
                 messages.setVisible(true);
-                throw new Exception("Favor de corregir los inconvenientes y omisiones de configuración de contabilización de nóminas listados.");
+                throw new Exception("Favor de corregir los " + messages.getMessagesCount() + " inconvenientes u omisiones de configuración de contabilización de nóminas mencionados.");
             }
         }
-        
-        moFormerPayroll.setDebit_r(totalDebit);
-        moFormerPayroll.setCredit_r(totalCredit);
 
-        // Validate that fully accounted payroll
+        validateAndCompleteAccounting();
+    }
+    
+    private void saveAccountingDynamic() throws Exception {
+        ArrayList<Integer> employeeIds = new ArrayList<>();
         
-        if (SLibUtils.roundAmount(totalDebit - totalCredit) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
-            throw new Exception("¡Hay una diferencia entre el total neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
-                    + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(totalDebit - totalCredit) +"!");
+        for (STableRow row : moTablePaneEmpSelected.getTableModel().getTableRows()) {
+            employeeIds.add(((int[]) ((SRowEmployee) row).getPrimaryKey())[0]);
         }
         
-        moAccountingPayroll.save(miClient.getSession());
+        ArrayList<String> exceptions = SHrsFinUtils.validateAccountingSettingsDynamic(miClient.getSession(), moPayroll.getPkPayrollId(), moPayroll.getDateEnd(), ArrayUtils.toPrimitive(employeeIds.toArray(new Integer[] {})));
         
-        oRequest = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
-        oRequest.setPacket(moFormerPayroll);
-        oResponse = miClient.getSessionXXX().request(oRequest);
+        if (exceptions.isEmpty()) {
+            try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement(); Statement statementAux = miClient.getSession().getStatement().getConnection().createStatement();) {
+                prepareRecordEmployeesForAccounting(); // prepare journal voucher for employees for accounting
+                
+                ArrayList<Integer> employeeIdsWithPackCostCentersInPayroll = SHrsFinUtils.getEmployeeIdsWithSuitablePackCostCenters(miClient.getSession(), moPayroll.getPkPayrollId(), moPayroll.getDateEnd()); // get employees with custom suitable pack of cost centers
+                
+                // process all selected journal vouchers and its employees:
+                
+                for (RecordEmployees recordEmployees : maRecordEmployeeses) {
+                    String sql = "";
+                    String sqlRecordEmployeeIds = StringUtils.join(recordEmployees.EmployeeIds, ",");
+                    SDataRecord record = recordEmployees.Record;
+                    ArrayList<Integer> employeeIdsWithPackCostCentersInRecord = getIntersection(employeeIdsWithPackCostCentersInPayroll, recordEmployees.EmployeeIds);
+                    
+                    // get last entry ID for current record:
+                    mnLastEntryId = getLastEntryIdForRecord(record);
+                    
+                    // process first earnings, then deductions:
+                    mdRecordEarnings = 0;
+                    mdRecordDeductions = 0;
+                    
+                    /*
+                    iteration #1: processing of perceptions;
+                    iteration #2: processing of deductions.
+                    */
+                    
+                    for (int conceptType = CONCEPT_TYPE_EAR; conceptType <= CONCEPT_TYPE_DED; conceptType++) {
+                        /*
+                        1. Process earnings and deductions whose accounting type for bookkeeping is GLOBAL.
+                        NOTE: 1) An individual accounting setting for each earning or deduction must exist.
+                        */
 
-        if (oResponse.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-            throw new Exception(oResponse.getMessage());
+                        switch (conceptType) {
+                            case CONCEPT_TYPE_EAR:
+                                sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
+                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "cac.fk_acc AS _acc_id, cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "1 AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, " // XXX 2023-11-29, Sergio Flores: Improve this! There is no way to setup an expense type for GLOBAL accounting record type!
+                                        + "SUM(pre.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " AS cac ON cac.id_ear = e.id_ear AND cac.fk_tp_acc_rec = e.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cac.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                        + "GROUP BY e.id_ear, e.code, e.name, e.name_abbr "
+                                        + "ORDER BY e.code, e.name, e.name_abbr, e.id_ear;";
+                                break;
+                                
+                            case CONCEPT_TYPE_DED:
+                                sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
+                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "cac.fk_acc AS _acc_id, cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "1 AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, " // XXX 2023-11-29, Sergio Flores: Improve this! There is no way to setup an expense type for GLOBAL accounting record type!
+                                        + "SUM(prd.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cac ON cac.id_ded = d.id_ded AND cac.fk_tp_acc_rec = d.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cac.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " "
+                                        + "GROUP BY d.id_ded, d.code, d.name, d.name_abbr "
+                                        + "ORDER BY d.code, d.name, d.name_abbr, d.id_ded;";
+                                break;
+                                
+                            default:
+                                // nothing
+                        }
+                        
+                        computeConceptAccountingDynamic(SModSysConsts.HRSS_TP_ACC_GBL, conceptType, statement, statementAux, 
+                                sql, sqlRecordEmployeeIds, employeeIdsWithPackCostCentersInRecord, record);
+
+                        /*
+                        2. Process earnings and deductions whose accounting type for bookkeeping is DEPARTMENT.
+                        NOTE: 1) An individual accounting setting for each department must exist.
+                        */
+
+                        switch (conceptType) {
+                            case CONCEPT_TYPE_EAR:
+                                sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cad.fk_tp_exp AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
+                                        + "SUM(pre.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " AS cac ON cac.id_ear = e.id_ear AND cac.fk_tp_acc_rec = e.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                        + "GROUP BY e.id_ear, e.code, e.name, e.name_abbr, dep.id_dep, dep.name "
+                                        + "ORDER BY e.code, e.name, e.name_abbr, e.id_ear, dep.name, dep.id_dep;";
+                                break;
+                                
+                            case CONCEPT_TYPE_DED:
+                                sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cad.fk_tp_exp AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
+                                        + "SUM(prd.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cac ON cac.id_ded = d.id_ded AND cac.fk_tp_acc_rec = d.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " "
+                                        + "GROUP BY d.id_ded, d.code, d.name, d.name_abbr, dep.id_dep, dep.name "
+                                        + "ORDER BY d.code, d.name, d.name_abbr, d.id_ded, dep.name, dep.id_dep;";
+                                break;
+                                
+                            default:
+                                // nothing
+                        }
+                        
+                        computeConceptAccountingDynamic(SModSysConsts.HRSS_TP_ACC_DEP, conceptType, statement, statementAux, 
+                                sql, sqlRecordEmployeeIds, employeeIdsWithPackCostCentersInRecord, record);
+
+                        /*
+                        3. Process earnings and deductions whose accounting type for bookkeeping is DEPARTMENT.
+                        NOTE: 1) An individual accounting setting for each department must exist.
+                        */
+
+                        switch (conceptType) {
+                            case CONCEPT_TYPE_EAR:
+                                sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
+                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cad.fk_tp_exp AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
+                                        + "SUM(pre.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " AS cac ON cac.id_ear = e.id_ear AND cac.fk_tp_acc_rec = e.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS empb ON empb.fid_bp = emp.id_emp AND empb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND e.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                        + "GROUP BY e.id_ear, e.code, e.name, e.name_abbr, emp.id_emp, bp.bp "
+                                        + "ORDER BY e.code, e.name, e.name_abbr, e.id_ear, bp.bp, emp.id_emp;";
+                                break;
+                                
+                            case CONCEPT_TYPE_DED:
+                                sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
+                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cad.fk_tp_exp AS _tp_exp_id, "
+                                        + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
+                                        + "SUM(prd.amt_r) AS _amt "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
+                                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cac ON cac.id_ded = d.id_ded AND cac.fk_tp_acc_rec = d.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS empb ON empb.fid_bp = emp.id_emp AND empb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
+                                        + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                                        + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
+                                        + "AND d.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " "
+                                        + "GROUP BY d.id_ded, d.code, d.name, d.name_abbr, emp.id_emp, bp.bp "
+                                        + "ORDER BY d.code, d.name, d.name_abbr, d.id_ded, bp.bp, emp.id_emp;";
+                                break;
+                                
+                            default:
+                                // nothing
+                        }
+                        
+                        computeConceptAccountingDynamic(SModSysConsts.HRSS_TP_ACC_EMP, conceptType, statement, statementAux, 
+                                sql, sqlRecordEmployeeIds, employeeIdsWithPackCostCentersInRecord, record);
+                    }
+
+                    // add record for further processing:
+                    moFormerPayroll.getAuxDataRecords().add(record);
+                    
+                    // reserve last entry ID for current record:
+                    preserveLastEntryIdForRecord(record);
+                    
+                    // render record totals:
+                    double[] amounts = getEmployeesAmounts(recordEmployees.EmployeeIds);
+                    
+                    System.out.println("Record " + record.getRecordPrimaryKey() + ":");
+                    System.out.println("original earnings: " + SLibUtils.getDecimalFormatAmount().format(amounts[0]) + " deductions: " + SLibUtils.getDecimalFormatAmount().format(amounts[1]) + ";");
+                    System.out.println("computed earnings: " + SLibUtils.getDecimalFormatAmount().format(mdRecordEarnings) + " deductions: " + SLibUtils.getDecimalFormatAmount().format(mdRecordDeductions) + ".");
+                }
+            }
+            
+            validateAndCompleteAccounting();
         }
         else {
-            nResult = oResponse.getResultType();
-            if (nResult != SLibConstants.DB_ACTION_SAVE_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (oResponse.getMessage().length() == 0 ? "" : "\n" + oResponse.getMessage()));
+            if (exceptions.size() == 1) {
+                throw new Exception(exceptions.get(0)); // throw exception with a simple message
+            }
+            else {
+                SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, 
+                        "Inconvenientes y omisiones de configuración de contabilización", 
+                        "Lista de inconvenientes y omisiones de configuración de contabilización:");
+                messages.appendMessages(exceptions);
+                messages.setVisible(true);
+                throw new Exception("Favor de corregir los " + exceptions.size() + " inconvenientes u omisiones de configuración de contabilización de nóminas mencionados.");
             }
         }
+    }
 
-        miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
-        miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_SIE_PAY);
-        miClient.showMsgBoxInformation("La nómina ha sido contabilizada.");
-        ((SClient) miClient).getSession().notifySuscriptors(SModConsts.HRS_SIE_PAY);
+    private void renderCurrentRecord() {
+        if (moCurrentRecord == null) {
+            jtfRecordDate.setText("");
+            jtfRecordBranch.setText("");
+            jtfRecordNumber.setText("");
+        }
+        else {
+            jtfRecordDate.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moCurrentRecord.getDate()));
+            jtfRecordBkc.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_BKC, new int[] { moCurrentRecord.getPkBookkeepingCenterId() }, SLibConstants.DESCRIPTION_CODE));
+            jtfRecordBranch.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BPB, new int[] { moCurrentRecord.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
+            jtfRecordNumber.setText(moCurrentRecord.getPkRecordTypeId() + "-" + moCurrentRecord.getPkNumberId());
+        }
     }
 
     public void actionPickRecord() {
@@ -1389,46 +2292,47 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
             // XXX set registry lock to accounting record
 
-            if (readRecord(key)) {
-                if (moCurrentRecord != null) {
-                    if (moCurrentRecord.getIsSystem()) {
-                        message = "No puede seleccionarse esta póliza contable porque es de sistema.";
-                    }
-                    else if (moCurrentRecord.getIsAudited()) {
-                        message = "No puede seleccionarse esta póliza contable porque está auditada.";
-                    }
-                    else if (moCurrentRecord.getIsAuthorized()) {
-                        message = "No puede seleccionarse esta póliza contable porque está autorizada.";
-                    }
-                    else if (!SDataUtilities.isPeriodOpen(miClient, moCurrentRecord.getDate())) {
-                        message = "No puede seleccionarse esta póliza contable porque su período contable correspondiente está cerrado.";
-                    }
+            moCurrentRecord = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, key, SLibConstants.EXEC_MODE_VERBOSE);
+            
+            if (moCurrentRecord == null) {
+                message = "No se encontró la póliza contable seleccionada.";
+            }
+            else if (moCurrentRecord.getIsSystem()) {
+                message = "No puede seleccionarse esta póliza contable porque es de sistema.";
+            }
+            else if (moCurrentRecord.getIsAudited()) {
+                message = "No puede seleccionarse esta póliza contable porque está auditada.";
+            }
+            else if (moCurrentRecord.getIsAuthorized()) {
+                message = "No puede seleccionarse esta póliza contable porque está autorizada.";
+            }
+            else if (!SDataUtilities.isPeriodOpen(miClient, moCurrentRecord.getDate())) {
+                message = "No puede seleccionarse esta póliza contable porque su período contable correspondiente está cerrado.";
+            }
 
-                    if (message.length() > 0) {
-                        miClient.showMsgBoxWarning(message);
-                        moCurrentRecord = null;
-                    }
-                    else {
-                        renderRecord();
-                    }
-                }
+            if (message.length() > 0) {
+                miClient.showMsgBoxWarning(message);
+                moCurrentRecord = null;
+            }
+            else {
+                renderCurrentRecord();
             }
         }
     }
     
-    public SDbAccountingPayrollEmployee createAccountingPayrollEmployee(int employeeId) {
-        SDbAccountingPayrollEmployee accountingPayrollEmployee = new SDbAccountingPayrollEmployee();
+    private SDbAccountingPayrollReceipt createAccountingPayrollReceipt(int employeeId) {
+        SDbAccountingPayrollReceipt accountingPayrollReceipt = new SDbAccountingPayrollReceipt();
         
-        accountingPayrollEmployee.setPkPayrollId(moPayroll.getPkPayrollId());
+        accountingPayrollReceipt.setPkPayrollId(moPayroll.getPkPayrollId());
         //accountingPayrollEmployee.setPkAccountingId(int n);
-        accountingPayrollEmployee.setPkEmployeeId(employeeId);
-        accountingPayrollEmployee.setFkRecordYearId(moCurrentRecord.getPkYearId());
-        accountingPayrollEmployee.setFkRecordPeriodId(moCurrentRecord.getPkPeriodId());
-        accountingPayrollEmployee.setFkRecordBookkeepingCenterId(moCurrentRecord.getPkBookkeepingCenterId());
-        accountingPayrollEmployee.setFkRecordRecordTypeId(moCurrentRecord.getPkRecordTypeId());
-        accountingPayrollEmployee.setFkRecordNumberId(moCurrentRecord.getPkNumberId());
+        accountingPayrollReceipt.setPkEmployeeId(employeeId);
+        accountingPayrollReceipt.setFkRecordYearId(moCurrentRecord.getPkYearId());
+        accountingPayrollReceipt.setFkRecordPeriodId(moCurrentRecord.getPkPeriodId());
+        accountingPayrollReceipt.setFkRecordBookkeepingCenterId(moCurrentRecord.getPkBookkeepingCenterId());
+        accountingPayrollReceipt.setFkRecordRecordTypeId(moCurrentRecord.getPkRecordTypeId());
+        accountingPayrollReceipt.setFkRecordNumberId(moCurrentRecord.getPkNumberId());
         
-        return accountingPayrollEmployee;
+        return accountingPayrollReceipt;
     }
 
     public boolean actionAdd() {
@@ -1452,7 +2356,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             row.getValues().add(jtfRecordNumber.getText());
             row.getValues().add(moCurrentRecord.getDate());
 
-            row.setAccountingPayrollEmployee(createAccountingPayrollEmployee(row.getFkBizPartnerId()));
+            row.setAccountingPayrollReceipt(createAccountingPayrollReceipt(row.getFkBizPartnerId()));
 
             moTablePaneEmpAvailable.removeTableRow(index);
             moTablePaneEmpAvailable.renderTableRows();
@@ -1514,7 +2418,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
             
             if (bankSelected && employeesAdded == 0) {
-                miClient.showMsgBoxInformation("Ninguno de los empleados pendientes coincide con el banco: '" + (!bank.isEmpty() ? bank : SHrsConsts.EMPTY_BANK) + "'.");
+                miClient.showMsgBoxInformation("Ninguno de los recibos pendientes coincide con el banco: '" + (!bank.isEmpty() ? bank : SHrsConsts.EMPTY_BANK) + "'.");
             }
         }
     }
@@ -1567,14 +2471,17 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
     public void actionOk() {
         String msg = "";
-        Boolean compute = true;
+        boolean compute = true;
+        int empAvailable = moTablePaneEmpAvailable.getTableGuiRowCount();
 
         if (moTablePaneEmpSelected.getTableGuiRowCount() == 0) {
-            miClient.showMsgBoxWarning("No hay empleados seleccionados.");
+            miClient.showMsgBoxWarning("No hay recibos seleccionados para contabilizar.");
             moTablePaneEmpAvailable.requestFocus();
         }
-        else if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
-            miClient.showMsgBoxWarning("Todavía quedan empleados pendientes sin ser seleccionados.");
+        else if (empAvailable > 0 && (!jckAccountingGradual.isSelected() || miClient.showMsgBoxConfirm("Se optó por contabilizar gradualmente esta nómina.\n"
+                + "¿Está seguro que se desea dejar para otra ocasión la contabilización "
+                + (empAvailable == 1 ? "del recibo pendiente" : "de los " + empAvailable + " recibos pendientes") + " de seleccionar?") != JOptionPane.YES_OPTION)) {
+            miClient.showMsgBoxWarning("Seleccionar " + (empAvailable == 1 ? "el recibo que queda pendiente" : "los " + empAvailable + " recibos que quedan pendientes") + " de contabilizar.");
             moTablePaneEmpAvailable.requestFocus();
         }
         else {
@@ -1588,18 +2495,27 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     }
                 }
                 else if (moCurrentRecord.getPkPeriodId() != moPayroll.getPeriod()) {
-                        msg = "El periodo de la nómina es diferente al periodo de la póliza contable.\n";
-                        if (miClient.showMsgBoxConfirm(msg + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                            compute = false;
-                            miClient.showMsgBoxWarning(msg);
-                            moTablePaneEmpAvailable.requestFocus();
-                        }
+                    msg = "El periodo de la nómina es diferente al periodo de la póliza contable.\n";
+                    if (miClient.showMsgBoxConfirm(msg + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        compute = false;
+                        miClient.showMsgBoxWarning(msg);
+                        moTablePaneEmpAvailable.requestFocus();
+                    }
                 }
                 
                 if (compute) {
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-                    computePayroll();
+                    switch (mnParamPayrollAccProcess) {
+                        case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
+                            saveAccountingOriginal();
+                            break;
+                        case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
+                            saveAccountingDynamic();
+                            break;
+                        default:
+                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                    }
 
                     mnFormResult = SLibConstants.FORM_RESULT_OK;
                     setVisible(false);
@@ -1621,6 +2537,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1628,6 +2546,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAdd;
     private javax.swing.JButton jbAddAll;
     private javax.swing.JButton jbCancel;
@@ -1636,6 +2555,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
     private javax.swing.JComboBox jcbBankFilter;
+    private javax.swing.JCheckBox jckAccountingGradual;
     private javax.swing.JLabel jlBankFilter;
     private javax.swing.JLabel jlBankFilterHint;
     private javax.swing.JLabel jlDummy01;
@@ -1652,6 +2572,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private javax.swing.JPanel jpEmployeesAvailable;
     private javax.swing.JPanel jpEmployeesSelected;
     private javax.swing.JPanel jpGrid;
+    private javax.swing.JPanel jpJournalVoucher;
     private javax.swing.JPanel jpPaymentType;
     private javax.swing.JTextField jtfPayrollDates;
     private javax.swing.JTextField jtfPayrollNet;
@@ -1689,6 +2610,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     public int getFormResult() {
         return mnFormResult;
     }
+    
+    public boolean isAccountingGradual() {
+        return jckAccountingGradual.isSelected();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -1710,6 +2635,64 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             else if (button == jbRemoveAll) {
                 actionRemoveAll();
             }
+        }
+    }
+    
+    private class RecordEmployees {
+        
+        SDataRecord Record;
+        ArrayList<Integer> EmployeeIds;
+        
+        public RecordEmployees(final SDataRecord record, final ArrayList<Integer> employeeIds) {
+            Record = record;
+            EmployeeIds = employeeIds;
+        }
+    }
+    
+    private class PayrollAmount {
+        
+        int DepartmentId;
+        int EmployeeId;
+        int PackCostCentersId;
+        double Amount;
+        
+        public PayrollAmount(final int departmentId, final int employeeId, final int packCostCentersId, final double amount) {
+            DepartmentId = departmentId;
+            EmployeeId = employeeId;
+            PackCostCentersId = packCostCentersId;
+            Amount = amount;
+        }
+        
+        public boolean isEmployeeWithSuitablePackCostCenters() {
+            return DepartmentId == 0 && EmployeeId != 0;
+        }
+    }
+    
+    private class Department {
+        
+        int DepartmentId;
+        String Name;
+        String Code;
+        
+        public Department(final int departmentId, final String name, final String code) {
+            DepartmentId = departmentId;
+            Name = name;
+            Code = code;
+        }
+    }
+    
+    private class Employee {
+        
+        int EmployeeId;
+        String Name;
+        String Number;
+        int BranchId;
+        
+        public Employee(final int employeeId, final String name, final String number, final int branchId) {
+            EmployeeId = employeeId;
+            Name = name;
+            Number = number;
+            BranchId = branchId;
         }
     }
 }

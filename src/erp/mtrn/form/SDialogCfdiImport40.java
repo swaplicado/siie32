@@ -1973,7 +1973,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         moDpsNew.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);   // all saved documents have "default" nature
         
         moDpsNew.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
-        moDpsNew.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NON);
+        moDpsNew.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
         moDpsNew.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
         moDpsNew.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
         moDpsNew.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());

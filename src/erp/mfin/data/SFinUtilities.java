@@ -1577,4 +1577,11 @@ public abstract class SFinUtilities {
         
         return ((Double) out.get(0));
     }
+    
+    public static boolean finYearExists(final SClientInterface client, int pkYearId) throws SQLException {
+        String mySql = "SELECT * FROM fin_year WHERE id_year = " + pkYearId + " AND NOT b_closed AND NOT b_del;";
+        Statement statement = client.getSession().getStatement().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(mySql);
+        return resultSet.next();
+    }
 }

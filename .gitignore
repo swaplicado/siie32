@@ -20,17 +20,18 @@ hs_err_pid*
 # CVS, NetBeans and SIIE directories and files:
 **/CVS/
 .cvsignore
-build/
-dist/
-nbproject/
+/build/
+/dist/
+/firmas/
+/logs/
+/nbproject/
 /cfd/
 /files/
-/logs/
 /reps/img/
-/reexpedicion
-/prenomina
-/vales
-/store
+/reexpedicion/
+/prenomina/
+/vales/
+/store/
 build.xml
 manifest.mf
 Thumbs.db
@@ -39,3 +40,4 @@ sa*.xml
 config*.xml
 *.jrxml
 src/.tmp.driveupload/
+.tmp.driveupload/

@@ -38,10 +38,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     protected Date mtTsUserUpdate;
     */
     
-    protected String msAuxNumber;
-    protected Date mtAuxDateStart;
-    protected Date mtAuxDateEnd;
-    protected int mnAuxEffectiveDays;
     protected boolean mbAuxIsClockSourced;
     
     protected SDbAbsence moParentAbsence;
@@ -78,17 +74,8 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public void setAuxNumber(String s) { msAuxNumber = s; }
-    public void setAuxDateStart(Date t) { mtAuxDateStart = t; }
-    public void setAuxDateEnd(Date t) { mtAuxDateEnd = t; }
-    public void setAuxEffectiveDays(int n) { mnAuxEffectiveDays = n; }
-    
-    public String getAuxNumber() { return msAuxNumber; }
-    public Date getAuxDateStart() { return mtAuxDateStart; }
-    public Date getAuxDateEnd() { return mtAuxDateEnd; }
-    public int getAuxEffectiveDays() { return mnAuxEffectiveDays; }
-
     public boolean isAuxIsClockSourced() { return mbAuxIsClockSourced; }
+    
     public void setAuxIsClockSourced(boolean mbAuxIsClockSourced) { this.mbAuxIsClockSourced = mbAuxIsClockSourced; }
     
     public void setParentAbsence(SDbAbsence o) { moParentAbsence = o; }
@@ -131,10 +118,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        msAuxNumber = "";
-        mtAuxDateStart = null;
-        mtAuxDateEnd = null;
-        mnAuxEffectiveDays = 0;
+        mbAuxIsClockSourced = false;
         
         moParentAbsence = null;
     }
@@ -284,10 +268,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        registry.setAuxNumber(this.getAuxNumber());
-        registry.setAuxDateStart(this.getAuxDateStart());
-        registry.setAuxDateEnd(this.getAuxDateEnd());
-        registry.setAuxEffectiveDays(this.getAuxEffectiveDays());
+        registry.setAuxIsClockSourced(this.isAuxIsClockSourced());
         
         registry.setParentAbsence(this.getParentAbsence());
         
@@ -342,16 +323,16 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
                 value = moParentAbsence.getXtaAbsenceType();
                 break;
             case 2:
-                value = msAuxNumber;
+                value = moParentAbsence.getNumber();
                 break;
             case 3:
-                value = mtAuxDateStart;
+                value = moParentAbsence.getDateStart();
                 break;
             case 4:
-                value = mtAuxDateEnd;
+                value = moParentAbsence.getDateEnd();
                 break;
             case 5:
-                value = mnAuxEffectiveDays;
+                value = moParentAbsence.getEffectiveDays();
                 break;
             case 6:
                 value = mtDateStart;
@@ -363,6 +344,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
                 value = mnEffectiveDays;
                 break;
             default:
+                // nothing
         }
         
         return value;
@@ -370,18 +352,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
 
     @Override
     public void setRowValueAt(Object value, int row) {
-        switch (row) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                break;
-            default:
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

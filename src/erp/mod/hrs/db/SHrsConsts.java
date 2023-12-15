@@ -85,6 +85,26 @@ public class SHrsConsts {
     public static final int PPAYROLL_POL_LIMITED_DATA = 2;
     public static final int PPAYROLL_POL_OTHER_DATA = 3;
     
+    /** Cómputo de prestaciones: por año calendario. */
+    public static final int BEN_COMP_CALENDAR_YEAR = 1;
+    /** Cómputo de prestaciones: por aniversario. */
+    public static final int BEN_COMP_ANNIVERSARY = 2;
+    
+    /** Configuración del procesamiento de contabilización original. */
+    public static final int CFG_ACC_PROCESS_ORIGINAL = 1;
+    /** Configuración del procesamiento de contabilización dinámico y con prorrateos. */
+    public static final int CFG_ACC_PROCESS_DYNAMIC = 2;
+    
+    public static final String TXT_ACTIVE_NO = "Inactivo";
+    public static final String TXT_ACTIVE_YES = "Activo";
+    public static final String TXT_INDISTINCT = "Indistinto";
+    
+    public static final String TXT_UNION_NO = "Confianza";
+    public static final String TXT_UNION_YES = "Sindicalizado";
+    
+    public static final String CODE_UNION_YES = "1";
+    public static final String CODE_UNION_NO = "0";
+    
     public static final HashMap<Integer, Integer> BanksHrsToFin = new HashMap<>();
     public static final HashMap<Integer, Integer> BanksFinToHrs = new HashMap<>();
     

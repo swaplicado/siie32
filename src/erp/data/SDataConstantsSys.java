@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -89,13 +89,27 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
+    public static final String CFG_PARAM_HRS_SIIEAPP = "HRS_SIIEAPP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final String CFG_PARAM_FIN_BANK_LAYOUT_CFD_REQ = "FIN_BANK_LAYOUT_CFD_REQ";
+    public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
+    public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
+    public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
+    public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
+    public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
+    public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
+    public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
+    public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
+    public static final String CFG_PARAM_DOC_HRS_REP_COM = "DOC_HRS_REP_COM";
+    public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
@@ -306,6 +320,11 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
     public static final int PRV_INV_MAINT = 105058;
+    public static final int PRV_INV_REQ_MAT_REQ = 105061;       // solicitante
+    public static final int PRV_INV_REQ_MAT_REV = 105062;       // revisor
+    public static final int PRV_INV_REQ_MAT_PROV = 105063;      // suministrador
+    public static final int PRV_INV_REQ_MAT_PUR = 105064;       // comprador
+    public static final int PRV_INV_REQ_MAT_ADMOR = 105065;     //administrador
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;
@@ -354,7 +373,10 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_PAY_OC = 109007;
     public static final int PRV_HRS_PAY_WEE = 109011;
     public static final int PRV_HRS_PAY_FOR = 109012;
+    public static final int PRV_HRS_ABS = 109016;
     public static final int PRV_HRS_AUX_HRS = 109021;
+    public static final int PRV_HRS_DOC_BREACH = 109051;
+    public static final int PRV_HRS_DOC_ADM_REC = 109052;
     public static final int PRV_HRS_EMP_PERS_DATA = 109091;
     public static final int PRV_HRS_EMP_VARIABLE_EARNINGS = 109092;
     public static final int PRV_HRS_REP = 109901;
@@ -904,7 +926,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_ST_FIN_MOV_TRANSIT = 2;
 
     public static final int FINU_TAX_BAS_VAT = 1;
-
+    
     public static final java.lang.String FINU_TP_REC_FY_OPEN = "EA";
     public static final java.lang.String FINU_TP_REC_FY_END = "EC";
     public static final java.lang.String FINU_TP_REC_PUR = "C";
@@ -990,6 +1012,9 @@ public abstract class SDataConstantsSys {
     
     public static final int FINX_ACC = 1;
     public static final int FINX_ACC_DEEP = 2;
+    
+    public static final String FINX_TAX_FACT_EX = "E";
+    public static final String FINX_TAX_FACT_TA = "T";
     
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
@@ -1155,9 +1180,13 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
     public static final int TRNS_TP_CFD_PAY_REC = 6;    // payment receipt
     public static final int TRNS_TP_CFD_PAYROLL = 11;   // payroll
+    
+    public static final int TRNS_CFD_BOL_VER_20 = 20;        // bol version 20
+    public static final int TRNS_CFD_BOL_VER_30 = 30;        // bol version 30
 
     public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
     public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order
+    public static final int TRNS_TP_STK_SEG_REQ_MAT = 3;    // Material request
 
     public static final int TRNS_TP_STK_SEG_INC = 1;    // increment
     public static final int TRNS_TP_STK_SEG_DEC = 2;    // decrement
@@ -1323,7 +1352,9 @@ public abstract class SDataConstantsSys {
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ONE = 215;
     public static final int TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT = 216;
-
+    public static final int TRNX_DPS_CFD_PAY = 217;
+    public static final int TRNX_DPS_CFD_PAY_DONE = 218;
+    
     public static final int TRNX_SAL_TOT = 301;
     public static final int TRNX_SAL_TOT_MONTH = 302;
     public static final int TRNX_SAL_TOT_BY_BP = 303;
@@ -1472,6 +1503,12 @@ public abstract class SDataConstantsSys {
                 break;
             case TRNX_TP_DPS_ADJ:
                 name = "Notas crédito";
+                break;
+            case TRNX_DPS_CFD_PAY:
+                name = "CFDI pagos x anexar";
+                break;
+            case TRNX_DPS_CFD_PAY_DONE:
+                name = "CFDI pagos anexados";
                 break;
             default:
         }
@@ -1661,6 +1698,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_BPS_ACC_AGI = 206061;       // business partner accounts aging
     public static final int REP_FIN_BPS_ACC_AGI_CRED = 206062;  // business partner accounts aging with credit information (credit days, credit limit, guarantee & insurance)
     public static final int REP_FIN_BPS_ACC_MOV_ORD = 206064;
+    public static final int REP_FIN_EXC_DIFF = 206065;
+    public static final int REP_FIN_AUX_ACC_DON = 206066;
 
     public static final int REP_TRN_DPS_BPS = 207001;
     public static final int REP_TRN_DPS_UNP = 207002;
@@ -1704,6 +1743,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_CFDI_33_CRP_10 = 207113;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
     public static final int REP_TRN_CFDI_40 = 207114;
+    public static final int REP_TRN_CFDI_40_ENG = 207117;
     public static final int REP_TRN_CFDI_40_CRP_20 = 207116;
     public static final int REP_TRN_SHIP = 207104;
     public static final int REP_TRN_COMMS_ITEM = 207105;

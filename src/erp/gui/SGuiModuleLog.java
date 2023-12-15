@@ -16,7 +16,6 @@ import erp.mod.SModSysConsts;
 import erp.mod.log.form.SDialogRepRate;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 import sa.lib.gui.SGuiParams;
 
 /**

@@ -129,7 +129,8 @@ public class SDbCfdBizPartner {
                         cfdBizPartner.setBizPartnerRfc(bizPartner.getFiscalId());
                         cfdBizPartner.setBizPartnerCurp(bizPartner.getAlternativeId());
                         cfdBizPartner.setBizPartnerFiscalForeing(bizPartner.getFiscalFrgId());
-                        cfdBizPartner.setBizPartnerName(bizPartner.getProperName());
+                        String name = !bizPartner.getBizPartnerFiscal().isEmpty() ? bizPartner.getBizPartnerFiscal() : bizPartner.getProperName();
+                        cfdBizPartner.setBizPartnerName(name);
                         cfdBizPartner.setBizPartnerStreet(bizPartnerBranchAddress.getStreet());
                         cfdBizPartner.setBizPartnerStreetNumberExt(bizPartnerBranchAddress.getStreetNumberExt());
                         cfdBizPartner.setBizPartnerStreetNumberInt(bizPartnerBranchAddress.getStreetNumberInt());

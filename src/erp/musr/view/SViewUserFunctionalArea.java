@@ -63,7 +63,7 @@ public class SViewUserFunctionalArea extends erp.lib.table.STableTab {
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.USRU_USR);
-
+        mvSuscriptors.add(SDataConstants.TRN_USR_CFG);
         populateTable();
     }
 

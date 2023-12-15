@@ -5,6 +5,14 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
+import erp.mod.trn.db.SDbConfCostCenterGroupVsItem;
+import erp.mod.trn.db.SDbConfCostCenterGroupVsUser;
+import erp.mod.trn.db.SDbConfEmployeeVsEntity;
+import erp.mod.trn.db.SDbConfMatConsSubentityCCVsCostCenterGroup;
+import erp.mod.trn.db.SDbConfMatConsSubentityVsCostCenter;
+import erp.mod.trn.db.SDbConfUserVsEntity;
+import erp.mod.trn.db.SDbConfWarehouseVsConsEntity;
+import erp.mod.trn.db.SDbConfWarehouseVsProvEntity;
 import erp.mod.trn.db.SDbDelivery;
 import erp.mod.trn.db.SDbDeliveryEntry;
 import erp.mod.trn.db.SDbDps;
@@ -23,7 +31,23 @@ import erp.mod.trn.db.SDbMaintConfig;
 import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
+import erp.mod.trn.db.SDbMaterialConsumptionEntity;
+import erp.mod.trn.db.SDbMaterialConsumptionEntityBudget;
+import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
+import erp.mod.trn.db.SDbMaterialCostCenterGroup;
+import erp.mod.trn.db.SDbMaterialPresentation;
+import erp.mod.trn.db.SDbMaterialProvisionEntity;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.form.SFormConfEmployeeVsEntity;
+import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
+import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
+import erp.mod.trn.form.SFormConfMatCostCenterGroupVsItem;
+import erp.mod.trn.form.SFormConfMatCostCenterGroupVsUser;
+import erp.mod.trn.form.SFormConfUserVsEntity;
+import erp.mod.trn.form.SFormConfWarehouseVsConsEntity;
+import erp.mod.trn.form.SFormConfWarehouseVsProvEntity;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
 import erp.mod.trn.form.SFormIdentifiedCostCalculation;
@@ -33,8 +57,32 @@ import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
 import erp.mod.trn.form.SFormMaintUserSupervisor;
+import erp.mod.trn.form.SFormMaterialConsumptionEntity;
+import erp.mod.trn.form.SFormMaterialConsumptionEntityBudget;
+import erp.mod.trn.form.SFormMaterialConsumptionSubentity;
+import erp.mod.trn.form.SFormMaterialCostCenterGroup;
+import erp.mod.trn.form.SFormMaterialPresentation;
+import erp.mod.trn.form.SFormMaterialProvisionEntity;
+import erp.mod.trn.form.SFormMaterialRequest;
+import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
+import erp.mod.trn.view.SViewConfEmployeeVsEntity;
+import erp.mod.trn.view.SViewConfEmployeeVsEntityDetail;
+import erp.mod.trn.view.SViewConfMatConsSubentityCCVsCostCenterGroup;
+import erp.mod.trn.view.SViewConfMatConsSubentityCCVsCostCenterGroupDetail;
+import erp.mod.trn.view.SViewConfMatConsSubentityVsCostCenter;
+import erp.mod.trn.view.SViewConfMatConsSubentityVsCostCenterDetail;
+import erp.mod.trn.view.SViewConfMatCostCenterGroupItem;
+import erp.mod.trn.view.SViewConfMatCostCenterGroupItemDetail;
+import erp.mod.trn.view.SViewConfMatCostCenterGroupUser;
+import erp.mod.trn.view.SViewConfMatCostCenterGroupUserDetail;
+import erp.mod.trn.view.SViewConfUserVsEntity;
+import erp.mod.trn.view.SViewConfUserVsEntityDetail;
+import erp.mod.trn.view.SViewConfWarehouseVsConsEntity;
+import erp.mod.trn.view.SViewConfWarehouseVsConsEntityDetail;
+import erp.mod.trn.view.SViewConfWarehouseVsProvEntity;
+import erp.mod.trn.view.SViewConfWarehouseVsProvEntityDetail;
 import erp.mod.trn.view.SViewCurrencyBalance;
 import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
@@ -51,8 +99,20 @@ import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
 import erp.mod.trn.view.SViewMaintUserSupervisor;
+import erp.mod.trn.view.SViewMaterialConsumptionEntity;
+import erp.mod.trn.view.SViewMaterialConsumptionEntityBudget;
+import erp.mod.trn.view.SViewMaterialConsumptionSubentity;
+import erp.mod.trn.view.SViewMaterialCostCenterGroup;
+import erp.mod.trn.view.SViewMaterialPresentation;
+import erp.mod.trn.view.SViewMaterialProvisionEntity;
+import erp.mod.trn.view.SViewMaterialRequesPendingSupply;
+import erp.mod.trn.view.SViewMaterialRequest;
+import erp.mod.trn.view.SViewMaterialRequestPending;
+import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
+import erp.mod.trn.view.SViewReportMaterialConsuption;
+import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewValCost;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
@@ -77,6 +137,19 @@ import sa.lib.gui.SGuiReport;
 public class SModuleTrn extends SGuiModule {
 
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
+    private SFormMaterialCostCenterGroup moFormMaterialCostCenterGroup;
+    private SFormMaterialConsumptionEntity moFormMaterialConsumptionEntity;
+    private SFormMaterialConsumptionSubentity moFormMaterialConsumptionSubentity;
+    private SFormMaterialProvisionEntity moFormMaterialProvisionEntity;
+    private SFormMaterialPresentation moFormMaterialPresentation;
+    private SFormConfUserVsEntity moFormUserVsEntity;
+    private SFormConfEmployeeVsEntity moFormEmployeeVsEntity;
+    private SFormConfWarehouseVsProvEntity moFormWarehouseVsProvEntity;
+    private SFormConfWarehouseVsConsEntity moFormWarehouseVsConsEntity;
+    private SFormConfMatCostCenterGroupVsItem moFormConfMatCostCenterGroupVsItem;
+    private SFormConfMatCostCenterGroupVsUser moFormConfMatCostCenterGroupVsUser;
+    private SFormConfMatConsSubentityVsCostCenter moFormConsSubentityVsCostCenter;
+    private SFormConfMatConsSubentityCCVsCostCenterGroup moFormConsSubentityCCVsCostCenterGroup;
     private SFormInventoryValuation moFormInventoryValuationPrcCalc;
     private SFormInventoryValuation moFormInventoryValuationUpdCost;
     private SFormIdentifiedCostCalculation moFormIdentifiedCostCalculation;
@@ -84,11 +157,15 @@ public class SModuleTrn extends SGuiModule {
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
     private SFormItemCost moFormItemCost;
+    private SFormMaterialRequest moFormMaterialReq;
+    private SFormMaterialRequest moFormMaterialReqSup;
+    private SFormMaterialRequestCostCenter moFormMaterialRequestCostCenter;
     private SFormMaintUser moFormMaintUserEmployee;
     private SFormMaintUser moFormMaintUserContractor;
     private SFormMaintUser moFormMaintUserToolMaintProv;
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
+    private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -115,6 +192,9 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_ct_dps = " + pk[0] + " AND id_cl_dps = " + pk[1] + " AND id_tp_dps = " + pk[2] + " "; }
                 };
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                registry = new SDbMaterialPresentation();
                 break;
             case SModConsts.TRNS_TP_MAINT_MOV:
                 registry = new SDbRegistrySysFly(type) {
@@ -176,14 +256,63 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_FUNC_BUDGET:
                 registry = new SDbFunctionalAreaBudget();
                 break;
-            case SModConsts.TRNX_FUNC_BUDGETS:
-                registry = new SDbFunctionalAreaBudgets();
-                break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 registry = new SDbIdentifiedCostCalculation();
                 break;
             case SModConsts.TRN_COST_IDENT_LOT:
                 registry = new SDbIdentifiedCostLot();
+                break;
+            case SModConsts.TRN_MAT_CC_GRP:
+                registry = new SDbMaterialCostCenterGroup();
+                break;
+            case SModConsts.TRN_MAT_REQ:
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
+            case SModConsts.TRNX_MAT_REQ_EST:
+                registry = new SDbMaterialRequest();
+                break;
+            case SModConsts.TRN_MAT_REQ_CC:
+                registry = new SDbMaterialRequestCostCenter();
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                registry = new SDbMaterialConsumptionEntity();
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                registry = new SDbMaterialConsumptionSubentity();
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                registry = new SDbMaterialConsumptionEntityBudget();
+                break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                registry = new SDbMaterialProvisionEntity();
+                break;
+            case SModConsts.TRNX_FUNC_BUDGETS:
+                registry = new SDbFunctionalAreaBudgets();
+                break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                registry = new SDbConfUserVsEntity();
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                registry = new SDbConfEmployeeVsEntity();
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_PRV_ENT:
+                registry = new SDbConfWarehouseVsProvEntity();
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_CON_ENT:
+                registry = new SDbConfWarehouseVsConsEntity();
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC:
+                registry = new SDbConfMatConsSubentityVsCostCenter();
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC_GRP:
+                registry = new SDbConfMatConsSubentityCCVsCostCenterGroup();
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_ITM:
+                registry = new SDbConfCostCenterGroupVsItem();
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
+                registry = new SDbConfCostCenterGroupVsUser();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -200,6 +329,13 @@ public class SModuleTrn extends SGuiModule {
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
+            case SModConsts.TRNS_ST_MAT_REQ:
+                settings = new SGuiCatalogueSettings("Estatus de requisición", 1);
+                sql = "SELECT id_st_mat_req AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_st_mat_req ";
+                break;
             case SModConsts.TRNU_TP_DPS:
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
                 sql = "SELECT id_ct_dps AS " + SDbConsts.FIELD_ID + "1, id_cl_dps AS " + SDbConsts.FIELD_ID + "2, id_tp_dps AS " + SDbConsts.FIELD_ID + "3, "
@@ -214,6 +350,21 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
                         + "ORDER BY id_tp_dps_ann ";
+                break;
+            case SModConsts.TRNU_MAT_REQ_PTY:
+                settings = new SGuiCatalogueSettings("Prioridad", 1);
+                sql = "SELECT id_mat_req_pty AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_mat_req_pty";
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                settings = new SGuiCatalogueSettings("Presentación", 1);
+                sql = "SELECT id_mat_pres AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del AND id_mat_pres <> " + SModSysConsts.TRNU_MAT_PRES_NA + " "
+                        + (params != null ? "AND fk_unit = " + params.getType() + " " : "")
+                        + "ORDER BY name";
                 break;
             case SModConsts.TRN_MAINT_AREA:
                 settings = new SGuiCatalogueSettings("Área de mantenimiento", 1);
@@ -252,6 +403,89 @@ public class SModuleTrn extends SGuiModule {
                         + "WHERE NOT b_del AND fk_maint_user_n = " + params.getKey()[0] + " "
                         + "ORDER BY name, id_maint_user_supv ";
                 break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                settings = new SGuiCatalogueSettings("Centro de suministro", 1);
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT p.id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(p.code, ' - ', p.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " AS p "
+                                + "INNER JOIN trn_mat_prov_ent_usr AS pu ON p.id_mat_prov_ent = pu.id_mat_prov_ent "
+                                + "WHERE NOT b_del AND pu.id_usr = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY pu.b_default DESC, p.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                settings = new SGuiCatalogueSettings("Centro de consumo", 1);
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT a.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(a.code, ' - ', a.name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM ("
+                                + "SELECT DISTINCT c.* FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_ent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent "
+                                + "WHERE cu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
+                                + "AND cu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "UNION "
+                                + "SELECT DISTINCT c.* FROM " + SModConsts.TablesMap.get(type) + " AS c " 
+                                + "INNER JOIN trn_mat_cons_subent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent " 
+                                + "WHERE cu.id_link = " + SModSysConsts.USRS_LINK_USR + " " 
+                                + "AND cu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + ") AS a "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY a.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY name";
+                        break;
+                }
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                settings = new SGuiCatalogueSettings("Subcentro de consumo", 2, 1);
+                switch (subtype) {
+                    case SModConsts.USRU_USR:
+                        sql = "SELECT a.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, a.id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(a.code, ' - ', a.name) AS " + SDbConsts.FIELD_ITEM + ", "
+                                + "a.id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
+                                + "FROM ("
+                                + "SELECT DISTINCT c.* FROM " + SModConsts.TablesMap.get(type) + " AS c "
+                                + "INNER JOIN trn_mat_cons_ent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent "
+                                + "WHERE cu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
+                                + "AND cu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "UNION "
+                                + "SELECT DISTINCT c.* FROM " + SModConsts.TablesMap.get(type) + " AS c " 
+                                + "INNER JOIN trn_mat_cons_subent_usr AS cu ON c.id_mat_cons_ent = cu.id_mat_cons_ent AND c.id_mat_cons_subent = cu.id_mat_cons_subent " 
+                                + "WHERE cu.id_link = " + SModSysConsts.USRS_LINK_USR + " " 
+                                + "AND cu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + ") AS a "
+                                + "WHERE NOT b_del "
+                                + "ORDER BY a.name";
+                        break;
+                    default:
+                        sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_mat_cons_subent AS " + SDbConsts.FIELD_ID + "2 , CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + ", "
+                                + "id_mat_cons_ent AS " + SDbConsts.FIELD_FK + "1 "
+                                + "FROM " + SModConsts.TablesMap.get(type) + " "
+                                + "WHERE NOT b_del "
+                                + (params != null && params.getKey() != null ? "AND id_mat_cons_ent = " + params.getKey()[0] : "") + " " 
+                                + "ORDER BY name";
+                        break;
+                }
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                settings = new SGuiCatalogueSettings("Presupuesto", 3);
+                sql = "SELECT id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, id_year AS " + SDbConsts.FIELD_ID + "2, id_period AS " + SDbConsts.FIELD_ID + "3, "
+                        + "CONCAT(id_year, ' - ', id_period) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " " 
+                        + "WHERE id_mat_cons_ent = " + ((int[]) params.getParamsMap().get(SModConsts.TRN_MAT_CONS_ENT))[0] + " " 
+                        + "AND id_year = " + (int) params.getParamsMap().get(SLibConsts.DATA_TYPE_DATE);
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -271,6 +505,9 @@ public class SModuleTrn extends SGuiModule {
         switch (type) {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 view = new SViewItemRequiredDpsConfig(miClient, "Configuración ítems obligatorios documentos origen");
+                break;
+            case SModConsts.TRNU_MAT_PRES:
+                view = new SViewMaterialPresentation(miClient, "Presentación de materiales");
                 break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 switch (subtype) {
@@ -348,6 +585,85 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_USER_SUPV:
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
+            case SModConsts.TRN_MAT_CC_GRP:
+                view = new SViewMaterialCostCenterGroup(miClient, "Grupos centros costo");
+                break;
+            case SModConsts.TRN_MAT_REQ:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PET:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis req. nuevas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requisiciones"; break;
+                            default: title = "Requisiciones de materiales"; break;
+                        }
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_REV:
+                        switch (params.getType()) {
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Requisiciones x autorizar"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "Req autorizadas/rechazadas"; break;
+                        }
+                        break;
+                }
+                view = new SViewMaterialRequest(miClient, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de consumo x suministrar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de consumo suministradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "RM de consumo x suministrar";
+                        break;
+                }
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de resurtido x suministrar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de resutido suministradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "RM de resurtido x suministrar";
+                        break;
+                }
+                view = new SViewMaterialRequesPendingSupply(miClient, SModConsts.TRNX_MAT_REQ_STK_SUP, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x comprar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "Requisiciones compradas";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x comprar";
+                        break;
+                }
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_EST:
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "Req x cotizar a detalle";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "Req cotizadas a detalle";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x cotizar";
+                        break;
+                }
+                view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                view = new SViewMaterialConsumptionEntity(miClient, "Centros de consumo");
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                view = new SViewMaterialConsumptionSubentity(miClient, "Subcentros de consumo");
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                view = new SViewMaterialConsumptionEntityBudget(miClient, "Centros de consumo presupuesto");
+                break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                view = new SViewMaterialProvisionEntity(miClient, "Centros de suministro");
+                break;
             case SModConsts.TRN_ITEM_COST:
                 view = new SViewItemCost(miClient, "Costos de ítems");
                 break;
@@ -369,6 +685,72 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_FUNC_EXPENSES:
                 view = new SViewFunctionalAreaExpenses(miClient, subtype, "Control presupuestos mensuales gastos");
+                break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                view = new SViewConfUserVsEntity(miClient, "Usuarios vs. centros");
+                break;
+            case SModConsts.TRNX_DET_USR_VS_ENT:
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_CONS_ENT_USR:
+                        title = "Usuarios x centros consumo a detalle";
+                        break;
+                    case SModConsts.TRN_MAT_PROV_ENT_USR:
+                        title = "Usuarios x centros suministro a detalle";
+                        break;
+                }
+                view = new SViewConfUserVsEntityDetail(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                view = new SViewConfEmployeeVsEntity(miClient, "Empleados x centros consumo");
+                break;
+            case SModConsts.TRNX_DET_EMP_VS_ENT:
+                view = new SViewConfEmployeeVsEntityDetail(miClient, "Empleados x centros consumo detalle");
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_PRV_ENT:
+                view = new SViewConfWarehouseVsProvEntity(miClient, "Almacenes x centros suministro");
+                break;
+            case SModConsts.TRNX_DET_WHS_VS_PRV_ENT:
+                view = new SViewConfWarehouseVsProvEntityDetail(miClient, "Almacenes x entidades suministro detalle");
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_CON_ENT:
+                view = new SViewConfWarehouseVsConsEntity(miClient, "Almacenes x centros consumo");
+                break;
+            case SModConsts.TRNX_DET_WHS_VS_CON_ENT:
+                view = new SViewConfWarehouseVsConsEntityDetail(miClient, "Almacenes x entidades consumo detalle");
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC:
+                view = new SViewConfMatConsSubentityVsCostCenter(miClient, "Subcen consumo x centro costo");
+                break;
+            case SModConsts.TRNX_DET_SUBENT_VS_CC:
+                view = new SViewConfMatConsSubentityVsCostCenterDetail(miClient, "Subcen consumo x centros costo detalle");
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC_GRP:
+                view = new SViewConfMatConsSubentityCCVsCostCenterGroup(miClient, "Subcen consumo x centro costo x gpo cc");
+                break;
+            case SModConsts.TRNX_DET_SUBENT_VS_CC_GRP:
+                view = new SViewConfMatConsSubentityCCVsCostCenterGroupDetail(miClient, "Subcen consumo x centro costo x gpo cc detalle");
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_ITM:
+                view = new SViewConfMatCostCenterGroupItem(miClient, "Grupo de centro de costo vs. ítems");
+                break;
+            case SModConsts.TRNX_DET_CC_GRP_VS_ITM:
+                view = new SViewConfMatCostCenterGroupItemDetail(miClient, "Grupo centro costo x ítems detalle");
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
+                view = new SViewConfMatCostCenterGroupUser(miClient, "Grupo de centro de costo vs. usuarios");
+                break;
+            case SModConsts.TRNX_DET_CC_GRP_VS_USR:
+                view = new SViewConfMatCostCenterGroupUserDetail(miClient, "Grupo centro costo x usuarios detalle");
+                break;
+            case SModConsts.TRNX_MAT_CONS:
+                view = new SViewReportMaterialConsuption(miClient, "Consumo de materiales");
+                break;
+            case SModConsts.TRNX_MAT_CONS_CC:
+                switch (subtype) {
+                    case SModConsts.TRNX_MAT_CONS_CC_R: title = "CC por consumo de materiales resumen"; break;
+                    default: title = "CC por consumo de materiales"; break;
+                }
+                view = new SViewReportMaterialConsuptionCC(miClient, subtype, title);
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
@@ -394,6 +776,10 @@ public class SModuleTrn extends SGuiModule {
                 if(moFormItemRequiredDpsConfig == null) moFormItemRequiredDpsConfig = new SFormItemRequiredDpsConfig(miClient, "Configuración de ítems obligatorios con documentos origen");
                 form = moFormItemRequiredDpsConfig;
                 break;
+            case SModConsts.TRNU_MAT_PRES:
+                if (moFormMaterialPresentation == null) moFormMaterialPresentation = new SFormMaterialPresentation(miClient, "Presentación de materiales");
+                form = moFormMaterialPresentation;
+                break;
             case SModConsts.TRN_INV_VAL:
                 if (moFormInventoryValuationPrcCalc == null) moFormInventoryValuationPrcCalc = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_PRC_CALC, "Valuación de inventarios");
                 form = moFormInventoryValuationPrcCalc;
@@ -417,6 +803,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_AREA:
                 if (moFormMaintArea == null) moFormMaintArea = new SFormMaintArea(miClient, "Área de mantenimiento");
                 form = moFormMaintArea;
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
+                if (moFormMaterialConsumptionEntityBudget == null) moFormMaterialConsumptionEntityBudget = new SFormMaterialConsumptionEntityBudget(miClient, "Presupuesto centros de consumo");
+                form = moFormMaterialConsumptionEntityBudget;
                 break;
             case SModConsts.TRN_MAINT_USER:
                 switch (subtype){
@@ -443,9 +833,72 @@ public class SModuleTrn extends SGuiModule {
                 if (moFormItemCost == null) moFormItemCost = new SFormItemCost(miClient, "Costos de ítems");
                 form = moFormItemCost;
                 break;
+            case SModConsts.TRN_MAT_CC_GRP:
+                if(moFormMaterialCostCenterGroup == null) moFormMaterialCostCenterGroup = new SFormMaterialCostCenterGroup(miClient, "Grupo de centro de costo");
+                form = moFormMaterialCostCenterGroup;
+                break;
+            case SModConsts.TRN_MAT_CONS_ENT:
+                if (moFormMaterialConsumptionEntity == null) moFormMaterialConsumptionEntity = new SFormMaterialConsumptionEntity(miClient, "Centro de consumo");
+                form = moFormMaterialConsumptionEntity;
+                break;
+            case SModConsts.TRN_MAT_CONS_SUBENT:
+                if (moFormMaterialConsumptionSubentity == null) moFormMaterialConsumptionSubentity = new SFormMaterialConsumptionSubentity(miClient, "Subcentro de consumo");
+                form = moFormMaterialConsumptionSubentity;
+                break;
+            case SModConsts.TRN_MAT_PROV_ENT:
+                if (moFormMaterialProvisionEntity == null) moFormMaterialProvisionEntity = new SFormMaterialProvisionEntity(miClient, "Centro de suministro");
+                form = moFormMaterialProvisionEntity;
+                break;
+            case SModConsts.TRN_MAT_REQ: 
+            case SModConsts.TRNX_MAT_REQ_STK_SUP:
+            case SModConsts.TRNX_MAT_REQ_EST:
+                if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                form = moFormMaterialReq;
+                break;
+            case SModConsts.TRNX_MAT_REQ_PEND_SUP:
+            case SModConsts.TRNX_MAT_REQ_PEND_PUR:
+                if (moFormMaterialReqSup == null) moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                form = moFormMaterialReqSup;
+                break;
+            case SModConsts.TRN_MAT_REQ_CC:
+                if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");
+                form = moFormMaterialRequestCostCenter;
+                break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
                 form = moFormFunctionalAreaBudgets;
+                break;
+            case SModConsts.TRNX_CONF_USR_VS_ENT:
+                if (moFormUserVsEntity == null) moFormUserVsEntity = new SFormConfUserVsEntity(miClient, "Configuración de usuario vs. centros de consumo/suministro");
+                form = moFormUserVsEntity;
+                break;
+            case SModConsts.TRNX_CONF_EMP_VS_ENT:
+                if (moFormEmployeeVsEntity == null) moFormEmployeeVsEntity = new SFormConfEmployeeVsEntity(miClient, "Configuración de empleado vs. centros");
+                form = moFormEmployeeVsEntity;
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_PRV_ENT:
+                if (moFormWarehouseVsProvEntity == null) moFormWarehouseVsProvEntity = new SFormConfWarehouseVsProvEntity(miClient, "Configuración de almacén vs. centros de suministro");
+                form = moFormWarehouseVsProvEntity;
+                break;
+            case SModConsts.TRNX_CONF_WHS_VS_CON_ENT:
+                if (moFormWarehouseVsConsEntity == null) moFormWarehouseVsConsEntity = new SFormConfWarehouseVsConsEntity(miClient, "Configuración de almacén vs. centros de consumo");
+                form = moFormWarehouseVsConsEntity;
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC:
+                if (moFormConsSubentityVsCostCenter == null) moFormConsSubentityVsCostCenter = new SFormConfMatConsSubentityVsCostCenter(miClient, "Configuración de centro de consumo vs. centro de costo");
+                form = moFormConsSubentityVsCostCenter;
+                break;
+            case SModConsts.TRNX_CONF_SUBENT_VS_CC_GRP:
+                if (moFormConsSubentityCCVsCostCenterGroup == null) moFormConsSubentityCCVsCostCenterGroup = new SFormConfMatConsSubentityCCVsCostCenterGroup(miClient, "Configuración subentidad de consumo centro de costo vs. gpo cc");
+                form = moFormConsSubentityCCVsCostCenterGroup;
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_ITM:
+                if (moFormConfMatCostCenterGroupVsItem == null) moFormConfMatCostCenterGroupVsItem = new SFormConfMatCostCenterGroupVsItem(miClient, "Configuración grupo de centro de costo vs. ítems");
+                form = moFormConfMatCostCenterGroupVsItem;
+                break;
+            case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
+                if (moFormConfMatCostCenterGroupVsUser == null) moFormConfMatCostCenterGroupVsUser = new SFormConfMatCostCenterGroupVsUser(miClient, "Configuración grupo de centro de costo vs. usuarios/empleados");
+                form = moFormConfMatCostCenterGroupVsUser;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -464,6 +917,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_ITEM_COST:
                 guiReport = new SGuiReport("reps/trn_cont_marg.jasper", "Reporte margen de contribución");
+                break;
+            case SModConsts.TRN_MAT_REQ:
+                guiReport = new SGuiReport("reps/trn_mat_req.jasper", "Requisición de materiales");
                 break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -19,14 +20,16 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbBenefitTable extends SDbRegistryUser {
-
+    
     protected int mnPkBenefitId;
     protected String msCode;
     protected String msName;
     protected Date mtDateStart;
+    protected Date mtDateEnd_n;
+    protected String msUnionized;
     //protected boolean mbDeleted;
     protected int mnFkBenefitTypeId;
     protected int mnFkEarningId;
@@ -49,6 +52,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
     public void setDateStart(Date t) { mtDateStart = t; }
+    public void setDateEnd_n(Date t) { mtDateEnd_n = t; }
+    public void setUnionized(String s) { msUnionized = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkEarningId(int n) { mnFkEarningId = n; }
@@ -63,6 +68,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
     public String getCode() { return msCode; }
     public String getName() { return msName; }
     public Date getDateStart() { return mtDateStart; }
+    public Date getDateEnd_n() { return mtDateEnd_n; }
+    public String getUnionized() { return msUnionized; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkEarningId() { return mnFkEarningId; }
@@ -74,6 +81,67 @@ public class SDbBenefitTable extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     public ArrayList<SDbBenefitTableRow> getChildRows() { return maChildRows; }
+    
+    public String composeUnionizedDescription() {
+        return SDbBenefitTable.composeUnionizedDescription(msUnionized);
+    }
+
+    public static String composeUnionizedDescription(String unionized) {
+        String description = "";
+        
+        if (unionized.equals(SHrsConsts.CODE_UNION_NO)) {
+            description = SHrsConsts.TXT_UNION_NO;
+        }
+        else if (unionized.equals(SHrsConsts.CODE_UNION_YES)) {
+            description = SHrsConsts.TXT_UNION_YES;
+        }
+        else if (unionized.isEmpty()) {
+            description = SHrsConsts.TXT_INDISTINCT;
+        }
+        else {
+            description = "?";
+        }
+        
+        return description;
+    }
+    
+    /**
+     * Create benefit annums up to required maximum number from this benefit table.
+     * @param reqAnnums Required number of annums to be created.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public ArrayList<SDbEmployeeBenefitTablesAnnum> createBenefitAnnums(final int reqAnnums) throws Exception {
+        int curAnnum = 1;
+        ArrayList<SDbEmployeeBenefitTablesAnnum> benefitAnnums = new ArrayList<>();
+        
+        for (SDbBenefitTableRow row : maChildRows) {
+            int maxAnnum = row.getMonths() / SLibTimeConsts.MONTHS;
+            
+            for (; curAnnum <= maxAnnum && curAnnum <= reqAnnums; curAnnum++) {
+                SDbEmployeeBenefitTablesAnnum benefitAnnum = new SDbEmployeeBenefitTablesAnnum();
+                //benefitAnnum.setPkEmployeeId(...);
+                benefitAnnum.setPkBenefitTypeId(mnFkBenefitTypeId);
+                benefitAnnum.setPkAnnumId(curAnnum);
+                benefitAnnum.setBenefitDays(row.getBenefitDays());
+                benefitAnnum.setBenefitBonusPct(row.getBenefitBonusPercentage());
+                benefitAnnum.setFkBenefitId(mnPkBenefitId);
+                //benefitAnnum.setFkUserId(...);
+                //benefitAnnum.setTsUser(...);
+                benefitAnnums.add(benefitAnnum);
+            }
+            
+            if (curAnnum > reqAnnums) {
+                break;
+            }
+        }
+        
+        if (benefitAnnums.size() != reqAnnums) {
+            throw new Exception("El número de aniversarios creado (" + benefitAnnums.size() + ") es diferente al número de aniversarios solicitado (" + reqAnnums + ").");
+        }
+        
+        return benefitAnnums;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -93,6 +161,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
         msCode = "";
         msName = "";
         mtDateStart = null;
+        mtDateEnd_n = null;
+        msUnionized = "";
         mbDeleted = false;
         mnFkBenefitTypeId = 0;
         mnFkEarningId = 0;
@@ -102,7 +172,7 @@ public class SDbBenefitTable extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
-        maChildRows = new ArrayList<SDbBenefitTableRow>();
+        maChildRows = new ArrayList<>();
     }
 
     @Override
@@ -152,6 +222,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
             mtDateStart = resultSet.getDate("dt_sta");
+            mtDateEnd_n = resultSet.getDate("dt_end_n");
+            msUnionized = resultSet.getString("uni");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkEarningId = resultSet.getInt("fk_ear");
@@ -200,6 +272,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
                     "'" + msCode + "', " + 
                     "'" + msName + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
+                    (mtDateEnd_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd_n) + "'") + ", " + 
+                    "'" + msUnionized + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     mnFkEarningId + ", " +
@@ -219,6 +293,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
+                    "dt_end_n = " + (mtDateEnd_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd_n) + "'") + ", " +
+                    "uni = '" + msUnionized + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
@@ -237,10 +313,10 @@ public class SDbBenefitTable extends SDbRegistryUser {
 
         msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW_AUX) + " "
                 + "WHERE id_ben = " + mnPkBenefitId + " ";
+        session.getStatement().execute(msSql);
 
         msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " "
                 + "WHERE id_ben = " + mnPkBenefitId + " ";
-
         session.getStatement().execute(msSql);
 
         for (SDbBenefitTableRow child : maChildRows) {
@@ -263,6 +339,8 @@ public class SDbBenefitTable extends SDbRegistryUser {
         registry.setCode(this.getCode());
         registry.setName(this.getName());
         registry.setDateStart(this.getDateStart());
+        registry.setDateEnd_n(this.getDateEnd_n());
+        registry.setUnionized(this.getUnionized());
         registry.setDeleted(this.isDeleted());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkEarningId(this.getFkEarningId());

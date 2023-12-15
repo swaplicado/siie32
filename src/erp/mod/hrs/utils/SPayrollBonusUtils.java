@@ -25,6 +25,7 @@ public class SPayrollBonusUtils {
     public static final int BONUS = 101;
     public static final int PANTRY = 102;
     public static final int SUPER_BONUS = 103;
+    public static final int PANTRY_FOREIGNERS = 104;
     
     /**
      * Esta función determina si el empleado ganó o no el bono en base a si
@@ -83,6 +84,9 @@ public class SPayrollBonusUtils {
                 nBonus =  resultSet.getInt("n_bonus");
             }
             
+             // se agrega 1 ya que solo entra a esta función si ya se ganó el bono actual
+            nBonus += 1;
+            
             return nBonus >= 4 ? 1d : 0d;
         }
         catch (SQLException ex) {
@@ -99,9 +103,14 @@ public class SPayrollBonusUtils {
      * @param client
      * @param idEmployee
      * @param referenceDate
+     * @param withPrePayments
      * @return 
      */
-    public static double hasPantry(SGuiClient client, int idEmployee, Date referenceDate) {
+    public static double hasPantry(SGuiClient client, int idEmployee, Date referenceDate, boolean withPrePayments) {
+        if (! withPrePayments) {
+            return 1d;
+        }
+        
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(referenceDate);
         calendar.add(Calendar.MONTH, -1);

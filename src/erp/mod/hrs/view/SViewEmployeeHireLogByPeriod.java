@@ -51,7 +51,7 @@ public class SViewEmployeeHireLogByPeriod extends SGridPaneView {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
-        moFilterEmployee.initFilter(0);
+        moFilterEmployee.initFilter(0); // status filter not required, but type-of-payment filter remains available
         
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
     }
@@ -99,10 +99,10 @@ public class SViewEmployeeHireLogByPeriod extends SGridPaneView {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(emp.b_act AND v.id_emp IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(NOT emp.b_act OR v.id_emp NOT IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
@@ -198,12 +198,12 @@ public class SViewEmployeeHireLogByPeriod extends SGridPaneView {
         }
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, SDbConsts.FIELD_NAME, "Nombre empleado", 250));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Clave empleado", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tpay.name", "Tipo pago", 60));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_hire", "Última alta"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_dis_n", "Última baja"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_ben", "Beneficios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_ben", "Inicio prestaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_seniority", "Antigüedad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "bp.fiscal_id", "RFC", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "bp.alt_id", "CURP", 150));

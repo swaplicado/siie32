@@ -17,6 +17,7 @@ import erp.lib.SLibConstants;
 import erp.lib.table.STableCellEditorOptions;
 import erp.lib.table.STableConstants;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SFinUtilities;
@@ -35,6 +36,7 @@ import erp.mod.fin.db.SMoney;
 import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
+import erp.mod.fin.util.SBankLayoutConsts;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.redis.SLockUtils;
 import java.awt.BorderLayout;
@@ -83,7 +85,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -98,6 +100,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int COL_TRN_TP_PREPAY_PREPAY = 2;
     private static final int COL_TRN_TP_PREPAY_AGREE = 4;
     private static final int COL_TRN_TP_PREPAY_AGREE_REF = 5;
+    
+    private static final int MAX_MISSING_CFD = 8;
     
     private JCheckBox jckShowOnlyDocsDateDue;
     private JCheckBox jckShowOnlyBenefsWithAccounts;
@@ -126,7 +130,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SLayoutBankRow> maAllLayoutBankRows; // for editing bank layouts
     private List<ArrayList<SGuiItem>> mltAccountCredits;
     private List<ArrayList<SGuiItem>> mltAgreementsReferences;
-    
+
+    private int mnCfgParamCfdRequired;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private ArrayList<SLayoutBankRecord> maLayoutBankRecords;
     
@@ -582,6 +587,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 640);
 
+        try {
+            mnCfgParamCfdRequired = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_FIN_BANK_LAYOUT_CFD_REQ));
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        
         moDialogRecordPicker = new SDialogRecordPicker((SClientInterface) miClient, SDataConstants.FINX_REC_USER);
         
         moDateDateLayout.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLayout), true);
@@ -797,7 +809,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
 
     private boolean isModeForTransfers() {
-        return SLibUtils.belongsTo(mnFormSubtype, new int[] { SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY });
+        return isModeForTransfersOfPayments() || isModeForTransfersOfPrepayments();
     }
 
     private boolean isModeForTransfersOfPayments() {
@@ -1135,7 +1147,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "COALESCE((SELECT SUM(tax.tax_cur) FROM trn_dps_ety AS de " +
                     "INNER JOIN trn_dps_ety_tax AS tax ON de.id_year = tax.id_year AND de.id_doc = tax.id_doc AND de.id_ety = tax.id_ety AND tax.id_tax_bas = " + SDataConstantsSys.FINU_TAX_BAS_VAT + " " +
                     "WHERE d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0), 0) AS f_iva_cur, ADDDATE(d.dt_start_cred, d.days_cred) AS dt_mat, " +
-                    "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type, doc_xml " +
+                    "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type, cx.doc_xml " +
                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                     "r.id_year = " + SLibTimeUtils.digestYear(moDateDateDue.getValue())[0] + " AND r.b_del = 0 AND re.b_del = 0 AND " +
@@ -1706,7 +1718,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (mnLayoutBank == SFinConsts.LAY_BANK_BBAJ) {
             for (SLayoutBankRow row : layoutBankRows) {
                 if (row.getBajioBankAlias().isEmpty()) {
-                    throw new Exception("No se ha especificado el 'alias ' de la cuenta de abono '" + row.getBeneficiaryAccountNumber() + "' del proveedor '" + row.getBizPartner() + "'.");
+                    throw new Exception("No se ha especificado el 'alias' de la cuenta de abono '" + row.getBeneficiaryAccountNumber() + "' del proveedor '" + row.getBizPartner() + "'.");
                 }
             }
         }
@@ -1857,7 +1869,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 
             default:
         }
-        
+
         jtfRows.setText(SLibUtils.DecimalFormatInteger.format(mnSelectedRows) + "/" + SLibUtils.DecimalFormatInteger.format(moGridPayments.getModel().getRowCount()));
     }
     
@@ -2371,8 +2383,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
     private void editingStoppedPaymentChecked() {
         if (isModeForTransfersOfPayments()) {
-            int index = moGridPayments.getTable().getSelectedRow();
+            SLayoutBankRow layoutBankRow = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
             
+            if (layoutBankRow.isForPayment()) {
+                if (mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_YES || mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_OPC) {
+                    if (!layoutBankRow.isXml()) {
+                        miClient.showMsgBoxWarning("Esta factura no tiene XML del CFD.");
+                    }
+                }
+            }
+            
+            int index = moGridPayments.getTable().getSelectedRow();
+           
             computeBalance();
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(index);
@@ -2390,6 +2412,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 layoutBankRow.setForPayment(false);
             }
 
+            if (layoutBankRow.isForPayment() && isModeForTransfersOfPayments()) {
+                if (mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_YES || mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_OPC) {
+                    if (!layoutBankRow.isXml()) {
+                        miClient.showMsgBoxWarning("Esta factura no tiene XML del CFD.");
+                    }
+                }
+            }
+            
             int index = moGridPayments.getTable().getSelectedRow();
 
             computeBalance();
@@ -2824,7 +2854,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (isModeForTransfers()) {
+            if (isModeForTransfers()) { // both invoice payments and prepayments
                 try {
                     validateTransfers();
                 }
@@ -2837,21 +2867,54 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLayoutPath) + "'.");
                         validation.setComponent(jbPickLayoutPath);
                     }
-                    else {
+                    else if (isModeForTransfersOfPayments()) { // only invoice payments
+                        int missingCfdCount = 0;
+                        String missingCfdInvoices = "";
                         boolean validateSatStatus = false;
                         
                         for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
-                            SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
-                            if (row.isXml()) {
-                                validateSatStatus = true;
-                                break;
+                            SLayoutBankRow layoutBankRow = (SLayoutBankRow) moGridPayments.getGridRow(i);
+                            
+                            if (layoutBankRow.isForPayment()) {
+                                if (layoutBankRow.isXml()) {
+                                    validateSatStatus = true;
+                                }
+                                else if (mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_YES || mnCfgParamCfdRequired == SBankLayoutConsts.CFD_REQ_OPC) {
+                                    if (++missingCfdCount <= MAX_MISSING_CFD) {
+                                        missingCfdInvoices += (missingCfdInvoices.isEmpty() ? "" : "\n") + layoutBankRow.getBizPartner() + ": " + layoutBankRow.getDpsNumber();
+                                    }
+                                }
                             }
                         }
                         
-                        if (validateSatStatus) {
-                            String cfdiSatStatus = getCfdiSatStatus();
-                            if (!cfdiSatStatus.isEmpty()) {
-                                validation.setMessage(cfdiSatStatus);
+                        if (missingCfdCount > 0) {
+                            if (missingCfdCount > MAX_MISSING_CFD) {
+                                int surplus = missingCfdCount - MAX_MISSING_CFD;
+                                missingCfdInvoices += "\n(Además de " + (surplus == 1 ? "otra factura" : "otras " + surplus + "facturas") + " más.)";
+                            }
+                            
+                            String message = "¡Hay " + (missingCfdCount == 1 ? "una factura que no tiene" : missingCfdCount + " facturas que no tienen") + " XML del CFD!:\n" + missingCfdInvoices;
+                            
+                            switch (mnCfgParamCfdRequired) {
+                                case SBankLayoutConsts.CFD_REQ_YES:
+                                    validation.setMessage(message);
+                                    break;
+                                case SBankLayoutConsts.CFD_REQ_OPC:
+                                    if (miClient.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                        validation.setMessage("Es necesario agregar el XML del CFD a " + (missingCfdCount == 1 ? "la factura" : "las facturas") + ":\n" + missingCfdInvoices);
+                                    }
+                                    break;
+                                default:
+                                    // nothing
+                            }
+                        }
+                        
+                        if (validation.isValid()) {
+                            if (validateSatStatus) {
+                                String cfdiSatStatus = getCfdiSatStatus();
+                                if (!cfdiSatStatus.isEmpty()) {
+                                    validation.setMessage(cfdiSatStatus);
+                                }
                             }
                         }
                     }

@@ -112,7 +112,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.HRSS_TP_PAY)).getValue();
@@ -128,10 +128,10 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelEmployee.EMP_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ACT) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 1 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(emp.b_act AND v.id_emp IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_INA) {
-                sql += (sql.isEmpty() ? "" : "AND ") + "emp.b_act = 0 ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "(NOT emp.b_act OR v.id_emp NOT IN (SELECT mem.id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE NOT mem.b_del)) ";
             }
             else if ((int)filter == SGridFilterPanelEmployee.EMP_STATUS_ALL) {
             }
@@ -148,6 +148,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
                 + "bp.bp, "
                 + "emp.num, "
                 + "emp.b_act, "
+                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS mem WHERE mem.id_emp = v.id_emp AND NOT mem.b_del) AS _member, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -173,7 +174,8 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "emp.num", "Clave", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_member", "Membresía", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.sal_ssc", "SBC $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));

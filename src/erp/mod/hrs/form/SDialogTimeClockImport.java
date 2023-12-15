@@ -6,7 +6,6 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
-import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.db.SRowPayrollEmployee;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
@@ -34,6 +33,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Edwin Carmona
  */
 public class SDialogTimeClockImport extends SBeanFormDialog {
+    
     protected SDbAbsence moAbsence;
     private SGridPaneForm moGridImportedRows;
     private List<SPrepayrollRow> lPpRows;

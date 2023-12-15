@@ -437,6 +437,17 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                                 number = cfd.getExtraNumber();
                                 
                                 detailMessage += STrnUtils.formatDocNumber(series, "" + number) + ": Timbrado" + (mbIsCfdiSendingAutomaticHrs ? " y enviado.\n" : ".\n");
+                                
+                                File pdfFile = new File(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
+                                File xmlFile = new File(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
+                                
+                                if (pdfFile.exists()) {
+                                    pdfFile.delete();
+                                }
+                                if (xmlFile.exists()) {
+                                    xmlFile.delete();
+                                }
+                                
                                 cfdProcessedOk++;
                                 break;
 

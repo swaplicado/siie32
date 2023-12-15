@@ -213,16 +213,24 @@ public class SDataReceiptPayment extends erp.lib.data.SDataRegistry implements j
 
         if (mnFkReceiptStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
             for (SDataReceiptPaymentPay pay : maDbmsReceiptPaymentPays) {
-                mdTotalRetainedVat = SLibUtils.roundAmount(mdTotalRetainedVat + pay.getRetainedTax(RETAINED_VAT));
-                mdTotalRetainedIncomeTax = SLibUtils.roundAmount(mdTotalRetainedIncomeTax + pay.getRetainedTax(RETAINED_INCOME_TAX));
-                mdTotalRetainedSpecialTax = SLibUtils.roundAmount(mdTotalRetainedSpecialTax + pay.getRetainedTax(RETAINED_SPECIAL_TAX));
-                mdTotalChargedVat16Base = SLibUtils.roundAmount(mdTotalChargedVat16Base + pay.getChargedVatTax(CHARGED_16_BASE));
-                mdTotalChargedVat16Tax = SLibUtils.roundAmount(mdTotalChargedVat16Tax + pay.getChargedVatTax(CHARGED_16_TAX));
-                mdTotalChargedVat08Base = SLibUtils.roundAmount(mdTotalChargedVat08Base + pay.getChargedVatTax(CHARGED_08_BASE));
-                mdTotalChargedVat08Tax = SLibUtils.roundAmount(mdTotalChargedVat08Tax + pay.getChargedVatTax(CHARGED_08_TAX));
-                mdTotalChargedVat00Base = SLibUtils.roundAmount(mdTotalChargedVat00Base + pay.getChargedVatTax(CHARGED_00_BASE));
+                mdTotalRetainedVat += pay.getRetainedTax(RETAINED_VAT);
+                mdTotalRetainedIncomeTax += pay.getRetainedTax(RETAINED_INCOME_TAX);
+                mdTotalRetainedSpecialTax += pay.getRetainedTax(RETAINED_SPECIAL_TAX);
+                mdTotalChargedVat16Base += pay.getChargedVatTax(CHARGED_16_BASE);
+                mdTotalChargedVat16Tax += pay.getChargedVatTax(CHARGED_16_TAX);
+                mdTotalChargedVat08Base += pay.getChargedVatTax(CHARGED_08_BASE);
+                mdTotalChargedVat08Tax += pay.getChargedVatTax(CHARGED_08_TAX);
+                mdTotalChargedVat00Base += pay.getChargedVatTax(CHARGED_00_BASE);
                 mdTotalChargedVatExemptBase += pay.getChargedVatExemptBase();
             }
+            mdTotalRetainedVat = SLibUtils.roundAmount(mdTotalRetainedVat);
+            mdTotalRetainedIncomeTax = SLibUtils.roundAmount(mdTotalRetainedIncomeTax);
+            mdTotalRetainedSpecialTax = SLibUtils.roundAmount(mdTotalRetainedSpecialTax);
+            mdTotalChargedVat16Base = SLibUtils.roundAmount(mdTotalChargedVat16Base);
+            mdTotalChargedVat16Tax = SLibUtils.roundAmount(mdTotalChargedVat16Tax);
+            mdTotalChargedVat08Base = SLibUtils.roundAmount(mdTotalChargedVat08Base);
+            mdTotalChargedVat08Tax = SLibUtils.roundAmount(mdTotalChargedVat08Tax);
+            mdTotalChargedVat00Base = SLibUtils.roundAmount(mdTotalChargedVat00Base);
         }
     }
     

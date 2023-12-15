@@ -41,6 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import sa.gui.util.SUtilConsts;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
@@ -124,6 +125,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintStockToolMaint;
     private javax.swing.JMenuItem jmiMaintStockToolLost;
     private javax.swing.JMenuItem jmiMaintStockTool;
+    private javax.swing.JMenuItem jmiConsumeMaterial;
     private javax.swing.JMenuItem jmiMaintMovementPart;
     private javax.swing.JMenuItem jmiMaintMovementPartDetail;
     private javax.swing.JMenuItem jmiMaintMovementTool;
@@ -136,6 +138,56 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintUserContractorSupv;
     private javax.swing.JMenuItem jmiMaintUserToolMaintProv;
     private javax.swing.JMenuItem jmiMaintArea;
+    
+    private javax.swing.JMenu jmMenuReq;
+    private javax.swing.JMenuItem jmiReqAll;
+    private javax.swing.JMenu jmMenuPetReq;
+    private javax.swing.JMenuItem jmiReqPetNew;
+    private javax.swing.JMenuItem jmiReqPetTbAuth;
+    private javax.swing.JMenuItem jmiReqPetTbProcc;
+    private javax.swing.JMenuItem jmiReqPetAll;
+    private javax.swing.JMenuItem jmiReqRevTbAuth;
+    private javax.swing.JMenuItem jmiReqRevAll;
+    private javax.swing.JMenu jmMenuConsSupPendReq;
+    private javax.swing.JMenuItem jmiReqConsSupPend;
+    private javax.swing.JMenuItem jmiReqConsSupPendDet;
+    private javax.swing.JMenuItem jmiReqConsSup;
+    private javax.swing.JMenu jmMenuStockSupPendReq;
+    private javax.swing.JMenuItem jmiReqStockSupPend;
+    private javax.swing.JMenuItem jmiReqStockSupPendDet;
+    private javax.swing.JMenuItem jmiReqStockSup;
+    private javax.swing.JMenuItem jmiReqPurPend;
+    private javax.swing.JMenuItem jmiReqPurPendDet;
+    private javax.swing.JMenuItem jmiReqEstDet;
+    private javax.swing.JMenuItem jmiReqPendEstDet;
+    private javax.swing.JMenu jmMenuCatReq;
+    private javax.swing.JMenuItem jmiReqMatPresentation;
+    private javax.swing.JMenuItem jmiReqMatCostCenterGrp;
+    private javax.swing.JMenuItem jmiReqMatConsumptionEnt;
+    private javax.swing.JMenuItem jmiReqMatConsumptionSubent;
+    private javax.swing.JMenuItem jmiReqMatConsumptionEntBudget;
+    private javax.swing.JMenuItem jmiReqMatProvisionEnt;
+    private javax.swing.JMenu jmMenuConfUsrEmpReq;
+    private javax.swing.JMenuItem jmiReqUsersEntities;
+    private javax.swing.JMenuItem jmiReqAccUsrCons;
+    private javax.swing.JMenuItem jmiReqAccUsrProv;
+    private javax.swing.JMenuItem jmiReqEmployeesEntities;
+    private javax.swing.JMenuItem jmiReqAccEmpCons;
+    private javax.swing.JMenu jmMenuConfWhsReq;
+    private javax.swing.JMenuItem jmiReqWarehouseProvisionEnt;
+    private javax.swing.JMenuItem jmiReqAccWarehouseProv;
+    private javax.swing.JMenuItem jmiReqWarehouseConsumptionEnt;
+    private javax.swing.JMenuItem jmiReqAccWarehouseCons;
+    private javax.swing.JMenu jmMenuConfConsSubentReq;
+    private javax.swing.JMenuItem jmiReqMatConsumptionSubentCC;
+    private javax.swing.JMenuItem jmiReqAccMatConsumptionSubentCC;
+    private javax.swing.JMenuItem jmiReqMatConsumptionSubentCCGrp;
+    private javax.swing.JMenuItem jmiReqAccMatConsumptionSubentCCGrp;
+    private javax.swing.JMenu jmMenuConfCostCenterGrpReq;
+    private javax.swing.JMenuItem jmiReqMatCostCenterGroupItem;
+    private javax.swing.JMenuItem jmiReqAccMatCostCenterGroupItem;
+    private javax.swing.JMenuItem jmiReqMatCostCenterGroupUser;
+    private javax.swing.JMenuItem jmiReqAccMatCostCenterGroupUser;
     
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
@@ -156,6 +208,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportStockMoves;
     private javax.swing.JMenuItem jmiReportStockMovesSumSum;
     private javax.swing.JMenuItem jmiReportStockTrackingLot;
+    private javax.swing.JMenuItem jmiReportMatCons;
+    private javax.swing.JMenuItem jmiReportMatConsCC;
+    private javax.swing.JMenuItem jmiReportMatConsCCRes;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendEntryMass;
@@ -207,6 +262,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMfgCon = false;
         boolean hasRightMaint = false;
         int levelRightMaint = 0;
+        boolean hasRightMatReqPet = false;
+        boolean hasRightMatReqRev = false;
+        boolean hasRightMatReqProv = false;
+        boolean hasRightMatReqPur = false;
+        boolean hasRightMatReqAdm = false;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -248,7 +308,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurOrderSupplies.addActionListener(this);
         jmiDpsPurOrderSuppliesInvoice.addActionListener(this);
 
-        jmMenuDpsPurRet = new JMenu("Devoluciones compras");
+        jmMenuDpsPurRet = new JMenu("Devs. compras");
         jmiDpsPurReturnPend = new JMenuItem("Compras por devolver");
         jmiDpsPurReturnPendEty = new JMenuItem("Compras por devolver a detalle");
         jmiDpsPurReturned = new JMenuItem("Compras devueltas");
@@ -282,7 +342,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsSalSuppliedEntry.addActionListener(this);
         jmiDpsSalOrderSupply.addActionListener(this);
 
-        jmMenuDpsSalRet = new JMenu("Devoluciones ventas");
+        jmMenuDpsSalRet = new JMenu("Devs. ventas");
         jmiDpsSalReturnPend = new JMenuItem("Ventas por devolver");
         jmiDpsSalReturnPendEntry = new JMenuItem("Ventas por devolver a detalle");
         jmiDpsSalReturned = new JMenuItem("Ventas devueltas");
@@ -342,7 +402,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMfgConsumePend.addActionListener(this);
         jmiMfgConsumePendEntry.addActionListener(this);
         jmiMfgConsumed.addActionListener(this);
-        jmiMfgConsumedEntry.addActionListener(this);    
+        jmiMfgConsumedEntry.addActionListener(this);
 
         jmMenuIog = new JMenu("Docs. inventarios");
         jmiIogStock = new JMenuItem("Docs. inventarios");
@@ -418,6 +478,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
         jmiMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
         jmiMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
+        jmiConsumeMaterial = new JMenuItem("Docs. consumos de materiales");
         jmiMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
         jmiMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
         jmiMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
@@ -438,6 +499,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuMaint.add(jmiMaintStockToolMaint);
         jmMenuMaint.add(jmiMaintStockToolLost);
         jmMenuMaint.add(jmiMaintStockTool);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiConsumeMaterial);
         jmMenuMaint.addSeparator();
         jmMenuMaint.add(jmiMaintMovementPart);
         jmMenuMaint.add(jmiMaintMovementPartDetail);
@@ -461,6 +524,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint.addActionListener(this);
         jmiMaintStockToolLost.addActionListener(this);
         jmiMaintStockTool.addActionListener(this);
+        jmiConsumeMaterial.addActionListener(this);
         jmiMaintMovementPart.addActionListener(this);
         jmiMaintMovementPartDetail.addActionListener(this);
         jmiMaintMovementTool.addActionListener(this);
@@ -473,6 +537,162 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserContractorSupv.addActionListener(this);
         jmiMaintUserToolMaintProv.addActionListener(this);
         jmiMaintArea.addActionListener(this);
+        
+        jmMenuReq = new JMenu("Requisiciones materiales");
+        
+        jmiReqAll = new JMenuItem("Requisiciones de materiales");
+        
+        jmMenuPetReq = new JMenu("Mis RM");
+        jmiReqPetNew = new JMenuItem("Mis RM nuevas");
+        jmiReqPetTbAuth = new JMenuItem("Mis RM por autorizar");
+        jmiReqPetTbProcc = new JMenuItem("Mis RM en proceso (suministro o compras)");
+        jmiReqPetAll = new JMenuItem("Todas mis RM");
+        
+        jmiReqRevTbAuth = new JMenuItem("RM por autorizar (revisor)");
+        jmiReqRevAll = new JMenuItem("RM aprobadas/rechazadas");
+        
+        jmMenuConsSupPendReq = new JMenu("RM de consumo por suministrar");
+        jmiReqConsSupPend = new JMenuItem("RM por suministrar");
+        jmiReqConsSupPendDet = new JMenuItem("RM por suministrar a detalle");
+        jmiReqConsSup = new JMenuItem("RM suministradas");
+        
+        jmMenuStockSupPendReq = new JMenu("RM de resurtido por suministrar");
+        jmiReqStockSupPend = new JMenuItem("RM por suministrar");
+        jmiReqStockSupPendDet = new JMenuItem("RM por suministrar a detalle");
+        jmiReqStockSup = new JMenuItem("RM suministradas");
+        
+        jmiReqPurPend = new JMenuItem("RM por comprar");
+        jmiReqPurPendDet = new JMenuItem("RM por comprar a detalle");
+        jmiReqEstDet = new JMenuItem("RM cotizadas a detalle");
+        jmiReqPendEstDet = new JMenuItem("RM por cotizar a detalle");
+        
+        jmMenuCatReq = new JMenu("Catálogos");
+        jmiReqMatPresentation = new JMenuItem("Presentaciones de materiales");
+        jmiReqMatCostCenterGrp = new JMenuItem("Grupo de centro de costo");
+        jmiReqMatConsumptionEnt = new JMenuItem("Centros de consumo");
+        jmiReqMatConsumptionSubent = new JMenuItem("Subcentros de consumo");
+        jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos centro de consumo");
+        jmiReqMatProvisionEnt = new JMenuItem("Centros de suministro");
+        
+        jmMenuConfUsrEmpReq = new JMenu("Configuración usuarios/empleados");
+        jmiReqUsersEntities = new JMenuItem("Usuarios vs centros de consumo/suministro");
+        jmiReqAccUsrCons = new JMenuItem("Usuarios vs centros de consumo a detalle");
+        jmiReqAccUsrProv = new JMenuItem("Usuarios vs centros de suministro a detalle");
+        jmiReqEmployeesEntities = new JMenuItem("Empleados vs centros de consumo");
+        jmiReqAccEmpCons = new JMenuItem("Empleados vs centros de cosumo a detalle");
+        
+        jmMenuConfWhsReq = new JMenu("Configuración almacenes");
+        jmiReqWarehouseProvisionEnt = new JMenuItem("Almacenes vs centros de suministro");
+        jmiReqAccWarehouseProv = new JMenuItem("Almacenes vs centros de suministro a detalle");
+        jmiReqWarehouseConsumptionEnt = new JMenuItem("Almacenes vs centros de consumo");
+        jmiReqAccWarehouseCons = new JMenuItem("Almacenes vs centros de consumo a detalle");
+        
+        jmMenuConfConsSubentReq = new JMenu("Configuración subcentros de consumo");
+        jmiReqMatConsumptionSubentCC = new JMenuItem("Subcentros de consumo vs centros de costo");
+        jmiReqAccMatConsumptionSubentCC = new JMenuItem("Subcentros de consumo vs centros de costo a detalle");
+        jmiReqMatConsumptionSubentCCGrp = new JMenuItem("Subcentros de consumo vs centros de costo vs grupos de centro de costo");
+        jmiReqAccMatConsumptionSubentCCGrp = new JMenuItem("Subcentros de consumo vs centros de costo vs grupos de centro de costo a detalle");
+        
+        jmMenuConfCostCenterGrpReq = new JMenu("Configuración grupo de centro de costo");
+        jmiReqMatCostCenterGroupItem = new JMenuItem("Grupo centro de costo vs items");
+        jmiReqAccMatCostCenterGroupItem = new JMenuItem("Grupo centro de costo vs items a detalle");
+        jmiReqMatCostCenterGroupUser = new JMenuItem("Grupo centro de costo vs usuarios/empleados");
+        jmiReqAccMatCostCenterGroupUser = new JMenuItem("Grupo centro de costo vs usuarios/empleados a detalle");
+        
+        jmMenuReq.add(jmMenuPetReq);
+        jmMenuPetReq.add(jmiReqPetNew);
+        jmMenuPetReq.add(jmiReqPetTbAuth);
+        jmMenuPetReq.add(jmiReqPetTbProcc);
+        jmMenuPetReq.add(jmiReqPetAll);
+        jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqAll);
+        jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqRevTbAuth);
+        jmMenuReq.add(jmiReqRevAll);
+        jmMenuReq.addSeparator();
+        jmMenuReq.add(jmMenuConsSupPendReq);
+        jmMenuConsSupPendReq.add(jmiReqConsSupPend);
+        jmMenuConsSupPendReq.add(jmiReqConsSupPendDet);
+        jmMenuConsSupPendReq.add(jmiReqConsSup);
+        jmMenuReq.add(jmMenuStockSupPendReq);
+        jmMenuStockSupPendReq.add(jmiReqStockSupPend);
+        jmMenuStockSupPendReq.add(jmiReqStockSupPendDet);
+        jmMenuStockSupPendReq.add(jmiReqStockSup);
+        jmMenuReq.add(jmiReqPurPend);
+        jmMenuReq.add(jmiReqPurPendDet);
+        jmMenuReq.add(jmiReqEstDet);
+        jmMenuReq.add(jmiReqPendEstDet);
+        jmMenuReq.addSeparator();
+        jmMenuReq.add(jmMenuCatReq);
+        jmMenuCatReq.add(jmiReqMatPresentation);
+        jmMenuCatReq.add(jmiReqMatCostCenterGrp);
+        jmMenuCatReq.add(jmiReqMatConsumptionEnt);
+        jmMenuCatReq.add(jmiReqMatConsumptionSubent);
+        jmMenuCatReq.add(jmiReqMatConsumptionEntBudget);
+        jmMenuCatReq.add(jmiReqMatProvisionEnt);
+        jmMenuReq.add(jmMenuConfUsrEmpReq);
+        jmMenuConfUsrEmpReq.add(jmiReqUsersEntities);
+        jmMenuConfUsrEmpReq.add(jmiReqAccUsrCons);
+        jmMenuConfUsrEmpReq.add(jmiReqAccUsrProv);
+        jmMenuConfUsrEmpReq.add(jmiReqEmployeesEntities);
+        jmMenuConfUsrEmpReq.add(jmiReqAccEmpCons);
+        jmMenuReq.add(jmMenuConfWhsReq);
+        jmMenuConfWhsReq.add(jmiReqWarehouseProvisionEnt);
+        jmMenuConfWhsReq.add(jmiReqAccWarehouseProv);
+        jmMenuConfWhsReq.add(jmiReqWarehouseConsumptionEnt);
+        jmMenuConfWhsReq.add(jmiReqAccWarehouseCons);
+        jmMenuReq.add(jmMenuConfConsSubentReq);
+        jmMenuConfConsSubentReq.add(jmiReqMatConsumptionSubentCC);
+        jmMenuConfConsSubentReq.add(jmiReqAccMatConsumptionSubentCC);
+        jmMenuConfConsSubentReq.add(jmiReqMatConsumptionSubentCCGrp);
+        jmMenuConfConsSubentReq.add(jmiReqAccMatConsumptionSubentCCGrp);
+        jmMenuReq.add(jmMenuConfCostCenterGrpReq);
+        jmMenuConfCostCenterGrpReq.add(jmiReqMatCostCenterGroupItem);
+        jmMenuConfCostCenterGrpReq.add(jmiReqAccMatCostCenterGroupItem);
+        jmMenuConfCostCenterGrpReq.add(jmiReqMatCostCenterGroupUser);
+        jmMenuConfCostCenterGrpReq.add(jmiReqAccMatCostCenterGroupUser);
+        
+        jmiReqAll.addActionListener(this);
+        jmiReqPetNew.addActionListener(this);
+        jmiReqPetTbAuth.addActionListener(this);
+        jmiReqPetTbProcc.addActionListener(this);
+        jmiReqPetNew.addActionListener(this);
+        jmiReqPetAll.addActionListener(this);
+        jmiReqRevTbAuth.addActionListener(this);
+        jmiReqRevAll.addActionListener(this);
+        jmiReqConsSupPend.addActionListener(this);
+        jmiReqConsSupPendDet.addActionListener(this);
+        jmiReqConsSup.addActionListener(this);
+        jmiReqStockSupPend.addActionListener(this);
+        jmiReqStockSupPendDet.addActionListener(this);
+        jmiReqStockSup.addActionListener(this);
+        jmiReqPurPend.addActionListener(this);
+        jmiReqPurPendDet.addActionListener(this);
+        jmiReqEstDet.addActionListener(this);
+        jmiReqPendEstDet.addActionListener(this);
+        jmiReqMatPresentation.addActionListener(this);
+        jmiReqMatCostCenterGrp.addActionListener(this);
+        jmiReqMatConsumptionEnt.addActionListener(this);
+        jmiReqMatConsumptionSubent.addActionListener(this);
+        jmiReqMatConsumptionEntBudget.addActionListener(this);
+        jmiReqMatProvisionEnt.addActionListener(this);
+        jmiReqUsersEntities.addActionListener(this);
+        jmiReqAccUsrCons.addActionListener(this);
+        jmiReqAccUsrProv.addActionListener(this);
+        jmiReqEmployeesEntities.addActionListener(this);
+        jmiReqAccEmpCons.addActionListener(this);
+        jmiReqWarehouseProvisionEnt.addActionListener(this);
+        jmiReqAccWarehouseProv.addActionListener(this);
+        jmiReqWarehouseConsumptionEnt.addActionListener(this);
+        jmiReqAccWarehouseCons.addActionListener(this);
+        jmiReqMatConsumptionSubentCC.addActionListener(this);
+        jmiReqAccMatConsumptionSubentCC.addActionListener(this);
+        jmiReqMatCostCenterGroupItem.addActionListener(this);
+        jmiReqAccMatCostCenterGroupItem.addActionListener(this);
+        jmiReqMatCostCenterGroupUser.addActionListener(this);
+        jmiReqAccMatCostCenterGroupUser.addActionListener(this);
+        jmiReqMatConsumptionSubentCCGrp.addActionListener(this);
+        jmiReqAccMatConsumptionSubentCCGrp.addActionListener(this);
         
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
@@ -522,16 +742,26 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportStockMoves = new JMenuItem("Reporte de movimientos de inventarios...");
         jmiReportStockMovesSumSum = new JMenuItem("Resumen de movimientos de inventarios...");
         jmiReportStockTrackingLot = new JMenuItem("Reporte de rastreo de lotes...");
+        jmiReportMatCons = new JMenuItem("Consumo de materiales");
+        jmiReportMatConsCC = new JMenuItem("Centros de consumo y consumo de materiales");
+        jmiReportMatConsCCRes = new JMenuItem("Centros de consumo y consumo de materiales resumen");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
         jmMenuRep.add(jmiReportStockMovesSumSum);
         jmMenuRep.add(jmiReportStockTrackingLot);
+        jmMenuRep.addSeparator();
+        jmMenuRep.add(jmiReportMatCons);
+        jmMenuRep.add(jmiReportMatConsCC);
+        jmMenuRep.add(jmiReportMatConsCCRes);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
         jmiReportStockMovesSumSum.addActionListener(this);
         jmiReportStockTrackingLot.addActionListener(this);
+        jmiReportMatCons.addActionListener(this);
+        jmiReportMatConsCC.addActionListener(this);
+        jmiReportMatConsCCRes.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
         jmiRepStatsMfgConsumePendMass = new JMenuItem("Masa de insumos y productos por consumir");
@@ -575,7 +805,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMfgCon = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_CON).HasRight;
         hasRightMaint = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MAINT).HasRight;
         levelRightMaint = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_MAINT);
-
+        hasRightMatReqPet = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight;
+        hasRightMatReqRev = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
+        hasRightMatReqProv = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
+        hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
+        hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmMenuDpsPurSup.setEnabled(hasRightInPur);
         jmMenuDpsPurRet.setEnabled(hasRightOutPur);
@@ -622,6 +857,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolMaint.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockToolLost.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiConsumeMaterial.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPartDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
@@ -634,6 +870,45 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserContractorSupv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmMenuReq.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqAll.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqPetNew.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqPetTbAuth.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqPetTbProcc.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqPetAll.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqRevTbAuth.setEnabled(hasRightMatReqRev || hasRightMatReqAdm);
+        jmiReqRevAll.setEnabled(hasRightMatReqRev || hasRightMatReqAdm);
+        jmiReqConsSupPend.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqConsSupPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqConsSup.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqStockSupPend.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqStockSupPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqStockSup.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqPurPend.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPurPendDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqMatPresentation.setEnabled(hasRightMatReqAdm);
+        jmiReqMatCostCenterGrp.setEnabled(hasRightMatReqAdm);
+        jmiReqMatConsumptionEnt.setEnabled(hasRightMatReqAdm);
+        jmiReqMatConsumptionSubent.setEnabled(hasRightMatReqAdm);
+        jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
+        jmiReqMatProvisionEnt.setEnabled(hasRightMatReqAdm);
+        jmiReqUsersEntities.setEnabled(hasRightMatReqAdm);
+        jmiReqAccUsrCons.setEnabled(hasRightMatReqAdm);
+        jmiReqAccUsrProv.setEnabled(hasRightMatReqAdm);
+        jmiReqEmployeesEntities.setEnabled(hasRightMatReqAdm);
+        jmiReqAccEmpCons.setEnabled(hasRightMatReqAdm);
+        jmiReqWarehouseProvisionEnt.setEnabled(hasRightMatReqAdm);
+        jmiReqAccWarehouseProv.setEnabled(hasRightMatReqAdm);
+        jmiReqMatConsumptionSubentCC.setEnabled(hasRightMatReqAdm);
+        jmiReqAccMatConsumptionSubentCC.setEnabled(hasRightMatReqAdm);
+        jmiReqMatCostCenterGroupItem.setEnabled(hasRightMatReqAdm);
+        jmiReqAccMatCostCenterGroupItem.setEnabled(hasRightMatReqAdm);
+        jmiReqMatCostCenterGroupUser.setEnabled(hasRightMatReqAdm);
+        jmiReqAccMatCostCenterGroupUser.setEnabled(hasRightMatReqAdm);
+        jmiReqMatConsumptionSubentCCGrp.setEnabled(hasRightMatReqAdm);
+        jmiReqAccMatConsumptionSubentCCGrp.setEnabled(hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1034,6 +1309,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SModSysConsts.TRNX_MAINT_TOOL_LOST:
                             title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase();
                             break;
+                        case SModSysConsts.TRNX_CONS_MAT:
+                            title += "Consumo de materiales";
+                            break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
@@ -1247,7 +1525,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuMaint, jmMenuStk, jmMenuRep };
+        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuMaint, jmMenuReq, jmMenuStk, jmMenuRep };
     }
 
     @Override
@@ -1259,7 +1537,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
-
+            
             if (item == jmiCatStockLot) {
                 showView(SDataConstants.TRN_LOT);
             }
@@ -1452,6 +1730,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiMaintStockTool) {
                 showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL);
             }
+            else if (item == jmiConsumeMaterial) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_CONS_MAT, SUtilConsts.PER_DOC);
+            }
             else if (item == jmiMaintMovementPart) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);
             }
@@ -1487,6 +1768,141 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiMaintArea) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAll) {
+                SGuiParams params = new SGuiParams(SModConsts.TRN_MAT_CONS_ENT_USR);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqPetNew) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_NEW);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqPetTbAuth) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqPetTbProcc) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqPetAll) {
+                SGuiParams params = new SGuiParams(SLibConstants.UNDEFINED);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqRevTbAuth) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_REV, params);
+            }
+            else if (item == jmiReqRevAll) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_REV, params);
+            }
+            else if (item == jmiReqConsSupPend) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SLibConstants.UNDEFINED, params);
+            }
+            else if (item == jmiReqConsSupPendDet) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+            }
+            else if (item == jmiReqConsSup) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PROVIDED, params);
+            }
+            else if (item == jmiReqStockSupPend) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SLibConstants.UNDEFINED, params);
+            }
+            else if (item == jmiReqStockSupPendDet) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+            }
+            else if (item == jmiReqStockSup) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_PROVIDED, params);
+            }
+            else if (item == jmiReqPurPend) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SLibConstants.UNDEFINED, params);
+            }
+            else if (item == jmiReqPurPendDet) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+            }
+            else if (item == jmiReqEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);
+            }
+            else if (item == jmiReqPendEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
+            }
+            else if (item == jmiReqMatPresentation) {
+                miClient.getSession().showView(SModConsts.TRNU_MAT_PRES, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatCostCenterGrp) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_CC_GRP, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatConsumptionEnt) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_CONS_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatConsumptionSubent) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_CONS_SUBENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatConsumptionEntBudget) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_CONS_ENT_BUDGET, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatProvisionEnt) {
+                miClient.getSession().showView(SModConsts.TRN_MAT_PROV_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqUsersEntities) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_USR_VS_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccUsrCons) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_USR_VS_ENT, SModConsts.TRN_MAT_CONS_ENT_USR, null);
+            }
+            else if (item == jmiReqAccUsrProv) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_USR_VS_ENT, SModConsts.TRN_MAT_PROV_ENT_USR, null);
+            }
+            else if (item == jmiReqEmployeesEntities) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_EMP_VS_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccEmpCons) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_EMP_VS_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqWarehouseProvisionEnt) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_WHS_VS_PRV_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccWarehouseProv) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_WHS_VS_PRV_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqWarehouseConsumptionEnt) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_WHS_VS_CON_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccWarehouseCons) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_WHS_VS_CON_ENT, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatConsumptionSubentCC) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_SUBENT_VS_CC, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccMatConsumptionSubentCC) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_SUBENT_VS_CC, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatCostCenterGroupItem) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_CC_GRP_VS_ITM, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccMatCostCenterGroupItem) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_CC_GRP_VS_ITM, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatCostCenterGroupUser) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_CC_GRP_VS_USR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccMatCostCenterGroupUser) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_CC_GRP_VS_USR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqMatConsumptionSubentCCGrp) {
+                miClient.getSession().showView(SModConsts.TRNX_CONF_SUBENT_VS_CC_GRP, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAccMatConsumptionSubentCCGrp) {
+                miClient.getSession().showView(SModConsts.TRNX_DET_SUBENT_VS_CC_GRP, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
@@ -1536,6 +1952,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportStockTrackingLot) {
                 menuRepStockTrackingLot();
+            }
+            else if (item == jmiReportMatCons) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS, SLibConstants.UNDEFINED, null); 
+            }
+            else if (item == jmiReportMatConsCC) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS_CC, SLibConstants.UNDEFINED, null); 
+            }
+            else if (item == jmiReportMatConsCCRes) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_CONS_CC, SModConsts.TRNX_MAT_CONS_CC_R, null); 
             }
             else if (item == jmiIogStockTheoricalCost) {
                 miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST_QRY, SLibConstants.UNDEFINED, null);

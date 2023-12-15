@@ -8,7 +8,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
-import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
@@ -16,7 +15,6 @@ import erp.mod.hrs.db.SDbLoan;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SHrsBenefit;
-import erp.mod.hrs.db.SHrsBenefitParams;
 import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceipt;
 import erp.mod.hrs.db.SHrsReceiptDeduction;
@@ -32,14 +30,12 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -72,7 +68,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     public static final String LABEL_AUX_VAL = "Valor auxiliar";
 
     protected SHrsReceipt moHrsReceipt;
-    protected SHrsBenefit moHrsBenefit;
+    protected SHrsBenefit moHrsCurrentBenefit;
     /** Key: ID of earning. */
     protected HashMap<Integer, SDbEarning> moEarnigsMap;
     /** Key: ID of deduction. */
@@ -84,6 +80,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     protected SGridPaneForm moGridReceiptEarnings;
     protected SGridPaneForm moGridReceiptDeductions;
     protected SGridPaneForm moGridAbsenceConsumptions;
+    protected SDialogPayrollBenefit moPayrollBenefitDialog;
     protected boolean mbEditable;
 
     /**
@@ -92,7 +89,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
      * @param title
      */
     public SDialogPayrollReceipt(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PAY_RCP, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PAY_RCP, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -185,7 +182,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moCurEarningAuxAmount1 = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jlEarningAuxAmount1Hint = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
-        jbAddEarning = new javax.swing.JButton();
         jPanel27 = new javax.swing.JPanel();
         jlEarningAuxValue = new javax.swing.JLabel();
         moCompEarningAuxValue = new sa.lib.gui.bean.SBeanCompoundField();
@@ -193,6 +189,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jlEarningAuxAmount2 = new javax.swing.JLabel();
         moCurEarningAuxAmount2 = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jlEarningAuxAmount2Hint = new javax.swing.JLabel();
+        jbAddEarning = new javax.swing.JButton();
         jpDeductions = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -207,8 +204,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jlDeductionValue = new javax.swing.JLabel();
         moCompDeductionValue = new sa.lib.gui.bean.SBeanCompoundField();
         jPanel11 = new javax.swing.JPanel();
-        jbAddDeduction = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
+        jbAddDeduction = new javax.swing.JButton();
         jPanel20 = new javax.swing.JPanel();
         jpAbsenceConsumption = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -247,7 +244,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         moTextNumber.setEditable(false);
         moTextNumber.setText("TEXT");
-        moTextNumber.setToolTipText("Clave empleado");
+        moTextNumber.setToolTipText("Número empleado");
         moTextNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(moTextNumber);
@@ -354,7 +351,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moDecSalary.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel29.add(moDecSalary);
 
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel29.add(jlDateBenefits);
 
@@ -577,11 +574,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel10.setLayout(new java.awt.BorderLayout());
 
-        jbAddEarning.setText("Agregar");
-        jbAddEarning.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbAddEarning.setPreferredSize(new java.awt.Dimension(65, 23));
-        jPanel10.add(jbAddEarning, java.awt.BorderLayout.EAST);
-
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningAuxValue.setText("Valor auxiliar:");
@@ -612,6 +604,11 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel27.add(jlEarningAuxAmount2Hint);
 
         jPanel10.add(jPanel27, java.awt.BorderLayout.CENTER);
+
+        jbAddEarning.setText("Agregar");
+        jbAddEarning.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbAddEarning.setPreferredSize(new java.awt.Dimension(65, 23));
+        jPanel10.add(jbAddEarning, java.awt.BorderLayout.EAST);
 
         jPanel6.add(jPanel10);
 
@@ -673,13 +670,13 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel11.setLayout(new java.awt.BorderLayout());
 
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel11.add(jPanel21, java.awt.BorderLayout.CENTER);
+
         jbAddDeduction.setText("Agregar");
         jbAddDeduction.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbAddDeduction.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel11.add(jbAddDeduction, java.awt.BorderLayout.EAST);
-
-        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel11.add(jPanel21, java.awt.BorderLayout.CENTER);
 
         jPanel7.add(jPanel11);
 
@@ -951,10 +948,11 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         resetFieldsEarning();
         resetFieldsDeduction();
+        
         mbEditable = true;
         setEnableFields(mbEditable);
 
-        moGridReceiptEarnings = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EAR, SLibConsts.UNDEFINED, "Percepciones") {
+        moGridReceiptEarnings = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EAR, 0, "Percepciones") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false, true, true);
@@ -1042,7 +1040,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moGridReceiptEarnings.setPaneFormOwner(this);
         jpEarnings.add(moGridReceiptEarnings, BorderLayout.CENTER);
 
-        moGridReceiptDeductions = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_DED, SLibConsts.UNDEFINED, "Deducciones") {
+        moGridReceiptDeductions = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_DED, 0, "Deducciones") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false, false, true);
@@ -1102,7 +1100,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moGridReceiptDeductions.setPaneFormOwner(this);
         jpDeductions.add(moGridReceiptDeductions, BorderLayout.CENTER);
         
-        moGridAbsenceConsumptions = new SGridPaneForm(miClient, SModConsts.HRS_ABS_CNS, SLibConsts.UNDEFINED, "Consumo incidencias") {
+        moGridAbsenceConsumptions = new SGridPaneForm(miClient, SModConsts.HRS_ABS_CNS, 0, "Consumo incidencias") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(true, false, true);
@@ -1127,13 +1125,24 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             @Override
             public void actionRowNew() {
-                SDialogPayrollReceiptAbsence dlgAbsence = new SDialogPayrollReceiptAbsence(miClient, "Consumo de incidencias");
-                dlgAbsence.setValue(SModConsts.HRS_PAY_RCP, moHrsReceipt);
-                dlgAbsence.setFormVisible(true);
+                if (jbRowNew.isEnabled()) {
+                    try {
+                        SDialogPayrollReceiptAbsenceConsumption dialog = new SDialogPayrollReceiptAbsenceConsumption(miClient, "Consumo de incidencias");
+                        dialog.setValue(SModConsts.HRS_PAY_RCP, moHrsReceipt);
+                        dialog.setFormVisible(true);
 
-                if (dlgAbsence.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                    populateAbsenceConsumption();
-                    refreshReceiptMovements();
+                        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            SDbAbsenceConsumption absenceConsumption = (SDbAbsenceConsumption) dialog.getValue(SModConsts.HRS_ABS_CNS);
+
+                            moHrsReceipt.updateHrsReceiptEarningAbsence(absenceConsumption, true);
+
+                            populateAbsenceConsumption();
+                            refreshReceiptMovements();
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
             
@@ -1229,7 +1238,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         double amountUnitAlleged;
         int[] loanKey = moKeyEarningLoan_n.getSelectedIndex() <= 0 ? new int[] { 0, 0 } : moKeyEarningLoan_n.getValue();
         
-        if (moHrsBenefit == null) {
+        if (moHrsCurrentBenefit == null) {
             if (moEarning.isBasedOnUnits()) {
                 unitsAlleged = moCompEarningValue.getField().getValue();
                 amountUnitAlleged = 0;
@@ -1241,17 +1250,16 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
         else {
             if (moEarning.isBasedOnUnits()) {
-                unitsAlleged = moHrsBenefit.getValuePayedReceipt();
+                unitsAlleged = moHrsCurrentBenefit.getReceiptDays();
                 amountUnitAlleged = 0;
             }
             else {
                 unitsAlleged = 1;
-                amountUnitAlleged = moHrsBenefit.getAmountPayedReceipt();
+                amountUnitAlleged = moHrsCurrentBenefit.getReceiptAmount();
             }
         }
         
-        SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
-                hrsReceipt, moEarning, hrsEmployeeDays, moHrsBenefit, 
+        SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(hrsReceipt, moEarning, hrsEmployeeDays, moHrsCurrentBenefit, 
                 unitsAlleged, amountUnitAlleged, false, 
                 loanKey[0], loanKey[1], moGridReceiptEarnings.getTable().getRowCount() + 1);
         
@@ -1289,70 +1297,27 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
     
     private void createBenefit(final SDbEarning earning) throws Exception {
-        int benefitType = 0;
-        Date dateCutOff = null;
-        SDbBenefitTable benefitTable = null;
-        SDbBenefitTable benefitTableAux = null;
-        SHrsBenefitParams benefitParams = null;
-        
-        benefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), 
-                earning.getPkEarningId(), 
-                moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd());
-        
-        benefitType = benefitTable.getFkBenefitTypeId();
-        
-        if (benefitType == SLibConsts.UNDEFINED) {
-            throw new Exception("No se encontró ninguna prestación para el tipo de prestación definido en la percepción '" + earning.getName() + "'.");
+        if (moPayrollBenefitDialog == null) {
+            moPayrollBenefitDialog = new SDialogPayrollBenefit(miClient, earning.getFkBenefitTypeId(), "Agregar prestación");
         }
-        else if (earning.getFkBenefitTypeId() != benefitType) {
-            throw new Exception("El tipo de prestación de la percepción '" + earning.getName() + "', es diferente al tipo de prestación de la prestación '" + benefitTable.getName() + "'.");
-        }
+        moPayrollBenefitDialog.setValue(SDialogPayrollBenefit.PARAMS, moPayrollBenefitDialog.new Params(moHrsReceipt, earning));
+        moPayrollBenefitDialog.setVisible(true);
         
-        // check if benefit is vacation bonus:
-        if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            int tableAuxId = SHrsUtils.getRecentBenefitTable(miClient.getSession(), 
-                    SModSysConsts.HRSS_TP_BEN_VAC, 
-                    moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                    moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd());
-            benefitTableAux = moHrsReceipt.getHrsPayroll().getBenefitTable(tableAuxId);
+        if (moPayrollBenefitDialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+            moHrsCurrentBenefit = (SHrsBenefit) moPayrollBenefitDialog.getValue(SModConsts.HRS_BEN);
             
-            if (benefitTableAux == null) {
-                throw new Exception("No se encontró ninguna tabla para la prestación 'Vacaciones' que es requerida para el pago de la prestación 'Prima Vacacional'.");
-            }
-        }
-        
-        if (!moHrsReceipt.getHrsEmployee().getEmployee().isActive()) {
-            dateCutOff = moHrsReceipt.getHrsEmployee().getEmployee().getDateLastDismissal_n();
-            
-            if (benefitType != SModSysConsts.HRSS_TP_BEN_ANN_BON && !SLibTimeUtils.isBelongingToPeriod(dateCutOff, moHrsReceipt.getHrsPayroll().getPayroll().getDateStart(), moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) {
-                dateCutOff = moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd();
-            }
-        }
-        else if (benefitType == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
-            dateCutOff = SLibTimeUtils.getEndOfYear(moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd());
-        }
-        else {
-            dateCutOff = moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd();
-        }
-        
-        // Create benefit params:
-        benefitParams = new SHrsBenefitParams(earning, benefitTable, benefitTableAux, moHrsReceipt, dateCutOff);
-        
-        SDialogPayrollBenefit dlgBenefit = new SDialogPayrollBenefit(miClient, benefitType, "Agregar prestación");
-        dlgBenefit.setValue(SGuiConsts.PARAM_ROWS, benefitParams);
-        dlgBenefit.setVisible(true);
-        
-        if (dlgBenefit.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            moHrsBenefit = (SHrsBenefit) dlgBenefit.getValue(SGuiConsts.PARAM_ROWS);
             if (moEarning.isBasedOnUnits()) {
-                moCompEarningValue.getField().setValue(moHrsBenefit.getValuePayedReceipt());
+                moCompEarningValue.getField().setValue(moHrsCurrentBenefit.getReceiptDays());
             }
             else {
-                moCompEarningValue.getField().setValue(moHrsBenefit.getAmountPayedReceipt());
+                moCompEarningValue.getField().setValue(moHrsCurrentBenefit.getReceiptAmount());
             }
             
             actionAddEarning();
+        }
+        else {
+            resetFieldsEarning();
+            moTextEarningCode.requestFocusInWindow();
         }
     }
 
@@ -1599,13 +1564,11 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         Vector<SGridRow> rows = new Vector<>();
 
         moGridAbsenceConsumptions.setRowButtonsEnabled(mbEditable, false, mbEditable);
+        
         for (SDbAbsenceConsumption absenceConsumption : moHrsReceipt.getAbsenceConsumptions()) {
             SDbAbsence absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, new int[] { absenceConsumption.getPkEmployeeId(), absenceConsumption.getPkAbsenceId() });
             
-            absenceConsumption.setAuxNumber(absence.getNumber());
-            absenceConsumption.setAuxDateStart(absence.getDateStart());
-            absenceConsumption.setAuxDateEnd(absence.getDateEnd());
-            absenceConsumption.setAuxEffectiveDays(absence.getEffectiveDays());
+            absenceConsumption.setParentAbsence(absence);
             
             rows.add(absenceConsumption);
         }
@@ -1670,12 +1633,15 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 if (moEarning == null) {
                     String code = moTextEarningCode.getValue();
                     miClient.showMsgBoxWarning("No se encontró ninguna percepción con el código '" + code + "'.");
+                    
                     resetFieldsEarning();
-                    moTextEarningCode.setValue(code);
                     moTextEarningCode.requestFocusInWindow();
+                    
+                    moTextEarningCode.setValue(code);
                 }
                 else if (moEarning.isAbsence()) {
                     miClient.showMsgBoxWarning("No se puede agregar la percepción '" + moEarning.getName() + " (" + moEarning.getCode() + ")' de forma directa, se debe agregar mediante una incidencia.");
+                    
                     moTextEarningCode.requestFocusInWindow();
                 }
                 else {
@@ -1686,7 +1652,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     // enable/disable specialized fields:
 
                     if (moEarning.isLoan()) {
-                        miClient.getSession().populateCatalogue(moKeyEarningLoan_n, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moHrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(), moEarning.getFkLoanTypeId()}));
+                        miClient.getSession().populateCatalogue(moKeyEarningLoan_n, SModConsts.HRS_LOAN, 0, new SGuiParams(new int[] { moHrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(), moEarning.getFkLoanTypeId()}));
                         moKeyEarningLoan_n.setEnabled(true);
                     }
                     else {
@@ -1734,7 +1700,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                     // create benefit, if it is necessary:
                     
-                    moHrsBenefit = null;
+                    moHrsCurrentBenefit = null;
                     
                     if (moEarning.isBenefit()) {
                         createBenefit(moEarning);
@@ -1775,12 +1741,15 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 if (moDeduction == null) {
                     String code = moTextDeductionCode.getValue();
                     miClient.showMsgBoxWarning("No se encontró ninguna deducción con el código '" + code + "'.");
+                    
                     resetFieldsDeduction();
-                    moTextDeductionCode.setValue(code);
                     moTextDeductionCode.requestFocusInWindow();
+                    
+                    moTextDeductionCode.setValue(code);
                 }
                 else if (moDeduction.isAbsence()) {
                     miClient.showMsgBoxWarning("No se puede agregar la deducción '" + moDeduction.getName() + " (" + moDeduction.getCode() + ")' de forma directa, se debe agregar mediante una incidencia.");
+                    
                     moTextDeductionCode.requestFocusInWindow();
                 }
                 else {
@@ -1791,7 +1760,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     // enable/disable specialized fields:
 
                     if (moDeduction.isLoan()) {
-                        miClient.getSession().populateCatalogue(moKeyDeductionLoan_n, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moHrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(), moDeduction.getFkLoanTypeId()}));
+                        miClient.getSession().populateCatalogue(moKeyDeductionLoan_n, SModConsts.HRS_LOAN, 0, new SGuiParams(new int[] { moHrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(), moDeduction.getFkLoanTypeId()}));
                         moKeyDeductionLoan_n.setEnabled(true);
                     }
                     else {
@@ -1821,7 +1790,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
 
     private void actionPickEarning() {
-        miClient.getSession().showOptionPicker(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null, moTextEarningCode);
+        miClient.getSession().showOptionPicker(SModConsts.HRS_EAR, 0, null, moTextEarningCode);
         
         if (!moTextEarningCode.getValue().isEmpty()) {
             actionLoadEarning(false, false);
@@ -1829,7 +1798,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
     
     private void actionPickDeduction() {
-        miClient.getSession().showOptionPicker(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null, moTextDeductionCode);
+        miClient.getSession().showOptionPicker(SModConsts.HRS_DED, 0, null, moTextDeductionCode);
         
         if (!moTextDeductionCode.getValue().isEmpty()) {
             actionLoadDeduction(false, false);
@@ -1869,7 +1838,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         }
                     }
 
-                    if (moEarning.isBenefit() && moHrsBenefit == null) {
+                    if (moEarning.isBenefit() && moHrsCurrentBenefit == null) {
                         miClient.showMsgBoxWarning("Se debe capturar la cantidad o monto de la prestación '" + moEarning.getName() + "'.");
                         moTextEarningCode.requestFocusInWindow();
                         return;
@@ -1899,6 +1868,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                     // add earning:
                     addHrsReceiptEarning();
+                    
                     resetFieldsEarning();
                     moTextEarningCode.requestFocusInWindow();
                 }
@@ -1978,6 +1948,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                     // add deduction:
                     addHrsReceiptDeduction();
+                    
                     resetFieldsDeduction();
                     moTextDeductionCode.requestFocusInWindow();
                 }

@@ -120,9 +120,9 @@ public class STheReceipts {
             String nom = "";
             String emp = "";
             String xmlFolio = "";
-            SHrsPayroll moHrsPayroll = null;
-            SHrsPayrollDataProvider prov = new SHrsPayrollDataProvider(miClient.getSession());
-            SDbConfig moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+            SHrsPayroll hrsPayroll = null;
+            SHrsPayrollDataProvider hrsPayrollDataProvider = new SHrsPayrollDataProvider(miClient.getSession());
+            SDbConfig moduleConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
             
             while (resulPayroll.next()) {
                 id_pay_read = resulPayroll.getInt("id_pay");
@@ -136,38 +136,37 @@ public class STheReceipts {
                     payroll = new SDbPayroll();
                     payroll.read(miClient.getSession(), new int[] { id_pay });
                     
-                    SDbWorkingDaySettings moWorkingDaySettings = SHrsUtils.getPayrollWorkingDaySettings(miClient.getSession(), payroll.getFkPaysheetTypeId());
-                    moHrsPayroll = prov.createHrsPayroll(moConfig, moWorkingDaySettings, payroll, false);
+                    SDbWorkingDaySettings workingDaySettings = SHrsUtils.getPayrollWorkingDaySettings(miClient.getSession(), payroll.getFkPaysheetTypeId());
+                    hrsPayroll = hrsPayrollDataProvider.createHrsPayroll(moduleConfig, workingDaySettings, payroll);
                 }
                 
-                int receiptKey [] = new int[] { id_pay, resulPayroll.getInt("id_emp"), resulPayroll.getInt("max_issue") };
+                int[] receiptKey = new int[] { id_pay, resulPayroll.getInt("id_emp"), resulPayroll.getInt("max_issue") };
                 SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(miClient.getSession(), receiptKey);
                 
-                SOutputData row = this.calculate(payroll, moHrsPayroll, payrollReceipt, uuid, xmlFolio, prov);
+                SOutputData row = this.calculate(payroll, hrsPayroll, payrollReceipt, uuid, xmlFolio, hrsPayrollDataProvider);
                 
-                dataList.add(new String[]
-                            { 
-                                row.getUuid(),
-                                row.getXmlFolio(),
-                                row.getTaxCalculated() + "",
-                                row.getTaxPayed() + "",
-                                (row.getTaxCalculated() - row.getTaxPayed()) + "",
-                                row.getSubsidyCalculated() + "",
-                                row.getSubPayed() + "",
-                                (row.getSubsidyCalculated() - row.getSubPayed()) + "",
-                                row.getTaxToHold() + "",
-                                row.getSubsidyToPay() + "",
-                                row.getTaxXml() + "",
-                                row.getSubsidyXml() + "",
-                                row.getResult(),
-                                row.getComments(),
-                                row.getIdPay() + "",
-                                row.getIdEmp() + "",
-                                row.getNomType(),
-                                nom,
-                                emp
-                            });
+                dataList.add(new String[] {
+                    row.getUuid(),
+                    row.getXmlFolio(),
+                    row.getTaxCalculated() + "",
+                    row.getTaxPayed() + "",
+                    (row.getTaxCalculated() - row.getTaxPayed()) + "",
+                    row.getSubsidyCalculated() + "",
+                    row.getSubPayed() + "",
+                    (row.getSubsidyCalculated() - row.getSubPayed()) + "",
+                    row.getTaxToHold() + "",
+                    row.getSubsidyToPay() + "",
+                    row.getTaxXml() + "",
+                    row.getSubsidyXml() + "",
+                    row.getResult(),
+                    row.getComments(),
+                    row.getIdPay() + "",
+                    row.getIdEmp() + "",
+                    row.getNomType(),
+                    nom,
+                    emp
+                });
             }
             
             DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
@@ -184,7 +183,8 @@ public class STheReceipts {
         catch (SQLException ex) {
             Logger.getLogger(SReceiptsR.class.getName()).log(Level.SEVERE, null, ex);
             return false;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             Logger.getLogger(STheReceipts.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
@@ -198,29 +198,31 @@ public class STheReceipts {
      * @param uuid
      * @return 
      */
-    private SOutputData calculate(SDbPayroll payroll, SHrsPayroll moHrsPayroll, SDbPayrollReceipt payrollReceipt, String uuid, String xmlFolio, SHrsPayrollDataProvider prov) {
+    private SOutputData calculate(SDbPayroll payroll, SHrsPayroll hrsPayroll, SDbPayrollReceipt payrollReceipt, String uuid, String xmlFolio, SHrsPayrollDataProvider dataProvider) {
         SOutputData oRow = null;
         SDbPayrollReceipt payrollReceiptOriginal;
         
         try {
             payrollReceiptOriginal = payrollReceipt.clone();
             
-            SHrsReceipt hrsReceipt = new SHrsReceipt();
-            hrsReceipt.setHrsPayroll(moHrsPayroll);
+            // create HRS receipt:
+            SHrsReceipt hrsReceipt = new SHrsReceipt(hrsPayroll);
 
-            SHrsEmployee hrsEmployee = prov.createHrsEmployee(moHrsPayroll, payroll.getPkPayrollId(), payrollReceipt.getPkEmployeeId(), 
-                    payroll.getFiscalYear(), payroll.getPeriod(), payroll.getFiscalYear(), payroll.getDateStart(), payroll.getDateEnd());
-            hrsEmployee.setHrsReceipt(hrsReceipt);
+            // create HRS employee:
+            SHrsEmployee hrsEmployee = dataProvider.createHrsEmployee(hrsPayroll, hrsReceipt, payrollReceipt.getPkEmployeeId());
+            
+            // asign HRS employee to HRS receipt:
             hrsReceipt.setHrsEmployee(hrsEmployee);
 
+            // asign payroll receipt to HRS receipt:
             hrsReceipt.setPayrollReceipt(payrollReceipt);
             
             if (payroll.isPayrollNormal()) {
-                hrsReceipt.getAbsenceConsumptions().addAll(moHrsPayroll.crateAbsenceConsumptions(hrsReceipt));
+                hrsReceipt.getAbsenceConsumptions().addAll(hrsPayroll.crateAbsenceConsumptions(hrsReceipt));
             }
 
-            hrsReceipt.getHrsReceiptEarnings().addAll(moHrsPayroll.createHrsReceiptEarnings(hrsReceipt, payroll.getDateStart(), payroll.getDateEnd()));
-            hrsReceipt.getHrsReceiptDeductions().addAll(moHrsPayroll.createHrsReceiptDeductions(hrsReceipt, payroll.getDateStart(), payroll.getDateEnd()));
+            hrsReceipt.getHrsReceiptEarnings().addAll(hrsPayroll.createHrsReceiptEarnings(hrsReceipt, payroll.getDateStart(), payroll.getDateEnd()));
+            hrsReceipt.getHrsReceiptDeductions().addAll(hrsPayroll.createHrsReceiptDeductions(hrsReceipt, payroll.getDateStart(), payroll.getDateEnd()));
 
             hrsReceipt.renumberHrsReceiptEarnings();
             hrsReceipt.renumberHrsReceiptDeductions();

@@ -4,15 +4,19 @@
  */
 package erp.mod.hrs.db;
 
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -26,16 +30,20 @@ public class SDbDepartment extends SDbRegistryUser {
     protected int mnPkDepartmentId;
     protected String msCode;
     protected String msName;
-    protected int mnFkSuperiorDepartmentId_n;
-    protected int mnFkTitularEmployeeId_n;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
+    */
+    protected int mnFkSuperiorDepartmentId_n;
+    protected int mnFkTitularEmployeeId_n;
+    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected SDbCfgAccountingDepartment moChildCfgAccountingDepartment;
 
     public SDbDepartment() {
         super(SModConsts.HRSU_DEP);
@@ -65,6 +73,10 @@ public class SDbDepartment extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
+    public void setChildCfgAccountingDepartment(SDbCfgAccountingDepartment o) { moChildCfgAccountingDepartment = o; }
+    
+    public SDbCfgAccountingDepartment getChildCfgAccountingDepartment() { return moChildCfgAccountingDepartment; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkDepartmentId = pk[0];
@@ -90,6 +102,8 @@ public class SDbDepartment extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        moChildCfgAccountingDepartment = null;
     }
 
     @Override
@@ -145,6 +159,18 @@ public class SDbDepartment extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            // read child registry:
+            
+            try (Statement statement = session.getStatement().getConnection().createStatement()) {
+                msSql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " " + getSqlWhere();
+                resultSet = statement.executeQuery(msSql);
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    moChildCfgAccountingDepartment = (SDbCfgAccountingDepartment) session.readRegistry(SModConsts.HRS_CFG_ACC_DEP, new int[] { mnPkDepartmentId });
+                }
+            }
+
+            // finish reading this registry:
 
             mbRegistryNew = false;
         }
@@ -179,13 +205,18 @@ public class SDbDepartment extends SDbRegistryUser {
                     ")";
         }
         else {
-            mnFkUserUpdateId = session.getUser().getPkUserId();
+            // validar que no haya dependencias circulares con los departamentos superiores:
             
             ArrayList<Integer> ids = new ArrayList<>();
             ids.add(mnPkDepartmentId);
-            if (! this.validateCircleDepartment(session, ids, mnFkSuperiorDepartmentId_n)) {
+            
+            if (!this.validateCircleDepartment(session, ids, mnFkSuperiorDepartmentId_n)) {
                 throw new Exception("No se puede guardar el registro, error dependencia circular.");
             }
+            
+            // guardar el registro:
+            
+            mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_dep = " + mnPkDepartmentId + ", " +
@@ -204,16 +235,37 @@ public class SDbDepartment extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
-        if (mbRegistryNew) {
-            SHrsAccounting accounting = new SHrsAccounting(session);
+        // save accounting configuration:
+        
+        int paramPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+        
+        switch (paramPayrollAccProcess) {
+            case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
+                if (mbRegistryNew) {
+                    SHrsAccounting accounting = new SHrsAccounting(session);
+
+                    accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_DEP);
+                    accounting.setPkReferenceId(mnPkDepartmentId);
+                    accounting.setFkUserInsertId(mnFkUserInsertId);
+                    accounting.setFkUserUpdateId(mnFkUserUpdateId);
+
+                    accounting.save();
+                }
+                break;
                 
-            accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_DEP);
-            accounting.setPkReferenceId(mnPkDepartmentId);
-            accounting.setFkUserInsertId(mnFkUserInsertId);
-            accounting.setFkUserUpdateId(mnFkUserUpdateId);
-            
-            accounting.save();
+            case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
+                if (moChildCfgAccountingDepartment != null) {
+                    moChildCfgAccountingDepartment.setPkDepartmentId(mnPkDepartmentId);
+                    moChildCfgAccountingDepartment.setDeleted(mbDeleted);
+                    moChildCfgAccountingDepartment.save(session);
+                }
+                break;
+                
+            default:
+                // nothing
         }
+        
+        // finish saving this registry:
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -272,6 +324,10 @@ public class SDbDepartment extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        if (moChildCfgAccountingDepartment != null) {
+            registry.setChildCfgAccountingDepartment(this.getChildCfgAccountingDepartment().clone());
+        }
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

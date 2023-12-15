@@ -15,6 +15,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.form.SDialogStockCardex;
 import erp.mtrn.form.SDialogStockSegregations;
 import erp.table.SFilterConstants;
@@ -327,7 +328,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 if (key != null) {
                     if (key[0] != SLibConstants.UNDEFINED) {
                         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_cob = " + key[0] + " ";
-                        sqlSegWhere += "AND swhs.fid_cob = " + key[0] + " ";
+                        sqlSegWhere += "AND swhs.id_cob = " + key[0] + " ";
                     }
                     if (key[1] != SLibConstants.UNDEFINED) {
                         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_wh = " + key[1] + " ";
@@ -341,8 +342,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         }
         
         segregationQuery = "(SELECT COALESCE(SUM(wety.qty_inc - wety.qty_dec), 0) " +
-                "FROM trn_stk_seg_whs AS swhs " +
-                "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " AS swhs " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_cob = wety.id_cob AND swhs.id_whs = wety.id_whs " +
                 "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere + ")";
         
         msSql = "SELECT s.id_item, s.id_unit, " +

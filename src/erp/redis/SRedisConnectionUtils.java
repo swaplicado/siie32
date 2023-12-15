@@ -95,6 +95,7 @@ public abstract class SRedisConnectionUtils {
      * @param jedis
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static Vector getSessionsUsers(Jedis jedis) {
         Set<String> keys = jedis.keys(SESSION + "+*");
         Vector vectorKeys = new Vector();

@@ -8,11 +8,14 @@ import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.mitm.data.SDataItem;
 import erp.mmfg.data.SDataProductionOrder;
+import erp.mod.SModConsts;
+import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -20,7 +23,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona, Sergio Flores, Edwin Carmona
  */
 public abstract class STrnStockSegregationUtils {
     
@@ -57,7 +60,10 @@ public abstract class STrnStockSegregationUtils {
                 case SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD:
                     segregation = populateSegregationFromProdOrder(client, reference);
                     segregation = STrnStockSegregationUtils.validateStock(client, segregation);
-                    break;                                                                          
+                    break;
+                    
+                case SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT:
+                    break;
             }
             
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -147,7 +153,7 @@ public abstract class STrnStockSegregationUtils {
         if (segregation.getPkStockSegregationId() == SLibConstants.UNDEFINED) {
             segregation.setFkStockSegregationTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_MFG_ORD);
             segregation.setFkReference1Id(productionOrder.getPkYearId());
-            segregation.setFkReference2Id(productionOrder.getPkOrdId());
+            segregation.setFkReference2Id_n(productionOrder.getPkOrdId());
             segregation.setFkUserEditId(client.getSession().getUser().getPkUserId());
             segregation.setFkUserNewId(client.getSession().getUser().getPkUserId());
             segregation.setFkUserDeleteId(client.getSession().getUser().getPkUserId());
@@ -156,8 +162,7 @@ public abstract class STrnStockSegregationUtils {
         
         warehouse = new SDataStockSegregationWarehouse();
         warehouse.setPkWarehouseId(productionOrder.getDbmsFkWarehouseId());
-	warehouse.setFkCompanyBranchId(productionOrder.getDbmsFkCompanyBranchId());
-	warehouse.setFkWarehouseId(productionOrder.getDbmsFkWarehouseId());
+	warehouse.setPkCompanyBranchId(productionOrder.getDbmsFkCompanyBranchId());
         
         segregation.getChildEntries().clear();
         segregation.getChildEntries().add(warehouse);
@@ -219,8 +224,17 @@ public abstract class STrnStockSegregationUtils {
         int id = 0;
         
         sql = "SELECT id_stk_seg " +
-                "FROM trn_stk_seg " +
-                "WHERE fid_ref_1 = " + reference[0] + " AND fid_ref_2 = " + reference[1] + " AND fid_tp_stk_seg = " + segregationType +"; ";
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG) + " " +
+                "WHERE fid_ref_1 = " + reference[0];
+        
+        if (reference.length > 1) {
+            sql += " AND fid_ref_2_n = " + reference[1];
+        }
+        else {
+            sql += " AND fid_ref_2_n IS NULL";
+        }
+        
+        sql += " AND fid_tp_stk_seg = " + segregationType +"; ";
         
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
@@ -256,6 +270,7 @@ public abstract class STrnStockSegregationUtils {
      * 
      * @param client
      * @param oStockMoveParams contains the attributes needed for the filter.
+     * @param iogKey_n
      * @return The STrnStock object containing the values obtained.
      * @throws Exception 
      */
@@ -264,7 +279,7 @@ public abstract class STrnStockSegregationUtils {
         ResultSet result = null;
         
         String sql = "SELECT COALESCE(SUM(stk.mov_in), 0) AS f_mov_in, COALESCE(SUM(stk.mov_out), 0) AS f_mov_out " +
-                "FROM trn_stk AS stk " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS stk " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON stk.id_cob = ent.id_cob AND stk.id_wh = ent.id_ent " +
                 "WHERE NOT ent.b_del AND NOT stk.b_del AND stk.id_year = " + oStockMoveParams.getPkYearId() + " AND stk.id_item = " + oStockMoveParams.getPkItemId() + " AND stk.id_unit = " + oStockMoveParams.getPkUnitId() + " ";
         
@@ -347,16 +362,16 @@ public abstract class STrnStockSegregationUtils {
         }
         
         String sql = "SELECT COALESCE(SUM(wety.qty_inc), 0) AS f_inc_seg, COALESCE(SUM(wety.qty_dec), 0) AS f_dec_seg " +
-                "FROM trn_stk_seg_whs swhs " +
-                "INNER JOIN trn_stk_seg_whs_ety wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS) + " swhs " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_cob = wety.id_cob AND swhs.id_whs = wety.id_whs " +
                 "WHERE fid_year = " + stockMoveParams.getPkYearId() + " AND fid_item = " + stockMoveParams.getPkItemId() + " AND fid_unit = " + stockMoveParams.getPkUnitId() + " ";
         
         if (stockMoveParams.getPkCompanyBranchId() != 0) {
-            sql += "AND swhs.fid_cob = " + stockMoveParams.getPkCompanyBranchId() + " ";
+            sql += "AND swhs.id_cob = " + stockMoveParams.getPkCompanyBranchId() + " ";
         }
         
         if (stockMoveParams.getPkWarehouseId() != 0) {
-            sql += "AND swhs.fid_whs = " + stockMoveParams.getPkWarehouseId() + " ";
+            sql += "AND swhs.id_whs = " + stockMoveParams.getPkWarehouseId() + " ";
         }
         
         if (stockMoveParams.getSegregationId() != 0) {
@@ -394,7 +409,7 @@ public abstract class STrnStockSegregationUtils {
                     stockMoveParams.setPkItemId(warehouseEntry.getFkItemId());
                     stockMoveParams.setPkUnitId(warehouseEntry.getFkUnitId());
                     stockMoveParams.setPkYearId(warehouseEntry.getFkYearId());
-                    stockMoveParams.setPkCompanyBranchId(warehouse.getFkCompanyBranchId());
+                    stockMoveParams.setPkCompanyBranchId(warehouse.getPkCompanyBranchId());
                     stockMoveParams.setPkWarehouseId(warehouse.getPkWarehouseId());
                     stockMoveParams.setSegregationId(currentSegregation.getPkStockSegregationId());
                     stockMoveParams.setIsCurrentSegregationExcluded(true);
@@ -513,7 +528,9 @@ public abstract class STrnStockSegregationUtils {
     public static boolean isValidYear(final java.sql.Connection connection, final int segregationId, final int yearId) throws SQLException {
         boolean isValidYear = true;
         ResultSet result = null;
-        String sqlStkSeg = "SELECT * FROM trn_stk_seg_whs_ety AS wety WHERE id_stk_seg = " + segregationId + " AND " + " fid_year <> " + yearId;
+        String sqlStkSeg = "SELECT * "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety "
+                + "WHERE id_stk_seg = " + segregationId + " AND " + " fid_year <> " + yearId;
             
         result = connection.createStatement().executeQuery(sqlStkSeg);
 
@@ -522,5 +539,79 @@ public abstract class STrnStockSegregationUtils {
         }
         
         return isValidYear;
-    }  
+    }
+    
+    public static int saveSegregations(SGuiSession session, ArrayList<SDataStockSegregationWarehouseEntry> lSegEtys, final int idSegregation, final int idMatReq) throws SQLException, Exception {
+        int nIdSegregation = idSegregation;
+        SDataStockSegregation oSeg = new SDataStockSegregation();
+        if (idSegregation == 0) {
+            oSeg.setExpirationDate_n(null);
+            oSeg.setDeleted(false);
+            oSeg.setFkStockSegregationTypeId(SDataConstantsSys.TRNS_TP_STK_SEG_REQ_MAT);
+            oSeg.setFkReference1Id(idMatReq);
+            oSeg.setFkReference2Id_n(0);
+            
+            oSeg.save(session.getDatabase().getConnection());
+            
+            if (oSeg.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                throw new Exception("Error al guardar la segregación.");
+            }
+        }
+        else {
+            oSeg.read(new int[] { nIdSegregation }, session.getDatabase().getConnection().createStatement());
+        }
+        
+        SDataStockSegregationWarehouse oWhsEntryCur = null;
+        for (SDataStockSegregationWarehouseEntry oSegEty : lSegEtys) {
+            oWhsEntryCur = null;
+            for (SDataStockSegregationWarehouse oWhsEntry : oSeg.getChildEntries()) {
+                if (oSegEty.getPkCompanyBranchId() == oWhsEntry.getPkCompanyBranchId() &&
+                    oSegEty.getPkWarehouseId() == oWhsEntry.getPkWarehouseId()) {
+                    oWhsEntryCur = oWhsEntry;
+                    break;
+                }
+            }
+            
+            if (oWhsEntryCur == null) {
+                SDataStockSegregationWarehouse oSegWhs = new SDataStockSegregationWarehouse();
+                oSegWhs.setPkCompanyBranchId(oSegEty.getPkCompanyBranchId());
+                oSegWhs.setPkWarehouseId(oSegEty.getPkWarehouseId());
+                
+                oSegWhs.getChildEntries().add(oSegEty);
+                oSeg.getChildEntries().add(oSegWhs);
+            }
+            else {
+                oWhsEntryCur.getChildEntries().add(oSegEty);
+            }
+        }
+        
+        oSeg.save(session.getDatabase().getConnection());
+            
+        if (oSeg.getLastDbActionResult() ==SLibConstants.DB_ACTION_SAVE_OK) {
+            nIdSegregation = oSeg.getPkStockSegregationId();
+
+            return nIdSegregation;
+        }
+
+        throw new Exception("Error al guardar la segregación.");
+    }
+    
+    public static boolean hasSegregationsRefs(final java.sql.Connection connection, ArrayList<SDbMaterialRequestEntry> lMatReqEtys) throws SQLException {
+        ResultSet result = null;
+        String sqlStkSeg = "SELECT id_stk_seg "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety "
+                + "WHERE ";
+            
+        String sqlEtys;
+        for (SDbMaterialRequestEntry oMREty : lMatReqEtys) {
+            sqlEtys = sqlStkSeg + "fid_mat_req_n = " + oMREty.getPkMatRequestId() + " AND fid_mat_req_ety_n = " + oMREty.getPkEntryId() + ";";
+            result = connection.createStatement().executeQuery(sqlEtys);
+            
+            if (result.next()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

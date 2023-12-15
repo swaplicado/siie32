@@ -33,13 +33,14 @@ import erp.gui.mod.xml.SXmlConfig;
 import erp.gui.mod.xml.SXmlModConsts;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.gui.SGuiDatePicker;
 import erp.lib.gui.SGuiDateRangePicker;
+import erp.lib.gui.SGuiModule;
 import erp.mcfg.data.SDataCertificate;
 import erp.mfin.data.SDataExchangeRate;
+import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleBps;
@@ -72,6 +73,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -81,6 +83,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+import org.joda.time.LocalDate;
 import redis.clients.jedis.Jedis;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -105,14 +108,14 @@ import sa.lib.xml.SXmlUtils;
 /**
  * SIIE Client.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 208.0"; // fecha release: 2022-10-28
-    public static final String APP_COPYRIGHT = "2007-2022";
+    public static final String APP_RELEASE = "3.2 229.0"; // fecha release: 2023-12-07
+    public static final String APP_COPYRIGHT = "2007-2023";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
     public static final String VENDOR = APP_PROVIDER;
@@ -194,6 +197,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconDocImport;
     private ImageIcon moIconDocImportCfd;
     private ImageIcon moIconDocImportCfdOrd;
+    private ImageIcon moIconDocImportMatReq;
     private ImageIcon moIconDocOpen;
     private ImageIcon moIconDocClose;
     private ImageIcon moIconDocXml;
@@ -215,6 +219,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconArrowLeft;
     private ImageIcon moIconArrowRight;
     private ImageIcon moIconBizPartnerExport;
+    private ImageIcon moIconCal;
+    private ImageIcon moIconShipIntDel;
+    private ImageIcon moIconShipIntRet;
     private ImageIcon moIconModuleCfg;
     private ImageIcon moIconModuleFin;
     private ImageIcon moIconModulePur;
@@ -507,7 +514,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginCompanyBranch.setToolTipText("Sucursal de la empresa actual");
         jtfLoginCompanyBranch.setFocusable(false);
         jtfLoginCompanyBranch.setOpaque(false);
-        jtfLoginCompanyBranch.setPreferredSize(new java.awt.Dimension(150, 20));
+        jtfLoginCompanyBranch.setPreferredSize(new java.awt.Dimension(125, 20));
         jpStatus.add(jtfLoginCompanyBranch);
 
         jtfLoginEntityCh.setEditable(false);
@@ -517,7 +524,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityCh.setToolTipText("Cuenta de efectivo actual");
         jtfLoginEntityCh.setFocusable(false);
         jtfLoginEntityCh.setOpaque(false);
-        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityCh);
 
         jtfLoginEntityWh.setEditable(false);
@@ -527,7 +534,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityWh.setToolTipText("Almacén actual");
         jtfLoginEntityWh.setFocusable(false);
         jtfLoginEntityWh.setOpaque(false);
-        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityWh);
 
         jtfLoginEntityPlt.setEditable(false);
@@ -537,7 +544,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityPlt.setToolTipText("Planta actual");
         jtfLoginEntityPlt.setFocusable(false);
         jtfLoginEntityPlt.setOpaque(false);
-        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityPlt);
 
         jtfLoginEntityPos.setEditable(false);
@@ -547,7 +554,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginEntityPos.setToolTipText("Punto de venta actual");
         jtfLoginEntityPos.setFocusable(false);
         jtfLoginEntityPos.setOpaque(false);
-        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(50, 20));
+        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(40, 20));
         jpStatus.add(jtfLoginEntityPos);
 
         jbSession.setBackground(java.awt.Color.black);
@@ -583,15 +590,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jlAppRelease.setForeground(new java.awt.Color(0, 153, 153));
         jlAppRelease.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jlAppRelease.setText("RELEASE");
-        jlAppRelease.setPreferredSize(new java.awt.Dimension(100, 20));
+        jlAppRelease.setText("3.2 000.0");
+        jlAppRelease.setPreferredSize(new java.awt.Dimension(60, 20));
         jPanel4.add(jlAppRelease);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/swap_logo_9.jpg"))); // NOI18N
         jLabel1.setToolTipText("www.swaplicado.com.mx");
         jPanel4.add(jLabel1);
 
-        jPanel3.add(jPanel4, java.awt.BorderLayout.LINE_END);
+        jPanel3.add(jPanel4, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
@@ -693,8 +700,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         mbLoggedIn = false;
 
         setExtendedState(Frame.MAXIMIZED_BOTH);
-        TimeZone.setDefault(SLibTimeUtilities.SysTimeZone); // XXX Fix this!: time zone must be set by configuration parameter
-
+        
         SBeanForm.OwnerFrame = this;
         SBeanFormDialog.OwnerFrame = this;
         SBeanFormProcess.OwnerFrame = this;
@@ -730,6 +736,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconDocImport = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import.gif"));
         moIconDocImportCfd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"));
         moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif"));
+        moIconDocImportMatReq = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_mat_req.gif"));
         moIconDocOpen = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif"));
         moIconDocClose = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif"));
         moIconDocXml = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"));
@@ -751,6 +758,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconArrowLeft = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif"));
         moIconArrowRight = new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif"));
         moIconBizPartnerExport = new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_export.gif"));
+        moIconShipIntDel = new ImageIcon(getClass().getResource("/erp/img/icon_std_ship_int_del.gif"));
+        moIconShipIntRet = new ImageIcon(getClass().getResource("/erp/img/icon_std_ship_int_ret.gif"));
+        moIconCal = new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif"));
         moIconModuleCfg = new ImageIcon(getClass().getResource("/erp/img/icon_mod_cfg.png"));
         moIconModuleFin = new ImageIcon(getClass().getResource("/erp/img/icon_mod_fin.png"));
         moIconModulePur = new ImageIcon(getClass().getResource("/erp/img/icon_mod_pur.png"));
@@ -771,8 +781,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             showMsgBoxError(ERR_PARAMS_APP_READING);
             System.exit(-1);    // there is no way of connecting to an ERP Server
         }
-
-	TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone("GMT-06:00"));
+        
+        TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone(moParamsApp.getTimeZone()));
         SLibUtils.restoreDateFormats(zone);
         TimeZone.setDefault(zone);
         
@@ -1175,17 +1185,82 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
         catch (Exception e) {
             showMsgBoxWarning("No se encontró el servidor de acceso exclusivo a registros."
-                    + "\nFavor de comunicarlo al administrador del sistema."
+                    + "\nSin embargo puede continuar usando " + APP_NAME + ", pero proceda con precaución al capturar información."
+                    + "\nDe cualquier forma, favor de comunicar esta situación al administrador del sistema."
                     + "\n(" + e.getMessage() + ")");
             moJedis = null;
         }
     }
+    
+    private void recoverTempData() throws Exception {
+        
+        // try to recover last unsaved journal voucher:
+        
+        boolean recover = false;
+        SDataRecord recordTemp = new SDataRecord();
+        
+        if (recordTemp.existsTempFile(this)) {
+            recordTemp.readTempFileData(this);
+            
+            Date datetimeTemp = recordTemp.getTempFileTimestamp();
+            
+            if (datetimeTemp != null) {
+                Date datetimeDbms = null;
+                
+                if (recordTemp.getIsRegistryNew()) {
+                    recover = true; // temp data is new
+                }
+                else {
+                    SDataRecord recordDbms = new SDataRecord();
+                    recordDbms.setAuxReadHeaderOnly(true);
+                    recordDbms.read(recordTemp.getPrimaryKey(), moSession.getStatement());
+
+                    datetimeDbms = recordDbms.getLastDbUpdate();
+                    
+                    LocalDate dateTemp = new LocalDate(datetimeTemp);
+                    LocalDate dateDbms = new LocalDate(datetimeDbms);
+                    
+                    if (dateDbms.compareTo(dateTemp) <= 0) {
+                        recover = true; // last storage was at least the same day of last temporal preservation
+                    }
+                }
+                
+                if (recover) {
+                    String message = "¡SE RECUPERÓ INFORMACIÓN QUE NO FUE GUARDADA!"
+                            + "\nHay información sin guardar de la póliza contable '" + recordTemp.getRecordPrimaryKey() + "'."
+                            + "\nFecha y hora de la información recuperada: " + SLibUtils.DateFormatDatetimeTimeZone.format(datetimeTemp) + ".";
+                    
+                    if (!recordTemp.getIsRegistryNew()) {
+                        message += "\nÚltima actualización de esta póliza contable: " + SLibUtils.DateFormatDatetimeTimeZone.format(datetimeDbms) + ".";
+                    }
+                    
+                    message += "\n\nIMPORTANTE: Si decide NO revisar la información recuperada, será eliminada."
+                            + "\n¿Desea revisar y, en su caso, guardar la información recuperada?";
+                    
+                    boolean review = showMsgBoxConfirm(message) == JOptionPane.YES_OPTION;
+                    
+                    if (!review) {
+                        review = showMsgBoxConfirm("Confirmar si desea eliminar la información recuperada de la póliza contable '" + recordTemp.getRecordPrimaryKey() + "'.") != JOptionPane.YES_OPTION;
+                    }
+                    
+                    if (review) {
+                        SGuiModule module = getGuiModule(SDataConstants.MOD_FIN);
+                        module.setAuxRegistry(recordTemp);
+                        if (module.showForm(SDataConstants.FIN_REC, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                            module.refreshCatalogues(SDataConstants.FIN_REC);
+                            showMsgBoxInformation("La póliza contable '" + recordTemp.getRecordPrimaryKey() + "' ha sido guardada.");
+                        }
+                    }
+                }
+            }
+            
+            recordTemp.deleteTempFile(this);
+        }
+    }
 
     private void logout() {
-        Cursor cursor = getCursor();
-
         try {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             actionFileCloseViews();
 
             if (mbLoggedIn) {
@@ -1244,19 +1319,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             SLibUtils.showException(this, e);
         }
         finally {
-            setCursor(cursor);
+            getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
     private void login() {
         boolean lookup = false;
-        Cursor cursor = getCursor();
         SLoginResponse response = null;
 
         mbLoggedIn = false;
 
         try {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
@@ -1291,6 +1365,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_USR_CO);
                             break;
                         case SLibConstants.LOGIN_OK:
+                            // login concedido
+                            // IMPORTANTE: ¡Favor de no cambiar el orden de las instrucciones de esta sección!
+                            
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
@@ -1301,10 +1378,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
                             boolean actionOk = actionFileSession(true);
                             
-                            if (!moParamsApp.getWithServer() && actionOk) {
-                                createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
-                                        response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
+                            if (actionOk) {
+                                // check if a Redis session is needed:
+                                if (!moParamsApp.getWithServer()) {
+                                    createRedisSession(response.getSession().getCompany().getPkCompanyId(), 
+                                            response.getSession().getUser().getPkUserId(), response.getSession().getUser().getUser());
+                                }
                             }
+                            
                             break;
                         default:
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_UNKNOWN);
@@ -1326,7 +1407,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             SLibUtils.showException(this, e);
         }
         finally {
-            setCursor(cursor);
+            getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             if (!lookup) {
                 showMsgBoxWarning("No se pudo establecer conexión con el ERP Server: '" + moParamsApp.getErpInstance() + "',\nen el host: '" + moParamsApp.getErpHost() + "'.");
@@ -1349,9 +1430,17 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 moModuleInv = new SGuiModuleTrnInv(this);
                 moModuleMkt = new SGuiModuleMkt(this);
                 moModuleLog = new SGuiModuleLog(this);
-                moModuleMfg = new SGuiModuleMfg(this);            
+                moModuleMfg = new SGuiModuleMfg(this);
                 moModuleHrs = new SGuiModuleHrs(this);
-                moModuleQlt = new SGuiModuleQlt(this);  
+                moModuleQlt = new SGuiModuleQlt(this);
+                
+                try {
+                    // check if there are temporal data to recover:
+                    recoverTempData();
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
             }
         }
     }
@@ -1498,7 +1587,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         else if (onLogin) {
             actionFileCloseSession();
         }
-            return response;
+        
+        return response;
     }
 
     private void actionFilePassword() {
@@ -1642,7 +1732,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SParamsApp getParamsApp() {
         return moParamsApp;
     }
-
+    
     @Override
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
@@ -2116,6 +2206,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             case SLibConstants.ICON_DOC_IMPORT_CFD_ORD:
                 imageIcon = moIconDocImportCfdOrd;
                 break;
+            case SLibConstants.ICON_DOC_IMPORT_MAT_REQ:
+                imageIcon = moIconDocImportMatReq;
+                break;
             case SLibConstants.ICON_DOC_OPEN:
                 imageIcon = moIconDocOpen;
                 break;
@@ -2139,7 +2232,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_DOC_DELIVERY:
                 imageIcon = moIconDocDelivery;
-                break;
+                break; 
             case SLibConstants.ICON_FILTER_BP:
                 imageIcon = moIconFilterBp;
                 break;
@@ -2178,6 +2271,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_BP_EXPORT:
                 imageIcon = moIconBizPartnerExport;
+                break;
+            case SLibConstants.ICON_SHIP_INT_DEL:
+                imageIcon = moIconShipIntDel;
+                break;
+            case SLibConstants.ICON_SHIP_INT_RET:
+                imageIcon = moIconShipIntRet;
+                break;
+            case SLibConstants.ICON_GUI_CAL:
+                imageIcon = moIconCal;
                 break;
             case SModConsts.MOD_CFG:
             case SModConsts.MOD_CFG_N:
@@ -2297,6 +2399,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         map.put("bShowDetailBackground", moSessionXXX.getParamsCompany().getIsReportsBackground());
         map.put("oDateFormat", SLibUtils.DateFormatDate);
         map.put("oDatetimeFormat", SLibUtils.DateFormatDatetime);
+        map.put("oDatetimeFormatIso", SLibUtils.IsoFormatDatetime);
         map.put("oTimeFormat", SLibUtils.DateFormatTime);
         map.put("oValueFormat", SLibUtils.getDecimalFormatAmount());
         map.put("sImageDir", moSessionXXX.getParamsCompany().getImagesDirectory());

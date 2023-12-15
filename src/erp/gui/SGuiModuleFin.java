@@ -56,6 +56,7 @@ import erp.mfin.form.SDialogRepBizPartnerMove;
 import erp.mfin.form.SDialogRepBizPartnerStatement;
 import erp.mfin.form.SDialogRepDpsMonthReport;
 import erp.mfin.form.SDialogRepDpsPayment;
+import erp.mfin.form.SDialogRepExchangeRateDiff;
 import erp.mfin.form.SDialogRepFinMov;
 import erp.mfin.form.SDialogRepFinMovBankDayDet;
 import erp.mfin.form.SDialogRepGlobalStatement;
@@ -282,6 +283,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmRepAccMovs;
     private javax.swing.JMenuItem jmiRepAccMovsTax;
     private javax.swing.JMenuItem jmiRepAccMovsProfitLoss;
+    private javax.swing.JMenuItem jmiRepAccMovsExcDiff;
     private javax.swing.JMenu jmRepCashFlow;
     private javax.swing.JMenuItem jmiRepCashFlowPaysCus;
     private javax.swing.JMenuItem jmiRepCashFlowPaysSup;
@@ -301,6 +303,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepLedgerCostCenter;
     private javax.swing.JMenuItem jmiRepConceptAdmin;
     private javax.swing.JMenuItem jmiRepConceptTax;
+    private javax.swing.JMenuItem jmiRepViewAccMovsDetail;
     private javax.swing.JMenuItem jmiRepContributionMargin;
     private javax.swing.JSeparator jsRepAux1;
     private javax.swing.JMenuItem jmiRepPrtJournalVouchers;
@@ -677,6 +680,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepAccMovs = new JMenu("Movimientos contables de cuentas de sistema");
         jmiRepAccMovsTax = new JMenuItem("Movimientos contables de impuestos...");
         jmiRepAccMovsProfitLoss = new JMenuItem("Movimientos contables de pérdidas y ganancias...");
+        jmiRepAccMovsExcDiff = new JMenuItem("Movimientos contables de diferencias cambiarias...");
 
         jmRepCashFlow = new JMenu("Flujo de efectivo");
         jmiRepCashFlowPaysCus = new JMenuItem("Reporte de cobros por periodo...");
@@ -699,6 +703,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepLedgerCostCenter = new JMenuItem("Reporte de auxiliares contables de centros de costo...");
         jmiRepConceptAdmin = new JMenuItem("Reporte de conceptos administrativos...");
         jmiRepConceptTax = new JMenuItem("Reporte de conceptos de impuestos...");
+        jmiRepViewAccMovsDetail = new JMenuItem("Vista axiliares contables a detalle");
         jmiRepContributionMargin = new JMenuItem("Reporte de margen de contribución...");
         jsRepAux1 = new JPopupMenu.Separator();
         jmiRepPrtJournalVouchers = new JMenuItem("Impresión de pólizas contables...");
@@ -784,6 +789,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmRepAccMovs.add(jmiRepAccMovsTax);
         jmRepAccMovs.add(jmiRepAccMovsProfitLoss);
+        jmRepAccMovs.add(jmiRepAccMovsExcDiff);
         jmRep.add(jmRepAccMovs);
 
         jmRep.addSeparator();
@@ -815,6 +821,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepLedgerCostCenter);
         jmRep.add(jmiRepConceptAdmin);
         jmRep.add(jmiRepConceptTax);
+        jmRep.add(jmiRepViewAccMovsDetail);
         jmRep.addSeparator();
         jmRep.add(jmiRepContributionMargin);
         jmRep.add(jsRepAux1);   // separator
@@ -964,6 +971,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBizPartnerAccMovsSup.addActionListener(this);
         jmiRepAccMovsTax.addActionListener(this);
         jmiRepAccMovsProfitLoss.addActionListener(this);
+        jmiRepAccMovsExcDiff.addActionListener(this);
         jmiRepCashFlowPaysCus.addActionListener(this);
         jmiRepCashFlowPaysSup.addActionListener(this);
         jmiQryCashFlowPaysCusSum.addActionListener(this);
@@ -986,6 +994,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepLedgerCostCenter.addActionListener(this);
         jmiRepConceptAdmin.addActionListener(this);
         jmiRepConceptTax.addActionListener(this);
+        jmiRepViewAccMovsDetail.addActionListener(this);
         jmiRepContributionMargin.addActionListener(this);
         jmiRepPrtJournalVouchers.addActionListener(this);
         jmiRepTaxesByConcept.addActionListener(this);
@@ -1139,6 +1148,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepLedgerCostCenter.setEnabled(hasRightRep);
         jmiRepConceptAdmin.setEnabled(hasRightRep);
         jmiRepConceptTax.setEnabled(hasRightRep);
+        jmiRepViewAccMovsDetail.setEnabled(hasRightRep);
         jmiRepContributionMargin.setEnabled(hasRightMoveAccCash);
         jmiRepPrtJournalVouchers.setEnabled(hasRightRep);
         jmiRepPrtChartOfAccounts.setEnabled(hasRightRep);
@@ -1719,6 +1729,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                             oViewClass = erp.mfin.view.SViewAccountMoves.class;
                             sViewTitle = "Movimientos de cuentas contables";
                             break;
+                        case SDataConstants.FINX_MOVES_ACC_DET_VIEW:
+                            oViewClass = erp.mfin.view.SViewAuxDetaill.class;
+                            sViewTitle = "Auxiliares contables a detalle";
+                            break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
@@ -2255,6 +2269,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepAccMovsProfitLoss) {
                 new SDialogRepFinMov(miClient, new Object[] { new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA } , SDataConstants.UNDEFINED }).setVisible(true);
             }
+            else if (item == jmiRepAccMovsExcDiff) {
+                new SDialogRepExchangeRateDiff(miClient).setVisible(true);
+            }
             else if (item == jmiRepCashFlowPaysCus) {
                 new SDialogRepDpsPayment(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
@@ -2305,6 +2322,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepConceptTax) {
                 new SDialogRepAccountConcept(miClient, SDataConstants.FINU_TP_TAX_CPT).setVisible(true);
+            }
+            else if (item == jmiRepViewAccMovsDetail) {
+                showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_MOVES_ACC_DET_VIEW);
             }
             else if (item == jmiRepContributionMargin) {
                 new SDialogRepContributionMargin(miClient.getSession().getClient(), "Reporte margen de contribución").setVisible(true);

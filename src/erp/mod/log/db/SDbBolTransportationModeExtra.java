@@ -254,7 +254,7 @@ public class SDbBolTransportationModeExtra extends SDbRegistryUser implements SG
         
         switch (row) {
             case 0:
-                value = DCfdi40Catalogs.TipoFigura.get(moBolPerson.getDbmsBolPersonTypeCode());
+                value = DCfdi40Catalogs.FiguraTransporte.get(moBolPerson.getDbmsBolPersonTypeCode());
                 break;
             case 1: 
                 value = moBolPerson.getName();

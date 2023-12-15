@@ -1,5 +1,433 @@
 ================================================================================
-SIIE 3.2 208.0/ 2022-11-24
+SIIE 3.2 229.0/ 2023-12-07
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación del complemento carta porte 3.0.
+
+================================================================================
+SIIE 3.2 228.4/ 2023-12-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cardex de documentos relacionados con las RM.
+
+================================================================================
+SIIE 3.2 228.3/ 2023-12-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la contabilización de nóminas en modalidad original.
+
+================================================================================
+SIIE 3.2 228.2/ 2023-12-05
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Se corrigen las notas de crédito cuando se quieren aplicar a facturas de monedas en moneda extrangera 
+
+================================================================================
+SIIE 3.2 228.1/ 2023-12-05
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega funcionalidad para cerrar RM para surtido.
+2) Se agregan cambios de estatus en RM por suministrar y por comprar
+3) Se modifica el email origen para las solicitudes de cotización de las RM
+4) Reordenamiento de columnas en la importación de partidas de RM
+
+================================================================================
+SIIE 3.2 228.0/ 2023-12-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la opción de contabilización dinámica de nóminas, y todas sus configuraciones relacionadas.
+
+================================================================================
+SIIE 3.2 226.2/ 2023-11-23
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Filtro de eliminados en vista de cotizaciones de requisiciones.
+2) Fecha de solicitud de cotización.
+
+================================================================================
+SIIE 3.2 226.1/ 2023-11-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación para diferenciar de los ítems inventariables y de los no inventariables en el dialogo de picker en las RM.
+
+================================================================================
+SIIE 3.2 226.0/ 2023-11-16
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementar la captura de texto opcional en el pase "hacia adelante" o "hacia atrás" en el cambio de estatus de las RM.
+2) Implementar kardex de status
+3) Refactorización del nombre del campo "comentarios a notas".
+4) Validación de no permitir suministrar, cotizar, o vincular partidas con ítem nuevo.
+
+================================================================================
+SIIE 3.2 225.7/ 2023-11-16
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
+2) Filtro de partidas de RM
+3) Reetiquetado de las requisiciones de suministro a resurtido.
+4) Se quito el filtro en la forma de selección de centros de costo para las requisiciones de resurtido.
+5) Correcciones en la pantalla de configuración de grupos de centros de costo vs. usuarios.
+6) Reestructuración de los botones en la partida de requisiciones de materiales.
+7) Se habilitó el campo "Ítem nuevo" y se creó la funcionalidad para asignarle el ítem correspondiente cuando se es suministrador o comprador. 
+
+================================================================================
+SIIE 3.2 225.6/ 2023-11-09
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Actualización de montos al importar requisiciones de materiales
+2) Cambios al formato de impresión de la requisición de materiales.
+3) Adición del campo de número de parte en las partidas en la forma de requisiciones de materiales.
+4) Refactorización general en las búsquedas de las vistas.
+
+================================================================================
+SIIE 3.2 225.5/ 2023-11-07
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó el número de parte en el ítem picker de las requisiciones de materiales.
+
+================================================================================
+SIIE 3.2 225.4/ 2023-10-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio en nombre tipo de material a familia de insumo.
+
+================================================================================
+SIIE 3.2 225.3/ 2023-10-27
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las vistas de facturas de compras con CFDI de pagos por anexar y anexados.
+2) Adición de las vistas de consumo de materiales en el módulo de inventarios.
+3) Se quitó la obligatoriedad en el precio unitario y la referencia en la forma de requisiciones de materiales.
+4) Corrección en la forma de la obtención del nombre del asociado de negocios al imprimir las facturas.
+5) Se agregó la validación antes de crear una nota de crédito que la factura asociada contenga un UUID.
+
+================================================================================
+SIIE 3.2 225.2/ 2023-10-27
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Adición de colunma crédito y débito en la vista de auxiliares contables.
+2) Correción de la constante de la vista de auxiliares contables.
+
+================================================================================
+SIIE 3.2 225.1/ 2023-10-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de funcionalidades del catálogo de materiales por cambio en nombres de tablas en la BD.
+
+================================================================================
+SIIE 3.2 225.0/ 2023-10-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Configuración de autorizaciones mediante puestos de usuarios ligados a empleados.
+
+================================================================================
+SIIE 3.2 224.1/ 2023-10-18
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de catálogos de tipos de materiales y atributos.
+2) Creación de catálogo de configuración de tipo de material vs atributos.
+
+================================================================================
+SIIE 3.2 224.0/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de de tipos de material.
+2) Creación de atributos de materiales.
+3) Creación de tipos de materiales vs atributos de materiales.
+4) Creación de tabla de item vs atributos de materiales.
+6) Modificación de ítems para agregar fk de tipo de material y sus atributos
+
+================================================================================
+SIIE 3.2 223.3/ 2023-10-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de personalización de contabilización de documentos (solamente facturas por el momento, las NC quedan para otra ocasión.)
+
+================================================================================
+SIIE 3.2 223.2/ 2023-10-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en las configuraciones para requisiciones.
+
+================================================================================
+SIIE 3.2 223.1/ 2023-10-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio en la obtención de centros de costo relacionados con un subcentro de consumo directamente sin tomar en cuenta ítems.
+
+================================================================================
+SIIE 3.2 223.0/ 2023-10-11
+Edwin Omar CARMONA FIGUEROA
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de solicitudes de cotización.
+2) Trabajo en proceso de personalización de contabilización de documentos.
+
+================================================================================
+SIIE 3.2 222.0/ 2023-10-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de las requisiciones de materiales de tipo "S".
+2) Implementación de la importación de las entradas de inventarios desde archivo externo.
+
+================================================================================
+SIIE 3.2 220.1/ 2023-10-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Inhabilitación de la opción "Item nuevo" en requisiciones de materiales.
+2) Se agregó el doble click en el item picker de requisiciones.
+
+================================================================================
+SIIE 3.2 220.0/ 2023-09-26
+Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Release estable de requisiciones de materiales.
+
+================================================================================
+SIIE 3.2 219.0/ 2023-09-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de gestión de sanciones RRHH: infracciones y actas administrativas.
+
+================================================================================
+SIIE 3.2 217.6/ 2023-08-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la generación de cfdi con impuesto exento.
+
+================================================================================
+SIIE 3.2 217.5/ 2023-08-08
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión y corrección de restricción de cambio de período original de documentos por cambio en sus fechas, si ya tienen pagos.
+
+================================================================================
+SIIE 3.2 217.4/ 2023-08-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la validación de existencia de CFD en layouts bancarios para sólo aplicarla a pagos de facturas de proveedores.
+
+================================================================================
+SIIE 3.2 217.3/ 2023-08-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del formato de impresión de las requisiciones de materiales.
+2) Corrección en la generación de CFDI de recepción de pagos al tener impuesto IVA Exento.
+
+================================================================================
+SIIE 3.2 217.2/ 2023-08-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de restricción de deducción de seguro social en recibos de nóminas si el empleado gana el salario mínimo.
+
+================================================================================
+SIIE 3.2 217.1/ 2023-08-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a validación de existencia de XML del CFD en layouts bancarios de pagos a documentos.
+
+================================================================================
+SIIE 3.2 217.0/ 2023-07-31
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de las configuraciones complementarias para la requisición de materiales.
+
+================================================================================
+SIIE 3.2 216.3/ 2023-07-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad de preservación y recuperación de información temporal de capturas de registros. Y su puesta en marcha para pólizas contables.
+
+================================================================================
+SIIE 3.2 216.2/ 2023-07-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección consulta de vista de beneficios para agregar el centro de costo asociado al departamento del empleado.
+
+================================================================================
+SIIE 3.2 216.1/ 2023-07-18
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en el cálculo y asignación de factor de los impuestos en el complemento de recepción de pagos.
+
+================================================================================
+SIIE 3.2 216.0/ 2023-07-14
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación de las requisiciones de materiales en em módulo de inventarios.
+
+================================================================================
+SIIE 3.2 214.3/ 2023-07-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejora para selección de recibos a timbrar con CFDI existente.
+2) Estandarización de etiquetas de vistas para nombres y números de empleados y centros de costo.
+
+================================================================================
+SIIE 3.2 214.2/ 2023-07-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta de recibos de nómina pendientes de timbrar.
+2) Corrección a validación de pertenencia de cierto aniversario a un período de fechas, excluyendo aniversarios que inician precisamente dentro del período en cuestión.
+
+================================================================================
+SIIE 3.2 214.1/ 2023-07-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión de captura de prestaciones para nuevos empleados.
+
+================================================================================
+SIIE 3.2 214.0/ 2023-07-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Puesta a punto de captura de percepciones de prestaciones a partir del nuevo esquema de control de prestaciones por empleado.
+
+================================================================================
+SIIE 3.2 213.2/ 2023-06-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del filtro en la vista de días inhábiles bancarios.
+2) Creación de la forma para copiar los días inhábiles bancarios de años pasados al año actual.
+3) Adición del Incoterm DPU en la lista de los incoterms multimodales.
+4) Nuevo filtro en la forma de DPS para evitar cambiar un DPS de periodo cuando este ya tenga pagos realizados.
+
+================================================================================
+SIIE 3.2 213.1/ 2023-05-22
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la funcionalidad para descargar todos los CFDIs de nóminas de un periodo.
+2) Mejora en el proceso de envío de CFDIs de nóminas.
+3) Eliminación de los archivos en disco de los CFDIs de nóminas después de ser enviados por correo.
+
+================================================================================
+SIIE 3.2 213.0/ 2023-05-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de prestaciones de empleados.
+2) Implementación de factores de integración de salario diario de empleados.
+3) Replanteamiento de IVA exento y revisión de tasas de IVA retenido.
+
+================================================================================
+SIIE 3.2 211.0/ 2023-04-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de configuración de bonos por condición de sindicato y tipo de periodicidad de pago.
+
+================================================================================
+SIIE 3.2 210.1/ 2023-04-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la variante del reporte automático de ventas ítem - cliente para enviarse con la información del mes pasado.
+2) Ajuste en la forma de CFDI de pagos que muestra el cálculo del monto total del pago del PAC.
+3) Creación del reporte de movimientos por diferencias cambiarias.
+
+================================================================================
+SIIE 3.2 210.0/ 2023-04-13
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la funcionalidad para cambiar la fecha a un DPS de ventas después de haber sido timbrado.
+
+================================================================================
+SIIE 3.2 209.12/ 2023-04-12
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en los CFDI de recepción de pagos.
+2) Cambio en la validación de regimén fiscal del receptor al crear un DPS.
+
+================================================================================
+SIIE 3.2 209.11/ 2023-04-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en los CFDI de recepción de pagos.
+2) Se Agregó un nuevo parámetro en la configuración para definir la zona horaria.
+
+================================================================================
+SIIE 3.2 209.9/ 2023-04-04
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en los CFDI de recepción de pagos.
+
+================================================================================
+SIIE 3.2 209.8/ 2023-03-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Mejoramiento en el truncado para calcular el nodo pagosP de los CFDIs de recepción de pagos.
+2) Corrección en la generación de CFDI con impuesto IVA exento.
+3) Corrección al método read de la clase erp.mfin.data.SDataExchangeRate
+
+================================================================================
+SIIE 3.2 209.7/ 2023-03-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en el cáclulo de los impuestos en los CFDIs de pagos.
+
+================================================================================
+SIIE 3.2 209.6/ 2023-01-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en la revaluación de saldos de moneda extranjera y diferencias cambiarias.
+2) Ajuste en la impresión de facturas con receptores con RFC genérico.
+
+================================================================================
+SIIE 3.2 209.5/ 2023-01-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del status de autorización en la vista de pedidos y muestra cuándo el pedido no se puede imprimir.
+2) Ajuste por redondeo al cálculo del nodo ImpuetosP en el complemento de recepción de pagos.
+
+================================================================================
+SIIE 3.2 209.5/ 2023-02-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a condición para habilitar controles para ajustes en forma de captura de pólizas contables.
+
+================================================================================
+SIIE 3.2 209.4/ 2023-01-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención del nombre del empleado para la emisión e impresión de CFDI de nóminas.
+2) Adecuación a la captura del nombre fiscal y régimen de capital de clientes y empresas.
+
+================================================================================
+SIIE 3.2 209.3/ 2023-01-13
+Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adecuación a la captura del nombre fiscal y régimen de capital de clientes y empresas.
+2) Adición de leyenda de embarque fuera del período de entregas al formato de impresión de contratos.
+3) Ajustes a validaciones propias del CFDI 4.0: domicilio fiscal del receptor en facturas a público en general; nodo global en facturas a público en general; uso de CFDI de facturas de exportación; etc.
+
+================================================================================
+SIIE 3.2 209.2/ 2023-01-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al despliegue del ícono indicador de categoría de régimen de contratación en la captura de recibos nóminas.
+
+================================================================================
+SIIE 3.2 209.1/ 2023-01-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la generación de CFDIs de facturas que parten de un pedido.
+2) Corrección al momento de obtener el nombre de las empresas que emiten un CFDI.
+
+================================================================================
+SIIE 3.2 209.1/ 2023-01-05
+Sergio Abraham FLORES GUTIÉRREZ/ Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a la lectura de empleados al modificar nóminas para pasar por alto la no existencia del registro de membresía en la empresa (empleados dados de baja o de otras empresas no cuentan con este registro).
+2) Corrección a la obtención del ID de usuario al insertar una entrada en la bitácora de altas y bajas al crear empleados.
+3) Corrección al registro (inserción) de cambios en el historial de partidas de documentos.
+
+================================================================================
+SIIE 3.2 209.0/ 2023-01-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la contabilización gradual de nóminas, i.e., en más de un paso.
+2) Validación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+
+================================================================================
+SIIE 3.2 208.1/ 2022-11-24
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Correción de vista pedidos de compras a surtir con factura (Bug)
@@ -16,7 +444,7 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 SIIE 3.2 208.0/ 2022-10-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
+1) Implementación de tipo de régimen de contratación opcional en la membresía de empleados en empresas para la emisión de recibos de nómina.
 2) Implementación de nombre fiscal y régimen de capital en asociados de negocios aplicable a clientes, personas morales.
 3) Refactorización de formas de captura de asociados de negocios para apellidos y nombres de personas físicas.
 4) Implementación de atributo para ID de solicitud externa de incidencias de empleados.

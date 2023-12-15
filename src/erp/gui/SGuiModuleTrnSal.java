@@ -155,6 +155,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmDpsDelAck;
     private javax.swing.JMenuItem jmiDpsDelAckPend;
     private javax.swing.JMenuItem jmiDpsDelAckOk;
+    private javax.swing.JMenuItem jmiDpsUpdateDateLog;
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
@@ -427,6 +428,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsDelAck = new JMenu("Acuses de entrega de facturas");
         jmiDpsDelAckPend = new JMenuItem("Acuses de entrega de facturas pendientes");
         jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
+        jmiDpsUpdateDateLog = new JMenuItem("Registro de cambio de fecha de documentos");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         
         jmDpsDelAck.add(jmiDpsDelAckPend);
@@ -461,6 +463,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsDocRemission);
         jmDps.addSeparator();
         jmDps.add(jmDpsDelAck);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsUpdateDateLog);
         jmDps.addSeparator();
         jmDps.add(jmiCfdiMassiveValidation);
 
@@ -749,6 +753,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDocRemission.addActionListener(this);
         jmiDpsDelAckPend.addActionListener(this);
         jmiDpsDelAckOk.addActionListener(this);
+        jmiDpsUpdateDateLog.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjEntry.addActionListener(this);
@@ -1573,6 +1578,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "Registros CFDI pagos";
                     break;
                     
+                case SDataConstants.TRN_DPS_UPD_DT_LOG:
+                    oViewClass = erp.mtrn.view.SViewDpsUpdateDateLog.class;
+                    sViewTitle = "Cambio fecha docs.";
+                    break;
+                    
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }
@@ -1954,6 +1964,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if(item == jmiDpsDelAckOk){
                 showView(SDataConstants.TRN_DPS_ACK, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.PROC);
+            }
+            else if(item == jmiDpsUpdateDateLog){
+                showView(SDataConstants.TRN_DPS_UPD_DT_LOG);
             }
             else if(item == jmiCfdiMassiveValidation){
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_SAL, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);

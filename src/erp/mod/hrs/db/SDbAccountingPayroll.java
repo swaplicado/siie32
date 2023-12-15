@@ -31,7 +31,9 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
-    protected ArrayList<SDbAccountingPayrollEmployee> maChildAccountingPayrollEmployee;
+    protected ArrayList<SDbAccountingPayrollReceipt> maChildReceipts;
+    
+    protected boolean mbAuxAccountingGradual;
 
     public SDbAccountingPayroll() {
         super(SModConsts.HRS_ACC_PAY);
@@ -53,7 +55,11 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
-    public ArrayList<SDbAccountingPayrollEmployee> getChildAccountingPayrollEmployees() { return maChildAccountingPayrollEmployee; }
+    public ArrayList<SDbAccountingPayrollReceipt> getChildReceipts() { return maChildReceipts; }
+    
+    public void setAuxAccountingGradual(boolean b) { mbAuxAccountingGradual = b; }
+
+    public boolean isAuxAccountingGradual() { return mbAuxAccountingGradual; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -78,7 +84,9 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
 
-        maChildAccountingPayrollEmployee = new ArrayList<SDbAccountingPayrollEmployee>();
+        maChildReceipts = new ArrayList<>();
+        
+        mbAuxAccountingGradual = false;
     }
 
     @Override
@@ -115,7 +123,6 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         Statement statement = null;
         ResultSet resultSet = null;
-        SDbAccountingPayrollEmployee accountingPayrollEmployee = null;
 
         initRegistry();
         initQueryMembers();
@@ -137,16 +144,26 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
 
             statement = session.getStatement().getConnection().createStatement();
 
-            msSql = "SELECT id_emp " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
-                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + "; ";
+            msSql = "SELECT id_emp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " "
+                    + "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + ";";
             
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
-                accountingPayrollEmployee = new SDbAccountingPayrollEmployee();
-                accountingPayrollEmployee.read(session, new int[] { mnPkPayrollId, mnPkAccountingId, resultSet.getInt(1) });
-                maChildAccountingPayrollEmployee.add(accountingPayrollEmployee);
+                SDbAccountingPayrollReceipt receipt = new SDbAccountingPayrollReceipt();
+                receipt.read(session, new int[] { mnPkPayrollId, mnPkAccountingId, resultSet.getInt(1) });
+                maChildReceipts.add(receipt);
             }
+            
+            msSql = "SELECT b_acc_grad "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                    + "WHERE id_pay = " + mnPkPayrollId + ";";
+            
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next()) {
+                mbAuxAccountingGradual = resultSet.getBoolean("b_acc_grad");
+            }
+            
             mbRegistryNew = false;
         }
 
@@ -194,10 +211,12 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
 
         // Delete previous registries:
 
-        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
-                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + ";";
-        
-        session.getStatement().execute(msSql);
+        if (!mbAuxAccountingGradual) {
+            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
+                        "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + ";";
+
+            session.getStatement().execute(msSql);
+        }
         
         msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " SET b_del = 1 " +
                     "WHERE id_pay = " + mnPkPayrollId + " AND id_acc < " + mnPkAccountingId + ";";
@@ -206,11 +225,10 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         
         // Save payroll receips:
         
-        for (SDbAccountingPayrollEmployee accountingPayrollEmployee : maChildAccountingPayrollEmployee) {
-            accountingPayrollEmployee.setRegistryNew(true);
-            accountingPayrollEmployee.setPkPayrollId(mnPkPayrollId);
-            accountingPayrollEmployee.setPkAccountingId(mnPkAccountingId);
-            accountingPayrollEmployee.save(session);
+        for (SDbAccountingPayrollReceipt receipt : maChildReceipts) {
+            receipt.setPkPayrollId(mnPkPayrollId);
+            receipt.setPkAccountingId(mnPkAccountingId);
+            receipt.save(session);
         }
         
         mbRegistryNew = false;
@@ -229,9 +247,11 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        for (SDbAccountingPayrollEmployee receipt : this.getChildAccountingPayrollEmployees()) {
-            registry.getChildAccountingPayrollEmployees().add(receipt.clone());
+        for (SDbAccountingPayrollReceipt receipt : this.getChildReceipts()) {
+            registry.getChildReceipts().add(receipt.clone());
         }
+        
+        registry.setAuxAccountingGradual(this.isAuxAccountingGradual());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

@@ -534,10 +534,10 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         cfd.ver3.nom12.DElementOtrosPagos otrosPagos = new cfd.ver3.nom12.DElementOtrosPagos();
         
         if (SLibUtils.belongsTo(moParentPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_NOR, SModSysConsts.HRSS_TP_PAY_SHT_SPE } )) {
-            sPayrollType = DCfdi40Catalogs.ClaveNominaOrd;
+            sPayrollType = DCfdi40Catalogs.ClaveNóminaOrd;
         }
         else if (SLibUtils.belongsTo(moParentPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_EXT } )) {
-            sPayrollType = DCfdi40Catalogs.ClaveNominaExt;
+            sPayrollType = DCfdi40Catalogs.ClaveNóminaExt;
             msPeriodicidadPago = DCfdi40Catalogs.ClavePeriodicidadPagoOtra;
         }
         
@@ -545,7 +545,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         nomina.getAttFechaPago().setDate(mtFechaPago);
         nomina.getAttFechaInicialPago().setDate(mtFechaInicialPago);
         nomina.getAttFechaFinalPago().setDate(mtFechaFinalPago);
-        nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados == 0d ? DCfdi40Catalogs.DIAS_PAG_MIN : mdNumDiasPagados);
+        nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados == 0d ? DCfdi40Catalogs.PAY_RCP_PAYED_DAYS_MIN : mdNumDiasPagados);
         
         // Emisor & Receptor:
         
@@ -969,7 +969,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
     
     @Override
     public String getReceptorRegimenFiscal() { // CFDI 4.0
-        return DCfdi40Catalogs.CAT_REG_FISCAL_RECEPTOR_NOM;
+        return DCfdi40Catalogs.ClaveRégimenFiscalSueldosSalarios;
     }
 
     @Override

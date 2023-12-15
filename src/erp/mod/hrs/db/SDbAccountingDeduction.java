@@ -98,7 +98,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
             can = SHrsFinUtils.validateAccount(session, mnFkAccountId, mnFkCostCenterId_n, mnFkBizPartnerId_n, mnFkItemId_n, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
         }
         
-        return true;
+        return can;
     }
 
     @Override

@@ -4,7 +4,7 @@
  */
 package erp.mhrs.data;
 
-import erp.mod.hrs.db.SDbAccountingPayrollEmployee;
+import erp.mod.hrs.db.SDbAccountingPayrollReceipt;
 
 /**
  *
@@ -23,7 +23,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     protected int mnDaysPayed;
     protected int mnFkBizPartnerId;
     protected int mnFkPaymentSystemTypeId;
-    protected SDbAccountingPayrollEmployee moAccountingPayrollEmployee;
+    protected SDbAccountingPayrollReceipt moAccountingPayrollReceipt;
 
     public SRowEmployee() {
         super();
@@ -61,7 +61,7 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public void setDaysPayed(int n) { mnDaysPayed = n; }
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkPaymentSystemTypeId(int n) { mnFkPaymentSystemTypeId = n; }
-    public void setAccountingPayrollEmployee(SDbAccountingPayrollEmployee o) { moAccountingPayrollEmployee = o; }
+    public void setAccountingPayrollReceipt(SDbAccountingPayrollReceipt o) { moAccountingPayrollReceipt = o; }
 
     public java.lang.String getEmployeeCategory() { return msEmployeeCategory; }
     public java.lang.String getEmployeeType() { return msEmployeeType; }
@@ -74,5 +74,5 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public int getDaysPayed() { return mnDaysPayed; }
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkPaymentSystemTypeId() { return mnFkPaymentSystemTypeId; }
-    public SDbAccountingPayrollEmployee getAccountingPayrollEmployee() { return moAccountingPayrollEmployee; }
+    public SDbAccountingPayrollReceipt getAccountingPayrollReceipt() { return moAccountingPayrollReceipt; }
 }

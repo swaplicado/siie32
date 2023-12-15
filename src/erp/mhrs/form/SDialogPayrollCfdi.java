@@ -20,6 +20,7 @@ import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mhrs.data.SHrsPayrollEmployeeReceipt;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
@@ -555,11 +556,11 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                     receipt.setPaymentTypeSys((String) SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { receipt.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT));
                     receipt.prepareTableRow();
                     
-                    if (receipt.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
-                        moTablePaneReceiptAvailable.addTableRow(receipt); // receipt not selected yet (2019-03-12, Sergio Flores: WTF! A bizarre solution!)
+                    if (receipt.getReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED || receipt.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) { // system payment type not set means that receipt has not been selected yet! (2019-03-12, Sergio Flores: WTF! A bizarre solution!)
+                        moTablePaneReceiptAvailable.addTableRow(receipt); // renew receipt
                     }
                     else {
-                        moTablePaneReceiptSelected.addTableRow(receipt); // receipt previously selected
+                        moTablePaneReceiptSelected.addTableRow(receipt); // reuse receipt
                     }
                 }
                 
@@ -595,7 +596,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                 throw new Exception("El recibo de '" + receipt.getEmployeeName() + "' no es modificable.");
             }
             else {
-                if (payrollReceiptIssue.isCfdAnnulled()) {
+                if (payrollReceiptIssue.isCfdAnnulled() || payrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED) {
                     // create a new payroll receipt issue:
                     SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP, issueKey);
                     payrollReceipt.updatePayrollReceiptIssue(miClient.getSession(), receipt.getDateOfIssue());
@@ -679,22 +680,22 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
             else {
                 int xmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
                 int paymentType = 0;
+                String paymentTypeOther = "";
 
                 if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
                     paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
                 }
                 else if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33 || xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
                     paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER;
+                    paymentTypeOther = (String) SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { paymentType }, SLibConstants.FIELD_TYPE_TEXT);
                 }
-
-                Object field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { paymentType }, SLibConstants.FIELD_TYPE_TEXT);
 
                 SHrsPayrollEmployeeReceipt row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
                 row.setNumberSeries(moConfig.getNumberSeries());
                 row.setDateOfIssue(moFieldDateIssue.getDate());
                 row.setDateOfPayment(moFieldDatePayment.getDate());
                 row.setPaymentTypeSysId(paymentType);
-                row.setPaymentTypeSys((String) field);
+                row.setPaymentTypeSys(paymentType == SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER ? paymentTypeOther : (String) SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { paymentType }, SLibConstants.FIELD_TYPE_TEXT));
                 row.setUuidToSubstitute(moFieldCfdiRelatedUuid.getString());
                 row.prepareTableRow();
 

@@ -48,7 +48,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        radGroupUnion = new javax.swing.ButtonGroup();
         jpRegistry = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -63,6 +63,14 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         jPanel13 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         moKeyReference = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel29 = new javax.swing.JPanel();
+        jlPaymentType = new javax.swing.JLabel();
+        moKeyPaymentType_n = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel30 = new javax.swing.JPanel();
+        jlUnion = new javax.swing.JLabel();
+        moRadNa = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadUnion = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadNoUnion = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel24 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
@@ -82,7 +90,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Percepciones:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jPanel25.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel25.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -128,6 +136,37 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
 
         jPanel25.add(jPanel13);
 
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel29.add(jlPaymentType);
+
+        moKeyPaymentType_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel29.add(moKeyPaymentType_n);
+
+        jPanel25.add(jPanel29);
+
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlUnion.setText("Sindicalizados:");
+        jlUnion.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel30.add(jlUnion);
+
+        radGroupUnion.add(moRadNa);
+        moRadNa.setText("No aplica");
+        jPanel30.add(moRadNa);
+
+        radGroupUnion.add(moRadUnion);
+        moRadUnion.setText("Sí");
+        jPanel30.add(moRadUnion);
+
+        radGroupUnion.add(moRadNoUnion);
+        moRadNoUnion.setText("No");
+        jPanel30.add(moRadNoUnion);
+
+        jPanel25.add(jPanel30);
+
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlDateStart.setText("Fecha inicio:*");
@@ -167,30 +206,38 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
     }//GEN-LAST:event_formWindowActivated
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
+    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel jlAmount;
     private javax.swing.JLabel jlBonus;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlEarning;
+    private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPercentage;
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlScopeId;
+    private javax.swing.JLabel jlUnion;
     private javax.swing.JPanel jpRegistry;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecAmount;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPercentage;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBonus;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyReference;
     private sa.lib.gui.bean.SBeanFieldKey moKeyScope;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadNa;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadNoUnion;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadUnion;
+    private javax.swing.ButtonGroup radGroupUnion;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -200,6 +247,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         moKeyBonus.setKeySettings(miClient, SGuiUtils.getLabelName(jlBonus.getText()), true);
         moKeyScope.setKeySettings(miClient, SGuiUtils.getLabelName(jlScopeId.getText()), true);
         moKeyReference.setKeySettings(miClient, SGuiUtils.getLabelName(jlReference.getText()), true);
+        moKeyPaymentType_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
         moDecAmount.setDecimalSettings(SGuiUtils.getLabelName(jlAmount), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
@@ -208,6 +256,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         moFields.addField(moKeyBonus);
         moFields.addField(moKeyScope);
         moFields.addField(moKeyReference);
+        moFields.addField(moKeyPaymentType_n);
         moFields.addField(moDateDateStart);
         moFields.addField(moDecAmount);
         moFields.addField(moDecPercentage);
@@ -244,6 +293,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         moKeyBonus.setValue(null);
         moDecAmount.setValue(0d);
         moDecPercentage.setValue(0d);
+        moRadNa.setSelected(true);
     }
     
     @Override
@@ -262,6 +312,7 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
             miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, 0, null);
             miClient.getSession().populateCatalogue(moKeyBonus, SModConsts.HRSS_BONUS, 0, null);
             miClient.getSession().populateCatalogue(moKeyScope, SModConsts.HRSS_TP_ACC, SLibConsts.UNDEFINED, null);
+            miClient.getSession().populateCatalogue(moKeyPaymentType_n, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -289,6 +340,18 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         moKeyEarning.setValue(new int[] { moRegistry.getFkEarningId()});
         moKeyBonus.setValue(new int[] { moRegistry.getFkBonusId()});
         moKeyScope.setValue(new int[] { moRegistry.getFkScopeId() });
+        moKeyPaymentType_n.setValue(new int[] { moRegistry.getFkPaymentTypeId_n() });
+        switch(moRegistry.getForUnion()) {
+            case 0:
+                moRadNa.setSelected(true);
+                break;
+            case 1:
+                moRadUnion.setSelected(true);
+                break;
+            case 2:
+                moRadNoUnion.setSelected(true);
+                break;
+        }
         itemStateChangedScope();
         moKeyReference.setValue(new int[] { moRegistry.getFkReferenceId() });
         moDateDateStart.setValue(moRegistry.getStartDate());
@@ -320,6 +383,16 @@ public class SFormConditionalEarning extends SBeanForm implements ItemListener {
         registry.setFkScopeId(moKeyScope.getValue()[0]);
         registry.setFkReferenceId(moKeyScope.getSelectedIndex() > 0 && moKeyScope.getValue()[0] > SModSysConsts.HRSS_TP_ACC_GBL ? moKeyReference.getValue()[0] : 0);
         registry.setFkBonusId(moKeyBonus.getValue()[0]);
+        registry.setFkPaymentTypeId_n(moKeyPaymentType_n.getSelectedIndex() > 0 ? moKeyPaymentType_n.getValue()[0] : 0);
+        if (moRadNa.isSelected()) {
+            registry.setForUnion(0);
+        }
+        else if (moRadUnion.isSelected()) {
+            registry.setForUnion(1);
+        }
+        else {
+            registry.setForUnion(2);
+        }
         
         return registry;
     }

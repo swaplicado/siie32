@@ -68,17 +68,17 @@ public class SDpsQualityUtils {
                 oEtyAnalysis.setFkAnalysisId(resultSet.getInt("id_analysis"));
                 oEtyAnalysis.setFkItemId(resultSet.getInt("id_item"));
                 
-                sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.type_name "
+                sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                         + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                         + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
-                        + "ON qa.fk_tp_analysis_id = qtp.id_analysis_type "
+                        + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
                         + "WHERE qa.id_analysis = " + oEtyAnalysis.getFkAnalysisId();
 
                 ResultSet resultSetAux = session.getDatabase().getConnection().createStatement().executeQuery(sql);
                 if (resultSetAux.next()) {
                     oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("analysis_name"));
                     oEtyAnalysis.setAuxAnalysisUnit(resultSetAux.getString("unit_symbol"));
-                    oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("type_name"));
+                    oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("name"));
                 }
                 
                 oEtyAnalysis.setFkUserNewId(session.getUser().getPkUserId());

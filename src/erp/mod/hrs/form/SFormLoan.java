@@ -13,6 +13,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
@@ -66,6 +67,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jPanel12 = new javax.swing.JPanel();
         jlLoanPaymentType = new javax.swing.JLabel();
         moKeyLoanPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlLoanPaymentTypeWarning = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
@@ -154,6 +156,11 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
 
         moKeyLoanPaymentType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel12.add(moKeyLoanPaymentType);
+
+        jlLoanPaymentTypeWarning.setForeground(java.awt.Color.red);
+        jlLoanPaymentTypeWarning.setText("...");
+        jlLoanPaymentTypeWarning.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel12.add(jlLoanPaymentTypeWarning);
 
         jPanel2.add(jPanel12);
 
@@ -391,6 +398,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlLoanPaymentType;
+    private javax.swing.JLabel jlLoanPaymentTypeWarning;
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlPaymentAmount;
@@ -514,6 +522,8 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     }
     
     private void itemStateKeyLoanPaymentType() {
+        jlLoanPaymentTypeWarning.setText("");
+        
         moDecPaymentAmount.setEditable(false);
         moDecPaymentFixedFees.setEditable(false);
         moDecPaymentUmas.setEditable(false);
@@ -539,6 +549,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                     
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_SAL:
                     moDecPaymentFixedFees.setEditable(true);
+                    jlLoanPaymentTypeWarning.setText("ADVERTENCIA: ¡Tipo de pago obsoleto!");
                     break;
                     
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_UMA:
@@ -732,6 +743,11 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         if (validation.isValid()) {
             if (moDateDateEnd_n.getValue() != null) {
                 validation = SGuiUtils.validateDateRangeIgnoreYears(moDateDateStart, moDateDateEnd_n);
+            }
+            else if (moKeyLoanPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_LOAN_PAY_FACT_SAL && miClient.showMsgBoxConfirm("¡El tipo de pago '" + moKeyLoanPaymentType.getSelectedItem().getItem() + "' es obsoleto!\n"
+                    + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moKeyLoanPaymentType.getFieldName() + "'.");
+                validation.setComponent(moKeyLoanPaymentType);
             }
         }
         

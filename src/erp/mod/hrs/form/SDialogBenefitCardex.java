@@ -26,7 +26,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
-import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
@@ -123,12 +122,12 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         moTextEmployeeName.setEditable(false);
         moTextEmployeeName.setText("TEXT");
         moTextEmployeeName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        moTextEmployeeName.setPreferredSize(new java.awt.Dimension(350, 23));
+        moTextEmployeeName.setPreferredSize(new java.awt.Dimension(360, 23));
         jPanel7.add(moTextEmployeeName);
 
         moTextEmployeeNumber.setEditable(false);
         moTextEmployeeNumber.setText("TEXT");
-        moTextEmployeeNumber.setToolTipText("Clave");
+        moTextEmployeeNumber.setToolTipText("Número empleado");
         moTextEmployeeNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextEmployeeNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(moTextEmployeeNumber);
@@ -138,7 +137,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(jLabel1);
 
-        moKeyCompany.setPreferredSize(new java.awt.Dimension(285, 23));
+        moKeyCompany.setPreferredSize(new java.awt.Dimension(275, 23));
         jPanel7.add(moKeyCompany);
 
         jbCompany.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -180,7 +179,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
         jPanel10.add(moTextDateCutoff);
 
         jlDateBenefits.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Inicio prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlDateBenefits);
 
@@ -191,7 +190,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
 
         jlSeniority.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSeniority.setText("Antigüedad:");
-        jlSeniority.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSeniority.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel10.add(jlSeniority);
 
         moIntSeniorityYears.setEditable(false);
@@ -417,14 +416,14 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ActionListe
             try (Statement statementBonus = miClient.getSession().getStatement().getConnection().createStatement()) {
                 // proceed adding 1 to show current anniversary, eventhough elapsed partially:
                 
-                int yearBenefits = SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0];
+                int benefitsYear = moEmployee.getBenefitsYear();
                 String dbmsSchema = getDbmsSchema();
                 
                 for (int anniversary = mnSeniorityYears + 1; anniversary >= 1; anniversary--) {
                     String sql;
                     ResultSet resultSet;
                     
-                    int benefitYear = yearBenefits + anniversary - 1;
+                    int benefitYear = benefitsYear + anniversary - 1;
                     
                     SRowBenefitCardex row = new SRowBenefitCardex(mnFormSubtype);
                     row.setBenefitYear(benefitYear);

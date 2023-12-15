@@ -14,7 +14,7 @@ import cfd.ver40.DCfdi40Catalogs;
 public final class SRowRelatedDocument extends erp.lib.table.STableRow implements java.io.Serializable {
     
     private final String msRelationTypeId;
-    private final String msDocUuids;
+    private String msDocUuids;
     private String msFirstDocUuid;
     private int[] moFirstDocKey;
     
@@ -33,6 +33,7 @@ public final class SRowRelatedDocument extends erp.lib.table.STableRow implement
     
     public void setFirstDocUuid(String s) { msFirstDocUuid = s; }
     public void setFirstDocKey(int[] o) { moFirstDocKey = o; }
+    public void setDocUuids(String s) { msDocUuids = s; }
     
     public String getRelationTypeId() { return msRelationTypeId; }
     public String getDocUuids() { return msDocUuids; }

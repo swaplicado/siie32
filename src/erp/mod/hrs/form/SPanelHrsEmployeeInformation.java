@@ -113,14 +113,14 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         jPanel16.add(moTextName);
 
         moTextNumber.setText("sBeanFieldText1");
-        moTextNumber.setToolTipText("clave");
+        moTextNumber.setToolTipText("Número empleado");
         moTextNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(moTextNumber);
 
         moTextId.setForeground(java.awt.Color.gray);
         moTextId.setText("sBeanFieldText1");
-        moTextId.setToolTipText("clave");
+        moTextId.setToolTipText("ID empleado");
         moTextId.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel16.add(moTextId);
 
@@ -178,7 +178,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         moDecSalary.setFocusable(false);
         jPanel29.add(moDecSalary);
 
-        jlDateBenefits.setText("Inicio beneficios:");
+        jlDateBenefits.setText("Prestaciones:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel29.add(jlDateBenefits);
 

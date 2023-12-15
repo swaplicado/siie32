@@ -68,7 +68,7 @@ public class SDialogAnalysisItemKardex extends javax.swing.JDialog implements ja
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Tarjeta auxiliar de almacén");
+        setTitle("Análisis del ítem");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -96,7 +96,7 @@ public class SDialogAnalysisItemKardex extends javax.swing.JDialog implements ja
         jtfItem.setEditable(false);
         jtfItem.setText("TEXT");
         jtfItem.setFocusable(false);
-        jtfItem.setPreferredSize(new java.awt.Dimension(350, 23));
+        jtfItem.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel10.add(jtfItem);
 
         jPanel4.add(jPanel10);
@@ -242,8 +242,8 @@ public class SDialogAnalysisItemKardex extends javax.swing.JDialog implements ja
                 + "    v.b_min, "
                 + "    v.b_max, "
                 + "    v.b_required, "
-                + "    CONCAT(ta.type_code, '-', ta.type_name) AS analysis_type, "
-                + "    ta.type_name, "
+                + "    CONCAT(ta.code, '-', ta.name) AS analysis_type, "
+                + "    ta.name, "
                 + "    v.b_del, "
                 + "    v.fid_usr_new, "
                 + "    v.fid_usr_edit, "

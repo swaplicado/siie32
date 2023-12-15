@@ -5,16 +5,20 @@
 
 package erp.mod.hrs.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.utils.SAnniversary;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import org.joda.time.LocalDate;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -35,6 +39,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public static final int FIELD_ACTIVE = FIELD_BASE + 1;
     public static final int FIELD_DATE_LAST_HIRE = FIELD_BASE + 2;
     public static final int FIELD_DATE_LAST_DISMISS = FIELD_BASE + 3;
+    public static final int FIELD_BRANCH_HQ = FIELD_BASE + 11;
 
     protected int mnPkEmployeeId;
     protected String msNumber;
@@ -263,7 +268,46 @@ public class SDbEmployee extends SDbRegistryUser {
     public SHrsEmployeeHireLog getAuxHrsEmployeeHireLog() { return moAuxHrsEmployeeHireLog; }
     
     /**
-     * Gets effective salary.
+     * Get base calendar year of benefits.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return 
+     */
+    public int getBenefitsYear() {
+        return SLibTimeUtils.digestYear(mtDateBenefits)[0];
+    }
+    
+    /**
+     * Get calendar year for given anniversary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param anniversary Anniversary.
+     * @return Calendar year for given anniversary.
+     */
+    public int getAnniversaryYear(final int anniversary) {
+        return getBenefitsYear() + (anniversary - 1);
+    }
+    
+    /**
+     * Get anniversary date for given anniversary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param anniversary Anniversary.
+     * @return Anniversary date for given anniversary.
+     */
+    public Date getAnniversaryDate(final int anniversary) {
+        return new LocalDate(mtDateBenefits).plusYears(anniversary - 1).toDate();
+    }
+    
+    /**
+     * Create <code>SAnniversary</code> from date of benefits.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param cutoff Cutoff date (e.g., today).
+     * @return Composed lastname.
+     */    
+    public SAnniversary createAnniversary(final Date cutoff) {
+        return new SAnniversary(mtDateBenefits, cutoff);
+    }
+    
+    /**
+     * Get effective salary.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
      * @return Effective salary.
@@ -283,7 +327,7 @@ public class SDbEmployee extends SDbRegistryUser {
     }
     
     /**
-     * Gets settlement salary.
+     * Get settlement salary.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @return Settlement salary.
      */
@@ -301,21 +345,22 @@ public class SDbEmployee extends SDbRegistryUser {
     }
     
     /**
-     * Gets effective type of recruitment schema.
-     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
-     * @return Effective type of recruitment schema.
-     */
-    public int getEffectiveRecruitmentSchemaTypeId() {
-        return mnXtaMembershipRecruitmentSchemaTypeId != 0 ? mnXtaMembershipRecruitmentSchemaTypeId : mnFkRecruitmentSchemaTypeId;
-    }
-    
-    /**
-     * Composes lastname.
+     * Compose lastname.
      * Mirrored in erp.mbps.data.SDataEmployee.
      * @return Composed lastname.
      */    
     public String composeLastname() {
         return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
+    }
+    
+    /**
+     * Get effective type of recruitment schema.
+     * If available, that one set in employee's membership, otherwise actual employee's type of recruitment schema.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return Effective type of recruitment schema.
+     */
+    public int getEffectiveRecruitmentSchemaTypeId() {
+        return mnXtaMembershipRecruitmentSchemaTypeId != 0 ? mnXtaMembershipRecruitmentSchemaTypeId : mnFkRecruitmentSchemaTypeId;
     }
     
     @Override
@@ -504,7 +549,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-
+            
             mbOldActive = mbActive;
             
             // employee's names, fiscal and legal ID:
@@ -529,8 +574,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     + "WHERE id_emp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
-                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
-                        + "Membresía del empleado.");
+                // do nothing; some long-ago dismissed employees do not have membership registry
             }
             else {
                 mnXtaMembershipRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche_n");
@@ -702,6 +746,8 @@ public class SDbEmployee extends SDbRegistryUser {
         }
         
         session.getStatement().execute(msSql);
+        
+        // process hiring or dismissing:
 
         if (mbRegistryNew || mbActive != mbOldActive) {
             SHrsEmployeeHireLog hrsEmployeeHireLog = moAuxHrsEmployeeHireLog != null ? moAuxHrsEmployeeHireLog : new SHrsEmployeeHireLog(session); // spreads log entries to all sibling companies
@@ -811,7 +857,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.mbOldActive = this.mbOldActive;
-
+        
         registry.setXtaEmployeeName(this.getXtaEmployeeName());
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
@@ -825,6 +871,52 @@ public class SDbEmployee extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    @Override
+    public Object readField(final Statement statement, final int[] pk, final int field) throws SQLException, Exception {
+        Object value = null;
+        ResultSet resultSet = null;
+
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+
+        msSql = "SELECT ";
+
+        switch (field) {
+            case FIELD_NAME:
+                msSql += "bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " WHERE id_bp = " + pk[0] + ";";
+                break;
+            case FIELD_CODE:
+                msSql += "num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp = " + pk[0] + ";";
+                break;
+            case FIELD_BRANCH_HQ:
+                msSql += "id_bpb FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " WHERE fid_bp = " + pk[0] + " AND fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + ";";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+
+        resultSet = statement.executeQuery(msSql);
+        if (!resultSet.next()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        }
+        else {
+            switch (field) {
+                case FIELD_NAME:
+                case FIELD_CODE:
+                    value = resultSet.getString(1);
+                    break;
+                case FIELD_BRANCH_HQ:
+                    value = resultSet.getInt(1);
+                    break;
+                default:
+            }
+        }
+
+        mnQueryResultId = SDbConsts.READ_OK;
+        return value;
     }
 
     @Override

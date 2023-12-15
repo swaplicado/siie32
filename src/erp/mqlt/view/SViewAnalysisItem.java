@@ -12,6 +12,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mod.SModConsts;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -42,14 +43,14 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
         
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[12];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[13];
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_code", "Código", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_name", "Ítem", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "analysis_name", "Análisis", STableConstants.WIDTH_ITEM_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "type_name", "Tipo análisis", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "name", "Tipo análisis", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit_symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit_name", "Nombre unidad", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_min", "Aplica mín", STableConstants.WIDTH_BOOLEAN);
@@ -57,6 +58,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_max", "Aplica máx", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "max_value", "Máximo", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_required", "Requerido", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -64,6 +66,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
 
         jbNew.setEnabled(true);
         jbEdit.setEnabled(true);
+        jbDelete.setEnabled(true);
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.USRU_USR);
@@ -94,7 +97,16 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
     @Override
     public void actionDelete() {
         if (jbDelete.isEnabled()) {
-
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                    if (miClient.getGuiModule(SDataConstants.MOD_QLT).deleteRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_DELETE_OK) {
+                        miClient.getGuiModule(SDataConstants.MOD_QLT).refreshCatalogues(mnTabType);
+                    }
+                }
+            }
         }
     }
 
@@ -123,7 +135,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
                 + "    v.b_min, "
                 + "    v.b_max, "
                 + "    v.b_required, "
-                + "    CONCAT(ta.type_code, '-', ta.type_name) AS analysis_type, "
+                + "    CONCAT(ta.code, '-', ta.name) AS analysis_type, "
                 + "    i.id_item, "
                 + "    i.item, "
                 + "    i.item_key, "
@@ -131,7 +143,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
                 + "    i.name AS item_name, "
                 + "    i.code AS item_code, "
                 + "    i.name_short, "
-                + "    ta.type_name, "
+                + "    ta.name, "
                 + "    v.b_del, "
                 + "    v.fid_usr_new, "
                 + "    v.fid_usr_edit, "

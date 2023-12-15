@@ -1253,17 +1253,21 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                             trasDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
                             trasDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
                             trasDR.getAttImporteDR().setDouble(docTax.getTax());
+                            if (docTax.getFactorCode().equals("E")) {
+                                trasDR.getAttTasaOCuotaDR().setCanBeZero(false);
+                                trasDR.getAttImporteDR().setCanBeZero(false);
+                            }
                             arrTrasladoDR.add(trasDR);
                         }
                     }
                     if (arrRetencionDR.size() > 0) {
                         DElementRetencionesDR retenciones = new DElementRetencionesDR();
-                        retenciones.getEltRetencionDR().addAll(arrRetencionDR);
+                        retenciones.getEltRetencionDRs().addAll(arrRetencionDR);
                         impuestosDR.setEltRetencionesDR(retenciones);
                     }
                     if (arrTrasladoDR.size() > 0) {
                         DElementTrasladosDR traslados = new DElementTrasladosDR();
-                        traslados.getEltTrasladoDR().addAll(arrTrasladoDR);
+                        traslados.getEltTrasladoDRs().addAll(arrTrasladoDR);
                         impuestosDR.setEltTrasladosDR(traslados);
                     }
                     
@@ -1294,17 +1298,21 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         trasP.getAttTipoFactorP().setString(payTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
                         trasP.getAttTasaOCuotaP().setDouble(payTax.getRate());
                         trasP.getAttImporteP().setDouble(payTax.getTax());
+                        if (payTax.getFactorCode().equals("E")) {
+                            trasP.getAttTasaOCuotaP().setCanBeZero(false);
+                            trasP.getAttImporteP().setCanBeZero(false);
+                        }
                         arrTrasladoP.add(trasP);
                     }
                 }
                 if (arrRetencionP.size() > 0) {
                     DElementRetencionesP retenciones = new DElementRetencionesP();
-                    retenciones.getEltRetencionP().addAll(arrRetencionP);
+                    retenciones.getEltRetencionPs().addAll(arrRetencionP);
                     impuestosP.setEltRetencionesP(retenciones);
                 }
                 if (arrTrasladoP.size() > 0) {
                     DElementTrasladosP traslados = new DElementTrasladosP();
-                    traslados.getEltTrasladoP().addAll(arrTrasladoP);
+                    traslados.getEltTrasladoPs().addAll(arrTrasladoP);
                     impuestosP.setEltTrasladosP(traslados);
                 }
                 

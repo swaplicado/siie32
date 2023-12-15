@@ -18,6 +18,7 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.utils.SAnniversary;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
@@ -508,7 +509,7 @@ public abstract class SHrsUtils {
         moConfig = (SDbConfig) client.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { bankId }, SLibConstants.EXEC_MODE_SILENT);
         moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
-        sDescription = moPayroll.composePayrollNumber() + " " + formatDateData.format(dateApplication);
+        sDescription = moPayroll.composePayrollNumber().replaceAll(".", "") + " " + formatDateData.format(dateApplication);
         sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
         employeesId = SLibUtils.textImplode(employees, ",");
         
@@ -737,7 +738,7 @@ public abstract class SHrsUtils {
                 headerLayout.append(nCont).append(',');
                 headerLayout.append(formatDate.format(new Date())).append(',');
                 headerLayout.append("").append(',');
-                headerLayout.append("PAGO NOMINA ").append( type == SModSysConsts.HRSS_TP_PAY_WEE ? "SEMANAL" : "QUINCENAL");
+                headerLayout.append("PAGO NOMINA ").append( type == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE : SHrsFormerConsts.PAY_FOR);
                 headerLayout.append("\r\n");
                 headerLayout.append(bodyLayout.toString());
 
@@ -866,15 +867,16 @@ public abstract class SHrsUtils {
     public static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " 
-                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND id_log = 1;";
+        String sql = "SELECT h.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS h " 
+                + "INNER JOIN erp.hrsu_emp AS emp ON h.id_emp = emp.id_emp "
+                + "WHERE h.dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "h.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT h.b_del AND h.b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND h.id_log = 1 ORDER BY emp.lastname1;";
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("h.id_emp"));                  
             }
         }
         
@@ -918,15 +920,16 @@ public abstract class SHrsUtils {
     private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " " 
-                + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
-                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del AND id_log > 1 GROUP BY id_emp;";
-
+        String sql = "SELECT ss.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " AS ss " 
+                + "INNER JOIN erp.hrsu_emp AS emp ON ss.id_emp = emp.id_emp "
+                + "WHERE ss.dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "ss.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
+                + "AND ss.sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND emp.b_act = 1 AND NOT ss.b_del AND ss.id_log > 1 GROUP BY ss.id_emp "
+                + "ORDER BY emp.lastname1 ";
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("ss.id_emp"));                  
             }
         }
         
@@ -944,15 +947,16 @@ public abstract class SHrsUtils {
     private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        String sql = "SELECT id_emp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
-                + "WHERE dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
-                + "dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + ";"; 
+        String sql = "SELECT h.id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS h "
+                + "INNER JOIN erp.hrsu_emp AS emp ON h.id_emp = emp.id_emp "
+                + "WHERE h.dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "h.dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT h.b_del AND h.b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " ORDER BY emp.lastname1 ;"; 
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                employeeIds.add(resultSet.getInt("id_emp"));                  
+                employeeIds.add(resultSet.getInt("h.id_emp"));                  
             }
         }
         
@@ -2043,8 +2047,7 @@ public abstract class SHrsUtils {
                             + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
-                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
-                            + "AND emp.id_emp = " + pkUser ; 
+                            + "WHERE NOT ssc.b_del AND emp.id_emp = " + pkUser + " ORDER BY ssc.dt DESC LIMIT 1" ; 
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
 
@@ -2078,7 +2081,7 @@ public abstract class SHrsUtils {
                         buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                     }
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
-                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
+                    buffer += String.valueOf(SLibUtilities.textRepeat("1", 1));
                     buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
                     buffer += "0"; //(Week or reduced working day)
                     buffer += formatDateData.format(dateApplication); // (Movement date)
@@ -2495,20 +2498,37 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Checks if period is anniversary of provided date.
-     * @param anniversary
-     * @param periodStart
-     * @param periodEnd
+     * Check if current anniversary of date of benefits belongs to given period.
+     * @param dateBenefits Date of benefits.
+     * @param periodStart Start of period.
+     * @param periodEnd End of period.
      * @return 
      * @throws java.lang.Exception 
      */
-    public static boolean isAnniversaryBelongingToPeriod(final Date anniversary, final Date periodStart, final Date periodEnd) throws Exception {
+    public static boolean isAnniversaryBelongingToPeriod(final Date dateBenefits, final Date periodStart, final Date periodEnd) throws Exception {
+        boolean belongsToPeriod = false;
+        
         SLibTimeUtils.validatePeriod(periodStart, periodEnd);
-        int[] elementsDate = SLibTimeUtils.digestDate(anniversary);
-        int[] elementsPeriodEnd = SLibTimeUtils.digestDate(periodEnd);
-        elementsDate[0] = elementsPeriodEnd[0];
-        Date newDate = SLibTimeUtils.createDate(elementsDate[0], elementsDate[1], elementsDate[2]);
-        return SLibTimeUtils.isBelongingToPeriod(newDate, periodStart, periodEnd);
+        
+        int[] digestedBenefitsDate = SLibTimeUtils.digestDate(dateBenefits);
+        int[] digestedPeriodStart = SLibTimeUtils.digestDate(periodStart);
+        int[] digestedPeriodEnd = SLibTimeUtils.digestDate(periodEnd);
+        
+        if (digestedBenefitsDate[0] < digestedPeriodStart[0]) {
+            if (digestedPeriodStart[0] == digestedPeriodEnd[0]) {
+                // start and end dates are of the same year:
+                Date anniversaryAtPeriod = SLibTimeUtils.createDate(digestedPeriodStart[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversaryAtPeriod, periodStart, periodEnd);
+            }
+            else if ((digestedPeriodStart[0] + 1) == digestedPeriodEnd[0]) {
+                // start date is of the previous year of end date:
+                Date anniversaryAtStart = SLibTimeUtils.createDate(digestedPeriodStart[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                Date anniversaryAtEnd = SLibTimeUtils.createDate(digestedPeriodEnd[0], digestedBenefitsDate[1], digestedBenefitsDate[2]);
+                belongsToPeriod = SLibTimeUtils.isBelongingToPeriod(anniversaryAtStart, periodStart, periodEnd) || SLibTimeUtils.isBelongingToPeriod(anniversaryAtEnd, periodStart, periodEnd);
+            }
+        }
+        
+        return belongsToPeriod;
     }
     
     /**
@@ -3746,42 +3766,74 @@ public abstract class SHrsUtils {
         return period.getMonths();
     }
     
-    public static int getPaymentVacationsByEmployee(final SGuiSession session, final int employeeId, final int benefitAnniversary, final int benefitYear) throws Exception {
-        int days = 0;
-        
-        String sql = "SELECT COALESCE(SUM(pre.unt_all), 0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
-                + "WHERE pr.id_emp = " + employeeId + " AND NOT pr.b_del AND NOT pre.b_del AND pre.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
-                + "pre.ben_ann = " + benefitAnniversary + " AND pre.ben_year = " + benefitYear + ";";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                days = resultSet.getInt(1);
-            }
-        }
-        
-        return days;
+    /**
+     * Compose SQL query for benefit payments of required employee from starting date of benefits.
+     * Names of columns in result set: 'ben_year' (integer), 'ben_ann' (integer), '_days' (double), '_pymt' (double).
+     * The query does not have an ending semicolon.
+     * @param schema DB squema name. If provided, includes an ending period, like in "squema.".
+     * @param employeeId ID of employee.
+     * @param dateBenefits Starting date of benefits.
+     * @param benefitsType Benefit type, constants defined in SModSysConsts.HRSS_TP_BEN_...
+     * @return SQL query as <code>String</code>.
+     * @throws Exception 
+     */
+    public static String composeQueryForBenefitPayments(final String schema, final int employeeId, final Date dateBenefits, final int benefitsType) throws Exception {
+        return composeQueryForBenefitPayments(schema, employeeId, dateBenefits, benefitsType, 0, 0);
     }
     
-    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnniversary, final Date dateCutoff) throws Exception {
-        int daysTableVacation = 0;
-        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<>();
-        ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversaries = new ArrayList<>();
+    /**
+     * Compose SQL query for benefit payments of required employee from starting date of benefits.
+     * Names of columns in result set: 'ben_year' (integer), 'ben_ann' (integer), '_days' (double), '_pymt' (double).
+     * The query does not have an ending semicolon.
+     * @param schema DB squema name. If provided, includes an ending period, like in "squema.".
+     * @param employeeId ID of employee.
+     * @param dateBenefits Starting date of benefits.
+     * @param benefitsType Benefit type, constants defined in SModSysConsts.HRSS_TP_BEN_...
+     * @param anniversaryLimit Anniversary limit. Can be discarded with zero value.
+     * @param payrollToExcludeId ID of payroll to exclude. Can be discarded with zero value.
+     * @return SQL query as <code>String</code>.
+     * @throws Exception 
+     */
+    public static String composeQueryForBenefitPayments(final String schema, final int employeeId, final Date dateBenefits, final int benefitsType, 
+            final int anniversaryLimit, final int payrollToExcludeId) throws Exception {
+        String sqlBenefits = "'" + SLibUtils.DbmsDateFormatDate.format(dateBenefits) + "'";
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, 0, dateCutoff) }));
+        String sql = "SELECT t.ben_year, t.ben_ann, SUM(t._days) AS _days, SUM(t._pymt) AS _pymt "
+                + "FROM ("
+                + "SELECT pre.ben_year, pre.ben_ann, SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _pymt "
+                + "FROM " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "WHERE pr.id_emp = " + employeeId + " AND pre.fk_tp_ben = " + benefitsType + " "
+                + "AND pre.ben_year >= YEAR(" + sqlBenefits + ") "
+                + "AND (p.dt_end >= " + sqlBenefits + " OR p.id_pay = 0) "
+                + (payrollToExcludeId == 0 ? "" : "AND p.id_pay <> " + payrollToExcludeId + " ")
+                + (anniversaryLimit == 0 ? "" : "AND pre.ben_ann <= " + anniversaryLimit + " ")
+                + "AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
+                + "GROUP BY pre.ben_year, pre.ben_ann "
+                + ""
+                + "UNION "
+                + ""
+                + "SELECT prd.ben_year, prd.ben_ann, - SUM(prd.unt_all) AS _days, - SUM(prd.amt_r) AS _pymt "
+                + "FROM " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + schema + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "WHERE pr.id_emp = " + employeeId + " AND prd.fk_tp_ben = " + benefitsType + " "
+                + "AND prd.ben_year >= YEAR(" + sqlBenefits + ") "
+                + "AND (p.dt_end >= " + sqlBenefits + " OR p.id_pay = 0) "
+                + (payrollToExcludeId == 0 ? "" : "AND p.id_pay <> " + payrollToExcludeId + " ")
+                + (anniversaryLimit == 0 ? "" : "AND prd.ben_ann <= " + anniversaryLimit + " ")
+                + "AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
+                + "GROUP BY prd.ben_year, prd.ben_ann "
+                + ""
+                + "ORDER BY ben_year, ben_ann) AS t "
+                + ""
+                + "GROUP BY t.ben_year, t.ben_ann "
+                + "ORDER BY t.ben_year, t.ben_ann";
         
-        aTableVacationByAnniversaries = createBenefitTablesAnniversaries(aTableVacation);
-        
-        for (SHrsBenefitTableAnniversary anniversary : aTableVacationByAnniversaries) {
-            if (anniversary.getBenefitAnn() <= benefitAnniversary) {
-                daysTableVacation += (int) anniversary.getValue();
-            }
-        }
-        
-        return daysTableVacation;
+        return sql;
     }
-
+    
     public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement statement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
@@ -4009,88 +4061,63 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int anniversaryLimit, final int benefitYear, final int payrrollId, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarysAux, final double paymentDaily) throws Exception {
+    /**
+     * Read days and amounts of payed benefits summed by anniversary.
+     * @param session GUI session.
+     * @param employee Employee.
+     * @param benefitType Benefit type. Constants defined in SModSysConsts.HRSS_TP_BEN_...
+     * @param payrrollToExcludeId ID of payroll to exclude.
+     * @return
+     * @throws Exception 
+     */
+    public static ArrayList<SHrsBenefit> getHrsBenefitsPayed(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int payrrollToExcludeId) throws Exception {
         ArrayList<SHrsBenefit> hrsBenefits = new ArrayList<>();
-        boolean foundAnniversary = false;
-        SHrsBenefit hrsBenefit = null;
-        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
-        SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
         
-        String sql = "SELECT ben_ann, ben_year, SUM(unt_all) AS _val_payed, SUM(amt_r) AS _amt_payed " +
-                "FROM hrs_pay_rcp_ear " +
-                "WHERE id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + anniversaryLimit + " AND NOT b_del " +
-                "GROUP BY ben_ann, ben_year " +
-                "ORDER BY ben_ann, ben_year;";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        String sql = composeQueryForBenefitPayments("", employee.getPkEmployeeId(), employee.getDateBenefits(), benefitType, 0, payrrollToExcludeId) + ";";
         
-        while (resultSet.next()) {
-            hrsBenefit = new SHrsBenefit(benefitType, resultSet.getInt("ben_ann"), resultSet.getInt("ben_year"));
-            
-            hrsBenefit.setValuePayed(resultSet.getDouble("_val_payed"));
-            hrsBenefit.setAmountPayed(resultSet.getDouble("_amt_payed"));
-            
-            hrsBenefits.add(hrsBenefit);
-        }
-        
-        for (SHrsBenefit benefit : hrsBenefits) {
-            if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { benefitType, anniversaryLimit, benefitYear })) {
-                foundAnniversary = true;
-            }
-        }
-        
-        if (!foundAnniversary) {
-            hrsBenefit = new SHrsBenefit(benefitType, anniversaryLimit, benefitYear);
-            hrsBenefits.add(hrsBenefit);
-        }
-        
-        // To complete benefits registries accumulated by benefit type:
-        
-        for (SHrsBenefit benefit : hrsBenefits) {
-            for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarys) { // lookup requested benefit
-                if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                    benefitTableAnniversary = anniversary;
-                }
-            }
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SHrsBenefit hrsBenefit = new SHrsBenefit(benefitType, resultSet.getInt("t.ben_ann"), resultSet.getInt("t.ben_year"));
 
-            if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                for (SHrsBenefitTableAnniversary anniversaryAux : benefitTableAnniversarysAux) { // lookup vacations benefit
-                    if (anniversaryAux.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                        benefitTableAnniversaryAux = anniversaryAux;
-                    }
-                }
-            }
+                hrsBenefit.setPaidDays(resultSet.getDouble("_days"));
+                hrsBenefit.setPaidAmount(resultSet.getDouble("_pymt"));
 
-            if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                benefit.setValue(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : benefitTableAnniversaryAux.getValue());
-                benefit.setAmount(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : SLibUtils.roundAmount(benefitTableAnniversaryAux.getValue() * paymentDaily * benefitTableAnniversary.getValue()));
-            }
-            else {
-                benefit.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
-                benefit.setAmount(benefitTableAnniversary == null ? 0d : SLibUtils.roundAmount(benefitTableAnniversary.getValue() * paymentDaily));
+                hrsBenefits.add(hrsBenefit);
             }
         }
 
         return hrsBenefits;
     }
     
-    public static int getScheduledDays(final SGuiSession session, final SDbEmployee employee, final int benefitAnn, final int benefitYear, final int absenceId) throws Exception {
-        int scheduledDays = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+    /**
+     * Get already vacation scheduled days excluding given absence.
+     * @param session GUI session.
+     * @param employee Employee.
+     * @param anniversary Benefit's anniversary.
+     * @param benefitsYear Benefit's calendar year.
+     * @param absenceId Absence's ID to be excluded.
+     * @return Already vacation scheduled days.
+     * @throws Exception 
+     */
+    public static int getVacationScheduledDays(final SGuiSession session, final SDbEmployee employee, final int anniversary, final int benefitsYear, final int absenceId) throws Exception {
+        int days = 0;
 
-         sql = "SELECT SUM(a.eff_day) " +
-                 "FROM hrs_abs AS a " +
-                 "WHERE NOT a.b_del AND a.id_emp = " + employee.getPkEmployeeId() + " AND " +
-                 "a.ben_ann = " + benefitAnn + " AND a.ben_year = " + benefitYear + " AND a.id_abs <> " + absenceId + " ";
-         
-         resultSet = session.getStatement().executeQuery(sql);
-         if (resultSet.next()) {
-             scheduledDays = resultSet.getInt(1);
-         }
-         
-        return scheduledDays;
+        String sql = "SELECT SUM(eff_day) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                + "WHERE id_emp = " + employee.getPkEmployeeId() + " "
+                + "AND fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " "
+                + "AND ben_ann = " + anniversary + " AND ben_year = " + benefitsYear + " AND id_abs <> " + absenceId + " "
+                + "AND NOT b_del;";
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                days = resultSet.getInt(1);
+            }
+        }
+
+        return days;
     }
-    
+    // xxx123 refactorizar
     public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
         int daysTableAnnualBonus = 0;
@@ -4108,7 +4135,8 @@ public abstract class SHrsUtils {
         benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, 0, dateCutoff) }));
         
         if (dateBenefits != null) {
-            seniority = getEmployeeSeniority(dateBenefits, dateCutoff);
+            SAnniversary anniversary = new SAnniversary(dateBenefits, dateCutoff);
+            seniority = anniversary.getElapsedYears();
         }
         else {
             seniority = 1;
@@ -4119,21 +4147,21 @@ public abstract class SHrsUtils {
         ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationBonusAnniversaries = createBenefitTablesAnniversaries(benefitTableVacationBonus);
         
         for (SHrsBenefitTableAnniversary anniversary : benefitTableAnnualBonusAnniversaries) {
-            if (anniversary.getBenefitAnn() <= seniority) {
+            if (anniversary.getAnniversary() <= seniority) {
                 benefitTableAnniversary = anniversary;
             }
         }
         daysTableAnnualBonus = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
         for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversaries) {
-            if (anniversary.getBenefitAnn() <= seniority) {
+            if (anniversary.getAnniversary() <= seniority) {
                 benefitTableAnniversary = anniversary;
             }
         }
         daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
         for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationBonusAnniversaries) {
-            if (anniversary.getBenefitAnn() <= seniority) {
+            if (anniversary.getAnniversary() <= seniority) {
                 benefitTableAnniversary = anniversary;
             }
         }
@@ -5060,7 +5088,7 @@ public abstract class SHrsUtils {
 
     public static ArrayList<String> companyWithRh(final Statement statement) throws SQLException {
         String sql;
-        ArrayList<String> companyName = new ArrayList<String>();
+        ArrayList<String> companyName = new ArrayList<>();
         
         sql = "SELECT bd FROM erp.cfgu_co WHERE b_mod_hrs = 1;";
         ResultSet resultSet = statement.executeQuery(sql);

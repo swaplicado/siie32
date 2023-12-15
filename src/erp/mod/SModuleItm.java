@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona
  */
 public class SModuleItm extends SGuiModule {
 
@@ -78,9 +78,19 @@ public class SModuleItm extends SGuiModule {
         switch (type) {
             case SModConsts.ITMS_LINK:
                 settings = new SGuiCatalogueSettings("Tipo de referencia", 1);
-                sql = "SELECT id_link AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " +
-                        " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 " +
-                        "ORDER BY id_link ";
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_CC_GRP_ITEM:
+                        sql = "SELECT id_link AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " +
+                                "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 " +
+                                "AND (id_link = " + SModSysConsts.ITMS_LINK_IGEN + " OR id_link = " + SModSysConsts.ITMS_LINK_ITEM + ") " +
+                                "ORDER BY id_link ";
+                        break;
+                    default:
+                        sql = "SELECT id_link AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " +
+                                " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 " +
+                                "ORDER BY id_link ";
+                        break;
+                }
                 break;
                 case SModConsts.ITMS_CT_ITEM:
                 settings = new SGuiCatalogueSettings("Categoría de ítem", 1);
@@ -122,10 +132,20 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_IGEN:
                 settings = new SGuiCatalogueSettings("Ítem genérico", 1, 1);
-                sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE b_del = 0 " +
-                        "ORDER BY igen, id_igen ";
+                switch (subtype) {
+                    case SModConsts.ITMX_IGEN_INV:
+                        sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
+                                "FROM " + SModConsts.TablesMap.get(type) + " " +
+                                "WHERE NOT b_del AND b_inv " +
+                                "ORDER BY igen, id_igen ";
+                        break;
+                    case SLibConsts.UNDEFINED:
+                        sql = "SELECT id_igen AS " + SDbConsts.FIELD_ID + "1, CONCAT(igen, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + ", fid_igrp AS " + SDbConsts.FIELD_FK + "1 " +
+                                "FROM " + SModConsts.TablesMap.get(type) + " " +
+                                "WHERE b_del = 0 " +
+                                "ORDER BY igen, id_igen ";
+                        break;
+                }
                 break;
             case SModConsts.ITMU_LINE:
                 settings = new SGuiCatalogueSettings("Línea de ítems", 1, 1);
@@ -155,10 +175,11 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
+                settings.setCodeSettings(true, false);
                 sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +
                         (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item " :
                         (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", " +
+                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", i.item_key AS " + SDbConsts.FIELD_CODE + ", " +
                         "i.fid_igen AS " + SDbConsts.FIELD_FK + "1, u.symbol AS f_comp " +
                         "FROM " + SModConsts.TablesMap.get(type) + " AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
@@ -173,6 +194,12 @@ public class SModuleItm extends SGuiModule {
                       "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " WHERE b_del = 0 " +
                       "ORDER BY unit, id_unit" ;
                 break;        
+            case SModConsts.ITMU_TP_MAT:
+                settings = new SGuiCatalogueSettings("Tipo de material", 1);
+                sql = "SELECT id_tp_mat AS " + SDbConsts.FIELD_ID + "1, " + " CONCAT(prefix,'-',name) AS " + SDbConsts.FIELD_ITEM + " " + 
+                      "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_MAT) + " WHERE b_del = 0 " +
+                      "ORDER BY prefix, name" ;
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -200,11 +227,34 @@ public class SModuleItm extends SGuiModule {
         
         switch (type) {
             case SModConsts.ITMU_ITEM:
-                sql = "SELECT id_item AS " + SDbConsts.FIELD_ID + "1, "
-                        + "item_key AS " + SDbConsts.FIELD_PICK + "1, item AS " + SDbConsts.FIELD_PICK + "2 "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
-                        + "WHERE b_del = 0 "
-                        + "ORDER BY item_key, item, id_item ";
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_REQ:
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM ("
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
+                                + "igen.id_link = " + SModSysConsts.ITMS_LINK_IGEN + " AND igen.id_ref = i.fid_igen " 
+                                + "UNION "
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS ii ON "
+                                + "ii.id_link = " + SModSysConsts.ITMS_LINK_ITEM + " AND ii.id_ref = i.id_item "
+                                + ") AS a "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
+                                + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
+                                + "WHERE NOT a.b_del AND a.id_mat_cc_grp = " + params.getParamsMap().get(SModConsts.TRN_MAT_CC_GRP) + " "
+                                + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
+                                + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY a.item_key, a.item, a.id_item ";
+                        break;
+                    default:
+                        sql = "SELECT id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "item_key AS " + SDbConsts.FIELD_PICK + "1, item AS " + SDbConsts.FIELD_PICK + "2 "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
+                                + "WHERE b_del = 0 "
+                                + "ORDER BY item_key, item, id_item ";
+                        break;
+                }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
                 settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);

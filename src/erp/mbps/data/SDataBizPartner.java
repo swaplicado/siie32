@@ -20,6 +20,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
+import sa.lib.gui.SGuiSession;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
@@ -75,6 +76,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     protected erp.mmkt.data.SDataCustomerConfig moDbmsDataCustomerConfig;
     protected erp.mmkt.data.SDataConfigurationSalesAgent moDbmsDataConfigurationSalesAgent;
     protected erp.mbps.data.SDataEmployee moDbmsDataEmployee;
+
+    /** Save benefit tables of employee in SBA-Lib style, in a post-save request. */
+    protected erp.mod.hrs.db.SDbEmployeeBenefitTables moAuxDbEmployeeBenefitTables;
 
     public SDataBizPartner() {
         super(SDataConstants.BPSU_BP);
@@ -191,6 +195,12 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     public erp.mmkt.data.SDataCustomerConfig getDbmsDataCustomerConfig() { return moDbmsDataCustomerConfig; }
     public erp.mmkt.data.SDataConfigurationSalesAgent getDbmsDataConfigurationSalesAgent() { return moDbmsDataConfigurationSalesAgent; }
     public erp.mbps.data.SDataEmployee getDbmsDataEmployee() { return moDbmsDataEmployee; }
+    
+    /** Set benefit tables of employee to be saved in SBA-Lib style, in a post-save request. */
+    public void setAuxDbEmployeeBenefitTables(erp.mod.hrs.db.SDbEmployeeBenefitTables o) { moAuxDbEmployeeBenefitTables = o; }
+    
+    /** Get benefit tables of employee to be saved in SBA-Lib style, in a post-save request. */
+    public erp.mod.hrs.db.SDbEmployeeBenefitTables getAuxDbEmployeeBenefitTables() { return moAuxDbEmployeeBenefitTables; }
 
     public boolean isPerson() {
         return mnFkBizPartnerIdentityTypeId == SDataConstantsSys.BPSS_TP_BP_IDY_PER;
@@ -277,6 +287,8 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         moDbmsDataCustomerConfig = null;
         moDbmsDataConfigurationSalesAgent = null;
         moDbmsDataEmployee = null;
+        
+        moAuxDbEmployeeBenefitTables = null;
     }
 
     @Override
@@ -882,6 +894,19 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         }
         else {
             client.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showForm(formType, pk);
+        }
+    }
+    
+    /**
+     * Save benefit tables of employee in SBA-Lib style, in a post-save request.
+     * Note that this registry's primary key must be already set before invoking this method.
+     * @param session
+     * @throws Exception 
+     */
+    public void saveEmployeeBenefitTables(final SGuiSession session) throws Exception {
+        if (moAuxDbEmployeeBenefitTables != null) {
+            moAuxDbEmployeeBenefitTables.setPkEmployeeId(mnPkBizPartnerId);
+            moAuxDbEmployeeBenefitTables.save(session);
         }
     }
 }

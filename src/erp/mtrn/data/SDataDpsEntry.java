@@ -5,6 +5,7 @@
 
 package erp.mtrn.data;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
@@ -174,6 +175,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> mvDbmsEntryCommissions;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> mvDbmsEntryPrices;
     protected ArrayList<SDataDpsEntryAnalysis> mlDbmsDpsEntryAnalysis;
+    protected SDataDpsMaterialRequest moDbmsDpsEntryMatRequest;
 
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsSource;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
@@ -189,6 +191,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
     protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
     protected boolean mbFlagMinorChangesEdited;
+    protected boolean mbFlagOpenedByMatRequestImport;
     
     protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
@@ -205,6 +208,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions = new Vector<>();
         mvDbmsEntryPrices = new Vector<>();
         mlDbmsDpsEntryAnalysis = new ArrayList<>();
+        moDbmsDpsEntryMatRequest = null;
 
         mvDbmsDpsLinksAsSource = new Vector<>();
         mvDbmsDpsLinksAsDestiny = new Vector<>();
@@ -451,6 +455,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsAddElektraParts(int n) { mnDbmsAddElektraParts = n; }
     public void setDbmsAddElektraPartPriceUnitary(double d) { mdDbmsAddElektraPartPriceUnitary = d; }
     public void setDbmsAddJsonData(java.lang.String s) { msDbmsAddJsonData = s; }
+    public void setDbmsDpsEntryMatRequest(SDataDpsMaterialRequest o) { moDbmsDpsEntryMatRequest = o; }
 
     public int getDbmsFkItemGenericId() { return mnDbmsFkItemGenericId; }
     public boolean getDbmsItemGenDataShipDomesticReq() { return mbDbmsItemGenDataShipDomesticReq; }
@@ -493,6 +498,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> getDbmsEntryCommissions() { return mvDbmsEntryCommissions; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> getDbmsEntryPrices() { return mvDbmsEntryPrices; }
     public ArrayList<SDataDpsEntryAnalysis> getDbmsDpsEntryAnalysis() { return mlDbmsDpsEntryAnalysis; }
+    public SDataDpsMaterialRequest getDbmsDpsEntryMatRequestLink() { return moDbmsDpsEntryMatRequest; }
 
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsSource() { return mvDbmsDpsLinksAsSource; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsDestiny() { return mvDbmsDpsLinksAsDestiny; }
@@ -515,9 +521,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
     public void setFlagReadLinksAswell(boolean b) { mbFlagReadLinksAswell = b; }
     public void setFlagMinorChangesEdited(boolean b) { mbFlagMinorChangesEdited = b; }
+    public void setFlagOpenedByMatRequestImport(boolean b) { mbFlagOpenedByMatRequestImport = b; }
     
     public boolean getFlagReadLinksAswell() { return mbFlagReadLinksAswell; }
     public boolean getFlagMinorChangesEdited() { return mbFlagMinorChangesEdited; }
+    public boolean getFlagOpenedByMatRequestImport() { return mbFlagOpenedByMatRequestImport; }
 
     public int[] getKeyDps() { return new int[] { mnPkYearId, mnPkDocId }; }
     public int[] getKeyDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
@@ -682,6 +690,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions.clear();
         mvDbmsEntryPrices.clear();
         mlDbmsDpsEntryAnalysis.clear();
+        moDbmsDpsEntryMatRequest = null;
 
         mvDbmsDpsLinksAsSource.clear();
         mvDbmsDpsLinksAsDestiny.clear();
@@ -697,6 +706,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         
         //mbFlagReadLinksAswell = false; // must be independent of a reset!
         mbFlagMinorChangesEdited = false;
+        mbFlagOpenedByMatRequestImport = false;
     
         mnXtaPkDpsYearConId = 0;
         mnXtaPkDpsDocConId = 0;
@@ -1108,6 +1118,28 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         oEtyAnalysis.read(new int[] { resultSet.getInt("id_ety_analysis") }, statement.getConnection().createStatement());
                         mlDbmsDpsEntryAnalysis.add(oEtyAnalysis);
                     }
+                    
+                    // Read Dps Ety links to Material Requests
+                    sql = "SELECT "
+                            + " id_dps_mat_req "
+                            + "FROM "
+                            + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_MAT_REQ) + " "
+                            + "WHERE "
+                            + "fid_dps_year = " + mnPkYearId + " AND "
+                            + "fid_dps_doc = " + mnPkDocId + " AND "
+                            + "fid_dps_ety = " + mnPkEntryId + " "
+                            + "ORDER BY fid_mat_req ASC, fid_mat_req_ety ASC, id_dps_mat_req ASC "
+                            + "LIMIT 1;";
+        
+                    moDbmsDpsEntryMatRequest = null;
+                    ResultSet resultLinks = statement.executeQuery(sql);
+                    if (resultLinks.next()) {
+                        SDataDpsMaterialRequest oEtyMatReqLink = new SDataDpsMaterialRequest();
+                        oEtyMatReqLink.read(new int[] { resultLinks.getInt("id_dps_mat_req") }, statement.getConnection().createStatement());
+                        moDbmsDpsEntryMatRequest = oEtyMatReqLink;
+                    }
+                    
+                    mbFlagOpenedByMatRequestImport = true;
                 }
 
                 mbIsRegistryNew = false;
@@ -1407,6 +1439,22 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         moDbmsDpsCfdEntry.setPkEntryId(mnPkEntryId);
                         moDbmsDpsCfdEntry.save(connection);
                     }
+                    else {
+                        String sql = "DELETE FROM trn_dps_cfd_ety " +
+                                "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        moDbmsDpsCfdEntry = new SDataDpsCfdEntry();
+                        moDbmsDpsCfdEntry.setPkYearId(mnPkYearId);
+                        moDbmsDpsCfdEntry.setPkDocId(mnPkDocId);
+                        moDbmsDpsCfdEntry.setPkEntryId(mnPkEntryId);
+                        if (!mvDbmsEntryTaxes.isEmpty()){
+                            moDbmsDpsCfdEntry.setTaxObject(DCfdi40Catalogs.ClaveObjetoImpSí);
+                        }
+                        else {
+                            moDbmsDpsCfdEntry.setTaxObject(DCfdi40Catalogs.ClaveObjetoImpNo);
+                        }
+                        moDbmsDpsCfdEntry.save(connection);
+                    }
                     
                     // Save quality configurations
                     if (mlDbmsDpsEntryAnalysis.size() > 0) {
@@ -1425,6 +1473,25 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             oEtyAnalysis.setPkEntryAnalysisId(0);
                             
                             oEtyAnalysis.save(connection);
+                        }
+                    }
+                    
+                    // Save dps mat reqs links
+                    if (moDbmsDpsEntryMatRequest != null) {
+                        String sql = "DELETE FROM trn_dps_mat_req " +
+                                "WHERE fid_dps_year = " + mnPkYearId + " "
+                                + "AND fid_dps_doc = " + mnPkDocId + " "
+                                + "AND fid_dps_ety = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        moDbmsDpsEntryMatRequest.setPkDpsMatReqId(0);
+                        moDbmsDpsEntryMatRequest.setFkDpsYearId(mnPkYearId);
+                        moDbmsDpsEntryMatRequest.setFkDpsDocId(mnPkDocId);
+                        moDbmsDpsEntryMatRequest.setFkDpsEntryId(mnPkEntryId);
+                        moDbmsDpsEntryMatRequest.setIsRegistryNew(true);
+                        moDbmsDpsEntryMatRequest.save(connection);
+
+                        if (moDbmsDpsEntryMatRequest.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                            throw new Exception("Ocurrió un error al guardar el vínculo con la requisición, contacte a soporte técnico");
                         }
                     }
                 }
@@ -1881,6 +1948,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsEntryCommissions().addAll(mvDbmsEntryCommissions);
         clone.getDbmsEntryPrices().addAll(mvDbmsEntryPrices);
         clone.getDbmsDpsEntryAnalysis().addAll(mlDbmsDpsEntryAnalysis);
+        clone.setDbmsDpsEntryMatRequest(moDbmsDpsEntryMatRequest);
 
         clone.getDbmsDpsLinksAsSource().addAll(mvDbmsDpsLinksAsSource);
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);
@@ -1896,6 +1964,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         
         clone.setFlagReadLinksAswell(mbFlagReadLinksAswell);
         clone.setFlagMinorChangesEdited(mbFlagMinorChangesEdited);
+        clone.setFlagOpenedByMatRequestImport(mbFlagOpenedByMatRequestImport);
 
         return clone;
     }

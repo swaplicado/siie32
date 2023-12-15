@@ -78,9 +78,9 @@ public class SModuleQlt extends SGuiModule {
         switch (type) {
             case SModConsts.QLT_TP_ANALYSIS:
                 settings = new SGuiCatalogueSettings("Tipo de análisis", 1);
-                sql = "SELECT id_analysis_type AS " + SDbConsts.FIELD_ID + "1, CONCAT(type_code, ' - ', type_name)  AS " + SDbConsts.FIELD_ITEM + " "
+                sql = "SELECT id_analysis_type AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name)  AS " + SDbConsts.FIELD_ITEM + " "
                         + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
-                        + "ORDER BY type_name ASC ";
+                        + "ORDER BY name ASC ";
                 break;
             case SModConsts.QLT_ANALYSIS:
                 settings = new SGuiCatalogueSettings("Análisis", 1);
@@ -127,10 +127,10 @@ public class SModuleQlt extends SGuiModule {
         switch (type) {
             case SModConsts.QLT_TP_ANALYSIS:
                 sql = "SELECT ta.id_analysis_type AS " + SDbConsts.FIELD_ID + "1, "
-                        + "ta.type_code AS " + SDbConsts.FIELD_PICK + "1, ta.type_name AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "ta.code AS " + SDbConsts.FIELD_PICK + "1, ta.name AS " + SDbConsts.FIELD_PICK + "2 "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta "
                         + "WHERE ta.b_del = 0 "
-                        + "ORDER BY ta.type_name, ta.type_code ";
+                        + "ORDER BY ta.name, ta.code ";
                 
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Código"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre"));

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -29,8 +30,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     protected double mdAmountUnitary;
     protected double mdAmountSystem_r;
     protected double mdAmount_r;
-    protected int mnBenefitYear;
-    protected int mnBenefitAnniversary;
+    protected int mnBenefitsYear;
+    protected int mnBenefitsAnniversary;
     protected boolean mbTimeClockSourced;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
@@ -52,6 +53,11 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     
     protected SDbPayrollReceiptDeductionComplement moChildDeductionComplement;
 
+    /** Custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    protected Date mtCustomTsUserInsert;
+    /** Custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    protected Date mtCustomTsUserUpdate;
+    
     public SDbPayrollReceiptDeduction() {
         super(SModConsts.HRS_PAY_RCP_DED);
     }
@@ -65,8 +71,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setAmountUnitary(double d) { mdAmountUnitary = d; }
     public void setAmountSystem_r(double d) { mdAmountSystem_r = d; }
     public void setAmount_r(double d) { mdAmount_r = d; }
-    public void setBenefitYear(int n) { mnBenefitYear = n; }
-    public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
+    public void setBenefitsYear(int n) { mnBenefitsYear = n; }
+    public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
@@ -86,6 +92,11 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     
     public void setChildDeductionComplement(SDbPayrollReceiptDeductionComplement o) { moChildDeductionComplement = o; }
 
+    /** Set custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public void setCustomTsUserInsert(Date t) { mtCustomTsUserInsert = t; }
+    /** Set custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public void setCustomTsUserUpdate(Date t) { mtCustomTsUserUpdate = t; }
+    
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkMoveId() { return mnPkMoveId; }
@@ -95,8 +106,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public double getAmountUnitary() { return mdAmountUnitary; }
     public double getAmountSystem_r() { return mdAmountSystem_r; }
     public double getAmount_r() { return mdAmount_r; }
-    public int getBenefitYear() { return mnBenefitYear; }
-    public int getBenefitAnniversary() { return mnBenefitAnniversary; }
+    public int getBenefitsYear() { return mnBenefitsYear; }
+    public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
@@ -116,6 +127,11 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     
     public SDbPayrollReceiptDeductionComplement getChildDeductionComplement() { return moChildDeductionComplement; }
 
+    /** Get custom value for timestamp of user insertion to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public Date getCustomTsUserInsert() { return mtCustomTsUserInsert; }
+    /** Get custom value for timestamp of user update to be used in subsequent calls of save() method, regardless it is an insertion or an update. */
+    public Date getCustomTsUserUpdate() { return mtCustomTsUserUpdate; }
+    
     public int[] getLoanKey() { return new int[] { mnFkLoanEmployeeId_n, mnFkLoanLoanId_n }; }
 
     @Override
@@ -143,8 +159,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mdAmountUnitary = 0;
         mdAmountSystem_r = 0;
         mdAmount_r = 0;
-        mnBenefitYear = 0;
-        mnBenefitAnniversary = 0;
+        mnBenefitsYear = 0;
+        mnBenefitsAnniversary = 0;
         mbTimeClockSourced = false;
         mbUserEdited = false;
         mbAutomatic = false;
@@ -163,6 +179,9 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         moChildDeductionComplement = null;
+        
+        mtCustomTsUserInsert = null;
+        mtCustomTsUserUpdate = null;
     }
 
     @Override
@@ -216,8 +235,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mdAmountUnitary = resultSet.getDouble("amt_unt");
             mdAmountSystem_r = resultSet.getDouble("amt_sys_r");
             mdAmount_r = resultSet.getDouble("amt_r");
-            mnBenefitYear = resultSet.getInt("ben_year");
-            mnBenefitAnniversary = resultSet.getInt("ben_ann");
+            mnBenefitsYear = resultSet.getInt("ben_year");
+            mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
@@ -280,8 +299,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     mdAmountUnitary + ", " + 
                     mdAmountSystem_r + ", " + 
                     mdAmount_r + ", " + 
-                    mnBenefitYear + ", " + 
-                    mnBenefitAnniversary + ", " + 
+                    mnBenefitsYear + ", " + 
+                    mnBenefitsAnniversary + ", " + 
                     (mbTimeClockSourced ? 1 : 0) + ", " + 
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
@@ -296,8 +315,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     (mnFkLoanTypeId_n > 0 ? mnFkLoanTypeId_n : "NULL") + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
-                    "NOW()" + ", " +
-                    "NOW()" + " " +
+                    (mtCustomTsUserInsert != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserInsert) + "'" : "NOW()") + ", " +
+                    (mtCustomTsUserUpdate != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserUpdate) + "'" : "NOW()") + " " +
                     ")";
         }
         else {
@@ -315,8 +334,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "amt_unt = " + mdAmountUnitary + ", " +
                     "amt_sys_r = " + mdAmountSystem_r + ", " +
                     "amt_r = " + mdAmount_r + ", " +
-                    "ben_year = " + mnBenefitYear + ", " +
-                    "ben_ann = " + mnBenefitAnniversary + ", " +
+                    "ben_year = " + mnBenefitsYear + ", " +
+                    "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
@@ -331,8 +350,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "fk_tp_loan_n = " + (mnFkLoanTypeId_n > 0 ? mnFkLoanTypeId_n : "NULL") + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + " " +
+                    (mtCustomTsUserInsert != null ? "ts_usr_ins = '" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserInsert) + "', " : "") + // if no custom timestamp provided, original one persists
+                    "ts_usr_upd = " + (mtCustomTsUserUpdate != null ? "'" + SLibUtils.DbmsDateFormatDatetime.format(mtCustomTsUserUpdate) + "'": "NOW()") + " " +
                     getSqlWhere();
         }
         
@@ -363,8 +382,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setAmountUnitary(this.getAmountUnitary());
         registry.setAmountSystem_r(this.getAmountSystem_r());
         registry.setAmount_r(this.getAmount_r());
-        registry.setBenefitYear(this.getBenefitYear());
-        registry.setBenefitAnniversary(this.getBenefitAnniversary());
+        registry.setBenefitsYear(this.getBenefitsYear());
+        registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
@@ -383,6 +402,9 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setChildDeductionComplement(this.getChildDeductionComplement());
+        
+        registry.setCustomTsUserInsert(this.getCustomTsUserInsert());
+        registry.setCustomTsUserUpdate(this.getCustomTsUserUpdate());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

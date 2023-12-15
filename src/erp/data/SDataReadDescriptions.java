@@ -28,9 +28,16 @@ public abstract class SDataReadDescriptions {
         String sql = "";
 
         switch (catalogue) {
+            case SDataConstants.FIN_ACC:
+                switch (fieldType) {
+                    case SLibConstants.FIELD_TYPE:
+                        sql = "SELECT fid_tp_acc_sys FROM fin_acc WHERE id_acc = '" + ((Object[]) pk)[0] + "' ";
+                    default:
+                }
+                break;
             case SDataConstants.MFGS_ST_ORD:
                 switch (fieldType) {
-                    case SLibConstants.FIELD_DEL:
+                    case SLibConstants.FIELD_DELETED:
                         sql = "SELECT b_del FROM erp.mfgs_st_ord WHERE id_st = " + ((int[]) pk)[0] + " ";
                     default:
                 }
@@ -58,7 +65,7 @@ public abstract class SDataReadDescriptions {
 
         switch (catalogue) {
             case SDataConstants.USRU_USR:
-                sql = "SELECT bp.bp AS descrip FROM erp.usru_usr AS u LEFT OUTER JOIN erp.bpsu_bp AS bp ON " +
+                sql = "SELECT COALESCE(bp.bp, u.usr) AS descrip FROM erp.usru_usr AS u LEFT OUTER JOIN erp.bpsu_bp AS bp ON " +
                         "u.fid_bp_n = bp.id_bp WHERE u.id_usr = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.CFGS_CT_ENT:
@@ -93,6 +100,26 @@ public abstract class SDataReadDescriptions {
                     
                 sql = "SELECT " + sql + " AS descrip FROM erp.locu_cty WHERE " + (pk instanceof int[] ? "id_cty = " + ((int[]) pk)[0] : "cty_code = '" + ((String) pk) + "'") + " ";
                 break;
+            case SDataConstants.LOCU_STA:
+                switch (descriptionType) {
+                    case SLibConstants.DESCRIPTION_CODE:
+                        sql = "sta_code";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME:
+                        sql = "sta";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_ABBR:
+                        sql = "sta_abbr";
+                        break;
+                    case SLibConstants.DESCRIPTION_NAME_LAN:
+                        sql = "sta_lan";
+                        break;
+                    default:
+                        sql = "sta";
+                }
+                    
+                sql = "SELECT " + sql + " AS descrip FROM erp.locu_sta WHERE " + (pk instanceof int[] ? "id_sta = " + ((int[]) pk)[0] : "sta_code = '" + ((String) pk) + "'") + " ";
+                break;
             case SDataConstants.BPSS_CT_BP:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "ct_bp") + " AS descrip FROM erp.bpss_ct_bp WHERE id_ct_bp = " + ((int[]) pk)[0] + " ";
                 break;
@@ -107,6 +134,9 @@ public abstract class SDataReadDescriptions {
                 break;
             case SDataConstants.BPSU_BP:
                 sql = "SELECT bp AS descrip FROM erp.bpsu_bp WHERE id_bp = " + ((int[]) pk)[0] + " ";
+                break;
+            case SDataConstants.BPSU_BP_CT:
+                sql = "SELECT bp_key AS descrip FROM erp.bpsu_bp_ct WHERE id_bp = " + ((int[]) pk)[0] + " AND id_ct_bp = " + ((int[]) pk)[1] + " ";
                 break;
             case SDataConstants.BPSU_BPB:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "bpb") + " AS descrip FROM erp.bpsu_bpb WHERE id_bpb = " + ((int[]) pk)[0] + " ";
@@ -130,13 +160,13 @@ public abstract class SDataReadDescriptions {
                 sql = "SELECT igen AS descrip FROM erp.itmu_igen WHERE id_igen = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.ITMU_ITEM:
-                sql = "SELECT item AS descrip FROM erp.itmu_item WHERE id_item = " + ((int[]) pk)[0] + " ";
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "item_key" : "item") + " AS descrip FROM erp.itmu_item WHERE id_item = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.ITMU_TP_UNIT:
-                sql = "SELECT "+ (descriptionType == SLibConstants.DESCRIPTION_CODE ? "unit_base" : "tp_unit") + " AS descrip FROM erp.itmu_tp_unit WHERE id_tp_unit = " + ((int[]) pk)[0] + " ";
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "unit_base" : "tp_unit") + " AS descrip FROM erp.itmu_tp_unit WHERE id_tp_unit = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.ITMU_UNIT:
-                sql = "SELECT "+ (descriptionType == SLibConstants.DESCRIPTION_CODE ? "symbol" : "unit") + " AS descrip FROM erp.itmu_unit WHERE id_unit = " + ((int[]) pk)[0] + " ";
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "symbol" : "unit") + " AS descrip FROM erp.itmu_unit WHERE id_unit = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.FINS_TP_BKR:
                 sql = "SELECT tp_bkr AS descrip FROM erp.fins_tp_bkr WHERE id_tp_bkr = " + ((int[]) pk)[0] + " ";
@@ -149,6 +179,12 @@ public abstract class SDataReadDescriptions {
                 break;
             case SDataConstants.FINS_CLS_ACC:
                 sql = "SELECT cls_acc AS descrip FROM erp.fins_cls_acc WHERE id_tp_acc = " + ((int[]) pk)[0] + " AND id_cl_acc = " + ((int[]) pk)[1] + " AND id_cls_acc = " + ((int[]) pk)[2] + " ";
+                break;
+            case SDataConstants.FINS_CL_SYS_MOV_32:
+                sql = "SELECT name AS descrip FROM erp.fins_cl_sys_mov WHERE id_cl_sys_mov = " + ((int[]) pk)[0] + " ";
+                break;
+            case SDataConstants.FINS_TP_SYS_MOV_32:
+                sql = "SELECT name AS descrip FROM erp.fins_tp_sys_mov WHERE id_cl_sys_mov = " + ((int[]) pk)[0] + " AND id_tp_sys_mov = " + ((int[]) pk)[1] + " ";
                 break;
             case SDataConstants.FINS_TP_ACC_MOV:
                 sql = "SELECT tp_acc_mov AS descrip FROM erp.fins_tp_acc_mov WHERE id_tp_acc_mov = " + ((int[]) pk)[0] + " ";
@@ -250,7 +286,7 @@ public abstract class SDataReadDescriptions {
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "dps_nat") + " AS descrip FROM erp.trnu_dps_nat WHERE id_dps_nat = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.TRN_DPS:
-                sql = "SELECT CONCAT(td.code,' ',CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip FROM trn_dps AS d INNER JOIN erp.TRNU_TP_DPS AS td ON d.fid_ct_dps = td.id_ct_dps " +
+                sql = "SELECT CONCAT(td.code, ' ', CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip FROM trn_dps AS d INNER JOIN erp.TRNU_TP_DPS AS td ON d.fid_ct_dps = td.id_ct_dps " +
                        "AND d.fid_cl_dps = td.id_cl_dps AND d.fid_tp_dps = td.id_tp_dps WHERE id_year = " + ((int[]) pk)[0] +" AND id_doc = " + ((int[]) pk)[1] + " ";
                 break;    
             case SDataConstants.TRN_DPS_ADD:

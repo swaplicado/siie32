@@ -145,6 +145,8 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel77 = new javax.swing.JPanel();
         jlCfdiRelated = new javax.swing.JLabel();
         moTextCfdiRelated = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel32 = new javax.swing.JPanel();
+        moBoolRevLog = new sa.lib.gui.bean.SBeanFieldBoolean();
         jpBolVehicle = new javax.swing.JPanel();
         jpBolVehicle1 = new javax.swing.JPanel();
         jPanel33 = new javax.swing.JPanel();
@@ -153,6 +155,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jPanel34 = new javax.swing.JPanel();
         jlPlate = new javax.swing.JLabel();
         moTextPlate = new sa.lib.gui.bean.SBeanFieldText();
+        moDecimalVehWei = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel35 = new javax.swing.JPanel();
         jlPermissonType = new javax.swing.JLabel();
         moKeyPermissonType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -263,7 +266,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         jpBolShipment.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del embarque:"));
         jpBolShipment.setLayout(new java.awt.BorderLayout());
 
-        jpBolShipment1.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
+        jpBolShipment1.setLayout(new java.awt.GridLayout(18, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -454,6 +457,14 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         jpBolShipment1.add(jPanel77);
 
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolRevLog.setText("Logística inversa, recolección, devolución");
+        moBoolRevLog.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel32.add(moBoolRevLog);
+
+        jpBolShipment1.add(jPanel32);
+
         jpBolShipment.add(jpBolShipment1, java.awt.BorderLayout.NORTH);
 
         jpBol.add(jpBolShipment);
@@ -476,13 +487,18 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPlate.setText("Placa:");
+        jlPlate.setText("Placa y peso veh.:");
         jlPlate.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel34.add(jlPlate);
 
         moTextPlate.setEditable(false);
         moTextPlate.setEnabled(false);
         jPanel34.add(moTextPlate);
+
+        moDecimalVehWei.setText("");
+        moDecimalVehWei.setEnabled(false);
+        moDecimalVehWei.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel34.add(moDecimalVehWei);
 
         jpBolVehicle1.add(jPanel34);
 
@@ -922,6 +938,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
@@ -1026,9 +1043,11 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
     private javax.swing.JPanel jpBolVehicle1;
     private javax.swing.JPanel jpLocations;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolInternationalShip;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolRevLog;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecimalGrossWeight;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecimalTotalDistance;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecimalVehWei;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartner;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCfdiUsage;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCountry;
@@ -1129,8 +1148,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moTextPremium.setTextSettings(SGuiUtils.getLabelName(jlPremium.getText()), 30, 0);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), true);
         moKeyCfdiUsage.setKeySettings(miClient, SGuiUtils.getLabelName(jlCfdiUsage.getText()), false);
+        moBoolRevLog.setBooleanSettings(moBoolRevLog.getText(), false);
         moKeyVehicle.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehicle.getText()), true);
         moTextPlate.setTextSettings(SGuiUtils.getLabelName(jlPlate.getText()), 10);
+        moDecimalVehWei.setDecimalSettings("Peso vehiculo", SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moKeyPermissonType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPermissonType.getText()), false);
         moTextPermissonNumber.setTextSettings(SGuiUtils.getLabelName(jlPermissonNumber.getText()), 50);
         moKeyInsurer.setKeySettings(miClient, SGuiUtils.getLabelName(jlInsurer.getText()), true);
@@ -1178,8 +1199,10 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moFields.addField(moTextPremium);
         moFields.addField(moKeyBizPartner);
         moFields.addField(moKeyCfdiUsage);
+        moFields.addField(moBoolRevLog);
         moFields.addField(moKeyVehicle);
         moFields.addField(moTextPlate);
+        moFields.addField(moDecimalVehWei);
         moFields.addField(moKeyPermissonType);
         moFields.addField(moTextPermissonNumber);
         moFields.addField(moKeyInsurer);
@@ -1354,6 +1377,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         if (moKeyVehicle.getSelectedIndex() >= 1) {
             SDbVehicle veh = (SDbVehicle) miClient.getSession().readRegistry(SModConsts.LOG_VEH, moKeyVehicle.getValue() );
             moTextPlate.setText(veh.getPlate());
+            moDecimalVehWei.setValue(veh.getGrossWeight());
             SGuiUtils.locateItemByCode(moKeyPermissonType, veh.getPermissonSctType());
             moTextPermissonNumber.setText(veh.getPermissonSctNumber());
             moKeyInsurer.setValue(new int[] { veh.getFkInsurerId_n() });
@@ -1363,6 +1387,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
         else {
             moTextPlate.setText("");
+            moDecimalVehWei.setValue(0.0);
             moKeyPermissonType.setSelectedIndex(0);
             moTextPermissonNumber.setText("");
             moKeyInsurer.setSelectedIndex(0);
@@ -1485,6 +1510,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionAddFigures() {
         moFormTranspExtra.setValue(1, maTranspTranspExtra);
         moFormTranspExtra.setVisible(true);
@@ -1657,6 +1683,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             moKeyInputOutput.addItem(salida);
             
             moTextPlate.setText("");
+            moDecimalVehWei.setValue(0.0);
             moTextPermissonNumber.setText("");
             moTextInsurancePolicy.setText("");
             moTextTrailerPlate1.setText("");
@@ -1725,6 +1752,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         moKeyMerchandiseInsurer.setValue(new int[] { moRegistry.getFkMerchandiseInsurer_n() });
         moTextMerchandisePolicy.setText(moRegistry.getMerchandiseInsurerPolicy());
         moTextPremium.setText(moRegistry.getPremium());
+        moBoolRevLog.setValue(moRegistry.isReverseLogistics());
         moKeyBizPartner.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
         if (moRegistry.getBolTransportationMode() != null) {
             maTranspTranspExtra = moRegistry.getBolTransportationMode().getBolTransportationModeExtra();
@@ -1743,6 +1771,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
             
             moKeyVehicle.setValue(new int[] { vehicle.getPkVehicleId() });
             moTextPlate.setValue(vehicle.getPlate());
+            moDecimalVehWei.setValue(vehicle.getGrossWeight());
             SGuiUtils.locateItemByCode(moKeyPermissonType, vehicle.getPermissonSctType());
             moTextPermissonNumber.setText( vehicle.getPermissonSctNumber() );
             moKeyInsurer.setValue(new int[] { vehicle.getFkInsurerId_n() } );
@@ -1809,6 +1838,7 @@ public class SFormBillOfLading extends sa.lib.gui.bean.SBeanForm implements SGri
         registry.setEnviromentalInsurerPolicy(moTextEnvironmentalPolicy.getValue());
         registry.setMerchandiseInsurerPolicy(moTextMerchandisePolicy.getValue());
         registry.setPremium(moTextPremium.getValue());
+        registry.setReverseLogistics(moBoolRevLog.getValue());
         registry.setFkCompanyBranchId(((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId());
         registry.setFkInputOutputCountry_n(moKeyCountry.getValue().length == 0 ? 0 : moKeyCountry.getValue()[0]);
         registry.setFkGrossWeightUnit(moKeyGrossWeightUnit.getValue()[0]);

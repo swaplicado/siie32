@@ -503,7 +503,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 bw.write(SLibUtilities.textToAscii(buffer));
                 
                 bw.write("\n");
-                buffer = "\"CLAVE EMPLEADO\",\"EMPLEADO\",\"CÓDIGO DEPARTAMENTO\",\"DEPARTAMENTO\"," + headerTaxExempt + ""
+                buffer = "\"NÚMERO EMPLEADO\",\"NOMBRE EMPLEADO\",\"CÓDIGO DEPARTAMENTO\",\"DEPARTAMENTO\"," + headerTaxExempt + ""
                         + "\"SUBTOTAL GRAVADO\",\"SUBTOTAL EXCENTO\",\"PERCEPCIONES TODAS\","
                         + "\"DEDUCCIONES DE LEY\",\"ISR RET. SALARIOS\",\"DEDUCCIONES TODAS\","
                         + "\"PAGO TOTAL BRUTO\",\"PAGO TOTAL NETO\"";

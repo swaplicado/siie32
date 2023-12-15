@@ -11,15 +11,18 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SMatConsumeSubEntCcConfig;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -46,6 +49,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrderId_n;
     protected int mnFkMfgChargeId_n;
+    protected int mnFkMatRequestId_n;
+    protected int mnFkMatRequestEtyId_n;
     protected int mnFkMaintAreaId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -68,6 +73,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUserDelete;
 
     protected java.util.Vector<erp.mtrn.data.STrnStockMove> mvAuxStockMoves;
+    protected ArrayList<SDataDiogEtyMatConsEntCostCenter> mlAuxDiogEtyMatEntCcsConfigs;
 
     protected int mnClonedFkMfgYearId_n;
     protected int mnClonedFkMfgOrderId_n;
@@ -104,6 +110,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrderId_n(int n) { mnFkMfgOrderId_n = n; }
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
+    public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
+    public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
     public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -135,6 +143,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrderId_n() { return mnFkMfgOrderId_n; }
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
+    public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
+    public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
     public int getFkMaintAreaId() { return mnFkMaintAreaId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -170,6 +180,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
 
     public java.util.Vector<erp.mtrn.data.STrnStockMove> getAuxStockMoves() { return mvAuxStockMoves; }
+    public ArrayList<SDataDiogEtyMatConsEntCostCenter> getAuxDiogEtyMatEntCcsConfigs() { return mlAuxDiogEtyMatEntCcsConfigs; }
 
     public void setClonedFkMfgYearId_n(int n) { mnClonedFkMfgYearId_n = n; }
     public void setClonedFkMfgOrderId_n(int n) { mnClonedFkMfgOrderId_n = n; }
@@ -195,6 +206,45 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         }
 
         return stockMoves;
+    }
+    
+    public String getConsumeCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxEntConsumeName() + " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
+    }
+    
+    public String getSubConsumeCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxSubEntConsumeName()+ " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
+    }
+    
+    public String getCostCenterAsString() {
+        if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+            String text = "";
+            for (SDataDiogEtyMatConsEntCostCenter oCcCfg : mlAuxDiogEtyMatEntCcsConfigs) {
+                text += oCcCfg.getAuxCostCenterName()+ " / ";
+            }
+            
+            return text.substring(0, text.length() - 3); 
+        }
+        
+        return "";
     }
 
     @Override
@@ -236,6 +286,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
         mnFkMfgChargeId_n = 0;
+        mnFkMatRequestId_n = 0;
+        mnFkMatRequestEtyId_n = 0;
         mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -258,6 +310,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUserDelete = "";
 
         mvAuxStockMoves.clear();
+        mlAuxDiogEtyMatEntCcsConfigs = new ArrayList<>();
 
         mnClonedFkMfgYearId_n = 0;
         mnClonedFkMfgOrderId_n = 0;
@@ -277,7 +330,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         try {
             sql = "SELECT de.*, d.fid_bkk_year_n, d.fid_bkk_num_n, " +
-                    "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
+                    "i.item, i.item_key, i.part_num, u.unit, u.symbol, uo.unit, " +
+                        "uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
                     "FROM trn_diog_ety AS de " +
                     "INNER JOIN trn_diog AS d ON de.id_year = d.id_year AND de.id_doc = d.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
@@ -316,7 +370,9 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("de.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("de.fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
-                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");              
+                mnFkMatRequestId_n = resultSet.getInt("de.fid_mat_req_n");
+                mnFkMatRequestEtyId_n = resultSet.getInt("de.fid_mat_req_ety_n");
+                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("de.fid_usr_del");
@@ -369,6 +425,18 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     mbHasLinksShipment = resultSet.getInt("f_count") > 0;
                 }
                 
+                String ccsQuery = "SELECT id_diog_ety_ce_cc FROM trn_diog_ety_cons_ent_cc "
+                + "WHERE fid_diog_doc = " + mnFkDpsYearId_n + " "
+                + "AND fid_diog_year = " + mnFkDpsDocId_n + " "
+                + "AND fid_diog_ety = " + mnFkDpsEntryId_n + " ";
+                ResultSet res = statement.getConnection().createStatement().executeQuery(ccsQuery);
+                while (res.next()) {
+                    SDataDiogEtyMatConsEntCostCenter oConfig = new SDataDiogEtyMatConsEntCostCenter();
+                    oConfig.read(new int[] { res.getInt("id_diog_ety_ce_cc") }, statement);
+                    
+                    mlAuxDiogEtyMatEntCcsConfigs.add(oConfig);
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -397,7 +465,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "{ CALL trn_diog_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -421,6 +489,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMfgYearId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgYearId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMfgOrderId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgOrderId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
             if (mnFkMfgChargeId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMfgChargeId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
+            if (mnFkMatRequestEtyId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
@@ -431,6 +501,46 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             mnPkEntryId = callableStatement.getInt(nParam - 3);
             mnDbmsErrorId = callableStatement.getInt(nParam - 2);
             msDbmsError = callableStatement.getString(nParam - 1);
+            
+            String deleteQuery = "DELETE FROM trn_diog_ety_cons_ent_cc "
+                    + "WHERE fid_diog_doc = " + mnFkDpsYearId_n + " "
+                    + "AND fid_diog_year = " + mnFkDpsDocId_n + " "
+                    + "AND fid_diog_ety = " + mnFkDpsEntryId_n + " ";
+            connection.createStatement().executeUpdate(deleteQuery);
+            if (mnFkMatRequestEtyId_n > 0) {
+                ArrayList<SMatConsumeSubEntCcConfig> lConfigs = SMaterialRequestUtils.getCcConfigsFromMatReqEty(connection, 
+                                                                                new int[] { mnFkMatRequestId_n, mnFkMatRequestEtyId_n });
+                
+                if (lConfigs.isEmpty()) {
+                    lConfigs = SMaterialRequestUtils.getCcConfigsFromMatReq(connection, mnFkMatRequestId_n);
+                }
+                
+                SDataDiogEtyMatConsEntCostCenter oDataConfig;
+                for (SMatConsumeSubEntCcConfig oConfig : lConfigs) {
+                    oDataConfig = new SDataDiogEtyMatConsEntCostCenter();
+                    
+                    oDataConfig.setPercentage(oConfig.getPercentage() <= 0d ? 100d : oConfig.getPercentage());
+                    oDataConfig.setFkDiogYearId(mnPkYearId);
+                    oDataConfig.setFkDiogDocId(mnPkDocId);
+                    oDataConfig.setFkDiogEntryId(mnPkEntryId);
+                    oDataConfig.setFkSubentMatConsumptionEntityId(oConfig.getFkSubentMatConsumptionEntityId());
+                    oDataConfig.setFkSubentMatConsumptionSubentityId(oConfig.getFkSubentMatConsumptionSubentityId());
+                    oDataConfig.setFkCostCenterId(oConfig.getFkCostCenterId());
+                    
+                    oDataConfig.save(connection);
+                }
+            }
+            else if (mlAuxDiogEtyMatEntCcsConfigs != null && mlAuxDiogEtyMatEntCcsConfigs.size() > 0) {
+                for (SDataDiogEtyMatConsEntCostCenter oDataConfig : mlAuxDiogEtyMatEntCcsConfigs) {
+                    oDataConfig.setPercentage(oDataConfig.getPercentage() <= 0d ? 100d : oDataConfig.getPercentage());
+                    oDataConfig.setIsRegistryNew(true);
+                    oDataConfig.setFkDiogYearId(mnPkYearId);
+                    oDataConfig.setFkDiogDocId(mnPkDocId);
+                    oDataConfig.setFkDiogEntryId(mnPkEntryId);
+
+                    oDataConfig.save(connection);
+                }
+            }
 
             if (mnDbmsErrorId != 0) {
                 throw new Exception(msDbmsError);
@@ -585,6 +695,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setFkMfgYearId_n(this.getClonedFkMfgYearId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgYearId_n() : this.getFkMfgYearId_n());
         registry.setFkMfgOrderId_n(this.getClonedFkMfgOrderId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgOrderId_n() : this.getFkMfgOrderId_n());
         registry.setFkMfgChargeId_n(this.getClonedFkMfgChargeId_n() != SLibConstants.UNDEFINED ? this.getClonedFkMfgChargeId_n() : this.getFkMfgChargeId_n());
+        registry.setFkMatRequestId_n(this.getFkMatRequestId_n());
+        registry.setFkMatRequestEtyId_n(this.getFkMatRequestEtyId_n());
         registry.setFkMaintAreaId(this.getFkMaintAreaId());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
@@ -606,6 +718,10 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         for (STrnStockMove move : mvAuxStockMoves) {
             registry.getAuxStockMoves().add(move.clone());
+        }
+        
+        for (SDataDiogEtyMatConsEntCostCenter oConfig : mlAuxDiogEtyMatEntCcsConfigs) {
+            registry.getAuxDiogEtyMatEntCcsConfigs().add(oConfig.clone());
         }
 
         return registry;

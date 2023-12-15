@@ -7,6 +7,7 @@ package erp.mfin.data;
 
 import erp.SErpConsts;
 import erp.data.SDataConstants;
+import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataCfd;
@@ -14,8 +15,13 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -27,6 +33,7 @@ import sa.lib.db.SDbConsts;
  * - erp.util.imp.ImportAccountingRecords
  * - erp.util.imp.ImportAccountingRecordsMicroSip
  * - erp.mod.hrs.db.SHrsFinUtils
+ * Also update any change to class members in methods encodeJson() and decodeJson()!
  * All of them also make raw SQL queries and insertions.
  */
 
@@ -69,13 +76,16 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.lang.String msDbmsBookkeepingCenterCode;
     protected java.lang.String msDbmsCompanyBranchCode;
     protected erp.mfin.data.SDataAccountCash moDbmsDataAccountCash;
-    protected java.util.Vector<erp.mfin.data.SDataRecordEntry> mvDbmsRecordEntries;
     protected int mnDbmsXmlFilesNumber;
     protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
+    protected java.util.Vector<erp.mfin.data.SDataRecordEntry> mvDbmsRecordEntries;
     
     protected HashSet<erp.mtrn.data.SDataCfd> maAuxDataCfdToDel;
     protected boolean mbAuxReadHeaderOnly; // it reduces dramatically reading time when entries and extra stuff are useless
 
+    protected boolean mbTempDataJustRecovered;
+    protected java.util.HashMap<java.lang.Integer, java.util.HashMap> moTempMapOfMaps; // for JSON decodign of record entries
+    
     public SDataRecord() {
         super(SDataConstants.FIN_REC);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
@@ -116,6 +126,17 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void readAccountCash(java.sql.Statement statement) throws Exception {
+        moDbmsDataAccountCash = null;
+        
+        if (mnFkCompanyBranchId_n != 0 && mnFkAccountCashId_n != 0) {
+            moDbmsDataAccountCash = new SDataAccountCash();
+            if (moDbmsDataAccountCash.read(new int[] { mnFkCompanyBranchId_n, mnFkAccountCashId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
             }
         }
     }
@@ -178,25 +199,52 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public void setDbmsDataAccountCash(erp.mfin.data.SDataAccountCash o) { moDbmsDataAccountCash = o; }
     public void setDbmsBookkeepingCenterCode(java.lang.String s) { msDbmsBookkeepingCenterCode = s; }
     public void setDbmsCompanyBranchCode(java.lang.String s) { msDbmsCompanyBranchCode = s; }
+    public void setDbmsDataAccountCash(erp.mfin.data.SDataAccountCash o) { moDbmsDataAccountCash = o; }
     public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
     public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
-    
-    public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
-    public boolean getAuxReadHeaderOnly() { return mbAuxReadHeaderOnly; }
     
     public java.lang.String getDbmsBookkeepingCenterCode() { return msDbmsBookkeepingCenterCode; }
     public java.lang.String getDbmsCompanyBranchCode() { return msDbmsCompanyBranchCode; }
     public erp.mfin.data.SDataAccountCash getDbmsDataAccountCash() { return moDbmsDataAccountCash; }
-    public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
     public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
     public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
+    
+    public void setAuxDataCfdToDel(HashSet<erp.mtrn.data.SDataCfd> a ) { maAuxDataCfdToDel = a; }
+    public boolean getAuxReadHeaderOnly() { return mbAuxReadHeaderOnly; }
     
     public HashSet<erp.mtrn.data.SDataCfd> getAuxDataCfdToDel() { return maAuxDataCfdToDel; }
     public void setAuxReadHeaderOnly(boolean b) { mbAuxReadHeaderOnly = b; }
-
+    
+    public void setTempDataJustRecovered(boolean b) { mbTempDataJustRecovered = b; }
+    
+    public boolean getTempDataJustRecovered() { return mbTempDataJustRecovered; }
+    /**
+     * Get temporal map of maps for JSON decodign of record entries.
+     * Prevent from reading the description of the same depending registry more than once.
+     * @return 
+     */
+    public java.util.HashMap<java.lang.Integer, java.util.HashMap> getTempMapOfMaps() { if (moTempMapOfMaps == null) moTempMapOfMaps = new HashMap<>(); return moTempMapOfMaps; }
+    
+    /**
+     * Get temporal map for JSON decodign of record entries.
+     * Prevent from reading the description of the same depending registry more than once.
+     * @param dbms Required map.
+     * @return 
+     */
+    @SuppressWarnings("unchecked")
+    public HashMap<String, Object> getTempMap(final int dbms) {
+        HashMap<String, Object> tempMap = getTempMapOfMaps().get(dbms);
+        
+        if (tempMap == null) {
+            tempMap = new HashMap<>();
+        }
+        
+        return tempMap;
+    }
+    
     /**
      * Composes record period in format yyyy-mm (i.e., year-month).
      * @return 
@@ -340,14 +388,17 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         msDbmsBookkeepingCenterCode = "";
         msDbmsCompanyBranchCode = "";
         moDbmsDataAccountCash = null;
-        mvDbmsRecordEntries.clear();
         mnDbmsXmlFilesNumber = 0;
         maDbmsDataCfd = new HashSet<>();
+        mvDbmsRecordEntries.clear();
         
         maAuxDataCfdToDel = new HashSet<>();
         //mbAuxReadHeaderOnly = false; // prevent from reseting this flag
+        
+        mbTempDataJustRecovered = false;
+        moTempMapOfMaps = null; // instantianted only when needed
     }
-
+    
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         Object[] key = (Object[]) pk;
@@ -401,15 +452,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
 
                 msDbmsBookkeepingCenterCode = resultSet.getString("bkc.code");
                 msDbmsCompanyBranchCode = resultSet.getString("cob.code");
-
-                // Read aswell cash account:
-
-                if (mnFkCompanyBranchId_n != 0 && mnFkAccountCashId_n != 0) {
-                    moDbmsDataAccountCash = new SDataAccountCash();
-                    if (moDbmsDataAccountCash.read(new int[] { mnFkCompanyBranchId_n, mnFkAccountCashId_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                }
+                readAccountCash(statement);
                 
                 if (!mbAuxReadHeaderOnly) {
                     statementAux = statement.getConnection().createStatement();
@@ -424,6 +467,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
                         SDataRecordEntry entry = new SDataRecordEntry();
+                        entry.setParentRecord(this);
                         if (entry.read(new Object[] { mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId, resultSet.getInt("id_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
@@ -528,74 +572,70 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
                 throw new Exception(msDbmsError);
             }
             else {
-                if (mnDbmsErrorId != 0) {
-                    throw new Exception(msDbmsError);
-                }
-                else {
-                    // Save aswell record entries:
+                // Save aswell record entries:
 
-                    for (SDataRecordEntry entry : mvDbmsRecordEntries) {
-                        if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
-                            entry.setPkYearId(mnPkYearId);
-                            entry.setPkPeriodId(mnPkPeriodId);
-                            entry.setPkBookkeepingCenterId(mnPkBookkeepingCenterId);
-                            entry.setPkRecordTypeId(msPkRecordTypeId);
-                            entry.setPkNumberId(mnPkNumberId);
-                            entry.setAuxDateCfd(mtDate);
+                for (SDataRecordEntry entry : mvDbmsRecordEntries) {
+                    if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
+                        entry.setParentRecord(this);
+                        entry.setPkYearId(mnPkYearId);
+                        entry.setPkPeriodId(mnPkPeriodId);
+                        entry.setPkBookkeepingCenterId(mnPkBookkeepingCenterId);
+                        entry.setPkRecordTypeId(msPkRecordTypeId);
+                        entry.setPkNumberId(mnPkNumberId);
+                        entry.setAuxDateCfd(mtDate);
 
-                            if (entry.getIsDeleted()) {
-                                entry.setSortingPosition(0);
-                            }
-                            else {
-                                entry.setSortingPosition(entry.getSortingPosition());
-                            }
-
-                            if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                            }
+                        if (entry.getIsDeleted()) {
+                            entry.setSortingPosition(0);
                         }
-                    }
-                    
-                    // Save XML associated:
-                
-                    for (SDataCfd cfd : maDbmsDataCfd) {
-                        cfd.setFkFinRecordYearId_n(mnPkYearId);
-                        cfd.setFkFinRecordPeriodId_n(mnPkPeriodId);
-                        cfd.setFkFinRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
-                        cfd.setFkFinRecordRecordTypeId_n(msPkRecordTypeId);
-                        cfd.setFkFinRecordNumberId_n(mnPkNumberId);
-                        cfd.setFkRecordYearId_n(0);
-                        cfd.setFkRecordPeriodId_n(0);
-                        cfd.setFkRecordBookkeepingCenterId_n(0);
-                        cfd.setFkRecordRecordTypeId_n("");
-                        cfd.setFkRecordNumberId_n(0);
-                        cfd.setFkRecordEntryId_n(0);
-                        cfd.setTimestamp(mtDate);
-                        
-                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        else {
+                            entry.setSortingPosition(entry.getSortingPosition());
+                        }
+
+                        if (entry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }
-                    
-                    // Delete XML:
-                    
-                    for (SDataCfd cfd : maAuxDataCfdToDel) {
-                        cfd.setFkFinRecordYearId_n(0);
-                        cfd.setFkFinRecordPeriodId_n(0);
-                        cfd.setFkFinRecordBookkeepingCenterId_n(0);
-                        cfd.setFkFinRecordRecordTypeId_n("");
-                        cfd.setFkFinRecordNumberId_n(0);
-                        
-                        if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                        }
-                    }
-
-                    updateChecksLinks(connection);  // link check registries with corresponding record entries
-
-                    mbIsRegistryNew = false;
-                    mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
                 }
+
+                // Save XML associated:
+
+                for (SDataCfd cfd : maDbmsDataCfd) {
+                    cfd.setFkFinRecordYearId_n(mnPkYearId);
+                    cfd.setFkFinRecordPeriodId_n(mnPkPeriodId);
+                    cfd.setFkFinRecordBookkeepingCenterId_n(mnPkBookkeepingCenterId);
+                    cfd.setFkFinRecordRecordTypeId_n(msPkRecordTypeId);
+                    cfd.setFkFinRecordNumberId_n(mnPkNumberId);
+                    cfd.setFkRecordYearId_n(0);
+                    cfd.setFkRecordPeriodId_n(0);
+                    cfd.setFkRecordBookkeepingCenterId_n(0);
+                    cfd.setFkRecordRecordTypeId_n("");
+                    cfd.setFkRecordNumberId_n(0);
+                    cfd.setFkRecordEntryId_n(0);
+                    cfd.setTimestamp(mtDate);
+
+                    if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+
+                // Delete XML:
+
+                for (SDataCfd cfd : maAuxDataCfdToDel) {
+                    cfd.setFkFinRecordYearId_n(0);
+                    cfd.setFkFinRecordPeriodId_n(0);
+                    cfd.setFkFinRecordBookkeepingCenterId_n(0);
+                    cfd.setFkFinRecordRecordTypeId_n("");
+                    cfd.setFkFinRecordNumberId_n(0);
+
+                    if (cfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+
+                updateChecksLinks(connection);  // link check registries with corresponding record entries
+
+                mbIsRegistryNew = false;
+                mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
         }
         catch (java.sql.SQLException e) {
@@ -682,5 +722,117 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public int delete(java.sql.Connection connection) {
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         return mnLastDbActionResult;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public String encodeJson(erp.client.SClientInterface client) throws ParseException, Exception {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonHeader = new JSONObject();
+        
+        mtTempFileTimestamp = new Date();
+        jsonHeader.put("timestamp", SLibUtils.DbmsDateFormatDatetime.format(mtTempFileTimestamp));
+        
+        jsonHeader.put("id_year", mnPkYearId);
+        jsonHeader.put("id_per", mnPkPeriodId);
+        jsonHeader.put("id_bkc", mnPkBookkeepingCenterId);
+        jsonHeader.put("id_tp_rec", msPkRecordTypeId);
+        jsonHeader.put("id_num", mnPkNumberId);
+        jsonHeader.put("dt", SLibUtils.DbmsDateFormatDate.format(mtDate != null ? mtDate : new Date()));
+        jsonHeader.put("concept", msConcept);
+        jsonHeader.put("b_adj_year", mbIsAdjustmentsYearEnd);
+        jsonHeader.put("b_adj_audit", mbIsAdjustmentsAudit);
+        jsonHeader.put("b_audit", mbIsAudited);
+        jsonHeader.put("b_authorn", mbIsAuthorized);
+        jsonHeader.put("b_sys", mbIsSystem);
+        jsonHeader.put("b_del", mbIsDeleted);
+        jsonHeader.put("fid_cob", mnFkCompanyBranchId);
+        jsonHeader.put("fid_cob_n", mnFkCompanyBranchId_n);
+        jsonHeader.put("fid_acc_cash_n", mnFkAccountCashId_n);
+        jsonHeader.put("fid_usr_audit", mnFkUserAuditedId);
+        jsonHeader.put("fid_usr_authorn", mnFkUserAuthorizedId);
+        jsonHeader.put("fid_usr_new", mnFkUserNewId);
+        jsonHeader.put("fid_usr_edit", mnFkUserEditId);
+        jsonHeader.put("fid_usr_del", mnFkUserDeleteId);
+        jsonHeader.put("ts_audit", SLibUtils.DbmsDateFormatDatetime.format(mtUserAuditedTs != null ? mtUserAuditedTs : new Date()));
+        jsonHeader.put("ts_authorn", SLibUtils.DbmsDateFormatDatetime.format(mtUserAuthorizedTs != null ? mtUserAuthorizedTs : new Date()));
+        jsonHeader.put("ts_new", SLibUtils.DbmsDateFormatDatetime.format(mtUserNewTs != null ? mtUserNewTs : new Date()));
+        jsonHeader.put("ts_edit", SLibUtils.DbmsDateFormatDatetime.format(mtUserEditTs != null ? mtUserEditTs : new Date()));
+        jsonHeader.put("ts_del", SLibUtils.DbmsDateFormatDatetime.format(mtUserDeleteTs != null ? mtUserDeleteTs : new Date()));
+        
+        JSONObject jsonEntries = new JSONObject();
+        
+        int n = 0;
+        for (SDataRecordEntry entry : mvDbmsRecordEntries) {
+            JSONObject jsonEntry = (JSONObject) jsonParser.parse(entry.encodeJson(client));
+            
+            jsonEntries.put("entry-" + ++n, jsonEntry);
+        }
+        
+        jsonHeader.put("entries", jsonEntries);
+        
+        return jsonHeader.toJSONString();
+    }
+    
+    @Override
+    public void decodeJson(erp.client.SClientInterface client, java.lang.String json) throws ParseException, Exception {
+        reset();
+        
+        // recover data:
+        
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonHeader = (JSONObject) jsonParser.parse(json);
+        
+        mtTempFileTimestamp = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("timestamp"));
+        
+        mnPkYearId = new Long((long) jsonHeader.get("id_year")).intValue();
+        mnPkPeriodId = new Long((long) jsonHeader.get("id_per")).intValue();
+        mnPkBookkeepingCenterId = new Long((long) jsonHeader.get("id_bkc")).intValue();
+        msPkRecordTypeId = (java.lang.String) jsonHeader.get("id_tp_rec");
+        mnPkNumberId = new Long((long) jsonHeader.get("id_num")).intValue();
+        mtDate = SLibUtils.DbmsDateFormatDate.parse((java.lang.String) jsonHeader.get("dt"));
+        msConcept = (java.lang.String) jsonHeader.get("concept");
+        mbIsAdjustmentsYearEnd = (boolean) jsonHeader.get("b_adj_year");
+        mbIsAdjustmentsAudit = (boolean) jsonHeader.get("b_adj_audit");
+        mbIsAudited = (boolean) jsonHeader.get("b_audit");
+        mbIsAuthorized = (boolean) jsonHeader.get("b_authorn");
+        mbIsSystem = (boolean) jsonHeader.get("b_sys");
+        mbIsDeleted = (boolean) jsonHeader.get("b_del");
+        mnFkCompanyBranchId = new Long((long) jsonHeader.get("fid_cob")).intValue();
+        mnFkCompanyBranchId_n = new Long((long) jsonHeader.get("fid_cob_n")).intValue();
+        mnFkAccountCashId_n = new Long((long) jsonHeader.get("fid_acc_cash_n")).intValue();
+        mnFkUserAuditedId = new Long((long) jsonHeader.get("fid_usr_audit")).intValue();
+        mnFkUserAuthorizedId = new Long((long) jsonHeader.get("fid_usr_authorn")).intValue();
+        mnFkUserNewId = new Long((long) jsonHeader.get("fid_usr_new")).intValue();
+        mnFkUserEditId = new Long((long) jsonHeader.get("fid_usr_edit")).intValue();
+        mnFkUserDeleteId = new Long((long) jsonHeader.get("fid_usr_del")).intValue();
+        mtUserAuditedTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("ts_audit"));
+        mtUserAuthorizedTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("ts_authorn"));
+        mtUserNewTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("ts_new"));
+        mtUserEditTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("ts_edit"));
+        mtUserDeleteTs = SLibUtils.DbmsDateFormatDatetime.parse((java.lang.String) jsonHeader.get("ts_del"));
+        
+        msDbmsBookkeepingCenterCode = (String) SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.FIN_BKC, new int[] { mnPkBookkeepingCenterId }, SLibConstants.DESCRIPTION_CODE);
+        msDbmsCompanyBranchCode = (String) SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BPB, new int[] { mnFkCompanyBranchId }, SLibConstants.DESCRIPTION_CODE);
+        readAccountCash(client.getSession().getStatement());
+                
+        int n = 0;
+        JSONObject jsonEntry = null;
+        JSONObject jsonEntries = (JSONObject) jsonHeader.get("entries");
+        
+        while ((jsonEntry = (JSONObject) jsonEntries.get("entry-" + ++n)) != null) {
+            SDataRecordEntry entry = new SDataRecordEntry();
+            entry.setParentRecord(this);
+            entry.decodeJson(client, jsonEntry.toJSONString());
+            mvDbmsRecordEntries.add(entry);
+        }
+        
+        // check if registry is new:
+        
+        mbIsRegistryNew = mnPkNumberId == 0;
+        
+        // mark this record as recovered!
+        
+        mbTempDataJustRecovered = true;
     }
 }

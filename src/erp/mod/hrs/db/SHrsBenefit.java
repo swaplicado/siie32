@@ -4,15 +4,13 @@
  */
 package erp.mod.hrs.db;
 
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
-import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SHrsBenefit extends SHrsBenefitBase {
+public class SHrsBenefit {
     
     public static final int VALIDATION_BENEFIT_TYPE = 1;
     public static final int VALIDATION_ABSENCE_TYPE = 2;
@@ -24,101 +22,77 @@ public class SHrsBenefit extends SHrsBenefitBase {
     public static final int VALID_AMOUNT_TO_PAY_TOTAL = 50;
     public static final int VALID_AMOUNT_TO_PAID_AMOUNT_SYS = 60;
 
-    protected double mdValue;
-    protected double mdValuePayed;
-    protected double mdValuePayedReceipt;
-    protected double mdAmount;
-    protected double mdAmountPayed;
-    protected double mdAmountPayedReceipt;
-    protected double mdAmountPayedReceiptSys;
-
-    public SHrsBenefit(int benefitType, int benefitAnn, int benefitYear) {
-        this(benefitType, benefitAnn, benefitYear, 1);
-    }
-
-    public SHrsBenefit(int benefitType, int benefitAnn, int benefitYear, double factorAmount) {
-        super(benefitType, benefitAnn, benefitYear, factorAmount);
-        
-        mdValue = 0;
-        mdValuePayed = 0;
-        mdValuePayedReceipt = 0;
-        mdAmount = 0;
-        mdAmountPayed = 0;
-        mdAmountPayedReceipt = 0;
-        mdAmountPayedReceiptSys = 0;
-    }
-
-    public void setValue(double d) { mdValue = d; }
-    public void setValuePayed(double d) { mdValuePayed = d; }
-    public void setValuePayedReceipt(double d) { mdValuePayedReceipt = d; }
-    public void setAmount(double d) { mdAmount = d; }
-    public void setAmountPayed(double d) { mdAmountPayed = d; }
-    public void setAmountPayedReceipt(double d) { mdAmountPayedReceipt = d; }
-    public void setAmountPayedReceiptSys(double d) { mdAmountPayedReceiptSys = d; }
-
-    public double getValue() { return mdValue; }
-    public double getValuePayed() { return mdValuePayed; }
-    public double getValuePayedReceipt() { return mdValuePayedReceipt; }
-    public double getAmount() { return mdAmount; }
-    public double getAmountPayed() { return mdAmountPayed; }
-    public double getAmountPayedReceipt() { return mdAmountPayedReceipt; }
-    public double getAmountPayedReceiptSys() { return mdAmountPayedReceiptSys; }
+    protected int mnBenefitType;
+    protected int mnBenefitAnniversary;
+    protected int mnBenefitYear;
     
-    public double getValuePending() { return SLibUtils.round(mdValue - mdValuePayed - mdValuePayedReceipt, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()) ; }
-    public double getAmountPending() { return SLibUtils.roundAmount(mdAmount - mdAmountPayed - mdAmountPayedReceipt); }
+    protected double mdBenefitDays;
+    protected double mdBenefitBonusPct;
     
-    public String validate(int valid, int validationType) throws Exception {
-        String msg = "";
+    protected double mdPaidDays;
+    protected double mdPaidAmount;
+    
+    protected double mdReceiptDays;
+    protected double mdReceiptAmount;
+
+    public SHrsBenefit(int benefitType, int benefitAnniversary, int benefitYear) {
+        mnBenefitType = benefitType;
+        mnBenefitAnniversary = benefitAnniversary;
+        mnBenefitYear = benefitYear;
+        mdBenefitBonusPct = 1;
         
-        switch (valid) {
-            case VALID_DAYS_TO_PAY:
-                if (mdValuePayedReceipt == 0) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "'.";
-                }
-                break;
-            case VALID_DAYS_TO_PAY_TOTAL:
-                if (getValuePending() < 0) {
-                    msg = "La suma de 'días pagados' + '" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
-                }
-                break;
-            case VALID_DAYS_TABLE:
-                if (mdValuePayedReceipt > mdValue) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
-                }
-                break;
-            case VALID_AMOUNT_TO_PAY:
-                if (mdAmountPayedReceipt == 0) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'monto por pagar'.";
-                }
-                break;
-            case VALID_AMOUNT_TO_PAY_TOTAL:
-                if (getAmountPending() < 0) {
-                    msg = "La suma de 'monto pagado' + 'monto por pagar' es mayor al valor del campo 'monto'.";
-                }
-                break;
-            case VALID_AMOUNT_TO_PAID_AMOUNT_SYS:
-                if (mdAmountPayedReceipt != mdAmountPayedReceiptSys) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'monto a pagar' es diferente al monto calculado por sistema.";
-                }
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-        }
+        mdBenefitDays = 0;
+        mdBenefitBonusPct = 1;
         
-        return msg;
+        mdPaidDays = 0;
+        mdPaidAmount = 0;
+        
+        mdReceiptDays = 0;
+        mdReceiptAmount = 0;
     }
+    
+    public void setBenefitDays(double d) { mdBenefitDays = d; }
+    public void setBenefitBonusPct(double d) { mdBenefitBonusPct = d; }
+    
+    public void setPaidDays(double d) { mdPaidDays = d; }
+    public void setPaidAmount(double d) { mdPaidAmount = d; }
+    
+    public void setReceiptDays(double d) { mdReceiptDays = d; }
+    public void setReceiptAmount(double d) { mdReceiptAmount = d; }
+
+    public int getBenefitType() { return mnBenefitType; }
+    public int getBenefitAnniversary() { return mnBenefitAnniversary; }
+    public int getBenefitYear() { return mnBenefitYear; }
+    
+    public double getBenefitDays() { return mdBenefitDays; }
+    public double getBenefitBonusPct() { return mdBenefitBonusPct; }
+    
+    public double getPaidDays() { return mdPaidDays; }
+    public double getPaidAmount() { return mdPaidAmount; }
+    
+    public double getReceiptDays() { return mdReceiptDays; }
+    public double getReceiptAmount() { return mdReceiptAmount; }
+    
+    public double getPendingDays() { return SLibUtils.round(mdBenefitDays - mdPaidDays - mdReceiptDays, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()); }
+
+    /**
+     * Get benefit key.
+     * @return Array of int containing: ID of benefit type, benefit anniversary and benefit year.
+     */
+    public int[] getBenefitKey() { return new int[] { mnBenefitType, mnBenefitAnniversary, mnBenefitYear }; } 
     
     @Override
     public SHrsBenefit clone() throws CloneNotSupportedException {
-        SHrsBenefit clone = new SHrsBenefit(this.getBenefitTypeId(), this.getBenefitAnn(), this.getBenefitYear(), this.getFactorAmount());
+        SHrsBenefit clone = new SHrsBenefit(this.getBenefitType(), this.getBenefitAnniversary(), this.getBenefitYear());
         
-        clone.setValue(this.getValue());
-        clone.setValuePayed(this.getValuePayed());
-        clone.setValuePayedReceipt(this.getValuePayedReceipt());
-        clone.setAmount(this.getAmount());
-        clone.setAmountPayed(this.getAmountPayed());
-        clone.setAmountPayedReceipt(this.getAmountPayedReceipt());
-        clone.setAmountPayedReceiptSys(this.getAmountPayedReceiptSys());
+        clone.setBenefitDays(this.getBenefitDays());
+        clone.setBenefitBonusPct(this.getBenefitBonusPct());
+
+        clone.setPaidDays(this.getPaidDays());
+        clone.setPaidAmount(this.getPaidAmount());
+
+        clone.setReceiptDays(this.getReceiptDays());
+        clone.setReceiptAmount(this.getReceiptAmount());
         
         return clone;
     }

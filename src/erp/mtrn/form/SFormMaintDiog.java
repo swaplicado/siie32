@@ -36,6 +36,7 @@ import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
+import erp.mtrn.data.SDataDiogEtyMatConsEntCostCenter;
 import erp.mtrn.data.SDataDiogMaintMovementEntryRow;
 import erp.mtrn.data.SDataDiogNotes;
 import erp.mtrn.data.STrnItemFound;
@@ -68,7 +69,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Gil De Jesús, Sergio Flores, Claudio Peña
+ * @author Gil De Jesús, Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
     
@@ -99,6 +100,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private erp.lib.form.SFormField moFieldMaintReturnUser;
     private erp.lib.form.SFormField moFieldMaintReturnUserSupervisor;
     private erp.lib.form.SFormField moFieldEntryMaintArea;
+    private erp.lib.form.SFormField moFieldEntryConsEntity;
+    private erp.lib.form.SFormField moFieldEntrySubConsEntity;
+    private erp.lib.form.SFormField moFieldEntryCostCenter;
     private erp.lib.form.SFormField moFieldEntryQuantity;
     private erp.lib.form.SFormField moFieldEntryValueUnit;
     private erp.lib.form.SFormField moFieldEntryValue;
@@ -199,6 +203,12 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jbEntryClear = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         jbEntryDelete = new javax.swing.JButton();
+        jLEntryConsEntity = new javax.swing.JLabel();
+        jcbEntryConsEntity = new javax.swing.JComboBox<String>();
+        jLEntrySubConsEntity = new javax.swing.JLabel();
+        jcbEntrySubConsEntity = new javax.swing.JComboBox<String>();
+        jLEntryCostCenter = new javax.swing.JLabel();
+        jcbEntryCostCenter = new javax.swing.JComboBox<String>();
         jpDiogEntries = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlDocQuantity = new javax.swing.JLabel();
@@ -447,7 +457,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
         jtfEntryQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfEntryQuantity.setText("0.00");
-        jtfEntryQuantity.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfEntryQuantity.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel10.add(jtfEntryQuantity);
 
         jtfEntryUnitSymbol.setEditable(false);
@@ -487,6 +497,29 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jbEntryDelete.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jbEntryDelete);
+
+        jLEntryConsEntity.setText("Centro cons.:*");
+        jLEntryConsEntity.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel11.add(jLEntryConsEntity);
+
+        jcbEntryConsEntity.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel11.add(jcbEntryConsEntity);
+
+        jLEntrySubConsEntity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLEntrySubConsEntity.setText("Subcentro cons.:*");
+        jLEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel11.add(jLEntrySubConsEntity);
+
+        jcbEntrySubConsEntity.setPreferredSize(new java.awt.Dimension(240, 23));
+        jPanel11.add(jcbEntrySubConsEntity);
+
+        jLEntryCostCenter.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLEntryCostCenter.setText("Centro costo:*");
+        jLEntryCostCenter.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel11.add(jLEntryCostCenter);
+
+        jcbEntryCostCenter.setPreferredSize(new java.awt.Dimension(210, 23));
+        jPanel11.add(jcbEntryCostCenter);
 
         jPanel5.add(jPanel11);
 
@@ -611,6 +644,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         moFieldEntryValueUnit.setDecimalFormat(SLibUtils.getDecimalFormatAmountUnitary());
         moFieldEntryValue = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfEntryValue, jlEntryValue);
         moFieldEntryValue.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
+        moFieldEntryConsEntity = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbEntryConsEntity, jLEntryConsEntity);
+        moFieldEntrySubConsEntity = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbEntrySubConsEntity, jLEntrySubConsEntity);
+        moFieldEntryCostCenter = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbEntryCostCenter, jLEntryCostCenter);
         
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldDate);
@@ -623,6 +659,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         mvFields.add(moFieldEntryQuantity);
         mvFields.add(moFieldEntryValueUnit);
         mvFields.add(moFieldEntryValue);
+        mvFields.add(moFieldEntryConsEntity);
+        mvFields.add(moFieldEntrySubConsEntity);
+        mvFields.add(moFieldEntryCostCenter);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -638,12 +677,14 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jtfEntryTextToFind.addActionListener(this);
         jcbMaintUser.addItemListener(this);
         jcbMaintReturnUser.addItemListener(this);
+        jcbEntryConsEntity.addItemListener(this);
+        jcbEntrySubConsEntity.addItemListener(this);
         jtfEntryQuantity.addFocusListener(this);
         jtfEntryValueUnit.addFocusListener(this);
         jtfEntryValue.addFocusListener(this);
 
         int i = 0;
-        STableColumnForm tableColumnsEntry[] = new STableColumnForm[14];
+        STableColumnForm tableColumnsEntry[] = new STableColumnForm[17];
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área mantenimiento", 150);
@@ -654,6 +695,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         tableColumnsEntry[i++].setCellRenderer(SGridUtils.getCellRendererNumberAmountUnitary());
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Importe $", STableConstants.WIDTH_VALUE_2X);
         tableColumnsEntry[i++].setCellRenderer(SGridUtils.getCellRendererNumberAmount());
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro consumo", 150);
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sub centro consumo", 150);
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro de costo", 150);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -720,6 +764,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             miClient.getSession().populateCatalogue(jcbMaintUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()));
             jcbMaintUserSupervisor.setEnabled(true);
         }
+        
+//        int idBp = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0];
+//        int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfBp(miClient.getSession(), idBp);
+//        SGuiUtils.locateItem(jcbEntryConsEntity, new int[] { idConsumeEntity });
     }
     
     private void populateMaintReturnUserSupervisor() {
@@ -730,6 +778,38 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             miClient.getSession().populateCatalogue(jcbMaintReturnUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey()));
             jcbMaintReturnUserSupervisor.setEnabled(true);
        }
+    }
+    
+    private void populateSubEntityConsume() {
+        jcbEntrySubConsEntity.setEnabled(false);
+        jcbEntrySubConsEntity.removeAllItems();
+        
+        if (((SGuiItem) jcbEntryConsEntity.getSelectedItem()) == null || ((SGuiItem) jcbEntryConsEntity.getSelectedItem()).getPrimaryKey().length == 0) {
+            jcbEntrySubConsEntity.setEnabled(false);
+        }
+        else {
+            SGuiParams params = new SGuiParams();
+            params.setKey(new int[] { ((SGuiItem) jcbEntryConsEntity.getSelectedItem()).getPrimaryKey()[0] });
+            miClient.getSession().populateCatalogue(jcbEntrySubConsEntity, SModConsts.TRN_MAT_CONS_SUBENT, SLibConstants.UNDEFINED, params);
+
+            jcbEntrySubConsEntity.setEnabled(jcbEntrySubConsEntity.getItemCount() > 1);
+        }
+    }
+    
+    private void populateCostCenter() {
+        jcbEntryCostCenter.setEnabled(false);
+        jcbEntryCostCenter.removeAllItems();
+        
+        if (((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()) == null || ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey().length == 0) {
+            jcbEntryCostCenter.setEnabled(false);
+        }
+        else {
+            SGuiParams params = new SGuiParams();
+            params.getParamsMap().put(SModConsts.TRN_MAT_CONS_SUBENT, ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey());
+            miClient.getSession().populateCatalogue(jcbEntryCostCenter, SModConsts.FIN_CC, SModConsts.TRN_DIOG, params);
+
+            jcbEntryCostCenter.setEnabled(jcbEntryCostCenter.getItemCount() > 1);
+        }
     }
     
     private Vector<SDataDiogEntry> getAllEntries() {
@@ -763,10 +843,13 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jtfEntryTextToFind.setEditable(false);
             jtfEntryTextToFind.setFocusable(false);
             jcbEntryMaintArea.setEnabled(false);
+            jcbEntryConsEntity.setEnabled(false);
+            jcbEntrySubConsEntity.setEnabled(false);
+            jcbEntryCostCenter.setEnabled(false);
             jtfEntryQuantity.setEditable(false);
             jtfEntryQuantity.setFocusable(false);
-            jtfEntryValueUnit.setEditable(false);
-            jtfEntryValueUnit.setFocusable(false);
+            jtfEntryValueUnit.setEditable(isConsumeCenterMov());
+            jtfEntryValueUnit.setFocusable(isConsumeCenterMov());
             jtfEntryValue.setEditable(false);
             jtfEntryValue.setFocusable(false);
 
@@ -795,10 +878,13 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jtfEntryTextToFind.setEditable(true);
             jtfEntryTextToFind.setFocusable(true);
             jcbEntryMaintArea.setEnabled(mbMaintAreaNeeded);
+            jcbEntryConsEntity.setEnabled(isConsumeCenterMov());
+            jcbEntrySubConsEntity.setEnabled(isConsumeCenterMov());
+            jcbEntryCostCenter.setEnabled(isConsumeCenterMov());
             jtfEntryQuantity.setEditable(true);
             jtfEntryQuantity.setFocusable(true);
-            jtfEntryValueUnit.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
-            jtfEntryValueUnit.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValueUnit.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN || isConsumeCenterMov());
+            jtfEntryValueUnit.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN || isConsumeCenterMov());
             jtfEntryValue.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
             jtfEntryValue.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
 
@@ -813,6 +899,11 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
     private boolean isDiogSigned() {
         return moMaintDiogSignature != null && (moMaintDiogSignature.isRegistryNew() || (!moDiog.getIsRegistryNew() && !moMaintDiogSignature.getTsUserInsert().before(moDiog.getUserEditTs())));
+    }
+    
+    private boolean isConsumeCenterMov() { //obligatorio
+        return mnParamMaintMovementType == SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT ||
+                mnParamMaintMovementType == SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT;
     }
     
     private void showSignatureStatus() {
@@ -844,6 +935,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         switch (mnParamMaintMovementType) {
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
@@ -858,6 +950,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 break;
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
@@ -899,6 +992,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         switch (mnParamMaintMovementType) {
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
@@ -913,6 +1007,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 break;
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
@@ -1199,7 +1294,23 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 else if (moFieldEntryValueUnit.getDouble() == 0 && mnIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar una partida sin valor?") != JOptionPane.YES_OPTION) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnit.getText() + "'.");
                     jtfEntryValueUnit.requestFocus();
-                }                
+                }
+                else if (isConsumeCenterMov() && moFieldEntryValueUnit.getDouble() == 0) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnit.getText() + "'.");
+                    jtfEntryValueUnit.requestFocus();
+                }
+                else if (isConsumeCenterMov() && jcbEntryConsEntity.getSelectedIndex() <= 0) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jLEntryConsEntity.getText() + "'.");
+                    jcbEntryConsEntity.requestFocus();
+                }
+                else if (isConsumeCenterMov() && jcbEntrySubConsEntity.getSelectedIndex() <= 0) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jLEntrySubConsEntity.getText() + "'.");
+                    jcbEntrySubConsEntity.requestFocus();
+                }
+                else if (isConsumeCenterMov() && jcbEntryCostCenter.getSelectedIndex() <= 0) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jLEntryCostCenter.getText() + "'.");
+                    jcbEntryCostCenter.requestFocus();
+                }
                 else if (validateAppropriateWarehousesItem(moEntryItem.getPkItemId())) {
                     SDataDiogEntry iogEntry = new SDataDiogEntry();
                     iogEntry.setPkYearId(SLibConstants.UNDEFINED);
@@ -1243,7 +1354,20 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
                     int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
                     iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
-
+                    
+                    if (isConsumeCenterMov()) {
+                        SDataDiogEtyMatConsEntCostCenter oCfgCC = new SDataDiogEtyMatConsEntCostCenter();
+                        oCfgCC.setPercentage(100d);
+                        oCfgCC.setFkDiogYearId(SLibConstants.UNDEFINED);
+                        oCfgCC.setFkDiogDocId(SLibConstants.UNDEFINED);
+                        oCfgCC.setFkDiogEntryId(SLibConstants.UNDEFINED);
+                        oCfgCC.setFkSubentMatConsumptionEntityId(jcbEntryConsEntity.getSelectedIndex() <= 0 ? SLibConstants.UNDEFINED : ((SGuiItem) jcbEntryConsEntity.getSelectedItem()).getPrimaryKey()[0]);
+                        oCfgCC.setFkSubentMatConsumptionSubentityId(jcbEntrySubConsEntity.getSelectedIndex() <= 0 ? SLibConstants.UNDEFINED : ((SGuiItem) jcbEntrySubConsEntity.getSelectedItem()).getPrimaryKey()[0]);
+                        oCfgCC.setFkCostCenterId(jcbEntryCostCenter.getSelectedIndex() <= 0 ? SLibConstants.UNDEFINED : ((SGuiItem) jcbEntryCostCenter.getSelectedItem()).getPrimaryKey()[0]);
+                        oCfgCC.readAuxs(miClient.getSession().getStatement());
+                        iogEntry.getAuxDiogEtyMatEntCcsConfigs().add(oCfgCC);
+                    }
+                    
                     moPaneDiogEntries.addTableRow(new SDataDiogMaintMovementEntryRow(iogEntry));
                     moPaneDiogEntries.renderTableRows();
                     moPaneDiogEntries.setTableRowSelection(moPaneDiogEntries.getTableGuiRowCount() - 1);
@@ -1269,6 +1393,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         moFieldEntryValue.resetField();
 
         jtfEntryTextToFind.requestFocus();
+        stateChangedCosumeEntity();
+        populateCostCenter();
     }
 
     public void actionEntryDelete() {
@@ -1319,8 +1445,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             }            
             else if (fingerPassword != 0) {
                 if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
-                        moMaintDiogSignature = new SDbMaintDiogSignature();
-                        showSignatureStatus();                
+                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                    showSignatureStatus();                
                 }
             } 
             else {
@@ -1339,8 +1465,15 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private void stateChangedReturnMaintUser() {
         populateMaintReturnUserSupervisor();
     }
+    
+    private void stateChangedCosumeEntity() {
+        populateSubEntityConsume();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLEntryConsEntity;
+    private javax.swing.JLabel jLEntryCostCenter;
+    private javax.swing.JLabel jLEntrySubConsEntity;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1367,7 +1500,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JButton jbEntryFind;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbSign;
+    private javax.swing.JComboBox<String> jcbEntryConsEntity;
+    private javax.swing.JComboBox<String> jcbEntryCostCenter;
     private javax.swing.JComboBox jcbEntryMaintArea;
+    private javax.swing.JComboBox<String> jcbEntrySubConsEntity;
     private javax.swing.JComboBox<SFormComponentItem> jcbMaintReturnUser;
     private javax.swing.JComboBox<SFormComponentItem> jcbMaintReturnUserSupervisor;
     private javax.swing.JComboBox<SFormComponentItem> jcbMaintUser;
@@ -1469,6 +1605,21 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 }
                 break;
                 
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT:
+                mnMaintMovementIogCategory = SModSysConsts.TRNS_CT_IOG_IN;
+                manIogTypeKey = SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS;
+                jtfSeries.setText(SERIES_ADJ_IN);
+                
+                mbMaintAreaNeeded = true;
+                
+                switch (mnParamMaintMovementType) {
+                    case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT:
+                        warehouseSourceKey = maintConfig.getKeyWarehouseParts();
+                        break;
+                    default:
+                }
+                break;
+                
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
@@ -1508,6 +1659,21 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                         break;
                     case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
                         warehouseSourceKey = maintConfig.getKeyWarehouseToolsAvailable();
+                        break;
+                    default:
+                }
+                break;
+                
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
+                mnMaintMovementIogCategory = SModSysConsts.TRNS_CT_IOG_OUT;
+                manIogTypeKey = SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS;
+                jtfSeries.setText(SERIES_ADJ_OUT);
+                
+                mbMaintAreaNeeded = true;
+                
+                switch (mnParamMaintMovementType) {
+                    case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
+                        warehouseSourceKey = maintConfig.getKeyWarehouseParts();
                         break;
                     default:
                 }
@@ -1627,6 +1793,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         miClient.getSession().populateCatalogue(jcbMaintUser, SModConsts.TRN_MAINT_USER, mnParamMaintUserType, null);
         miClient.getSession().populateCatalogue(jcbMaintReturnUser, SModConsts.TRN_MAINT_USER, mnParamMaintUserType, null);
         miClient.getSession().populateCatalogue(jcbEntryMaintArea, SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(jcbEntryConsEntity, SModConsts.TRN_MAT_CONS_ENT, SLibConstants.UNDEFINED, null);
+        jcbEntrySubConsEntity.setEnabled(false);
         mbResetingForm = false;
     }
 
@@ -2055,6 +2223,12 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     }
                     else if (comboBox == jcbMaintReturnUser) {
                         stateChangedReturnMaintUser();
+                    }
+                    else if (comboBox == jcbEntryConsEntity) {
+                        stateChangedCosumeEntity();
+                    }
+                    else if (comboBox == jcbEntrySubConsEntity) {
+                        populateCostCenter();
                     }
                 }
             }

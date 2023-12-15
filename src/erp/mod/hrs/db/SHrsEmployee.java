@@ -16,12 +16,14 @@ import sa.lib.SLibUtils;
  */
 public class SHrsEmployee {
 
-    protected final int mnYear;   // for accumulated earnings & deductions
+    protected SDbEmployee moEmployee;
+    protected final int mnPeriodYear;   // for accumulated earnings & deductions
     protected final int mnPeriod; // for accumulated earnings & deductions
     protected final Date mtPeriodStart; // analyzed period start date
     protected final Date mtPeriodEnd;   // analyzed period end date
-    protected SDbEmployee moEmployee;
+    
     protected SHrsReceipt moHrsReceipt; // current receipt
+    
     protected ArrayList<SDbLoan> maLoans;       // all employee loans
     protected ArrayList<SHrsLoan> maHrsLoans;   // all employee loans
     protected ArrayList<SDbAbsence> maAbsences; // all employee absences
@@ -32,11 +34,10 @@ public class SHrsEmployee {
     protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductions;       // accumulated deductions in year, current payroll receipt not included (applies only for deductions)
     protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByType; // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
     
-    protected int mnDaysHiredAnnual;  // hired days in fiscal year
-    protected int mnDaysHiredPayroll; // hired days in the period payroll
-    protected int mnBusinessDays; // business days in the period payroll
-    protected int mnSeniority;    // seniority in years to payroll end
-    protected double mdAnnualTaxableEarnings;    // taxable amount accumulated of earnigs 
+    protected int mnDaysHiredAnnual;    // hired days in fiscal year
+    protected int mnDaysHiredPayroll;   // hired days in the period payroll
+    protected int mnBusinessDays;       // business days in the period payroll
+    protected double mdAnnualTaxableEarnings;       // taxable amount accumulated of earnigs 
     protected double mdAnnualTaxableEarningsArt174; // taxable amount accumulated of earnigs configured for articule 174 the RLISR
     protected double mdAnnualTaxCompensated;
     protected double mdAnnualTaxSubsidyCompensated;
@@ -44,13 +45,17 @@ public class SHrsEmployee {
     protected SHrsDaysByPeriod moHrsDaysCurr;
     protected SHrsDaysByPeriod moHrsDaysNext;
 
-    public SHrsEmployee(final int year, final int period, final Date periodStart, final Date periodEnd) throws Exception {
-        mnYear = year;
-        mnPeriod = period;
-        mtPeriodStart = periodStart;
-        mtPeriodEnd = periodEnd;
-        moEmployee = null;
-        moHrsReceipt = null;
+    public SHrsEmployee(final SHrsPayroll hrsPayroll, final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
+        SDbPayroll payroll = hrsPayroll.getPayroll(); // convenience variable
+        
+        moEmployee = hrsPayroll.getEmployee(employeeId);
+        mnPeriodYear = payroll.getPeriodYear();
+        mnPeriod = payroll.getPeriod();
+        mtPeriodStart = payroll.getDateStart();
+        mtPeriodEnd = payroll.getDateEnd();
+        
+        moHrsReceipt = hrsReceipt;
+        
         maLoans = new ArrayList<>();
         maHrsLoans = new ArrayList<>();
         maAbsences = new ArrayList<>();
@@ -64,7 +69,6 @@ public class SHrsEmployee {
         mnDaysHiredAnnual = 0;
         mnDaysHiredPayroll = 0;
         mnBusinessDays = 0;
-        mnSeniority = 0;
         mdAnnualTaxableEarnings = 0;
         mdAnnualTaxableEarningsArt174 = 0;
         mdAnnualTaxCompensated = 0;
@@ -74,14 +78,9 @@ public class SHrsEmployee {
         moHrsDaysNext = null;
     }
 
-    public void setEmployee(final SDbEmployee o) { moEmployee = o; }
-    public void setHrsReceipt(final SHrsReceipt o) { moHrsReceipt = o; }
-    
     public void setDaysHiredAnnual(int n) { mnDaysHiredAnnual = n; }
     public void setDaysHiredPayroll(int n) { mnDaysHiredPayroll = n; }
     public void setBusinessDays(int n) { mnBusinessDays = n; }
-    /** Set seniority of employee in years. */
-    public void setSeniority(int n) { mnSeniority = n; }
     public void setAnnualTaxableEarnings(double d) { mdAnnualTaxableEarnings = d; }
     public void setAnnualTaxableEarningArt174(double d) { mdAnnualTaxableEarningsArt174 = d; }
     public void setAnnualTaxCompensated(double d) { mdAnnualTaxCompensated = d; }
@@ -90,20 +89,19 @@ public class SHrsEmployee {
     public void setHrsDaysCurr(SHrsDaysByPeriod o) { moHrsDaysCurr = o; }
     public void setHrsDaysNext(SHrsDaysByPeriod o) { moHrsDaysNext = o; }
 
-    public int getYear() { return mnYear; }
+    public SDbEmployee getEmployee() { return moEmployee; }
+    public int getPeriodYear() { return mnPeriodYear; }
     public int getPeriod() { return mnPeriod; }
     public Date getPeriodStart() { return mtPeriodStart; }
     public Date getPeriodEnd() { return mtPeriodEnd; }
-    public SDbEmployee getEmployee() { return moEmployee; }
+    
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
+    
     public ArrayList<SDbLoan> getLoans() { return maLoans; }
     public ArrayList<SHrsLoan> getHrsLoans() { return maHrsLoans; }
     public ArrayList<SDbAbsence> getAbsences() { return maAbsences; }
     public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptions() { return maAbsenceConsumptions; }
     public ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs() { return maEmployeeHireLogs; }
-    
-    /** Get seniority of employee in years. */
-    public int getSeniority() { return mnSeniority; }
     public double getAnnualTaxableEarnings() { return mdAnnualTaxableEarnings; }
     public double getAnnualTaxableEarningsArt174() { return mdAnnualTaxableEarningsArt174; }
     public double getAnnualTaxCompensated() { return mdAnnualTaxCompensated; }
@@ -304,7 +302,7 @@ public class SHrsEmployee {
             }
         }
 
-        SHrsEmployeeDays hrsEmployeeDays = new SHrsEmployeeDays(mnYear, mnPeriod, mtPeriodStart, mtPeriodEnd);
+        SHrsEmployeeDays hrsEmployeeDays = new SHrsEmployeeDays(mnPeriodYear, mnPeriod, mtPeriodStart, mtPeriodEnd);
         
         hrsEmployeeDays.setFactorCalendar(factorCalendar);
         hrsEmployeeDays.setFactorDaysPaid(moHrsReceipt.getHrsPayroll().getFactorDaysPaid());

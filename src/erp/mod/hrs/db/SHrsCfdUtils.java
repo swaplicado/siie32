@@ -36,7 +36,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Irving Sánchez, Juan Barajas, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Irving Sánchez, Juan Barajas, Claudio Peña, Isabel Servín, Sergio Flores
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -50,7 +50,7 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of contract is for employment.
      */
     public static boolean isTypeContractForEmployment(final String tipoContrato) {
-        return tipoContrato.compareTo(DCfdi40Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
+        return tipoContrato.compareTo(DCfdi40Catalogs.ClaveTipoContratoModalidadTrabajoComisión) <= 0;
     }
     
     /**
@@ -59,10 +59,10 @@ public abstract class SHrsCfdUtils {
      * @return <code>true</code> if type of recruitment schema is for employment.
      */
     public static boolean isTypeRecruitmentSchemaForEmployment(final String tipoRegimenContratación) {
-        return tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenSueldos) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubilados) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenPensionados) || 
-                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRegimenJubiladosOPensionados);
+        return tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenSueldos) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenJubilados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenPensionados) || 
+                tipoRegimenContratación.equals(DCfdi40Catalogs.ClaveTipoRégimenJubiladosOPensionados);
     }
     
     /**
@@ -104,47 +104,50 @@ public abstract class SHrsCfdUtils {
         
         return validateReceiptsPendingCfdi(session, payrollId);
     }
-    
+
+    /**
+     * Obtener la lista de recibos de nómina activos pendientes de timbrar, de la siguiente forma:<br>
+     * 1) Recibos de nómina cuya emisión más reciente tenga estatus 'emitido', pero que no tenga CFD o que su CFD no esté emitido o esté cancelado.<br>
+     * 1) Recibos de nómina cuya emisión más reciente tenga estatus 'cancelado', pero que no tenga CFD o que su CFD no esté emitido o esté cancelado.<br>
+     * 
+     * 2) Por otro lado, recibos de nómina cuyas emisiones estén 'canceladas', pero con CFD 'nuevo' o 'cancelado' o sin UUID (i.e., sin timbrar, o sea, redundantemente, 'nuevo').<br>
+     * <b>NOTA:</b> Al cerrarse la nómina, se crean los registros de emisión de cada recibo de nómina con estatus 'emitido (2)'.
+     * 
+     * 1) Por un lado, recibos de nómina cuyas emisiones estén 'emitidas' o 'canceladas', pero sin CFD.<br>
+     * 2) Por otro lado, recibos de nómina cuyas emisiones estén 'canceladas', pero con CFD 'nuevo' o 'cancelado' o sin UUID (i.e., sin timbrar, o sea, redundantemente, 'nuevo').<br>
+     * <b>NOTA:</b> Al cerrarse la nómina, se crean los registros de emisión de cada recibo de nómina con estatus 'emitido (2)'.
+     * @param session
+     * @param payrollId
+     * @return
+     * @throws Exception 
+     */
     public static ArrayList<SHrsPayrollEmployeeReceipt> getReceiptsPendig(final SGuiSession session, final int payrollId) throws Exception {
         ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<>();
         
-        String sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
-                + "pr.id_emp, bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
-                + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
+        String sql = "SELECT "
+                + "pri.id_pay, pri.id_emp, pri.id_iss, "
+                + "pri.num_ser, pri.num, pri.dt_iss, pri.dt_pay, pri.uuid_rel, pri.fk_tp_pay_sys, pri.fk_st_rcp, "
+                + "p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
+                + "pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
+                + "bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND "
-                + "pri.b_del = 0 AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND "
-                + "pri.id_iss = (SELECT pri1.id_iss "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri1 "
-                + " WHERE pri1.id_pay = pri.id_pay AND pri1.id_emp = pri.id_emp AND pri1.b_del = 0 "
-                + " ORDER BY pri1.id_iss DESC LIMIT 1) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp "
+                + "AND pri.id_iss = COALESCE("
+                + "(SELECT MAX(prix.id_iss) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS prix "
+                + " WHERE prix.id_pay = pr.id_pay AND prix.id_emp = pr.id_emp AND NOT prix.b_del), 0) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " bp ON bp.id_bp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
-                + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 AND pr.b_cfd_req = 1 AND "
-                + "NOT EXISTS (SELECT * "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
-                + "WHERE fid_pay_rcp_pay_n = pri.id_pay AND fid_pay_rcp_emp_n = pri.id_emp AND fid_pay_rcp_iss_n = pri.id_iss) "
-                + "UNION "
-                + "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
-                + "pr.id_emp, bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
-                + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp AND "
-                + "pri.b_del = 0 " + /*AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + "*/ " AND "
-                + "pri.id_iss = (SELECT pri1.id_iss "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri1 "
-                + " WHERE pri1.id_pay = pri.id_pay AND pri1.id_emp = pri.id_emp AND pri1.b_del = 0 "
-                + " ORDER BY pri1.id_iss DESC LIMIT 1) "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n AND "
-                + "(c.fid_st_xml IN (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") OR c.uuid = '') "
-                + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 "
-                + "ORDER BY _emp_name, id_emp, id_iss ";
+                + "WHERE p.id_pay = " + payrollId + " "
+                + "AND NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND pr.b_cfd_req "
+                + "AND ("
+                + "pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
+                + "OR "
+                + "NOT (pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND EXISTS "
+                + "(SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c "
+                + " WHERE c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ")))"
+                + "ORDER BY _emp_name, id_emp, id_iss;";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
@@ -172,6 +175,7 @@ public abstract class SHrsCfdUtils {
                 receipt.setDateOfPayment(resultSet.getDate("dt_pay"));
                 receipt.setPaymentTypeSysId(resultSet.getInt("fk_tp_pay_sys"));
                 receipt.setPaymentTypeSys("");
+                receipt.setReceiptStatusId(resultSet.getInt("fk_st_rcp"));
                 receipt.setUuidToSubstitute(resultSet.getString("uuid_rel"));
                 
                 receipts.add(receipt);
@@ -420,7 +424,7 @@ public abstract class SHrsCfdUtils {
                     "pri.dt_pay, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, " +
                     "TIMESTAMPDIFF(DAY, pr.dt_ben, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
                     "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
-                    "IF(emp.b_uni, '" + DCfdi40Catalogs.TxtSí + "', '" + DCfdi40Catalogs.TxtNo + "') AS f_emp_union, " +
+                    "IF(emp.b_uni, '" + DCfdi40Catalogs.TextoSí + "', '" + DCfdi40Catalogs.TextoNo + "') AS f_emp_union, " +
                     "NOW() AS f_emp_date_edit " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay " +

@@ -145,7 +145,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
                 case SDataConstants.QLT_ANALYSIS_ITEM:
                     oViewClass = erp.mqlt.view.SViewAnalysisItem.class;
-                    sViewTitle = "Análisis vs ítems";
+                    sViewTitle = "Análisis vs ítems a detalle";
                     break;
                     
                 case SDataConstants.QLTX_DPS_ETY_ANALYSIS:
@@ -160,7 +160,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     
                 case SDataConstants.QLTX_DOCUMENT_ANALYSIS:
                     oViewClass = erp.mqlt.view.SViewDocumentAnalysis.class;
-                    sViewTitle = "Items configurados";
+                    sViewTitle = "Documentos vs análisis";
                     break;
                     
                 default:
@@ -219,7 +219,26 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public int deleteRegistry(int registryType, java.lang.Object pk) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int result = SLibConstants.UNDEFINED;
+
+        try {
+            switch (registryType) {
+                case SDataConstants.QLT_ANALYSIS_ITEM:
+                    moRegistry = new SDataAnalysisItem();
+                    moRegistry.read(pk, miClient.getSession().getDatabase().getConnection().createStatement());
+                    break;
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+            
+            boolean delete = ! moRegistry.getIsDeleted();
+            result = processActionDelete(pk, delete);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+
+        return result;
     }
 
     @Override

@@ -11,6 +11,7 @@ import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
@@ -185,5 +186,11 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
     @Override
     public Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    public static boolean existBankNbDayInYear(Statement statement, int pkYearId) throws SQLException {
+        String mySql = "SELECT * FROM erp.finu_bank_nb_day WHERE YEAR(nb_day) = " + pkYearId + " AND NOT b_del;";
+        ResultSet resultSet = statement.executeQuery(mySql);
+        return resultSet.next();
     }
 }

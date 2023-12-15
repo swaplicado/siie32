@@ -228,8 +228,8 @@ public class SDialogRepMovsIncExp extends SBeanDialogReport {
         moPanelEndAccount.setComponentPrevious(moPanelStartAccount.getTextNumberFirst());
         moPanelEndAccount.setComponentNext(moKeyCompanyBranch);
         
-        moPanelStartAccount.resetPanel();
-        moPanelEndAccount.resetPanel();
+        moPanelStartAccount.initPanel();
+        moPanelEndAccount.initPanel();
         
         moRadSummary.setSelected(true);
         moRadDetail.setSelected(false);

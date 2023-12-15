@@ -15,5 +15,6 @@ public abstract class SDataConstantsPrint {
 
     public static final int PRINT_MODE_VIEWER = 1;
     public static final int PRINT_MODE_PDF_FILE = 2;
-    public static final int PRINT_MODE_PRINT = 3;
+    public static final int PRINT_MODE_PDF_FILE_PATH = 3;
+    public static final int PRINT_MODE_PRINT = 4;
 }

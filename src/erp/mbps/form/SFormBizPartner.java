@@ -526,11 +526,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel2.add(jlBizPartnerFiscal);
 
         jtfBizPartnerFiscal.setToolTipText("Nombre fiscal");
-        jtfBizPartnerFiscal.setPreferredSize(new java.awt.Dimension(315, 23));
+        jtfBizPartnerFiscal.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel2.add(jtfBizPartnerFiscal);
 
         jtfBizPartnerCapitalRegime.setToolTipText("Régimen capital");
-        jtfBizPartnerCapitalRegime.setPreferredSize(new java.awt.Dimension(80, 23));
+        jtfBizPartnerCapitalRegime.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel2.add(jtfBizPartnerCapitalRegime);
 
         bgOrgNamesPolicy.add(jrbOrgNamesPolicyFiscalName);
@@ -1442,7 +1442,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }//GEN-LAST:event_jckIsAttEmployeeItemStateChanged
 
     private void jcbFkBizPartnerTypeIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkBizPartnerTypeIdItemStateChanged
-        renderBussinesPartnerType();
+        renderBizPartnerType();
     }//GEN-LAST:event_jcbFkBizPartnerTypeIdItemStateChanged
     
     private void initComponentsExtra() {
@@ -1802,6 +1802,14 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         return isSupplier() || isCustomer();
     }
     
+    private boolean applyOrgNamesPolicy() {
+        return isCompany() || isCustomer();
+    }
+    
+    private boolean enableOrgNamesPolicyControls() {
+        return applyOrgNamesPolicy() && mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE;
+    }
+    
     private String composeBizPartnerName() {
         String name = "";
 
@@ -1821,8 +1829,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         return name;
     }
 
-    private void renderBizPartnerSettings() {
+    private void renderBizPartnerIdentityType() {
         if (jcbFkBizPartnerIdentityTypeId.getSelectedIndex() <= 0) {
+            // business partner name settings:
+            
             jtfFirstName.setEnabled(false);
             jtfLastName.setEnabled(false);
             jftAlternativeId.setEnabled(false);
@@ -1834,10 +1844,18 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             
             jtfBizPartnerFiscal.setEnabled(false);
             jtfBizPartnerCapitalRegime.setEnabled(false);
-
+            
             moFieldAlternativeId.setMaskFormatter("");
+            
+            // tax identity:
+            
+            jcbFkTaxIdentityTypeId.setEnabled(false);
+            
+            jcbFkTaxIdentityTypeId.removeAllItems();
         }
         else {
+            // business partner name settings:
+            
             if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
                 jtfFirstName.setEnabled(true);
                 jtfLastName.setEnabled(true);
@@ -1859,19 +1877,35 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 jftAlternativeId.setEnabled(false);
                 jtfBizPartner.setEnabled(true);
                 
-                boolean enableOrgNamesPolicy = isCustomer() && mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE;
-                jrbOrgNamesPolicyFullName.setEnabled(enableOrgNamesPolicy);
-                jrbOrgNamesPolicyFiscalName.setEnabled(enableOrgNamesPolicy);
+                boolean applyPolicy = applyOrgNamesPolicy();
+                boolean enablePolicyControls = enableOrgNamesPolicyControls();
+                
+                jrbOrgNamesPolicyFullName.setEnabled(enablePolicyControls);
+                jrbOrgNamesPolicyFiscalName.setEnabled(enablePolicyControls);
                 bgOrgNamesPolicy.clearSelection();
                 
-                if (enableOrgNamesPolicy) {
-                    bgOrgNamesPolicy.setSelected(jrbOrgNamesPolicyFullName.getModel(), true);
+                if (applyPolicy) {
+                    if (mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME) {
+                        jrbOrgNamesPolicyFiscalName.setSelected(true);
+                    }
+                    else {
+                        jrbOrgNamesPolicyFullName.setSelected(true);
+                    }
                 }
                 
-                jtfBizPartnerFiscal.setEnabled(isCustomer());
-                jtfBizPartnerCapitalRegime.setEnabled(isCustomer());
+                jtfBizPartnerFiscal.setEnabled(applyPolicy);
+                jtfBizPartnerCapitalRegime.setEnabled(applyPolicy);
 
                 moFieldAlternativeId.setMaskFormatter("");
+            }
+            
+            // tax identity:
+            
+            jcbFkTaxIdentityTypeId.setEnabled(true);
+            
+            SFormUtilities.populateComboBox(miClient, jcbFkTaxIdentityTypeId, SDataConstants.FINU_TAX_IDY, moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray());
+            if (jcbFkTaxIdentityTypeId.getItemCount() <= 2) {
+                jcbFkTaxIdentityTypeId.setSelectedIndex(jcbFkTaxIdentityTypeId.getItemCount() - 1);
             }
         }
     }
@@ -1922,6 +1956,70 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlIconCustomer.setIcon(moBizPartner == null ? mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CUS ? moIconHasCategoryCus : moIconHasNotCategory : moBizPartner.getIsCustomer() || mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CUS ? moIconHasCategoryCus : moIconHasNotCategory);
         jlIconCreditor.setIcon(moBizPartner == null ? mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CDR ? moIconHasCategoryCdr : moIconHasNotCategory : moBizPartner.getIsCreditor() || mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CDR ? moIconHasCategoryCdr : moIconHasNotCategory);
         jlIconDebtor.setIcon(moBizPartner == null ? mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_DBR ? moIconHasCategoryDbr : moIconHasNotCategory : moBizPartner.getIsDebtor() || mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_DBR ? moIconHasCategoryDbr : moIconHasNotCategory);
+    }
+
+    private void renderBizPartnerType() {
+        moBizPartnerType = null;
+        
+        if (jcbFkBizPartnerTypeId.getSelectedIndex() > 0) {
+            moBizPartnerType = new SDataBizPartnerType();
+            moBizPartnerType.read(((SFormComponentItem) jcbFkBizPartnerTypeId.getSelectedItem()).getPrimaryKey(), miClient.getSession().getStatement());
+        }
+        
+        if (moBizPartnerType == null) {
+            // clear all credit settings:
+            moFieldFkCreditTypeId_n.setFieldValue(new int[] { SModSysConsts.BPSS_TP_CRED_CRED_NO });
+            moFieldCreditLimit.setFieldValue(0d);
+            moFieldDaysOfCredit.setFieldValue(0);
+            moFieldDaysOfGrace.setFieldValue(0);
+            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RISK_HIGH });
+            moFieldGuaranteeAmount.setFieldValue(0d);
+            moFieldInsuranceAmount.setFieldValue(0d);
+            moFieldIsGuaranteeInProcess.setFieldValue(false);
+            moFieldIsInsuranceInProcess.setFieldValue(false);
+            
+            bgGuaranteeType.clearSelection();
+        }
+        else {
+            if (!jckIsCreditByUser.isSelected()) {
+                // credit settings of business partner type:
+                moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerType.getFkCreditTypeId() });
+                moFieldCreditLimit.setFieldValue(moBizPartnerType.getCreditLimit());
+                moFieldDaysOfCredit.setFieldValue(moBizPartnerType.getDaysOfCredit());
+                moFieldDaysOfGrace.setFieldValue( moBizPartnerType.getDaysOfGrace());
+                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerType.getFkRiskTypeId()});
+                //moFieldGuaranteeAmount.setFieldValue(...);
+                //moFieldInsuranceAmount.setFieldValue(...);
+                //moFieldIsInGuarProcess.setFieldValue(...);
+                //moFieldIsInInsurProcess.setFieldValue(...);
+            }
+            else {
+                // credit settings of category from current business partner:
+                moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCreditTypeId_n() });
+                moFieldCreditLimit.setFieldValue(moBizPartnerCategory.getCreditLimit());
+                moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getDaysOfCredit());
+                moFieldDaysOfGrace.setFieldValue( moBizPartnerCategory.getDaysOfGrace());
+                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskId_n()});
+                moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
+                moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
+                moFieldIsGuaranteeInProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
+                moFieldIsInsuranceInProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
+                
+                switch (moBizPartnerCategory.getGuaranteeType()) {
+                    case SDataBizPartnerCategory.GARNT_TP_PAY:
+                        jrbGuaranteeTypePay.setSelected(true);
+                        break;
+                    case SDataBizPartnerCategory.GARNT_TP_PROP:
+                        jrbGuaranteeTypeProp.setSelected(true);
+                        break;
+                    case SDataBizPartnerCategory.GARNT_TP_PAY_PROP:
+                        jrbGuaranteeTypePayProp.setSelected(true);
+                        break;
+                    default:
+                        bgGuaranteeType.clearSelection();
+                }
+            }
+        }
     }
 
     private void setFieldEnableCategory(boolean enable) {
@@ -2102,70 +2200,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         updateSettingsBizPartnerCredit();
     }
 
-    private void renderBussinesPartnerType() {
-        moBizPartnerType = null;
-        
-        if (jcbFkBizPartnerTypeId.getSelectedIndex() > 0) {
-            moBizPartnerType = new SDataBizPartnerType();
-            moBizPartnerType.read(((SFormComponentItem) jcbFkBizPartnerTypeId.getSelectedItem()).getPrimaryKey(), miClient.getSession().getStatement());
-        }
-        
-        if (moBizPartnerType == null) {
-            // clear all credit settings:
-            moFieldFkCreditTypeId_n.setFieldValue(new int[] { SModSysConsts.BPSS_TP_CRED_CRED_NO });
-            moFieldCreditLimit.setFieldValue(0d);
-            moFieldDaysOfCredit.setFieldValue(0);
-            moFieldDaysOfGrace.setFieldValue(0);
-            moFieldFkRiskTypeId.setFieldValue(new int[] { SModSysConsts.BPSS_RISK_C_RISK_HIGH });
-            moFieldGuaranteeAmount.setFieldValue(0d);
-            moFieldInsuranceAmount.setFieldValue(0d);
-            moFieldIsGuaranteeInProcess.setFieldValue(false);
-            moFieldIsInsuranceInProcess.setFieldValue(false);
-            
-            bgGuaranteeType.clearSelection();
-        }
-        else {
-            if (!jckIsCreditByUser.isSelected()) {
-                // credit settings of business partner type:
-                moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerType.getFkCreditTypeId() });
-                moFieldCreditLimit.setFieldValue(moBizPartnerType.getCreditLimit());
-                moFieldDaysOfCredit.setFieldValue(moBizPartnerType.getDaysOfCredit());
-                moFieldDaysOfGrace.setFieldValue( moBizPartnerType.getDaysOfGrace());
-                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerType.getFkRiskTypeId()});
-                //moFieldGuaranteeAmount.setFieldValue(...);
-                //moFieldInsuranceAmount.setFieldValue(...);
-                //moFieldIsInGuarProcess.setFieldValue(...);
-                //moFieldIsInInsurProcess.setFieldValue(...);
-            }
-            else {
-                // credit settings of category from current business partner:
-                moFieldFkCreditTypeId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCreditTypeId_n() });
-                moFieldCreditLimit.setFieldValue(moBizPartnerCategory.getCreditLimit());
-                moFieldDaysOfCredit.setFieldValue(moBizPartnerCategory.getDaysOfCredit());
-                moFieldDaysOfGrace.setFieldValue( moBizPartnerCategory.getDaysOfGrace());
-                moFieldFkRiskTypeId.setFieldValue(new int[] { moBizPartnerCategory.getFkRiskId_n()});
-                moFieldGuaranteeAmount.setFieldValue(moBizPartnerCategory.getGuarantee());
-                moFieldInsuranceAmount.setFieldValue(moBizPartnerCategory.getInsurance());
-                moFieldIsGuaranteeInProcess.setFieldValue(moBizPartnerCategory.getIsGuaranteeInProcess());
-                moFieldIsInsuranceInProcess.setFieldValue(moBizPartnerCategory.getIsInsuranceInProcess());
-                
-                switch (moBizPartnerCategory.getGuaranteeType()) {
-                    case SDataBizPartnerCategory.GARNT_TP_PAY:
-                        jrbGuaranteeTypePay.setSelected(true);
-                        break;
-                    case SDataBizPartnerCategory.GARNT_TP_PROP:
-                        jrbGuaranteeTypeProp.setSelected(true);
-                        break;
-                    case SDataBizPartnerCategory.GARNT_TP_PAY_PROP:
-                        jrbGuaranteeTypePayProp.setSelected(true);
-                        break;
-                    default:
-                        bgGuaranteeType.clearSelection();
-                }
-            }
-        }
-    }
-
     private void updateSettingsCustomerConfig() {
          if (isCustomer()) {
             jlFkCustomerTypeId.setEnabled(true);
@@ -2254,20 +2288,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             if (miClient.getSessionXXX().getParamsErp().getCustomerDaysOfGrace() == 0) {
                 jtfDaysOfGrace.setEditable(false);
             }
-        }
-    }
-
-    private void renderTaxIdentity() {
-        if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] > 0) {
-            jcbFkTaxIdentityTypeId.setEnabled(true);
-            SFormUtilities.populateComboBox(miClient, jcbFkTaxIdentityTypeId, SDataConstants.FINU_TAX_IDY, moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray());
-            if (jcbFkTaxIdentityTypeId.getItemCount() <= 2) {
-                jcbFkTaxIdentityTypeId.setSelectedIndex(jcbFkTaxIdentityTypeId.getItemCount() - 1);
-            }
-        }
-        else {
-            jcbFkTaxIdentityTypeId.setEnabled(false);
-            jcbFkTaxIdentityTypeId.removeAllItems();
         }
     }
 
@@ -2647,8 +2667,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void itemStateChangedBizPartnerIdentityType() {
-        renderBizPartnerSettings();
-        renderTaxIdentity();
+        renderBizPartnerIdentityType();
         updateSettingsBizPartnerKey();
     }
     
@@ -2660,7 +2679,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         boolean enable = jckIsCreditByUser.isSelected() && mbCanEditCredit;
         jcbFkCreditTypeId_n.setEnabled(enable);
         jcbFkRiskId.setEnabled(enable);
-        renderBussinesPartnerType();
+        renderBizPartnerType();
         updateSettingsBizPartnerCredit();
     }
 
@@ -3287,30 +3306,32 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner = (SDataBizPartner) registry;
 
         moFieldFkBizPartnerIdentityTypeId.setFieldValue(new int[] { moBizPartner.getFkBizPartnerIdentityTypeId() });
-        renderBizPartnerSettings();
-        renderTaxIdentity();
+        renderBizPartnerIdentityType();
+        
         moFieldLastName.setFieldValue(moBizPartner.getLastname());
         moFieldFirstName.setFieldValue(moBizPartner.getFirstname());
-        moFieldBizPartner.setFieldValue(moBizPartner.getFkBizPartnerIdentityTypeId() == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? "" : moBizPartner.getBizPartner());
+        moFieldBizPartner.setFieldValue(moBizPartner.getBizPartner());
         
-        bgOrgNamesPolicy.clearSelection();
-        switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
-            case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
-                jrbOrgNamesPolicyFullName.setSelected(true);
-                break;
-            case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
-                jrbOrgNamesPolicyFiscalName.setSelected(true);
-                break;
-            default:
-                // nothing
+        if (applyOrgNamesPolicy()) {
+            switch (SLibUtilities.parseInt(moBizPartner.getBizPartnerFiscalPolicy())) {
+                case SDataBizPartner.CFD_ORG_NAMES_FULL_NAME:
+                    jrbOrgNamesPolicyFullName.setSelected(true);
+                    break;
+                case SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME:
+                    jrbOrgNamesPolicyFiscalName.setSelected(true);
+                    break;
+                default:
+                    // nothing
+            }
+
+            moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
+            moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
         }
-        moFieldBizPartnerFiscal.setFieldValue(moBizPartner.getBizPartnerFiscal());
-        moFieldBizPartnerCapitalRegime.setFieldValue(moBizPartner.getBizPartnerCapitalRegime());
         
         moFieldBizPartnerCommercial.setFieldValue(moBizPartner.getBizPartner().equals(moBizPartner.getBizPartnerCommercial()) ? "" : moBizPartner.getBizPartnerCommercial());
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());
         moFieldFiscalFrgId.setFieldValue(moBizPartner.getFiscalFrgId());
-        moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId());
+        moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId()); // CURP
         moFieldFkTaxIdentityTypeId.setFieldValue(new int[] { moBizPartner.getFkTaxIdentityId() });
         moFieldFkBizArea.setFieldValue(new int[] { moBizPartner.getFkBizAreaId() });
         moFieldWeb.setFieldValue(moBizPartner.getWeb());
@@ -3518,20 +3539,32 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner.setFkBizAreaId(moFieldFkBizArea.getKeyAsIntArray()[0]);
 
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
+            // business partner is a person
+            
+            // keep name for persons:
+            
             moBizPartner.setLastname(moFieldLastName.getString());
             moBizPartner.setFirstname(moFieldFirstName.getString());
             moBizPartner.setAlternativeId(moFieldAlternativeId.getString().toUpperCase()); // CURP
+            
+            // clear name fiscal data for organizations:
             
             moBizPartner.setBizPartnerFiscalPolicy("");
             moBizPartner.setBizPartnerFiscal("");
             moBizPartner.setBizPartnerCapitalRegime("");
         }
         else {
+            // business partner is an organization
+            
+            // clear name for persons:
+            
             moBizPartner.setLastname("");
             moBizPartner.setFirstname("");
             moBizPartner.setAlternativeId(""); // CURP
             
-            if (isCustomer()) {
+            // keep name fiscal data for organizations only if applies:
+            
+            if (applyOrgNamesPolicy()) {
                 if (mnCfgParamCfdOrgNames == SDataConstantsSys.CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE) {
                     moBizPartner.setBizPartnerFiscalPolicy("" + (jrbOrgNamesPolicyFiscalName.isSelected() ? SDataBizPartner.CFD_ORG_NAMES_FISCAL_NAME : SDataBizPartner.CFD_ORG_NAMES_FULL_NAME));
                 }
@@ -3541,11 +3574,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 
                 moBizPartner.setBizPartnerFiscal(moFieldBizPartnerFiscal.getString());
                 moBizPartner.setBizPartnerCapitalRegime(moFieldBizPartnerCapitalRegime.getString());
-            }
-            else {
-                moBizPartner.setBizPartnerFiscalPolicy("");
-                moBizPartner.setBizPartnerFiscal("");
-                moBizPartner.setBizPartnerCapitalRegime("");
             }
         }
         
@@ -3656,7 +3684,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setFkUserAnalystId_n(jcbFkUserAnalystId.getSelectedIndex() <= 0 ? 0 : moFieldFkUserAnalystId.getKeyAsIntArray()[0]);
         moBizPartnerCategory.setIsDeleted(moFieldIsCategoryDeleted.getBoolean());
 
-        moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedItem().toString());
+        moBizPartnerCategory.setDbmBizPartnerType(jcbFkBizPartnerTypeId.getSelectedIndex() <= 0 ? "" : jcbFkBizPartnerTypeId.getSelectedItem().toString());
         moBizPartnerCategory.setDbmsCreditType(jcbFkCreditTypeId_n.getSelectedIndex() <= 0 ? "" : jcbFkCreditTypeId_n.getSelectedItem().toString());
         moBizPartnerCategory.setDbmsLanguage(jcbFkLanguageId_n.getSelectedIndex() <= 0 ? "" : readLanguageKey(moFieldFkLanguageId_n.getKeyAsIntArray()[0]));
         moBizPartnerCategory.setDbmsCurrency(jcbFkCurrencyId_n.getSelectedIndex() <= 0 ? "" : readCurrencyKey(moFieldFkCurrencyId_n.getKeyAsIntArray()[0]));
@@ -3812,18 +3840,21 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                         jckIsCategoryDeleted.setText("Empresa eliminada");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
+                        
                     case SDataConstants.BPSX_BP_SUP:
                         setTitle("Proveedor");
                         jckIsCategoryDeleted.setText("Proveedor eliminado");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_SUP;
                         mbCanEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_CRED_CONFIG).HasRight;
                         break;
+                        
                     case SDataConstants.BPSX_BP_CUS:
                         setTitle("Cliente");
                         jckIsCategoryDeleted.setText("Cliente eliminado");
                         mnParamBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CUS;
                         mbCanEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_CRED_CONFIG).HasRight;
                         break;
+                        
                     default:
                         setTitle("Asociado de negocios");
                         jckIsCategoryDeleted.setText("Asociado de negocios eliminado");

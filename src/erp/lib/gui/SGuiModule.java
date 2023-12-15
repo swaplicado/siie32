@@ -18,6 +18,7 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.awt.Cursor;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.Vector;
 import sa.lib.SLibMethod;
 import sa.lib.SLibUtils;
@@ -26,7 +27,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Adrián Avilés
+ * @author Sergio Flores, Adrián Avilés, Sergio Flores
  */
 public abstract class SGuiModule {
 
@@ -37,7 +38,6 @@ public abstract class SGuiModule {
     protected java.lang.Object moLastSavedPrimaryKey;
     protected erp.lib.data.SDataRegistry moRegistry;
     protected erp.lib.form.SFormInterface miForm;
-    protected java.awt.Cursor moCursor;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks;
     */
@@ -77,7 +77,6 @@ public abstract class SGuiModule {
         moLastSavedPrimaryKey = null;
         moRegistry = null;
         miForm = null;
-        moCursor = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro     
         mvIndependentLocks.clear();
         */
@@ -94,15 +93,11 @@ public abstract class SGuiModule {
     }
 
     protected void setFrameWaitCursor() {
-        moCursor = miClient.getFrame().getCursor();
-        miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
     }
 
     protected void restoreFrameCursor() {
-        if (moCursor == null || moCursor.getType() == Cursor.WAIT_CURSOR) {
-            moCursor = new Cursor(Cursor.DEFAULT_CURSOR);
-        }
-        miClient.getFrame().setCursor(moCursor);
+        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     @SuppressWarnings("unchecked")
@@ -148,6 +143,8 @@ public abstract class SGuiModule {
                 constructor = viewClass.getConstructor(classParams);
             }
             catch (java.lang.NoSuchMethodException e) {
+                SLibUtils.printException(this, e);
+                
                 // Last chance to identify view class construtor:
 
                 classParams = new Class[] { erp.client.SClientInterface.class, java.lang.String.class, int.class, int.class, int.class };
@@ -155,7 +152,7 @@ public abstract class SGuiModule {
 
                 constructor = viewClass.getConstructor(classParams);
             }
-
+            
             miClient.getTabbedPane().addTab(viewTitle, (java.awt.Component) constructor.newInstance(instanceParams));
             miClient.getTabbedPane().setTabComponentAt(count, new STableTabComponent(miClient.getTabbedPane(), miClient.getImageIcon(mnModuleType)));
             miClient.getTabbedPane().setSelectedIndex(count);
@@ -166,7 +163,7 @@ public abstract class SGuiModule {
         int result = SLibConstants.UNDEFINED;
         SServerRequest request = null;
         SServerResponse response = null;
-        SDataRegistry registry = null;
+        
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro     
         SSrvLock lock = null;
         */
@@ -277,7 +274,7 @@ public abstract class SGuiModule {
             }
         }
         else {
-            registry = miForm.getRegistry();
+            SDataRegistry registry = miForm.getRegistry();
             /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
             if (lock != null) {
                 // Verify that user still has data lock:
@@ -329,10 +326,16 @@ public abstract class SGuiModule {
             }
             
             // Save data registry:
+            
+            HashMap<String, Object> nonSerializableMembersMap = registry.backupNonSerializableMembers();
 
             request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
             request.setPacket(registry);
             response = miClient.getSessionXXX().request(request);
+            
+            if (nonSerializableMembersMap != null) {
+                registry.restoreNonSerializableMembers(nonSerializableMembersMap);
+            }
 
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro             
@@ -398,12 +401,13 @@ public abstract class SGuiModule {
                 else {
                     moRegistry = (SDataRegistry) response.getPacket();
                     moLastSavedPrimaryKey = moRegistry.getPrimaryKey();
+                    registry.setPrimaryKey(moRegistry.getPrimaryKey());
+                    registry.deleteTempFile(miClient);
                 }
                 /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro 
                 if (lock != null) {
                     SSrvUtils.releaseLock(miClient.getSession(), lock);
                 }
-
                 
                 for (SSrvLock il : mvIndependentLocks) {
                     SSrvUtils.releaseLock(miClient.getSession(), il);
@@ -427,10 +431,18 @@ public abstract class SGuiModule {
                     SLockUtils.releaseLock(miClient, sl);
                 }
 
-                if (result == SLibConstants.DB_ACTION_SAVE_OK && miForm instanceof SFormExtendedInterface) {
-                    method = ((SFormExtendedInterface) miForm).getPostSaveMethod(moRegistry);
-                    if (method != null && method.getTarget() != null && method.getMethod() != null) {
-                        SLibUtils.invoke(method.getTarget(), method.getMethod(), method.getMethodArgs());
+                // Post-save processing:
+                
+                if (result == SLibConstants.DB_ACTION_SAVE_OK) {
+                    if (registry.getPostSaveTarget() != null && registry.getPostSaveMethod() != null) {
+                        SLibUtils.invoke(registry.getPostSaveTarget(), registry.getPostSaveMethod(), registry.getPostSaveMethodArgs());
+                    }
+                    
+                    if (miForm instanceof SFormExtendedInterface) {
+                        method = ((SFormExtendedInterface) miForm).getPostSaveMethod(moRegistry);
+                        if (method != null && method.getTarget() != null && method.getMethod() != null) {
+                            SLibUtils.invoke(method.getTarget(), method.getMethod(), method.getMethodArgs());
+                        }
                     }
                 }
             }

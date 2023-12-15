@@ -185,7 +185,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         msSql = "SELECT "
                 + "bp.id_bp AS _emp_id, bp.bp AS _emp_name, CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.b_act AS _emp_act, "
                 + "e.fk_tp_pay AS _pay_tp_id, tp.name AS _pay_tp_name, "
-                + "e.dt_ben AS _emp_dt_ben, e.dt_dis_n AS _emp_dt_dis_n, cc.fk_cc AS _fk_cc, ";
+                + "e.dt_ben AS _emp_dt_ben, e.dt_dis_n AS _emp_dt_dis_n, cc.id_cc AS _id_cc, ";
         
         // # cut off date:
         String sqlCutoff = "IF(e.b_act, " + cutoff + ", e.dt_dis_n)";
@@ -324,8 +324,9 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
-                + "INNER JOIN erp.HRSU_DEP AS dep ON e.fk_dep = dep.id_dep "
-                + "LEFT OUTER JOIN HRS_DEP_CC AS cc ON cc.id_dep = dep.id_dep "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON e.fk_dep = dep.id_dep "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DEP_CC) + " AS depcc ON depcc.id_dep = dep.id_dep "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON cc.pk_cc = depcc.fk_cc "
                 + ""
                 // # retrieve current benefit payed:
                 + "LEFT OUTER JOIN ("
@@ -407,17 +408,17 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Nombre empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_emp_num", "Clave empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_emp_num", "Número empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_emp_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pay_tp_name", "Período pago", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_sal_day", "Salario diario $", 75));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_emp_dt_ben", "Inicio beneficios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_emp_dt_ben", "Inicio prestaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_emp_dt_dis_n", "Última baja"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_p_dt_cutoff", "Corte"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_months", "Antigüedad meses", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_sen_raw", "Antigüedad años", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_day_name", "Tabla " + benefit));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_fk_cc", "Centro de costo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_id_cc", "No. centro de costo"));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_bon_name", "Tabla prima vacacional"));

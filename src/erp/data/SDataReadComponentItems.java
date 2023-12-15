@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín, Edwin Carmona
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SDataReadComponentItems {
 
@@ -534,9 +534,10 @@ public abstract class SDataReadComponentItems {
                 lenPk = 1;
                 sql = "SELECT DISTINCT bp.id_bp AS f_id_1, bp.bp AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
-                        "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND bp.b_del = 0 " +
-                        "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope = 1 " +
+                        "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CDR + " " +
+                        "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope " +
                         "INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " +
+                        "WHERE e.b_act AND NOT e.b_del AND NOT bp.b_del " +
                         "ORDER BY bp.bp, bp.id_bp ";
                 text = "operador";
                 break;
@@ -1557,6 +1558,22 @@ public abstract class SDataReadComponentItems {
                         "ORDER BY s.dns, s.id_dns, cl.id_ct_iog, cl.cl_iog ";
                 text = "serie folios de inventarios";
                 break;
+            case SDataConstants.TRN_MAT_CONS_ENT:
+                lenPk = 1;
+                sql = "SELECT id_mat_cons_ent AS f_id_1, name AS f_item " +
+                        "FROM trn_mat_cons_ent WHERE b_del = 0 ORDER BY name, id_mat_cons_ent ";
+                text = "entidades de consumo";
+                break;
+            case SDataConstants.TRN_MAT_CONS_SUBENT:
+                lenPk = 2;
+                sql = "SELECT id_mat_cons_ent AS f_id_1, id_mat_cons_subent AS f_id_2, name AS f_item " +
+                        "FROM trn_mat_cons_subent WHERE b_del = 0 ";
+                if (pk != null) {
+                    sql += "AND id_mat_cons_ent = " + ((int[]) pk)[0] + " ";
+                }
+                sql += "ORDER BY name, id_mat_cons_ent ";
+                text = "subentidades de consumo";
+                break;
             default:
         }
 
@@ -1895,7 +1912,7 @@ public abstract class SDataReadComponentItems {
                 lenPk = 1;
                 sql = "SELECT id_tp_pay AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " WHERE b_del = 0 ORDER BY sort ";
-                text = "periodo pago";
+                text = "período pago";
                 break;
             case SModConsts.HRSS_TP_SAL:
                 lenPk = 1;
@@ -1960,7 +1977,9 @@ public abstract class SDataReadComponentItems {
             case SModConsts.HRSU_DEP:
                 lenPk = 1;
                 sql = "SELECT id_dep AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " WHERE b_del = 0 ORDER BY name, id_dep ";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name, id_dep ";
                 text = "departamento";
                 break;
             case SModConsts.HRSU_POS:
@@ -1968,15 +1987,27 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_pos AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " "
                         + "WHERE b_del = 0 "
-                        + (pk != null ? " AND fk_dep = " + ((int) pk) : "") + " " 
+                        + (pk != null ? " AND fk_dep = " + (int) pk : "") + " " 
                         + "ORDER BY name, id_pos ";
                 text = "puesto";
                 break;
             case SModConsts.HRSU_SHT:
                 lenPk = 1;
                 sql = "SELECT id_sht AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " WHERE b_del = 0 ORDER BY name, id_sht ";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " "
+                        + "WHERE b_del = 0 "
+                        + "ORDER BY name, id_sht ";
                 text = "turno";
+                break;
+
+            case SModConsts.HRS_BEN:
+                lenPk = 1;
+                sql = "SELECT id_ben AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
+                        + "WHERE b_del = 0 "
+                        + (pk == null ? "" : "AND fk_tp_ben = " + (int) pk + " ")
+                        + "ORDER BY name, id_ben ";
+                text = "tabla prestaciones";
                 break;
 
             default:

@@ -59,7 +59,7 @@ public class SFormFirstDayYear extends SBeanForm {
 
         jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlYear.setForeground(new java.awt.Color(0, 0, 255));
         jlYear.setText("Año:*");
@@ -71,7 +71,7 @@ public class SFormFirstDayYear extends SBeanForm {
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFirstDayYear.setText("Primer día año:*");
         jlFirstDayYear.setPreferredSize(new java.awt.Dimension(100, 23));

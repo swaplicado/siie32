@@ -38,6 +38,7 @@ public class SViewPayrollReceiptRecord extends SGridPaneView {
 
     private void initComponentCustom() {
         setRowButtonsEnabled(false);
+        jtbFilterDeleted.setEnabled(false);
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));

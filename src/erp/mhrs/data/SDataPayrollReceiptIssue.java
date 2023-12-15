@@ -93,7 +93,6 @@ public class SDataPayrollReceiptIssue extends SDataRegistry implements Serializa
                 moDbmsDataCfd.annul(connection);
             }
             mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
-        
         }
         catch (SQLException exception) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
