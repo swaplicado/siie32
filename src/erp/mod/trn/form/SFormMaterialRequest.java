@@ -2078,13 +2078,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            double per = 0;
-            for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
-                SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
-                per += cc.getPercentage();
-            }
-            if (per != 1) {
-                validation.setMessage("La suma de los porcentajes de los centros de costo no es igual al 100%");
+            if (moDecAsign.getValue() != 1.0) {
+                validation.setMessage("La suma de los porcentajes de los centros de costo es " + moDecAsign.getValue() * 100 + "% y deberia ser igual al 100%");
             }
         }
         
