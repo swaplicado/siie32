@@ -7849,9 +7849,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         else {
                             //BizParther is internacional
                             if (moBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)){
+                                // document sales
+                                if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
                             // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
-                                if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
-                                    miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
+                                    if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
+                                        miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
+                                    }
                                 }
                             }
                             
