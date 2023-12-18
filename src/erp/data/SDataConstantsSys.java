@@ -882,6 +882,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_TP_ACC_BP_OP = 1;
     public static final int FINS_TP_ACC_BP_PAY = 2;
     public static final int FINS_TP_ACC_BP_ADV_BILL = 3;
+    public static final int FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY = 4;
 
     public static final int FINS_TP_ACC_ITEM_ASSET = 1;
     public static final int FINS_TP_ACC_ITEM_INV_MFG_CO = 2;
