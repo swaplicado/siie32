@@ -35,7 +35,6 @@ import erp.mod.trn.db.SDbMaterialConsumptionEntity;
 import erp.mod.trn.db.SDbMaterialConsumptionEntityBudget;
 import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
 import erp.mod.trn.db.SDbMaterialCostCenterGroup;
-import erp.mod.trn.db.SDbMaterialPresentation;
 import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
@@ -61,7 +60,6 @@ import erp.mod.trn.form.SFormMaterialConsumptionEntity;
 import erp.mod.trn.form.SFormMaterialConsumptionEntityBudget;
 import erp.mod.trn.form.SFormMaterialConsumptionSubentity;
 import erp.mod.trn.form.SFormMaterialCostCenterGroup;
-import erp.mod.trn.form.SFormMaterialPresentation;
 import erp.mod.trn.form.SFormMaterialProvisionEntity;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMaterialRequestCostCenter;
@@ -103,7 +101,6 @@ import erp.mod.trn.view.SViewMaterialConsumptionEntity;
 import erp.mod.trn.view.SViewMaterialConsumptionEntityBudget;
 import erp.mod.trn.view.SViewMaterialConsumptionSubentity;
 import erp.mod.trn.view.SViewMaterialCostCenterGroup;
-import erp.mod.trn.view.SViewMaterialPresentation;
 import erp.mod.trn.view.SViewMaterialProvisionEntity;
 import erp.mod.trn.view.SViewMaterialRequesPendingSupply;
 import erp.mod.trn.view.SViewMaterialRequest;
@@ -141,7 +138,6 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaterialConsumptionEntity moFormMaterialConsumptionEntity;
     private SFormMaterialConsumptionSubentity moFormMaterialConsumptionSubentity;
     private SFormMaterialProvisionEntity moFormMaterialProvisionEntity;
-    private SFormMaterialPresentation moFormMaterialPresentation;
     private SFormConfUserVsEntity moFormUserVsEntity;
     private SFormConfEmployeeVsEntity moFormEmployeeVsEntity;
     private SFormConfWarehouseVsProvEntity moFormWarehouseVsProvEntity;
@@ -192,9 +188,6 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_ct_dps = " + pk[0] + " AND id_cl_dps = " + pk[1] + " AND id_tp_dps = " + pk[2] + " "; }
                 };
-                break;
-            case SModConsts.TRNU_MAT_PRES:
-                registry = new SDbMaterialPresentation();
                 break;
             case SModConsts.TRNS_TP_MAINT_MOV:
                 registry = new SDbRegistrySysFly(type) {
@@ -358,14 +351,6 @@ public class SModuleTrn extends SGuiModule {
                         + "WHERE NOT b_del "
                         + "ORDER BY id_mat_req_pty";
                 break;
-            case SModConsts.TRNU_MAT_PRES:
-                settings = new SGuiCatalogueSettings("Presentación", 1);
-                sql = "SELECT id_mat_pres AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE NOT b_del AND id_mat_pres <> " + SModSysConsts.TRNU_MAT_PRES_NA + " "
-                        + (params != null ? "AND fk_unit = " + params.getType() + " " : "")
-                        + "ORDER BY name";
-                break;
             case SModConsts.TRN_MAINT_AREA:
                 settings = new SGuiCatalogueSettings("Área de mantenimiento", 1);
                 sql = "SELECT id_maint_area AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
@@ -506,9 +491,6 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 view = new SViewItemRequiredDpsConfig(miClient, "Configuración ítems obligatorios documentos origen");
                 break;
-            case SModConsts.TRNU_MAT_PRES:
-                view = new SViewMaterialPresentation(miClient, "Presentación de materiales");
-                break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 switch (subtype) {
                     case SModConsts.MOD_TRN_SAL_N:
@@ -592,17 +574,24 @@ public class SModuleTrn extends SGuiModule {
                 switch(subtype) {
                     case SModSysConsts.TRNX_MAT_REQ_PET:
                         switch (params.getType()) {
-                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis req. nuevas"; break;
-                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis req. x autorizar"; break;
-                            case SModSysConsts.TRNS_ST_MAT_REQ_PROV: title = "Mis req. en proceso"; break;
-                            case SLibConsts.UNDEFINED: title = "Todas mis requisiciones"; break;
-                            default: title = "Requisiciones de materiales"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis RM nuevas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis RM x autorizar"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_PROV: 
+                                switch (params.getSubtype()) {
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PROV: title = "Mis RM x suministrar"; break;
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PUR: title = "Mis RM x comprar"; break;
+                                }
+                                break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis RM"; break;
+                            case SModConsts.TRN_MAT_CONS_ENT_USR: title = "RM mis c. consumo"; break;
+                            case SModConsts.TRN_MAT_PROV_ENT: title = "RM mis c. suministro"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_REV:
                         switch (params.getType()) {
-                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Requisiciones x autorizar"; break;
-                            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "Req autorizadas/rechazadas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "RM x autorizar"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_AUTHO: title = "RM autorizadas"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "RM rechazadas"; break;
                         }
                         break;
                 }
@@ -632,22 +621,22 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "Req x comprar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM x comprar a detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "Requisiciones compradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "RM compradas";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Requisiciones x comprar";
+                    case SLibConsts.UNDEFINED: title = "RM x comprar";
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "Req x cotizar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x cotizar a detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "Req cotizadas a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM cotizadas a detalle";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Requisiciones x cotizar";
+                    case SLibConsts.UNDEFINED: title = "RM x cotizar";
                         break;
                 }
                 view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
@@ -775,10 +764,6 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 if(moFormItemRequiredDpsConfig == null) moFormItemRequiredDpsConfig = new SFormItemRequiredDpsConfig(miClient, "Configuración de ítems obligatorios con documentos origen");
                 form = moFormItemRequiredDpsConfig;
-                break;
-            case SModConsts.TRNU_MAT_PRES:
-                if (moFormMaterialPresentation == null) moFormMaterialPresentation = new SFormMaterialPresentation(miClient, "Presentación de materiales");
-                form = moFormMaterialPresentation;
                 break;
             case SModConsts.TRN_INV_VAL:
                 if (moFormInventoryValuationPrcCalc == null) moFormInventoryValuationPrcCalc = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_PRC_CALC, "Valuación de inventarios");

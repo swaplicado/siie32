@@ -3404,16 +3404,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             // Initialize original unit combo box:
 
             if (mnAuxCurrentUnitTypeId != moItem.getDbmsDataUnit().getFkUnitTypeId() || 
-                    (mnAuxCurrentUnitTypeId == moItem.getDbmsDataUnit().getFkUnitTypeId() && mnAuxCurrentUnitAlternativeTypeId != moItem.getFkUnitAlternativeTypeId())) {
+                    (mnAuxCurrentUnitTypeId == moItem.getDbmsDataUnit().getFkUnitTypeId() && mnAuxCurrentUnitAlternativeTypeId != moItem.getFkUnitAlternativeTypeId()) ||
+                    moItem.getDbmsDataUnit().hasEquivalentUnits()) {
                 mnAuxCurrentUnitTypeId = moItem.getDbmsDataUnit().getFkUnitTypeId();
                 mnAuxCurrentUnitAlternativeTypeId = moItem.getFkUnitAlternativeTypeId();
 
-                if (moItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA) {
-                    SFormUtilities.populateComboBox(miClient, jcbFkOriginalUnitId, SDataConstants.ITMU_UNIT, new Object[] { moItem.getDbmsDataUnit().getFkUnitTypeId(), moItem.getFkUnitAlternativeTypeId() });
-                }
-                else {
-                    SFormUtilities.populateComboBox(miClient, jcbFkOriginalUnitId, SDataConstants.ITMU_UNIT, new int[] { moItem.getDbmsDataUnit().getFkUnitTypeId() });
-                }
+                int flagIsItemApplying = 1;
+                SFormUtilities.populateComboBox(miClient, 
+                                                jcbFkOriginalUnitId, 
+                                                SDataConstants.ITMU_UNIT, 
+                                                new int[] { moItem.getFkUnitId(), moItem.getPkItemId(), flagIsItemApplying });
+                
             }
 
             // Initialize surplus default:
@@ -3450,7 +3451,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             moFieldConceptKey.setFieldValue(!conceptKey.isEmpty() ? conceptKey : moItem.getKey());
             moFieldConcept.setFieldValue(concept);
-            moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : moItem.getFkUnitId() });
+            moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : (moItem.getFkUnitCommercial_n() > 0 ? moItem.getFkUnitCommercial_n() : moItem.getFkUnitId()) });
             moFieldIsInventoriable.setFieldValue(moItem.getIsInventoriable());
             moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
             moFieldPartNum.setFieldValue(!partNum.isEmpty() ? partNum : "S/No.Parte");

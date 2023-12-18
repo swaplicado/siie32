@@ -64,7 +64,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[48];
+        STableColumn[] aoTableColumns = new STableColumn[49];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -98,6 +98,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unc.symbol", "U. cont. neto", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uncu.symbol", "U. cont. neto u.", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tua.tp_unit", "Tipo u. alt.", 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un_comm", "Un. com", 55);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tl.tp_lev", "Tipo nivel", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "si.name", "Estatus", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.prod_time", "Tiempo producción", STableConstants.WIDTH_QUANTITY);
@@ -205,7 +206,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         msSql = "SELECT i.id_item, i.item, i.item_short, i.item_key, i.b_bulk, i.b_inv, i.b_lot, i.units_cont, i.part_num, " +
                 "i.units_virt, i.prod_time, i.prod_cost, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, i.b_pre_pay, i.tariff, i.custs_unit, i.custs_equiv, " +
                 "i.b_free_price, i.b_free_disc, i.b_free_disc_u, i.b_free_disc_ety, i.b_free_disc_doc, i.b_free_comms, i.b_sales_freight_req, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
-                "ig.igen, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, tua.tp_unit, tl.tp_lev, brd.brd, " +
+                "ig.igen, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, COALESCE(ucomm.symbol, '') AS un_comm, tua.tp_unit, tl.tp_lev, brd.brd, " +
                 "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON " +
@@ -242,6 +243,8 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
                 "i.fid_line_n = il.id_line " +
                 "LEFT OUTER JOIN erp.itms_cfd_prod_serv AS cfdps ON " +
                 "i.fid_cfd_prod_serv_n = cfdps.id_cfd_prod_serv " +
+                "LEFT OUTER JOIN erp.itmu_unit AS ucomm ON " +
+                "i.fid_unit_comm_n = ucomm.id_unit " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
                     "i.item_key, i.item, " :

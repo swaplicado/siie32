@@ -81,6 +81,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected int mnFkUnitUnitsVirtualId;
     protected int mnFkUnitNetContentId;
     protected int mnFkUnitNetContentUnitaryId;
+    protected int mnFkUnitCommercial_n;
     protected int mnFkUnitAlternativeTypeId;
     protected int mnFkLevelTypeId;
     protected int mnFkBrandId;
@@ -177,6 +178,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setFkUnitUnitsVirtualId(int n) { mnFkUnitUnitsVirtualId = n; }
     public void setFkUnitNetContentId(int n) { mnFkUnitNetContentId = n; }
     public void setFkUnitNetContentUnitaryId(int n) { mnFkUnitNetContentUnitaryId = n; }
+    public void setFkUnitCommercial_n(int n) { mnFkUnitCommercial_n = n; }
     public void setFkUnitAlternativeTypeId(int n) { mnFkUnitAlternativeTypeId = n; }
     public void setFkLevelTypeId(int n) { mnFkLevelTypeId = n; }
     public void setFkBrandId(int n) { mnFkBrandId = n; }
@@ -259,6 +261,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int getFkUnitUnitsVirtualId() { return mnFkUnitUnitsVirtualId; }
     public int getFkUnitNetContentId() { return mnFkUnitNetContentId; }
     public int getFkUnitNetContentUnitaryId() { return mnFkUnitNetContentUnitaryId; }
+    public int getFkUnitCommercial_n() { return mnFkUnitCommercial_n; }
     public int getFkUnitAlternativeTypeId() { return mnFkUnitAlternativeTypeId; }
     public int getFkLevelTypeId() { return mnFkLevelTypeId; }
     public int getFkBrandId() { return mnFkBrandId; }
@@ -392,6 +395,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkUnitUnitsVirtualId = 0;
         mnFkUnitNetContentId = 0;
         mnFkUnitNetContentUnitaryId = 0;
+        mnFkUnitCommercial_n = 0;
         mnFkUnitAlternativeTypeId = 0;
         mnFkLevelTypeId = 0;
         mnFkBrandId = 0;
@@ -498,6 +502,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mnFkUnitUnitsVirtualId = resultSet.getInt("fid_unit_units_virt");
                 mnFkUnitNetContentId = resultSet.getInt("fid_unit_net_cont");
                 mnFkUnitNetContentUnitaryId = resultSet.getInt("fid_unit_net_cont_u");
+                mnFkUnitCommercial_n = resultSet.getInt("fid_unit_comm_n");
                 mnFkUnitAlternativeTypeId = resultSet.getInt("fid_tp_unit_alt");
                 mnFkLevelTypeId = resultSet.getInt("fid_tp_lev");
                 mnFkBrandId = resultSet.getInt("fid_brd");
@@ -615,7 +620,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -675,6 +680,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mnFkUnitUnitsVirtualId);
             callableStatement.setInt(nParam++, mnFkUnitNetContentId);
             callableStatement.setInt(nParam++, mnFkUnitNetContentUnitaryId);
+            callableStatement.setInt(nParam++, mnFkUnitCommercial_n);
             callableStatement.setInt(nParam++, mnFkUnitAlternativeTypeId);
             callableStatement.setInt(nParam++, mnFkLevelTypeId);
             callableStatement.setInt(nParam++, mnFkBrandId);

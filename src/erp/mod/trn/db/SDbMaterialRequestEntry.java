@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -30,17 +31,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnPkEntryId;
     protected Date mtDateRequest_n;
     protected double mdQuantity;
-    protected double mdFactorConvertion;
     protected double mdPriceUnitarySystem;
     protected double mdPriceUnitary;
-    protected String msPriceUnitaryReference;
+    protected double mdUserQuantity;
+    protected double mdUserPriceUnitary;
+    protected String msUserPriceUnitaryReference;
     protected double mdTotal_r;
     protected int mnCosnsumptionEstimated;
     protected boolean mbNewItem;
     //protected boolean mbDeleted;
     protected int mnFkItemId;
     protected int mnFkUnitId;
-    protected int mnFkMatPresentationId;
+    protected int mnFkUserUnitId;
     protected int mnFkMatRequestPriorityId_n;
     protected int mnFkEntMatConsumptionEntityId_n;
     protected int mnFkSubentMatConsumptionEntityId_n;
@@ -55,10 +57,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     protected SDataItem moDataItem;
     protected SDataItem moDataItemRef;
+    protected SDataUnit moDataUnitUsr;
     protected SDbMaterialConsumptionEntity moDbmsMatConsEntity;
     protected SDbMaterialConsumptionSubentity moDbmsMatConsSubentity;
     protected SDbMaterialRequestPriority moDbmsMatReqPty;
-    protected SDbMaterialPresentation moDbmsPresentation;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -68,17 +70,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
     public void setQuantity(double d) { mdQuantity = d; }
-    public void setFactorConvertion(double d) { mdFactorConvertion = d; }
     public void setPriceUnitarySystem(double d) { mdPriceUnitarySystem = d; }
     public void setPriceUnitary(double d) { mdPriceUnitary = d; }
-    public void setPriceUnitaryReference(String s) { msPriceUnitaryReference = s; }
+    public void setUserQuantity(double d) { mdUserQuantity = d; }
+    public void setUserPriceUnitary(double d) { mdUserPriceUnitary = d; }
+    public void setUserPriceUnitaryReference(String s) { msUserPriceUnitaryReference = s; }
     public void setTotal_r(double d) { mdTotal_r = d; }
     public void setCosnsumptionEstimated(int n) { mnCosnsumptionEstimated = n; }
     public void setNewItem(boolean b) { mbNewItem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
-    public void setFkMatPresentationId(int n) { mnFkMatPresentationId = n; }
+    public void setFkUserUnitId(int n) { mnFkUserUnitId = n; }
     public void setFkMatRequestPriorityId_n(int n) { mnFkMatRequestPriorityId_n = n; }
     public void setFkEntMatConsumptionEntityId_n(int n) { mnFkEntMatConsumptionEntityId_n = n; }
     public void setFkSubentMatConsumptionEntityId_n(int n) { mnFkSubentMatConsumptionEntityId_n = n; }
@@ -88,6 +91,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     public void setDataItem(SDataItem o) { moDataItem = o; }
     public void setDataItemRef(SDataItem o) { moDataItemRef = o; }
+    public void setDataUnitUsr(SDataUnit o) { moDataUnitUsr = o; }
     
     public void setAuxRowId(int n) { mnAuxRowId = n; }
 
@@ -95,17 +99,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getPkEntryId() { return mnPkEntryId; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
     public double getQuantity() { return mdQuantity; }
-    public double getFactorConvertion() { return mdFactorConvertion; }
     public double getPriceUnitarySystem() { return mdPriceUnitarySystem; }
     public double getPriceUnitary() { return mdPriceUnitary; }
-    public String getPriceUnitaryReference() { return msPriceUnitaryReference; }
+    public double getUserQuantity() { return mdUserQuantity; }
+    public double getUserPriceUnitary() { return mdUserPriceUnitary; }
+    public String getUserPriceUnitaryReference() { return msUserPriceUnitaryReference; }
     public double getTotal_r() { return mdTotal_r; }
     public int getCosnsumptionEstimated() { return mnCosnsumptionEstimated; }
     public boolean isNewItem() { return mbNewItem; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
-    public int getFkMatPresentationId() { return mnFkMatPresentationId; }
+    public int getFkUserUnitId() { return mnFkUserUnitId; }
     public int getFkMatRequestPriorityId_n() { return mnFkMatRequestPriorityId_n; }
     public int getFkEntMatConsumptionEntityId_n() { return mnFkEntMatConsumptionEntityId_n; }
     public int getFkSubentMatConsumptionEntityId_n() { return mnFkSubentMatConsumptionEntityId_n; }
@@ -119,6 +124,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getAuxRowId() { return mnAuxRowId; }
     public SDataItem getDataItem() { return moDataItem; }
     public SDataItem getDataItemRef() { return moDataItemRef; }
+    public SDataUnit getDataUnitUsr() { return moDataUnitUsr; }
     
     public String getItemNewDescription() {
         for (SDbMaterialRequestEntryNote note : maChildNotes) {
@@ -183,7 +189,6 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
-        moDbmsPresentation = null;
         
         if (mnFkEntMatConsumptionEntityId_n != 0) {
             moDbmsMatConsEntity = new SDbMaterialConsumptionEntity();
@@ -196,10 +201,6 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         if (mnFkMatRequestPriorityId_n != 0) {
             moDbmsMatReqPty = new SDbMaterialRequestPriority();
             moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
-        }
-        if (mnFkMatPresentationId != 0) {
-            moDbmsPresentation = new SDbMaterialPresentation();
-            moDbmsPresentation.read(session, new int[] { mnFkMatPresentationId });
         }
     }
             
@@ -222,17 +223,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnPkEntryId = 0;
         mtDateRequest_n = null;
         mdQuantity = 0;
-        mdFactorConvertion = 0;
         mdPriceUnitarySystem = 0;
         mdPriceUnitary = 0;
-        msPriceUnitaryReference = "";
+        mdUserQuantity = 0;
+        mdUserPriceUnitary = 0;
+        msUserPriceUnitaryReference = "";
         mdTotal_r = 0;
         mnCosnsumptionEstimated = 0;
         mbNewItem = false;
         mbDeleted = false;
         mnFkItemId = 0;
         mnFkUnitId = 0;
-        mnFkMatPresentationId = 0;
+        mnFkUserUnitId = 0;
         mnFkMatRequestPriorityId_n = 0;
         mnFkEntMatConsumptionEntityId_n = 0;
         mnFkSubentMatConsumptionEntityId_n = 0;
@@ -246,10 +248,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnAuxRowId = 0;
         moDataItem = null;
         moDataItemRef = null;
+        moDataUnitUsr = null;
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
-        moDbmsPresentation = null;
     }
 
     @Override
@@ -301,17 +303,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mnPkEntryId = resultSet.getInt("id_ety");
             mtDateRequest_n = resultSet.getDate("dt_req_n");
             mdQuantity = resultSet.getDouble("qty");
-            mdFactorConvertion = resultSet.getDouble("fact_conv");
             mdPriceUnitarySystem = resultSet.getDouble("price_u_sys");
             mdPriceUnitary = resultSet.getDouble("price_u");
-            msPriceUnitaryReference = resultSet.getString("price_u_ref");
+            mdUserQuantity = resultSet.getDouble("user_qty");
+            mdUserPriceUnitary = resultSet.getDouble("user_price_u");
+            msUserPriceUnitaryReference = resultSet.getString("user_price_u_ref");
             mdTotal_r = resultSet.getDouble("tot_r");
             mnCosnsumptionEstimated = resultSet.getInt("cons_est");
             mbNewItem = resultSet.getBoolean("b_new_item");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkItemId = resultSet.getInt("fk_item");
             mnFkUnitId = resultSet.getInt("fk_unit");
-            mnFkMatPresentationId = resultSet.getInt("fk_mat_pres");
+            mnFkUserUnitId = resultSet.getInt("fk_user_unit");
             mnFkMatRequestPriorityId_n = resultSet.getInt("fk_mat_req_pty_n");
             mnFkEntMatConsumptionEntityId_n = resultSet.getInt("fk_ent_mat_cons_ent_n");
             mnFkSubentMatConsumptionEntityId_n = resultSet.getInt("fk_subent_mat_cons_ent_n");
@@ -359,6 +362,11 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                 moDataItemRef.read(new int[] { mnFkItemReferenceId_n }, statement);
             }
             
+            if (mnFkUserUnitId != 0) {
+                moDataUnitUsr = new SDataUnit();
+                moDataUnitUsr.read(new int[] { mnFkUserUnitId }, statement);
+            }
+            
             readOptionalInfo(session);
 
             mbRegistryNew = false;
@@ -383,17 +391,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     mnPkEntryId + ", " + 
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
                     mdQuantity + ", " + 
-                    mdFactorConvertion + ", " + 
                     mdPriceUnitarySystem + ", " + 
                     mdPriceUnitary + ", " + 
-                    "'" + msPriceUnitaryReference + "', " + 
+                    mdUserQuantity + ", " + 
+                    mdUserPriceUnitary + ", " + 
+                    "'" + msUserPriceUnitaryReference + "', " + 
                     mdTotal_r + ", " + 
                     mnCosnsumptionEstimated + ", " + 
                     (mbNewItem ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkItemId + ", " + 
                     mnFkUnitId + ", " + 
-                    mnFkMatPresentationId + ", " + 
+                    mnFkUserUnitId + ", " + 
                     (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") + 
                     (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") + 
                     (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") + 
@@ -410,17 +419,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     //"id_ety = " + mnPkEntryId + ", " +
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
                     "qty = " + mdQuantity + ", " +
-                    "fact_conv = " + mdFactorConvertion + ", " +
                     "price_u_sys = " + mdPriceUnitarySystem + ", " +
                     "price_u = " + mdPriceUnitary + ", " +
-                    "price_u_ref = '" + msPriceUnitaryReference + "', " +
+                    "user_qty = " + mdUserQuantity + ", " +
+                    "user_price_u = " + mdUserPriceUnitary + ", " +
+                    "user_price_u_ref = '" + msUserPriceUnitaryReference + "', " +
                     "tot_r = " + mdTotal_r + ", " +
                     "cons_est = " + mnCosnsumptionEstimated + ", " +
                     "b_new_item = " + (mbNewItem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_item = " + mnFkItemId + ", " +
                     "fk_unit = " + mnFkUnitId + ", " +
-                    "fk_mat_pres = " + mnFkMatPresentationId + ", " +
+                    "fk_user_unit = " + mnFkUserUnitId + ", " +
                     "fk_mat_req_pty_n = " + (mnFkMatRequestPriorityId_n == 0 ? "NULL, " : mnFkMatRequestPriorityId_n + ", ") +
                     "fk_ent_mat_cons_ent_n = " + (mnFkEntMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkEntMatConsumptionEntityId_n + ", ") +
                     "fk_subent_mat_cons_ent_n = " + (mnFkSubentMatConsumptionEntityId_n == 0 ? "NULL, " : mnFkSubentMatConsumptionEntityId_n + ", ") +
@@ -466,17 +476,18 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setPkEntryId(this.getPkEntryId());
         registry.setDateRequest_n(this.getDateRequest_n());
         registry.setQuantity(this.getQuantity());
-        registry.setFactorConvertion(this.getFactorConvertion());
         registry.setPriceUnitarySystem(this.getPriceUnitarySystem());
         registry.setPriceUnitary(this.getPriceUnitary());
-        registry.setPriceUnitaryReference(this.getPriceUnitaryReference());
+        registry.setUserQuantity(this.getUserQuantity());
+        registry.setUserPriceUnitary(this.getUserPriceUnitary());
+        registry.setUserPriceUnitaryReference(this.getUserPriceUnitaryReference());
         registry.setTotal_r(this.getTotal_r());
         registry.setCosnsumptionEstimated(this.getCosnsumptionEstimated());
         registry.setNewItem(this.isNewItem());
         registry.setDeleted(this.isDeleted());
         registry.setFkItemId(this.getFkItemId());
         registry.setFkUnitId(this.getFkUnitId());
-        registry.setFkMatPresentationId(this.getFkMatPresentationId());
+        registry.setFkUserUnitId(this.getFkUserUnitId());
         registry.setFkMatRequestPriorityId_n(this.getFkMatRequestPriorityId_n());
         registry.setFkEntMatConsumptionEntityId_n(this.getFkEntMatConsumptionEntityId_n());
         registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
@@ -545,12 +556,12 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 1: value = mbNewItem ? getItemNewDescription() : moDataItem.getName(); break;
             case 2: value = mbNewItem ? "" : moDataItem.getPartNumber(); break;
             case 3: value = moDataItemRef == null ? "" : moDataItemRef.getKey(); break;
-            case 4: value = mdQuantity; break;
-            case 5: value = mbNewItem ? "" : moDataItem.getDbmsDataUnit().getSymbol(); break;
-            case 6: value = mdTotal_r; break;
-            case 7: value = mbNewItem; break;
-            case 8: value = moDbmsPresentation != null ? moDbmsPresentation.getName(): ""; break;
-            case 9: value = mdFactorConvertion; break;
+            case 4: value = mdUserQuantity; break;
+            case 5: value = moDataUnitUsr.getSymbol(); break;
+            case 6: value = mdQuantity; break;
+            case 7: value = moDataItem.getDbmsDataUnit().getSymbol(); break;
+            case 8: value = mdTotal_r; break;
+            case 9: value = mbNewItem; break;
             case 10: value = mnCosnsumptionEstimated; break;
             case 11: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
             case 12: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;

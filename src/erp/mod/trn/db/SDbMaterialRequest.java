@@ -690,6 +690,11 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
+    
+    public void cancel(SGuiSession session) throws Exception {
+        msSql = "UPDATE " + getSqlTable() + " SET fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_CAN + " " + getSqlWhere();
+        session.getStatement().execute(msSql);
+    }
 
     @Override
     public SDbMaterialRequest clone() throws CloneNotSupportedException {

@@ -207,6 +207,7 @@ public abstract class SModConsts {
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
     public static final int ITMU_UNIT = 1052503;
+    public static final int ITMU_UNIT_EQUIV = 1052514;
     public static final int ITMU_TP_VAR = 1052504;
     public static final int ITMU_VAR = 1052505;
     public static final int ITMU_TP_BRD = 1052506;
@@ -373,8 +374,7 @@ public abstract class SModConsts {
     public static final int TRNU_TP_IOG_ADJ = 2022004;
     public static final int TRNU_TP_DPS_ANN = 2022005;
     public static final int TRNU_MAT_REQ_PTY = 2022007;
-    public static final int TRNU_MAT_PRES = 2022008;
-
+    
     public static final int TRN_DNS_DPS = 2023001;
     public static final int TRN_DNS_DIOG = 2023002;
     public static final int TRN_DNC_DPS_COB = 2023003;
@@ -1016,6 +1016,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
+        TablesMap.put(ITMU_UNIT_EQUIV, "erp.itmu_unit_equiv");
         TablesMap.put(ITMU_TP_VAR, "erp.itmu_tp_var");
         TablesMap.put(ITMU_VAR, "erp.itmu_var");
         TablesMap.put(ITMU_TP_BRD, "erp.itmu_tp_brd");
@@ -1164,7 +1165,6 @@ public abstract class SModConsts {
         TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
         TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
         TablesMap.put(TRNU_MAT_REQ_PTY, "erp.trnu_mat_req_pty");
-        TablesMap.put(TRNU_MAT_PRES, "erp.trnu_mat_pres");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
         TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");
