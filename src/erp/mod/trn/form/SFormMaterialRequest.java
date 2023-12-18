@@ -1617,7 +1617,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         if (moDialogPickerUnit == null) {
         }
-        moDialogPickerUnit = SMaterialRequestUtils.getOptionUnitPicker(miClient, SModConsts.ITMU_UNIT, SLibConsts.UNDEFINED, null);
+        SGuiParams params = new SGuiParams();
+        params.getParamsMap().put(0, moItemEty.getFkUnitId());
+        params.getParamsMap().put(1, moItemEty.getPkItemId());
+        moDialogPickerUnit = SMaterialRequestUtils.getOptionUnitPicker(miClient, SModConsts.ITMU_UNIT, SMaterialRequestUtils.EQUIVALENCES, params);
         
         moDialogPickerUnit.resetPicker();
         moDialogPickerUnit.initComponentsCustom();

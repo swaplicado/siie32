@@ -592,6 +592,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                                                                                 SMaterialRequestEntryRow.FORM_ESTIMATE,
                                                                                 oMaterialRequestEntry.getFkItemId(), 
                                                                                 oMaterialRequestEntry.getFkUnitId(),
+                                                                                oMaterialRequestEntry.getFkUserUnitId(),
                                                                                 oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                         moMaterialRequest.getConsumptionInfo() : 
                                                                                         oMaterialRequestEntry.getConsumptionInfo()

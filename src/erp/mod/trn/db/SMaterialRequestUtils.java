@@ -7,7 +7,9 @@ package erp.mod.trn.db;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -48,6 +50,7 @@ import sa.lib.gui.SGuiSession;
 public abstract class SMaterialRequestUtils {
 
     public static String ITEM_INV = "is_inv";
+    public static final int EQUIVALENCES = 1;
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
         String query = "SELECT id_stk_seg "
@@ -156,6 +159,7 @@ public abstract class SMaterialRequestUtils {
                 oSuppRow = new SMaterialRequestSupplyRow((SClientInterface) client, 
                                                         res.getInt("dety.fid_item"), 
                                                         res.getInt("dety.fid_unit"), 
+                                                        res.getInt("dety.fid_orig_unit"), 
                                                         res.getInt("fid_cob"), 
                                                         res.getInt("fid_wh"));
                 
@@ -190,7 +194,7 @@ public abstract class SMaterialRequestUtils {
         return qtySupplied;
     }
     
-    public static ArrayList<SDataDiog> makeDiogs(final int pkYear, final Date date, final int fkUser, ArrayList<SMaterialRequestSupplyRow> lSupplies, final int idStkseg, final int user, final int userSup) {
+    public static ArrayList<SDataDiog> makeDiogs(SGuiClient client, final int pkYear, final Date date, final int fkUser, ArrayList<SMaterialRequestSupplyRow> lSupplies, final int idStkseg, final int user, final int userSup) {
         HashMap<String, SDataDiog> mDiogs = new HashMap<>();
         String warehouseKey = null;
         for (SMaterialRequestSupplyRow oSupply : lSupplies) {
@@ -254,14 +258,15 @@ public abstract class SMaterialRequestUtils {
             oDiogEty.setQuantity(oSupply.getQuantity());
             oDiogEty.setValueUnitary(0d);
             oDiogEty.setValue(0d);
-            oDiogEty.setOriginalQuantity(oSupply.getQuantity());
+            oDiogEty.setOriginalQuantity(SLibUtilities.round(oSupply.getQuantity() * 
+                                                        ((SSessionCustom) client.getSession().getSessionCustom()).getUnitsFactorForQuantity(oSupply.getFkItemId(), oSupply.getFkUnitId(), oSupply.getFkOrigUnitId()), ((SClientInterface) client).getSessionXXX().getParamsErp().getDecimalsQuantity()));
             oDiogEty.setOriginalValueUnitary(0d);
             oDiogEty.setSortingPosition(0);
             oDiogEty.setIsInventoriable(oSupply.getIsInventorable());
             oDiogEty.setIsDeleted(false);
             oDiogEty.setFkItemId(oSupply.getFkItemId());
             oDiogEty.setFkUnitId(oSupply.getFkUnitId());
-            oDiogEty.setFkOriginalUnitId(oSupply.getFkUnitId());
+            oDiogEty.setFkOriginalUnitId(oSupply.getFkOrigUnitId());
             oDiogEty.setFkDpsYearId_n(0);
             oDiogEty.setFkDpsDocId_n(0);
             oDiogEty.setFkDpsEntryId_n(0);
@@ -477,6 +482,40 @@ public abstract class SMaterialRequestUtils {
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS a " 
                                 + "WHERE NOT a.b_del ";
                         break;
+                    case EQUIVALENCES:
+                        sql = "SELECT u.id_unit AS " + SDbConsts.FIELD_ID + "1, " +
+                                "u.unit AS " + SDbConsts.FIELD_PICK + "1, u.symbol AS " + SDbConsts.FIELD_PICK + "2 " +
+                                "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u " +
+                                "WHERE " +
+                                "    NOT u.b_del " +
+                                "        AND (fid_tp_unit = (SELECT  " +
+                                "            fid_tp_unit " +
+                                "        FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS ui " +
+                                "        WHERE " +
+                                "            ui.id_unit = " + params.getParamsMap().get(0) + ") " +
+                                "        OR fid_tp_unit = (COALESCE((SELECT  " +
+                                "                    fid_tp_unit_alt " +
+                                "                FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS itm " +
+                                "                WHERE " +
+                                "                    id_item = " + params.getParamsMap().get(1) + "), " +
+                                "            0)) " +
+                                "        OR u.id_unit = (COALESCE((SELECT  " +
+                                "                    fid_unit_comm_n " +
+                                "                FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS itm " +
+                                "                WHERE " +
+                                "                    id_item = " + params.getParamsMap().get(1) + "), " +
+                                "            0)) " +
+                                "        OR u.id_unit IN (SELECT  " +
+                                "            id_unit " +
+                                "        FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT_EQUIV) + " AS ue " +
+                                "        WHERE " +
+                                "            ue.id_unit_equiv = " + params.getParamsMap().get(0) + " AND NOT ue.b_del) " +
+                                "        OR u.id_unit IN (SELECT  " +
+                                "            id_unit_equiv " +
+                                "        FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT_EQUIV) + " AS ue " +
+                                "        WHERE " +
+                                "            ue.id_unit = " + params.getParamsMap().get(0) + " AND NOT ue.b_del));";
+                        break;
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Unidad"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Símbolo"));
@@ -541,10 +580,11 @@ public abstract class SMaterialRequestUtils {
      * @param pkMatReqEty llave primaria de la partida de la requisición
      * @param dpsType tipo de documento, si este es nulo, no filtra y muestra la suma de todas las referencias de todos los tipos de documento
      * @param pkDpsEtyExcluded
+     * @param qtyOrOrigQty 1 = qty, 2 = orig_qty
      * @return 
      */
-    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType, final int[] pkDpsEtyExcluded) {
-        String query = "SELECT SUM(dmr.qty) AS qty_linked FROM "
+    public static double getQuantityLinkedOfReqEty(SGuiSession session, final int[] pkMatReqEty, final int[] dpsType, final int[] pkDpsEtyExcluded, final int qtyOrOrigQty) {
+        String query = "SELECT "+ (qtyOrOrigQty == 1 ? "SUM(dmr.qty) " : "SUM(dety.orig_qty) ") + " AS qty_linked FROM "
                 + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dmr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dety ON dmr.fid_dps_year = dety.id_year "
                                                                                         + "AND dmr.fid_dps_doc = dety.id_doc "
@@ -583,17 +623,31 @@ public abstract class SMaterialRequestUtils {
         return 0d;
     }
     
-    public static double getQuantitySuppliedOfReqEty(SGuiSession session, final int[] pkMatRequestEty) {
-        String query = "SELECT " +
-                        "SUM(mov_out) AS qty_supplied " +
-                        "FROM " +
-                        SModConsts.TablesMap.get(SModConsts.TRN_STK) + " " +
-                        "WHERE " +
-                        "    NOT b_del AND id_year = " + session.getCurrentYear() + " " +
-                        "        AND dt <= '" + session.getCurrentDate() + "' " +
-                        "        AND fid_mat_req_n = " + pkMatRequestEty[0] + " " +
-                        "        AND fid_mat_req_ety_n = " + pkMatRequestEty[1] + " " +
-                        "        AND fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_OUT +";";
+    /**
+     * 
+     * @param session
+     * @param pkMatRequestEty
+     * @param qtyOrQtyOrig 1 = qty, 2 = orig_qty
+     * @return 
+     */
+    public static double getQuantitySuppliedOfReqEty(SGuiSession session, final int[] pkMatRequestEty, final int qtyOrQtyOrig) {
+        String query = "SELECT  " +
+                "     SUM(" + (qtyOrQtyOrig == 1 ? "de.qty" : "de.orig_qty"  ) + ") AS qty_supplied " +
+                "    FROM " +
+                "        trn_diog AS d " +
+                "    INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year " +
+                "        AND d.id_doc = de.id_doc " +
+                "    INNER JOIN trn_mat_req AS v ON de.fid_mat_req_n = v.id_mat_req " +
+                "    WHERE " +
+                "        de.fid_mat_req_n IS NOT NULL " +
+                "            AND de.fid_mat_req_ety_n IS NOT NULL " +
+                "            AND NOT de.b_del " +
+                "            AND NOT d.b_del " +
+                "            AND d.fid_ct_iog IN (" + SDataConstantsSys.TRNS_CT_IOG_OUT +") " +
+                "            AND d.fid_cl_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1] + ") " +
+                "            AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[2] + ") " +
+                "            AND de.fid_mat_req_n = " + pkMatRequestEty[0] + " " +
+                "            AND de.fid_mat_req_ety_n = " + pkMatRequestEty[1] + ";";
         
         try {
             ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
@@ -625,10 +679,12 @@ public abstract class SMaterialRequestUtils {
             double qtyReq = 0d;
             double qtySupplied = 0d;
             double qtyLinked = 0d;
+            //1 = qty, 2 = orig_qty;
+            int qtyOrOrigQty = 1;
             while (resultSet.next()) {
                 qtyReq += resultSet.getDouble("qty");
-                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") });
-                qtyLinked += SMaterialRequestUtils.getQuantityLinkedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") }, dpsType, null);
+                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") }, qtyOrOrigQty);
+                qtyLinked += SMaterialRequestUtils.getQuantityLinkedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") }, dpsType, null, qtyOrOrigQty);
             }
             
             double percent = 0d;
@@ -667,9 +723,11 @@ public abstract class SMaterialRequestUtils {
             ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(query);
             double qtyReq = 0d;
             double qtySupplied = 0d;
+            //1 = qty, 2 = orig_qty;
+            int qtyOrOrigQty = 1;
             while (resultSet.next()) {
                 qtyReq += resultSet.getDouble("qty");
-                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") });
+                qtySupplied += SMaterialRequestUtils.getQuantitySuppliedOfReqEty(session, new int[] { resultSet.getInt("id_mat_req"), resultSet.getInt("id_ety") }, qtyOrOrigQty);
             }
             
             double percent = 0d;

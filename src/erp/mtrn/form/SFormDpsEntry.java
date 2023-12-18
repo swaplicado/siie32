@@ -5780,7 +5780,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setComponent(jtfOriginalQuantity);
                 }
                 else if (moDpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
-                    if (moFieldOriginalQuantity.getDouble() < moDpsEntry.getDbmsDpsEntryMatRequestLink().getQuantity()) {
+                    if (SLibUtils.parseDouble(jtfQuantityRo.getText()) < moDpsEntry.getDbmsDpsEntryMatRequestLink().getQuantity() && mbMatRequestImport) {
                         validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' no puede ser menor de lo que se vinculó con la requisición, "
                                 + "debe eliminar el renglón y agregarlo de nuevo.");
                         validation.setComponent(jtfOriginalQuantity);
