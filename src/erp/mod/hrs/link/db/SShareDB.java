@@ -896,7 +896,7 @@ public class SShareDB {
         return imageString;
     }
     
-    public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException {
+    public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
         SMySqlClass mdb = new SMySqlClass();
         String empresas[]= new String[5];
         empresas[0] = "erp_aeth";
@@ -908,15 +908,86 @@ public class SShareDB {
         ArrayList<SEmployeeVacations> lEmp = null;
         lEmp = new ArrayList();
         SEmployeeVacations emp = null;
-         
-        for(int num_empresas = 0 ; num_empresas < empresas.length ; num_empresas ++){
         
-            Connection conn = mdb.connect("", "", empresas[num_empresas], "", "");
+        //query para revisar si hay cambios en un empleado en particular
+        JSONParser parser = new JSONParser();
+        JSONArray root;
+        root = (JSONArray) parser.parse(strDate);
+        
+        
+         
+        for(int num_empresas = 0 ; num_empresas < root.size() ; num_empresas ++){
+            JSONObject row = (JSONObject) root.get(num_empresas);
+            Connection conn = mdb.connect("", "", row.get("company_db_name").toString(), "", "");
 
             if (conn == null) {
                 return null;
             }
-
+            String sqlAbs ="";
+            // query para recuparar empleados que tengan modificacniones en sus vacaciones o consumos para despues obtener su informmación.
+            if(row.get("last_sync_date") != null ){
+                sqlAbs = "SELECT abs.id_emp AS emp FROM hrs_abs AS abs"
+                    + " WHERE abs.ts_usr_upd > '" + row.get("last_sync_date")+"'"
+                    + " AND fk_cl_abs = 3 AND fk_tp_abs = 1"
+                    + " UNION"
+                    + " SELECT abs.id_emp AS emp FROM hrs_abs_cns AS cns"
+                    + " INNER JOIN hrs_abs AS abs ON abs.id_emp = cns.id_emp AND abs.id_abs = cns.id_abs"
+                    + " WHERE cns.ts_usr_upd > '" + row.get("last_sync_date")+"'"
+                    + " AND abs.fk_cl_abs = 3 AND abs.fk_tp_abs = 1"
+                    + " UNION"
+                    + " SELECT receipt.id_emp FROM hrs_pay AS payroll"
+                    + " INNER JOIN hrs_pay_rcp AS receipt ON receipt.id_pay = payroll.id_pay"
+                    + " INNER JOIN hrs_pay_rcp_ear AS earning ON earning.id_pay = receipt.id_pay AND earning.id_emp = receipt.id_emp"
+                    + " INNER JOIN hrs_pay_rcp_ded AS deduction ON deduction.id_pay = receipt.id_pay AND deduction.id_emp = receipt.id_emp"
+                    + " WHERE payroll.ts_usr_upd > '" + row.get("last_sync_date")+"'"
+                    + " AND (fk_ear = 101 OR fk_ear = 210 OR fk_ded = 207) AND receipt.b_del = 0 AND earning.b_del = 0 AND deduction.b_del = 0"
+                    + " UNION"
+                    + " SELECT receipt.id_emp FROM hrs_pay AS payroll"
+                    + " INNER JOIN hrs_pay_rcp AS receipt ON receipt.id_pay = payroll.id_pay"
+                    + " INNER JOIN hrs_pay_rcp_ear AS earning ON earning.id_pay = receipt.id_pay AND earning.id_emp = receipt.id_emp"
+                    + " INNER JOIN hrs_pay_rcp_ded AS deduction ON deduction.id_pay = receipt.id_pay AND deduction.id_emp = receipt.id_emp"
+                    + " WHERE num = 0"
+                    + " AND (fk_ear = 101 OR fk_ear = 210 OR fk_ded = 207) AND receipt.b_del = 0 AND earning.b_del = 0 AND deduction.b_del = 0"
+                    + " AND payroll.ts_usr_upd > '" + row.get("last_sync_date")+"'";
+            }else{
+                sqlAbs = "SELECT abs.id_emp AS emp FROM hrs_abs AS abs"
+                    + " WHERE fk_cl_abs = 3 AND fk_tp_abs = 1"
+                    + " UNION"
+                    + " SELECT abs.id_emp AS emp FROM hrs_abs_cns AS cns"
+                    + " INNER JOIN hrs_abs AS abs ON abs.id_emp = cns.id_emp AND abs.id_abs = cns.id_abs"
+                    + " WHERE abs.fk_cl_abs = 3 AND abs.fk_tp_abs = 1"
+                    + " UNION"
+                    + " SELECT receipt.id_emp FROM hrs_pay AS payroll"
+                    + " INNER JOIN hrs_pay_rcp AS receipt ON receipt.id_pay = payroll.id_pay"
+                    + " INNER JOIN hrs_pay_rcp_ear AS earning ON earning.id_pay = receipt.id_pay AND earning.id_emp = receipt.id_emp"
+                    + " INNER JOIN hrs_pay_rcp_ded AS deduction ON deduction.id_pay = receipt.id_pay AND deduction.id_emp = receipt.id_emp"
+                    + " WHERE (fk_ear = 101 OR fk_ear = 210 OR fk_ded = 207) AND receipt.b_del = 0 AND earning.b_del = 0 AND deduction.b_del = 0"
+                    + " UNION"
+                    + " SELECT receipt.id_emp FROM hrs_pay AS payroll"
+                    + " INNER JOIN hrs_pay_rcp AS receipt ON receipt.id_pay = payroll.id_pay"
+                    + " INNER JOIN hrs_pay_rcp_ear AS earning ON earning.id_pay = receipt.id_pay AND earning.id_emp = receipt.id_emp"
+                    + " INNER JOIN hrs_pay_rcp_ded AS deduction ON deduction.id_pay = receipt.id_pay AND deduction.id_emp = receipt.id_emp"
+                    + " WHERE num = 0"
+                    + " AND (fk_ear = 101 OR fk_ear = 210 OR fk_ded = 207) AND receipt.b_del = 0 AND earning.b_del = 0 AND deduction.b_del = 0";
+            }
+            Statement stAbs = conn.createStatement();
+            ResultSet resAbs = stAbs.executeQuery(sqlAbs);
+            String listaEmpleados = "";
+            ArrayList<Integer> aEmpleados = new ArrayList<>();
+            int numEmpleados = 0;
+            while (resAbs.next()) {
+                aEmpleados.add(resAbs.getInt("emp"));
+            }
+            for (int i = 0; i < aEmpleados.size(); i++) {
+                listaEmpleados += aEmpleados.get(i);
+                if (i < aEmpleados.size() - 1) {
+                    listaEmpleados += ", ";
+                }
+            }
+            if( listaEmpleados == ""){
+                continue;
+            }
+            
             String sql = "";
             String sqlCutOff = "";
             String sqlBenefit = "";
@@ -986,7 +1057,7 @@ public class SShareDB {
 
             String sqlVac = "SELECT b.id_bp AS _employee_id, b.bp AS _employee, e.num AS _employee_number, d.name AS _department, "
                     + "e.dt_ben AS _benefits, e.dt_dis_n AS _dismiss, e.b_act AS _active, tp.name AS _payment_type, "
-                    + "@cut_off := IF(e.b_act, " + sqlCutOff + ", e.dt_dis_n) AS _cut_off, "
+                    + "@cut_off := IF(e.b_act, now(), e.dt_dis_n) AS _cut_off, "
                     + "@seniority := TIMESTAMPDIFF(YEAR, e.dt_ben, @cut_off) AS _seniority, "
                     + "@vac_right := (SELECT COALESCE(SUM(bra.ben_day), 0) "
                     + "  FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW_AUX) + " AS bra "
@@ -1018,7 +1089,8 @@ public class SShareDB {
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON b.id_bp = em.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON e.fk_dep = d.id_dep "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
-                    + "WHERE " + sql
+                    + "WHERE b.id_bp IN (" + listaEmpleados + ")"
+                    + " AND " + sql
                     + "ORDER BY b.bp, b.id_bp;";
 
 
@@ -1691,6 +1763,8 @@ public class SShareDB {
     public SEarningResponse getEarnings(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException, ParseException{
         ResultSet resultSet;
         int company = 0;
+        String dt_ini = "";
+        String dt_fin = "";
 
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
@@ -1732,8 +1806,28 @@ public class SShareDB {
             SMySqlClass empresa = new SMySqlClass();
             Connection conn_empresa = empresa.connect("", "", resultSet.getString("bd"), "", "");
             
+            String payroll = "SELECT payroll.dt_sta, payroll.dt_end "
+                                + " FROM hrs_pay AS payroll"
+                                + " WHERE payroll.fis_year = " + root.get("year")
+                                + " AND payroll.num = " + root.get("num")
+                                + " AND payroll.fk_tp_pay = " + root.get("type_pay")
+                    // tipo normal de nomina
+                                + " AND payroll.fk_tp_pay_sht = 1"
+                    // tipo sueldos y salarios
+                                + " AND payroll.fk_tp_pay_sht_cus = 2"
+                                + " AND payroll.b_del = 0";
+            
+            Statement stConPayroll = conn_empresa.createStatement();
+            resultSet = stConPayroll.executeQuery(payroll);
+            
+            if(resultSet.next()){
+                dt_ini = resultSet.getString("payroll.dt_sta");
+                dt_fin = resultSet.getString("payroll.dt_end");
+            }
+            
             String earnings = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
-                                + " receipt.id_emp, earnings.fk_ear, earnings.unt"
+                                + " receipt.id_emp, earnings.fk_ear, earnings.unt, receipt.day_not_wrk_not_pad, "
+                                + " payroll.cal_day_r, receipt.day_not_wrk_pad"
                                 + " FROM hrs_pay AS payroll"
                                 + " INNER JOIN HRS_PAY_RCP AS receipt ON payroll.id_pay = receipt.id_pay"
                                 + " INNER JOIN HRS_PAY_RCP_EAR AS earnings ON receipt.id_pay = earnings.id_pay AND receipt.id_emp = earnings.id_emp"
@@ -1755,11 +1849,22 @@ public class SShareDB {
      
             while(resultSet.next()){
                 // clase para colocar los ear
-                 SEarning earning = new SEarning();
+                SEarning earning = new SEarning();
                 earning.setId_ear(resultSet.getInt("earnings.fk_ear"));
                 earning.setUnit_ear(resultSet.getDouble("earnings.unt"));
                 
                 lEar.add(earning);
+                
+                if(resultSet.getInt("earnings.fk_ear") == 1){
+                    int diasCalendario = resultSet.getInt("payroll.cal_day_r");
+                    int earn = resultSet.getInt("earnings.unt");
+                    int diasNTP = resultSet.getInt("receipt.day_not_wrk_pad");
+                    int diasNTNP = resultSet.getInt("receipt.day_not_wrk_not_pad");
+                    int diasNTCAP = diasCalendario-(earn+diasNTP-diasNTNP);
+                    int datoEnviar = diasNTCAP + diasNTNP;
+                    empEar.setDay_not_work(datoEnviar);
+                }
+                
             }
             //termina la query
             //query para saber si se gano bonos
@@ -1773,9 +1878,10 @@ public class SShareDB {
                                 + " AND receipt.id_emp = " + row.get("id_emp")
                                 + " AND payroll.fk_tp_pay = " + root.get("type_pay")
                     // tipo especial de nomina
-                                + " AND payroll.fk_tp_pay_sht = 2"
+                    //          + " AND payroll.fk_tp_pay_sht = 2"
                     // tipo vales de despensa
-                                + " AND payroll.fk_tp_pay_sht_cus = 3"
+                    //          + " AND payroll.fk_tp_pay_sht_cus = 3"
+                                + " AND earnings.fk_ear = 9"
                                 + " AND payroll.b_del = 0 AND receipt.b_del = 0 AND earnings.b_del = 0";
             
             Statement stConBon = conn_empresa.createStatement();
@@ -1787,6 +1893,7 @@ public class SShareDB {
             }
             //termina la query para saber de bonos
             // query percepciones de empresa pruebas y
+            conn_empresa.close();
             conn_empresa = empresa.connect("", "", "erp_pbas_y", "", "");
             
             earnings = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
@@ -1818,10 +1925,13 @@ public class SShareDB {
                 
                 lEar.add(earning);
             }
+            conn_empresa.close();
             // termina query
             
             empEar.setId_emp(Integer.parseInt(row.get("id_emp").toString())); 
             empEar.setId_company(company);
+            empEar.setDt_ini(dt_ini);
+            empEar.setDt_fin(dt_fin);
             empEar.setHave_bonus(bonusFlag);
             empEar.setEarnings(lEar);
             
