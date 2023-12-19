@@ -584,7 +584,7 @@ public class SModuleTrn extends SGuiModule {
                                 break;
                             case SLibConsts.UNDEFINED: title = "Todas mis RM"; break;
                             case SModConsts.TRN_MAT_CONS_ENT_USR: title = "RM mis c. consumo"; break;
-                            case SModConsts.TRN_MAT_PROV_ENT: title = "RM mis c. suministro"; break;
+                            case SModConsts.TRN_MAT_PROV_ENT_USR: title = "RM mis c. suministro"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_REV:
