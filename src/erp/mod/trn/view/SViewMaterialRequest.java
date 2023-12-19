@@ -439,7 +439,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " ";
+                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " ";
                 }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
@@ -490,14 +490,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModConsts.TRN_MAT_CONS_ENT_USR:
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " "
                             + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
                 }
             case SModConsts.TRN_MAT_PROV_ENT_USR:
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.ts_usr_ins = " + usrId + " "
-                            + "OR (peu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND peu.id_ref = " + usrId + ")) ";
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " "
+                            + "OR (peu.id_usr = " + usrId + ")) ";
                 }
             default:
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
@@ -524,7 +524,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
             }
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
-                where += (where.isEmpty() ? "" : "AND ") + "(v.ts_usr_ins = " + usrId + " "
+                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_ins = " + usrId + " "
                         + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") OR aut.fk_usr_step = " + usrId + ") ";
             }
         }
