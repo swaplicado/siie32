@@ -66,11 +66,11 @@ public class SDataEmployee {
     }
     
     public String getBenefitData() {
-        return position;
+        return benefit_date;
     }
 
-    public void setBenefitData(String position) {
-        this.position = position;
+    public void setBenefitData(String benefit_date) {
+        this.benefit_date = benefit_date;
     }
     
     public String getSalary() {
