@@ -680,7 +680,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mnFkUnitUnitsVirtualId);
             callableStatement.setInt(nParam++, mnFkUnitNetContentId);
             callableStatement.setInt(nParam++, mnFkUnitNetContentUnitaryId);
-            callableStatement.setInt(nParam++, mnFkUnitCommercial_n);
+            if (mnFkUnitCommercial_n > 0) callableStatement.setInt(nParam++, mnFkUnitCommercial_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkUnitAlternativeTypeId);
             callableStatement.setInt(nParam++, mnFkLevelTypeId);
             callableStatement.setInt(nParam++, mnFkBrandId);

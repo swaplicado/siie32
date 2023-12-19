@@ -27,13 +27,13 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemMaterialAttribute;
 import erp.mitm.data.SDataItemBarcode;
 import erp.mitm.data.SDataItemBarcodeRow;
 import erp.mitm.data.SDataItemForeignLanguage;
 import erp.mitm.data.SDataItemForeignLanguageRow;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataItemLine;
+import erp.mitm.data.SDataItemMaterialAttribute;
 import erp.mitm.data.SDataManufacturer;
 import erp.mitm.data.SDataMaterialAttribute;
 import erp.mitm.data.SDataUnit;
@@ -126,7 +126,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldMass;
     private erp.lib.form.SFormField moFieldMassUnitary;
     private erp.lib.form.SFormField moFieldIsMassVariable;
-    private erp.lib.form.SFormField moFieldFkCommercialId_n;
+    private erp.lib.form.SFormField moFieldFkUnitCommercialId_n;
     private erp.lib.form.SFormField moFieldFkUnitAlternativeTypeId;
     private erp.lib.form.SFormField moFieldFkLevelTypeId;
     private erp.lib.form.SFormField moFieldUnitAlternativeBaseEquivalence;
@@ -1845,8 +1845,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldMassUnitary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsMassVariable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsMassVariable);
         moFieldIsMassVariable.setTabbedPaneIndex(0, jTabbedPane);
-        moFieldFkCommercialId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitCommercialId_n, jlFkUnitCommercialId_n);
-        moFieldFkCommercialId_n.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldFkUnitCommercialId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkUnitCommercialId_n, jlFkUnitCommercialId_n);
+        moFieldFkUnitCommercialId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkUnitAlternativeTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitAlternativeTypeId, jlFkUnitAlternativeTypeId);
         moFieldFkUnitAlternativeTypeId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkLevelTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLevelTypeId, jlFkLevelTypeId);
@@ -1988,7 +1988,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldMass);
         mvFields.add(moFieldMassUnitary);
         mvFields.add(moFieldIsMassVariable);
-        mvFields.add(moFieldFkCommercialId_n);
+        mvFields.add(moFieldFkUnitCommercialId_n);
         mvFields.add(moFieldFkUnitAlternativeTypeId);
         mvFields.add(moFieldFkLevelTypeId);
         mvFields.add(moFieldUnitAlternativeBaseEquivalence);
@@ -4156,7 +4156,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         itemStateIsInventoriable();
         computeItemKeyAndName();
         
-        moFieldFkCommercialId_n.setFieldValue(new int[] { moItem.getFkUnitCommercial_n() });
+        moFieldFkUnitCommercialId_n.setFieldValue(new int[] { moItem.getFkUnitCommercial_n() });
         
         switch (moItem.getFkItemStatusId()) {
             case SModSysConsts.ITMS_ST_ITEM_ACT:
@@ -4253,7 +4253,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setMass(moFieldMass.getDouble());
         moItem.setMassUnitary(moFieldMassUnitary.getDouble());
         moItem.setIsMassVariable(moFieldIsMassVariable.getBoolean());
-        moItem.setFkUnitCommercial_n(moFieldFkCommercialId_n.getKeyAsIntArray()[0]);
+        moItem.setFkUnitCommercial_n(jcbFkUnitCommercialId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkUnitCommercialId_n.getKeyAsIntArray()[0]);
         moItem.setFkUnitAlternativeTypeId(moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0]);
         moItem.setFkLevelTypeId(moFieldFkLevelTypeId.getKeyAsIntArray()[0]);
         moItem.setUnitAlternativeBaseEquivalence(moFieldUnitAlternativeBaseEquivalence.getDouble());
