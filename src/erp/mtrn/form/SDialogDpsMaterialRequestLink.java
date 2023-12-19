@@ -487,15 +487,23 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oEntry.setConceptKey(oTableRow.getItem().getKey());
                 oEntry.setConcept(oTableRow.getItem().getName());
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
-                oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
+                oEntry.setFkItemId(oTableRow.getMaterialRequestEntry().getFkItemId());
+                oEntry.setFkUnitId(oTableRow.getMaterialRequestEntry().getFkUnitId());
+                
+                if (oTableRow.getMaterialRequestEntry().getFkUnitId() != oTableRow.getMaterialRequestEntry().getFkUserUnitId()) {
+                    oEntry.setFkOriginalUnitId(oTableRow.getMaterialRequestEntry().getFkUserUnitId());
+                }
+                else {
+                    oEntry.setFkOriginalUnitId(oEntry.getFkUnitId());
+                }
+                
+                oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * 
+                                                        ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
                 oEntry.setPriceUnitary(oTableRow.getUnitaryPrice());
                 oEntry.setPriceUnitarySystem(oTableRow.getUnitaryPrice());
                 oEntry.setOriginalPriceUnitaryCy(oTableRow.getUnitaryPrice());
                 oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getUnitaryPrice());
-
-                oEntry.setFkItemId(oTableRow.getItem().getPkItemId());
-                oEntry.setFkUnitId(oTableRow.getItem().getFkUnitId());
-                oEntry.setFkOriginalUnitId(oTableRow.getItem().getFkUnitId());
+                
                 oEntry.setIsPrepayment(oTableRow.getItem().getIsPrepayment());
                 oEntry.setIsInventoriable(oTableRow.getItem().getIsInventoriable());
 
@@ -531,7 +539,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
                 // Links con requisición de materiales
                 SDataDpsMaterialRequest oDpsMatReqLink = new SDataDpsMaterialRequest();
-                oDpsMatReqLink.setQuantity(oEntry.getOriginalQuantity());
+                oDpsMatReqLink.setQuantity(oEntry.getQuantity());
                 oDpsMatReqLink.setValue(oEntry.getPriceUnitary());
                 oDpsMatReqLink.setValueCy(oEntry.getPriceUnitaryCy());
                 oDpsMatReqLink.setFkDpsYearId(oEntry.getPkYearId());

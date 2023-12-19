@@ -550,6 +550,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                                                                             SMaterialRequestEntryRow.FORM_SUPPLY,
                                                                             oMaterialRequestEntry.getFkItemId(), 
                                                                             oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getFkUserUnitId(),
                                                                             oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                     moMaterialRequest.getConsumptionInfo() : 
                                                                                     oMaterialRequestEntry.getConsumptionInfo()
@@ -736,6 +737,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 oSupplyEty = new SMaterialRequestSupplyRow((SClientInterface) miClient, 
                                                             oMatReqRow.getFkItemId(), 
                                                             oMatReqRow.getFkUnitId(),
+                                                            oMatReqRow.getFkUnitOrigId(),
                                                             moKeyWarehouseEntity.getValue()[0],
                                                             moKeyWarehouseEntity.getValue()[1]
                                                             );
@@ -823,7 +825,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             */
             int user = moKeyMaintUser.getSelectedIndex() <= 0 ? 0 : moKeyMaintUser.getValue()[0];
             int userSup = moKeyMaintUserSupervisor.getSelectedIndex() <= 0 ? 1 : moKeyMaintUserSupervisor.getValue()[0];
-            ArrayList<SDataDiog> lDiogs = SMaterialRequestUtils.makeDiogs(miClient.getSession().getCurrentYear(), 
+            ArrayList<SDataDiog> lDiogs = SMaterialRequestUtils.makeDiogs(miClient,
+                                                                miClient.getSession().getCurrentYear(), 
                                                                 miClient.getSession().getCurrentDate(), 
                                                                 miClient.getSession().getUser().getPkUserId(),
                                                                 mlMemoryMaterialRequestSupplies,

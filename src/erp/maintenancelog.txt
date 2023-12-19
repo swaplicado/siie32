@@ -1,6 +1,21 @@
 ================================================================================
+SIIE 3.2 231.0/ 2023-12-18
+Isabel Danae GARCÍA SERVÍN/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Eliminación de la tabla presentaciones de materiales.
+2) Ajustes al formato de impresión de facturas FSC para Cartró.
+
+================================================================================
+SIIE 3.2 230.1/ 2023-12-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de equivalencias de unidades en requisiciones de materiales, vinculación con documentos de compra.
+2) Implementación de la unidad comercial opcional para los ítems, en caso de que la tengan, se pone por defecto en el DPS.
+3) Corrección en las vistas y formas de captura para unificar la unidad y unidad original de RM, DPS y DIOGs
+
+================================================================================
 SIIE 3.2 230.0*/ 2023-12-14
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de cambio de unidad en las requisiciones de materiales.
 2) Eliminación de las presentaciones de materiales.

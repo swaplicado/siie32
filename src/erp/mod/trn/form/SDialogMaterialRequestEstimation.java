@@ -354,8 +354,14 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     lRows.add(row);
                 }
             }
-
-            msBodyRows = SMaterialRequestEstimationUtils.getBodyEntries(lRows);
+            if (moMaterialRequest.getAuxNotes() != null && ! moMaterialRequest.getAuxNotes().isEmpty()) {
+                msBodyRows = moMaterialRequest.getAuxNotes() + "\n";
+            }
+            else {
+                msBodyRows = "";
+            }
+            
+            msBodyRows += SMaterialRequestEstimationUtils.getBodyEntries(lRows);
         }
         else {
             msBodyRows = "---";
@@ -592,6 +598,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                                                                                 SMaterialRequestEntryRow.FORM_ESTIMATE,
                                                                                 oMaterialRequestEntry.getFkItemId(), 
                                                                                 oMaterialRequestEntry.getFkUnitId(),
+                                                                                oMaterialRequestEntry.getFkUserUnitId(),
                                                                                 oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                         moMaterialRequest.getConsumptionInfo() : 
                                                                                         oMaterialRequestEntry.getConsumptionInfo()

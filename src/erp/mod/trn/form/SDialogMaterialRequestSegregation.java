@@ -404,6 +404,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                                                                             SMaterialRequestEntryRow.FORM_SEGREGATION,
                                                                             oMaterialRequestEntry.getFkItemId(), 
                                                                             oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getFkUserUnitId(),
                                                                             oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                     moMaterialRequest.getConsumptionInfo() : 
                                                                                     oMaterialRequestEntry.getConsumptionInfo());

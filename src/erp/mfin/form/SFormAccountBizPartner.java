@@ -327,7 +327,8 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
         manAccountTypes = new int[] {
             SDataConstantsSys.FINS_TP_ACC_BP_OP,
             SDataConstantsSys.FINS_TP_ACC_BP_PAY,
-            SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL
+            SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL,
+            SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY
         };
 
         jbOk.addActionListener(this);

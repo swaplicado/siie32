@@ -612,7 +612,6 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_C + "' ";
 //                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
-                subGroupOrderBy = "de.fid_mat_req_n ";
                 having = "HAVING per_sumi < 1 ";
             }
         }
@@ -638,19 +637,19 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                         + "INNER JOIN erp.itmu_unit AS u ON ve.fk_unit = u.id_unit "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
                 groupOrderBy = "ve.id_mat_req, ve.id_ety ";
-                subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
                 //subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 //having = "HAVING per_pur < 1 "; // Descomentar para mostrar unicamente los que faltan por suministrar
             }
             else if (mnGridSubtype == SLibConsts.UNDEFINED) {
                 select += "COUNT(ve.id_ety) AS ety, ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
-                subGroupOrderBy = "de.fid_mat_req_n ";
                 //having = "HAVING per_pur < 1 ";
             }
             
             where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
         }
+        
+        subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
         
         subWhere += "AND d.fid_ct_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[0] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[0] + ") ";
         subWhere += "AND d.fid_cl_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[1] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1] + ") ";
@@ -751,10 +750,8 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + subWhere
                 + "GROUP BY " + subGroupOrderBy + " " 
                 + "ORDER BY " + subGroupOrderBy + " ) AS de ON " 
-                + "ve.id_mat_req = de.fid_mat_req_n ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
-            msSql += "AND ve.id_ety = de.fid_mat_req_ety_n ";
-        }
+                + "ve.id_mat_req = de.fid_mat_req_n AND ve.id_ety = de.fid_mat_req_ety_n ";
+        
         msSql += "LEFT JOIN (SELECT "
                 + "ddmr.fid_mat_req, "
                 + "ddmr.fid_mat_req_ety, "

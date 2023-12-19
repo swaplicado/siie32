@@ -33,6 +33,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected boolean mbItemNew;
     protected int mnFkItemId;
     protected int mnFkUnitId;
+    protected int mnFkUnitOrigId;
     protected int mnFkConsumeEntityId_n;
     protected int mnFkSubConsumeEntityId_n;
     
@@ -59,11 +60,12 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public static int FORM_SUPPLY = 2;
     public static int FORM_ESTIMATE = 3;
     
-    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, String consumeEntity) {
+    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, final int fkUnitOrig, String consumeEntity) {
         miClient = client;
         mnFormType = formType;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
+        mnFkUnitOrigId = fkUnitOrig;
         mnFkConsumeEntityId_n = 0;
         mnFkSubConsumeEntityId_n = 0;
         msAuxConsumeEntity = consumeEntity;
@@ -115,6 +117,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkUnitOrigId() { return mnFkUnitOrigId; }
     public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
     public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
     

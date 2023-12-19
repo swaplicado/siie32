@@ -306,12 +306,15 @@ public class SPanelMaterialRequestEntry extends javax.swing.JPanel {
             }
             
             jtfQuantityReqEty.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moMaterialRequestEty.getQuantity()));
-            double dSupplied = SMaterialRequestUtils.getQuantitySuppliedOfReqEty(miClient.getSession(), moMaterialRequestEty.getPrimaryKey());
+            // qtyOrOrigQty 1 = qty, 2 = orig_qty
+            int qtyOrOrigQty = 1;
+            double dSupplied = SMaterialRequestUtils.getQuantitySuppliedOfReqEty(miClient.getSession(), moMaterialRequestEty.getPrimaryKey(), qtyOrOrigQty);
             jtfQuantitySupplied.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(dSupplied));
             double dLinked = SMaterialRequestUtils.getQuantityLinkedOfReqEty(miClient.getSession(), 
                                                                             moMaterialRequestEty.getPrimaryKey(), 
                                                                             maDpsType, 
-                                                                            this.maDpsPk == null ? null : maDpsPk);
+                                                                            this.maDpsPk == null ? null : maDpsPk,
+                                                                            qtyOrOrigQty);
             jtfQuantityLinkedReqEty.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(dLinked));
             jtfQuantityCurrentReqEty.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(mdQuantity));
             double dPending = moMaterialRequestEty.getQuantity() - dSupplied - dLinked - mdQuantity;

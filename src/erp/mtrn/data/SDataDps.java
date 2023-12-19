@@ -3381,7 +3381,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (bFoundPrepayments) { // prevent from reading configuration when not needed!
                             oAccountConfigPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), null, oStatement));
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), null, oStatement));
                             
                             oAccountConfigPrepayments.setTaxKey(new int[] { 0, 0 });
                             
@@ -3394,7 +3394,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                         mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
+                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
                                 
                                 if (accountConfigEntries != null) {
                                     SFinAccountConfig accountConfig = new SFinAccountConfig(accountConfigEntries);
@@ -3407,9 +3407,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         
                         if (bFoundPrepaymentsToInvoice) { // prevent from reading configuration when not needed!
-                            oAccountConfigPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), null, oStatement));
+                            oAccountConfigPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY, isDebitForBizPartner(), null, oStatement));
                             
                             oAccountConfigPrepaymentsToInvoice.setTaxKey(new int[] { 0, 0 });
                             
@@ -3420,9 +3419,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     continue;
                                 }
                                 
-                                Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                        mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
+                                Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
                                 
                                 if (accountConfigEntries != null) {
                                     SFinAccountConfig accountConfig = new SFinAccountConfig(accountConfigEntries);

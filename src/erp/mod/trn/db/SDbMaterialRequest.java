@@ -69,6 +69,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected String msAuxAuthStatus;
     protected String msAuxProvStatus;
     protected String msAuxPurStatus;
+    protected String msAuxNotes;
     
     protected int mnAuxReqStatusIdOld;
     protected int mnAuxReqAuthStatusId;
@@ -173,6 +174,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public String getAuxAuthStatus() { return msAuxAuthStatus; }
     public String getAuxProvStatus() { return msAuxProvStatus; }
     public String getAuxPurStatus() { return msAuxPurStatus; }
+    public String getAuxNotes() { return msAuxNotes; }
 
     public int getAuxReqStatusIdOld() { return mnAuxReqStatusIdOld; }
     public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
@@ -271,6 +273,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         msAuxProvEntName = "";
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
+        msAuxNotes = "";
     }
 
     @Override
@@ -367,6 +370,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 note = new SDbMaterialRequestNote();
                 note.read(session, new int[] { mnPkMatRequestId, resultSet.getInt(1) });
                 maChildNotes.add(note);
+                msAuxNotes += note.getNotes() + "\n";
             }
             
             // Read aswell cost centers:
