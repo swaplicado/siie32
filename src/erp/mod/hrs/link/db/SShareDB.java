@@ -391,6 +391,34 @@ public class SShareDB {
 
         return lEmps;
     }
+    
+    /**
+     * Método que determina la empresa a la que pertenece el empleado en SIIE
+     *
+     * @param lEmps
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException
+     */
+    private ArrayList<SDataEmployee> assignCompanyData(ArrayList<SDataEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
+        ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
+        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
+        for (SCompany company : companies) {
+            ids.add(this.getEmployeesFromCompany(company));
+        }
+
+        for (SDataEmployee emp : lEmps) {
+            for (HashMap<Integer, Integer> empCompay : ids) {
+                if (empCompay.containsKey(emp.id_employee)) {
+                    emp.setCompany_id(empCompay.get(emp.id_employee));
+                    break;
+                }
+            }
+        }
+
+        return lEmps;
+    }
 
     /**
      * Obtiene los empleados que pertecen a una empresa en específico
@@ -1565,7 +1593,7 @@ public class SShareDB {
                     insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
                     insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
                     insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
-                    insert.setExternarRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
+                    //insert.setExternarRe//questId(Integer.parseInt(row.get("breakdown_id").toString()));
                     insert.setFkAbsenceClassId(Integer.parseInt(root.get("cl_abs").toString()));
                     insert.setFkAbsenceTypeId(Integer.parseInt(root.get("tp_abs").toString()));
                     insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
@@ -1807,4 +1835,137 @@ public class SShareDB {
         return objResponse;
          
     }
+    
+    /**
+     *
+     * @param idEmp
+     * @return
+     * @throws SConfigException
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws ParseException
+     */
+    public SDataEmployee getDataEmployee(String idEmp) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT " +
+                    "e.id_emp, " +
+                    "bp.bp, " +
+                    "bp.fiscal_id, " +
+                    "e.ssn, " +
+                    "pos.name AS namepos, " +
+                    "e.dt_ben, " +
+                    "IF(e.fk_tp_pay= 1, (e.sal*30), e.wage) AS sal, " +
+                    "(SELECT CONCAT (bp.firstname, ' ',bp.lastname) AS name " +
+                    "FROM erp.hrsu_pos pos " +
+                    "INNER JOIN " +
+                    "erp.hrsu_emp e ON e.fk_pos = pos.id_pos " +
+                    "INNER JOIN " +
+                    "erp.bpsu_bp bp ON e.id_emp = bp.id_bp " +
+                    "WHERE pos.id_pos = 155) AS nameGH " +
+                    "FROM " +
+                    "erp.hrsu_emp e " +
+                    "INNER JOIN " +
+                    "erp.bpsu_bp bp ON e.id_emp = bp.id_bp " +
+                    "INNER JOIN " +
+                    "erp.bpsu_bpb bpb ON bp.id_bp = bpb.fid_bp " +
+                    "INNER JOIN " +
+                    "erp.bpsu_bpb_con bpcon ON bpb.id_bpb = bpcon.id_bpb " +
+                    "INNER JOIN " +
+                    "erp.hrsu_pos pos ON e.fk_pos = pos.id_pos " +
+                    "WHERE " +
+                    "e.id_emp = " + idEmp + " "+
+                    "AND bp.b_att_emp;";
+
+        ArrayList<SDataEmployee> lEmps = null;
+
+        try {
+            Statement st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+
+            lEmps = new ArrayList();
+            SDataEmployee emp = null;
+            while (res.next()) {
+                emp = new SDataEmployee();
+
+                emp.id_employee = res.getInt("id_emp");
+                emp.name = res.getString("bp");
+                emp.rfc = res.getString("fiscal_id");
+                emp.nss = res.getString("ssn");
+                emp.position = res.getString("namePos");
+                emp.benefit_date = res.getString("dt_ben");
+                emp.salary = res.getString("sal");
+                emp.nameGh = res.getString("nameGH");
+                
+
+                lEmps.add(emp);
+            }
+
+            conn.close();
+            st.close();
+            res.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        lEmps = this.assignCompanyData(lEmps);
+        int idCompany = lEmps.get(0).getCompany_id();
+        
+        SDataEmployee DataEmploye = lEmps.get(0);
+        SDataCompany dataCompany = this.assignDataCompany(lEmps.get(0).getCompany_id());
+        DataEmploye.setNameCompany(dataCompany.nameCompany);
+        DataEmploye.setRfcCompany(dataCompany.rfcCompany);
+        DataEmploye.setRgg_fiscal(dataCompany.reg_ss);
+        
+        return DataEmploye;
+    }
+    
+    public SDataCompany assignDataCompany(int idComp) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT bp.bp, bp.fiscal_id, co.reg_ss " +
+                        "FROM erp.bpsu_bp AS bp " +
+                        "INNER JOIN erp_otsa.cfg_param_co AS co " +
+                        "WHERE bp.id_bp = " + idComp + " ; ";
+
+        ArrayList<SDataCompany> lDataComp = null;
+
+        try {
+            Statement st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+
+            lDataComp = new ArrayList();
+            SDataCompany com = null;
+            while (res.next()) {
+                com = new SDataCompany();
+
+                com.nameCompany = res.getString("bp.bp");
+                com.rfcCompany = res.getString("bp.fiscal_id");
+                com.reg_ss = res.getString("co.reg_ss");
+                   
+                lDataComp.add(com);
+            }
+
+            conn.close();
+            st.close();
+            res.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        return lDataComp.get(0);
+    }
+    
+            
 }

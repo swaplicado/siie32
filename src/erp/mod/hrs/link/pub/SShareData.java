@@ -247,4 +247,13 @@ public class SShareData {
             return null;
         }
     }
+    
+    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+      try {
+            return SUtilsJSON.personalData(idEmp);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
 }

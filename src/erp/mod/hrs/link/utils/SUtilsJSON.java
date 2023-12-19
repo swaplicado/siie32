@@ -12,6 +12,7 @@ import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SCancelResponse;
 import erp.mod.hrs.link.db.SConfigException;
+import erp.mod.hrs.link.db.SDataEmployee;
 import erp.mod.hrs.link.db.SEarningResponse;
 import erp.mod.hrs.link.db.SIncidentResponse;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
@@ -329,5 +330,17 @@ public class SUtilsJSON {
         String jsonPhotosString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
         
         return jsonPhotosString;
+    }
+    
+    public static String personalData(String idEmp) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        
+        SDataEmployee dataEmployee = new SDataEmployee();
+        SShareDB sDb = new SShareDB();
+        
+        dataEmployee = sDb.getDataEmployee(idEmp);
+        String jsonInStringDataEmploye = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataEmployee);
+        return jsonInStringDataEmploye; 
+      
     }
 }
