@@ -567,7 +567,9 @@ public abstract class SDataConstantsSys {
     public static final int ITMU_VAR_NA = 1;
     public static final int ITMU_BRD_NA = 1;
     public static final int ITMU_MFR_NA = 1;
+    public static final int ITMU_TP_EMT_DEF = 1;
     public static final int ITMU_EMT_NA = 1;
+    public static final int ITMU_TP_MAT_NA = 1;
 
     public static final int ITMS_NAM_ORD_POS_QTY = 5;
     public static final int ITMS_NAM_LINE_POS_QTY = 4;

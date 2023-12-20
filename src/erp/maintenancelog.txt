@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 231.2/ 2023-12-20
+Isabel Danae GARCÍA SERVÍN/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a las vistas de requisiciones de materiales por error de nombre de columna en la modalidad de suministrador.
+
+================================================================================
 SIIE 3.2 231.1/ 2023-12-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

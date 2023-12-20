@@ -31,7 +31,10 @@ import sa.lib.srv.SSrvConsts;
  * @author Sergio Flores
  * To generate stub:
  * 1) build project;
- * 2) create stub for this class, like this: ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ * 2) create stub for this class, like this:
+ *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ *    OR
+ *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;dist\lib\sa-lib-10.jar erp.server.SServer
  * 3) build project again to add stub to project's JAR.
  * 
  * Do not forget to generate stubs for:
@@ -63,6 +66,7 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
             SLibUtils.restoreDateFormats(zone);
             TimeZone.setDefault(zone);
         }
+        
         mbIsActive = false;
         moDatetimeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 

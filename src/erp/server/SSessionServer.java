@@ -71,7 +71,10 @@ import sa.lib.srv.SSrvResponse;
  * @author Sergio Flores, Isabel Servín, Adrián Avilés
  * To generate stub:
  * 1) build project;
- * 2) create stub for this class, like this: ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
+ * 2) create stub for this class, like this:
+ *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
+ *    OR
+ *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;dist\lib\sa-lib-10.jar erp.server.SSessionServer
  * 3) build project again to add stub to project's JAR.
  */
 public class SSessionServer implements SSessionServerRemote, Serializable {

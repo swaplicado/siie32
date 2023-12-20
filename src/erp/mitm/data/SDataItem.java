@@ -570,7 +570,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     }
                 }
                 
-                if (mnFkMaterialTypeId_n > 1) {
+                if (mnFkMaterialTypeId_n > SDataConstantsSys.ITMU_TP_MAT_NA) {
                     sql = "SELECT id_mat_att FROM erp.itmu_item_mat_att WHERE NOT b_del AND id_item = " + key[0] + " ORDER BY sort ASC ";
                     resultSet = statement.executeQuery(sql);
                     while (resultSet.next()) {
