@@ -106,6 +106,19 @@ public class SShareData {
         return SUtilsJSON.getData(sLastSyncDate);
     }
     
+    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+        try {
+            //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //formatterd.parse(sLastSyncDate);
+
+            return SUtilsJSON.getDataPGH(sJSon);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
+    }
+    
     /**
      * Obtiene las fotos de los empleados subordinados del empleado que corresponde al id recibido.
      * 

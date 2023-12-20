@@ -77,7 +77,21 @@ public class SUtilsJSON {
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
             objResponse.absences = sDb.getAllAbsences(lastSyncDate);
             objResponse.cuts = sDb.getAllCutsCalendar(lastSyncDate);
-            objResponse.vacations = sDb.getEmployeeVacations(lastSyncDate);
+            //objResponse.vacations = sDb.getEmployeeVacations(lastSyncDate);
+            
+            // Java objects to JSON string - pretty-print
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+    }
+    
+    public static String getDataPGH(String sJson) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+            SShareDB sDb = new SShareDB();
+            
+            SRootJSON objResponse = new SRootJSON();
+            objResponse.vacations = sDb.getEmployeeVacations(sJson);
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);

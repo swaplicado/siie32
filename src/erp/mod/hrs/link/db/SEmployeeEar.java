@@ -14,7 +14,10 @@ import java.util.ArrayList;
 public class SEmployeeEar {
     private int id_emp;
     private int id_company;
+    private String dt_ini;
+    private String dt_fin;
     private boolean have_bonus;
+    private int day_not_work;
     private ArrayList<SEarning> earnings;
 
     public int getId_emp() {
@@ -33,6 +36,18 @@ public class SEmployeeEar {
         return earnings;
     }
 
+    public int getDay_not_work() {
+        return day_not_work;
+    }
+
+    public String getDt_ini() {
+        return dt_ini;
+    }
+
+    public String getDt_fin() {
+        return dt_fin;
+    }
+
     public void setId_emp(int id_emp) {
         this.id_emp = id_emp;
     }
@@ -48,6 +63,17 @@ public class SEmployeeEar {
     public void setEarnings(ArrayList<SEarning> earnings) {
         this.earnings = earnings;
     }
-    
+
+    public void setDay_not_work(int day_not_work) {
+        this.day_not_work = day_not_work;
+    }
+
+    public void setDt_ini(String dt_ini) {
+        this.dt_ini = dt_ini;
+    }
+
+    public void setDt_fin(String dt_fin) {
+        this.dt_fin = dt_fin;
+    }
     
 }
