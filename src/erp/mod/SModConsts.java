@@ -101,7 +101,8 @@ public abstract class SModConsts {
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
-
+    public static final int CFG_CUSTOM_REP = 1013531;
+    
     /*
      * Users
      */
@@ -546,6 +547,7 @@ public abstract class SModConsts {
     public static final int TRNR_CON_STA_BP = 2025003;
     public static final int TRNR_CON_MON_DVY_PROG = 2025004;
     public static final int TRNR_DPS_CON = 2025005;
+    public static final int TRNR_VTAS_FSC = 2025006;
 
     /*
      * Marketing
@@ -930,6 +932,7 @@ public abstract class SModConsts {
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
+        TablesMap.put(CFG_CUSTOM_REP, "cfg_custom_rep");
 
         TablesMap.put(USRS_TP_USR, "erp.usrs_tp_usr");
         TablesMap.put(USRS_TP_LEV, "erp.usrs_tp_lev");

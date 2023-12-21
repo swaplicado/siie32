@@ -32,6 +32,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
+import erp.mod.trn.form.SDialogRepFSC;
 import erp.mod.trn.form.SDialogSendMailContract;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
@@ -77,6 +78,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 import sa.lib.srv.SSrvConsts;
@@ -203,6 +205,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerType;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepFSC;
     private javax.swing.JMenu jmRepBackorder;
     private javax.swing.JMenuItem jmiRepBackorderContract;
     private javax.swing.JMenuItem jmiRepBackorderContractByItem;
@@ -283,6 +286,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     }
 
     private void initComponents() {
+        boolean existFSCReport = SModuleUtilities.customReportExists(miClient, SModSysConsts.CFG_CUSTOM_REP_FSC);
         boolean hasRightDnsDps = false;
         boolean hasRightDnsDiog = false;
         boolean hasRightDocEstimate = false;
@@ -297,7 +301,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightItemConfig = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
-
+        
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de ventas");
         jmiCatDiogDncDocumentNumberSeries = new JMenuItem("Folios de docs. de inventarios");
@@ -558,6 +562,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerType = new JMenuItem("Ventas por tipo de cliente");
         jmiRepTrnByBizPartnerTypeBizPartner = new JMenuItem("Ventas por tipo de cliente-cliente");
         jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de ventas por ítem-cliente");
+        jmiRepFSC = new JMenuItem("Reporte personalizado de ventas...");
         jmRepBackorder = new JMenu("Consultas de backorder de ventas");
         jmiRepBackorderContract = new JMenuItem("Backorder de contratos");
         jmiRepBackorderContractByItem = new JMenuItem("Backorder de contratos por ítem");
@@ -617,6 +622,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRepStats.add(jmiRepTrnByBizPartnerTypeBizPartner);
         jmRepStats.addSeparator();
         jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
+        if (existFSCReport) {
+            jmRepStats.addSeparator();
+            jmRepStats.add(jmiRepFSC);
+        }
         jmRepBackorder.add(jmiRepBackorderContract);
         jmRepBackorder.add(jmiRepBackorderContractByItem);
         jmRepBackorder.add(jmiRepBackorderContractByItemBizPartner);
@@ -793,6 +802,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerType.addActionListener(this);
         jmiRepTrnByBizPartnerTypeBizPartner.addActionListener(this);
         jmiRepTrnDpsByItemBizPartner.addActionListener(this);
+        jmiRepFSC.addActionListener(this);
         jmiRepBackorderContract.addActionListener(this);
         jmiRepBackorderContractByItem.addActionListener(this);
         jmiRepBackorderContractByItemBizPartner.addActionListener(this);
@@ -2084,6 +2094,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
+            }
+            else if (item == jmiRepFSC) {
+                new SDialogRepFSC((SGuiClient) miClient, SDataConstantsSys.TRNS_CT_DPS_SAL, "Reporte personalizado de ventas").setVisible(true);
             }
             else if (item == jmiRepBackorderContract) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);

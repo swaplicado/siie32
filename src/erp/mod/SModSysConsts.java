@@ -58,6 +58,8 @@ public abstract class SModSysConsts {
     public static final int CFGX_IVM_FIFO = 1;
     public static final int CFGX_IVM_LIFO = 2;
     public static final int CFGX_IVM_AVG = 3;
+    
+    public static final String CFG_CUSTOM_REP_FSC = "VENTAS_FSC";
 
     /*
      * Users
