@@ -169,7 +169,7 @@ public abstract class SModuleUtilities {
     
     public static boolean customReportExists(final SClientInterface client, final String reportKey) {
         try {
-            String sql = "SELECT * FROM cfg_custom_rep WHERE rep_key = '" + reportKey + "'";
+            String sql = "SELECT * FROM cfg_custom_rep WHERE rep_key = '" + reportKey + "' AND NOT b_del";
             ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
             return resultSet.next();
         } catch (Exception e) {
