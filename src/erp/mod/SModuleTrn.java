@@ -918,6 +918,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNR_DPS_CON:
                 guiReport = new SGuiReport("reps/trn_dps_con.jasper", "Reporte de estatus de contratos");
                 break;
+            case SModConsts.TRNR_VTAS_FSC:
+                guiReport = new SGuiReport("reps/trn_vtas_fsc.jasper", "Reporte de ventas FSC");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

@@ -18,6 +18,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogShowDocumentLinks;
 import erp.mtrn.form.SDialogShowDocumentNotes;
 import java.awt.Cursor;
+import java.sql.ResultSet;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiConsts;
 
@@ -164,5 +165,16 @@ public abstract class SModuleUtilities {
                 dialog.setFormVisible(true);
             }
         }
+    }
+    
+    public static boolean customReportExists(final SClientInterface client, final String reportKey) {
+        try {
+            String sql = "SELECT * FROM cfg_custom_rep WHERE rep_key = '" + reportKey + "' AND NOT b_del";
+            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+            return resultSet.next();
+        } catch (Exception e) {
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return false;
     }
 }
