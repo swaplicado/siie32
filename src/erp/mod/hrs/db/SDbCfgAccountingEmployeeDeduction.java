@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -18,13 +17,13 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Sergio Flores
  */
-public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
+public class SDbCfgAccountingEmployeeDeduction extends SDbRegistryUser {
 
-    protected int mnPkDepartmentId;
-    protected int mnPkCfgAccountingId;
-    protected Date mtDateStart;
+    protected int mnPkEmployeeId;
+    protected int mnPkDeductionId;
     //protected boolean mbDeleted;
-    protected int mnFkPackCostCentersId;
+    protected int mnFkBizPartnerId;
+    protected int mnFkAccountingRecordTypeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -32,25 +31,25 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
     
-    public SDbCfgAccountingDepartmentPackCostCenters() {
-        super(SModConsts.HRS_CFG_ACC_DEP_PACK_CC);
+    public SDbCfgAccountingEmployeeDeduction() {
+        super(SModConsts.HRS_CFG_ACC_EMP_DED);
     }
 
-    public void setPkDepartmentId(int n) { mnPkDepartmentId = n; }
-    public void setPkCfgAccountingId(int n) { mnPkCfgAccountingId = n; }
-    public void setDateStart(Date t) { mtDateStart = t; }
+    public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
+    public void setPkDeductionId(int n) { mnPkDeductionId = n; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkPackCostCentersId(int n) { mnFkPackCostCentersId = n; }
+    public void setFkAccountingRecordTypeId(int n) { mnFkAccountingRecordTypeId = n; }
+    public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public int getPkDepartmentId() { return mnPkDepartmentId; }
-    public int getPkCfgAccountingId() { return mnPkCfgAccountingId; }
-    public Date getDateStart() { return mtDateStart; }
+    public int getPkEmployeeId() { return mnPkEmployeeId; }
+    public int getPkDeductionId() { return mnPkDeductionId; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkPackCostCentersId() { return mnFkPackCostCentersId; }
+    public int getFkBizPartnerId() { return mnFkBizPartnerId; }
+    public int getFkAccountingRecordTypeId() { return mnFkAccountingRecordTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -58,24 +57,24 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkDepartmentId = pk[0];
-        mnPkCfgAccountingId = pk[1];
+        mnPkEmployeeId = pk[0];
+        mnPkDeductionId = pk[1];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkDepartmentId, mnPkCfgAccountingId };
+        return new int[] { mnPkEmployeeId, mnPkDeductionId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
 
-        mnPkDepartmentId = 0;
-        mnPkCfgAccountingId = 0;
-        mtDateStart = null;
+        mnPkEmployeeId = 0;
+        mnPkDeductionId = 0;
         mbDeleted = false;
-        mnFkPackCostCentersId = 0;
+        mnFkBizPartnerId = 0;
+        mnFkAccountingRecordTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -89,28 +88,19 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_dep = " + mnPkDepartmentId + " "
-                + "AND id_cfg_acc = " + mnPkCfgAccountingId + " ";
+        return "WHERE id_emp = " + mnPkEmployeeId + " "
+                + "AND id_ded = " + mnPkDeductionId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_dep = " + pk[0] + " "
-                + "AND id_cfg_acc = " + pk[1] + " ";
+        return "WHERE id_emp = " + pk[0] + " "
+                + "AND id_ded = " + pk[1] + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
-        ResultSet resultSet = null;
 
-        mnPkCfgAccountingId = 0;
-
-        msSql = "SELECT COALESCE(MAX(id_cfg_acc), 0) + 1 FROM " + getSqlTable() + " "
-                + "WHERE id_dep = " + mnPkDepartmentId + " ";
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (resultSet.next()) {
-            mnPkCfgAccountingId = resultSet.getInt(1);
-        }
     }
 
     @Override
@@ -127,11 +117,11 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkDepartmentId = resultSet.getInt("id_dep");
-            mnPkCfgAccountingId = resultSet.getInt("id_cfg_acc");
-            mtDateStart = resultSet.getDate("dt_sta");
+            mnPkEmployeeId = resultSet.getInt("id_emp");
+            mnPkDeductionId = resultSet.getInt("id_ded");
             mbDeleted = resultSet.getBoolean("b_del");
-            mnFkPackCostCentersId = resultSet.getInt("fk_pack_cc");
+            mnFkBizPartnerId = resultSet.getInt("fk_bp");
+            mnFkAccountingRecordTypeId = resultSet.getInt("fk_tp_acc_rec");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -151,17 +141,21 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         if (mbRegistryNew) {
-            computePrimaryKey(session);
+            verifyRegistryNew(session);
+        }
+        
+        if (mbRegistryNew) {
             mbDeleted = false;
+            mbSystem = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkDepartmentId + ", " + 
-                    mnPkCfgAccountingId + ", " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
+                    mnPkEmployeeId + ", " + 
+                    mnPkDeductionId + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
-                    mnFkPackCostCentersId + ", " + 
+                    mnFkBizPartnerId + ", " + 
+                    mnFkAccountingRecordTypeId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -172,11 +166,11 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_dep = " + mnPkDepartmentId + ", " +
-                    //"id_cfg_acc = " + mnPkCfgAccountingId + ", " +
-                    "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
+                    //"id_emp = " + mnPkEmployeeId + ", " +
+                    //"id_ded = " + mnPkDeductionId + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "fk_pack_cc = " + mnFkPackCostCentersId + ", " +
+                    "fk_bp = " + mnFkBizPartnerId + ", " +
+                    "fk_tp_acc_rec = " + mnFkAccountingRecordTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -193,14 +187,14 @@ public class SDbCfgAccountingDepartmentPackCostCenters extends SDbRegistryUser {
     }
 
     @Override
-    public SDbCfgAccountingDepartmentPackCostCenters clone() throws CloneNotSupportedException {
-        SDbCfgAccountingDepartmentPackCostCenters registry = new SDbCfgAccountingDepartmentPackCostCenters();
+    public SDbCfgAccountingEmployeeDeduction clone() throws CloneNotSupportedException {
+        SDbCfgAccountingEmployeeDeduction registry = new SDbCfgAccountingEmployeeDeduction();
 
-        registry.setPkDepartmentId(this.getPkDepartmentId());
-        registry.setPkCfgAccountingId(this.getPkCfgAccountingId());
-        registry.setDateStart(this.getDateStart());
+        registry.setPkEmployeeId(this.getPkEmployeeId());
+        registry.setPkDeductionId(this.getPkDeductionId());
         registry.setDeleted(this.isDeleted());
-        registry.setFkPackCostCentersId(this.getFkPackCostCentersId());
+        registry.setFkBizPartnerId(this.getFkBizPartnerId());
+        registry.setFkAccountingRecordTypeId(this.getFkAccountingRecordTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

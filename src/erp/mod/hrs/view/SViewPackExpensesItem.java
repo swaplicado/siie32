@@ -80,7 +80,7 @@ public class SViewPackExpensesItem extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " paquete gastos"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " paquete gastos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " paquete gastos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "te.name", SGridConsts.COL_TITLE_NAME + " tipo gasto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "te.code", SGridConsts.COL_TITLE_CODE + " tipo gasto"));

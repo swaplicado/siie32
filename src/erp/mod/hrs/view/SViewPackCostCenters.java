@@ -55,7 +55,9 @@ public class SViewPackCostCenters extends SGridPaneView {
                 + "pc.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "pc.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
+                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PACK_CC_CC) + " AS pcc WHERE pcc.id_pack_cc = pc.id_pack_cc) AS _child, "
+                + "(SELECT COALESCE(SUM(pcc.prorat_per), 0.0) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PACK_CC_CC) + " AS pcc WHERE pcc.id_pack_cc = pc.id_pack_cc) AS _prorat_per "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PACK_CC) + " AS pc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "pc.fk_usr_ins = ui.id_usr "
@@ -69,8 +71,10 @@ public class SViewPackCostCenters extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_child", "Núm. dependientes"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "_prorat_per", "% prorrateo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

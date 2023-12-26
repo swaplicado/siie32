@@ -251,14 +251,14 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
         
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moKeyDepartmentSuperior.setKeySettings(miClient, SGuiUtils.getLabelName(jlDepartmentSuperior), false);
-        moKeyEmployeeHead.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployeeHead.getText()), false);
-        moKeyExpenseType.setKeySettings(miClient, SGuiUtils.getLabelName(jlExpenseType.getText()), true);
-        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
-        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
-        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
+        moKeyEmployeeHead.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployeeHead), false);
+        moKeyExpenseType.setKeySettings(miClient, SGuiUtils.getLabelName(jlExpenseType), true);
+        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, true);
+        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), false);
+        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax), false);
 
         moPanelAccount.setAccountNameWidth(500);
         moPanelAccount.setComponentPrevious(moKeyEmployeeHead);
@@ -289,7 +289,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         int[] key = null;
         SGuiOptionPicker picker = null;
 
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BANK_ACC, 0, null);
+        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
@@ -462,7 +462,7 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
                 }
                 
                 child.setFkExpenseTypeId(moKeyExpenseType.getValue()[0]);
-                child.setFkAccountId(moPanelAccount.getSelectedAccount().getAccountId());
+                child.setFkAccountId(moPanelAccount.getSelectedAccount() != null ? moPanelAccount.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
                 child.setFkBizPartnerId_n(moKeyBizPartner.getSelectedIndex() <= 0 ? 0 : moKeyBizPartner.getValue()[0]);
                 child.setFkTaxBasicId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[0]);
                 child.setFkTaxTaxId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[1]);

@@ -231,7 +231,6 @@ public class SDbCfgAccountingEarning extends SDbRegistryUser {
         }
 
         if (mbRegistryNew) {
-            computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;

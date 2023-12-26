@@ -55,7 +55,8 @@ public class SViewPackExpenses extends SGridPaneView {
                 + "pe.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "pe.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
+                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_PACK_EXP_ITEM) + " AS pei WHERE pei.id_pack_exp = pe.id_pack_exp) AS _child "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_PACK_EXP) + " AS pe "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "pe.fk_usr_ins = ui.id_usr "
@@ -69,8 +70,9 @@ public class SViewPackExpenses extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_child", "Núm. dependientes"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

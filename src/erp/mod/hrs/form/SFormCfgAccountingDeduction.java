@@ -256,8 +256,8 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
         moKeyPackExpenses.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackExpenses), true);
         moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, true);
         moKeyPackCostCenters.setKeySettings(miClient, SGuiUtils.getLabelName(jlPackCostCenters), true);
-        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
-        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
+        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), false);
+        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax), false);
 
         moPanelAccount.setAccountNameWidth(500);
 
@@ -279,7 +279,7 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
         int[] key = null;
         SGuiOptionPicker picker = null;
 
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BANK_ACC, 0, null);
+        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 

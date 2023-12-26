@@ -25,6 +25,8 @@ import erp.mod.hrs.db.SDbCfgAccountingDeduction;
 import erp.mod.hrs.db.SDbCfgAccountingDepartment;
 import erp.mod.hrs.db.SDbCfgAccountingDepartmentPackCostCenters;
 import erp.mod.hrs.db.SDbCfgAccountingEarning;
+import erp.mod.hrs.db.SDbCfgAccountingEmployeeDeduction;
+import erp.mod.hrs.db.SDbCfgAccountingEmployeeEarning;
 import erp.mod.hrs.db.SDbCfgAccountingEmployeePackCostCenters;
 import erp.mod.hrs.db.SDbConditionalEarning;
 import erp.mod.hrs.db.SDbConfig;
@@ -46,6 +48,7 @@ import erp.mod.hrs.db.SDbEmployeeWageFactorAnnum;
 import erp.mod.hrs.db.SDbEmployeeWageLog;
 import erp.mod.hrs.db.SDbEmployeeWageSscBaseLog;
 import erp.mod.hrs.db.SDbExpenseType;
+import erp.mod.hrs.db.SDbExpenseTypeAccount;
 import erp.mod.hrs.db.SDbFirstDayYear;
 import erp.mod.hrs.db.SDbHoliday;
 import erp.mod.hrs.db.SDbLoan;
@@ -105,6 +108,7 @@ import erp.mod.hrs.form.SFormEarning;
 import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
 import erp.mod.hrs.form.SFormExpenseType;
+import erp.mod.hrs.form.SFormExpenseTypeAccount;
 import erp.mod.hrs.form.SFormFirstDayYear;
 import erp.mod.hrs.form.SFormHoliday;
 import erp.mod.hrs.form.SFormLoan;
@@ -142,6 +146,8 @@ import erp.mod.hrs.view.SViewBenefitVacationStatus;
 import erp.mod.hrs.view.SViewCfgAccountingDeduction;
 import erp.mod.hrs.view.SViewCfgAccountingDepartmentPackCostCenters;
 import erp.mod.hrs.view.SViewCfgAccountingEarning;
+import erp.mod.hrs.view.SViewCfgAccountingEmployeeDeduction;
+import erp.mod.hrs.view.SViewCfgAccountingEmployeeEarning;
 import erp.mod.hrs.view.SViewCfgAccountingEmployeePackCostCenters;
 import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewConfig;
@@ -163,6 +169,7 @@ import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
 import erp.mod.hrs.view.SViewExpenseType;
+import erp.mod.hrs.view.SViewExpenseTypeAccount;
 import erp.mod.hrs.view.SViewFirstDayYear;
 import erp.mod.hrs.view.SViewHoliday;
 import erp.mod.hrs.view.SViewLoan;
@@ -266,6 +273,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormAccountingDeduction moFormAccountingDeductionGlobal;
     private SFormAccountingDeduction moFormAccountingDeductionDepartament;
     private SFormAccountingDeduction moFormAccountingDeductionEmployee;
+    private SFormExpenseTypeAccount moFormExpenseTypeAccount;
     private SFormCfgAccountingDepartmentPackCostCenters moFormCfgAccountingDepartmentPackCostCenters;
     private SFormCfgAccountingEmployeePackCostCenters moFormCfgAccountingEmployeePackCostCenters;
     private SFormCfgAccountingEarning moFormCfgAccountingEarning;
@@ -607,6 +615,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_ACC_DED:
                 registry = new SDbAccountingDeduction();
                 break;
+            case SModConsts.HRS_TP_EXP_ACC:
+                registry = new SDbExpenseTypeAccount();
+                break;
             case SModConsts.HRS_PACK_CC:
                 registry = new SDbPackCostCenters();
                 break;
@@ -621,6 +632,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_CFG_ACC_EMP_PACK_CC:
                 registry = new SDbCfgAccountingEmployeePackCostCenters();
+                break;
+            case SModConsts.HRS_CFG_ACC_EMP_EAR:
+                registry = new SDbCfgAccountingEmployeeEarning();
+                break;
+            case SModConsts.HRS_CFG_ACC_EMP_DED:
+                registry = new SDbCfgAccountingEmployeeDeduction();
                 break;
             case SModConsts.HRS_CFG_ACC_EAR:
                 registry = new SDbCfgAccountingEarning();
@@ -1239,6 +1256,9 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+            case SModConsts.HRS_TP_EXP_ACC:
+                view = new SViewExpenseTypeAccount(miClient, "Contab. tipos gasto");
+                break;
             case SModConsts.HRS_PACK_CC:
                 view = new SViewPackCostCenters(miClient, "Paqs. centros costos");
                 break;
@@ -1251,11 +1271,17 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_CFG_ACC_EMP_PACK_CC:
                 view = new SViewCfgAccountingEmployeePackCostCenters(miClient, "Empleados y paqs. centros costos");
                 break;
+            case SModConsts.HRS_CFG_ACC_EMP_EAR:
+                view = new SViewCfgAccountingEmployeeEarning(miClient, "Empleados y percepciones");
+                break;
+            case SModConsts.HRS_CFG_ACC_EMP_DED:
+                view = new SViewCfgAccountingEmployeeDeduction(miClient, "Empleados y deducciones");
+                break;
             case SModConsts.HRS_CFG_ACC_EAR:
-                view = new SViewCfgAccountingEarning(miClient, "Contabilización percepciones");
+                view = new SViewCfgAccountingEarning(miClient, "Contab. percepciones");
                 break;
             case SModConsts.HRS_CFG_ACC_DED:
-                view = new SViewCfgAccountingDeduction(miClient, "Contabilización deducciones");
+                view = new SViewCfgAccountingDeduction(miClient, "Contab. deducciones");
                 break;
             case SModConsts.HRS_PAY:
                 view = new SViewPayroll(miClient, "Nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
@@ -1572,6 +1598,10 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+            case SModConsts.HRS_TP_EXP_ACC:
+                if (moFormExpenseTypeAccount == null) moFormExpenseTypeAccount = new SFormExpenseTypeAccount(miClient, "Contabilización de tipo de gasto");
+                form = moFormExpenseTypeAccount;
+                break;
             case SModConsts.HRS_PACK_CC:
                 if (moFormPackCostCenters == null) moFormPackCostCenters = new SFormPackCostCenters(miClient, "Paquete de centros de costo");
                 form = moFormPackCostCenters;
@@ -1583,6 +1613,14 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_CFG_ACC_EMP_PACK_CC:
                 if (moFormCfgAccountingEmployeePackCostCenters == null) moFormCfgAccountingEmployeePackCostCenters = new SFormCfgAccountingEmployeePackCostCenters(miClient, "Empleado y paquete de centros de costo");
                 form = moFormCfgAccountingEmployeePackCostCenters;
+                break;
+            case SModConsts.HRS_CFG_ACC_EMP_EAR:
+//                if (moFormCfgAccountingEmployeeEarning == null) moFormCfgAccountingEmployeeEarning = new SFormCfgAccountingEmployeeEarning(miClient, "Empleado y percepción");
+//                form = moFormCfgAccountingEmployeeEarning;
+                break;
+            case SModConsts.HRS_CFG_ACC_EMP_DED:
+//                if (moFormCfgAccountingEmployeeDeduction == null) moFormCfgAccountingEmployeeDeduction = new SFormCfgAccountingEmployeeDeduction(miClient, "Empleado y deducción");
+//                form = moFormCfgAccountingEmployeeDeduction;
                 break;
             case SModConsts.HRS_CFG_ACC_EAR:
                 if (moFormCfgAccountingEarning == null) moFormCfgAccountingEarning = new SFormCfgAccountingEarning(miClient, "Contabilización de percepción");

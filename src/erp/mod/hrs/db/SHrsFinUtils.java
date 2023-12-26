@@ -738,7 +738,7 @@ public abstract class SHrsFinUtils {
      * @return 
      */
     public static SDataAccount getAccountLedger(final SGuiSession session, SDataAccount account) {
-        return (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+        return account.getLevel() == 1 ? account : (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
     }
     
     /**
@@ -820,10 +820,10 @@ public abstract class SHrsFinUtils {
      * @return 
      */
     public static boolean checkIfAccountRequiresCostCenter(final SGuiSession session, final int accountId) {
-        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
-        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        SDataAccount account = getAccount(session, accountId);
+        SDataAccount accountLedger = getAccountLedger(session, account);
         
-        return account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || SHrsFinUtils.isAccountTypeForResults(accountLedger);
+        return account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || isAccountTypeForResults(accountLedger);
     }
     
     /**
@@ -833,10 +833,10 @@ public abstract class SHrsFinUtils {
      * @return 
      */
     public static boolean checkIfAccountRequiresItem(final SGuiSession session, final int accountId) {
-        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
-        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        SDataAccount account = getAccount(session, accountId);
+        SDataAccount accountLedger = getAccountLedger(session, account);
         
-        return account.getIsRequiredItem() || accountLedger.getIsRequiredItem() || SHrsFinUtils.isAccountTypeForResults(accountLedger);
+        return account.getIsRequiredItem() || accountLedger.getIsRequiredItem() || isAccountTypeForResults(accountLedger);
     }
     
     /**
@@ -846,10 +846,10 @@ public abstract class SHrsFinUtils {
      * @return 
      */
     public static boolean checkIfAccountRequiresBizPartner(final SGuiSession session, final int accountId) {
-        SDataAccount account = SHrsFinUtils.getAccount(session, accountId);
-        SDataAccount accountLedger = SHrsFinUtils.getAccountLedger(session, account);
+        SDataAccount account = getAccount(session, accountId);
+        SDataAccount accountLedger = getAccountLedger(session, account);
         
-        return account.getIsRequiredBizPartner()|| accountLedger.getIsRequiredBizPartner() || SHrsFinUtils.isAccountSystemTypeForBizPartner(accountLedger);
+        return account.getIsRequiredBizPartner()|| accountLedger.getIsRequiredBizPartner() || isAccountSystemTypeForBizPartner(accountLedger);
     }
     
     /**

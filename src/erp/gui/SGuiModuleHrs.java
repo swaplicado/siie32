@@ -71,13 +71,16 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmCfgAcc;
     private javax.swing.JMenuItem jmiCfgAccDepartmentPackCostCenters;
     private javax.swing.JMenuItem jmiCfgAccEmployeePackCostCenters;
+    private javax.swing.JMenuItem jmiCfgAccEmployeeEarnings;
+    private javax.swing.JMenuItem jmiCfgAccEmployeeDeductions;
     private javax.swing.JMenuItem jmiCfgAccEarnings;
     private javax.swing.JMenuItem jmiCfgAccDeductions;
     private javax.swing.JMenuItem jmiCfgAccPackCostCenters;
     private javax.swing.JMenuItem jmiCfgAccPackCostCentersCostCenters;
     private javax.swing.JMenuItem jmiCfgAccPackExpenses;
     private javax.swing.JMenuItem jmiCfgAccPackExpensesItems;
-    private javax.swing.JMenuItem jmiCfgAccExpenseType;
+    private javax.swing.JMenuItem jmiCfgAccExpenseTypeAccounts;
+    private javax.swing.JMenuItem jmiCfgAccExpenseTypes;
     private javax.swing.JMenu jmCfgBkkEarning;
     private javax.swing.JMenuItem jmiCfgBkkEarningGlobal;
     private javax.swing.JMenuItem jmiCfgBkkEarningDepartament;
@@ -223,13 +226,16 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAcc = new JMenu("Contabilización de nóminas");
         jmiCfgAccDepartmentPackCostCenters = new JMenuItem("Departamentos y paquetes de centros de costos");
         jmiCfgAccEmployeePackCostCenters = new JMenuItem("Empleados y paquetes de centros de costos");
+        jmiCfgAccEmployeeEarnings = new JMenuItem("Empleados y percepciones");
+        jmiCfgAccEmployeeDeductions = new JMenuItem("Empleados y deducciones");
         jmiCfgAccEarnings = new JMenuItem("Contabilización de percepciones");
         jmiCfgAccDeductions = new JMenuItem("Contabilización de deducciones");
         jmiCfgAccPackCostCenters = new JMenuItem("Paquetes de centros de costos");
         jmiCfgAccPackCostCentersCostCenters = new JMenuItem("Paquetes de centros de costos y centros de costos");
         jmiCfgAccPackExpenses = new JMenuItem("Paquetes de gastos");
         jmiCfgAccPackExpensesItems = new JMenuItem("Paquetes de gastos e ítems");
-        jmiCfgAccExpenseType = new JMenuItem("Tipos de gasto");
+        jmiCfgAccExpenseTypeAccounts = new JMenuItem("Contabilización de tipos de gasto");
+        jmiCfgAccExpenseTypes = new JMenuItem("Tipos de gasto");
         jmCfgBkkEarning = new JMenu("Contabilización de percepciones");
         jmiCfgBkkEarningGlobal = new JMenuItem("Percepciones globales");
         jmiCfgBkkEarningDepartament = new JMenuItem("Percepciones por departamento");
@@ -262,7 +268,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgDeductions);
         jmCfg.addSeparator();
         jmCfgAcc.add(jmiCfgAccDepartmentPackCostCenters);
+        jmCfgAcc.addSeparator();
         jmCfgAcc.add(jmiCfgAccEmployeePackCostCenters);
+        jmCfgAcc.add(jmiCfgAccEmployeeEarnings);
+        jmCfgAcc.add(jmiCfgAccEmployeeDeductions);
         jmCfgAcc.addSeparator();
         jmCfgAcc.add(jmiCfgAccEarnings);
         jmCfgAcc.add(jmiCfgAccDeductions);
@@ -272,7 +281,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAcc.addSeparator();
         jmCfgAcc.add(jmiCfgAccPackExpenses);
         jmCfgAcc.add(jmiCfgAccPackExpensesItems);
-        jmCfgAcc.add(jmiCfgAccExpenseType);
+        jmCfgAcc.addSeparator();
+        jmCfgAcc.add(jmiCfgAccExpenseTypeAccounts);
+        jmCfgAcc.add(jmiCfgAccExpenseTypes);
         jmCfg.add(jmCfgAcc);
         jmCfgBkkEarning.add(jmiCfgBkkEarningGlobal);
         jmCfgBkkEarning.add(jmiCfgBkkEarningDepartament);
@@ -525,13 +536,16 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDeductions.addActionListener(this);
         jmiCfgAccDepartmentPackCostCenters.addActionListener(this);
         jmiCfgAccEmployeePackCostCenters.addActionListener(this);
+        jmiCfgAccEmployeeEarnings.addActionListener(this);
+        jmiCfgAccEmployeeDeductions.addActionListener(this);
         jmiCfgAccEarnings.addActionListener(this);
         jmiCfgAccDeductions.addActionListener(this);
         jmiCfgAccPackCostCenters.addActionListener(this);
         jmiCfgAccPackCostCentersCostCenters.addActionListener(this);
         jmiCfgAccPackExpenses.addActionListener(this);
         jmiCfgAccPackExpensesItems.addActionListener(this);
-        jmiCfgAccExpenseType.addActionListener(this);
+        jmiCfgAccExpenseTypeAccounts.addActionListener(this);
+        jmiCfgAccExpenseTypes.addActionListener(this);
         jmiCfgBkkEarningGlobal.addActionListener(this);
         jmiCfgBkkEarningDepartament.addActionListener(this);
         jmiCfgBkkEarningEmployee.addActionListener(this);
@@ -653,13 +667,16 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAcc.setEnabled(mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC);
         jmiCfgAccDepartmentPackCostCenters.setEnabled(true);
         jmiCfgAccEmployeePackCostCenters.setEnabled(true);
+        jmiCfgAccEmployeeEarnings.setEnabled(true);
+        jmiCfgAccEmployeeDeductions.setEnabled(true);
         jmiCfgAccEarnings.setEnabled(true);
         jmiCfgAccDeductions.setEnabled(true);
         jmiCfgAccPackCostCenters.setEnabled(true);
         jmiCfgAccPackCostCentersCostCenters.setEnabled(true);
         jmiCfgAccPackExpenses.setEnabled(true);
         jmiCfgAccPackExpensesItems.setEnabled(true);
-        jmiCfgAccExpenseType.setEnabled(true);
+        jmiCfgAccExpenseTypeAccounts.setEnabled(true);
+        jmiCfgAccExpenseTypes.setEnabled(true);
         jmCfgBkkEarning.setEnabled(mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_ORIGINAL);
         jmiCfgBkkEarningGlobal.setEnabled(true);
         jmiCfgBkkEarningDepartament.setEnabled(true);
@@ -1050,6 +1067,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgAccEmployeePackCostCenters) {
                 miClient.getSession().showView(SModConsts.HRS_CFG_ACC_EMP_PACK_CC, 0, null);
             }
+            else if (item == jmiCfgAccEmployeeEarnings) {
+                miClient.getSession().showView(SModConsts.HRS_CFG_ACC_EMP_EAR, 0, null);
+            }
+            else if (item == jmiCfgAccEmployeeDeductions) {
+                miClient.getSession().showView(SModConsts.HRS_CFG_ACC_EMP_DED, 0, null);
+            }
             else if (item == jmiCfgAccEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_CFG_ACC_EAR, 0, null);
             }
@@ -1068,7 +1091,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgAccPackExpensesItems) {
                 miClient.getSession().showView(SModConsts.HRSU_PACK_EXP_ITEM, 0, null);
             }
-            else if (item == jmiCfgAccExpenseType) {
+            else if (item == jmiCfgAccExpenseTypeAccounts) {
+                miClient.getSession().showView(SModConsts.HRS_TP_EXP_ACC, 0, null);
+            }
+            else if (item == jmiCfgAccExpenseTypes) {
                 miClient.getSession().showView(SModConsts.HRSU_TP_EXP, 0, null);
             }
             else if (item == jmiCfgBkkEarningGlobal) {

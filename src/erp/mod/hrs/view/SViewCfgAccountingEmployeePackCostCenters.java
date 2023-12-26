@@ -82,7 +82,7 @@ public class SViewCfgAccountingEmployeePackCostCenters extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Clave"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ca.dt_sta", "Inicio vigencia"));
@@ -103,6 +103,7 @@ public class SViewCfgAccountingEmployeePackCostCenters extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.HRS_PACK_CC);
         moSuscriptionsSet.add(SModConsts.HRSU_EMP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }

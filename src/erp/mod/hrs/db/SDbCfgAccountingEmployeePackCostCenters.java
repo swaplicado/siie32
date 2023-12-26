@@ -158,7 +158,6 @@ public class SDbCfgAccountingEmployeePackCostCenters extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
-            mbSystem = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 

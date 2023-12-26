@@ -265,13 +265,13 @@ public class SFormAccountingEarning extends SBeanForm implements ActionListener 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
 
-        moTextEarning.setTextSettings(SGuiUtils.getLabelName(jlEarning.getText()), 10);
-        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference.getText()), 100);
+        moTextEarning.setTextSettings(SGuiUtils.getLabelName(jlEarning), 10);
+        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference), 100);
         moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
         moPanelCostCenter.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, false, true, true);
-        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner.getText()), false);
-        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), false);
-        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), false);
+        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), false);
+        moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem), false);
+        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax), false);
 
         moPanelAccount.setAccountNameWidth(500);
         moPanelCostCenter.setAccountNameWidth(500);
@@ -305,7 +305,7 @@ public class SFormAccountingEarning extends SBeanForm implements ActionListener 
         int[] key = null;
         SGuiOptionPicker picker = null;
 
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BANK_ACC, SLibConsts.UNDEFINED, null);
+        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
