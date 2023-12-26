@@ -848,6 +848,9 @@ public abstract class SModConsts {
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
     public static final int HRSX_PTU = 2064106;
+    public static final int HRSX_BEN_ANN_BON = 2064107;
+    public static final int HRSX_BANK_PAY_DISP = 2064108;
+    public static final int HRSX_EMP_CC = 2064109;
     public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_EMP_LOG_SUA = 2064161;
     public static final int HRSX_EMP_LOG_IDSE = 2064162;
