@@ -1790,6 +1790,9 @@ public class SShareDB {
             SEmployeeEar empEar = new SEmployeeEar();
             
             JSONObject row = (JSONObject) rows.get(i);
+            if (row.get("company_id") == null) {
+                continue;
+            }
             company = Integer.parseInt(row.get("company_id").toString());
             String companies = "SELECT * "
                                         + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
