@@ -215,7 +215,8 @@ public class SDbCfgAccountingEmployeeEarning extends SDbRegistryUser {
      */
     public static final int countExistingRegistries(final SGuiSession session, final int[] keyToBeCounted) throws Exception {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_EAR) + " WHERE id_emp = " + keyToBeCounted[0] + " id_ear = " + keyToBeCounted[1] + ";";
+        String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_EAR) + " "
+                + "WHERE id_emp = " + keyToBeCounted[0] + " AND id_ear = " + keyToBeCounted[1] + ";";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             if (resultSet.next()) {

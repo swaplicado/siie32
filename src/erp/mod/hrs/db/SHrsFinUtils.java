@@ -329,6 +329,98 @@ public abstract class SHrsFinUtils {
     }
     
     /**
+     * Retrieve map of all expense types.
+     * @param session User session.
+     * @return Map of all expense types.
+     * @throws Exception 
+     */
+    public static HashMap<Integer, SDbExpenseType> retrieveExpenseTypesMap(final SGuiSession session) throws Exception {
+        HashMap<Integer, SDbExpenseType> map = new HashMap<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql = "SELECT id_tp_exp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EXP) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_tp_exp;";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SDbExpenseType account = new SDbExpenseType();
+                account.read(session, new int[] { resultSet.getInt("id_tp_exp") });
+                map.put(resultSet.getInt("id_tp_exp"), account);
+            }
+        }
+        
+        return map;
+    }
+    
+    /**
+     * Retrieve map of accounting settings for all expense types.
+     * @param session User session.
+     * @return Map of accounting settings.
+     * @throws Exception 
+     */
+    public static HashMap<Integer, SDbExpenseTypeAccount> retrieveExpenseTypeAccountsMap(final SGuiSession session) throws Exception {
+        HashMap<Integer, SDbExpenseTypeAccount> map = new HashMap<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String sql = "SELECT id_tp_exp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TP_EXP_ACC) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_tp_exp;";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SDbExpenseTypeAccount account = new SDbExpenseTypeAccount();
+                account.read(session, new int[] { resultSet.getInt("id_tp_exp") });
+                map.put(resultSet.getInt("id_tp_exp"), account);
+            }
+        }
+        
+        return map;
+    }
+    
+    /**
+     * Retrieve configuration of earning for employee.
+     * @param session GUI session.
+     * @param employeeId ID of employee.
+     * @param earningId ID of earning.
+     * @return Configuration instance if exist, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SDbCfgAccountingEmployeeEarning retrieveCfgAccountingEmployeeEarning(final SGuiSession session, final int employeeId, final int earningId) throws Exception {
+        SDbCfgAccountingEmployeeEarning cfg = new SDbCfgAccountingEmployeeEarning();
+        
+        try {
+            cfg.read(session, new int[] { employeeId, earningId });
+        }
+        catch (Exception e) {
+            cfg = null;
+        }
+        
+        return cfg;
+    }
+    
+    /**
+     * Retrieve configuration of deduction for employee.
+     * @param session GUI session.
+     * @param employeeId ID of employee.
+     * @param deductionId ID of deduction.
+     * @return Configuration instance if exist, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SDbCfgAccountingEmployeeDeduction retrieveCfgAccountingEmployeeDeduction(final SGuiSession session, final int employeeId, final int deductionId) throws Exception {
+        SDbCfgAccountingEmployeeDeduction cfg = new SDbCfgAccountingEmployeeDeduction();
+        
+        try {
+            cfg.read(session, new int[] { employeeId, deductionId });
+        }
+        catch (Exception e) {
+            cfg = null;
+        }
+        
+        return cfg;
+    }
+    
+    /**
      * Retrive and validate accounting configuration for earning.
      * @param session GUI session.
      * @param earningId ID of accounting configuration to be retrieved and validated.
@@ -525,6 +617,21 @@ public abstract class SHrsFinUtils {
      */
     public static ArrayList<String> validateAccountingSettingsDynamic(final SGuiSession session, final int payrollId, final Date cutoff, final int[] employeeIds) throws Exception {
         ArrayList<String> exceptions = new ArrayList<>();
+        
+        // validate accounting settings for all expense types:
+        
+        HashMap<Integer, SDbExpenseType> expenseTypesMap = retrieveExpenseTypesMap(session); // key: ID of expense type; value: expense type
+        HashMap<Integer, SDbExpenseTypeAccount> expenseTypeAccountsMap = retrieveExpenseTypeAccountsMap(session); // key: ID of expense type; value: accounting setting for expense type
+
+        for (int expenseTypeId : expenseTypesMap.keySet()) {
+            SDbExpenseType expenseType = expenseTypesMap.get(expenseTypeId);
+            SDbExpenseTypeAccount account = expenseTypeAccountsMap.get(expenseTypeId);
+            if (account == null) {
+                exceptions.add("No existe la configuración de contabilización del tipo de gasto '" + expenseType.getName() + "'.");
+            }
+        }
+        
+        // validate accounting settings for all earnings and deductions of payroll:
         
         try (Statement statement = session.getStatement().getConnection().createStatement(); Statement statementAux = statement.getConnection().createStatement()) {
             String sql;

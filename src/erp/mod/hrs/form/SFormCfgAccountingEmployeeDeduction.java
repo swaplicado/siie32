@@ -6,8 +6,8 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbCfgAccountingEmployeeEarning;
-import erp.mod.hrs.db.SDbEarning;
+import erp.mod.hrs.db.SDbCfgAccountingEmployeeDeduction;
+import erp.mod.hrs.db.SDbDeduction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -24,22 +24,22 @@ import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
- * Configuración de la contabilización de las percepciones de empleados que lo requieran.
+ * Configuración de la contabilización de las deducciones de empleados que lo requieran.
  * Aplica para la modalidad de configuración de contabilización 'dinámica'.
  * @author Sergio Flores
  */
-public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements ActionListener, ItemListener {
+public class SFormCfgAccountingEmployeeDeduction extends SBeanForm implements ActionListener, ItemListener {
 
-    private SDbCfgAccountingEmployeeEarning moRegistry;
-    private SDbEarning moEarning;
+    private SDbCfgAccountingEmployeeDeduction moRegistry;
+    private SDbDeduction moDeduction;
 
     /**
-     * Creates new form SFormCfgAccountingEmployeeEarning.
+     * Creates new form SFormCfgAccountingEmployeeDeduction.
      * @param client GUI client.
      * @param title Form title.
      */
-    public SFormCfgAccountingEmployeeEarning(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_CFG_ACC_EAR, 0, title);
+    public SFormCfgAccountingEmployeeDeduction(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_CFG_ACC_DED, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -61,8 +61,8 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         moKeyEmployee = new sa.lib.gui.bean.SBeanFieldKey();
         jbPickEmployee = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
-        jlEarning = new javax.swing.JLabel();
-        moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
+        jlDeduction = new javax.swing.JLabel();
+        moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel8 = new javax.swing.JPanel();
         jlAccountingRecordType = new javax.swing.JLabel();
         jtfAccountingRecordType = new javax.swing.JTextField();
@@ -102,13 +102,13 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEarning.setForeground(java.awt.Color.blue);
-        jlEarning.setText("Percepción:*");
-        jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlEarning);
+        jlDeduction.setForeground(java.awt.Color.blue);
+        jlDeduction.setText("Deducción:*");
+        jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlDeduction);
 
-        moKeyEarning.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel6.add(moKeyEarning);
+        moKeyDeduction.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel6.add(moKeyDeduction);
 
         jPanel12.add(jPanel6);
 
@@ -179,11 +179,11 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
     private javax.swing.JLabel jlAccountingRecordTypeHelp;
     private javax.swing.JLabel jlAccountingRecordTypeHelpText;
     private javax.swing.JLabel jlBizPartner;
-    private javax.swing.JLabel jlEarning;
+    private javax.swing.JLabel jlDeduction;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JTextField jtfAccountingRecordType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartner;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     // End of variables declaration//GEN-END:variables
 
@@ -191,11 +191,11 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         SGuiUtils.setWindowBounds(this, 560, 350);
 
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee), false);
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning), true);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction), true);
         moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), false);
         
         moFields.addField(moKeyEmployee);
-        moFields.addField(moKeyEarning);
+        moFields.addField(moKeyDeduction);
         moFields.addField(moKeyBizPartner);
 
         moFields.setFormButton(jbSave);
@@ -234,14 +234,14 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
     }
     
     private void updateAccountComplements() {
-        boolean enable = moEarning != null && moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_EMP;
+        boolean enable = moDeduction != null && moDeduction.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_EMP;
         
         moKeyBizPartner.setEnabled(enable);
         jbPickBizPartner.setEnabled(enable);
     }
     
     private void itemStateChangedEarning() {
-        moEarning = null;
+        moDeduction = null;
         
         jtfAccountingRecordType.setText("");
         jlAccountingRecordTypeHelpText.setText("");
@@ -249,19 +249,19 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         moKeyBizPartner.resetField();
         jbPickBizPartner.setEnabled(false);
         
-        if (moKeyEarning.getSelectedIndex() > 0) {
-            moEarning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, moKeyEarning.getValue());
+        if (moKeyDeduction.getSelectedIndex() > 0) {
+            moDeduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeduction.getValue());
         }
         
-        if (moEarning != null) {
-            jtfAccountingRecordType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { moEarning.getFkAccountingRecordTypeId() }, SDbRegistry.FIELD_NAME));
+        if (moDeduction != null) {
+            jtfAccountingRecordType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { moDeduction.getFkAccountingRecordTypeId() }, SDbRegistry.FIELD_NAME));
             jtfAccountingRecordType.setCaretPosition(0);
             
-            if (moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_EMP) {
+            if (moDeduction.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_EMP) {
                 jlAccountingRecordTypeHelpText.setText("(Seleccionar un valor para el campo '" + moKeyBizPartner.getFieldName() + "'.)");
             }
             else {
-                jlAccountingRecordTypeHelpText.setText("(¡El registro contable de la percepción debe ser '" + miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_EMP }, SDbRegistry.FIELD_NAME) + "' para ser configurable!)");
+                jlAccountingRecordTypeHelpText.setText("(¡El registro contable de la deducción debe ser '" + miClient.getSession().readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_EMP }, SDbRegistry.FIELD_NAME) + "' para ser configurable!)");
             }
             
             updateAccountComplements();
@@ -272,26 +272,26 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
     public void addAllListeners() {
         jbPickEmployee.addActionListener(this);
         jbPickBizPartner.addActionListener(this);
-        moKeyEarning.addItemListener(this);
+        moKeyDeduction.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         jbPickEmployee.removeActionListener(this);
         jbPickBizPartner.removeActionListener(this);
-        moKeyEarning.removeItemListener(this);
+        moKeyDeduction.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyEmployee, SModConsts.HRSU_EMP, 0, null);
-        miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, 0, null);
+        miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, 0, null);
         miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, 0, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbCfgAccountingEmployeeEarning) registry;
+        moRegistry = (SDbCfgAccountingEmployeeDeduction) registry;
         
         mnFormResult = 0;
         mbFirstActivation = true;
@@ -309,7 +309,7 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         }
         
         moKeyEmployee.setValue(new int[] { moRegistry.getPkEmployeeId()});
-        moKeyEarning.setValue(new int[] { moRegistry.getPkEarningId() });
+        moKeyDeduction.setValue(new int[] { moRegistry.getPkDeductionId()});
         itemStateChangedEarning();
         moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId() });
         
@@ -318,11 +318,11 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         
         if (moRegistry.isRegistryNew()) {
             moKeyEmployee.setEnabled(true);
-            moKeyEarning.setEnabled(true);
+            moKeyDeduction.setEnabled(true);
         }
         else {
             moKeyEmployee.setEnabled(false);
-            moKeyEarning.setEnabled(false);
+            moKeyDeduction.setEnabled(false);
         }
         
         addAllListeners();
@@ -330,15 +330,15 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbCfgAccountingEmployeeEarning registry = moRegistry.clone();
+        SDbCfgAccountingEmployeeDeduction registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) {
             registry.setPkEmployeeId(moKeyEmployee.getValue()[0]);
-            registry.setPkEarningId(moKeyEarning.getValue()[0]);
+            registry.setPkDeductionId(moKeyDeduction.getValue()[0]);
         }
         
         registry.setFkBizPartnerId(moKeyBizPartner.getValue()[0]);
-        registry.setFkAccountingRecordTypeId(moEarning.getFkAccountingRecordTypeId());
+        registry.setFkAccountingRecordTypeId(moDeduction.getFkAccountingRecordTypeId());
 
         return registry;
     }
@@ -350,16 +350,16 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         if (validation.isValid()) {
             if (moRegistry.isRegistryNew()) {
                 try {
-                    int[] key = new int[] { moKeyEmployee.getValue()[0], moKeyEarning.getValue()[0] }; // convenience variable
+                    int[] key = new int[] { moKeyEmployee.getValue()[0], moKeyDeduction.getValue()[0] }; // convenience variable
                     
-                    if (SDbCfgAccountingEmployeeEarning.countExistingRegistries(miClient.getSession(), key) > 0) {
-                        throw new Exception("Ya existe un registro para el empleado '" + moKeyEmployee.getSelectedItem().getItem() + "' y la percepción '" + moKeyEarning.getSelectedItem().getItem() + "'."
+                    if (SDbCfgAccountingEmployeeDeduction.countExistingRegistries(miClient.getSession(), key) > 0) {
+                        throw new Exception("Ya existe un registro para el empleado '" + moKeyEmployee.getSelectedItem().getItem() + "' y la deducción '" + moKeyDeduction.getSelectedItem().getItem() + "'."
                                 + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
                     }
                 }
                 catch (Exception e) {
                     validation.setMessage(e.getMessage());
-                    validation.setComponent(moKeyEarning);
+                    validation.setComponent(moKeyDeduction);
                 }
             }
         }
@@ -386,7 +386,7 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
             SBeanFieldKey field = (SBeanFieldKey) e.getSource();
             
-            if (field == moKeyEarning) {
+            if (field == moKeyDeduction) {
                 itemStateChangedEarning();
             }
         }

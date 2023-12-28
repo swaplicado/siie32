@@ -6,8 +6,6 @@ package erp.mod.hrs.view;
 
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -20,7 +18,7 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Sergio Flores
  */
-public class SViewExpenseTypeAccount extends SGridPaneView implements ActionListener {
+public class SViewExpenseTypeAccount extends SGridPaneView {
 
     public SViewExpenseTypeAccount(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_TP_EXP_ACC, 0, title);
@@ -93,10 +91,5 @@ public class SViewExpenseTypeAccount extends SGridPaneView implements ActionList
         moSuscriptionsSet.add(SModConsts.HRSU_TP_EXP);
         moSuscriptionsSet.add(SModConsts.FIN_ACC);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

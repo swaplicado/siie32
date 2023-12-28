@@ -95,6 +95,8 @@ import erp.mod.hrs.form.SFormBenefitTable;
 import erp.mod.hrs.form.SFormCfgAccountingDeduction;
 import erp.mod.hrs.form.SFormCfgAccountingDepartmentPackCostCenters;
 import erp.mod.hrs.form.SFormCfgAccountingEarning;
+import erp.mod.hrs.form.SFormCfgAccountingEmployeeDeduction;
+import erp.mod.hrs.form.SFormCfgAccountingEmployeeEarning;
 import erp.mod.hrs.form.SFormCfgAccountingEmployeePackCostCenters;
 import erp.mod.hrs.form.SFormConditionalEarning;
 import erp.mod.hrs.form.SFormConfig;
@@ -276,6 +278,8 @@ public class SModuleHrs extends SGuiModule {
     private SFormExpenseTypeAccount moFormExpenseTypeAccount;
     private SFormCfgAccountingDepartmentPackCostCenters moFormCfgAccountingDepartmentPackCostCenters;
     private SFormCfgAccountingEmployeePackCostCenters moFormCfgAccountingEmployeePackCostCenters;
+    private SFormCfgAccountingEmployeeEarning moFormCfgAccountingEmployeeEarning;
+    private SFormCfgAccountingEmployeeDeduction moFormCfgAccountingEmployeeDeduction;
     private SFormCfgAccountingEarning moFormCfgAccountingEarning;
     private SFormCfgAccountingDeduction moFormCfgAccountingDeduction;
     private SFormPayroll moFormPayrollWeekly;
@@ -289,6 +293,7 @@ public class SModuleHrs extends SGuiModule {
 
     private SBeanOptionPicker moPickerEarnings;
     private SBeanOptionPicker moPickerDeductions;
+    private SBeanOptionPicker moPickerEmployees;
 
     public SModuleHrs(SGuiClient client) {
         super(client, SModConsts.MOD_HRS_N, SLibConsts.UNDEFINED);
@@ -1375,6 +1380,7 @@ public class SModuleHrs extends SGuiModule {
                 }
                 picker = moPickerEarnings;
                 break;
+                
             case SModConsts.HRS_DED:
                 sql = "SELECT id_ded AS " + SDbConsts.FIELD_ID + "1, "
                         + "code AS " + SDbConsts.FIELD_PICK + "1, name AS " + SDbConsts.FIELD_PICK + "2, "
@@ -1392,6 +1398,28 @@ public class SModuleHrs extends SGuiModule {
                 }
                 picker = moPickerDeductions;
                 break;
+                
+            case SModConsts.HRSU_EMP:
+                sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, "
+                        + "b.bp AS " + SDbConsts.FIELD_PICK + "1, e.num AS " + SDbConsts.FIELD_PICK + "2, "
+                        + "e.id_emp AS " + SDbConsts.FIELD_VALUE + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
+                        + "WHERE NOT e.b_del AND e.b_act AND NOT b.b_del "
+                        + "ORDER BY b.bp, e.num, e.id_emp ";
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Nombre"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código"));
+                settings = new SGuiOptionPickerSettings("Empleados", sql, gridColumns, 1, SLibConsts.DATA_TYPE_INT);
+
+                if (moPickerEmployees == null) {
+                    moPickerEmployees = new SBeanOptionPicker();
+                    moPickerEmployees.setPickerSettings(miClient, type, subtype, settings);
+                }
+                picker = moPickerEmployees;
+                break;
+                
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
         return picker;
@@ -1615,12 +1643,12 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormCfgAccountingEmployeePackCostCenters;
                 break;
             case SModConsts.HRS_CFG_ACC_EMP_EAR:
-//                if (moFormCfgAccountingEmployeeEarning == null) moFormCfgAccountingEmployeeEarning = new SFormCfgAccountingEmployeeEarning(miClient, "Empleado y percepción");
-//                form = moFormCfgAccountingEmployeeEarning;
+                if (moFormCfgAccountingEmployeeEarning == null) moFormCfgAccountingEmployeeEarning = new SFormCfgAccountingEmployeeEarning(miClient, "Empleado y percepción");
+                form = moFormCfgAccountingEmployeeEarning;
                 break;
             case SModConsts.HRS_CFG_ACC_EMP_DED:
-//                if (moFormCfgAccountingEmployeeDeduction == null) moFormCfgAccountingEmployeeDeduction = new SFormCfgAccountingEmployeeDeduction(miClient, "Empleado y deducción");
-//                form = moFormCfgAccountingEmployeeDeduction;
+                if (moFormCfgAccountingEmployeeDeduction == null) moFormCfgAccountingEmployeeDeduction = new SFormCfgAccountingEmployeeDeduction(miClient, "Empleado y deducción");
+                form = moFormCfgAccountingEmployeeDeduction;
                 break;
             case SModConsts.HRS_CFG_ACC_EAR:
                 if (moFormCfgAccountingEarning == null) moFormCfgAccountingEarning = new SFormCfgAccountingEarning(miClient, "Contabilización de percepción");

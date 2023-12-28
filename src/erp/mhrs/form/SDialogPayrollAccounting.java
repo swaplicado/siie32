@@ -31,11 +31,15 @@ import erp.mhrs.data.SRowEmployee;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SDbBizPartner;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.hrs.db.SDbAccountingPayroll;
 import erp.mod.hrs.db.SDbAccountingPayrollReceipt;
 import erp.mod.hrs.db.SDbCfgAccountingDepartment;
+import erp.mod.hrs.db.SDbCfgAccountingEmployeeDeduction;
+import erp.mod.hrs.db.SDbCfgAccountingEmployeeEarning;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SDbExpenseTypeAccount;
 import erp.mod.hrs.db.SDbPackCostCenters;
 import erp.mod.hrs.db.SDbPackExpenses;
 import erp.mod.hrs.db.SDbPackExpensesItem;
@@ -124,6 +128,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private HashMap<Integer, Boolean> moAccountsCostCenterRequiredMap; // key: numeric ID of account; value: flag for cost center required
     private HashMap<Integer, Boolean> moAccountsBizPartnerRequiredMap; // key: numeric ID of account; value: flag for business partner required
     private HashMap<String, Integer> moRecordsLastEntryIdMap; // key: PK of record as string; value: last entry ID for record
+    private HashMap<Integer, SDbExpenseTypeAccount> moExpenseTypeAccountsMap; // key: ID of expense type; value: accounting setting for expense type
     
     /** Creates new form SDialogPayrollAccounting
      * @param client
@@ -729,6 +734,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         moAccountsCostCenterRequiredMap = new HashMap<>();
         moAccountsBizPartnerRequiredMap = new HashMap<>();
         moRecordsLastEntryIdMap = new HashMap<>();
+        moExpenseTypeAccountsMap = SHrsFinUtils.retrieveExpenseTypeAccountsMap(miClient.getSession());
         
         moFormerPayroll.getDbmsDataFormerPayrollEmps().clear();
         moFormerPayroll.getDbmsDataFormerPayrollMoves().clear();
@@ -1433,6 +1439,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             int accountId = resultSet.getInt("_acc_id"); // bookkeeping account
             int effBizPartnerId = 0;
             int effBizPartnerBranchId = 0;
+            boolean isCustomEffBizPartner = false;
             
             if (isBizPartnerRequiredForAccount(accountId)) {
                 switch (accountingRecordType) {
@@ -1443,16 +1450,45 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         break;
 
                     case SModSysConsts.HRSS_TP_ACC_EMP:
-                        SDbCfgAccountingDepartment cfgAccountingDepartment = getCfgAccountingForDepartment(effDepartmentId);
-                        if (cfgAccountingDepartment.getFkBizPartnerId_n() == 0) {
-                            // configuration of department does not have a business partner, use employee by default:
-                            effBizPartnerId = resultSet.getInt("_emp_id");
-                            effBizPartnerBranchId = resultSet.getInt("_empb_id");
+                        // check if there is a custom setting for employee, to set business partner:
+                        
+                        switch (conceptType) {
+                            case CONCEPT_TYPE_EAR:
+                                SDbCfgAccountingEmployeeEarning caea = SHrsFinUtils.retrieveCfgAccountingEmployeeEarning(miClient.getSession(), effEmployeeId, conceptId);
+                                if (caea != null) {
+                                    SDbBizPartner bp = (SDbBizPartner) miClient.getSession().readRegistry(SModConsts.BPSU_BP, new int[] { caea.getFkBizPartnerId() });
+                                    effBizPartnerId = bp.getPkBizPartnerId();
+                                    effBizPartnerBranchId = bp.getRegHeadquarters().getPkBizPartnerBranchId();
+                                    isCustomEffBizPartner = true;
+                                }
+                                break;
+                            case CONCEPT_TYPE_DED:
+                                SDbCfgAccountingEmployeeDeduction caed = SHrsFinUtils.retrieveCfgAccountingEmployeeDeduction(miClient.getSession(), effEmployeeId, conceptId);
+                                if (caed != null) {
+                                    SDbBizPartner bp = (SDbBizPartner) miClient.getSession().readRegistry(SModConsts.BPSU_BP, new int[] { caed.getFkBizPartnerId() });
+                                    effBizPartnerId = bp.getPkBizPartnerId();
+                                    effBizPartnerBranchId = bp.getRegHeadquarters().getPkBizPartnerBranchId();
+                                    isCustomEffBizPartner = true;
+                                }
+                                break;
+                            default:
+                                // nothing
                         }
-                        else {
-                            // configuration of department has been set with a business partner:
-                            effBizPartnerId = resultSet.getInt("_bp_id");
-                            effBizPartnerBranchId = resultSet.getInt("_bpb_id");
+                        
+                        // if yet neccesary, set business partner:
+                        
+                        if (!isCustomEffBizPartner) {
+                            SDbCfgAccountingDepartment cfgAccountingDepartment = getCfgAccountingForDepartment(effDepartmentId);
+                            if (cfgAccountingDepartment.getFkBizPartnerId_n() == 0) {
+                                // configuration of department does not have a business partner, use employee by default:
+                                effBizPartnerId = resultSet.getInt("_emp_id");
+                                effBizPartnerBranchId = resultSet.getInt("_empb_id");
+                            }
+                            else {
+                                // configuration of department has been set with a business partner:
+                                effBizPartnerId = resultSet.getInt("_bp_id");
+                                effBizPartnerBranchId = resultSet.getInt("_bpb_id");
+                            }
                         }
                         break;
 
@@ -1513,7 +1549,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     }
                 }
             }
-
+            
             // create payroll moves and journal voucher entries:
             
             double total = 0;
@@ -1568,7 +1604,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                 // payroll move:
                 
-                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptName, 
+                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptName,
                         referenceId, referenceName, referenceCode, payrollAmount.Amount, record));
 
                 // journal voucher:
@@ -1576,8 +1612,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 if (payrollAmount.PackCostCentersId == SModSysConsts.HRS_PACK_CC_NA) {
                     // direct amount, cost centers are not needed:
 
-                    record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
-                            0, 0, effBizPartnerId, effBizPartnerBranchId, effTaxKey, 
+                    record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId,
+                            0, 0, effBizPartnerId, effBizPartnerBranchId, effTaxKey,
                             conceptType, conceptNameAbbr, referenceName, referenceCode, payrollAmount.Amount));
                 }
                 else {
@@ -1587,8 +1623,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     double[] proratedAmounts = SLibProrationUtils.prorateAmount(payrollAmount.Amount, packCostCenters.getProrationPercentages());
 
                     for (int i = 0; i < packCostCenters.getChildCostCenters().size(); i++) {
-                        record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
-                                packCostCenters.getChildCostCenters().get(i).getPkCostCenterId(), effItemId, effBizPartnerId, effBizPartnerBranchId, effTaxKey, 
+                        record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId,
+                                packCostCenters.getChildCostCenters().get(i).getPkCostCenterId(), effItemId, effBizPartnerId, effBizPartnerBranchId, effTaxKey,
                                 conceptType, conceptNameAbbr, referenceName, referenceCode, proratedAmounts[i]));
                     }
                 }
@@ -2029,7 +2065,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         if (exceptions.isEmpty()) {
             try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement(); Statement statementAux = miClient.getSession().getStatement().getConnection().createStatement();) {
                 prepareRecordEmployeesForAccounting(); // prepare journal voucher for employees for accounting
-                
+
                 ArrayList<Integer> employeeIdsWithPackCostCentersInPayroll = SHrsFinUtils.getEmployeeIdsWithSuitablePackCostCenters(miClient.getSession(), moPayroll.getPkPayrollId(), moPayroll.getDateEnd()); // get employees with custom suitable pack of cost centers
                 
                 // process all selected journal vouchers and its employees:
@@ -2062,7 +2098,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
                                         + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "cac.fk_acc AS _acc_id, cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cac.fk_acc AS _acc_id, "
+                                        + "cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
                                         + "1 AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, " // XXX 2023-11-29, Sergio Flores: Improve this! There is no way to setup an expense type for GLOBAL accounting record type!
                                         + "SUM(pre.amt_r) AS _amt "
@@ -2082,7 +2119,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
                                         + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "cac.fk_acc AS _acc_id, cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "cac.fk_acc AS _acc_id, "
+                                        + "cac.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cac.fk_tax_bas_n AS _tax_bas_id, cac.fk_tax_tax_n AS _tax_tax_id, "
                                         + "1 AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, " // XXX 2023-11-29, Sergio Flores: Improve this! There is no way to setup an expense type for GLOBAL accounting record type!
                                         + "SUM(prd.amt_r) AS _amt "
@@ -2115,7 +2153,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
                                         + "SUM(pre.amt_r) AS _amt "
@@ -2126,6 +2165,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " AS cac ON cac.id_ear = e.id_ear AND cac.fk_tp_acc_rec = e.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_TP_EXP_ACC) + " AS tea ON tea.id_tp_exp = cad.fk_tp_exp AND NOT tea.b_del " // exclude deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                                         + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
@@ -2137,7 +2177,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
                                         + "SUM(prd.amt_r) AS _amt "
@@ -2148,6 +2189,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cac ON cac.id_ded = d.id_ded AND cac.fk_tp_acc_rec = d.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_TP_EXP_ACC) + " AS tea ON tea.id_tp_exp = cad.fk_tp_exp AND NOT tea.b_del " // exclude deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
                                         + "AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND pr.id_emp IN (" + sqlRecordEmployeeIds + ") "
@@ -2172,7 +2214,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
-                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
                                         + "SUM(pre.amt_r) AS _amt "
@@ -2185,6 +2228,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EAR) + " AS cac ON cac.id_ear = e.id_ear AND cac.fk_tp_acc_rec = e.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_TP_EXP_ACC) + " AS tea ON tea.id_tp_exp = cad.fk_tp_exp AND NOT tea.b_del " // exclude deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS empb ON empb.fid_bp = emp.id_emp AND empb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
@@ -2197,7 +2241,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
-                                        + "cad.fk_acc AS _acc_id, cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
+                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
                                         + "SUM(prd.amt_r) AS _amt "
@@ -2210,6 +2255,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DED) + " AS cac ON cac.id_ded = d.id_ded AND cac.fk_tp_acc_rec = d.fk_tp_acc_rec AND NOT cac.b_del " // exclude unmatching and deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_DEP) + " AS cad ON cad.id_dep = pr.fk_dep AND NOT cad.b_del " // exclude deleted accounting settings
+                                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_TP_EXP_ACC) + " AS tea ON tea.id_tp_exp = cad.fk_tp_exp AND NOT tea.b_del " // exclude deleted accounting settings
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bpb.fid_bp = cad.fk_bp_n AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS empb ON empb.fid_bp = emp.id_emp AND empb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " // restrict only to HQ
                                         + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "

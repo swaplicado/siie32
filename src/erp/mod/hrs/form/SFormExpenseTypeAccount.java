@@ -8,7 +8,6 @@ import erp.data.SDataConstantsSys;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbCfgAccountingEarning;
 import erp.mod.hrs.db.SDbExpenseTypeAccount;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -207,7 +206,7 @@ public class SFormExpenseTypeAccount extends SBeanForm implements ItemListener {
                 try {
                     int id = moKeyExpenseType.getValue()[0]; // convenience variable
                     
-                    if (SDbCfgAccountingEarning.countExistingRegistries(miClient.getSession(), id) > 0) {
+                    if (SDbExpenseTypeAccount.countExistingRegistries(miClient.getSession(), id) > 0) {
                         throw new Exception("Ya existe un registro para el tipo de gasto '" + miClient.getSession().readField(SModConsts.HRSU_TP_EXP, new int[] { id }, SDbRegistry.FIELD_NAME) + "'."
                                 + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
                     }

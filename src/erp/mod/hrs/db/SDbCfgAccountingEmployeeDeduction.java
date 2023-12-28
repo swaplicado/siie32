@@ -205,4 +205,25 @@ public class SDbCfgAccountingEmployeeDeduction extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
+    
+    /**
+     * Count existing registries of accounting configuration for this employee and earning.
+     * @param session GUI session.
+     * @param keyToBeCounted Employee and earning key to counted.
+     * @return
+     * @throws Exception 
+     */
+    public static final int countExistingRegistries(final SGuiSession session, final int[] keyToBeCounted) throws Exception {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_CFG_ACC_EMP_DED) + " "
+                + "WHERE id_emp = " + keyToBeCounted[0] + " AND id_ded = " + keyToBeCounted[1] + ";";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        }
+                
+        return count;
+    }
 }

@@ -53,6 +53,8 @@ public class SViewCfgAccountingEmployeeEarning extends SGridPaneView {
                 + "c.code, "
                 + "c.name, "
                 + "c.b_del, "
+                + "bp.bp, "
+                + "IF(ca.fk_tp_acc_rec = c.fk_tp_acc_rec, " + SGridConsts.ICON_OK + ", " + SGridConsts.ICON_WARN + ") AS _ta_ok, "
                 + "ca.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "ca.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "ca.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -86,7 +88,8 @@ public class SViewCfgAccountingEmployeeEarning extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "c.code", SGridConsts.COL_TITLE_CODE + " percepción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "c.name", SGridConsts.COL_TITLE_NAME + " percepción"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.name", SGridConsts.COL_TITLE_NAME + " asociado negocios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ta_ok", "Coincidencia registro contable percepción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", SGridConsts.COL_TITLE_NAME + " asociado negocios"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "e.b_del", SGridConsts.COL_TITLE_IS_DEL + " empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "c.b_del", SGridConsts.COL_TITLE_IS_DEL + " percepción"));

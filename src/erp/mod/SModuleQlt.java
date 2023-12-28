@@ -120,7 +120,7 @@ public class SModuleQlt extends SGuiModule {
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
 
