@@ -156,6 +156,7 @@ import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewDepartmentCostCenter;
+import erp.mod.hrs.view.SViewBankPayDispersion;
 import erp.mod.hrs.view.SViewDocAdminRecord;
 import erp.mod.hrs.view.SViewDocAdminRecordSummary;
 import erp.mod.hrs.view.SViewDocBreach;
@@ -173,6 +174,8 @@ import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
 import erp.mod.hrs.view.SViewExpenseType;
 import erp.mod.hrs.view.SViewExpenseTypeAccount;
 import erp.mod.hrs.view.SViewFirstDayYear;
+import erp.mod.hrs.view.SViewBenAnnualBon;
+import erp.mod.hrs.view.SViewEmployeesCc;
 import erp.mod.hrs.view.SViewHoliday;
 import erp.mod.hrs.view.SViewLoan;
 import erp.mod.hrs.view.SViewLoanTypeAdjustment;
@@ -1077,6 +1080,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_DEP_CC:
                 view = new SViewDepartmentCostCenter(miClient, "Deptos. y centros costo");
                 break;
+            case SModConsts.HRSX_EMP_CC:
+                view = new SViewEmployeesCc(miClient, "Empleados y centros costo");
+                break;
             case SModConsts.HRSU_SHT:
                 view = new SViewShift(miClient, "Turnos");
                 break;
@@ -1347,6 +1353,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSX_PTU:
                 view = new SViewPtu(miClient, "Consulta para PTU");
+                break;
+            case SModConsts.HRSX_BEN_ANN_BON:
+                view = new SViewBenAnnualBon(miClient, "Consulta provisión de aguinaldo");
+                break;
+            case SModConsts.HRSX_BANK_PAY_DISP:
+                view = new SViewBankPayDispersion(miClient, "Consulta dispersión mensual");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

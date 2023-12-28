@@ -104,7 +104,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeIdse;
     private javax.swing.JMenuItem jmiCatPosition;
     private javax.swing.JMenuItem jmiCatDeparment;
-    private javax.swing.JMenuItem jmiCatDeparmentCc;
+    private javax.swing.JMenuItem jmiCatDepartmentCc;
+    private javax.swing.JMenuItem jmiCatEmployeeCc;
     private javax.swing.JMenuItem jmiCatShift;
     private javax.swing.JMenuItem jmiCatEmployeeType;
     private javax.swing.JMenuItem jmiCatWorkerType;
@@ -188,6 +189,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepHireLogByPeriodActive;
     private javax.swing.JMenuItem jmiRepHireLogByPeriodInactive;
     private javax.swing.JMenuItem jmiRepPtu;
+    private javax.swing.JMenuItem jmiRepBenAnnBon;
+    private javax.swing.JMenuItem jmiRepBankPayrollDisp;
     private javax.swing.JMenuItem jmiRepAnnexAF02;
     private javax.swing.JMenuItem jmiRepPositions;
 
@@ -309,7 +312,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeIdse = new JMenuItem("Empleados para IDSE");
         jmiCatPosition = new JMenuItem("Puestos");
         jmiCatDeparment = new JMenuItem("Departamentos");
-        jmiCatDeparmentCc = new JMenuItem("Departamentos y centros de costo");
+        jmiCatDepartmentCc = new JMenuItem("Departamentos y centros de costo");
+        jmiCatEmployeeCc = new JMenuItem("Empleados y centros de costo");
         jmiCatShift = new JMenuItem("Turnos");
         jmiCatEmployeeType = new JMenuItem("Tipos de empleado");
         jmiCatWorkerType = new JMenuItem("Tipos de obrero");
@@ -336,7 +340,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.addSeparator();
         jmCat.add(jmiCatPosition);
         jmCat.add(jmiCatDeparment);
-        jmCat.add(jmiCatDeparmentCc);
+        jmCat.add(jmiCatDepartmentCc);
+        jmCat.add(jmiCatEmployeeCc);
         jmCat.add(jmiCatShift);
         jmCat.addSeparator();
         jmCat.add(jmiCatEmployeeType);
@@ -497,6 +502,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepHireLogByPeriodActive = new JMenuItem("Consulta de altas por período");
         jmiRepHireLogByPeriodInactive = new JMenuItem("Consulta de bajas por período");
         jmiRepPtu = new JMenuItem("Consulta para PTU");
+        jmiRepBenAnnBon = new JMenuItem("Consulta provisión aguinaldo");
+        jmiRepBankPayrollDisp = new JMenuItem("Consulta de dispersión de nóminas");
         jmiRepAnnexAF02 = new JMenuItem("Layout anexo AF02");
         jmiRepPositions = new JMenuItem("Reporte de posiciones y vacantes");
         
@@ -513,6 +520,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepHireLogByPeriodActive);
         jmRep.add(jmiRepHireLogByPeriodInactive);
         jmRep.add(jmiRepPtu);
+        jmRep.add(jmiRepBenAnnBon);
+        jmRep.add(jmiRepBankPayrollDisp);
         jmRep.add(jmiRepAnnexAF02);
         jmRep.addSeparator();
         jmRep.add(jmiRepPositions);
@@ -566,7 +575,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeIdse.addActionListener(this);
         jmiCatPosition.addActionListener(this);
         jmiCatDeparment.addActionListener(this);
-        jmiCatDeparmentCc.addActionListener(this);
+        jmiCatDepartmentCc.addActionListener(this);
+        jmiCatEmployeeCc.addActionListener(this);
         jmiCatShift.addActionListener(this);
         jmiCatEmployeeType.addActionListener(this);
         jmiCatWorkerType.addActionListener(this);
@@ -641,6 +651,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepHireLogByPeriodActive.addActionListener(this);
         jmiRepHireLogByPeriodInactive.addActionListener(this);
         jmiRepPtu.addActionListener(this);
+        jmiRepBenAnnBon.addActionListener(this);
+        jmiRepBankPayrollDisp.addActionListener(this);
         jmiRepAnnexAF02.addActionListener(this);
         jmiRepPositions.addActionListener(this);
         
@@ -707,7 +719,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeIdse.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatPosition.setEnabled(hasRightCat || hasRightEmp);
         jmiCatDeparment.setEnabled(hasRightCat || hasRightEmp);
-        jmiCatDeparmentCc.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatDepartmentCc.setEnabled(hasRightCat || hasRightEmp);
+        jmiCatEmployeeCc.setEnabled(hasRightCat || hasRightEmp);
         jmiCatShift.setEnabled(hasRightCat || hasRightEmp);
         jmiCatEmployeeType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
         jmiCatWorkerType.setEnabled(hasRightConfig || hasRightCat || hasRightEmp || hasRightEmpWage);
@@ -815,6 +828,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepHireLogByPeriodActive.setEnabled(hasRightReports);
         jmiRepHireLogByPeriodInactive.setEnabled(hasRightReports);
         jmiRepPtu.setEnabled(hasRightEmpWage);
+        jmiRepBenAnnBon.setEnabled(hasRightEmpWage);
+        jmiRepBankPayrollDisp.setEnabled(hasRightEmpWage);
         jmiRepAnnexAF02.setEnabled(isConfigAF02);
         jmiRepPositions.setEnabled(hasRightReports);
         
@@ -1154,8 +1169,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatDeparment) {
                 miClient.getSession().showView(SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiCatDeparmentCc) {
+            else if (item == jmiCatDepartmentCc) {
                 miClient.getSession().showView(SModConsts.HRS_DEP_CC, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatEmployeeCc) {
+                miClient.getSession().showView(SModConsts.HRSX_EMP_CC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatShift) {
                 miClient.getSession().showView(SModConsts.HRSU_SHT, SLibConsts.UNDEFINED, null);
@@ -1367,6 +1385,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepPtu) {
                 miClient.getSession().showView(SModConsts.HRSX_PTU, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiRepBenAnnBon) {
+                miClient.getSession().showView(SModConsts.HRSX_BEN_ANN_BON, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiRepBankPayrollDisp) {
+                miClient.getSession().showView(SModConsts.HRSX_BANK_PAY_DISP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiRepAnnexAF02) {
                 new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02").setFormVisible(true);
