@@ -1350,6 +1350,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_TOT_BY_AGS_ITEM = 211;
     public static final int TRNX_PUR_TOT_BY_TP_BP = 212;
     public static final int TRNX_PUR_TOT_BY_TP_BP_BP = 213;
+    public static final int TRNX_PUR_TOT_BY_IGEN_IREF = 219;
+    public static final int TRNX_PUR_TOT_BY_IREF = 220;
     /** All document entries purchase at once. What type of document is needed must be provided: invoices or credit notes. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
@@ -1371,6 +1373,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_TOT_BY_AGS_ITEM = 311;
     public static final int TRNX_SAL_TOT_BY_TP_BP = 312;
     public static final int TRNX_SAL_TOT_BY_TP_BP_BP = 313;
+    public static final int TRNX_SAL_TOT_BY_IGEN_IREF = 316;
+    public static final int TRNX_SAL_TOT_BY_IREF = 317;
     /** All sales document entries at once. What type of document is needed must be provided: invoices or credit notes. */
     public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ALL = 314;
     /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */

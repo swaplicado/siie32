@@ -33,6 +33,7 @@ import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPos;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
+import erp.mod.trn.form.SDialogUuidSearch;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -142,6 +143,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayCfdiPayroll;
     private javax.swing.JMenuItem jmiPayCfdiPayrollRec;
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
+    private javax.swing.JMenuItem jmiUuidSearch;
     private javax.swing.JMenu jmPayCfdi;
     private javax.swing.JMenuItem jmiPayCfdiStampSign;
     private javax.swing.JMenuItem jmiPayCfdiStampSignPending;
@@ -397,6 +399,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCfdiPayroll = new JMenuItem("CFDI de nóminas");
         jmiPayCfdiPayrollRec = new JMenuItem("CFDI de recibos de nóminas");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI de recibos de nóminas... ");
+        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
         jmPayCfdi = new JMenu("Comprobantes fiscales digitales");
         jmiPayCfdiStampSign = new JMenuItem("CFDI de nóminas timbrados");
         jmiPayCfdiStampSignPending = new JMenuItem("CFDI de nóminas por timbrar");
@@ -428,6 +431,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayCfdiPayroll);
         jmPay.add(jmiPayCfdiPayrollRec);
         jmPay.add(jmiCfdiMassiveValidation);
+        jmPay.add(jmiUuidSearch);
         jmPayCfdi.add(jmiPayCfdiStampSign);
         jmPayCfdi.add(jmiPayCfdiStampSignPending);
         jmPayCfdi.addSeparator();
@@ -611,6 +615,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCfdiPayroll.addActionListener(this);
         jmiPayCfdiPayrollRec.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
+        jmiUuidSearch.addActionListener(this);
         jmiPayCfdiStampSign.addActionListener(this);
         jmiPayCfdiStampSignPending.addActionListener(this);
         jmiPayCfdiSendingLog.addActionListener(this);
@@ -762,6 +767,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCfdiPayroll.setEnabled(hasRightPay);
         jmiPayCfdiPayrollRec.setEnabled(hasRightPay);
         jmiCfdiMassiveValidation.setEnabled(hasRightPay);
+        jmiUuidSearch.setEnabled(hasRightPay);
         jmPayCfdi.setEnabled(hasRightPay);
         jmiPayCfdiStampSign.setEnabled(hasRightPay);
         jmiPayCfdiStampSignPending.setEnabled(hasRightPay);
@@ -1270,6 +1276,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfdiMassiveValidation) {
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_HRS, SDataConstants.UNDEFINED).setVisible(true);
+            }
+            else if (item == jmiUuidSearch) {
+                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiPayCfdiStampSign) {
                 showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFDI_PAYROLL_VER_CUR);

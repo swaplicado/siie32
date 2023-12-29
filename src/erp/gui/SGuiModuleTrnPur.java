@@ -31,6 +31,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
+import erp.mod.trn.form.SDialogUuidSearch;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
@@ -62,6 +63,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
@@ -171,6 +173,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerItem;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerType;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnByItemGenericReference;
+    private javax.swing.JMenuItem jmiRepTrnByItemReference;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
     private javax.swing.JMenuItem jmiRepFunctionalAreaExpenses;
     private javax.swing.JMenuItem jmiRepBackorderContract;
@@ -215,6 +219,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JSeparator jsRepContract;
     private javax.swing.JMenuItem jmiRepTrnUnitaryCosts;
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
+    private javax.swing.JMenuItem jmiUuidSearch;
     
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
@@ -393,6 +398,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
+        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -421,6 +427,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsDocRemission);
         jmDps.addSeparator();
         jmDps.add(jmiCfdiMassiveValidation);
+        jmDps.addSeparator();
+        jmDps.add(jmiUuidSearch);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
@@ -483,6 +491,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerItem = new JMenuItem("Compras por proveedor-ítem");
         jmiRepTrnByBizPartnerType = new JMenuItem("Compras por tipo de proveedor");
         jmiRepTrnByBizPartnerTypeBizPartner = new JMenuItem("Compras por tipo de proveedor-proveedor");
+        jmiRepTrnByItemGenericReference = new JMenuItem("Compras por ítem genérico del ítem de referencia");
+        jmiRepTrnByItemReference = new JMenuItem("Compras por ítem de referencia");
         jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de compras por ítem-proveedor");
         jmiRepFunctionalAreaExpenses= new JMenuItem("Control de presupuestos mensuales de gastos");
         jmRepBackorder = new JMenu("Consultas de backorder de compras");
@@ -538,6 +548,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepStats.add(jmiRepTrnByBizPartnerItem);
         jmRepStats.add(jmiRepTrnByBizPartnerType);
         jmRepStats.add(jmiRepTrnByBizPartnerTypeBizPartner);
+        jmRepStats.add(jmiRepTrnByItemGenericReference);
+        jmRepStats.add(jmiRepTrnByItemReference);
         jmRepStats.addSeparator();
         jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
         jmRepStats.addSeparator();
@@ -673,6 +685,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
+        jmiUuidSearch.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
@@ -699,6 +712,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerItem.addActionListener(this);
         jmiRepTrnByBizPartnerType.addActionListener(this);
         jmiRepTrnByBizPartnerTypeBizPartner.addActionListener(this);
+        jmiRepTrnByItemGenericReference.addActionListener(this);
+        jmiRepTrnByItemReference.addActionListener(this);
         jmiRepTrnDpsByItemBizPartner.addActionListener(this);
         jmiRepFunctionalAreaExpenses.addActionListener(this);
         jmiRepBackorderContract.addActionListener(this);
@@ -799,6 +814,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiCfdiMassiveValidation.setEnabled(true);
+        jmiUuidSearch.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -968,6 +984,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
            case SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ONE:
                 viewTitle = "Compras docs. x ítem-proveedor";
                 break;
+           case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
+               viewTitle = "Compras x ítem gen - ítem ref";
+               break;
+           case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
+               viewTitle = "Compras x ítem ref";
+               break;
             default:
         }
 
@@ -1367,6 +1389,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM_BP:
                         case SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP:
                         case SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP:
+                        case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
+                        case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
                             oViewClass = erp.mtrn.view.SViewQueryTotal.class;
                             sViewTitle = getViewTitle(auxType01);
                             break;
@@ -1684,6 +1708,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if(item == jmiCfdiMassiveValidation){
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_PUR, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
+            else if(item == jmiUuidSearch){
+                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
+            }
             else if (item == jmiOrdersFunctionalArea) {
                  miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));
             }
@@ -1767,6 +1794,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepTrnByBizPartnerTypeBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP);
+            }
+            else if (item == jmiRepTrnByItemGenericReference) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF);
+            }
+            else if (item == jmiRepTrnByItemReference) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT_BY_IREF);                
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ONE);

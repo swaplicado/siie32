@@ -517,7 +517,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
-            msBillOfLadingUuid = "CCC" + java.util.UUID.randomUUID().toString().substring(3);
+            msBillOfLadingUuid = "CCC" + java.util.UUID.randomUUID().toString().substring(3).toUpperCase();
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             

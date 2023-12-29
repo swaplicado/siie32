@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 232.3/ 2023-12-29
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de la ventana de búsqueda de CFDI a traves de UUID para facturas de compras, ventas, recepción de pagos,
+    traslados y nóminas en sus menús correspondientes.
+2) Creación de las nuevas vistas de consultas estadisticas de compras y ventas de ítem genérico de ítem de referencia e ítem de referencia.
+
+================================================================================
 SIIE 3.2 232.2/ 2023-12-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

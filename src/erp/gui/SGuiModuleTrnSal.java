@@ -34,6 +34,7 @@ import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogRepFSC;
 import erp.mod.trn.form.SDialogSendMailContract;
+import erp.mod.trn.form.SDialogUuidSearch;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataCfd;
@@ -159,6 +160,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsDelAckOk;
     private javax.swing.JMenuItem jmiDpsUpdateDateLog;
     private javax.swing.JMenuItem jmiCfdiMassiveValidation;
+    private javax.swing.JMenuItem jmiUuidSearch;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmiDpsAdjEntry;
@@ -204,6 +206,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerItem;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerType;
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
+    private javax.swing.JMenuItem jmiRepTrnByItemGenericReference;
+    private javax.swing.JMenuItem jmiRepTrnByItemReference;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
     private javax.swing.JMenuItem jmiRepFSC;
     private javax.swing.JMenu jmRepBackorder;
@@ -434,6 +438,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
         jmiDpsUpdateDateLog = new JMenuItem("Registro de cambio de fecha de documentos");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
+        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
         
         jmDpsDelAck.add(jmiDpsDelAckPend);
         jmDpsDelAck.add(jmiDpsDelAckOk);
@@ -471,6 +476,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsUpdateDateLog);
         jmDps.addSeparator();
         jmDps.add(jmiCfdiMassiveValidation);
+        jmDps.addSeparator();
+        jmDps.add(jmiUuidSearch);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
@@ -561,6 +568,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerItem = new JMenuItem("Ventas por cliente-ítem");
         jmiRepTrnByBizPartnerType = new JMenuItem("Ventas por tipo de cliente");
         jmiRepTrnByBizPartnerTypeBizPartner = new JMenuItem("Ventas por tipo de cliente-cliente");
+        jmiRepTrnByItemGenericReference = new JMenuItem("Ventas por ítem genérico del ítem de referencia");
+        jmiRepTrnByItemReference = new JMenuItem("Ventas por ítem de referencia");
         jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de ventas por ítem-cliente");
         jmiRepFSC = new JMenuItem("Reporte personalizado de ventas...");
         jmRepBackorder = new JMenu("Consultas de backorder de ventas");
@@ -620,6 +629,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRepStats.add(jmiRepTrnByBizPartnerItem);
         jmRepStats.add(jmiRepTrnByBizPartnerType);
         jmRepStats.add(jmiRepTrnByBizPartnerTypeBizPartner);
+        jmRepStats.add(jmiRepTrnByItemGenericReference);
+        jmRepStats.add(jmiRepTrnByItemReference);
         jmRepStats.addSeparator();
         jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
         if (existFSCReport) {
@@ -764,6 +775,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDelAckOk.addActionListener(this);
         jmiDpsUpdateDateLog.addActionListener(this);
         jmiCfdiMassiveValidation.addActionListener(this);
+        jmiUuidSearch.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
@@ -801,6 +813,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerItem.addActionListener(this);
         jmiRepTrnByBizPartnerType.addActionListener(this);
         jmiRepTrnByBizPartnerTypeBizPartner.addActionListener(this);
+        jmiRepTrnByItemGenericReference.addActionListener(this);
+        jmiRepTrnByItemReference.addActionListener(this);
         jmiRepTrnDpsByItemBizPartner.addActionListener(this);
         jmiRepFSC.addActionListener(this);
         jmiRepBackorderContract.addActionListener(this);
@@ -899,6 +913,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction);
         jmDpsDelAck.setEnabled(hasRightDocTransaction);
         jmiCfdiMassiveValidation.setEnabled(true);
+        jmiUuidSearch.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -1082,6 +1097,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
            case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE:
                 viewTitle = "Ventas docs. x ítem-cliente";
                 break;
+           case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
+               viewTitle = "Ventas x ítem gen - ítem ref";
+               break;
+           case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
+               viewTitle = "Ventas x ítem ref";
+               break;
             default:
         }
 
@@ -1537,6 +1558,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP:
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP:
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
                             oViewClass = erp.mtrn.view.SViewQueryTotal.class;
                             sViewTitle = getViewTitle(auxType01);
                             break;
@@ -1981,6 +2004,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if(item == jmiCfdiMassiveValidation){
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_SAL, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
+            else if(item == jmiUuidSearch){
+                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
+            }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
@@ -2091,6 +2117,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepTrnByBizPartnerTypeBizPartner) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP);
+            }
+            else if (item == jmiRepTrnByItemGenericReference) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF);
+            }
+            else if (item == jmiRepTrnByItemReference) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_IREF);                
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
