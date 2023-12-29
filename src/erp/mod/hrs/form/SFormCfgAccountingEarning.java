@@ -137,7 +137,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jlAccountingRecordTypeHelp);
 
-        jlAccountingRecordTypeHelpText.setPreferredSize(new java.awt.Dimension(450, 23));
+        jlAccountingRecordTypeHelpText.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel3.add(jlAccountingRecordTypeHelpText);
 
         jPanel12.add(jPanel3);
@@ -276,15 +276,12 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
     }
     
     private void actionPickBizPartner() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -296,15 +293,12 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
     }
     
     private void actionPickTax() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -328,14 +322,14 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
     private void updateAccountComplements() {
         boolean enable = moEarning != null && moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL;
         
-        moPanelAccount.setPanelEditable(enable);
+        moPanelAccount.setPanelEditable(true);
         moKeyPackCostCenters.setEnabled(enable);
-        moKeyBizPartner.setEnabled(enable);
-        jbPickBizPartner.setEnabled(enable);
-        jbClearBizPartner.setEnabled(enable);
-        moKeyTax.setEnabled(enable);
-        jbPickTax.setEnabled(enable);
-        jbClearTax.setEnabled(enable);
+        moKeyBizPartner.setEnabled(true);
+        jbPickBizPartner.setEnabled(true);
+        jbClearBizPartner.setEnabled(true);
+        moKeyTax.setEnabled(true);
+        jbPickTax.setEnabled(true);
+        jbClearTax.setEnabled(true);
     }
     
     private void itemStateChangedEarning() {
@@ -365,10 +359,10 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
             jtfAccountingRecordType.setCaretPosition(0);
             
             if (moEarning.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL) {
-                jlAccountingRecordTypeHelpText.setText("(¡Es necesario especificar una cuenta contable para contabilizar esta percepción!)");
+                jlAccountingRecordTypeHelpText.setText("NOTA: ¡Se debe especificar una cuenta contable para contabilizar esta percepción!");
             }
             else {
-                jlAccountingRecordTypeHelpText.setText("(No es necesario especificar una cuenta contable.)");
+                jlAccountingRecordTypeHelpText.setText("NOTA: Si se requiere, se puede especificar una cuenta contable para contabilizar esta percepción.");
             }
             
             updateAccountComplements();
@@ -487,6 +481,25 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
             
             if (validation.isValid()) {
                 validation = moPanelAccount.validatePanel();
+            }
+            
+            if (validation.isValid()) {
+                boolean isAccountNonSet = moPanelAccount.getSelectedAccount() == null || moPanelAccount.getSelectedAccount().getAccountId() == SDataConstantsSys.NA;
+                
+                if (isAccountNonSet) {
+                    if (moKeyPackCostCenters.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyPackCostCenters.getFieldName() + "'.");
+                        validation.setComponent(moKeyPackCostCenters);
+                    }
+                    else if (moKeyBizPartner.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyBizPartner.getFieldName() + "'.");
+                        validation.setComponent(moKeyBizPartner);
+                    }
+                    else if (moKeyTax.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyTax.getFieldName() + "'.");
+                        validation.setComponent(moKeyTax);
+                    }
+                }
             }
         }
             

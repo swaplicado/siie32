@@ -2153,7 +2153,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
@@ -2177,7 +2177,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
-                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
@@ -2214,7 +2214,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
-                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "
@@ -2241,7 +2241,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
                                         + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, empb.id_bpb AS _empb_id, "
-                                        + "IF(cad.fk_acc <> " + SDataConstantsSys.NA + ", cad.fk_acc, tea.fk_acc) AS _acc_id, "
+                                        + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "cad.fk_bp_n AS _bp_id, bpb.id_bpb AS _bpb_id, cad.fk_tax_bas_n AS _tax_bas_id, cad.fk_tax_tax_n AS _tax_tax_id, "
                                         + "cad.fk_tp_exp AS _tp_exp_id, "
                                         + "cac.fk_pack_exp AS _pack_exp_id, cac.fk_pack_cc AS _pack_cc_id, "

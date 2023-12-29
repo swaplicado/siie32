@@ -137,7 +137,7 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
         jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jlAccountingRecordTypeHelp);
 
-        jlAccountingRecordTypeHelpText.setPreferredSize(new java.awt.Dimension(450, 23));
+        jlAccountingRecordTypeHelpText.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel3.add(jlAccountingRecordTypeHelpText);
 
         jPanel12.add(jPanel3);
@@ -276,15 +276,12 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
     }
     
     private void actionPickBizPartner() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -296,15 +293,12 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
     }
     
     private void actionPickTax() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -328,14 +322,14 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
     private void updateAccountComplements() {
         boolean enable = moDeduction != null && moDeduction.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL;
         
-        moPanelAccount.setPanelEditable(enable);
+        moPanelAccount.setPanelEditable(true);
         moKeyPackCostCenters.setEnabled(enable);
-        moKeyBizPartner.setEnabled(enable);
-        jbPickBizPartner.setEnabled(enable);
-        jbClearBizPartner.setEnabled(enable);
-        moKeyTax.setEnabled(enable);
-        jbPickTax.setEnabled(enable);
-        jbClearTax.setEnabled(enable);
+        moKeyBizPartner.setEnabled(true);
+        jbPickBizPartner.setEnabled(true);
+        jbClearBizPartner.setEnabled(true);
+        moKeyTax.setEnabled(true);
+        jbPickTax.setEnabled(true);
+        jbClearTax.setEnabled(true);
     }
     
     private void itemStateChangedDeduction() {
@@ -365,10 +359,10 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
             jtfAccountingRecordType.setCaretPosition(0);
             
             if (moDeduction.getFkAccountingRecordTypeId() == SModSysConsts.HRSS_TP_ACC_GBL) {
-                jlAccountingRecordTypeHelpText.setText("(¡Es necesario especificar una cuenta contable para contabilizar esta deducción!)");
+                jlAccountingRecordTypeHelpText.setText("NOTA: ¡Se debe especificar una cuenta contable para contabilizar esta deducción!");
             }
             else {
-                jlAccountingRecordTypeHelpText.setText("(No es necesario especificar una cuenta contable.)");
+                jlAccountingRecordTypeHelpText.setText("NOTA: Si se requiere, se puede especificar una cuenta contable para contabilizar esta deducción.");
             }
             
             updateAccountComplements();
@@ -487,6 +481,25 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
             
             if (validation.isValid()) {
                 validation = moPanelAccount.validatePanel();
+            }
+            
+            if (validation.isValid()) {
+                boolean isAccountNonSet = moPanelAccount.getSelectedAccount() == null || moPanelAccount.getSelectedAccount().getAccountId() == SDataConstantsSys.NA;
+                
+                if (isAccountNonSet) {
+                    if (moKeyPackCostCenters.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyPackCostCenters.getFieldName() + "'.");
+                        validation.setComponent(moKeyPackCostCenters);
+                    }
+                    else if (moKeyBizPartner.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyBizPartner.getFieldName() + "'.");
+                        validation.setComponent(moKeyBizPartner);
+                    }
+                    else if (moKeyTax.getSelectedIndex() > 0) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyTax.getFieldName() + "'.");
+                        validation.setComponent(moKeyTax);
+                    }
+                }
             }
         }
             

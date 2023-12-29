@@ -11,7 +11,6 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
-import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
@@ -46,24 +45,16 @@ public abstract class SHrsFinUtils {
      * @throws Exception 
      */
     public static boolean canOpenPayroll(final SGuiSession session, final int payrollId) throws Exception {
-        String sql = "SELECT DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
+        String sql = "SELECT DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt "
                 + "FROM fin_rec r "
                 + "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                 + "WHERE fid_pay_n =  " + payrollId + "  AND NOT r.b_del AND NOT re.b_del;";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                Object [] pk = new Object[] {
-                    resultSet.getInt("r.id_year"),
-                    resultSet.getInt("r.id_per"),
-                    resultSet.getInt("r.id_bkc"),
-                    resultSet.getString("r.id_tp_rec"),
-                    resultSet.getInt("r.id_num") };
-
-                SDataRecord record = new SDataRecord();
-                record.read(pk, session.getStatement().getConnection().createStatement());
-                if (!SDataUtilities.isPeriodOpen((SClientInterface) session.getClient(), record.getDate())) {
-                    throw new Exception("El periodo contable de la póliza ' " + record.getRecordNumber() + "' se encuentra cerrado.");
+                if (!SDataUtilities.isPeriodOpen((SClientInterface) session.getClient(), resultSet.getDate("r.dt"))) {
+                    throw new Exception("El período contable de la póliza '" + resultSet.getString("r.id_tp_rec") + "-" + SLibUtils.DecimalNumberFormat.format(resultSet.getInt("r.id_num")) + "', "
+                            + "de fecha " + SLibUtils.DateFormatDate.format(resultSet.getDate("r.dt")) + ", se encuentra cerrado.");
                 }
             }
         }

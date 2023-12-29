@@ -176,11 +176,6 @@ public class SDbCfgAccountingEarning extends SDbRegistryUser {
                 throw new Exception("Se debe especificar una cuenta contable, porque el tipo de registro contable de la percepción es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_GBL }, SDbRegistry.FIELD_NAME) + "'.");
             }
         }
-        else {
-            if (mnFkAccountId != SDataConstantsSys.NA) {
-                throw new Exception("No se debe especificar una cuenta contable. Sólo es necesaria si el tipo de registro contable de la percepción es '" + session.readField(SModConsts.HRSS_TP_ACC, new int[] { SModSysConsts.HRSS_TP_ACC_GBL }, SDbRegistry.FIELD_NAME) + "'.");
-            }
-        }
         
         if (mnFkAccountId != SDataConstantsSys.NA) {
             valid = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, isAccountingRecordTypeGlobal || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);

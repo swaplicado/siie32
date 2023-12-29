@@ -286,15 +286,12 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
     }
 
     private void actionPickBizPartner() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -305,15 +302,12 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
     }
     
     private void actionPickTax() {
-        int[] key = null;
-        SGuiOptionPicker picker = null;
-
-        picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
         picker.resetPicker();
         picker.setPickerVisible(true);
 
         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            key = (int[]) picker.getOption();
+            int[] key = (int[]) picker.getOption();
 
             if (key != null) {
                 if (key[0] != 0) {
@@ -491,6 +485,21 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
 
                     case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
                         validation = moPanelAccount.validatePanel();
+            
+                        if (validation.isValid()) {
+                            boolean isAccountNonSet = moPanelAccount.getSelectedAccount() == null || moPanelAccount.getSelectedAccount().getAccountId() == SDataConstantsSys.NA;
+
+                            if (isAccountNonSet) {
+                                if (moKeyBizPartner.getSelectedIndex() > 0) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyBizPartner.getFieldName() + "'.");
+                                    validation.setComponent(moKeyBizPartner);
+                                }
+                                else if (moKeyTax.getSelectedIndex() > 0) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyTax.getFieldName() + "'.");
+                                    validation.setComponent(moKeyTax);
+                                }
+                            }
+                        }
                         break;
 
                     default:
