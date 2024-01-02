@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 232.4/ 2024-01-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de modo del concepto en la contabilización de nóminas para percepciones y deducciones con tipo de registro contable Empleado (aplica para sólo para procesamiento dinámico).
+
+================================================================================
 SIIE 3.2 232.3/ 2023-12-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -10,7 +16,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 232.2/ 2023-12-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Corrección a la posibilida de capturar cuentas contables en percepciones y deducciones para tipos de registro contable Departamento o Empleado.
+1) Corrección a la posibilidad de capturar cuentas contables en percepciones y deducciones para tipos de registro contable Departamento o Empleado.
 2) Corrección a la precedencia de la elegibilidad de cuentas contables para percepciones y deducciones para tipos de registro contable Departamento o Empleado:
     Cuenta contable de la percepción o deducción, si la hay, si no, cuenta contable del departamento, si la hay, si no, cuenta contable del tipo de gasto del departamento.
 

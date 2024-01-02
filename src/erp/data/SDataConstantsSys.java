@@ -90,6 +90,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE = "HRS_PAYROLL_ACC_DYN_EMP_MODE";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_EMP = "E";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP = "D";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_HRS_SIIEAPP = "HRS_SIIEAPP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";

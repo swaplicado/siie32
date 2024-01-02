@@ -101,6 +101,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private erp.mhrs.data.SDataFormerPayroll moFormerPayroll;
     private java.util.ArrayList<RecordEmployees> maRecordEmployeeses;
     private int mnParamPayrollAccProcess;
+    private String msParamAccountingDynamicEmployeeMode;
     private int mnNewMoveId;
     private int mnLastEntryId;
     private double mdRecordEarnings;
@@ -532,6 +533,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         
         try {
             mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+            msParamAccountingDynamicEmployeeMode = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -922,8 +924,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
             if (department == null) {
                 department = new Department(departmentId, 
-                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { departmentId }, SDbRegistry.FIELD_NAME), 
-                        (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { departmentId }, SDbRegistry.FIELD_CODE));
+                        (String) miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { departmentId }, SDbRegistry.FIELD_NAME), 
+                        (String) miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { departmentId }, SDbRegistry.FIELD_CODE));
                 moDepartmentsMap.put(departmentId, department);
             }
         }
@@ -1226,7 +1228,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 break;
             case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
             case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                entryConcept = moPayroll.composePayrollNumber() + "; " + conceptName + "; " + referenceCode + ". " + referenceName;
+                entryConcept = moPayroll.composePayrollNumber() + "; " + conceptName;
+                if (!referenceCode.isEmpty() && !referenceName.isEmpty()) {
+                    entryConcept += "; " + referenceCode + ". " + referenceName;
+                }
                 break;
             default:
                 // nothing
@@ -1560,15 +1565,30 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 int referenceId = 0;
                 String referenceName = "";
                 String referenceCode = "";
+                String formerReferenceName = "";
+                String formerReferenceCode = "";
 
                 if (payrollAmount.isEmployeeWithSuitablePackCostCenters()) {
-                    // employee with suitable pack of cost centers:
+                    // employee with suitable pack of cost centers (consider that ID of department is zero!):
                     
                     Employee employee = getEmployee(payrollAmount.EmployeeId);
+                    
+                    if (msParamAccountingDynamicEmployeeMode.equals(SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP)) {
+                        // Mode for concept for employee in dynamic accounting set to 'department':
+                        
+                        Department department = getDepartment(getEmployeeDepartmentId(payrollAmount.EmployeeId));
 
-                    referenceId = employee.EmployeeId;
-                    referenceName = employee.Name;
-                    referenceCode = employee.Number;
+                        referenceId = department.DepartmentId;
+                        referenceName = department.Name;
+                        referenceCode = department.Code;
+                    }
+                    else {
+                        // Default mode for concept for employee in dynamic accounting:
+                        
+                        referenceId = employee.EmployeeId;
+                        referenceName = employee.Name;
+                        referenceCode = employee.Number;
+                    }
                     
                     effBizPartnerId = employee.EmployeeId;
                     effBizPartnerBranchId = employee.BranchId;
@@ -1584,16 +1604,16 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         case SModSysConsts.HRSS_TP_ACC_DEP:
                             if (payrollAmount.DepartmentId != 0 && payrollAmount.DepartmentId == resultSet.getInt("_dep_id")) {
                                 referenceId = payrollAmount.DepartmentId;
-                                referenceName = resultSet.getString("_dep_name");
-                                referenceCode = resultSet.getString("_dep_code");
+                                referenceName = formerReferenceName = resultSet.getString("_dep_name");
+                                referenceCode = formerReferenceCode = resultSet.getString("_dep_code");
                             }
                             break;
 
                         case SModSysConsts.HRSS_TP_ACC_EMP:
                             if (payrollAmount.EmployeeId != 0 && payrollAmount.EmployeeId == resultSet.getInt("_emp_id")) {
                                 referenceId = payrollAmount.EmployeeId;
-                                referenceName = resultSet.getString("_emp_name");
-                                referenceCode = resultSet.getString("_emp_num");
+                                referenceName = formerReferenceName = resultSet.getString("_emp_name");
+                                referenceCode = formerReferenceCode = resultSet.getString("_emp_num");
                             }
                             break;
 
@@ -1605,7 +1625,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 // payroll move:
                 
                 moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptName,
-                        referenceId, referenceName, referenceCode, payrollAmount.Amount, record));
+                        referenceId, formerReferenceName, formerReferenceCode, payrollAmount.Amount, record));
 
                 // journal voucher:
 
