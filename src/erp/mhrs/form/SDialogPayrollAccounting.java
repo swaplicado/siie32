@@ -1624,7 +1624,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                 // payroll move:
                 
-                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptName,
+                moFormerPayroll.getDbmsDataFormerPayrollMoves().add(computeFormerPayrollMove(conceptType, conceptId, conceptNameAbbr,
                         referenceId, formerReferenceName, formerReferenceCode, payrollAmount.Amount, record));
 
                 // journal voucher:

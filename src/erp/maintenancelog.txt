@@ -3,6 +3,7 @@ SIIE 3.2 232.4/ 2024-01-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de modo del concepto en la contabilización de nóminas para percepciones y deducciones con tipo de registro contable Empleado (aplica para sólo para procesamiento dinámico).
+2) Corrección de variable de la descripción abreviada de percepciones y deduccinoes en el registro obsoleto de movimientos de contabilización de nóminas.
 
 ================================================================================
 SIIE 3.2 232.3/ 2023-12-29
