@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 232.6/ 2024-01-03
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de captura de número telefónico de la empresa y extensión de conmutador para empleados.
+2) Mejoramiento al filtrado de empleados propios de la empresa en las vistas de domicilios y cuentas bancarias de empleados.
+
+================================================================================
 SIIE 3.2 232.5/ 2024-01-03
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
