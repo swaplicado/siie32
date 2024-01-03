@@ -57,9 +57,7 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     }
 
     @Override
-    public void setPrimaryKey(Object pk) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void setPrimaryKey(Object pk) { }
 
     @Override
     public Object getPrimaryKey() {
@@ -67,17 +65,15 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     }
 
     @Override
-    public void reset() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void reset() { }
 
     @Override
     public int read(Object pk, Statement statement) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 0;
     }
 
     @Override
     public Date getLastDbUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 }

@@ -342,7 +342,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
         groupOrderBy = "ve.id_mat_req, ve.id_ety ";
 
-        where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+//        where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
 
         if (usrId != 2 || !mbHasAdmRight) { // SUPER
             join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
