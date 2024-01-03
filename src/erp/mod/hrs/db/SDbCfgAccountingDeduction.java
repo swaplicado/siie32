@@ -170,6 +170,7 @@ public class SDbCfgAccountingDeduction extends SDbRegistryUser {
         }
 
         boolean isAccountingRecordTypeGlobal = mnFkAccountingRecordTypeId == SModSysConsts.HRSS_TP_ACC_GBL; // convenience variable
+        boolean isAccountingRecordTypeDepartment = mnFkAccountingRecordTypeId == SModSysConsts.HRSS_TP_ACC_DEP; // convenience variable
 
         if (isAccountingRecordTypeGlobal) {
             if (mnFkAccountId == SDataConstantsSys.NA) {
@@ -178,7 +179,7 @@ public class SDbCfgAccountingDeduction extends SDbRegistryUser {
         }
         
         if (mnFkAccountId != SDataConstantsSys.NA) {
-            valid = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, isAccountingRecordTypeGlobal || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
+            valid = SHrsFinUtils.validateAccount(session, mnFkAccountId, -1, isAccountingRecordTypeGlobal || isAccountingRecordTypeDepartment || mnFkBizPartnerId_n != 0 ? mnFkBizPartnerId_n : -1, -1, mnFkTaxBasicId_n, mnFkTaxTaxId_n);
 
             if (valid) {
                 SDataAccount account = SHrsFinUtils.getAccount(session, mnFkAccountId);

@@ -487,7 +487,7 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
                 boolean isAccountNonSet = moPanelAccount.getSelectedAccount() == null || moPanelAccount.getSelectedAccount().getAccountId() == SDataConstantsSys.NA;
                 
                 if (isAccountNonSet) {
-                    if (moKeyPackCostCenters.getSelectedIndex() > 0) {
+                    if (moKeyPackCostCenters.getSelectedIndex() > 0 && moKeyPackCostCenters.getValue()[0] != SModSysConsts.HRS_PACK_CC_NA) {
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyPackCostCenters.getFieldName() + "'.");
                         validation.setComponent(moKeyPackCostCenters);
                     }
