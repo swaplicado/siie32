@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 232.5/ 2024-01-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Funcionalidad para cambiar ítems de referencia y CC en DPS y Pólizas contables
+2) Se omite filtro de status en compras para mostrar las RM cotizadas
+
+================================================================================
 SIIE 3.2 232.4/ 2024-01-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
