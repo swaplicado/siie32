@@ -10,6 +10,7 @@ import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
@@ -19,6 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -256,10 +259,21 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
-                int[] key = (int[]) gridRow.getRowPrimaryKey();
-                moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, new int[] { key[0] });
-                moDialogEstimate.setVisible(true);
+                try {
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    SDbMaterialRequest moMaterialRequest = new SDbMaterialRequest();
+                    moMaterialRequest.read(miClient.getSession(), new int[] { key[0] });
+                    if (moMaterialRequest.getFkMatRequestStatusId() != SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+                        miClient.showMsgBoxWarning("La requisición no puede cotizarse porque no está en estatus 'EN COMPRAS'");
+                        return;
+                    }
+                    moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
+                    moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, new int[] { key[0] });
+                    moDialogEstimate.setVisible(true);
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequestPendingEstimation.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 miClient.getSession().notifySuscriptors(mnGridType);
             }
@@ -342,7 +356,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
         groupOrderBy = "ve.id_mat_req, ve.id_ety ";
 
-//        where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
+            where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+        }
 
         if (usrId != 2 || !mbHasAdmRight) { // SUPER
             join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
