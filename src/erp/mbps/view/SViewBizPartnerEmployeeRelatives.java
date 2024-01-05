@@ -210,9 +210,9 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_son5_age", "Hijo 5 edad", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cson5.name", "Hijo 5 sexo", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "er.b_son_dec_5", "Hijo 5 finado", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_con", "Contacto emergencias", 200);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_tel_num", "Teléfono emergencias", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ckin.name", "Parentesco emergencias", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_con", "Nombre contacto emergencias", 200);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_tel_num", "Teléfono contacto emergencias", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ckin.name", "Parentesco contacto emergencias", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.benefs", "Beneficiarios", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);

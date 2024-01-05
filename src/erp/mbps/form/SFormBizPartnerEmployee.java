@@ -1717,15 +1717,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlEmergencies0.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlEmergencies0);
 
-        jlEmergenciesContact.setText("Contacto:");
+        jlEmergenciesContact.setText("Nombre contacto:");
         jlEmergenciesContact.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel35.add(jlEmergenciesContact);
 
-        jlEmergenciesPhone.setText("Teléfono:");
+        jlEmergenciesPhone.setText("Teléfono contacto:");
         jlEmergenciesPhone.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel35.add(jlEmergenciesPhone);
 
-        jlEmergenciesKinship.setText("Parentesco:*");
+        jlEmergenciesKinship.setText("Parentesco contacto:*");
         jlEmergenciesKinship.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel35.add(jlEmergenciesKinship);
 
