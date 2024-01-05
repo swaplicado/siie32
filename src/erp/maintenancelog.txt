@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 233.0/ 2024-01-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la navegación de campos de captura del bean del panel de cuentas.
+2) Mejoramiento al despliegue de cuentas contables en la vista de departamentos para la contabilización dinámica de nóminas.
+3) Despliegue del primary key del registro en la forma de captura de CFDI de recepción de pagos.
+4) Implementación de la captura de nombre, teléfono y parentesco del contacto para emergencias, y beneficiarios en el catálogo de empleados.
+
+================================================================================
 SIIE 3.2 232.6/ 2024-01-03
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

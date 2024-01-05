@@ -53,7 +53,9 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     private Color moColorNormal;
     private Color moColorWarning;
     private Component moComponentPrevious;
+    private Component moComponentPreviousExtra; // even farther than previous
     private Component moComponentNext;
+    private Component moComponentNextExtra; // even farther than next
     private SGuiFields moFields;
     private SBeanFieldText[] maoTextCodeLevelStds;
     private SAccountChooser[] maoAccountChoosers;
@@ -225,7 +227,9 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         moColorNormal = jtfName.getForeground();
         moColorWarning = Color.RED;
         moComponentPrevious = null;
+        moComponentPreviousExtra = null;
         moComponentNext = null;
+        moComponentNextExtra = null;
         moFields = new SGuiFields();
         maoTextCodeLevelStds = new SBeanFieldText[SAccountConsts.LEVELS];
         maoAccountChoosers = new SAccountChooser[SAccountConsts.LEVELS];
@@ -336,18 +340,27 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     private boolean isLastTextNumberReached(final int index) {
         return index >= 0 && ((index + 1 == maoTextCodeLevelStds.length) || (index + 1 < maoTextCodeLevelStds.length && !maoTextCodeLevelStds[index + 1].isEditable()));
     }
+    
+    private void processFocusPrevious(Component component) {
+        if (component instanceof SBeanPanelAccount) {
+            SBeanPanelAccount panelAccount = (SBeanPanelAccount) component;
+            
+            panelAccount.getTextNumberLast().requestFocus();
+        }
+        else {
+            component.requestFocus();
+        }
+    }
 
     private void computeFocusComponentPrevious(final int index) {
         if (index == 0) {
             // Move to previous component:
 
-            if (moComponentPrevious != null) {
-                if (moComponentPrevious instanceof SBeanPanelAccount) {
-                    ((SBeanPanelAccount) moComponentPrevious).getTextNumberLast().requestFocus();
-                }
-                else {
-                    moComponentPrevious.requestFocus();
-                }
+            if (moComponentPrevious != null && moComponentPrevious.isEnabled()) {
+                processFocusPrevious(moComponentPrevious);
+            }
+            else if (moComponentPreviousExtra != null && moComponentPreviousExtra.isEnabled()) {
+                processFocusPrevious(moComponentPreviousExtra);
             }
         }
         else {
@@ -356,21 +369,31 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
             maoTextCodeLevelStds[index - 1].requestFocus();
         }
     }
+    
+    private void processFocusNext(Component component) {
+        if (component instanceof SBeanPanelAccount) {
+            SBeanPanelAccount panelAccount = (SBeanPanelAccount) component;
+            
+            if (panelAccount.getSelectedAccount() == null) {
+                panelAccount.setSelectedAccount(getSelectedAccount()); // user aid: repeat current selected account in next panel
+            }
+
+            panelAccount.getTextNumberFirst().requestFocus();
+        }
+        else {
+            component.requestFocus();
+        }
+    }
 
     private void computeFocusComponentNext(final int index) {
         if (isLastTextNumberReached(index)) {
             // Move to next component:
 
-            if (moComponentNext != null) {
-                if (moComponentNext instanceof SBeanPanelAccount) {
-                    if (((SBeanPanelAccount) moComponentNext).getSelectedAccount() == null) {
-                        ((SBeanPanelAccount) moComponentNext).setSelectedAccount(getSelectedAccount());
-                    }
-                    ((SBeanPanelAccount) moComponentNext).getTextNumberFirst().requestFocus();
-                }
-                else {
-                    moComponentNext.requestFocus();
-                }
+            if (moComponentNext != null && moComponentNext.isEnabled()) {
+                processFocusNext(moComponentNext);
+            }
+            else if (moComponentNextExtra != null && moComponentNextExtra.isEnabled()) {
+                processFocusNext(moComponentNextExtra);
             }
             else {
                 jbPick.requestFocus();
@@ -550,18 +573,42 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     /**
      * Sets previous component for focus moving backward.
      * Note that component can be a <code>SBeanPanelAccount</code> object aswell.
+     * @param component
      */
     public void setComponentPrevious(final Component component) {
         moComponentPrevious = component;
+        moComponentPreviousExtra = null;
     }
 
     /**
-     * Sets previous component for focus moving forward.
+     * Sets previous components for focus moving backward.
+     * Note that components can be a <code>SBeanPanelAccount</code> object aswell.
+     * @param component
+     * @param componentExtra
+     */
+    public void setComponentPrevious(final Component component, final Component componentExtra) {
+        moComponentPrevious = component;
+        moComponentPreviousExtra = componentExtra;
+    }
+
+    /**
+     * Sets next component for focus moving forward.
      * Note that component can be a <code>SBeanPanelAccount</code> object aswell.
      * In this case, next panel's account will be set with this panel current account if the former is empty.
      */
     public void setComponentNext(final Component component) {
         moComponentNext = component;
+        moComponentNextExtra = null;
+    }
+
+    /**
+     * Sets next components for focus moving forward.
+     * Note that components can be a <code>SBeanPanelAccount</code> object aswell.
+     * In this case, next panels' account will be set with this panel current account if the former is empty.
+     */
+    public void setComponentNext(final Component component, final Component componentExtra) {
+        moComponentNext = component;
+        moComponentNextExtra = componentExtra;
     }
 
     /**

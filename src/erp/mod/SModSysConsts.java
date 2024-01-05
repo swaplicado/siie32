@@ -900,9 +900,10 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_PAY_SHT_SPE = 2;    // Special
     public static final int HRSS_TP_PAY_SHT_EXT = 3;    // Extraordinary
 
-    public static final int HRSS_TP_SAL_FIX = 1;    // Fixed
-    public static final int HRSS_TP_SAL_VAR = 2;    // Variable
-    public static final int HRSS_TP_SAL_MIX = 3;    // Mixed
+    public static final int HRSS_TP_SAL_FIX = 1;        // Fixed
+    public static final int HRSS_TP_SAL_VAR = 2;        // Variable
+    public static final int HRSS_TP_SAL_MIX = 3;        // Mixed
+    public static final int HRSS_CL_HRS_CAT_KIN = 5;    // Kinship
 
     public static final int HRSS_TP_ACC_GBL = 1;    // Global
     public static final int HRSS_TP_ACC_DEP = 2;    // Department

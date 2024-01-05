@@ -141,6 +141,8 @@ import erp.mod.hrs.view.SViewAccountingEarning;
 import erp.mod.hrs.view.SViewAdvanceSettlement;
 import erp.mod.hrs.view.SViewAutomaticDeductions;
 import erp.mod.hrs.view.SViewAutomaticEarnings;
+import erp.mod.hrs.view.SViewBankPayDispersion;
+import erp.mod.hrs.view.SViewBenAnnualBon;
 import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
@@ -156,7 +158,6 @@ import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewDepartmentCostCenter;
-import erp.mod.hrs.view.SViewBankPayDispersion;
 import erp.mod.hrs.view.SViewDocAdminRecord;
 import erp.mod.hrs.view.SViewDocAdminRecordSummary;
 import erp.mod.hrs.view.SViewDocBreach;
@@ -171,11 +172,10 @@ import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
+import erp.mod.hrs.view.SViewEmployeesCc;
 import erp.mod.hrs.view.SViewExpenseType;
 import erp.mod.hrs.view.SViewExpenseTypeAccount;
 import erp.mod.hrs.view.SViewFirstDayYear;
-import erp.mod.hrs.view.SViewBenAnnualBon;
-import erp.mod.hrs.view.SViewEmployeesCc;
 import erp.mod.hrs.view.SViewHoliday;
 import erp.mod.hrs.view.SViewLoan;
 import erp.mod.hrs.view.SViewLoanTypeAdjustment;
@@ -937,13 +937,13 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSU_TP_EXP:
                 settings = new SGuiCatalogueSettings("Tipo gasto", 1);
-                settings.setCodeSettings(true, false);
+                settings.setCodeSettings(true, true);
                 sql = "SELECT id_tp_exp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del ORDER BY name, id_tp_exp ";
                 break;
             case SModConsts.HRSU_PACK_EXP:
                 settings = new SGuiCatalogueSettings("Paquete gastos", 1);
-                settings.setCodeSettings(true, false);
+                settings.setCodeSettings(true, true);
                 aux = subtype == SModDataConsts.OPC_ALL ? "" : "AND id_pack_exp <> " + SModSysConsts.HRSU_PACK_EXP_NA + " ";
                 sql = "SELECT id_pack_exp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE NOT b_del " + aux + "ORDER BY name, id_pack_exp ";
