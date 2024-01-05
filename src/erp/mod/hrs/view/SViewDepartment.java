@@ -6,6 +6,7 @@ package erp.mod.hrs.view;
 
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ public class SViewDepartment extends SGridPaneView {
                 + "COALESCE(bp.bp, '') AS _emp_head, "
                 + "IF(caccd.id_dep IS NULL, " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_OK + ") AS _ico_cfg, "
                 + "cte.name AS _cte_name, "
-                + "cacc.id_acc, cacc.acc, "
+                + "f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", acc.code) AS _acc, "
+                + "acc.acc, "
                 + "cbp.bp AS _cbp_name, "
                 + "ctax.tax AS _ctax_name, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -89,8 +91,8 @@ public class SViewDepartment extends SGridPaneView {
                 + "v.id_dep = caccd.id_dep "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EXP) + " AS cte ON "
                 + "caccd.fk_tp_exp = cte.id_tp_exp "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS cacc ON "
-                + "caccd.fk_acc = cacc.pk_acc "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS acc ON "
+                + "caccd.fk_acc = acc.pk_acc "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS cbp ON "
                 + "caccd.fk_bp_n = cbp.id_bp "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS ctax ON "
@@ -113,8 +115,8 @@ public class SViewDepartment extends SGridPaneView {
         if (mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_DYNAMIC) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_cfg", "Configuración contabilización"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_cte_name", "Tipo gasto"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "cacc.id_acc", "No. cuenta contable"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "cacc.acc", "Cuenta contable"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "_acc", "No. cuenta contable"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "acc.acc", "Cuenta contable"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_cbp_name", "Asociado negocios"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_ctax_name", "Impuesto"));
         }

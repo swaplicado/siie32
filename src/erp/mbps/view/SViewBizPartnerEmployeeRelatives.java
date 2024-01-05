@@ -136,7 +136,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[78];
+        STableColumn[] aoTableColumns = new STableColumn[82];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Número empleado", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -210,6 +210,10 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_son5_age", "Hijo 5 edad", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cson5.name", "Hijo 5 sexo", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "er.b_son_dec_5", "Hijo 5 finado", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_con", "Contacto emergencias", 200);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.emergs_tel_num", "Teléfono emergencias", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ckin.name", "Parentesco emergencias", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.benefs", "Beneficiarios", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "bp.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -398,6 +402,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "er.son_3, er.son_dt_bir_3_n, er.b_son_dec_3, cson3.name, " +
                 "er.son_4, er.son_dt_bir_4_n, er.b_son_dec_4, cson4.name, " +
                 "er.son_5, er.son_dt_bir_5_n, er.b_son_dec_5, cson5.name, " +
+                "er.emergs_con, er.emergs_tel_num, er.benefs, ckin.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / 12 AS _e_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / 12 AS _e_set, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.mate_dt_bir_n, '%Y%m')) / 12 AS _mate_age, " +
@@ -433,6 +438,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cson3 ON er.fk_cl_cat_sex_son_3 = cson3.id_cl_hrs_cat AND er.fk_tp_cat_sex_son_3 = cson3.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cson4 ON er.fk_cl_cat_sex_son_4 = cson4.id_cl_hrs_cat AND er.fk_tp_cat_sex_son_4 = cson4.id_tp_hrs_cat " +
                 "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS cson5 ON er.fk_cl_cat_sex_son_5 = cson5.id_cl_hrs_cat AND er.fk_tp_cat_sex_son_5 = cson5.id_tp_hrs_cat " +
+                "LEFT OUTER JOIN erp.hrss_tp_hrs_cat AS ckin ON er.fk_cl_cat_kin_emergs = ckin.id_cl_hrs_cat AND er.fk_tp_cat_kin_emergs = ckin.id_tp_hrs_cat " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + sqlBizPartner + 
                 (mnFilterPaymentTypeId == SLibConsts.UNDEFINED ? "" : "AND e.fk_tp_pay = " + mnFilterPaymentTypeId + " ") +
                 (mnFilterDepartamentId == SLibConsts.UNDEFINED ? "" : "AND e.fk_dep = " + mnFilterDepartamentId + " ") +

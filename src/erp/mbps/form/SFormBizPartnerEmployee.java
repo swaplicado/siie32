@@ -192,6 +192,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldSonDateBirth5;
     private erp.lib.form.SFormField moFieldSonSex5;
     private erp.lib.form.SFormField moFieldSonDeceased5;
+    private erp.lib.form.SFormField moFieldEmergenciesContact;
+    private erp.lib.form.SFormField moFieldEmergenciesPhone;
+    private erp.lib.form.SFormField moFieldEmergenciesKinship;
+    private erp.lib.form.SFormField moFieldBeneficiaries;
     
     // Benefits:
     
@@ -418,12 +422,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel63 = new javax.swing.JPanel();
         jlPhoneOwn = new javax.swing.JLabel();
         jtfPhoneOwn = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         jPanel64 = new javax.swing.JPanel();
         jlPhoneCorp = new javax.swing.JLabel();
         jtfPhoneCorp = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
         jPanel65 = new javax.swing.JPanel();
         jlPhoneCorpExt = new javax.swing.JLabel();
         jtfPhoneCorpExt = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
         jPanel58 = new javax.swing.JPanel();
         jlRelative = new javax.swing.JLabel();
@@ -437,7 +444,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftMateDateBirth = new javax.swing.JFormattedTextField();
         jbMateDateBirth = new javax.swing.JButton();
         jtfMateAge = new javax.swing.JTextField();
-        jcbFkMateCatalogueSexTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkMateCatSexTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jckMateDeceased = new javax.swing.JCheckBox();
         jPanel53 = new javax.swing.JPanel();
         jlSon1 = new javax.swing.JLabel();
@@ -445,7 +452,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth1 = new javax.swing.JFormattedTextField();
         jbSonDateBirth1 = new javax.swing.JButton();
         jtfSonAge1 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId1 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatSexTypeId1 = new javax.swing.JComboBox<SFormComponentItem>();
         jckSonDeceased1 = new javax.swing.JCheckBox();
         jPanel54 = new javax.swing.JPanel();
         jlSon2 = new javax.swing.JLabel();
@@ -453,7 +460,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth2 = new javax.swing.JFormattedTextField();
         jbSonDateBirth2 = new javax.swing.JButton();
         jtfSonAge2 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId2 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatSexTypeId2 = new javax.swing.JComboBox<SFormComponentItem>();
         jckSonDeceased2 = new javax.swing.JCheckBox();
         jPanel55 = new javax.swing.JPanel();
         jlSon3 = new javax.swing.JLabel();
@@ -461,7 +468,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth3 = new javax.swing.JFormattedTextField();
         jbSonDateBirth3 = new javax.swing.JButton();
         jtfSonAge3 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId3 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatSexTypeId3 = new javax.swing.JComboBox<SFormComponentItem>();
         jckSonDeceased3 = new javax.swing.JCheckBox();
         jPanel56 = new javax.swing.JPanel();
         jlSon4 = new javax.swing.JLabel();
@@ -469,7 +476,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth4 = new javax.swing.JFormattedTextField();
         jbSonDateBirth4 = new javax.swing.JButton();
         jtfSonAge4 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId4 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatSexTypeId4 = new javax.swing.JComboBox<SFormComponentItem>();
         jckSonDeceased4 = new javax.swing.JCheckBox();
         jPanel57 = new javax.swing.JPanel();
         jlSon5 = new javax.swing.JLabel();
@@ -477,8 +484,22 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftSonDateBirth5 = new javax.swing.JFormattedTextField();
         jbSonDateBirth5 = new javax.swing.JButton();
         jtfSonAge5 = new javax.swing.JTextField();
-        jcbFkSonCatalogueSexTypeId5 = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSonCatSexTypeId5 = new javax.swing.JComboBox<SFormComponentItem>();
         jckSonDeceased5 = new javax.swing.JCheckBox();
+        jPanel35 = new javax.swing.JPanel();
+        jlEmergencies0 = new javax.swing.JLabel();
+        jlEmergenciesContact = new javax.swing.JLabel();
+        jlEmergenciesPhone = new javax.swing.JLabel();
+        jlEmergenciesKinship = new javax.swing.JLabel();
+        jPanel66 = new javax.swing.JPanel();
+        jlEmergencies = new javax.swing.JLabel();
+        jtfEmergenciesContact = new javax.swing.JTextField();
+        jtfEmergenciesPhone = new javax.swing.JTextField();
+        jcbFkCatKinshipEmergenciesId = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel67 = new javax.swing.JPanel();
+        jlBeneficiaries = new javax.swing.JLabel();
+        jtfBeneficiaries = new javax.swing.JTextField();
+        jlBeneficiariesHellp = new javax.swing.JLabel();
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
         jpBenefits = new javax.swing.JPanel();
@@ -775,6 +796,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlMailOwn.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlMailOwn);
 
+        jtfMailOwn.setToolTipText("Para envío de CFDI de nóminas");
         jtfMailOwn.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jtfMailOwn);
 
@@ -783,6 +805,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlMailCorp.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlMailCorp);
 
+        jtfMailCorp.setToolTipText("Dato informativo");
         jtfMailCorp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jtfMailCorp);
 
@@ -1407,8 +1430,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlPhoneOwn.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel63.add(jlPhoneOwn);
 
-        jtfPhoneOwn.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfPhoneOwn.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel63.add(jtfPhoneOwn);
+
+        jLabel3.setForeground(java.awt.Color.gray);
+        jLabel3.setText("del empleado");
+        jLabel3.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel63.add(jLabel3);
 
         jPanel43.add(jPanel63);
 
@@ -1419,8 +1447,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlPhoneCorp.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel64.add(jlPhoneCorp);
 
-        jtfPhoneCorp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfPhoneCorp.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel64.add(jtfPhoneCorp);
+
+        jLabel4.setForeground(java.awt.Color.gray);
+        jLabel4.setText("línea asignada");
+        jLabel4.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel64.add(jLabel4);
 
         jPanel43.add(jPanel64);
 
@@ -1431,8 +1464,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlPhoneCorpExt.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel65.add(jlPhoneCorpExt);
 
-        jtfPhoneCorpExt.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfPhoneCorpExt.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel65.add(jtfPhoneCorpExt);
+
+        jLabel6.setForeground(java.awt.Color.gray);
+        jLabel6.setText("de la empresa");
+        jLabel6.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel65.add(jLabel6);
 
         jPanel43.add(jPanel65);
 
@@ -1447,7 +1485,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel58.add(jlRelative);
 
         jlRelativeName.setText("Nombre:");
-        jlRelativeName.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlRelativeName.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel58.add(jlRelativeName);
 
         jlRelativeDateBirth.setText("Nacimiento:");
@@ -1458,7 +1496,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlRelativeSex1.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel58.add(jlRelativeSex1);
 
-        jlRelativeSex.setText("Sexo:");
+        jlRelativeSex.setText("Sexo:*");
         jlRelativeSex.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel58.add(jlRelativeSex);
 
@@ -1490,8 +1528,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfMateAge.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel52.add(jtfMateAge);
 
-        jcbFkMateCatalogueSexTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel52.add(jcbFkMateCatalogueSexTypeId);
+        jcbFkMateCatSexTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel52.add(jcbFkMateCatSexTypeId);
 
         jckMateDeceased.setText("Finado(a)");
         jckMateDeceased.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -1525,8 +1563,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge1.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel53.add(jtfSonAge1);
 
-        jcbFkSonCatalogueSexTypeId1.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel53.add(jcbFkSonCatalogueSexTypeId1);
+        jcbFkSonCatSexTypeId1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel53.add(jcbFkSonCatSexTypeId1);
 
         jckSonDeceased1.setText("Finado(a)");
         jckSonDeceased1.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -1560,8 +1598,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge2.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel54.add(jtfSonAge2);
 
-        jcbFkSonCatalogueSexTypeId2.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel54.add(jcbFkSonCatalogueSexTypeId2);
+        jcbFkSonCatSexTypeId2.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel54.add(jcbFkSonCatSexTypeId2);
 
         jckSonDeceased2.setText("Finado(a)");
         jckSonDeceased2.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -1595,8 +1633,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge3.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel55.add(jtfSonAge3);
 
-        jcbFkSonCatalogueSexTypeId3.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel55.add(jcbFkSonCatalogueSexTypeId3);
+        jcbFkSonCatSexTypeId3.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel55.add(jcbFkSonCatSexTypeId3);
 
         jckSonDeceased3.setText("Finado(a)");
         jckSonDeceased3.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -1630,8 +1668,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge4.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel56.add(jtfSonAge4);
 
-        jcbFkSonCatalogueSexTypeId4.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel56.add(jcbFkSonCatalogueSexTypeId4);
+        jcbFkSonCatSexTypeId4.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel56.add(jcbFkSonCatSexTypeId4);
 
         jckSonDeceased4.setText("Finado(a)");
         jckSonDeceased4.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -1665,14 +1703,66 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge5.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel57.add(jtfSonAge5);
 
-        jcbFkSonCatalogueSexTypeId5.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel57.add(jcbFkSonCatalogueSexTypeId5);
+        jcbFkSonCatSexTypeId5.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel57.add(jcbFkSonCatSexTypeId5);
 
         jckSonDeceased5.setText("Finado(a)");
         jckSonDeceased5.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel57.add(jckSonDeceased5);
 
         jPanel40.add(jPanel57);
+
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmergencies0.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel35.add(jlEmergencies0);
+
+        jlEmergenciesContact.setText("Contacto:");
+        jlEmergenciesContact.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel35.add(jlEmergenciesContact);
+
+        jlEmergenciesPhone.setText("Teléfono:");
+        jlEmergenciesPhone.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel35.add(jlEmergenciesPhone);
+
+        jlEmergenciesKinship.setText("Parentesco:*");
+        jlEmergenciesKinship.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel35.add(jlEmergenciesKinship);
+
+        jPanel40.add(jPanel35);
+
+        jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmergencies.setText("Emergencias:");
+        jlEmergencies.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel66.add(jlEmergencies);
+
+        jtfEmergenciesContact.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel66.add(jtfEmergenciesContact);
+
+        jtfEmergenciesPhone.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel66.add(jtfEmergenciesPhone);
+
+        jcbFkCatKinshipEmergenciesId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel66.add(jcbFkCatKinshipEmergenciesId);
+
+        jPanel40.add(jPanel66);
+
+        jPanel67.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBeneficiaries.setText("Beneficiarios:");
+        jlBeneficiaries.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel67.add(jlBeneficiaries);
+
+        jtfBeneficiaries.setPreferredSize(new java.awt.Dimension(355, 23));
+        jPanel67.add(jtfBeneficiaries);
+
+        jlBeneficiariesHellp.setForeground(java.awt.Color.gray);
+        jlBeneficiariesHellp.setText("Si son varios, indicar % individuales.");
+        jlBeneficiariesHellp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel67.add(jlBeneficiariesHellp);
+
+        jPanel40.add(jPanel67);
 
         jPanel51.add(jPanel40, java.awt.BorderLayout.EAST);
 
@@ -2500,7 +2590,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldMateDateBirth = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftMateDateBirth, jlMate);
         moFieldMateDateBirth.setPickerButton(jbMateDateBirth);
         moFieldMateDateBirth.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldMateSex = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkMateCatalogueSexTypeId, jlMate);
+        moFieldMateSex = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkMateCatSexTypeId, jlMate);
         moFieldMateSex.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldMateDeceased = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckMateDeceased);
         moFieldMateDeceased.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
@@ -2510,7 +2600,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldSonDateBirth1 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth1, jlSon1);
         moFieldSonDateBirth1.setPickerButton(jbSonDateBirth1);
         moFieldSonDateBirth1.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldSonSex1 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId1, jlSon1);
+        moFieldSonSex1 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatSexTypeId1, jlSon1);
         moFieldSonSex1.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldSonDeceased1 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased1);
         moFieldSonDeceased1.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
@@ -2520,7 +2610,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldSonDateBirth2 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth2, jlSon2);
         moFieldSonDateBirth2.setPickerButton(jbSonDateBirth2);
         moFieldSonDateBirth2.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldSonSex2 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId2, jlSon2);
+        moFieldSonSex2 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatSexTypeId2, jlSon2);
         moFieldSonSex2.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldSonDeceased2 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased2);
         moFieldSonDeceased2.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
@@ -2530,7 +2620,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldSonDateBirth3 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth3, jlSon3);
         moFieldSonDateBirth3.setPickerButton(jbSonDateBirth3);
         moFieldSonDateBirth3.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldSonSex3 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId3, jlSon3);
+        moFieldSonSex3 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatSexTypeId3, jlSon3);
         moFieldSonSex3.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldSonDeceased3 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased3);
         moFieldSonDeceased3.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
@@ -2540,7 +2630,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldSonDateBirth4 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth4, jlSon4);
         moFieldSonDateBirth4.setPickerButton(jbSonDateBirth4);
         moFieldSonDateBirth4.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldSonSex4 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId4, jlSon4);
+        moFieldSonSex4 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatSexTypeId4, jlSon4);
         moFieldSonSex4.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldSonDeceased4 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased4);
         moFieldSonDeceased4.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
@@ -2550,10 +2640,21 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldSonDateBirth5 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth5, jlSon5);
         moFieldSonDateBirth5.setPickerButton(jbSonDateBirth5);
         moFieldSonDateBirth5.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
-        moFieldSonSex5 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId5, jlSon5);
+        moFieldSonSex5 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatSexTypeId5, jlSon5);
         moFieldSonSex5.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         moFieldSonDeceased5 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased5);
         moFieldSonDeceased5.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
+        moFieldEmergenciesContact = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmergenciesContact, jlEmergenciesContact);
+        moFieldEmergenciesContact.setLengthMax(100);
+        moFieldEmergenciesContact.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
+        moFieldEmergenciesPhone = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmergenciesPhone, jlEmergenciesPhone);
+        moFieldEmergenciesPhone.setLengthMax(50);
+        moFieldEmergenciesPhone.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
+        moFieldEmergenciesKinship = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCatKinshipEmergenciesId, jlEmergenciesKinship);
+        moFieldEmergenciesKinship.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
+        moFieldBeneficiaries = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBeneficiaries, jlBeneficiaries);
+        moFieldBeneficiaries.setLengthMax(200);
+        moFieldBeneficiaries.setTabbedPaneIndex(TAB_DATA_PER, jTabbedPane);
         
         // Benefits:
 
@@ -2648,6 +2749,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldSonDateBirth5);
         mvFields.add(moFieldSonSex5);
         mvFields.add(moFieldSonDeceased5);
+        mvFields.add(moFieldEmergenciesContact);
+        mvFields.add(moFieldEmergenciesPhone);
+        mvFields.add(moFieldEmergenciesKinship);
+        mvFields.add(moFieldBeneficiaries);
         
         // Benefits:
         
@@ -3769,6 +3874,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.ButtonGroup bgOvertime;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -3797,6 +3905,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
@@ -3830,6 +3939,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel63;
     private javax.swing.JPanel jPanel64;
     private javax.swing.JPanel jPanel65;
+    private javax.swing.JPanel jPanel66;
+    private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -3867,6 +3978,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbVacUpdate;
     private javax.swing.JComboBox<SFormComponentItem> jcbAnnBonTable;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBank_n;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkCatKinshipEmergenciesId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCatalogueBloodTypeTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCatalogueEducationTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCatalogueMaritalStatusTypeId;
@@ -3875,7 +3987,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkDepartment;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkEmployeeType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkGroceryService;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkMateCatalogueSexTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkMateCatSexTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkMwzType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPaymentType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkPosition;
@@ -3883,11 +3995,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbFkRecruitmentSchemaType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkSalaryType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkShift;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId1;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId2;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId3;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId4;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatalogueSexTypeId5;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatSexTypeId1;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatSexTypeId2;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatSexTypeId3;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatSexTypeId4;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkSonCatSexTypeId5;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkWorkerType;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkWorkingDayType;
     private javax.swing.JComboBox<SFormComponentItem> jcbVacBonTable;
@@ -3939,6 +4051,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlBenSeniorityDays;
     private javax.swing.JLabel jlBenSeniorityProp;
     private javax.swing.JLabel jlBenSeniorityYears;
+    private javax.swing.JLabel jlBeneficiaries;
+    private javax.swing.JLabel jlBeneficiariesHellp;
     private javax.swing.JLabel jlBirthPlace;
     private javax.swing.JLabel jlCheckerPolicy;
     private javax.swing.JLabel jlContractExpiration;
@@ -3947,6 +4061,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateBirth;
     private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlEmergencies;
+    private javax.swing.JLabel jlEmergencies0;
+    private javax.swing.JLabel jlEmergenciesContact;
+    private javax.swing.JLabel jlEmergenciesKinship;
+    private javax.swing.JLabel jlEmergenciesPhone;
     private javax.swing.JLabel jlFacDateBenefits;
     private javax.swing.JLabel jlFacDateCutoff;
     private javax.swing.JLabel jlFacEmp;
@@ -4089,8 +4208,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JTextField jtfBenSeniorityDays;
     private javax.swing.JTextField jtfBenSeniorityProp;
     private javax.swing.JTextField jtfBenSeniorityYears;
+    private javax.swing.JTextField jtfBeneficiaries;
     private javax.swing.JTextField jtfBirthPlace;
     private javax.swing.JTextField jtfBizPartner_Ro;
+    private javax.swing.JTextField jtfEmergenciesContact;
+    private javax.swing.JTextField jtfEmergenciesPhone;
     private javax.swing.JTextField jtfFacDateBenefits;
     private javax.swing.JTextField jtfFacDateCutoff;
     private javax.swing.JTextField jtfFacEmpName;
@@ -4208,13 +4330,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge4.setText("");
         jtfSonAge5.setText("");
         
-        int[] na = new int[] { SModSysConsts.HRSS_CL_HRS_CAT_SEX, 1 };  // non applying
-        moFieldMateSex.setFieldValue(na);
-        moFieldSonSex1.setFieldValue(na);
-        moFieldSonSex2.setFieldValue(na);
-        moFieldSonSex3.setFieldValue(na);
-        moFieldSonSex4.setFieldValue(na);
-        moFieldSonSex5.setFieldValue(na);
+        int[] naSex = new int[] { SModSysConsts.HRSS_CL_HRS_CAT_SEX, SDataConstantsSys.NA };
+        moFieldMateSex.setFieldValue(naSex);
+        moFieldSonSex1.setFieldValue(naSex);
+        moFieldSonSex2.setFieldValue(naSex);
+        moFieldSonSex3.setFieldValue(naSex);
+        moFieldSonSex4.setFieldValue(naSex);
+        moFieldSonSex5.setFieldValue(naSex);
+        
+        int[] naKin = new int[] { SModSysConsts.HRSS_CL_HRS_CAT_KIN, SDataConstantsSys.NA };
+        moFieldEmergenciesKinship.setFieldValue(naKin);
 
         mbUpdatingForm = false;
         jbImagePhotoView.setEnabled(false);
@@ -4254,12 +4379,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbFkCatalogueBloodTypeTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_BLO);
         SFormUtilities.populateComboBox(miClient, jcbFkCatalogueEducationTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_EDU);
         SFormUtilities.populateComboBox(miClient, jcbFkCatalogueMaritalStatusTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_MAR);
-        SFormUtilities.populateComboBox(miClient, jcbFkMateCatalogueSexTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
-        SFormUtilities.populateComboBox(miClient, jcbFkSonCatalogueSexTypeId1, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
-        SFormUtilities.populateComboBox(miClient, jcbFkSonCatalogueSexTypeId2, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
-        SFormUtilities.populateComboBox(miClient, jcbFkSonCatalogueSexTypeId3, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
-        SFormUtilities.populateComboBox(miClient, jcbFkSonCatalogueSexTypeId4, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
-        SFormUtilities.populateComboBox(miClient, jcbFkSonCatalogueSexTypeId5, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkMateCatSexTypeId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkSonCatSexTypeId1, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkSonCatSexTypeId2, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkSonCatSexTypeId3, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkSonCatSexTypeId4, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkSonCatSexTypeId5, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_SEX);
+        SFormUtilities.populateComboBox(miClient, jcbFkCatKinshipEmergenciesId, SModConsts.HRSS_TP_HRS_CAT, SModSysConsts.HRSS_CL_HRS_CAT_KIN);
         SFormUtilities.populateComboBox(miClient, jcbVacTable, SModConsts.HRS_BEN, SModSysConsts.HRSS_TP_BEN_VAC);
         SFormUtilities.populateComboBox(miClient, jcbVacBonTable, SModConsts.HRS_BEN, SModSysConsts.HRSS_TP_BEN_VAC_BON);
         SFormUtilities.populateComboBox(miClient, jcbAnnBonTable, SModConsts.HRS_BEN, SModSysConsts.HRSS_TP_BEN_ANN_BON);
@@ -4431,12 +4557,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             dates.add(moFieldSonDateBirth5);
 
             ArrayList<JComboBox> sexes = new ArrayList<>();
-            sexes.add(jcbFkMateCatalogueSexTypeId);
-            sexes.add(jcbFkSonCatalogueSexTypeId1);
-            sexes.add(jcbFkSonCatalogueSexTypeId2);
-            sexes.add(jcbFkSonCatalogueSexTypeId3);
-            sexes.add(jcbFkSonCatalogueSexTypeId4);
-            sexes.add(jcbFkSonCatalogueSexTypeId5);
+            sexes.add(jcbFkMateCatSexTypeId);
+            sexes.add(jcbFkSonCatSexTypeId1);
+            sexes.add(jcbFkSonCatSexTypeId2);
+            sexes.add(jcbFkSonCatSexTypeId3);
+            sexes.add(jcbFkSonCatSexTypeId4);
+            sexes.add(jcbFkSonCatSexTypeId5);
 
             ArrayList<SFormField> deceaseds = new ArrayList<>();
             deceaseds.add(moFieldMateDeceased);
@@ -4478,6 +4604,21 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         validation.setTabbedPaneIndex(TAB_DATA_PER);
                         break;
                     }
+                }
+            }
+            
+            if (!validation.getIsError()) {
+                // validate 3 data for emergencies:
+                
+                int data = 
+                        (!moFieldEmergenciesContact.getString().isEmpty() ? 1 : 0) +
+                        (!moFieldEmergenciesPhone.getString().isEmpty() ? 1 : 0) +
+                        (moFieldEmergenciesKinship.getKeyAsIntArray()[1] != SDataConstantsSys.NA ? 1 : 0);
+                
+                if (data > 0 && data != 3) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmergencies) + "' (" + SGuiUtils.getLabelName(jlEmergenciesContact) + ", " + SGuiUtils.getLabelName(jlEmergenciesPhone) + ", " + SGuiUtils.getLabelName(jlEmergenciesKinship) + ").");
+                        validation.setComponent(moFieldEmergenciesContact.getComponent());
+                        validation.setTabbedPaneIndex(TAB_DATA_PER);
                 }
             }
         }
@@ -4698,36 +4839,47 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         
         if (moEmployee.getChildRelatives() != null) {
             SDataEmployeeRelatives relatives = moEmployee.getChildRelatives();
+            
             moFieldMateName.setFieldValue(relatives.getMate());
             moFieldMateDateBirth.setFieldValue(relatives.getMateDateBirth());
             focusLostMateDateBirth();
-            moFieldMateSex.setFieldValue(new int[] { relatives.getFkCatSexClassIdMate(), relatives.getFkCatSexTypeIdMate() });
+            moFieldMateSex.setFieldValue(new int[] { relatives.getFkCatSexMateClassId(), relatives.getFkCatSexMateTypeId() });
             moFieldMateDeceased.setFieldValue(relatives.isMateDeceased());
+            
             moFieldSonName1.setFieldValue(relatives.getSon1());
             moFieldSonDateBirth1.setFieldValue(relatives.getSonDateBirth1());
             focusLostSonDateBirth1();
-            moFieldSonSex1.setFieldValue(new int[] { relatives.getFkCatSexClassIdSon1(), relatives.getFkCatSexTypeIdSon1() });
+            moFieldSonSex1.setFieldValue(new int[] { relatives.getFkCatSexSon1ClassId(), relatives.getFkCatSexSon1TypeId() });
             moFieldSonDeceased1.setFieldValue(relatives.isSonDeceased1());
+            
             moFieldSonName2.setFieldValue(relatives.getSon2());
             moFieldSonDateBirth2.setFieldValue(relatives.getSonDateBirth2());
             focusLostSonDateBirth2();
-            moFieldSonSex2.setFieldValue(new int[] { relatives.getFkCatSexClassIdSon2(), relatives.getFkCatSexTypeIdSon2() });
+            moFieldSonSex2.setFieldValue(new int[] { relatives.getFkCatSexSon2ClassId(), relatives.getFkCatSexSon2TypeId() });
             moFieldSonDeceased2.setFieldValue(relatives.isSonDeceased2());
+            
             moFieldSonName3.setFieldValue(relatives.getSon3());
             moFieldSonDateBirth3.setFieldValue(relatives.getSonDateBirth3());
             focusLostSonDateBirth3();
-            moFieldSonSex3.setFieldValue(new int[] { relatives.getFkCatSexClassIdSon3(), relatives.getFkCatSexTypeIdSon3() });
+            moFieldSonSex3.setFieldValue(new int[] { relatives.getFkCatSexSon3ClassId(), relatives.getFkCatSexSon3TypeId() });
             moFieldSonDeceased3.setFieldValue(relatives.isSonDeceased3());
+            
             moFieldSonName4.setFieldValue(relatives.getSon4());
             moFieldSonDateBirth4.setFieldValue(relatives.getSonDateBirth4());
             focusLostSonDateBirth4();
-            moFieldSonSex4.setFieldValue(new int[] { relatives.getFkCatSexClassIdSon4(), relatives.getFkCatSexTypeIdSon4() });
+            moFieldSonSex4.setFieldValue(new int[] { relatives.getFkCatSexSon4ClassId(), relatives.getFkCatSexSon4TypeId() });
             moFieldSonDeceased4.setFieldValue(relatives.isSonDeceased4());
+            
             moFieldSonName5.setFieldValue(relatives.getSon5());
             moFieldSonDateBirth5.setFieldValue(relatives.getSonDateBirth5());
             focusLostSonDateBirth5();
-            moFieldSonSex5.setFieldValue(new int[] { relatives.getFkCatSexClassIdSon5(), relatives.getFkCatSexTypeIdSon5() });
+            moFieldSonSex5.setFieldValue(new int[] { relatives.getFkCatSexSon5ClassId(), relatives.getFkCatSexSon5TypeId() });
             moFieldSonDeceased5.setFieldValue(relatives.isSonDeceased5());
+            
+            moFieldEmergenciesContact.setFieldValue(relatives.getEmergenciesContact());
+            moFieldEmergenciesPhone.setFieldValue(relatives.getEmergenciesTelNumber());
+            moFieldEmergenciesKinship.setFieldValue(new int[] { relatives.getFkCatKinshipEmergenciesClassId(), relatives.getFkCatKinshipEmergenciesTypeId() });
+            moFieldBeneficiaries.setFieldValue(relatives.getBeneficiaries());
         }
         
         // Benefit tables of employee:
@@ -4983,18 +5135,23 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         relatives.setSon5(moFieldSonName5.getString());
         relatives.setSonDateBirth5(moFieldSonDateBirth5.getDate());
         relatives.setSonDeceased5(moFieldSonDeceased5.getBoolean());
-        relatives.setFkCatSexClassIdMate(moFieldMateSex.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdMate(moFieldMateSex.getKeyAsIntArray()[1]);
-        relatives.setFkCatSexClassIdSon1(moFieldSonSex1.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdSon1(moFieldSonSex1.getKeyAsIntArray()[1]);
-        relatives.setFkCatSexClassIdSon2(moFieldSonSex2.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdSon2(moFieldSonSex2.getKeyAsIntArray()[1]);
-        relatives.setFkCatSexClassIdSon3(moFieldSonSex3.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdSon3(moFieldSonSex3.getKeyAsIntArray()[1]);
-        relatives.setFkCatSexClassIdSon4(moFieldSonSex4.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdSon4(moFieldSonSex4.getKeyAsIntArray()[1]);
-        relatives.setFkCatSexClassIdSon5(moFieldSonSex5.getKeyAsIntArray()[0]);
-        relatives.setFkCatSexTypeIdSon5(moFieldSonSex5.getKeyAsIntArray()[1]);
+        relatives.setEmergenciesContact(moFieldEmergenciesContact.getString());
+        relatives.setEmergenciesTelNumber(moFieldEmergenciesPhone.getString());
+        relatives.setBeneficiaries(moFieldBeneficiaries.getString());
+        relatives.setFkCatSexMateClassId(moFieldMateSex.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexMateTypeId(moFieldMateSex.getKeyAsIntArray()[1]);
+        relatives.setFkCatSexSon1ClassId(moFieldSonSex1.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexSon1TypeId(moFieldSonSex1.getKeyAsIntArray()[1]);
+        relatives.setFkCatSexSon2ClassId(moFieldSonSex2.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexSon2TypeId(moFieldSonSex2.getKeyAsIntArray()[1]);
+        relatives.setFkCatSexSon3ClassId(moFieldSonSex3.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexSon3TypeId(moFieldSonSex3.getKeyAsIntArray()[1]);
+        relatives.setFkCatSexSon4ClassId(moFieldSonSex4.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexSon4TypeId(moFieldSonSex4.getKeyAsIntArray()[1]);
+        relatives.setFkCatSexSon5ClassId(moFieldSonSex5.getKeyAsIntArray()[0]);
+        relatives.setFkCatSexSon5TypeId(moFieldSonSex5.getKeyAsIntArray()[1]);
+        relatives.setFkCatKinshipEmergenciesClassId(moFieldEmergenciesKinship.getKeyAsIntArray()[0]);
+        relatives.setFkCatKinshipEmergenciesTypeId(moFieldEmergenciesKinship.getKeyAsIntArray()[1]);
         moEmployee.setChildRelatives(relatives);
         
         moEmployee.setIsRegistryEdited(true);

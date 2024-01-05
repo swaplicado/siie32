@@ -262,7 +262,7 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
         moPanelAccount.setAccountNameWidth(500);
 
         moPanelAccount.setComponentPrevious(moKeyPackExpenses);
-        moPanelAccount.setComponentNext(moKeyPackCostCenters);
+        moPanelAccount.setComponentNext(moKeyPackCostCenters, moKeyBizPartner);
         
         moPanelAccount.initPanel();
         

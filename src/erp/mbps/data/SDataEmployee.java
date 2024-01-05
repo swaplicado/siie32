@@ -625,18 +625,23 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                     moChildRelatives.setSon5(resultSet.getString("son_5"));
                     moChildRelatives.setSonDateBirth5(resultSet.getDate("son_dt_bir_5_n"));
                     moChildRelatives.setSonDeceased5(resultSet.getBoolean("b_son_dec_5"));
-                    moChildRelatives.setFkCatSexClassIdMate(resultSet.getInt("fk_cl_cat_sex_mate"));
-                    moChildRelatives.setFkCatSexTypeIdMate(resultSet.getInt("fk_tp_cat_sex_mate"));
-                    moChildRelatives.setFkCatSexClassIdSon1(resultSet.getInt("fk_cl_cat_sex_son_1"));
-                    moChildRelatives.setFkCatSexTypeIdSon1(resultSet.getInt("fk_tp_cat_sex_son_1"));
-                    moChildRelatives.setFkCatSexClassIdSon2(resultSet.getInt("fk_cl_cat_sex_son_2"));
-                    moChildRelatives.setFkCatSexTypeIdSon2(resultSet.getInt("fk_tp_cat_sex_son_2"));
-                    moChildRelatives.setFkCatSexClassIdSon3(resultSet.getInt("fk_cl_cat_sex_son_3"));
-                    moChildRelatives.setFkCatSexTypeIdSon3(resultSet.getInt("fk_tp_cat_sex_son_3"));
-                    moChildRelatives.setFkCatSexClassIdSon4(resultSet.getInt("fk_cl_cat_sex_son_4"));
-                    moChildRelatives.setFkCatSexTypeIdSon4(resultSet.getInt("fk_tp_cat_sex_son_4"));
-                    moChildRelatives.setFkCatSexClassIdSon5(resultSet.getInt("fk_cl_cat_sex_son_5"));
-                    moChildRelatives.setFkCatSexTypeIdSon5(resultSet.getInt("fk_tp_cat_sex_son_5"));
+                    moChildRelatives.setEmergenciesContact(resultSet.getString("emergs_con"));
+                    moChildRelatives.setEmergenciesTelNumber(resultSet.getString("emergs_tel_num"));
+                    moChildRelatives.setBeneficiaries(resultSet.getString("benefs"));
+                    moChildRelatives.setFkCatSexMateClassId(resultSet.getInt("fk_cl_cat_sex_mate"));
+                    moChildRelatives.setFkCatSexMateTypeId(resultSet.getInt("fk_tp_cat_sex_mate"));
+                    moChildRelatives.setFkCatSexSon1ClassId(resultSet.getInt("fk_cl_cat_sex_son_1"));
+                    moChildRelatives.setFkCatSexSon1TypeId(resultSet.getInt("fk_tp_cat_sex_son_1"));
+                    moChildRelatives.setFkCatSexSon2ClassId(resultSet.getInt("fk_cl_cat_sex_son_2"));
+                    moChildRelatives.setFkCatSexSon2TypeId(resultSet.getInt("fk_tp_cat_sex_son_2"));
+                    moChildRelatives.setFkCatSexSon3ClassId(resultSet.getInt("fk_cl_cat_sex_son_3"));
+                    moChildRelatives.setFkCatSexSon3TypeId(resultSet.getInt("fk_tp_cat_sex_son_3"));
+                    moChildRelatives.setFkCatSexSon4ClassId(resultSet.getInt("fk_cl_cat_sex_son_4"));
+                    moChildRelatives.setFkCatSexSon4TypeId(resultSet.getInt("fk_tp_cat_sex_son_4"));
+                    moChildRelatives.setFkCatSexSon5ClassId(resultSet.getInt("fk_cl_cat_sex_son_5"));
+                    moChildRelatives.setFkCatSexSon5TypeId(resultSet.getInt("fk_tp_cat_sex_son_5"));
+                    moChildRelatives.setFkCatKinshipEmergenciesClassId(resultSet.getInt("fk_cl_cat_kin_emergs"));
+                    moChildRelatives.setFkCatKinshipEmergenciesTypeId(resultSet.getInt("fk_tp_cat_kin_emergs"));
                 }
 
                 mbIsRegistryNew = false;
@@ -878,18 +883,23 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + moChildRelatives.getSon5() + "', " + 
                         (moChildRelatives.getSonDateBirth5() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth5()) + "'") + ", " +
                         (moChildRelatives.isSonDeceased5() ? 1 : 0) + ", " + 
-                        moChildRelatives.getFkCatSexClassIdMate() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdMate() + ", " + 
-                        moChildRelatives.getFkCatSexClassIdSon1() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdSon1() + ", " + 
-                        moChildRelatives.getFkCatSexClassIdSon2() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdSon2() + ", " + 
-                        moChildRelatives.getFkCatSexClassIdSon3() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdSon3() + ", " + 
-                        moChildRelatives.getFkCatSexClassIdSon4() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdSon4() + ", " + 
-                        moChildRelatives.getFkCatSexClassIdSon5() + ", " + 
-                        moChildRelatives.getFkCatSexTypeIdSon5() + " " + 
+                        "'" + moChildRelatives.getEmergenciesContact() + "', " + 
+                        "'" + moChildRelatives.getEmergenciesTelNumber()+ "', " + 
+                        "'" + moChildRelatives.getBeneficiaries()+ "', " + 
+                        moChildRelatives.getFkCatSexMateClassId() + ", " + 
+                        moChildRelatives.getFkCatSexMateTypeId() + ", " + 
+                        moChildRelatives.getFkCatSexSon1ClassId() + ", " + 
+                        moChildRelatives.getFkCatSexSon1TypeId() + ", " + 
+                        moChildRelatives.getFkCatSexSon2ClassId() + ", " + 
+                        moChildRelatives.getFkCatSexSon2TypeId() + ", " + 
+                        moChildRelatives.getFkCatSexSon3ClassId() + ", " + 
+                        moChildRelatives.getFkCatSexSon3TypeId() + ", " + 
+                        moChildRelatives.getFkCatSexSon4ClassId() + ", " + 
+                        moChildRelatives.getFkCatSexSon4TypeId() + ", " + 
+                        moChildRelatives.getFkCatSexSon5ClassId() + ", " + 
+                        moChildRelatives.getFkCatSexSon5TypeId() + ", " + 
+                        moChildRelatives.getFkCatKinshipEmergenciesClassId() + ", " + 
+                        moChildRelatives.getFkCatKinshipEmergenciesTypeId() + " " + 
                         ")";
                 statement.execute(sql);
             }
