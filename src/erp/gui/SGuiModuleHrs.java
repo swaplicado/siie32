@@ -33,7 +33,7 @@ import erp.mod.hrs.form.SDialogRepHrsPayrollWageSalaryFileCsv;
 import erp.mod.hrs.form.SDialogRepHrsPos;
 import erp.mod.hrs.form.SFormCalculateNetGrossAmount;
 import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
-import erp.mod.trn.form.SDialogUuidSearch;
+import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -1278,7 +1278,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_HRS, SDataConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiUuidSearch) {
-                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SLibConstants.UNDEFINED).setVisible(true);
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiPayCfdiStampSign) {
                 showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFDI_PAYROLL_VER_CUR);

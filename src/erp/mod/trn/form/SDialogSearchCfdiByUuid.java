@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiUtils;
  *
  * @author Isabel Servin
  */
-public class SDialogUuidSearch extends JDialog implements ActionListener {
+public class SDialogSearchCfdiByUuid extends JDialog implements ActionListener {
     
     private final SGuiClient miClient;
     private final int mnCfdType;
@@ -46,7 +46,7 @@ public class SDialogUuidSearch extends JDialog implements ActionListener {
      * @param cfdType
      * @param dpsCt
      */
-    public SDialogUuidSearch(SGuiClient client, int cfdType, int dpsCt) {
+    public SDialogSearchCfdiByUuid(SGuiClient client, int cfdType, int dpsCt) {
         miClient = client;
         mnCfdType = cfdType;
         mnDpsCategory = dpsCt;

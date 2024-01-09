@@ -14,7 +14,7 @@ import erp.lib.form.SFormOptionPickerInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.log.form.SDialogRepRate;
-import erp.mod.trn.form.SDialogUuidSearch;
+import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import sa.lib.gui.SGuiClient;
@@ -495,7 +495,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.LOG_BOL, SDataConstantsSys.TRNS_TP_CFD_INV, null);
             }
             else if (item == jmiUuidSearch) {
-                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, SLibConstants.UNDEFINED).setVisible(true);
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiRepRate) {
                 new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);

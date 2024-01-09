@@ -113,7 +113,7 @@ import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
-import erp.mod.trn.form.SDialogUuidSearch;
+import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.data.SDataCtr;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
@@ -2151,7 +2151,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_FIN, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
             else if (item == jmiUuidSearch) {
-                new SDialogUuidSearch((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SLibConstants.UNDEFINED).setVisible(true);
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);
