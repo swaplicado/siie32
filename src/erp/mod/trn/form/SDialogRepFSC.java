@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
@@ -75,11 +76,13 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
         jPanel9 = new javax.swing.JPanel();
         jlTitle = new javax.swing.JLabel();
         moTextTitle = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel10 = new javax.swing.JPanel();
-        jlItemKeys = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtaItemKeys = new javax.swing.JTextArea();
+        jPanel21 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jtaItemName = new javax.swing.JTextArea();
         jPanel14 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
@@ -161,7 +164,7 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
 
         jPanel18.setLayout(new java.awt.BorderLayout());
 
-        jPanel8.setLayout(new java.awt.GridLayout(2, 0));
+        jPanel8.setLayout(new java.awt.GridLayout());
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -174,23 +177,32 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
 
         jPanel8.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jlItemKeys.setText("Claves de ítems a mostrar en el reporte: (separados por salto de línea)");
-        jlItemKeys.setPreferredSize(new java.awt.Dimension(450, 16));
-        jPanel10.add(jlItemKeys);
-
-        jPanel8.add(jPanel10);
-
         jPanel18.add(jPanel8, java.awt.BorderLayout.NORTH);
 
         jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Códigos de ítems: (separados por salto de línea)"));
+        jPanel13.setLayout(new java.awt.BorderLayout());
 
         jtaItemKeys.setColumns(20);
         jtaItemKeys.setRows(5);
         jScrollPane1.setViewportView(jtaItemKeys);
 
-        jPanel11.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel13.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel11.add(jPanel13, java.awt.BorderLayout.CENTER);
+
+        jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Contenidos en la descripción: (separados por salto de línea)"));
+        jPanel21.setPreferredSize(new java.awt.Dimension(370, 83));
+        jPanel21.setLayout(new java.awt.BorderLayout());
+
+        jtaItemName.setColumns(20);
+        jtaItemName.setRows(5);
+        jScrollPane2.setViewportView(jtaItemName);
+
+        jPanel21.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jPanel11.add(jPanel21, java.awt.BorderLayout.EAST);
 
         jPanel18.add(jPanel11, java.awt.BorderLayout.CENTER);
 
@@ -240,9 +252,9 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
     private javax.swing.ButtonGroup bgDocs;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
@@ -251,6 +263,7 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -259,14 +272,15 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton jbCancelConf;
     private javax.swing.JButton jbModify;
     private javax.swing.JButton jbSaveConf;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlItemKeys;
     private javax.swing.JLabel jlTitle;
     private javax.swing.JTextArea jtaItemKeys;
+    private javax.swing.JTextArea jtaItemName;
     private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateStart;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCur;
@@ -282,6 +296,7 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
         mbConfEdit = false;
         moTextTitle.setEnabled(false);
         jtaItemKeys.setEnabled(false);
+        jtaItemName.setEnabled(false);
         jbSaveConf.setEnabled(false);
         jbCancelConf.setEnabled(false);
 
@@ -316,7 +331,8 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
             miClient.getSession().populateCatalogue(moKeyCur, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
             moCustomerRep.readByReportKey(miClient.getSession(), SModSysConsts.CFG_CUSTOM_REP_FSC);
             moTextTitle.setValue(moCustomerRep.getName());
-            jtaItemKeys.setText(moCustomerRep.getSettings().replaceAll(",", "\n"));
+            jtaItemKeys.setText(moCustomerRep.getSettingsCode().replaceAll(",", "\n"));
+            jtaItemName.setText(moCustomerRep.getSettingsName().replaceAll(",", "\n"));
         }
         catch (Exception e) {
             miClient.showMsgBoxError(e.getMessage());
@@ -329,6 +345,7 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
         jbCancelConf.setEnabled(true);
         moTextTitle.setEnabled(true);
         jtaItemKeys.setEnabled(true);
+        jtaItemName.setEnabled(true);
         jbPrint.setEnabled(false);
     }
     
@@ -338,7 +355,8 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
                 try {
                     moCustomerRep.setRegistryEdited(true);
                     moCustomerRep.setName(moTextTitle.getValue());
-                    moCustomerRep.setSettings(jtaItemKeys.getText().replaceAll("\n", ","));
+                    moCustomerRep.setSettingsCode(jtaItemKeys.getText().replaceAll("\n", ","));
+                    moCustomerRep.setSettingsName(jtaItemName.getText().replaceAll("\n", ","));
                     moCustomerRep.save(miClient.getSession());
                     if (moCustomerRep.getQueryResultId() == SDbConsts.SAVE_OK) {
                         miClient.showMsgBoxInformation("¡Configuración guardada con éxito!");
@@ -347,6 +365,7 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
                         jbCancelConf.setEnabled(false);
                         moTextTitle.setEnabled(false);
                         jtaItemKeys.setEnabled(false);
+                        jtaItemName.setEnabled(false);
                         jbPrint.setEnabled(true);
                     }
                 }
@@ -363,18 +382,26 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
         jbCancelConf.setEnabled(false);
         moTextTitle.setEnabled(false);
         jtaItemKeys.setEnabled(false);
+        jtaItemName.setEnabled(false);
         jbPrint.setEnabled(true);
         moTextTitle.setValue(moCustomerRep.getName());
-        jtaItemKeys.setText(moCustomerRep.getSettings().replaceAll(",", "\n"));
+        jtaItemKeys.setText(moCustomerRep.getSettingsCode().replaceAll(",", "\n"));
+        jtaItemName.setText(moCustomerRep.getSettingsName().replaceAll(",", "\n"));
     }
     
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
-        if (validation.isValid()){
+        if (validation.isValid()) {
             if (moRadioCurDocs.isSelected() && moKeyCur.getSelectedIndex() <= 0) {
                 validation.setMessage("Debe seleccionar una moneda de documento.");
                 validation.setComponent(moKeyCur);
+            }
+        }
+        if (validation.isValid()) {
+            if (jtaItemKeys.getText().isEmpty() && jtaItemName.getText().isEmpty()) {
+                validation.setMessage("Debe existir configuración del reporte para códigos de ítems o contenido de descripción");
+                validation.setComponent(jbModify);
             }
         }
         return validation;
@@ -385,15 +412,50 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
         if (jbPrint.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 String itemKeys = ""; 
+                String itemName = "";
                 String cur;
                 String whereCur = "";
-                for (String key : jtaItemKeys.getText().split("\n")) {
-                    if (itemKeys.isEmpty()) {
-                        itemKeys += "'" + key + "'";
+                String parameters = "";
+                String between = "dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateStart.getValue()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moDateEnd.getValue()) + "'";
+                if (!jtaItemKeys.getText().isEmpty()) {
+                    for (String key : jtaItemKeys.getText().split("\n")) {
+                        if (itemKeys.isEmpty()) {
+                            itemKeys += "AND i.item_key IN ('" + key + "'";
+                        }
+                        else {
+                            itemKeys += ", '" + key + "'";
+                        }
+                        if (parameters.isEmpty()) {
+                            parameters += "'" + key + "'";
+                        }
+                        else{
+                            parameters += ", '" + key + "'";
+                        }
                     }
-                    else {
-                        itemKeys += ", '" + key + "'";
+                }
+                if (!itemKeys.isEmpty()) {
+                    itemKeys += ") ";
+                }
+                
+                if (!jtaItemName.getText().isEmpty()) {
+                    for (String name : jtaItemName.getText().split("\n")) {
+                        if (itemName.isEmpty()) {
+                            itemName += "AND (i.item LIKE '%" + name + "%' ";
+                        }
+                        else {
+                            itemName += "OR i.item LIKE '%" + name + "%' ";
+                        }
+                        if (parameters.isEmpty()) {
+                            parameters = "'" + name + "'";
+                        }
+                        else {
+                            parameters += ", '" + name + "'";
+                        }
                     }
+                }
+                
+                if (!itemName.isEmpty()){
+                    itemName += ")";
                 }
                 
                 if (moRadioAllDocs.isSelected()) {
@@ -413,8 +475,10 @@ public class SDialogRepFSC extends sa.lib.gui.bean.SBeanDialogReport implements 
                 moParamsMap.put("tDateEnd", moDateEnd.getValue());  
                 moParamsMap.put("sCur", cur);  
                 moParamsMap.put("bDetail", moRadioDetail.isSelected());  
-                moParamsMap.put("sFooter", itemKeys);  
-                moParamsMap.put("sWhereCur", whereCur);                  
+                moParamsMap.put("sParameters", parameters);  
+                moParamsMap.put("sWhereCur", whereCur);   
+                moParamsMap.put("sItemName", itemName);
+                moParamsMap.put("sBetween", between);
             }
         }
     }

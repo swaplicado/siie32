@@ -23,7 +23,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
     protected int mnPkCustomSalesReportId;
     protected String msReportKey;
     protected String msName;
-    protected String msSettings;
+    protected String msSettingsCode;
+    protected String msSettingsName;
     /*
     protected boolean mbDeleted;
     protected int mnFkUserInsertId;
@@ -39,7 +40,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
     public void setPkCustomSalesReportId(int n) { mnPkCustomSalesReportId = n; }
     public void setReportKey(String s) { msReportKey = s; }
     public void setName(String s) { msName = s; }
-    public void setSettings(String s) { msSettings = s; }
+    public void setSettingsCode(String s) { msSettingsCode = s; }
+    public void setSettingsName(String s) { msSettingsName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -49,7 +51,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
     public int getPkCustomSalesReportId() { return mnPkCustomSalesReportId; }
     public String getReportKey() { return msReportKey; }
     public String getName() { return msName; }
-    public String getSettings() { return msSettings; }
+    public String getSettingsCode() { return msSettingsCode; }
+    public String getSettingsName() { return msSettingsName; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -90,7 +93,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
         mnPkCustomSalesReportId = 0;
         msReportKey = "";
         msName = "";
-        msSettings = null;
+        msSettingsCode = null;
+        msSettingsName = null;
         mbDeleted = false;
         mbSystem = false;
         mnFkUserInsertId = 0;
@@ -136,7 +140,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
             mnPkCustomSalesReportId = resultSet.getInt("id_custom_rep");
             msReportKey = resultSet.getString("rep_key");
             msName = resultSet.getString("name");
-            msSettings = resultSet.getString("settings");
+            msSettingsCode = resultSet.getString("settings_code");
+            msSettingsName = resultSet.getString("settings_name");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -164,7 +169,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
                     mnPkCustomSalesReportId + ", " + 
                     "'" + msReportKey + "', " + 
                     "'" + msName + "', " + 
-                    "'" + msSettings + "', " + 
+                    "'" + msSettingsCode + "', " + 
+                    "'" + msSettingsName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -179,7 +185,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
                     //"id_custom_rep = " + mnPkCustomSalesReportId + ", " +
                     //"rep_key = '" + msReportKey + "', " +
                     "name = '" + msName + "', " +
-                    "settings = '" + msSettings + "', " +
+                    "settings_code = '" + msSettingsCode + "', " +
+                    "settings_name = '" + msSettingsName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -201,7 +208,8 @@ public class SDbCustomerReport extends SDbRegistryUser {
         registry.setPkCustomSalesReportId(this.getPkCustomSalesReportId());
         registry.setReportKey(this.getReportKey());
         registry.setName(this.getName());
-        registry.setSettings(this.getSettings());
+        registry.setSettingsCode(this.getSettingsCode());
+        registry.setSettingsName(this.getSettingsName());
         registry.setDeleted(this.isDeleted());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
