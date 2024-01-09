@@ -32,7 +32,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
-import erp.mod.trn.form.SDialogRepFSC;
+import erp.mod.trn.form.SDialogCustomReportFsc;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
 import erp.mod.trn.form.SDialogSendMailContract;
@@ -2135,7 +2135,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
             }
             else if (item == jmiRepCustomReportFsc) {
-                new SDialogRepFSC((SGuiClient) miClient, SDataConstantsSys.TRNS_CT_DPS_SAL, "Reporte personalizado de ventas").setVisible(true);
+                new SDialogCustomReportFsc((SGuiClient) miClient, SDataConstantsSys.TRNS_CT_DPS_SAL, "Reporte personalizado de ventas").setVisible(true);
             }
             else if (item == jmiRepBackorderContract) {
                 showView(SDataConstants.TRNX_DPS_BACKORDER, SDataConstantsSys.TRNX_SAL_BACKORDER_CON, SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1]);
