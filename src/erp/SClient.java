@@ -283,7 +283,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfLoginTimestamp = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jlAppRelease = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        jlAppLogo = new javax.swing.JLabel();
         jMenuBar = new javax.swing.JMenuBar();
         jmFile = new javax.swing.JMenu();
         jmiFileCurrentDate = new javax.swing.JMenuItem();
@@ -591,12 +591,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jlAppRelease.setForeground(new java.awt.Color(0, 153, 153));
         jlAppRelease.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlAppRelease.setText("3.2 000.0");
-        jlAppRelease.setPreferredSize(new java.awt.Dimension(60, 20));
+        jlAppRelease.setPreferredSize(new java.awt.Dimension(75, 20));
         jPanel4.add(jlAppRelease);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/swap_logo_9.jpg"))); // NOI18N
-        jLabel1.setToolTipText("www.swaplicado.com.mx");
-        jPanel4.add(jLabel1);
+        jlAppLogo.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlAppLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/swap_logo_9.jpg"))); // NOI18N
+        jlAppLogo.setToolTipText("www.swaplicado.com.mx");
+        jlAppLogo.setPreferredSize(new java.awt.Dimension(80, 20));
+        jPanel4.add(jlAppLogo);
 
         jPanel3.add(jPanel4, java.awt.BorderLayout.EAST);
 
@@ -1658,7 +1660,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup jButtonGroup;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -1668,6 +1669,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton jbCurrentDate;
     private javax.swing.JButton jbSession;
+    private javax.swing.JLabel jlAppLogo;
     private javax.swing.JLabel jlAppRelease;
     private javax.swing.JLabel jlLogo;
     private javax.swing.JMenu jmFile;
