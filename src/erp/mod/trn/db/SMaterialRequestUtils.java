@@ -441,7 +441,7 @@ public abstract class SMaterialRequestUtils {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
                                 + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
                                 + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
-                                + "AND a.fid_st_item = 1 "
+                                + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " " 
                                 + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
                                 + "ORDER BY a.item_key, a.item, a.id_item, a.part_num ";
@@ -453,7 +453,7 @@ public abstract class SMaterialRequestUtils {
                                 + "a.b_inv AS " + ITEM_INV + " "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
                                 + "WHERE NOT a.b_del "
-                                + "AND a.fid_st_item = 1 ";
+                                + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " ";
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
