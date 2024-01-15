@@ -102,7 +102,7 @@ public class SDbQltyAnalysisType extends SDbRegistryUser implements java.io.Seri
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkAnalysisTypeId = resultSet.getInt("id_analysis_type");
+            mnPkAnalysisTypeId = resultSet.getInt("id_tp_analysis");
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -164,12 +164,12 @@ public class SDbQltyAnalysisType extends SDbRegistryUser implements java.io.Seri
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_analysis_type = " + mnPkAnalysisTypeId ;
+        return "WHERE id_tp_analysis = " + mnPkAnalysisTypeId ;
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_analysis_type = " + pk[0] ;
+        return "WHERE id_tp_analysis = " + pk[0] ;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class SDbQltyAnalysisType extends SDbRegistryUser implements java.io.Seri
 
         mnPkAnalysisTypeId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_analysis_type), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_tp_analysis), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkAnalysisTypeId = resultSet.getInt(1);

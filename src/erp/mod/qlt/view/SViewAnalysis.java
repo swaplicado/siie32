@@ -65,7 +65,7 @@ public class SViewAnalysis extends SGridPaneView implements ActionListener {
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON "
-                + " v.fk_tp_analysis_id = ta.id_analysis_type "
+                + " v.fk_tp_analysis_id = ta.id_tp_analysis "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
