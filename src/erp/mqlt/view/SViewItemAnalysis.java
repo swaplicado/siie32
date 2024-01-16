@@ -154,7 +154,7 @@ public class SViewItemAnalysis extends erp.lib.table.STableTab implements java.a
                 + "    FROM " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS_ITEM) + " AS qai "
                 + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON qai.id_item = i.id_item "
                 + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS a ON qai.id_analysis = a.id_analysis "
-                + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON a.fk_tp_analysis_id = ta.id_analysis_type "
+                + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON a.fk_tp_analysis_id = ta.id_tp_analysis "
                 + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON qai.fid_usr_new = un.id_usr "
                 + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ue ON qai.fid_usr_edit = ue.id_usr "
                 + "    INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ud ON qai.fid_usr_del = ud.id_usr "

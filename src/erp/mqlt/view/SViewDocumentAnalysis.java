@@ -58,7 +58,7 @@ public class SViewDocumentAnalysis extends erp.lib.table.STableTab implements ja
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num", "Num", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ser", "Serie", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ref", "Referencia", STableConstants.WIDTH_ITEM_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fceha", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc", "Fecha Doc.", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", STableConstants.WIDTH_ITEM_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "concept_key", "Clave", STableConstants.WIDTH_CODE_DOC);

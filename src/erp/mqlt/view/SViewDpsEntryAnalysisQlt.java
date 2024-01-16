@@ -175,7 +175,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "        INNER JOIN "
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " qa ON v.fid_analysis_id = qa.id_analysis "
                 + "        INNER JOIN "
-                + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " qta ON qa.fk_tp_analysis_id = qta.id_analysis_type "
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " qta ON qa.fk_tp_analysis_id = qta.id_tp_analysis "
                 + "        INNER JOIN "
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.USRU_USR) + " AS un ON v.fid_usr_new = un.id_usr "
                 + "        INNER JOIN "

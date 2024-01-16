@@ -161,7 +161,7 @@ public class SViewAnalysisItem extends erp.lib.table.STableTab {
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS a ON v.id_analysis = a.id_analysis "
                 + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON a.fk_tp_analysis_id = ta.id_analysis_type "
+                + "    " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON a.fk_tp_analysis_id = ta.id_tp_analysis "
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON v.fid_usr_new = un.id_usr "
                 + "        INNER JOIN "
