@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 234.2/ 2024-01-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de ajuste al CFDI con complemento de recepción de pagos para expresar la equivalencia del documento relacionado a con diez decimales cuando la moneda del pago es la misma que la del documento.
+2) Adecuación del reporte de empleados activos por período para facilitar su exportación a Excel.
+
+================================================================================
 SIIE 3.2 234.1/ 2024-01-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

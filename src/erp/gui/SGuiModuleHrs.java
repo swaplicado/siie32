@@ -521,6 +521,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepPayrollEarDedFileCsv);
         jmRep.addSeparator();
         jmRep.add(jmiRepEmployeeActive);
+        jmRep.addSeparator();
         jmRep.add(jmiRepHireLogByPeriodActive);
         jmRep.add(jmiRepHireLogByPeriodInactive);
         jmRep.add(jmiRepPtu);
