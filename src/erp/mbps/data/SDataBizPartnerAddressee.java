@@ -346,34 +346,72 @@ public class SDataBizPartnerAddressee extends erp.lib.data.SDataRegistry impleme
         setFkCountryId_n(address.getFkCountryId_n());
         setFkStateId_n(address.getFkStateId_n());
     }
+    
     /**
-     * Creates element root for International Commerce addressee for business partner indicated.
-     * @param cfdiVersion CFDI version (3.3 only supported).
-     * @return cfd.ver3.cce11.DElementDestinatario node for International Commerce receptor.
+     * Creates element root for International Commerce Addressee 1.1 for business partner indicated.
+     * @param cfdiVersion CFDI version (3.3 & 4.0 supported).
+     * @return cfd.ver3.cce11.DElementDestinatario node for International Commerce Addressee 1.1.
      * @throws java.lang.Exception 
      */
-    public cfd.ver3.cce11.DElementDestinatario createRootElementDestinatarioIntCommerce(double cfdiVersion) throws java.lang.Exception {
+    public cfd.ver3.cce11.DElementDestinatario createRootElementDestinatarioIntCommerce11(double cfdiVersion) throws java.lang.Exception {
         cfd.ver3.cce11.DElementDestinatario destinatario = null;
 
-        if (cfdiVersion == DCfdConsts.CFDI_VER_33) {
+        if (cfdiVersion == DCfdConsts.CFDI_VER_40 || cfdiVersion == DCfdConsts.CFDI_VER_33) {
             destinatario = new cfd.ver3.cce11.DElementDestinatario();
 
             destinatario.getAttNumRegIdTrib().setString(msFiscalId);
             destinatario.getAttNombre().setString(msName);
 
-            destinatario.getEltDomicilio().getAttCalle().setString(msStreet);
-            destinatario.getEltDomicilio().getAttNoExterior().setString(msStreetNumberExt);
-            destinatario.getEltDomicilio().getAttNoInterior().setString(msStreetNumberInt);
-            destinatario.getEltDomicilio().getAttColonia().setString(msNeighborhood);
-            destinatario.getEltDomicilio().getAttLocalidad().setString(msLocality);
-            destinatario.getEltDomicilio().getAttReferencia().setString(msReference);
-            destinatario.getEltDomicilio().getAttMunicipio().setString(msCounty);
-            destinatario.getEltDomicilio().getAttEstado().setString(!msDbmsStateCode.isEmpty() ? msDbmsStateCode : msState);
-            destinatario.getEltDomicilio().getAttCodigoPostal().setString(msZipCode);
-            destinatario.getEltDomicilio().getAttPais().setString(msDbmsCountryCode);
+            cfd.ver3.cce11.DElementTipoDomicilioInt domicilio = destinatario.getEltDomicilio(); // convenience variable, object already exists!
+            
+            domicilio.getAttCalle().setString(msStreet);
+            domicilio.getAttNoExterior().setString(msStreetNumberExt);
+            domicilio.getAttNoInterior().setString(msStreetNumberInt);
+            domicilio.getAttColonia().setString(msNeighborhood);
+            domicilio.getAttLocalidad().setString(msLocality);
+            domicilio.getAttReferencia().setString(msReference);
+            domicilio.getAttMunicipio().setString(msCounty);
+            domicilio.getAttEstado().setString(!msDbmsStateCode.isEmpty() ? msDbmsStateCode : msState);
+            domicilio.getAttCodigoPostal().setString(msZipCode);
+            domicilio.getAttPais().setString(msDbmsCountryCode);
         }
-        else if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        else {
+            throw new Exception("La versión de CFDI no puede ser anterior a la 3.3.");
+        }
+
+        return destinatario;
+    }
+    
+    /**
+     * Creates element root for International Commerce Addressee 2.0 for business partner indicated.
+     * @param cfdiVersion CFDI version (only 4.0 supported).
+     * @return cfd.ver4.cce20.DElementDestinatario node for International Commerce Addressee 2.0.
+     * @throws java.lang.Exception 
+     */
+    public cfd.ver4.cce20.DElementDestinatario createRootElementDestinatarioIntCommerce20(double cfdiVersion) throws java.lang.Exception {
+        cfd.ver4.cce20.DElementDestinatario destinatario = null;
+
+        if (cfdiVersion == DCfdConsts.CFDI_VER_40) {
+            destinatario = new cfd.ver4.cce20.DElementDestinatario();
+
+            destinatario.getAttNumRegIdTrib().setString(msFiscalId);
+            destinatario.getAttNombre().setString(msName);
+
+            cfd.ver4.cce20.DElementTipoDomicilioInt domicilio = destinatario.getEltDomicilio(); // convenience variable, object already exists!
+            
+            domicilio.getAttCalle().setString(msStreet);
+            domicilio.getAttNoExterior().setString(msStreetNumberExt);
+            domicilio.getAttNoInterior().setString(msStreetNumberInt);
+            domicilio.getAttColonia().setString(msNeighborhood);
+            domicilio.getAttLocalidad().setString(msLocality);
+            domicilio.getAttReferencia().setString(msReference);
+            domicilio.getAttMunicipio().setString(msCounty);
+            domicilio.getAttEstado().setString(!msDbmsStateCode.isEmpty() ? msDbmsStateCode : msState);
+            domicilio.getAttCodigoPostal().setString(msZipCode);
+            domicilio.getAttPais().setString(msDbmsCountryCode);
+        }
+        else {
+            throw new Exception("La versión de CFDI no puede ser anterior a la 4.0.");
         }
 
         return destinatario;
