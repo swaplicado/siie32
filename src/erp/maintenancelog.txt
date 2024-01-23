@@ -1,4 +1,18 @@
 ================================================================================
+SIIE 3.2 235.1/ 2024-01-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de emisión de CFDI de nóminas con el domicilio fiscal del empleado.
+2) Implementación exclusión del atributo Total Sueldos del CFDI de nóminas cuando todas las percepciones del recibo no son sueldos o equivalentes.
+
+================================================================================
+SIIE 3.2 235.0/ 2024-01-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de Complemento Comercio Exterior versión 2.0, vigente a partir del 18/01/2024.
+2) Implementación de la captura del código postal fiscal del empleado independiente al código postal de su domicilio actual.
+
+================================================================================
 SIIE 3.2 234.2/ 2024-01-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -49,6 +49,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected String msNumber;
     protected String msLastname1;
     protected String msLastname2;
+    protected String msZipCode;
     protected String msSocialSecurityNumber;
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
@@ -195,6 +196,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setNumber(String s) { msNumber = s; }
     public void setLastname1(String s) { msLastname1 = s; }
     public void setLastname2(String s) { msLastname2 = s; }
+    public void setZipCode(String s) { msZipCode = s; }
     public void setSocialSecurityNumber(String s) { msSocialSecurityNumber = s; }
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
@@ -265,6 +267,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public String getNumber() { return msNumber; }
     public String getLastname1() { return msLastname1; }
     public String getLastname2() { return msLastname2; }
+    public String getZipCode() { return msZipCode; }
     public String getSocialSecurityNumber() { return msSocialSecurityNumber; }
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
@@ -445,6 +448,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         msNumber = "";
         msLastname1 = "";
         msLastname2 = "";
+        msZipCode = "";
         msSocialSecurityNumber = "";
         mtDateBirth = null;
         mtDateBenefits = null;
@@ -534,6 +538,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 msNumber = resultSet.getString("num");
                 msLastname1 = resultSet.getString("lastname1");
                 msLastname2 = resultSet.getString("lastname2");
+                msZipCode = resultSet.getString("zip_code");
                 msSocialSecurityNumber = resultSet.getString("ssn");
                 mtDateBirth = resultSet.getDate("dt_bir");
                 mtDateBenefits = resultSet.getDate("dt_ben");
@@ -688,6 +693,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + msNumber + "', " +
                         "'" + msLastname1 + "', " + 
                         "'" + msLastname2 + "', " + 
+                        "'" + msZipCode + "', " + 
                         "'" + msSocialSecurityNumber + "', " +
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
@@ -749,6 +755,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "num = '" + msNumber + "', " +
                         "lastname1 = '" + msLastname1 + "', " +
                         "lastname2 = '" + msLastname2 + "', " +
+                        "zip_code = '" + msZipCode + "', " +
                         "ssn = '" + msSocialSecurityNumber + "', " +
                         "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                         "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +

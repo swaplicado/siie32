@@ -12,6 +12,8 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
+import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbEmployee;
 import erp.mtrn.data.SCfdUtils;
 import sa.lib.SLibUtils;
 
@@ -29,8 +31,10 @@ public class SDbCfdBizPartner {
     protected int mnIssuingBizPartnerId;
     protected int mnIssuingBizPartnerBranchId;
     protected String msZipCodeHq;
+    protected String msZipCodeEmployee;
     protected boolean mbIsIssuer;
     protected boolean mbIsIssueForIntCommerce;
+    protected boolean mbIsIssueForPayroll;
     
     public SDbCfdBizPartner(SClientInterface client) {
         miClient = client;
@@ -40,8 +44,10 @@ public class SDbCfdBizPartner {
         mnIssuingBizPartnerId = 0;
         mnIssuingBizPartnerBranchId = 0;
         msZipCodeHq = "";
+        msZipCodeEmployee = "";
         mbIsIssuer = false;
         mbIsIssueForIntCommerce = false;
+        mbIsIssueForPayroll = false;
     }
     
     public void setBizPartnerIds(final int bizPartnerId, final int bizPartnerBranchId) {
@@ -64,7 +70,11 @@ public class SDbCfdBizPartner {
         mbIsIssueForIntCommerce = isIssueForIntCommerce;
     }
     
-    public SCfdDataBizPartner getCfdDataBizPartner() throws Exception {
+    public void setIssueForPayroll(final boolean isIssueForPayroll) {
+        mbIsIssueForPayroll = isIssueForPayroll;
+    }
+    
+    public SCfdDataBizPartner createCfdDataBizPartner() throws Exception {
         SCfdDataBizPartner cfdBizPartner = null;
         
         try {
@@ -106,6 +116,11 @@ public class SDbCfdBizPartner {
                     else {
                         bizPartnerBranchAddress = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial();
                         msZipCodeHq = bizPartnerBranchAddress.getZipCode();
+                        
+                    }
+                    
+                    if (mbIsIssueForPayroll) {
+                        msZipCodeEmployee = (String) miClient.getSession().readField(SModConsts.HRSU_EMP, new int[] { mnBizPartnerId }, SDbEmployee.FIELD_ZIP_CODE);
                     }
                     
                     if (bizPartnerBranchAddress == null) {
@@ -142,6 +157,7 @@ public class SDbCfdBizPartner {
                         cfdBizPartner.setBizPartnerStateName(bizPartnerBranchAddress.getState());
                         cfdBizPartner.setBizPartnerZipCode(bizPartnerBranchAddress.getZipCode());
                         cfdBizPartner.setBizPartnerZipCodeHq(msZipCodeHq);
+                        cfdBizPartner.setBizPartnerZipCodeEmployee(msZipCodeEmployee);
                         cfdBizPartner.setBizPartnerPoBox(bizPartnerBranchAddress.getPoBox());
                         cfdBizPartner.setBizPartnerCountryCode(bizPartnerBranchAddress.getDbmsDataCountry().getCountryCode());
                         cfdBizPartner.setBizPartnerCountryName(bizPartnerBranchAddress.getDbmsDataCountry().getCountry());
