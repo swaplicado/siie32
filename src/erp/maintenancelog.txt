@@ -57,8 +57,8 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 232.5/ 2024-01-03
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Funcionalidad para cambiar ítems de referencia y CC en DPS y Pólizas contables
-2) Se omite filtro de status en compras para mostrar las RM cotizadas
+1) Funcionalidad para cambiar ítems de referencia y CC en DPS y pólizas contables.
+2) Se omite filtro de status en compras para mostrar las RM cotizadas.
 
 ================================================================================
 SIIE 3.2 232.4/ 2024-01-02
@@ -121,7 +121,7 @@ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Implementación de equivalencias de unidades en requisiciones de materiales, vinculación con documentos de compra.
 2) Implementación de la unidad comercial opcional para los ítems, en caso de que la tengan, se pone por defecto en el DPS.
-3) Corrección en las vistas y formas de captura para unificar la unidad y unidad original de RM, DPS y DIOGs
+3) Corrección en las vistas y formas de captura para unificar la unidad y unidad original de RM, DPS y DIOG.
 
 ================================================================================
 SIIE 3.2 230.0*/ 2023-12-14
@@ -141,7 +141,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 228.4/ 2023-12-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Cardex de documentos relacionados con las RM.
+1) Cárdex de documentos relacionados con las RM.
 
 ================================================================================
 SIIE 3.2 228.3/ 2023-12-05
@@ -153,16 +153,16 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 228.2/ 2023-12-05
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Se corrigen las notas de crédito cuando se quieren aplicar a facturas de monedas en moneda extrangera 
+1) Se corrigen las notas de crédito cuando se quieren aplicar a facturas de monedas en moneda extrangera.
 
 ================================================================================
 SIIE 3.2 228.1/ 2023-12-05
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega funcionalidad para cerrar RM para surtido.
-2) Se agregan cambios de estatus en RM por suministrar y por comprar
-3) Se modifica el email origen para las solicitudes de cotización de las RM
-4) Reordenamiento de columnas en la importación de partidas de RM
+2) Se agregan cambios de estatus en RM por suministrar y por comprar.
+3) Se modifica el email origen para las solicitudes de cotización de las RM.
+4) Reordenamiento de columnas en la importación de partidas de RM.
 
 ================================================================================
 SIIE 3.2 228.0/ 2023-12-04
@@ -181,25 +181,25 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 226.1/ 2023-11-21
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Implementación para diferenciar de los ítems inventariables y de los no inventariables en el dialogo de picker en las RM.
+1) Implementación para diferenciar de los ítems inventariables y de los no inventariables en el dialogo picker de las RM.
 
 ================================================================================
 SIIE 3.2 226.0/ 2023-11-16
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementar la captura de texto opcional en el pase "hacia adelante" o "hacia atrás" en el cambio de estatus de las RM.
-2) Implementar kardex de status
+2) Implementar cárdex de status de RM.
 3) Refactorización del nombre del campo "comentarios a notas".
-4) Validación de no permitir suministrar, cotizar, o vincular partidas con ítem nuevo.
+4) Validación de no permitir suministrar, cotizar, o vincular partidas con ítems nuevos.
 
 ================================================================================
 SIIE 3.2 225.7/ 2023-11-16
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
-2) Filtro de partidas de RM
+2) Filtro de partidas de RM.
 3) Reetiquetado de las requisiciones de suministro a resurtido.
-4) Se quito el filtro en la forma de selección de centros de costo para las requisiciones de resurtido.
+4) Remoción del filtro en la forma de selección de centros de costo para las requisiciones de resurtido.
 5) Correcciones en la pantalla de configuración de grupos de centros de costo vs. usuarios.
 6) Reestructuración de los botones en la partida de requisiciones de materiales.
 7) Se habilitó el campo "Ítem nuevo" y se creó la funcionalidad para asignarle el ítem correspondiente cuando se es suministrador o comprador. 
@@ -208,7 +208,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 225.6/ 2023-11-09
 Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Actualización de montos al importar requisiciones de materiales
+1) Actualización de montos al importar requisiciones de materiales.
 2) Cambios al formato de impresión de la requisición de materiales.
 3) Adición del campo de número de parte en las partidas en la forma de requisiciones de materiales.
 4) Refactorización general en las búsquedas de las vistas.
@@ -259,7 +259,7 @@ SIIE 3.2 224.1/ 2023-10-18
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Creación de catálogos de tipos de materiales y atributos.
-2) Creación de catálogo de configuración de tipo de material vs atributos.
+2) Creación de catálogo de configuración de tipo de material vs. atributos.
 
 ================================================================================
 SIIE 3.2 224.0/ 2023-10-13
@@ -268,8 +268,8 @@ Edwin Omar CARMONA FIGUEROA
 1) Creación de de tipos de material.
 2) Creación de atributos de materiales.
 3) Creación de tipos de materiales vs atributos de materiales.
-4) Creación de tabla de item vs atributos de materiales.
-6) Modificación de ítems para agregar fk de tipo de material y sus atributos
+4) Creación de tabla de item vs. atributos de materiales.
+6) Modificación de ítems para agregar referencia foránea de tipo de material y sus atributos.
 
 ================================================================================
 SIIE 3.2 223.3/ 2023-10-20
@@ -281,7 +281,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 223.2/ 2023-10-16
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Correcciones en las configuraciones para requisiciones.
+1) Correcciones en las configuraciones para requisiciones de materiales.
 
 ================================================================================
 SIIE 3.2 223.1/ 2023-10-13
@@ -328,7 +328,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 217.6/ 2023-08-10
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Corrección en la generación de cfdi con impuesto exento.
+1) Corrección en la generación de CFDI con IVA exento.
 
 ================================================================================
 SIIE 3.2 217.5/ 2023-08-08
@@ -389,7 +389,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 216.0/ 2023-07-14
 Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Creación de las requisiciones de materiales en em módulo de inventarios.
+1) Creación de las requisiciones de materiales en el módulo de inventarios.
 
 ================================================================================
 SIIE 3.2 214.3/ 2023-07-21
@@ -488,7 +488,7 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Mejoramiento en el truncado para calcular el nodo pagosP de los CFDIs de recepción de pagos.
 2) Corrección en la generación de CFDI con impuesto IVA exento.
-3) Corrección al método read de la clase erp.mfin.data.SDataExchangeRate
+3) Corrección al método read() de la clase erp.mfin.data.SDataExchangeRate.
 
 ================================================================================
 SIIE 3.2 209.7/ 2023-03-10
