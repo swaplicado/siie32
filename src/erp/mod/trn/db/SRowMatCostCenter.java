@@ -40,7 +40,7 @@ public class SRowMatCostCenter implements SGridRow, Serializable {
 
     @Override
     public String getRowName() {
-        return "";
+        return moDataCostCenter.getCostCenter();
     }
 
     @Override

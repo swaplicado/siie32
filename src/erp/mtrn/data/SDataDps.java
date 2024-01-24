@@ -2962,6 +2962,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         else {
                             dpsEntry.setSortingPosition(++nSortingPosition);
                         }
+                        
+                        if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
+                            dpsEntry.setXtaIsPurInv(true);
+                        }
 
                         if (dpsEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);

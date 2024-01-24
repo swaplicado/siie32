@@ -314,6 +314,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatViewIntegralCustomers = new JMenuItem("Vista integral de clientes");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
+        jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
+        jmiCatCfdiStampAvailable = new JMenuItem("Timbres disponibles");
+        jmiCatCfdiStampSign = new JMenuItem("CFDI timbrados");
+        jmiCatCfdiStampSignPending = new JMenuItem("CFDI por timbrar");
+        jmiCatCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -322,11 +327,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatViewIntegralCustomers);
         jmCat.addSeparator();
         jmCat.add(jmCatCfg);
-        jmCatCfdi = new JMenu("Comprobantes fiscales digitales");
-        jmiCatCfdiStampAvailable = new JMenuItem("Timbres disponibles");
-        jmiCatCfdiStampSign = new JMenuItem("CFDI timbrados");
-        jmiCatCfdiStampSignPending = new JMenuItem("CFDI por timbrar");
-        jmiCatCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
         jmCatCfdi.add(jmiCatCfdiStampAvailable);
         jmCatCfdi.add(jmiCatCfdiStampSign);
         jmCatCfdi.add(jmiCatCfdiStampSignPending);

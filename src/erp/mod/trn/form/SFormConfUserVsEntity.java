@@ -1019,6 +1019,14 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             }
         }
         
+        if (validation.isValid() && (maMatConsEntSelected.isEmpty() || maMatConsSubentSelected.isEmpty())) {
+            validation.setMessage("Se debe de configurar al menos una entidad o subentidad de consumo.");
+        }
+        
+        if (validation.isValid() && maMatProvEntSelected.isEmpty()) {
+            validation.setMessage("Se debe de configurar al menos una entidad de suministro.");
+        }
+        
         return validation;
     }
 

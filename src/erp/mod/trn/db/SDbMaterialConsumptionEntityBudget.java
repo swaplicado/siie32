@@ -172,7 +172,7 @@ public class SDbMaterialConsumptionEntityBudget extends SDbRegistryUser {
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     //"id_mat_cons_ent = " + mnPkMatConsumptionEntityId + ", " +
                     //"id_year = " + mnPkYearId + ", " +
-                    //"id_period = " + mnPkPeriodId + ", " +
+                    "id_period = " + mnPkPeriodId + ", " +
                     "dt_start = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     "budget = " + mdBudget + ", " +
