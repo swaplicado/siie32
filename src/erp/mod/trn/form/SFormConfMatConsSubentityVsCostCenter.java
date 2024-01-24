@@ -39,7 +39,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private ArrayList<SDbMaterialConsumptionSubentityCostCenter> maMatConsumptionSubCC;
 
     /**
-     * Creates new form SFormConfEmployeeVsEntity
+     * Creates new form SFormConfMatConsSubentityVsCostCenter
      * @param client
      * @param title
      */
@@ -150,23 +150,52 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
         jpCommandRight.remove(jbReadInfo);
     }
     
+    private SGuiValidation validateCCNotRepeat() {
+        SGuiValidation validation = new SGuiValidation();
+        
+        try {
+            for (SRowMatCostCenter cc : maMatCostCenter) {
+                if (validation.isValid() && cc.getIsSelected()) {
+                    String sql = "SELECT ce.name centro, cs.name subcentro FROM trn_mat_cons_subent_cc AS cc "
+                            + "INNER JOIN trn_mat_cons_ent AS ce ON cc.id_mat_cons_ent = ce.id_mat_cons_ent "
+                            + "INNER JOIN trn_mat_cons_subent AS cs ON cc.id_mat_cons_ent = cs.id_mat_cons_ent AND cc.id_mat_cons_subent = cs.id_mat_cons_subent "
+                            + "WHERE cc.id_mat_cons_ent <> " + moRegistry.getPkConsumptionEntity() + " "
+                            + "AND cc.id_mat_cons_subent <> " + moRegistry.getPkConsumptionSubentity() + " "
+                            + "AND cc.id_cc = " + cc.getRowPrimaryKey()[0];
+                    try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                        if (resultSet.next()) {
+                            validation.setMessage("El centro de costo \"" + cc.getRowName() + "\" no puede ser asignado debido a que ya fue previamente asignado.\n"
+                                    + "Subcentro de consumo: " + resultSet.getString("subcentro") + "\nCentro de consumo: " + resultSet.getString("centro"));
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+        
+        return validation;
+    }
+    
     private void readCostCenters() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
             String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE (lev = (SELECT MAX(lev) FROM fin_cc) AND NOT b_del) OR pk_cc = 1 ORDER BY id_cc";
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                boolean found = false;
-                for (SDbMaterialConsumptionSubentityCostCenter ee : maMatConsumptionSubCC) {
-                    if (resultSet.getInt("pk_cc") == ee.getPkCostCenterId()) {
-                        found = true;
-                        break;
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    boolean found = false;
+                    for (SDbMaterialConsumptionSubentityCostCenter ee : maMatConsumptionSubCC) {
+                        if (resultSet.getInt("pk_cc") == ee.getPkCostCenterId()) {
+                            found = true;
+                            break;
+                        }
                     }
+                    SRowMatCostCenter row = new SRowMatCostCenter();
+                    row.readDataCostCenter(resultSet.getString("id_cc"), miClient.getSession());
+                    row.setSelected(found);
+                    maMatCostCenter.add(row);
                 }
-                SRowMatCostCenter row = new SRowMatCostCenter();
-                row.readDataCostCenter(resultSet.getString("id_cc"), miClient.getSession());
-                row.setSelected(found);
-                maMatCostCenter.add(row);
             }
         }
         catch (Exception e) {
@@ -218,6 +247,8 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
             maMatConsumptionSubCC.add(ee);
         }
         
+        jtfRegistryKey.setText("");
+        
         readCostCenters();
         
         populateGrid();
@@ -245,6 +276,10 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            validation = validateCCNotRepeat();
+        }
         
         return validation;
     }

@@ -31,6 +31,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnNumber;
     protected Date mtDate;
     protected Date mtDateRequest_n;
+    protected Date mtDateDelivery_n;
     protected String msReference;
     protected double mdTotal_r;
     protected boolean mbExternalSystem;
@@ -93,6 +94,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setNumber(int n) { mnNumber = n; }
     public void setDate(Date t) { mtDate = t; }
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
+    public void setDateDelivery_n(Date t) { mtDateDelivery_n = t; }
     public void setReference(String s) { msReference = s; }
     public void setTotal_r(double d) { mdTotal_r = d; }
     public void setExternalSystem(boolean b) { mbExternalSystem = b; }
@@ -140,6 +142,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getNumber() { return mnNumber; }
     public Date getDate() { return mtDate; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
+    public Date getDateDelivery_n() { return mtDateDelivery_n; }
     public String getReference() { return msReference; }
     public double getTotal_r() { return mdTotal_r; }
     public boolean isExternalSystem() { return mbExternalSystem; }
@@ -228,6 +231,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnNumber = 0;
         mtDate = null;
         mtDateRequest_n = null;
+        mtDateDelivery_n = null;
         msReference = "";
         mdTotal_r = 0;
         mbExternalSystem = false;
@@ -327,6 +331,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnNumber = resultSet.getInt("num");
             mtDate = resultSet.getDate("dt");
             mtDateRequest_n = resultSet.getDate("dt_req_n");
+            mtDateDelivery_n = resultSet.getDate("dt_delivery_n");
             msReference = resultSet.getString("ref");
             mdTotal_r = resultSet.getDouble("tot_r");
             mbExternalSystem = resultSet.getBoolean("b_ext_sys");
@@ -480,6 +485,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
+                    (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") + 
                     "'" + msReference + "', " + 
                     mdTotal_r + ", " + 
                     (mbExternalSystem ? 1 : 0) + ", " + 
@@ -534,6 +540,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "num = " + mnNumber + ", " +
                     "dt = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
+                    "dt_delivery_n = " + (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") +
                     "ref = '" + msReference + "', " +
                     "tot_r = " + mdTotal_r + ", " +
                     "b_ext_sys = " + (mbExternalSystem ? 1 : 0) + ", " +
@@ -709,6 +716,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setNumber(this.getNumber());
         registry.setDate(this.getDate());
         registry.setDateRequest_n(this.getDateRequest_n());
+        registry.setDateDelivery_n(this.getDateDelivery_n());
         registry.setReference(this.getReference());
         registry.setTotal_r(this.getTotal_r());
         registry.setExternalSystem(this.isExternalSystem());

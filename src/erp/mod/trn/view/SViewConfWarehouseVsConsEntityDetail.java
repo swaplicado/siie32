@@ -44,7 +44,7 @@ public class SViewConfWarehouseVsConsEntityDetail extends SGridPaneView {
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(false);
         
-        msSql = "SELECT v.id_mat_prov_ent AS " + SDbConsts.FIELD_ID + "1, "
+        msSql = "SELECT v.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_cob AS " + SDbConsts.FIELD_ID + "2, "
                 + "v.id_whs AS " + SDbConsts.FIELD_ID + "3, "
                 + "j.name AS entidad, "
@@ -55,7 +55,7 @@ public class SViewConfWarehouseVsConsEntityDetail extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_WHS) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS j ON "
-                + "v.id_mat_prov_ent = j.id_mat_prov_ent "
+                + "v.id_mat_cons_ent = j.id_mat_cons_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS c ON " 
                 + "v.id_cob = c.id_cob AND v.id_whs = id_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
@@ -69,7 +69,7 @@ public class SViewConfWarehouseVsConsEntityDetail extends SGridPaneView {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Almacén"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         

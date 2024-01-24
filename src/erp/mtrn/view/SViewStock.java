@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña, Isabel Servín
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -141,6 +141,14 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
                 aoTableColumns = new STableColumn[12];
                 break;
+            
+            case SDataConstants.TRNX_STK_COMM_PRICE:
+                i = 0;
+                aoKeyFields = new STableField[2];
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+                aoTableColumns = new STableColumn[11];
+                break;
                 
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -193,13 +201,17 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         mnColStock = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH) {
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH || mnTabTypeAux01 == SDataConstants.TRNX_STK_COMM_PRICE) {
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_seg", "Segregadas", STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_avble", "Disponibles", STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_COMM_PRICE){
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "price", "Precio comercial", STableConstants.WIDTH_QUANTITY_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "comm_val", "Valor comercial", STableConstants.WIDTH_QUANTITY_2X);
+        }
  
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -358,10 +370,12 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 segregationQuery + " AS f_stk_seg, " +
                 "(SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") AS f_stk_avble, " +
                 "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND NOT sx.b_del " +
-                ") AS f_val_u " +
+                ") AS f_val_u, " +
+                "pc.price, SUM(s.mov_in - s.mov_out) * pc.price AS comm_val " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
+                "LEFT JOIN itmu_price_comm_log AS pc ON i.id_item = pc.id_item AND u.id_unit = pc.id_unit AND NOT pc.b_del " +
                 (!showLots() ? "" : "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot ") +
                 (!showWarehouses() ? "" : "INNER JOIN erp.bpsu_bpb AS bpb ON s.id_cob = bpb.id_bpb INNER JOIN erp.cfgu_cob_ent AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent ") +
                 (!showWarehouses() ? "" : "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = bpb.id_bpb AND sc.id_wh = ent.id_ent ") +
