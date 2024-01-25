@@ -114,6 +114,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldLastname1;
     private erp.lib.form.SFormField moFieldLastname2;
     private erp.lib.form.SFormField moFieldFirstname;
+    private erp.lib.form.SFormField moFieldZipCode;
     private erp.lib.form.SFormField moFieldFiscalId;
     private erp.lib.form.SFormField moFieldAlternativeId;
     private erp.lib.form.SFormField moFieldSocialSecurityNumber;
@@ -258,6 +259,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel22 = new javax.swing.JPanel();
         jlFirstname = new javax.swing.JLabel();
         jtfFirstname = new javax.swing.JTextField();
+        jlZipCode = new javax.swing.JLabel();
+        jtfZipCode = new javax.swing.JTextField();
+        jlZipCodeHelp = new javax.swing.JLabel();
         jPanel29 = new javax.swing.JPanel();
         jlFiscalId = new javax.swing.JLabel();
         jtfFiscalId = new javax.swing.JTextField();
@@ -683,7 +687,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         });
         jPanel25.add(jtfLastname1);
 
-        jlLastname1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlLastname1.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlLastname1.setText("Apellido materno:*");
         jlLastname1.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlLastname1);
@@ -713,6 +717,20 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         });
         jPanel22.add(jtfFirstname);
 
+        jlZipCode.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlZipCode.setText("CP domicilio fiscal:*");
+        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlZipCode);
+
+        jtfZipCode.setText("00000");
+        jtfZipCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel22.add(jtfZipCode);
+
+        jlZipCodeHelp.setForeground(java.awt.Color.gray);
+        jlZipCodeHelp.setText("(Para CFDI de nóminas.)");
+        jlZipCodeHelp.setPreferredSize(new java.awt.Dimension(145, 23));
+        jPanel22.add(jlZipCodeHelp);
+
         jPanel19.add(jPanel22);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -740,7 +758,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         });
         jPanel29.add(jftAlternativeId);
 
-        jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlSocialSecurityNumber.setText("NSS:");
         jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel29.add(jlSocialSecurityNumber);
@@ -760,6 +778,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkBank_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jcbFkBank_n);
 
+        jlBankAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlBankAccount.setText("Cuenta bancaria:");
         jlBankAccount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlBankAccount);
@@ -779,6 +798,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkGroceryService.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel42.add(jcbFkGroceryService);
 
+        jlGroceryServiceAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlGroceryServiceAccount.setText("Cuenta despensa:");
         jlGroceryServiceAccount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel42.add(jlGroceryServiceAccount);
@@ -801,6 +821,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel6.add(jtfMailOwn);
 
         jlMailCorp.setForeground(new java.awt.Color(0, 102, 102));
+        jlMailCorp.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlMailCorp.setText("Correo-e empresa:");
         jlMailCorp.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlMailCorp);
@@ -1758,7 +1779,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel67.add(jtfBeneficiaries);
 
         jlBeneficiariesHellp.setForeground(java.awt.Color.gray);
-        jlBeneficiariesHellp.setText("Si son varios, indicar % individuales.");
+        jlBeneficiariesHellp.setText("(Si son varios, indicar % individuales.)");
         jlBeneficiariesHellp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel67.add(jlBeneficiariesHellp);
 
@@ -1768,7 +1789,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jpPersonalData.add(jPanel51, java.awt.BorderLayout.NORTH);
 
-        jpBranchAddress.setBorder(javax.swing.BorderFactory.createTitledBorder("Información del domicilio:"));
+        jpBranchAddress.setBorder(javax.swing.BorderFactory.createTitledBorder("Domicilio actual del empleado:"));
         jpBranchAddress.setLayout(new java.awt.BorderLayout());
 
         jpOficialAddress.setLayout(new java.awt.BorderLayout());
@@ -2456,6 +2477,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFirstname = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstname, jlFirstname);
         moFieldFirstname.setLengthMax(100);
         moFieldFirstname.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
+        moFieldZipCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfZipCode, jlZipCode);
+        moFieldZipCode.setLengthMax(5);
+        moFieldZipCode.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
         moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
@@ -2671,6 +2695,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldLastname1);
         mvFields.add(moFieldLastname2);
         mvFields.add(moFieldFirstname);
+        mvFields.add(moFieldZipCode);
         mvFields.add(moFieldFiscalId);
         mvFields.add(moFieldAlternativeId);
         mvFields.add(moFieldSocialSecurityNumber);
@@ -4136,6 +4161,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlVacTable;
     private javax.swing.JLabel jlWage;
     private javax.swing.JLabel jlWorkingHoursDay;
+    private javax.swing.JLabel jlZipCode;
+    private javax.swing.JLabel jlZipCodeHelp;
     private javax.swing.JPanel jpBenefits;
     private javax.swing.JPanel jpBenefitsAnnBon;
     private javax.swing.JPanel jpBenefitsAnnBon1;
@@ -4263,6 +4290,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JTextField jtfVacUnionized;
     private javax.swing.JTextField jtfWage;
     private javax.swing.JTextField jtfWorkingHoursDay;
+    private javax.swing.JTextField jtfZipCode;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -4706,6 +4734,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldLastname1.setFieldValue(moEmployee.getLastname1());
         moFieldLastname2.setFieldValue(moEmployee.getLastname2());
         moFieldFirstname.setFieldValue(moBizPartner.getFirstname());
+        moFieldZipCode.setFieldValue(moEmployee.getZipCode());
         computeBizPartner_Ro();
 
         moFieldNumber.setFieldValue(moEmployee.getNumber());
@@ -4993,6 +5022,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setNumber(moFieldNumber.getString());
         moEmployee.setLastname1(moFieldLastname1.getString());
         moEmployee.setLastname2(moFieldLastname2.getString());
+        moEmployee.setZipCode(moFieldZipCode.getString());
         moEmployee.setSocialSecurityNumber(moFieldSocialSecurityNumber.getString());
         moEmployee.setDateBirth(moFieldDateBirth.getDate());
         moEmployee.setDateBenefits(moFieldDateBenefits.getDate());

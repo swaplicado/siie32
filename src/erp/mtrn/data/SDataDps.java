@@ -28,13 +28,7 @@ import cfd.ext.interfactura.DElementFacturaInterfactura;
 import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
-import cfd.ver2.DAttributeOptionTipoDeComprobante;
-import cfd.ver3.cce11.DCce11Catalogs;
-import cfd.ver3.cce11.DElementDescripcionesEspecificas;
-import cfd.ver3.clf10.DElementLeyenda;
-import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver40.DCfdi40Catalogs;
-import cfd.ver40.DElementInformacionGlobal;
 import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -5513,6 +5507,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return payment;
     }
 
+    @Deprecated
     private cfd.DElement createCfdiNodeComplementoComercioExterior11() throws java.lang.Exception {
         cfd.ver3.cce11.DElementComercioExterior comercioExterior = null;
         
@@ -5569,7 +5564,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
                     mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
                     mercancia.getAttUnidadAduana().setString(customsUnit);
-                    if (customsUnit.equals(DCce11Catalogs.UA_SERV)) {
+                    if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
                         mercancia.getAttValorUnitarioAduana().setDouble(0.0);
                         mercancia.getAttValorDolares().setDouble(0.0);
                         comercioExterior.getAttTotalUSD().setDouble(
@@ -5583,7 +5578,92 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     
                     // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
                     if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
-                        DElementDescripcionesEspecificas descripcionesEspecificas = new DElementDescripcionesEspecificas();
+                        cfd.ver3.cce11.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver3.cce11.DElementDescripcionesEspecificas();
+                        descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
+                        mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
+                    }
+                    
+                    // add node Mercancia to complement:
+
+                    comercioExterior.getEltMercancias().addMercancia(mercancia);
+                }
+            }
+        }
+        
+        return comercioExterior;
+    }
+
+    private cfd.DElement createCfdiNodeComplementoComercioExterior20() throws java.lang.Exception {
+        cfd.ver4.cce20.DElementComercioExterior comercioExterior = null;
+        
+        if (moDbmsDataDpsCfd != null) {
+            comercioExterior = new cfd.ver4.cce20.DElementComercioExterior();
+            //comercioExterior.getAttMotivoTraslado().setString(...); // required only if comprobant type is "T" (traslado)
+            //comercioExterior.getAttTipoOperacion().setString(moDbmsDataDpsCfd.getCfdCceTipoOperacion()); // deprecated in version 2.0, since 2024-01-18
+            comercioExterior.getAttClaveDePedimento().setString(moDbmsDataDpsCfd.getCfdCceClaveDePedimento());
+            comercioExterior.getAttCertificadoOrigen().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen()));
+            comercioExterior.getAttNumCertificadoOrigen().setString(moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen());
+            comercioExterior.getAttNumeroExportadorConfiable().setString(moDbmsDataDpsCfd.getCfdCceNumeroExportadorConfiable());
+            comercioExterior.getAttIncoterm().setString(moDbmsDataDpsCfd.getCfdCceIncoterm());
+            //comercioExterior.getAttSubdivision().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision())); // deprecated in version 2.0, since 2024-01-18
+            //comercioExterior.getAttObservaciones(...); // optional, not implemented
+            comercioExterior.getAttTipoCambioUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()).doubleValue());
+            comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUsd()).doubleValue());
+            comercioExterior.setEltMercancias(new cfd.ver4.cce20.DElementMercancias());
+
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
+            
+            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                if (dpsEntry.isAccountable()) {
+                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
+                    }
+                    
+                    double valueMxn = SLibUtils.roundAmount((dpsEntry.getSubtotalCy_r() * mdExchangeRate));
+                    double valueUsd = SLibUtils.roundAmount((valueMxn / exr));
+                    
+                    // compose node Mercancia:
+                    
+                    cfd.ver4.cce20.DElementMercancia mercancia = new cfd.ver4.cce20.DElementMercancia();
+                    
+                    mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
+                    mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariff());
+                    
+                    double equivUnitOriginal;
+                    double equivUnitCustoms;
+                    String customsUnit;
+                    
+                    if (!dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        // special conversion required:
+                        equivUnitOriginal = dpsEntry.getDbmsOriginalUnitBaseEquivalence();
+                        equivUnitCustoms = dpsEntry.getDbmsItemCustomsUnitEquivalence();
+                        customsUnit = dpsEntry.getDbmsItemCustomsUnitSymbol();
+                    }
+                    else {
+                        // no special conversion needed:
+                        equivUnitOriginal = 1;
+                        equivUnitCustoms = 1;
+                        customsUnit = dpsEntry.getDbmsCustomsUnitSymbol();
+                    }
+                    
+                    double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
+                    mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
+                    mercancia.getAttUnidadAduana().setString(customsUnit);
+                    if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
+                        mercancia.getAttValorUnitarioAduana().setDouble(0.0);
+                        mercancia.getAttValorDolares().setDouble(0.0);
+                        comercioExterior.getAttTotalUSD().setDouble(
+                                new BigDecimal(String.valueOf(comercioExterior.getAttTotalUSD().getDouble())).subtract(
+                                new BigDecimal(String.valueOf(valueUsd))).doubleValue());
+                    }
+                    else {
+                        mercancia.getAttValorUnitarioAduana().setDouble(SLibUtils.roundAmount(valueUsd / quantityCustoms));
+                        mercancia.getAttValorDolares().setDouble(valueUsd);
+                    }
+                    
+                    // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
+                    if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
+                        cfd.ver4.cce20.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver4.cce20.DElementDescripcionesEspecificas();
                         descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
                         mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
                     }
@@ -5599,11 +5679,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private cfd.DElement createCfdiNodeComplementoLeyendasFiscales10() throws java.lang.Exception {
-        DElementLeyendasFiscales leyendasFiscales = new DElementLeyendasFiscales();
+        cfd.ver3.clf10.DElementLeyendasFiscales leyendasFiscales = new cfd.ver3.clf10.DElementLeyendasFiscales();
         
         for (SDataDpsNotes dpsNotes : mvDbmsDpsNotes) {
             if (dpsNotes.getIsCfdComplement() && !dpsNotes.getIsDeleted()) {
-                DElementLeyenda leyenda = new DElementLeyenda();
+                cfd.ver3.clf10.DElementLeyenda leyenda = new cfd.ver3.clf10.DElementLeyenda();
                 
                 leyenda.getAttDisposicionFiscal().setString(dpsNotes.getCfdComplementDisposition());
                 leyenda.getAttNorma().setString(dpsNotes.getCfdComplementRule());
@@ -5994,7 +6074,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int getComprobanteTipoDeComprobante() { // CFDI 3.2
-        return isDocument() ? DAttributeOptionTipoDeComprobante.CFD_INGRESO : DAttributeOptionTipoDeComprobante.CFD_EGRESO;
+        return isDocument() ? cfd.ver2.DAttributeOptionTipoDeComprobante.CFD_INGRESO : cfd.ver2.DAttributeOptionTipoDeComprobante.CFD_EGRESO;
     }
 
     @Override
@@ -6049,15 +6129,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public DElement getElementInformacionGlobal() { // CFDI 4.0
-        DElementInformacionGlobal global = null;
-        if (!moDbmsDataDpsCfd.getGlobalPeriodocity().isEmpty() && 
-                !moDbmsDataDpsCfd.getGlobalMonths().isEmpty() &&
-                moDbmsDataDpsCfd.getGlobalYear() != 0) {
-            global = new DElementInformacionGlobal();
+        cfd.ver40.DElementInformacionGlobal global = null;
+        
+        if (!moDbmsDataDpsCfd.getGlobalPeriodocity().isEmpty() && !moDbmsDataDpsCfd.getGlobalMonths().isEmpty() && moDbmsDataDpsCfd.getGlobalYear() != 0) {
+            global = new cfd.ver40.DElementInformacionGlobal();
             global.getAttPeriodicidad().setString(moDbmsDataDpsCfd.getGlobalPeriodocity());
             global.getAttMeses().setString(moDbmsDataDpsCfd.getGlobalMonths());
             global.getAttAño().setInteger(moDbmsDataDpsCfd.getGlobalYear());
         }
+        
         return global;
     }
     
@@ -6231,7 +6311,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (requireComplementoComercioExterior()) {
             complemento = new cfd.ver40.DElementComplemento();
-            complemento.getElements().add(createCfdiNodeComplementoComercioExterior11());
+            //complemento.getElements().add(createCfdiNodeComplementoComercioExterior11()); // valid until 2024-01-17
+            complemento.getElements().add(createCfdiNodeComplementoComercioExterior20()); // valid since 2024-01-18
         }
         
         if (requireComplementoLeyendasFiscales()) {
