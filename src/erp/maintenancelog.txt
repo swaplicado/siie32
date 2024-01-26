@@ -23,6 +23,12 @@ Sergio Abraham FLORES GUTIÉRREZ
 2) Adición de columna para mostrar el asociado de negocios asignado a un usuario, cuando aplique.
 
 ================================================================================
+SIIE 3.2 235.2/ 2024-01-25
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la generación de CFDI de pagos al excluir documentos relacionados con pagos de impuestos con base 0.
+
+================================================================================
 SIIE 3.2 235.1/ 2024-01-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

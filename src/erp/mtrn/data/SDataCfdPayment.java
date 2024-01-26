@@ -1237,27 +1237,29 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     ArrayList<DElementTrasladoDR> arrTrasladoDR = new ArrayList<>();
 
                     for (SDataReceiptPaymentPayDocTax docTax : paymentEntryDoc.ReceiptPaymentPayDocTaxes) {
-                        if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
-                            DElementRetencionDR retDR = new DElementRetencionDR();
-                            retDR.getAttBaseDR().setDouble(docTax.getBase());
-                            retDR.getAttImpuestoDR().setString("00" + docTax.getFkCfdTaxId());
-                            retDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
-                            retDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
-                            retDR.getAttImporteDR().setDouble(docTax.getTax());
-                            arrRetencionDR.add(retDR);
-                        }
-                        else if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                            DElementTrasladoDR trasDR = new DElementTrasladoDR();
-                            trasDR.getAttBaseDR().setDouble(docTax.getBase());
-                            trasDR.getAttImpuestoDR().setString("00" + docTax.getFkCfdTaxId());
-                            trasDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
-                            trasDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
-                            trasDR.getAttImporteDR().setDouble(docTax.getTax());
-                            if (docTax.getFactorCode().equals("E")) {
-                                trasDR.getAttTasaOCuotaDR().setCanBeZero(false);
-                                trasDR.getAttImporteDR().setCanBeZero(false);
+                        if (docTax.getBase() != 0.0) {
+                            if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                                DElementRetencionDR retDR = new DElementRetencionDR();
+                                retDR.getAttBaseDR().setDouble(docTax.getBase());
+                                retDR.getAttImpuestoDR().setString("00" + docTax.getFkCfdTaxId());
+                                retDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
+                                retDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
+                                retDR.getAttImporteDR().setDouble(docTax.getTax());
+                                arrRetencionDR.add(retDR);
                             }
-                            arrTrasladoDR.add(trasDR);
+                            else if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                DElementTrasladoDR trasDR = new DElementTrasladoDR();
+                                trasDR.getAttBaseDR().setDouble(docTax.getBase());
+                                trasDR.getAttImpuestoDR().setString("00" + docTax.getFkCfdTaxId());
+                                trasDR.getAttTipoFactorDR().setString(docTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
+                                trasDR.getAttTasaOCuotaDR().setDouble(docTax.getRate());
+                                trasDR.getAttImporteDR().setDouble(docTax.getTax());
+                                if (docTax.getFactorCode().equals("E")) {
+                                    trasDR.getAttTasaOCuotaDR().setCanBeZero(false);
+                                    trasDR.getAttImporteDR().setCanBeZero(false);
+                                }
+                                arrTrasladoDR.add(trasDR);
+                            }
                         }
                     }
                     if (arrRetencionDR.size() > 0) {
