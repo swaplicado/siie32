@@ -1771,7 +1771,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel67.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBeneficiaries.setText("Beneficiarios:");
+        jlBeneficiaries.setText("Beneficiario(s):");
         jlBeneficiaries.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel67.add(jlBeneficiaries);
 

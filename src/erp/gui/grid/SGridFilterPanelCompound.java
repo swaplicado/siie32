@@ -73,6 +73,7 @@ public class SGridFilterPanelCompound extends JPanel implements SGridFilter, Act
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        moKeyFilter1.setMaximumRowCount(12);
         moKeyFilter1.setPreferredSize(new java.awt.Dimension(150, 23));
         add(moKeyFilter1);
 
@@ -81,6 +82,7 @@ public class SGridFilterPanelCompound extends JPanel implements SGridFilter, Act
         jbClearFilter1.setPreferredSize(new java.awt.Dimension(23, 23));
         add(jbClearFilter1);
 
+        moKeyFilter2.setMaximumRowCount(12);
         moKeyFilter2.setPreferredSize(new java.awt.Dimension(150, 23));
         add(moKeyFilter2);
 

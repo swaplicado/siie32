@@ -1,4 +1,28 @@
 ================================================================================
+SIIE 3.2 237.0/ 2024-01-26
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cambios a etiquetas y vistas de empleados relacionados con beneficiarios.
+2) Cambios a etiquetas y vistas de usuarios relacionados con el asociado de negocios, además que ahora sólo se podrán elegir empleados.
+3) Ampliación del tamaño de la columna del nombre de usuario.
+4) Ampliación de número de filas a mostrar en filtros de vistas de tipo combo box.
+5) Alineación de campos de captura y estandarización de textos de ayuda del panel de domicilio de sucursales de asociados de negocios.
+6) Corrección al manejo de impuestos exentos en pagos de documentos.
+
+================================================================================
+SIIE 3.2 236.0/ 2024-01-??
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de valuación y contabilización de consumos de almacén.
+
+================================================================================
+SIIE 3.2 235.2/ 2024-01-24
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al determinar si las percepciones no son sueldos o equivalentes en la emisión de CFDI de nóminas.
+2) Adición de columna para mostrar el asociado de negocios asignado a un usuario, cuando aplique.
+
+================================================================================
 SIIE 3.2 235.1/ 2024-01-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

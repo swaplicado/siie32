@@ -1289,8 +1289,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            boolean isRefTax = false; // allways remains false, why?, no idea!
-            
             try (Statement statement = connection.createStatement()) {
                 String sql;
                 ResultSet resultSet;
@@ -1309,9 +1307,9 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 resultSet.close();
                 
-                // Get type taxes for DPS document:
+                // Get taxes of DPS document:
                 
-                sql = "SELECT DISTINCT det.id_tax_bas, det.id_tax, det.fid_tp_tax, det.fid_tp_tax_app " +
+                sql = "SELECT DISTINCT det.id_tax_bas, det.id_tax, det.fid_tp_tax, det.fid_tp_tax_cal, det.fid_tp_tax_app " +
                         "FROM trn_dps_ety AS de " +
                         "INNER JOIN trn_dps_ety_tax AS det ON det.id_year = de.id_year AND det.id_doc = de.id_doc AND det.id_ety = de.id_ety " +
                         "WHERE det.id_year = " + dpsYearId + " AND det.id_doc = " + dpsDocId + " AND NOT de.b_del " +
@@ -1319,74 +1317,65 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    // Read type tax:
+                    // Check if tax needs to be processed:
                     
-                    int taxType = resultSet.getInt("det.fid_tp_tax");
                     int taxTypeApp = resultSet.getInt("det.fid_tp_tax_app");
-                    int taxBasicId = resultSet.getInt("det.id_tax_bas");
-                    int taxId = resultSet.getInt("det.id_tax");
-                    int[] sysMoveTypeKeyDps = new int[] { dsmEntry.getDbmsCtSysMovId(), dsmEntry.getDbmsTpSysMovId() };
-                    int[] sysMoveTypeKeyTax = null;
-                    Vector<Object> sysMoveTypeKeys = new Vector<>();
+                    int taxTypeCal = resultSet.getInt("det.fid_tp_tax_cal");
                     
-                    if (taxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH) {
-                        // Check if reference has taxes:
+                    if (taxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH && taxTypeCal == SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                        // Find accounts for debits and credits:
                         
-                        if (isRefTax) {
-                            // Code for next version:
-                            
-                            //Read from table: TRN_ACC_TAX
-                            //Parameters: ID_TAX_BAS, ID_TAX, ID_TP_DOC, APPLICATION_DATE
-                            //Read account FID_ACC_PAY_PEND_ADV
-                            //Add to vector: vEntries
-                        }
-                        else {
-                            // Find account for debit and credit:
-                            
-                            try (Statement statementAux = connection.createStatement()) {
-                                sql = "SELECT a.id_dt_start, a.fid_acc_pay, a.fid_acc_pay_pend, t.per " +
-                                        "FROM fin_acc_tax AS a " +
-                                        "INNER JOIN erp.finu_tax AS t ON a.id_tax_bas = t.id_tax_bas AND a.id_tax = t.id_tax " +
-                                        "WHERE NOT a.b_del AND " +
-                                        "a.id_tax_bas = " + taxBasicId + " AND " +
-                                        "a.id_tax = " + taxId + " AND " +
-                                        "a.id_ct_dps = " + dsmEntry.getDbmsFkDpsCategoryId() + " AND " +
-                                        "a.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' " +
-                                        "ORDER BY a.id_dt_start DESC;";
+                        int taxType = resultSet.getInt("det.fid_tp_tax");
+                        int taxBasicId = resultSet.getInt("det.id_tax_bas");
+                        int taxId = resultSet.getInt("det.id_tax");
+                        int[] sysMoveTypeKeyDps = new int[] { dsmEntry.getDbmsCtSysMovId(), dsmEntry.getDbmsTpSysMovId() };
+                        int[] sysMoveTypeKeyTax = null;
+                        Vector<Object> sysMoveTypeKeys = new Vector<>();
 
-                                ResultSet resultSetAux = statementAux.executeQuery(sql);
-                                if (resultSetAux.next()) {
-                                    String accountPayId = resultSetAux.getString("a.fid_acc_pay");
-                                    String accountPayPendId = resultSetAux.getString("a.fid_acc_pay_pend");
-                                    //dPercentageTax = resultSet1.getDouble("t.per");
+                        try (Statement statementAux = connection.createStatement()) {
+                            sql = "SELECT a.fid_acc_pay, a.fid_acc_pay_pend " +
+                                    "FROM fin_acc_tax AS a " +
+                                    "INNER JOIN erp.finu_tax AS t ON a.id_tax_bas = t.id_tax_bas AND a.id_tax = t.id_tax " +
+                                    "WHERE NOT a.b_del AND " +
+                                    "a.id_tax_bas = " + taxBasicId + " AND " +
+                                    "a.id_tax = " + taxId + " AND " +
+                                    "a.id_ct_dps = " + dsmEntry.getDbmsFkDpsCategoryId() + " AND " +
+                                    "a.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' " +
+                                    "ORDER BY a.id_dt_start DESC;";
 
-                                    // Get accountId for debit and credit, and systemMoveId (ct and tp):
+                            ResultSet resultSetAux = statementAux.executeQuery(sql);
+                            if (resultSetAux.next()) {
+                                String accountPayId = resultSetAux.getString("a.fid_acc_pay");
+                                String accountPayPendId = resultSetAux.getString("a.fid_acc_pay_pend");
 
-                                    sysMoveTypeKeys = renderTaxAccDbtCdt(sysMoveTypeKeys,
-                                            new int[] { dsmEntry.getFkAccountingMoveTypeId(), dsmEntry.getFkAccountingMoveClassId(), dsmEntry.getFkAccountingMoveSubclassId() },
-                                            accountPayId, accountPayPendId, "", taxType, sourceType);
+                                // Get accountId for debit and credit, and systemMoveId (ct and tp):
 
-                                    // Obtain tp_sys_mov_id (purchase, sales):
+                                sysMoveTypeKeys = renderTaxAccDbtCdt(sysMoveTypeKeys,
+                                        new int[] { dsmEntry.getFkAccountingMoveTypeId(), dsmEntry.getFkAccountingMoveClassId(), dsmEntry.getFkAccountingMoveSubclassId() },
+                                        accountPayId, accountPayPendId, "", taxType, sourceType);
 
-                                    if (dsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) {
-                                        // is supplier:
-                                        if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
-                                        }
-                                        else{
-                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
-                                        }
+                                // Obtain tp_sys_mov_id (purchase, sales):
+
+                                if (dsmEntry.getDbmsTpSysMovId() == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]) {
+                                    // is supplier:
+                                    if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                        sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
                                     }
-                                    else {
-                                        // is customer:
-                                        if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
-                                        }
-                                        else{
-                                            sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
-                                        }
+                                    else if (taxType == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                                        sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
                                     }
-
+                                }
+                                else {
+                                    // is customer:
+                                    if (taxType == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                        sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(1);
+                                    }
+                                    else if (taxType == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                                        sysMoveTypeKeyTax = (int[]) (Object) sysMoveTypeKeys.get(4);
+                                    }
+                                }
+                                
+                                if (sysMoveTypeKeyTax != null) {
                                     // Get current balance of DPS:
 
                                     double valueTaxLoc = 0;
@@ -1457,12 +1446,11 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 // do nothing
                                         }
                                     }
-                                    
+
                                     sortPos = saveRecordEntriesTaxes(connection, record, recordEntry, dsmEntry, numberId, concept, dpsYearId, dpsDocId, dpsCategory, sortPos, sysMoveTypeKeys, taxBasicId, taxId, valueTaxLoc, valueTaxCur, sourceType);
                                 }
                             }
                         }
-                        
                     }
                 }
             }

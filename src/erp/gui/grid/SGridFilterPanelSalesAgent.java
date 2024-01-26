@@ -66,6 +66,7 @@ public class SGridFilterPanelSalesAgent extends JPanel implements SGridFilter, A
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        moKeyFilter.setMaximumRowCount(16);
         moKeyFilter.setPreferredSize(new java.awt.Dimension(200, 23));
         add(moKeyFilter);
 

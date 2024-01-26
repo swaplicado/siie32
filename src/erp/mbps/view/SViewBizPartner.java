@@ -114,6 +114,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             jcbFilterDepartament = new javax.swing.JComboBox();
             jcbFilterDepartament.setToolTipText("Filtrar departamento");
             jcbFilterDepartament.setPreferredSize(new java.awt.Dimension(250, 23));
+            jcbFilterDepartament.setMaximumRowCount(16);
             
             jbClearFilterDepartament = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro departamento", this);
             

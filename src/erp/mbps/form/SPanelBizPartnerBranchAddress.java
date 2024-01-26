@@ -218,7 +218,7 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jtfNeighborhood.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel3.add(jtfNeighborhood);
 
-        jtfReference.setToolTipText("Referencia");
+        jtfReference.setToolTipText("Referencia del domicilio, p. ej. coordenadas");
         jtfReference.setPreferredSize(new java.awt.Dimension(230, 23));
         jPanel3.add(jtfReference);
 
@@ -235,11 +235,11 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
         jPanel2.add(jtfStreet);
 
         jtfStreetNumberExt.setToolTipText("Número exterior");
-        jtfStreetNumberExt.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfStreetNumberExt.setPreferredSize(new java.awt.Dimension(114, 23));
         jPanel2.add(jtfStreetNumberExt);
 
         jtfStreetNumberInt.setToolTipText("Número interior");
-        jtfStreetNumberInt.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfStreetNumberInt.setPreferredSize(new java.awt.Dimension(114, 23));
         jPanel2.add(jtfStreetNumberInt);
 
         add(jPanel2);

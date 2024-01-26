@@ -657,8 +657,10 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
                                 countPerceptions++;
                                 
                                 if (!DCfdi40Catalogs.TiposPercepcionesQueNoSonSueldos.contains(percepcion.getAttTipoPercepcion().getString())) { 
-                                    countPerceptionsAreNotSalary++;
                                     dTotalSueldos = SLibUtils.roundAmount(dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble()));
+                                }
+                                else {
+                                    countPerceptionsAreNotSalary++;
                                 }
 
                                 dTotalGravado = SLibUtils.roundAmount(dTotalGravado + percepcion.getAttImporteGravado().getDouble());
@@ -721,7 +723,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
             percepciones.getAttTotalSueldos().setDouble(dTotalSueldos);
             
             if (countPerceptions == countPerceptionsAreNotSalary) {
-                percepciones.getAttTotalSueldos().setCanBeZero(false); // there are not salaries
+                percepciones.getAttTotalSueldos().setCanBeZero(false); // all perceptions are of type non-salaries
             }
             
             percepciones.getAttTotalSeparacionIndemnizacion().setDouble(dTotalSeparacionIndemnizacion);

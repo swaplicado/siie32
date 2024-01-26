@@ -90,7 +90,8 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
         jtbAll.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         add(jtbAll);
 
-        moKeyFilter1.setPreferredSize(new java.awt.Dimension(125, 23));
+        moKeyFilter1.setMaximumRowCount(12);
+        moKeyFilter1.setPreferredSize(new java.awt.Dimension(150, 23));
         add(moKeyFilter1);
 
         jbClearFilter1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N
