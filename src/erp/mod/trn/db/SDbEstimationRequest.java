@@ -1,6 +1,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.usr.db.SDbUser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -31,6 +33,8 @@ public class SDbEstimationRequest extends SDbRegistryUser {
     
     protected ArrayList<SDbEstimationRequestEntry> maChildEntries;
     protected ArrayList<SDbEstimationRequestRecipient> maRecipients;
+    
+    protected String msAuxUserName;
     
     public SDbEstimationRequest() {
         super(SModConsts.TRN_EST_REQ);
@@ -97,6 +101,8 @@ public class SDbEstimationRequest extends SDbRegistryUser {
     public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkUserId(int n) { mnFkUserId = n; }
     public void setTsUser(Date t) { mtTsUser = t; }
+    
+    public void setAuxUserName(String s) { msAuxUserName = s; }
 
     public int getPkEstimationRequestId() { return mnPkEstimationRequestId; }
     public int getNumber() { return mnNumber; }
@@ -107,6 +113,8 @@ public class SDbEstimationRequest extends SDbRegistryUser {
 
     public ArrayList<SDbEstimationRequestEntry> getChildEntries() { return maChildEntries; }
     public ArrayList<SDbEstimationRequestRecipient> getChildRecipients() { return maRecipients; }
+    
+    public String getAuxUserName() { return msAuxUserName; }
     
     public int[] getKeyMaterialRequest() { return new int[] { mnFkMatRequestId_n }; }
     
@@ -133,6 +141,8 @@ public class SDbEstimationRequest extends SDbRegistryUser {
         
         maChildEntries = new ArrayList<>();
         maRecipients = new ArrayList<>();
+        
+        msAuxUserName = "";
     }
 
     @Override
@@ -183,6 +193,9 @@ public class SDbEstimationRequest extends SDbRegistryUser {
             mnFkMatRequestId_n = resultSet.getInt("fk_mat_req_n");
             mnFkUserId = resultSet.getInt("fk_usr");
             mtTsUser = resultSet.getTimestamp("ts_usr");
+            
+            SDbUser moAuxUser = new SDbUser();
+            msAuxUserName = (String) moAuxUser.readField(session.getStatement(), new int[] { mnFkUserId }, SDbRegistry.FIELD_NAME);
             
             // Read aswell child registries:
             

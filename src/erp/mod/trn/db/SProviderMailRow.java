@@ -25,6 +25,7 @@ public class SProviderMailRow implements SGridRow {
     String msCco;
     String msSubject;
     String msBody;
+    String msUserMail;
     int mnFkProviderId_n;
     
     int mnGridMode = 1;
@@ -91,6 +92,12 @@ public class SProviderMailRow implements SGridRow {
     }
     public void setBody(String s) {
         this.msBody = s;
+    }
+    public String getUserMail() {
+        return msUserMail;
+    }
+    public void setUserMail(String s) {
+        this.msUserMail = s;
     }
     public void setFkProviderId_n(int n) {
         this.mnFkProviderId_n = n;
@@ -180,6 +187,9 @@ public class SProviderMailRow implements SGridRow {
                     break;
                 case 6:
                     value = msBody;
+                    break;
+                case 7:
+                    value = msUserMail;
                     break;
                 default:
             }

@@ -19,6 +19,7 @@ import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SMaterialRequestEntryRow;
 import erp.mod.trn.db.SMaterialRequestEstimationUtils;
+import erp.mod.trn.db.SMaterialRequestSupplyRow;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SProviderMailRow;
 import erp.mtrn.form.SPanelMaterialRequest;
@@ -452,6 +453,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "# Parte"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Especificaciones"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Requerido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Surtido"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "A Cotizar");
                 col.setEditable(true);
                 gridColumnsForm.add(col);
@@ -591,6 +593,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         try {
             moGridMatReqEty.clearGridRows();
             
+            double qtySupplied;
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
                 if (! oMaterialRequestEntry.isDeleted()) {
@@ -603,10 +606,23 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                                                                                         moMaterialRequest.getConsumptionInfo() : 
                                                                                         oMaterialRequestEntry.getConsumptionInfo()
                                                                                 );
-
+                    ArrayList<SMaterialRequestSupplyRow> lEntrySuppliesRows = SMaterialRequestUtils.getMaterialRequestSupplies(miClient, oMaterialRequestEntry.getPkMatRequestId(), oMaterialRequestEntry.getPkEntryId());
+                    /**
+                     * Surtido desde la base de datos
+                     */
+                    qtySupplied = 0d;
+                    if (lEntrySuppliesRows.size() > 0) {
+                        qtySupplied = lEntrySuppliesRows.stream()
+                                    .filter(row -> (row.getFkMatRequestId() == oMaterialRequestEntry.getPkMatRequestId() 
+                                                    && row.getFkMatRequestEntryId() == oMaterialRequestEntry.getPkEntryId()
+                                                    && ! row.isDeleted()))
+                                    .mapToDouble(o -> o.getQuantity())
+                                    .sum();
+                    }
                     oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
                     oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                     oRow.setQuantity(oMaterialRequestEntry.getQuantity());
+                    oRow.setAuxSupplied(qtySupplied);
                     oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
                     oRow.setAuxIsEstimated(SMaterialRequestUtils.hasMatReqEtyEstimation(miClient.getSession(), oMaterialRequestEntry.getPrimaryKey()));
                     oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
@@ -637,11 +653,13 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
      */
     private void actionEstimateAll() {
         SMaterialRequestEntryRow oMatReqRow;
+        double dToEstimate = 0d;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (! oMatReqRow.isItemNew()) {
-                oMatReqRow.setAuxToEstimate(oMatReqRow.getQuantity());
-                oMatReqRow.setAuxIsToEstimate(true);
+                dToEstimate = oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied();
+                oMatReqRow.setAuxToEstimate(dToEstimate < 0d ? 0d : dToEstimate);
+                oMatReqRow.setAuxIsToEstimate(dToEstimate > 0d);
             }
         }
         

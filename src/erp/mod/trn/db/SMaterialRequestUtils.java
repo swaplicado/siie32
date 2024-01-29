@@ -1013,17 +1013,17 @@ public abstract class SMaterialRequestUtils {
                 "    itm.item, " +
                 "    itm.part_num, " +
                 "    uni.symbol," +
-                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
+                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ", " +
                 "        CONCAT('COT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
                 "        '')) AS cot, " +
-                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ", " +
                 "        CONCAT('PED ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
                 "        '')) AS ped, " +
-                "    MAX(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + ", " +
                 "        CONCAT('FACT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
@@ -1075,9 +1075,9 @@ public abstract class SMaterialRequestUtils {
                 oMatReqEtyDocsRow.msItem = resultSet.getString("item");
                 oMatReqEtyDocsRow.msPartNumber = resultSet.getString("part_num");
                 oMatReqEtyDocsRow.msUnitSymbol = resultSet.getString("symbol");
-                oMatReqEtyDocsRow.msCot = resultSet.getString("cot");
-                oMatReqEtyDocsRow.msPed = resultSet.getString("ped");
-                oMatReqEtyDocsRow.msFact = resultSet.getString("fact");
+                oMatReqEtyDocsRow.msCot = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("cot"));
+                oMatReqEtyDocsRow.msPed = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("ped"));
+                oMatReqEtyDocsRow.msFact = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("fact"));
                         
                 lMatReqDocsRows.add(oMatReqEtyDocsRow);
             }
@@ -1110,5 +1110,18 @@ public abstract class SMaterialRequestUtils {
         }
         
         return price;
+    }
+    
+    private static String formatTextWithCommas(String sText) {
+        // Eliminar comas al inicio
+        sText = sText.replaceAll("^,+", "");
+
+        // Eliminar comas al final
+        sText = sText.replaceAll(",+$", "");
+
+        // Eliminar comas repetidas en el medio
+        sText = sText.replaceAll(",+", ",");
+
+        return sText;
     }
 }
