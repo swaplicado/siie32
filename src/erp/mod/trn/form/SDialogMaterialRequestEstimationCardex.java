@@ -98,6 +98,8 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
         jPanel22 = new javax.swing.JPanel();
         jlDateEstimation = new javax.swing.JLabel();
         moFieldDateEstimation = new sa.lib.gui.bean.SBeanFieldDatetime();
+        jLabel1 = new javax.swing.JLabel();
+        moUserMailRequest = new sa.lib.gui.bean.SBeanFieldText();
         jPanel21 = new javax.swing.JPanel();
         jlCCO = new javax.swing.JLabel();
         moTextCCO = new sa.lib.gui.bean.SBeanFieldText();
@@ -190,6 +192,14 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
         moFieldDateEstimation.setEnabled(false);
         jPanel22.add(moFieldDateEstimation);
 
+        jLabel1.setText("Usr. sol.:");
+        jLabel1.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel22.add(jLabel1);
+
+        moUserMailRequest.setEditable(false);
+        moUserMailRequest.setPreferredSize(new java.awt.Dimension(182, 23));
+        jPanel22.add(moUserMailRequest);
+
         jPanel10.add(jPanel22);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -238,6 +248,7 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
     }//GEN-LAST:event_closeDialog
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel16;
@@ -266,6 +277,7 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
     private sa.lib.gui.bean.SBeanFieldText moTextProvider;
     private sa.lib.gui.bean.SBeanFieldText moTextSubject;
     private sa.lib.gui.bean.SBeanFieldText moTextTo;
+    private sa.lib.gui.bean.SBeanFieldText moUserMailRequest;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -301,6 +313,7 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "CCO"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Asunto"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Cuerpo del correo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Usuario solicitud"));
 
                 return gridColumnsForm;
             }
@@ -349,6 +362,7 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
                         oRow.setCco(oMailRow.getMailsCco());
                         oRow.setSubject(oMailRow.getSubject());
                         oRow.setBody(oMailRow.getBody());
+                        oRow.setUserMail(oRequest.getAuxUserName());
 
                         lRows.add(oRow);
                     }
@@ -373,6 +387,7 @@ public class SDialogMaterialRequestEstimationCardex extends SBeanFormDialog impl
     
     private void setProvider(SProviderMailRow oRow) {
         moFieldDateEstimation.setValue(oRow.getDateEstimation());
+        moUserMailRequest.setValue(oRow.getUserMail());
         moTextProvider.setValue(oRow.getProvider());
         moTextTo.setValue(oRow.getTo());
         moTextCC.setValue(oRow.getCc());

@@ -30,6 +30,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected int mnPkMatRequestId;
     protected int mnPkEntryId;
     protected Date mtDateRequest_n;
+    protected Date mtDateDelivery_n;
     protected double mdQuantity;
     protected double mdPriceUnitarySystem;
     protected double mdPriceUnitary;
@@ -69,6 +70,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
+    public void setDateDelivery_n(Date t) { mtDateDelivery_n = t; }
     public void setQuantity(double d) { mdQuantity = d; }
     public void setPriceUnitarySystem(double d) { mdPriceUnitarySystem = d; }
     public void setPriceUnitary(double d) { mdPriceUnitary = d; }
@@ -98,6 +100,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
+    public Date getDateDelivery_n() { return mtDateDelivery_n; }
     public double getQuantity() { return mdQuantity; }
     public double getPriceUnitarySystem() { return mdPriceUnitarySystem; }
     public double getPriceUnitary() { return mdPriceUnitary; }
@@ -222,6 +225,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         mnPkMatRequestId = 0;
         mnPkEntryId = 0;
         mtDateRequest_n = null;
+        mtDateDelivery_n = null;
         mdQuantity = 0;
         mdPriceUnitarySystem = 0;
         mdPriceUnitary = 0;
@@ -302,6 +306,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mnPkMatRequestId = resultSet.getInt("id_mat_req");
             mnPkEntryId = resultSet.getInt("id_ety");
             mtDateRequest_n = resultSet.getDate("dt_req_n");
+            mtDateDelivery_n = resultSet.getDate("dt_delivery_n");
             mdQuantity = resultSet.getDouble("qty");
             mdPriceUnitarySystem = resultSet.getDouble("price_u_sys");
             mdPriceUnitary = resultSet.getDouble("price_u");
@@ -390,6 +395,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     mnPkMatRequestId + ", " + 
                     mnPkEntryId + ", " + 
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
+                    (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") + 
                     mdQuantity + ", " + 
                     mdPriceUnitarySystem + ", " + 
                     mdPriceUnitary + ", " + 
@@ -418,6 +424,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                     //"id_mat_req = " + mnPkMatRequestId + ", " +
                     //"id_ety = " + mnPkEntryId + ", " +
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
+                    "dt_delivery_n = " + (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") +
                     "qty = " + mdQuantity + ", " +
                     "price_u_sys = " + mdPriceUnitarySystem + ", " +
                     "price_u = " + mdPriceUnitary + ", " +
@@ -475,6 +482,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         registry.setPkMatRequestId(this.getPkMatRequestId());
         registry.setPkEntryId(this.getPkEntryId());
         registry.setDateRequest_n(this.getDateRequest_n());
+        registry.setDateDelivery_n(this.getDateDelivery_n());
         registry.setQuantity(this.getQuantity());
         registry.setPriceUnitarySystem(this.getPriceUnitarySystem());
         registry.setPriceUnitary(this.getPriceUnitary());

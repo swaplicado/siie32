@@ -578,6 +578,7 @@ public abstract class SDataConstants {
     public static final int TRNX_STK_MOVES_ETY = 207586;
     public static final int TRNX_STK_ROTATION = 207587;
     public static final int TRNX_STK_COMSUME = 207588;
+    public static final int TRNX_STK_COMM_PRICE = 207610;
     public static final int TRNX_DIOG_MFG = 207589;
     public static final int TRNX_DIOG_MFG_RM = 207590;
     public static final int TRNX_DIOG_MFG_WP = 207591;
