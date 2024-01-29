@@ -539,6 +539,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_DOCS_KAR = 2024358;
     public static final int TRNX_MAT_CONS = 2024356;
     public static final int TRNX_MAT_CONS_CC = 2024357;
+    public static final int TRNX_MAT_BUDGET_SUM = 2024359;
     public static final int TRNX_MAT_CONS_CC_R = 1;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)

@@ -10,10 +10,14 @@ Sergio Abraham FLORES GUTIÉRREZ
 6) Corrección al manejo de impuestos exentos en pagos de documentos.
 
 ================================================================================
-SIIE 3.2 236.0/ 2024-01-??
-Edwin Omar CARMONA FIGUEROA
+SIIE 3.2 236.0/ 2024-01-29 
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de valuación y contabilización de consumos de almacén.
+2) Creación de la bitácora de precios comerciales de ítems que puede ser llenada manualmente o al generar facturas de compras.
+3) Inserción de la fecha de entrega a nivel de RM y de ítem en las RM. 
+4) Implementación de obtener el precio de sistema y replicarlo en el precio definido por el usuario en las RM.
+5) Creación del reporte y la consulta resumen de presupuestos vs. gastos.
 
 ================================================================================
 SIIE 3.2 235.2/ 2024-01-24

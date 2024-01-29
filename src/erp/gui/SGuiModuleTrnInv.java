@@ -24,6 +24,7 @@ import erp.mtrn.data.SDataStockConfigItem;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.form.SDialogDiogSaved;
+import erp.mtrn.form.SDialogRepConsumptionBudget;
 import erp.mtrn.form.SDialogRepStock;
 import erp.mtrn.form.SDialogRepStockMoves;
 import erp.mtrn.form.SDialogRepStockMovesSumSum;
@@ -210,6 +211,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportMatCons;
     private javax.swing.JMenuItem jmiReportMatConsCC;
     private javax.swing.JMenuItem jmiReportMatConsCCRes;
+    private javax.swing.JMenuItem jmiReportBudget;
+    private javax.swing.JMenuItem jmiReportBudgetSummary;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendEntryMass;
@@ -222,6 +225,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepStockMoves moDialogRepStockMoves;
     private erp.mtrn.form.SDialogRepStockMovesSumSum moDialogRepStockMovesSumSum;
     private erp.mtrn.form.SDialogRepStockTrackingLot moDialogRepStockTrackingLot;
+    private erp.mtrn.form.SDialogRepConsumptionBudget moDialogRepConsumptionBudget;
     private erp.mtrn.form.SFormDiog moFormDiog;
     private erp.mtrn.form.SFormMaintDiog moFormMaintDiog;
     private erp.mtrn.form.SFormStockLot moFormStockLot;
@@ -756,6 +760,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportMatCons = new JMenuItem("Consumo de materiales");
         jmiReportMatConsCC = new JMenuItem("Centros de consumo y consumo de materiales");
         jmiReportMatConsCCRes = new JMenuItem("Centros de consumo y consumo de materiales resumen");
+        jmiReportBudget = new JMenuItem("Reporte de presupuestos vs. gastos...");
+        jmiReportBudgetSummary = new JMenuItem("Consulta resumen de presupuestos vs. gastos");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
@@ -765,6 +771,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuRep.add(jmiReportMatCons);
         jmMenuRep.add(jmiReportMatConsCC);
         jmMenuRep.add(jmiReportMatConsCCRes);
+        jmMenuRep.addSeparator();
+        jmMenuRep.add(jmiReportBudget);
+        jmMenuRep.add(jmiReportBudgetSummary);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
@@ -773,6 +782,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportMatCons.addActionListener(this);
         jmiReportMatConsCC.addActionListener(this);
         jmiReportMatConsCCRes.addActionListener(this);
+        jmiReportBudget.addActionListener(this);
+        jmiReportBudgetSummary.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
         jmiRepStatsMfgConsumePendMass = new JMenuItem("Masa de insumos y productos por consumir");
@@ -981,6 +992,17 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepStockTrackingLot.formRefreshCatalogues();
         moDialogRepStockTrackingLot.formReset();
         moDialogRepStockTrackingLot.setFormVisible(true);
+    }
+    
+    
+    private void menuRepConsumptionBudget() {
+        if (moDialogRepConsumptionBudget == null) {
+            moDialogRepConsumptionBudget = new SDialogRepConsumptionBudget(miClient);
+        }
+        
+        moDialogRepConsumptionBudget.formRefreshCatalogues();
+        moDialogRepConsumptionBudget.formReset();
+        moDialogRepConsumptionBudget.setFormVisible(true);
     }
 
     private void showPanelProdOrder(int panelType) {
@@ -1990,6 +2012,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportMatConsCCRes) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_CONS_CC, SModConsts.TRNX_MAT_CONS_CC_R, null); 
+            }
+            else if (item == jmiReportBudget) {
+                menuRepConsumptionBudget();
+            }
+            else if (item == jmiReportBudgetSummary) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_BUDGET_SUM, SLibConstants.UNDEFINED, null);                 
             }
             else if (item == jmiIogStockTheoricalCost) {
                 miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST_QRY, SLibConstants.UNDEFINED, null);
