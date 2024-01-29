@@ -108,6 +108,7 @@ import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
+import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewValCost;
@@ -740,6 +741,9 @@ public class SModuleTrn extends SGuiModule {
                     default: title = "CC consumo materiales"; break;
                 }
                 view = new SViewReportMaterialConsuptionCC(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_MAT_BUDGET_SUM:
+                view = new SViewReportBudgetSummary(miClient, "Resumen presupuestos vs. gastos");
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");

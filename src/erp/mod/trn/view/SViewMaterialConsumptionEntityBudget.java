@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implements ActionListener {
 
-     private SGridFilterYear moFilterYear;
+    private SGridFilterYear moFilterYear;
     
     /**
      * @param client GUI client.
