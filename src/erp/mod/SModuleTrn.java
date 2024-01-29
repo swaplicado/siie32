@@ -39,6 +39,7 @@ import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
 import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
@@ -64,6 +65,7 @@ import erp.mod.trn.form.SFormMaterialProvisionEntity;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
+import erp.mod.trn.form.SFormStockValuation;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewConfEmployeeVsEntity;
 import erp.mod.trn.view.SViewConfEmployeeVsEntityDetail;
@@ -111,6 +113,7 @@ import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
+import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewValCost;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
@@ -163,6 +166,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
     private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
+    private SFormStockValuation moFormStockValuation;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -280,6 +284,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
                 registry = new SDbMaterialProvisionEntity();
+                break;
+            case SModConsts.TRN_STK_VAL:
+                registry = new SDbStockValuation();
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 registry = new SDbFunctionalAreaBudgets();
@@ -598,6 +605,10 @@ public class SModuleTrn extends SGuiModule {
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
+            case SModConsts.TRN_STK_VAL:
+                title = "Valuación de inventarios";
+                view = new SViewStockValuation(miClient, title);
+                break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
                     case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM consumo x suministrar detalle";
@@ -852,6 +863,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ_CC:
                 if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");
                 form = moFormMaterialRequestCostCenter;
+                break;
+            case SModConsts.TRN_STK_VAL:
+                if (moFormStockValuation == null) moFormStockValuation = new SFormStockValuation(miClient, "Valuación de inventario");
+                form = moFormStockValuation;
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");

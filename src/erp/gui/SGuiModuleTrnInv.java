@@ -199,6 +199,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockMovementsEntry;
     private javax.swing.JMenuItem jmiStkStockRotation;
     private javax.swing.JMenuItem jmiStkStockRotationLot;
+    private javax.swing.JMenuItem jmiStkStockValuation;
     private javax.swing.JMenuItem jmiStkStockClosing;
     private javax.swing.JMenuItem jmiItemHistoric;
     
@@ -717,6 +718,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
+        jmiStkStockValuation = new JMenuItem("Valuación de inventarios");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiItemHistoric = new JMenuItem("Historial ítems");
         
@@ -734,6 +736,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.add(jmiStkStockRotation);
         jmMenuStk.add(jmiStkStockRotationLot);
         jmMenuStk.addSeparator();
+        jmMenuStk.add(jmiStkStockValuation);
+        jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockClosing);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiItemHistoric);
@@ -748,6 +752,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry.addActionListener(this);
         jmiStkStockRotation.addActionListener(this);
         jmiStkStockRotationLot.addActionListener(this);
+        jmiStkStockValuation.addActionListener(this);
         jmiStkStockClosing.addActionListener(this);
         jmiItemHistoric.addActionListener(this);
 
@@ -934,6 +939,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock);
+        jmiStkStockValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockValueCost.setEnabled(false);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1255,6 +1261,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRNX_STK_COMSUME:
                     viewClass = erp.mtrn.view.SViewDpsStockConsume.class;
                     title = "Consumo " + dpsCategory.toLowerCase();
+                    break;
+                case SDataConstants.TRN_STK_VAL:
+                    viewClass = erp.mod.trn.view.SViewStockValuation.class;
+                    title = "Valuación de inventario";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
@@ -1984,6 +1994,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStockRotationLot) {
                 showView(SDataConstants.TRNX_STK_ROTATION, SDataConstants.TRNX_STK_LOT);
+            }
+            else if (item == jmiStkStockValuation) {
+                miClient.getSession().showView(SModConsts.TRN_STK_VAL, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStockClosing) {
                 moDialogUtilStockClosing.resetForm();

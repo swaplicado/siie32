@@ -482,6 +482,7 @@ public abstract class SDataConstants {
     public static final int TRN_STK_SEG = 207101;
     public static final int TRN_STK_SEG_WHS = 207102;
     public static final int TRN_STK_SEG_WHS_ETY = 207103;
+    public static final int TRN_STK_VAL = 207107;
     public static final int TRN_PDF = 207094;
     public static final int TRN_CFD = 207095;
     public static final int TRN_CFD_SIGN_LOG = 207100;
@@ -1036,6 +1037,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_STK_SEG, "trn_stk_seg");
         TablesMap.put(TRN_STK_SEG_WHS, "trn_stk_seg_whs");
         TablesMap.put(TRN_STK_SEG_WHS_ETY, "trn_stk_seg_whs_ety");
+        TablesMap.put(TRN_STK_VAL, "trn_stk_val");
         TablesMap.put(TRN_PDF, "trn_pdf");
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
