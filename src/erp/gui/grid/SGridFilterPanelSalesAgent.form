@@ -21,6 +21,7 @@
   <SubComponents>
     <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyFilter">
       <Properties>
+        <Property name="maximumRowCount" type="int" value="16"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[200, 23]"/>
         </Property>

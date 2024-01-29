@@ -21,6 +21,7 @@
   <SubComponents>
     <Component class="javax.swing.JComboBox" name="jcbFilter">
       <Properties>
+        <Property name="maximumRowCount" type="int" value="12"/>
         <Property name="toolTipText" type="java.lang.String" value="Filtrar"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[150, 23]"/>

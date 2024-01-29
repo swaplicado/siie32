@@ -335,12 +335,9 @@ public abstract class SDataReadComponentItems {
         int lenFk = 0;
         int category = 0;
         int sortingType = 0;
-        boolean isKeyApplying = false;
         boolean isPkOnlyInts = true;
         boolean isFkOnlyInts = true;
         boolean isComplementApplying = false;
-        boolean onlyInternational = false;
-        boolean fiscalId = false;
         java.lang.String sql = "";
         java.lang.String text = "";
         java.lang.String field = "";
@@ -420,6 +417,11 @@ public abstract class SDataReadComponentItems {
             case SDataConstants.BPSX_BP_EMP:
                 lenPk = 1;
 
+                boolean isEmployee = false;
+                boolean isKeyApplying = false;
+                boolean isInternationalOnly = false;
+                boolean showFiscalId = false;
+                
                 switch (catalogue) {
                     case SDataConstants.BPSX_BP_CO:
                         text = "empresa";
@@ -435,10 +437,10 @@ public abstract class SDataReadComponentItems {
                         sortingType = paramsErp.getFkSortingSupplierTypeId();
                         isKeyApplying = paramsErp.getIsKeySupplierApplying();
                         if (catalogue == SDataConstants.BPSX_BP_SUP_FI) {
-                            fiscalId = true;
+                            showFiscalId = true;
                         }
                         else if (catalogue == SDataConstants.BPSX_BP_INT_SUP) {
-                            onlyInternational = true;
+                            isInternationalOnly = true;
                         }
                         break;
                     case SDataConstants.BPSX_BP_CUS:
@@ -449,10 +451,10 @@ public abstract class SDataReadComponentItems {
                         sortingType = paramsErp.getFkSortingCustomerTypeId();
                         isKeyApplying = paramsErp.getIsKeyCustomerApplying();
                         if (catalogue == SDataConstants.BPSX_BP_CUS_FI) {
-                            fiscalId = true;
+                            showFiscalId = true;
                         }
                         else if (catalogue == SDataConstants.BPSX_BP_INT_CUS) {
-                            onlyInternational = true;
+                            isInternationalOnly = true;
                         }
                         break;
                     case SDataConstants.BPSX_BP_CDR:
@@ -471,22 +473,60 @@ public abstract class SDataReadComponentItems {
                         text = "empleado";
                         sortingType = paramsErp.getFkSortingEmployeeTypeId();
                         isKeyApplying = paramsErp.getIsKeyEmployeeApplying();
+                        isEmployee = true;
                         break;
                     default:
                 }
+                
+                if (isEmployee) {
+                    sql = "SELECT b.id_bp AS f_id_1, " +
+                            "CONCAT(b.bp, ' - Núm. ', e.num, ' - ', IF(e.b_act, CONCAT('Activo, alta: ', DATE_FORMAT(e.dt_hire, '%d/%m/%Y')), CONCAT('Inactivo, baja: ', COALESCE(DATE_FORMAT(e.dt_dis_n, '%d/%m/%Y'), 'ND')))) AS f_item " +
+                            "FROM erp.bpsu_bp AS b " +
+                            "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp " +
+                            "WHERE NOT b.b_del AND b.b_att_emp " +
+                            "ORDER BY f_item, f_id_1 ";
+                }
+                else {
+                    String item = "";
+                    
+                    if (!isKeyApplying) {
+                        if (!showFiscalId) {
+                            item = "b.bp";
+                        }
+                        else {
+                            item = "CONCAT(b.bp, ' (', b.fiscal_id, ')')";
+                        }
+                    }
+                    else {
+                        switch (sortingType) {
+                            case SDataConstantsSys.CFGS_TP_SORT_KEY_NAME:
+                                item = "CONCAT(bc.bp_key, ' - ', b.bp)";
+                                break;
+                            case SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM:
+                                item = "CONCAT(bc.bp_key, ' - ', b.bp_comm)";
+                                break;
+                            case SDataConstantsSys.CFGS_TP_SORT_NAME_KEY:
+                                item = "CONCAT(b.bp, ' - ', bc.bp_key)";
+                                break;
+                            case SDataConstantsSys.CFGS_TP_SORT_NAME_COMM_KEY:
+                                item = "CONCAT(b.bp_comm, ' - ', bc.bp_key)";
+                                break;
+                            default:
+                                item = "CONCAT(b.bp, ' - ', bc.bp_key)"; // same as name and key
+                        }
+                    }
+                    
+                    sql = "SELECT b.id_bp AS f_id_1, " +
+                            item + " AS f_item " +
+                            "FROM erp.bpsu_bp AS b " +
+                            "INNER JOIN erp.bpsu_bp_ct AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + category + " " +
+                            (!isInternationalOnly ? "" :
+                            "INNER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp " +
+                            "INNER JOIN erp.bpsu_bpb_add AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " AND (bba.fid_cty_n IS NOT NULL AND bba.fid_cty_n <> " + paramsErp.getFkCountryId() + ") ") +
+                            "WHERE NOT b.b_del AND NOT bc.b_del " +
+                            "ORDER BY f_item, f_id_1 ";
+                }
 
-                sql = "SELECT DISTINCT bp.id_bp AS f_id_1, " + (!isKeyApplying ? !fiscalId ? "bp.bp " : "CONCAT(bp.bp, ' (', bp.fiscal_id, ')')" :
-                        (sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ||sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM ? "CONCAT(ct.bp_key, ' - ', bp.bp) " : "CONCAT(bp.bp, ' - ', ct.bp_key) ")) + "AS f_item " +
-                        "FROM erp.bpsu_bp AS bp " +
-                        (catalogue == SDataConstants.BPSX_BP_EMP ? "WHERE bp.b_del = 0 AND bp.b_att_emp = 1 " :
-                        "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
-                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + category + " AND bp.b_del = 0 AND ct.b_del = 0 ") +
-                        (!onlyInternational ? "" :
-                        "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
-                        "INNER JOIN erp.bpsu_bpb_add AS bpba ON bpba.id_bpb = bpb.id_bpb AND bpba.id_add = 1 AND bpba.fid_cty_n IS NOT NULL ") +
-                        "ORDER BY " +
-                        (catalogue == SDataConstants.BPSX_BP_EMP ? "bp.bp, " :
-                        (sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME || sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM ? "ct.bp_key, bp.bp, " : "bp.bp, ct.bp_key, ")) + "bp.id_bp ";
                 break;
             case SDataConstants.BPSX_BP_X_SUP_CUS:
             case SDataConstants.BPSX_BP_X_CDR_DBR:
