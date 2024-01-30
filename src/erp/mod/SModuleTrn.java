@@ -330,6 +330,13 @@ public class SModuleTrn extends SGuiModule {
                         + "WHERE NOT b_del "
                         + "ORDER BY id_st_mat_req ";
                 break;
+            case SModConsts.TRNU_DPS_NAT:
+                settings = new SGuiCatalogueSettings("Naturaleza de documento", 1);
+                sql = "SELECT id_dps_nat AS " + SDbConsts.FIELD_ID + "1, dps_nat AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_dps_nat ";
+                break;
             case SModConsts.TRNU_TP_DPS:
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
                 sql = "SELECT id_ct_dps AS " + SDbConsts.FIELD_ID + "1, id_cl_dps AS " + SDbConsts.FIELD_ID + "2, id_tp_dps AS " + SDbConsts.FIELD_ID + "3, "
