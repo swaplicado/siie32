@@ -151,6 +151,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jlContractor = new javax.swing.JLabel();
         moKeyContractor = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel15 = new javax.swing.JPanel();
+        jlDocNature = new javax.swing.JLabel();
+        moKeyDocNature = new sa.lib.gui.bean.SBeanFieldKey();
         jlReference = new javax.swing.JLabel();
         moTextReferecnce = new sa.lib.gui.bean.SBeanFieldText();
         jbImport = new javax.swing.JButton();
@@ -346,11 +348,20 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlReference.setText("Referencia:");
-        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDocNature.setText("Naturaleza doc.:*");
+        jlDocNature.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlDocNature);
+
+        moKeyDocNature.setPreferredSize(new java.awt.Dimension(158, 23));
+        jPanel15.add(moKeyDocNature);
+
+        jlReference.setText("Ref.:");
+        jlReference.setPreferredSize(new java.awt.Dimension(30, 23));
+        jlReference.setRequestFocusEnabled(false);
         jPanel15.add(jlReference);
 
         moTextReferecnce.setEnabled(false);
+        moTextReferecnce.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel15.add(moTextReferecnce);
 
         jbImport.setText("Importar");
@@ -811,7 +822,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jlTotal.setText("Total req.:");
         jlTotal.setPreferredSize(new java.awt.Dimension(65, 23));
         jpEstados.add(jlTotal);
-        jlTotal.getAccessibleContext().setAccessibleName("Total req.:");
 
         moDecTotal.setEditable(false);
         moDecTotal.setText("0.00");
@@ -893,6 +903,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private javax.swing.JLabel jlDateDeliveryEty;
     private javax.swing.JLabel jlDateReq;
     private javax.swing.JLabel jlDateReqEty;
+    private javax.swing.JLabel jlDocNature;
     private javax.swing.JLabel jlEtyNotes;
     private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlItem;
@@ -952,6 +963,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsSubentEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyContractor;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCostCenterEty;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDocNature;
     private sa.lib.gui.bean.SBeanFieldKey moKeyItemRef;
     private sa.lib.gui.bean.SBeanFieldKey moKeyItemRefEty;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriEty;
@@ -985,6 +997,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextDate.setTextSettings(SGuiUtils.getLabelName("Fecha"), 10, 0);
         moKeyUsrReq.setKeySettings(miClient, SGuiUtils.getLabelName(jlUsrReq), true);
         moKeyContractor.setKeySettings(miClient, SGuiUtils.getLabelName(jlContractor), false);
+        moKeyDocNature.setKeySettings(miClient, SGuiUtils.getLabelName(jlDocNature), true);
         moTextReferecnce.setTextSettings(SGuiUtils.getLabelName(jlReference), 25, 0);
         moKeyItemRef.setKeySettings(miClient, SGuiUtils.getLabelName(jlItemRef), true);
         moDateReq.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateReq), false);
@@ -1029,6 +1042,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moFields.addField(moTextDate);
         moFields.addField(moKeyUsrReq);
         moFields.addField(moKeyContractor);
+        moFields.addField(moKeyDocNature);
         moFields.addField(moTextReferecnce);
         moFields.addField(moKeyItemRef);
         moFields.addField(moDateReq);
@@ -1242,6 +1256,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moKeyProvEnt.setEnabled(enable);
         moKeyUsrReq.setEnabled(enable);
         moKeyContractor.setEnabled(enable);
+        moKeyDocNature.setEnabled(enable);
         moKeyItemRef.setEnabled(enable);
         jbPickItemRef.setEnabled(enable);
         moDateReq.setEnabled(enable);
@@ -1983,6 +1998,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         miClient.getSession().populateCatalogue(moKeyProvEnt, SModConsts.TRN_MAT_PROV_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
         miClient.getSession().populateCatalogue(moKeyUsrReq, SModConsts.USRU_USR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyContractor, SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
+        miClient.getSession().populateCatalogue(moKeyDocNature, SModConsts.TRNU_DPS_NAT, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriReq, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriEty, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
@@ -2015,6 +2031,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             else {
                 moTextTypeReq.setValue(SModSysConsts.TRNS_MAT_REQ_TP_C);
             }
+            moKeyDocNature.setValue(new int[] { 1 });
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
@@ -2022,6 +2039,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             moKeyPriReq.setValue(new int[] { moRegistry.getFkMatRequestPriorityId() });
             moKeyProvEnt.setValue(new int[] { moRegistry.getFkMatProvisionEntityId() });
             moTextTypeReq.setValue(moRegistry.getTypeRequest());
+            moKeyDocNature.setValue(new int[] { moRegistry.getFkDpsNatureId() });
         }
 
         moDecQtyUsr.setValue(moRegistry.getTotal_r());
@@ -2129,6 +2147,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         }
         registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
+        registry.setFkDpsNatureId(moKeyDocNature.getValue()[0]);
         registry.setFkWarehouseCompanyBranch_n(moWahId[0]);
         registry.setFkWarehouseWarehouse_n(moWahId[1]);
         registry.setFkItemReferenceId_n(moKeyItemRef.getSelectedIndex() == 0 ? 0 : moKeyItemRef.getValue()[0]);
