@@ -71,20 +71,20 @@ public class SDbPriceCommercialLog extends SDbRegistryUser {
         return samePrice;
     }
     
-    private void sameItem(Connection connection) throws SQLException, Exception { 
-        boolean sameItem = false;
-        
-        msSql = "SELECT id_log FROM " + getSqlTable() + " WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId + " AND NOT b_del";
-        try (ResultSet resultSet = connection.createStatement().executeQuery(msSql)) {
-            if (resultSet.next()) {
-                sameItem = true;
-            }
-        }
-        if (sameItem) {
-            msSql = "UPDATE " + getSqlTable() + " SET b_del = 1 WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId;
-            connection.createStatement().execute(msSql);
-        }
-    }
+//    private void sameItem(Connection connection) throws SQLException, Exception { 
+//        boolean sameItem = false;
+//        
+//        msSql = "SELECT id_log FROM " + getSqlTable() + " WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId + " AND NOT b_del";
+//        try (ResultSet resultSet = connection.createStatement().executeQuery(msSql)) {
+//            if (resultSet.next()) {
+//                sameItem = true;
+//            }
+//        }
+//        if (sameItem) {
+//            msSql = "UPDATE " + getSqlTable() + " SET b_del = 1 WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId;
+//            connection.createStatement().execute(msSql);
+//        }
+//    }
     
     public void setPkItemId(int n) { mnPkItemId = n; }
     public void setPkUnitId(int n) { mnPkUnitId = n; }
@@ -121,7 +121,7 @@ public class SDbPriceCommercialLog extends SDbRegistryUser {
         ResultSet resultSet;
         if (isItemInv(connection)) {
             if (!isSamePrice(connection)) {
-                sameItem(connection);
+                //sameItem(connection);
                 mnPkLogId = 0;
         
                 msSql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM " + getSqlTable() + " " +
@@ -271,7 +271,7 @@ public class SDbPriceCommercialLog extends SDbRegistryUser {
                 mbDeleted = false;
                 mnFkUserInsertId = session.getUser().getPkUserId();
                 mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
-                sameItem(session.getDatabase().getConnection());
+                //sameItem(session.getDatabase().getConnection());
 
                 msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                         mnPkItemId + ", " + 

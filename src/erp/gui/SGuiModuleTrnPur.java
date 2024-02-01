@@ -84,6 +84,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenuItem jmiCatFunctionalAreaBudgets;
     private javax.swing.JMenuItem jmiCatPriceCommercialLog;
+    private javax.swing.JMenuItem jmiCatPriceCommercialRecentLog;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates; 
     private javax.swing.JMenuItem jmiEstimatesDetail;
@@ -280,6 +281,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
         jmiCatPriceCommercialLog = new JMenuItem("Bitácora de precios comerciales de ítems");
+        jmiCatPriceCommercialRecentLog = new JMenuItem("Bitácora de precios comerciales más recientes de ítems");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -294,6 +296,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatFunctionalAreaBudgets);
         jmCat.addSeparator();
         jmCat.add(jmiCatPriceCommercialLog);
+        jmCat.add(jmiCatPriceCommercialRecentLog);
         
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de compras");
@@ -641,6 +644,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog.addActionListener(this);
         jmiCatFunctionalAreaBudgets.addActionListener(this);
         jmiCatPriceCommercialLog.addActionListener(this);
+        jmiCatPriceCommercialRecentLog.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesDetail.addActionListener(this);        
         jmiEstimatesLinkPend.addActionListener(this);
@@ -1574,6 +1578,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatPriceCommercialLog) {
                 miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatPriceCommercialRecentLog) {
+                miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SModConsts.ITMX_PRICE_COMM_REC_LOG, null);
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

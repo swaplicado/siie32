@@ -1097,7 +1097,7 @@ public abstract class SMaterialRequestUtils {
     public static Double getItemPriceCommercial(SGuiSession session, int itemPk, int unitPk) {
         double price = 0.0;
         ResultSet resultSet;
-        String sql = "SELECT price FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " "
+        String sql = "SELECT price FROM itmu_price_view "
                 + "WHERE id_item = " + itemPk + " AND id_unit = " + unitPk + " AND NOT b_del "; 
         try {
             resultSet = session.getStatement().executeQuery(sql);

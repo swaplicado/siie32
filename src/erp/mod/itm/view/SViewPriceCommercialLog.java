@@ -7,7 +7,6 @@ package erp.mod.itm.view;
 
 import erp.mod.SModConsts;
 import java.util.ArrayList;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -24,20 +23,24 @@ public class SViewPriceCommercialLog extends SGridPaneView {
     /**
      * Creates view of Price commercial log.
      * @param client GUI client.
+     * @param subType
      * @param title View's title.
      */
-    public SViewPriceCommercialLog(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.ITMU_PRICE_COMM_LOG, SLibConsts.UNDEFINED, title);
+    public SViewPriceCommercialLog(SGuiClient client, int subType, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.ITMU_PRICE_COMM_LOG, subType, title);
         initComponetsCustom();
     }
     
     private void initComponetsCustom() {
-        
+        if (mnGridSubtype == SModConsts.ITMX_PRICE_COMM_REC_LOG) {
+            setRowButtonsEnabled(false);
+        }
     }
 
     @Override
     public void prepareSqlQuery() {
         String sql = "";
+        String from = "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " AS v ";
         Object filter;
 
         moPaneSettings = new SGridPaneSettings(3);
@@ -48,6 +51,10 @@ public class SViewPriceCommercialLog extends SGridPaneView {
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
+        }
+        
+        if (mnGridSubtype == SModConsts.ITMX_PRICE_COMM_REC_LOG) {
+            from = "FROM itmu_price_view AS v ";
         }
         
         msSql = "SELECT "
@@ -70,7 +77,7 @@ public class SViewPriceCommercialLog extends SGridPaneView {
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " AS v "
+                + from
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " 
                 + "v.id_item = i.id_item " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON " 

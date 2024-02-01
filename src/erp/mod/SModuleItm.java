@@ -238,7 +238,11 @@ public class SModuleItm extends SGuiModule {
         
         switch (type) {
             case SModConsts.ITMU_PRICE_COMM_LOG:
-                view = new SViewPriceCommercialLog(miClient, "Bitácora precios com. ítems");
+                switch (subtype) {
+                    case SModConsts.ITMX_PRICE_COMM_REC_LOG: title = "Bitácora precios com. recientes ítems"; break;
+                    default: title = "Bitácora precios com. ítems"; break;
+                }
+                view = new SViewPriceCommercialLog(miClient, subtype, title);
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

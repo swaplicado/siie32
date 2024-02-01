@@ -198,7 +198,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocEtyConId; // DPS for adjustment DPS in contract
     
-    protected boolean mbXtaIsPurInv; 
+    protected boolean mbXtaIsPurInvoiceInventoriable; 
+    protected double mnXtaPriceCommUnitary;
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -536,9 +537,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int[] getKeyCashAccount_n() { return mnFkCashCompanyBranchId_n == SLibConsts.UNDEFINED ? null : new int[] { mnFkCashCompanyBranchId_n, mnFkCashAccountId_n }; }
     public int[] getKeyAuxDps() { return new int[] { mnAuxPkDpsYearId, mnAuxPkDpsDocId }; }
     
-    public void setXtaIsPurInv(boolean b) { mbXtaIsPurInv = b; }
+    public void setXtaIsPurInvoiceInventoriable(boolean b) { mbXtaIsPurInvoiceInventoriable = b; }
+    public void setXtaPriceCommUnitary(double n) { mnXtaPriceCommUnitary = n; }
     
-    public boolean getXtaIsPurInv() { return mbXtaIsPurInv; }
+    public boolean getXtaIsPurInvoiceInventoriable() { return mbXtaIsPurInvoiceInventoriable; }
+    public double getXtaPriceCommUnitary() { return mnXtaPriceCommUnitary; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -719,7 +722,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnXtaPkDpsDocConId = 0;
         mnXtaPkDpsDocEtyConId = 0;
         
-        mbXtaIsPurInv = false;
+        mbXtaIsPurInvoiceInventoriable = false;
+        mnXtaPriceCommUnitary = 0;
     }
 
     @Override
@@ -1505,11 +1509,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     }
                     
                     // Save item price commercial if dps purchase invoice
-                    if (mbXtaIsPurInv) {
+                    if (mbXtaIsPurInvoiceInventoriable) {
                         SDbPriceCommercialLog log = new SDbPriceCommercialLog();
                         log.setPkItemId(mnFkItemId);
                         log.setPkUnitId(mnFkOriginalUnitId);
-                        log.setPrice(mdPriceUnitary);
+                        log.setPrice(mnXtaPriceCommUnitary);
                         log.setFkDpsYear_n(mnPkYearId);
                         log.setFkDpsDoc_n(mnPkDocId);
                         log.setFkDpsEntry_n(mnPkEntryId);
@@ -1988,7 +1992,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setFlagMinorChangesEdited(mbFlagMinorChangesEdited);
         clone.setFlagOpenedByMatRequestImport(mbFlagOpenedByMatRequestImport);
 
-        clone.setXtaIsPurInv(mbIsDeleted);
+        clone.setXtaIsPurInvoiceInventoriable(mbXtaIsPurInvoiceInventoriable);
+        clone.setXtaPriceCommUnitary(mnXtaPriceCommUnitary);
         
         return clone;
     }

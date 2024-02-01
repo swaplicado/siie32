@@ -214,6 +214,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportMatConsCCRes;
     private javax.swing.JMenuItem jmiReportBudget;
     private javax.swing.JMenuItem jmiReportBudgetSummary;
+    private javax.swing.JMenuItem jmiReportWarehouseConsumptionDetail;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendEntryMass;
@@ -767,6 +768,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportMatConsCCRes = new JMenuItem("Centros de consumo y consumo de materiales resumen");
         jmiReportBudget = new JMenuItem("Reporte de presupuestos vs. gastos...");
         jmiReportBudgetSummary = new JMenuItem("Consulta resumen de presupuestos vs. gastos");
+        jmiReportWarehouseConsumptionDetail = new JMenuItem("Consulta consumo de almacenes a detalle");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
@@ -779,6 +781,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuRep.addSeparator();
         jmMenuRep.add(jmiReportBudget);
         jmMenuRep.add(jmiReportBudgetSummary);
+        jmMenuRep.addSeparator();
+        jmMenuRep.add(jmiReportWarehouseConsumptionDetail);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
@@ -789,6 +793,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportMatConsCCRes.addActionListener(this);
         jmiReportBudget.addActionListener(this);
         jmiReportBudgetSummary.addActionListener(this);
+        jmiReportWarehouseConsumptionDetail.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
         jmiRepStatsMfgConsumePendMass = new JMenuItem("Masa de insumos y productos por consumir");
@@ -2031,6 +2036,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportBudgetSummary) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_BUDGET_SUM, SLibConstants.UNDEFINED, null);                 
+            }
+            else if (item == jmiReportWarehouseConsumptionDetail) {
+                miClient.getSession().showView(SModConsts.TRNX_WAH_CONS_DET, SLibConstants.UNDEFINED, null); 
             }
             else if (item == jmiIogStockTheoricalCost) {
                 miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST_QRY, SLibConstants.UNDEFINED, null);

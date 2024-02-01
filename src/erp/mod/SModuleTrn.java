@@ -115,6 +115,7 @@ import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewValCost;
+import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -762,6 +763,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_BUDGET_SUM:
                 view = new SViewReportBudgetSummary(miClient, "Resumen presupuestos vs. gastos");
+                break;
+            case SModConsts.TRNX_WAH_CONS_DET:
+                view = new SViewWarehouseConsumptionDetail(miClient, "Consumo almacenes detalle");
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");

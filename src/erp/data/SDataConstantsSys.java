@@ -114,6 +114,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
     public static final String CFG_PARAM_DOC_HRS_REP_COM = "DOC_HRS_REP_COM";
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
+    public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;

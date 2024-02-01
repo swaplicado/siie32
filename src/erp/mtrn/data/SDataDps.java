@@ -59,6 +59,7 @@ import erp.mfin.data.SFinAmount;
 import erp.mfin.data.SFinAmounts;
 import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
+import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
@@ -2945,6 +2946,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 nSortingPosition = 0;
 
+                double addPrice = 0.0;
+                
+                if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
+                    int admCpt = SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
+                            SDataConstantsSys.CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT));
+                    int inv = 0;
+                    double admPrice = 0.0;
+                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                        connection.getClientInfo();
+                        SDataItem item = new SDataItem();
+                        item.read(new int[] { dpsEntry.getFkItemId() } , oStatement);
+                        if (admCpt != 0 && item.getFkAdministrativeConceptTypeId() == admCpt) {
+                            admPrice += dpsEntry.getPriceUnitary();
+                        }
+                        else if (item.getIsInventoriable()) {
+                            inv++;
+                            dpsEntry.setXtaIsPurInvoiceInventoriable(true);
+                        }
+                    }
+                    try {
+                        addPrice = admPrice / inv;
+                    } catch(Exception e) {}
+                }
+                
                 for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                     if (dpsEntry.getIsRegistryNew() || dpsEntry.getIsRegistryEdited()) {
                         dpsEntry.setPkYearId(mnPkYearId);
@@ -2957,8 +2982,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             dpsEntry.setSortingPosition(++nSortingPosition);
                         }
                         
-                        if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
-                            dpsEntry.setXtaIsPurInv(true);
+                        if (dpsEntry.getXtaIsPurInvoiceInventoriable()) {
+                            dpsEntry.setXtaPriceCommUnitary(dpsEntry.getPriceUnitary() + (addPrice / dpsEntry.getQuantity()));
                         }
 
                         if (dpsEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {

@@ -229,7 +229,8 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
                     msSeekQueryText += "OR i.item LIKE '%" + text + "%' "
                             + "OR i.item_key LIKE '%" + text + "%' "
-                            + "OR u.unit LIKE '%" + text + "%' ";
+                            + "OR u.unit LIKE '%" + text + "%' "
+                            + "OR IF(ISNULL(entc.name), trn_get_cons_info(v.id_mat_req, 1), entc.name) LIKE '%" + text + "%' ";
                 }
                 
                 msSeekQueryText += ") ";
