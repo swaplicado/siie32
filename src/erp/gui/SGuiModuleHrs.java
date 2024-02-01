@@ -249,7 +249,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBkkDeductionGlobal = new JMenuItem("Deducciones globales");
         jmiCfgBkkDeductionDepartament = new JMenuItem("Deducciones por departamento");
         jmiCfgBkkDeductionEmployee = new JMenuItem("Deducciones por empleado");
-        jmiCfgBkkRestoreAccountingSettings = new JMenuItem("Restore configuraciones de contabilización...");
+        jmiCfgBkkRestoreAccountingSettings = new JMenuItem("Restaurar configuraciones de contabilización...");
         jmiCfgConfig = new JMenuItem("Configuración del módulo");
         
         jmCfg.add(jmiCfgTaxTable);
