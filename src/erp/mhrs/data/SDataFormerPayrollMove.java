@@ -10,6 +10,8 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -192,9 +194,10 @@ public class SDataFormerPayrollMove extends erp.lib.data.SDataRegistry implement
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
         }
-        catch (java.lang.Exception e) {
+        catch (Exception ex) {
+            Logger.getLogger(SDataFormerPayrollMove.class.getName()).log(Level.SEVERE, null, ex);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
+            SLibUtilities.printOutException(this, ex);
         }
 
         return mnLastDbActionResult;

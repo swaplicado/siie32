@@ -8,8 +8,11 @@ package erp.mod;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mod.itm.db.SDbItem;
+import erp.mod.itm.db.SDbPriceCommercialLog;
 import erp.mod.itm.db.SDbUnit;
 import erp.mod.itm.db.SDbUnitType;
+import erp.mod.itm.form.SFormPriceCommercialLog;
+import erp.mod.itm.view.SViewPriceCommercialLog;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -30,10 +33,12 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Edwin Carmona
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín
  */
 public class SModuleItm extends SGuiModule {
 
+    private SFormPriceCommercialLog moFormPriceCommercialLog;
+    
     private SBeanOptionPicker moPickerItem;
     private SBeanOptionPicker moPickerUnit;
     
@@ -60,6 +65,9 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 registry = new SDbItem();
+                break;
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                registry = new SDbPriceCommercialLog();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -176,6 +184,17 @@ public class SModuleItm extends SGuiModule {
             case SModConsts.ITMU_ITEM:
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
                 settings.setCodeSettings(true, false);
+                String where = "";
+                switch (subtype) {
+                    case SModSysConsts.ITMU_ITEM_INV: where += "AND i.b_inv "; break;
+                    case SModSysConsts.ITMU_ITEM_NOT_INV: where += "AND NOT i.b_inv "; break;
+                    default:
+                }
+                
+                if (params != null) {
+                    where += "AND i.fid_st_item = " + params.getParamsMap().get(SModConsts.ITMS_ST_ITEM) + " ";
+                }
+                
                 sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +
                         (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item " :
                         (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
@@ -185,6 +204,7 @@ public class SModuleItm extends SGuiModule {
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                         "WHERE i.b_del = 0 " +
+                        where +
                         "ORDER BY " + (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item, " :
                         ((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "id_item ";
                 break;
@@ -214,7 +234,16 @@ public class SModuleItm extends SGuiModule {
     @Override
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
-
+        String title = "";
+        
+        switch (type) {
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                view = new SViewPriceCommercialLog(miClient, "Bitácora precios com. ítems");
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return view;
     }
 
@@ -293,6 +322,15 @@ public class SModuleItm extends SGuiModule {
     public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
         SGuiForm form = null;
 
+        switch (type) {
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                if (moFormPriceCommercialLog == null) moFormPriceCommercialLog = new SFormPriceCommercialLog(miClient, "Precio comercial de ítem");
+                form = moFormPriceCommercialLog;
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return form;
     }
 

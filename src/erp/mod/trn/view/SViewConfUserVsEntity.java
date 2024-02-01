@@ -7,7 +7,12 @@ package erp.mod.trn.view;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -15,13 +20,19 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SViewConfUserVsEntity extends SGridPaneView {
+public class SViewConfUserVsEntity extends SGridPaneView implements ActionListener {
+    
+    private JButton jbConfig;
 
     /**
      * @param client GUI client.
@@ -29,11 +40,44 @@ public class SViewConfUserVsEntity extends SGridPaneView {
      */
     public SViewConfUserVsEntity(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_CONF_USR_VS_ENT, SLibConsts.UNDEFINED, title, null);
+        setRowButtonsEnabled(false);
         initComponents();
     }
     
     private void initComponents() {
-        setRowButtonsEnabled(false, false, true, false, false);
+        jbConfig = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Configurar", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbConfig);
+    }
+    
+    private void actionConfig() {
+        super.actionRowEdit();
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SGuiParams params;
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else if (moPaneSettings.isUserInsertApplying() && mnUserLevelAccess == SUtilConsts.LEV_AUTHOR && gridRow.getFkUserInsertId() != miClient.getSession().getUser().getPkUserId()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_RIGHT);
+            }
+            else {
+                params = moFormParams != null ? moFormParams : new SGuiParams();
+                params.setKey(gridRow.getRowPrimaryKey());
+
+                miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, mnGridSubtype, params);
+                moFormParams = null;
+            }
+        }
     }
     
     @Override
@@ -97,15 +141,9 @@ public class SViewConfUserVsEntity extends SGridPaneView {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_NAME, "Usuario"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "conf_cons", "Conf. consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME + "_cons", SGridConsts.COL_TITLE_USER_INS_NAME + " consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS + "_cons", SGridConsts.COL_TITLE_USER_INS_TS + " consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "conf_sub", "Conf. sub consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME + "_sub", SGridConsts.COL_TITLE_USER_INS_NAME + " sub consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS + "_sub", SGridConsts.COL_TITLE_USER_INS_TS + " sub consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "conf_prov", "Conf. suministro"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME + "_prov", SGridConsts.COL_TITLE_USER_INS_NAME + " suministro"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS + "_prov", SGridConsts.COL_TITLE_USER_INS_TS + " suministro"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "conf_cons", "Configurado"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME + "_cons", SGridConsts.COL_TITLE_USER_INS_NAME));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS + "_cons", SGridConsts.COL_TITLE_USER_INS_TS));
         
         return columns;
     }
@@ -116,5 +154,16 @@ public class SViewConfUserVsEntity extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.TRN_MAT_PROV_ENT_USR);
         moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_ENT_USR);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbConfig) {
+                actionConfig();
+            }
+        }
     }
 }

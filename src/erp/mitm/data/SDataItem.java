@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
@@ -107,6 +109,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     protected erp.mitm.data.SDataUnit moDbmsDataUnit;
     protected erp.mitm.data.SDataItemGeneric moDbmsDataItemGeneric;
+    protected erp.mitm.data.SDataUnit moDbmsDataCommercialUnit;
     protected java.util.Vector<erp.mitm.data.SDataItemBarcode> mvDbmsItemBarcodes;
     protected java.util.Vector<erp.mitm.data.SDataItemForeignLanguage> mvDbmsItemForeignLanguageDescriptions;
     protected ArrayList<SDataItemMaterialAttribute> mlItemAttributes;
@@ -286,6 +289,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
     public erp.mitm.data.SDataUnit getDbmsDataUnit() { return moDbmsDataUnit; }
+    public erp.mitm.data.SDataUnit getDbmsDataCommercialUnit() { return moDbmsDataCommercialUnit; }
     public erp.mitm.data.SDataItemGeneric getDbmsDataItemGeneric() { return moDbmsDataItemGeneric; }
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
     public java.util.Vector<SDataItemForeignLanguage> getDbmsItemForeignLanguageDescriptions() { return mvDbmsItemForeignLanguageDescriptions; }
@@ -420,6 +424,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtUserDeleteTs = null;
 
         moDbmsDataUnit = null;
+        moDbmsDataCommercialUnit = null;
         moDbmsDataItemGeneric = null;
         mvDbmsItemBarcodes.clear();
         mvDbmsItemForeignLanguageDescriptions.clear();
@@ -531,6 +536,16 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 moDbmsDataUnit = new SDataUnit();
                 if (moDbmsDataUnit.read(new int[] { mnFkUnitId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                if (mnFkUnitCommercial_n > 0) {
+                    moDbmsDataCommercialUnit = new SDataUnit();
+                    if (moDbmsDataCommercialUnit.read(new int[] { mnFkUnitCommercial_n }, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                }
+                else {
+                    moDbmsDataCommercialUnit = null;
                 }
 
                 // Read aswell item generic object:
@@ -748,14 +763,16 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             }
         }
         catch (java.sql.SQLException e) {
+            Logger.getLogger(SDataItem.class.getName()).log(Level.SEVERE, null, e);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-        catch (java.lang.Exception e) {
+        catch (Exception e) {
+            Logger.getLogger(SDataItem.class.getName()).log(Level.SEVERE, null, e);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-
+        
         return mnLastDbActionResult;
     }
 

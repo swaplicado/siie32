@@ -221,6 +221,7 @@ public abstract class SModConsts {
     public static final int ITMU_MAT_ATT = 1052513;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
+    public static final int ITMU_PRICE_COMM_LOG = 1052122;
     
     public static final int ITMX_IGEN_INV = 1053001;
 
@@ -434,6 +435,9 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
     public static final int TRN_STK_SEG_X = 2023065;
+    public static final int TRN_STK_VAL = 2023068;
+    public static final int TRN_STK_VAL_MVT = 2023069;
+    public static final int TRN_STK_VAL_ACC = 2023070;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
@@ -538,6 +542,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_DOCS_KAR = 2024358;
     public static final int TRNX_MAT_CONS = 2024356;
     public static final int TRNX_MAT_CONS_CC = 2024357;
+    public static final int TRNX_MAT_BUDGET_SUM = 2024359;
     public static final int TRNX_MAT_CONS_CC_R = 1;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
@@ -1038,6 +1043,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_MAT_ATT, "erp.itmu_mat_att");
 
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
+        TablesMap.put(ITMU_PRICE_COMM_LOG, "itmu_price_comm_log");
         
         TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
         TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
@@ -1231,6 +1237,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_SEG, "trn_stk_seg");
         TablesMap.put(TRN_STK_SEG_WHS, "trn_stk_seg_whs");
         TablesMap.put(TRN_STK_SEG_WHS_ETY, "trn_stk_seg_whs_ety");
+        TablesMap.put(TRN_STK_VAL, "trn_stk_val");
+        TablesMap.put(TRN_STK_VAL_MVT, "trn_stk_val_mvt");
+        TablesMap.put(TRN_STK_VAL_ACC, "trn_stk_val_acc");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");

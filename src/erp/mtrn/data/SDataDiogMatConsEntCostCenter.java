@@ -89,8 +89,8 @@ public class SDataDiogMatConsEntCostCenter extends erp.lib.data.SDataRegistry im
             else {
                 mnPkDiogConsEntCostCenter = resultSet.getInt("id_diog_ce_cc");
                 mdPercentage = resultSet.getDouble("percentage");
-                mnFkDiogYearId = resultSet.getInt("fid_diog_doc");
-                mnFkDiogDocId = resultSet.getInt("fid_diog_year");
+                mnFkDiogYearId = resultSet.getInt("fid_diog_year");
+                mnFkDiogDocId = resultSet.getInt("fid_diog_doc");
                 mnFkSubentMatConsumptionEntityId = resultSet.getInt("fid_mat_sub_cons_ent");
                 mnFkSubentMatConsumptionSubentityId = resultSet.getInt("fid_mat_sub_cons_sub_ent");
                 mnFkCostCenterId = resultSet.getInt("fid_cc");
@@ -133,8 +133,8 @@ public class SDataDiogMatConsEntCostCenter extends erp.lib.data.SDataRegistry im
                 sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DIOG_CONS_ENT_CC) + " SET " +
 //                    "id_diog_ce_cc = " + mnPkDiogConsEntCostCenter + ", " +
                     "percentage = " + mdPercentage + ", " +
-                    "fid_diog_doc = " + mnFkDiogYearId + ", " +
-                    "fid_diog_year = " + mnFkDiogDocId + ", " +
+                    "fid_diog_year = " + mnFkDiogYearId + ", " +
+                    "fid_diog_doc = " + mnFkDiogDocId + ", " +
                     "fid_mat_sub_cons_ent = " + mnFkSubentMatConsumptionEntityId + ", " +
                     "fid_mat_sub_cons_sub_ent = " + mnFkSubentMatConsumptionSubentityId + ", " +
                     "fid_cc = '" + mnFkCostCenterId + "' ";

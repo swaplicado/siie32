@@ -39,6 +39,7 @@ import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
 import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
@@ -64,6 +65,7 @@ import erp.mod.trn.form.SFormMaterialProvisionEntity;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
+import erp.mod.trn.form.SFormStockValuation;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewConfEmployeeVsEntity;
 import erp.mod.trn.view.SViewConfEmployeeVsEntityDetail;
@@ -108,8 +110,10 @@ import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
+import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
+import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewValCost;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
@@ -162,6 +166,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintUserSupervisor moFormMaintUserSupv;
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
     private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
+    private SFormStockValuation moFormStockValuation;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -279,6 +284,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
                 registry = new SDbMaterialProvisionEntity();
+                break;
+            case SModConsts.TRN_STK_VAL:
+                registry = new SDbStockValuation();
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 registry = new SDbFunctionalAreaBudgets();
@@ -568,7 +576,7 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
             case SModConsts.TRN_MAT_CC_GRP:
-                view = new SViewMaterialCostCenterGroup(miClient, "Grupos centros costo");
+                view = new SViewMaterialCostCenterGroup(miClient, "Grupos CC");
                 break;
             case SModConsts.TRN_MAT_REQ:
                 switch(subtype) {
@@ -597,31 +605,35 @@ public class SModuleTrn extends SGuiModule {
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
+            case SModConsts.TRN_STK_VAL:
+                title = "Valuación de inventarios";
+                view = new SViewStockValuation(miClient, title);
+                break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de consumo x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM consumo x suministrar detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de consumo suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM de consumo x suministrar";
+                    case SLibConsts.UNDEFINED: title = "RM consumo x suministrar";
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM de resurtido x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM resurtido x suministrar a detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM de resutido suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM de resurtido x suministrar";
+                    case SLibConsts.UNDEFINED: title = "RM resurtido x suministrar";
                         break;
                 }
                 view = new SViewMaterialRequesPendingSupply(miClient, SModConsts.TRNX_MAT_REQ_STK_SUP, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM x comprar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM x comprar detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "RM compradas";
                         break;
@@ -632,9 +644,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x cotizar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x cotizar detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM cotizadas a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM cotizadas detalle";
                         break;
                     case SLibConsts.UNDEFINED: title = "RM x cotizar";
                         break;
@@ -642,19 +654,19 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
-                view = new SViewMaterialConsumptionEntity(miClient, "Centros de consumo");
+                view = new SViewMaterialConsumptionEntity(miClient, "C. consumo");
                 break;
             case SModConsts.TRN_MAT_CONS_SUBENT:
-                view = new SViewMaterialConsumptionSubentity(miClient, "Subcentros de consumo");
+                view = new SViewMaterialConsumptionSubentity(miClient, "Subc. consumo");
                 break;
             case SModConsts.TRN_MAT_CONS_ENT_BUDGET:
-                view = new SViewMaterialConsumptionEntityBudget(miClient, "Centros de consumo presupuesto");
+                view = new SViewMaterialConsumptionEntityBudget(miClient, "Presupuestos c. consumo");
                 break;
             case SModConsts.TRN_MAT_PROV_ENT:
-                view = new SViewMaterialProvisionEntity(miClient, "Centros de suministro");
+                view = new SViewMaterialProvisionEntity(miClient, "C. suministro");
                 break;
             case SModConsts.TRN_ITEM_COST:
-                view = new SViewItemCost(miClient, "Costos de ítems");
+                view = new SViewItemCost(miClient, "Costos ítems");
                 break;
             case SModConsts.TRNX_BP_BAL_CUR:
                 title = (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "CXC" : "CXP") + " x moneda";
@@ -676,70 +688,73 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewFunctionalAreaExpenses(miClient, subtype, "Control presupuestos mensuales gastos");
                 break;
             case SModConsts.TRNX_CONF_USR_VS_ENT:
-                view = new SViewConfUserVsEntity(miClient, "Usuarios vs. centros");
+                view = new SViewConfUserVsEntity(miClient, "Config. usuarios vs. c. consumo suministro");
                 break;
             case SModConsts.TRNX_DET_USR_VS_ENT:
                 switch (subtype) {
                     case SModConsts.TRN_MAT_CONS_ENT_USR:
-                        title = "Usuarios x centros consumo a detalle";
+                        title = "Usuarios vs. c. consumo (detalle)";
                         break;
                     case SModConsts.TRN_MAT_PROV_ENT_USR:
-                        title = "Usuarios x centros suministro a detalle";
+                        title = "Usuarios vs. c. suministro (detalle)";
                         break;
                 }
                 view = new SViewConfUserVsEntityDetail(miClient, subtype, title);
                 break;
             case SModConsts.TRNX_CONF_EMP_VS_ENT:
-                view = new SViewConfEmployeeVsEntity(miClient, "Empleados x centros consumo");
+                view = new SViewConfEmployeeVsEntity(miClient, "Config. empleados vs. c. consumo");
                 break;
             case SModConsts.TRNX_DET_EMP_VS_ENT:
-                view = new SViewConfEmployeeVsEntityDetail(miClient, "Empleados x centros consumo detalle");
+                view = new SViewConfEmployeeVsEntityDetail(miClient, "Empleados vs. c. consumo (detalle)");
                 break;
             case SModConsts.TRNX_CONF_WHS_VS_PRV_ENT:
-                view = new SViewConfWarehouseVsProvEntity(miClient, "Almacenes x centros suministro");
+                view = new SViewConfWarehouseVsProvEntity(miClient, "Config. almacenes vs. c. suministro");
                 break;
             case SModConsts.TRNX_DET_WHS_VS_PRV_ENT:
-                view = new SViewConfWarehouseVsProvEntityDetail(miClient, "Almacenes x entidades suministro detalle");
+                view = new SViewConfWarehouseVsProvEntityDetail(miClient, "Almacenes vs. c. suministro (detalle)");
                 break;
             case SModConsts.TRNX_CONF_WHS_VS_CON_ENT:
-                view = new SViewConfWarehouseVsConsEntity(miClient, "Almacenes x centros consumo");
+                view = new SViewConfWarehouseVsConsEntity(miClient, "Config. almacenes vs. c. consumo");
                 break;
             case SModConsts.TRNX_DET_WHS_VS_CON_ENT:
-                view = new SViewConfWarehouseVsConsEntityDetail(miClient, "Almacenes x entidades consumo detalle");
+                view = new SViewConfWarehouseVsConsEntityDetail(miClient, "Almacenes vs. c. consumo (detalle)");
                 break;
             case SModConsts.TRNX_CONF_SUBENT_VS_CC:
-                view = new SViewConfMatConsSubentityVsCostCenter(miClient, "Subcen consumo x centro costo");
+                view = new SViewConfMatConsSubentityVsCostCenter(miClient, "Config. subc. consumo vs. CC");
                 break;
             case SModConsts.TRNX_DET_SUBENT_VS_CC:
-                view = new SViewConfMatConsSubentityVsCostCenterDetail(miClient, "Subcen consumo x centros costo detalle");
+                view = new SViewConfMatConsSubentityVsCostCenterDetail(miClient, "Subc. consumo vs. CC (detalle)");
                 break;
             case SModConsts.TRNX_CONF_SUBENT_VS_CC_GRP:
-                view = new SViewConfMatConsSubentityCCVsCostCenterGroup(miClient, "Subcen consumo x centro costo x gpo cc");
+                view = new SViewConfMatConsSubentityCCVsCostCenterGroup(miClient, "Config. subc. consumo vs. CC vs. grupos CC");
                 break;
             case SModConsts.TRNX_DET_SUBENT_VS_CC_GRP:
-                view = new SViewConfMatConsSubentityCCVsCostCenterGroupDetail(miClient, "Subcen consumo x centro costo x gpo cc detalle");
+                view = new SViewConfMatConsSubentityCCVsCostCenterGroupDetail(miClient, "Subc. consumo vs. CC vs. grupos CC (detalle)");
                 break;
             case SModConsts.TRNX_CONF_CC_GRP_VS_ITM:
-                view = new SViewConfMatCostCenterGroupItem(miClient, "Grupo de centro de costo vs. ítems");
+                view = new SViewConfMatCostCenterGroupItem(miClient, "Config. grupos CC vs. ítems");
                 break;
             case SModConsts.TRNX_DET_CC_GRP_VS_ITM:
-                view = new SViewConfMatCostCenterGroupItemDetail(miClient, "Grupo centro costo x ítems detalle");
+                view = new SViewConfMatCostCenterGroupItemDetail(miClient, "Grupos CC vs. ítems (detalle)");
                 break;
             case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
-                view = new SViewConfMatCostCenterGroupUser(miClient, "Grupo de centro de costo vs. usuarios");
+                view = new SViewConfMatCostCenterGroupUser(miClient, "Config. grupos CC vs. usuarios y empleados");
                 break;
             case SModConsts.TRNX_DET_CC_GRP_VS_USR:
-                view = new SViewConfMatCostCenterGroupUserDetail(miClient, "Grupo centro costo x usuarios detalle");
+                view = new SViewConfMatCostCenterGroupUserDetail(miClient, "Grupos CC vs. usuarios y empleados (detalle)");
                 break;
             case SModConsts.TRNX_MAT_CONS:
-                view = new SViewReportMaterialConsuption(miClient, "Consumo de materiales");
+                view = new SViewReportMaterialConsuption(miClient, "Consumo materiales");
                 break;
             case SModConsts.TRNX_MAT_CONS_CC:
                 switch (subtype) {
-                    case SModConsts.TRNX_MAT_CONS_CC_R: title = "CC por consumo de materiales resumen"; break;
-                    default: title = "CC por consumo de materiales"; break;
+                    case SModConsts.TRNX_MAT_CONS_CC_R: title = "CC consumo materiales resumen"; break;
+                    default: title = "CC consumo materiales"; break;
                 }
                 view = new SViewReportMaterialConsuptionCC(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_MAT_BUDGET_SUM:
+                view = new SViewReportBudgetSummary(miClient, "Resumen presupuestos vs. gastos");
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
@@ -848,6 +863,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ_CC:
                 if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");
                 form = moFormMaterialRequestCostCenter;
+                break;
+            case SModConsts.TRN_STK_VAL:
+                if (moFormStockValuation == null) moFormStockValuation = new SFormStockValuation(miClient, "Valuación de inventario");
+                form = moFormStockValuation;
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");

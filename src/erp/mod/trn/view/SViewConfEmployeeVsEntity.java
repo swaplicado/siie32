@@ -6,7 +6,12 @@ package erp.mod.trn.view;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -14,25 +19,63 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SViewConfEmployeeVsEntity extends SGridPaneView {
+public class SViewConfEmployeeVsEntity extends SGridPaneView implements ActionListener {
 
+    private JButton jbConfig;
+    
     /**
      * @param client GUI client.
      * @param title View's GUI tab title.
      */
     public SViewConfEmployeeVsEntity(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_CONF_EMP_VS_ENT, SLibConsts.UNDEFINED, title, null);
+        setRowButtonsEnabled(false);
         initComponents();
     }
     
     private void initComponents() {
-        setRowButtonsEnabled(false, false, true, false, false);
+        jbConfig = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Configurar", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbConfig);
+    }
+    
+    private void actionConfig() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SGuiParams params;
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else if (moPaneSettings.isUserInsertApplying() && mnUserLevelAccess == SUtilConsts.LEV_AUTHOR && gridRow.getFkUserInsertId() != miClient.getSession().getUser().getPkUserId()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_RIGHT);
+            }
+            else {
+                params = moFormParams != null ? moFormParams : new SGuiParams();
+                params.setKey(gridRow.getRowPrimaryKey());
+
+                miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, mnGridSubtype, params);
+                moFormParams = null;
+            }
+        }
     }
     
     @Override
@@ -96,5 +139,16 @@ public class SViewConfEmployeeVsEntity extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.HRSU_EMP);
         moSuscriptionsSet.add(SModConsts.TRN_MAT_CONS_ENT_USR);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbConfig) {
+                actionConfig();
+            }
+        }
     }
 }

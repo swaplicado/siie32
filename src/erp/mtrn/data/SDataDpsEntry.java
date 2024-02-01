@@ -13,6 +13,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
+import erp.mod.itm.db.SDbPriceCommercialLog;
 import erp.mod.trn.db.STrnConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -196,6 +197,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocEtyConId; // DPS for adjustment DPS in contract
+    
+    protected boolean mbXtaIsPurInv; 
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -532,6 +535,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int[] getKeyDpsAdjustmentSubtype() { return new int[] { mnFkDpsAdjustmentTypeId, mnFkDpsAdjustmentSubtypeId }; }
     public int[] getKeyCashAccount_n() { return mnFkCashCompanyBranchId_n == SLibConsts.UNDEFINED ? null : new int[] { mnFkCashCompanyBranchId_n, mnFkCashAccountId_n }; }
     public int[] getKeyAuxDps() { return new int[] { mnAuxPkDpsYearId, mnAuxPkDpsDocId }; }
+    
+    public void setXtaIsPurInv(boolean b) { mbXtaIsPurInv = b; }
+    
+    public boolean getXtaIsPurInv() { return mbXtaIsPurInv; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -711,6 +718,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnXtaPkDpsYearConId = 0;
         mnXtaPkDpsDocConId = 0;
         mnXtaPkDpsDocEtyConId = 0;
+        
+        mbXtaIsPurInv = false;
     }
 
     @Override
@@ -1494,6 +1503,19 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             throw new Exception("Ocurrió un error al guardar el vínculo con la requisición, contacte a soporte técnico");
                         }
                     }
+                    
+                    // Save item price commercial if dps purchase invoice
+                    if (mbXtaIsPurInv) {
+                        SDbPriceCommercialLog log = new SDbPriceCommercialLog();
+                        log.setPkItemId(mnFkItemId);
+                        log.setPkUnitId(mnFkOriginalUnitId);
+                        log.setPrice(mdPriceUnitary);
+                        log.setFkDpsYear_n(mnPkYearId);
+                        log.setFkDpsDoc_n(mnPkDocId);
+                        log.setFkDpsEntry_n(mnPkEntryId);
+                        log.setSystem(true);
+                        log.saveFromDps(connection);
+                    }
                 }
 
                 mbIsRegistryNew = false;
@@ -1966,6 +1988,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setFlagMinorChangesEdited(mbFlagMinorChangesEdited);
         clone.setFlagOpenedByMatRequestImport(mbFlagOpenedByMatRequestImport);
 
+        clone.setXtaIsPurInv(mbIsDeleted);
+        
         return clone;
     }
     

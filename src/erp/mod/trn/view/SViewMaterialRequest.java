@@ -536,6 +536,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.tp_req, "
                 + "LPAD(v.num, 6, 0) AS folio, "
                 + "v.dt_req_n, "
+                + "v.dt_delivery_n, "
                 + "v.ref, "
                 + "v.b_ext_sys, "
                 + "v.b_clo_prov, "
@@ -645,6 +646,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_delivery_n", "Fecha entrega estimada"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_pty", "Prioridad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_status", "Estatus"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "auth_status", "Autorización"));

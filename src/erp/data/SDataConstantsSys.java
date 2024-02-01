@@ -107,6 +107,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
+    public static final String CFG_PARAM_TRN_STK_MAT_VAL = "TRN_STK_MAT_VAL";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
@@ -1746,6 +1747,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_STK_MOV_SUM_SUM = 207034;   // sumary of stock movements summary
     public static final int REP_TRN_PS_CL_ITEM_TOT_COMM = 207035;
     public static final int REP_TRN_ADV = 207037;
+    public static final int REP_TRN_MAT_CONS_BUDGET = 207039;
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;

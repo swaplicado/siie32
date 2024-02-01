@@ -258,12 +258,15 @@ public class SMaterialRequestEntryRow implements SGridRow {
                     value = mdQuantity;
                     break;
                 case 6:
-                    value = mdAuxToEstimate;
+                    value = mdAuxSupplied;
                     break;
                 case 7:
-                    value = mbAuxIsEstimated;
+                    value = mdAuxToEstimate;
                     break;
                 case 8:
+                    value = mbAuxIsEstimated;
+                    break;
+                case 9:
                     value = mbAuxEstimate;
                     break;
                 default:
@@ -328,8 +331,9 @@ public class SMaterialRequestEntryRow implements SGridRow {
                 case 3:
                 case 4:
                 case 5:
-                    break;
                 case 6:
+                    break;
+                case 7:
                     if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
                         JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -337,9 +341,9 @@ public class SMaterialRequestEntryRow implements SGridRow {
                         mdAuxToEstimate = (double) value;
                     }
                     break;
-                case 7:
-                    break;
                 case 8:
+                    break;
+                case 9:
                     if ((boolean) value) {
                         if (mbItemNew) {
                             JOptionPane.showMessageDialog(null, "No se puede cotizar esta partida, el ítem debe ser cambiado.", "Error", JOptionPane.ERROR_MESSAGE);

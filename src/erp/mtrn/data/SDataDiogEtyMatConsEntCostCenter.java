@@ -163,8 +163,8 @@ public class SDataDiogEtyMatConsEntCostCenter extends erp.lib.data.SDataRegistry
             else {
                 mnPkDiogEntryConsEntCostCenter = resultSet.getInt("m.id_diog_ety_ce_cc");
                 mdPercentage = resultSet.getDouble("m.percentage");
-                mnFkDiogYearId = resultSet.getInt("m.fid_diog_doc");
-                mnFkDiogDocId = resultSet.getInt("m.fid_diog_year");
+                mnFkDiogYearId = resultSet.getInt("m.fid_diog_year");
+                mnFkDiogDocId = resultSet.getInt("m.fid_diog_doc");
                 mnFkDiogEntryId = resultSet.getInt("m.fid_diog_ety");
                 mnFkSubentMatConsumptionEntityId = resultSet.getInt("m.fid_mat_sub_cons_ent");
                 mnFkSubentMatConsumptionSubentityId = resultSet.getInt("m.fid_mat_sub_cons_sub_ent");
