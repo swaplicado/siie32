@@ -1097,8 +1097,23 @@ public abstract class SMaterialRequestUtils {
     public static Double getItemPriceCommercial(SGuiSession session, int itemPk, int unitPk) {
         double price = 0.0;
         ResultSet resultSet;
-        String sql = "SELECT price FROM itmu_price_view "
-                + "WHERE id_item = " + itemPk + " AND id_unit = " + unitPk + " AND NOT b_del "; 
+        
+        String sql = "SELECT pcl.price " 
+                + "FROM itmu_price_comm_log AS pcl " 
+                + "INNER JOIN ( " 
+                + " SELECT p.id_item, p.id_unit, MAX(p.id_log) AS _max_id_log " 
+                + " FROM itmu_price_comm_log AS p " 
+                + " INNER JOIN ( " 
+                + "  SELECT id_item, id_unit, MAX(dt) AS _max_dt " 
+                + "  FROM itmu_price_comm_log " 
+                + "  WHERE NOT b_del " 
+                + "  GROUP BY id_item, id_unit " 
+                + "  ORDER BY id_item, id_unit) AS t1 ON t1.id_item = p.id_item AND t1.id_unit = p.id_unit AND t1._max_dt = p.dt " 
+                + " WHERE NOT p.b_del " 
+                + " GROUP BY p.id_item, p.id_unit " 
+                + " ORDER BY p.id_item, p.id_unit) AS t2 ON t2.id_item = pcl.id_item AND t2.id_unit = pcl.id_unit AND t2._max_id_log = pcl.id_log " 
+                + "WHERE NOT pcl.b_del AND pcl.id_item = " + itemPk + " AND pcl.id_unit = " + unitPk + " "  
+                + "ORDER BY pcl.id_item, pcl.id_unit";
         try {
             resultSet = session.getStatement().executeQuery(sql);
             if (resultSet.next()) {
