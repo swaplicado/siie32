@@ -358,6 +358,23 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_cob = wety.id_cob AND swhs.id_whs = wety.id_whs " +
                 "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere + ")";
         
+        String priceQuery = "(SELECT pcl.* " +
+                "FROM itmu_price_comm_log AS pcl " +
+                "INNER JOIN ( " +
+                " SELECT p.id_item, p.id_unit, MAX(p.id_log) AS _max_id_log " +
+                " FROM itmu_price_comm_log AS p " +
+                " INNER JOIN ( " +
+                "  SELECT id_item, id_unit, MAX(dt) AS _max_dt " +
+                "  FROM itmu_price_comm_log " +
+                "  WHERE NOT b_del " +
+                "  GROUP BY id_item, id_unit " +
+                "  ORDER BY id_item, id_unit) AS t1 ON t1.id_item = p.id_item AND t1.id_unit = p.id_unit AND t1._max_dt = p.dt " +
+                " WHERE NOT p.b_del " +
+                " GROUP BY p.id_item, p.id_unit " +
+                " ORDER BY p.id_item, p.id_unit) AS t2 ON t2.id_item = pcl.id_item AND t2.id_unit = pcl.id_unit AND t2._max_id_log = pcl.id_log " +
+                "WHERE NOT pcl.b_del " +
+                "ORDER BY pcl.id_item, pcl.id_unit)";
+        
         msSql = "SELECT s.id_item, s.id_unit, " +
                 "i.item_key, i.item, u.symbol,  i.part_num, " +
                 (!showLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
@@ -375,7 +392,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
-                "LEFT JOIN itmu_price_view AS pc ON i.id_item = pc.id_item AND u.id_unit = pc.id_unit AND NOT pc.b_del " +
+                "LEFT JOIN " + priceQuery + " AS pc ON i.id_item = pc.id_item AND u.id_unit = pc.id_unit AND NOT pc.b_del " +
                 (!showLots() ? "" : "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot ") +
                 (!showWarehouses() ? "" : "INNER JOIN erp.bpsu_bpb AS bpb ON s.id_cob = bpb.id_bpb INNER JOIN erp.cfgu_cob_ent AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent ") +
                 (!showWarehouses() ? "" : "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = bpb.id_bpb AND sc.id_wh = ent.id_ent ") +

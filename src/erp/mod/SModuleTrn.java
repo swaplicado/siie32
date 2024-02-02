@@ -619,7 +619,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM consumo x suministrar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
                         break;
@@ -630,7 +630,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM resurtido x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
                         break;
@@ -641,14 +641,15 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM x comprar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM x pedir detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "RM compradas";
-                        break;
-                    case SLibConsts.UNDEFINED: title = "RM x comprar";
+                    case SLibConsts.UNDEFINED: title = "RM x pedir";
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_CLO_PUR:
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, "RM pedidas detalle", params);
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {

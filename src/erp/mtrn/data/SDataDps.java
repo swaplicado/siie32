@@ -2954,7 +2954,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     int inv = 0;
                     double admPrice = 0.0;
                     for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                        connection.getClientInfo();
                         SDataItem item = new SDataItem();
                         item.read(new int[] { dpsEntry.getFkItemId() } , oStatement);
                         if (admCpt != 0 && item.getFkAdministrativeConceptTypeId() == admCpt) {
@@ -2967,7 +2966,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     try {
                         addPrice = admPrice / inv;
-                    } catch(Exception e) {}
+                    } catch(Exception e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
                 
                 for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {

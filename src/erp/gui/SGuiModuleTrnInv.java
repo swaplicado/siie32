@@ -159,6 +159,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqStockSup;
     private javax.swing.JMenuItem jmiReqPurPend;
     private javax.swing.JMenuItem jmiReqPurPendDet;
+    private javax.swing.JMenuItem jmiReqPurClosedDet;
     private javax.swing.JMenuItem jmiReqEstDet;
     private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenuItem jmiCatMatCostCenterGrp;
@@ -650,8 +651,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqStockSupPendDet = new JMenuItem("RM de resurtido por suministrar a detalle");
         jmiReqStockSup = new JMenuItem("RM de resurtido suministradas");
         
-        jmiReqPurPend = new JMenuItem("RM por comprar");
-        jmiReqPurPendDet = new JMenuItem("RM por comprar a detalle");
+        jmiReqPurPend = new JMenuItem("RM por pedir");
+        jmiReqPurPendDet = new JMenuItem("RM por pedir a detalle");
+        jmiReqPurClosedDet = new JMenuItem("RM pedidas a detalle");
         jmiReqEstDet = new JMenuItem("RM cotizadas a detalle");
         jmiReqPendEstDet = new JMenuItem("RM por cotizar a detalle");
         
@@ -680,6 +682,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqPurPend);
         jmMenuReq.add(jmiReqPurPendDet);
+        jmMenuReq.add(jmiReqPurClosedDet);
         jmMenuReq.add(jmiReqEstDet);
         jmMenuReq.add(jmiReqPendEstDet);
         jmMenuReq.addSeparator();
@@ -704,6 +707,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqStockSup.addActionListener(this);
         jmiReqPurPend.addActionListener(this);
         jmiReqPurPendDet.addActionListener(this);
+        jmiReqPurClosedDet.addActionListener(this);
         jmiReqEstDet.addActionListener(this);
         jmiReqPendEstDet.addActionListener(this);
         jmiReqMatConsumptionEntBudget.addActionListener(this);
@@ -940,6 +944,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqStockSup.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
         jmiReqPurPend.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurPendDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPurClosedDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
@@ -1869,7 +1874,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqConsSupPendDet) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_SUP, SModSysConsts.TRNX_MAT_REQ_DETAIL, params);
             }
             else if (item == jmiReqConsSup) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
@@ -1881,7 +1886,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqStockSupPendDet) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_STK_SUP, SModSysConsts.TRNX_MAT_REQ_DETAIL, params);
             }
             else if (item == jmiReqStockSup) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PROV);
@@ -1893,7 +1898,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqPurPendDet) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PEND_PUR, SModSysConsts.TRNX_MAT_REQ_DETAIL, params);
+            }
+            else if (item == jmiReqPurClosedDet) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_CLO_PUR, SModSysConsts.TRNX_MAT_REQ_DETAIL, params);
             }
             else if (item == jmiReqEstDet) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);

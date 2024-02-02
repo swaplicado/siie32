@@ -765,9 +765,8 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
     public static final int TRNX_MAT_REQ_AUTHO = 100; // autorizado
     public static final int TRNX_MAT_REQ_AUTHO_RECH = 106; // rechazado
-    public static final int TRNX_MAT_REQ_PEND_DETAIL = 101; // pendiente a detalle
+    public static final int TRNX_MAT_REQ_DETAIL = 101; // a detalle
     public static final int TRNX_MAT_REQ_PROVIDED = 102; // suministrado
-    public static final int TRNX_MAT_REQ_PURCHASED = 103; // comprado
     public static final int TRNX_MAT_REQ_ESTIMATED = 104; // comprado
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
     

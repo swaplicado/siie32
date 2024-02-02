@@ -224,7 +224,6 @@ public abstract class SModConsts {
     public static final int ITMU_PRICE_COMM_LOG = 1052122;
     
     public static final int ITMX_IGEN_INV = 1053001;
-    public static final int ITMX_PRICE_COMM_REC_LOG = 1;
 
     /*
      * Finance
@@ -515,6 +514,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_PEND = 2024075;        // material requisitions pending
     public static final int TRNX_MAT_REQ_PEND_SUP = 2024072;        // material requisitions pending supply
     public static final int TRNX_MAT_REQ_PEND_PUR = 2024074;        // material requisitions pending purchase
+    public static final int TRNX_MAT_REQ_CLO_PUR = 2024080;        // material requisitions closed purchase
     public static final int TRNX_MAT_REQ_EST = 2024078;        // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;   // diálogo de cotizaciones

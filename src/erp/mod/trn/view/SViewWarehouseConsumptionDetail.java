@@ -61,6 +61,23 @@ public class SViewWarehouseConsumptionDetail extends SGridPaneView  {
             where += SGridUtils.getSqlFilterDateRange("s.dt", dateRange);
         }
         
+        String sqlPrice = "(SELECT pcl.* " 
+                + "FROM itmu_price_comm_log AS pcl " 
+                + "INNER JOIN ( " 
+                + " SELECT p.id_item, p.id_unit, MAX(p.id_log) AS _max_id_log " 
+                + " FROM itmu_price_comm_log AS p " 
+                + " INNER JOIN ( " 
+                + "  SELECT id_item, id_unit, MAX(dt) AS _max_dt " 
+                + "  FROM itmu_price_comm_log " 
+                + "  WHERE NOT b_del " 
+                + "  GROUP BY id_item, id_unit " 
+                + "  ORDER BY id_item, id_unit) AS t1 ON t1.id_item = p.id_item AND t1.id_unit = p.id_unit AND t1._max_dt = p.dt " 
+                + " WHERE NOT p.b_del " 
+                + " GROUP BY p.id_item, p.id_unit " 
+                + " ORDER BY p.id_item, p.id_unit) AS t2 ON t2.id_item = pcl.id_item AND t2.id_unit = pcl.id_unit AND t2._max_id_log = pcl.id_log " 
+                + "WHERE NOT pcl.b_del "  
+                + "ORDER BY pcl.id_item, pcl.id_unit)";
+        
         msSql = "SELECT " 
                 + "s.id_year AS " + SDbConsts.FIELD_ID + "1, "
                 + "s.id_item AS " + SDbConsts.FIELD_ID + "2, "
@@ -123,7 +140,7 @@ public class SViewWarehouseConsumptionDetail extends SGridPaneView  {
                 + "dece.fid_mat_sub_cons_ent = mcse.id_mat_cons_ent AND dece.fid_mat_sub_cons_sub_ent = mcse.id_mat_cons_subent " 
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON "
                 + "dece.fid_cc = cc.pk_cc " 
-                + "LEFT JOIN itmu_price_view AS pcl ON "
+                + "LEFT JOIN " + sqlPrice + " AS pcl ON "
                 + "s.id_item = pcl.id_item AND s.id_unit = pcl.id_unit AND NOT pcl.b_del " 
                 + "WHERE " + where + " " 
                 + "AND NOT s.b_del AND NOT d.b_del AND NOT de.b_del";

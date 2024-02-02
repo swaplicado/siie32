@@ -34,6 +34,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
@@ -41,6 +42,7 @@ import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -64,7 +66,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private JButton mjbCleanSearch;
     //private JButton mjbClose;
     //private JButton mjbOpen;
-    //private SGridFilterDatePeriod moFilterDatePeriod;
+    private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogAuthorizationCardex moDialogAuthCardex;
     private SDialogMaterialRequestSegregation moDialogSegregations;
     private SDialogMaterialRequestSupply moDialogSupply;
@@ -135,7 +137,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         jbAuthCardex.setEnabled(true);
         jbLogCardex.setEnabled(true);
         jbSegregate.setEnabled(true);
-        mjbSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL);
+        mjbSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL);
         mjbCloseOpenSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED);
         mjbToSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
         mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
@@ -143,17 +145,14 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
         jbDocsCardex.setEnabled(true);
         
-
-//        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
-//            moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
-//            if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_PUR) {
-//                moFilterDatePeriod.initFilter(null);
-//            }
-//            else {
-//                moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-//            }
-//            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-//        }
+        if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
+            moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+            moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+            mjbSupply.setEnabled(false);
+            jbSegregate.setEnabled(false);
+            jbRowEdit.setEnabled(false);
+        }
         
         moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
@@ -516,7 +515,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                         + "bmu.bp LIKE '%" + text + "%' OR "
                         + "smr.name LIKE '%" + text + "%' ";
                 
-                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                     msSeekQueryText += "OR i.item LIKE '%" + text + "%' "
                             + "OR i.item_key LIKE '%" + text + "%' "
                             + "OR u.unit LIKE '%" + text + "%' "
@@ -580,7 +579,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
-            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 select = "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "SUM(ve.qty) AS org_qty, "
                         + "COALESCE(SUM(de.sumi_qty), 0) AS sumi_qty, "
@@ -616,7 +615,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 having = "HAVING per_sumi < 1 ";
             }
         }
-        else if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
+        else if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
             select = "SUM(ve.qty) AS org_qty, "
                     + "COALESCE(SUM(de.sumi_qty), 0) AS sumi_qty, "
                     + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
@@ -625,7 +624,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     + "IF((1 - COALESCE(SUM(req_pur.pur_qty), 0) / (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0))) < 0, 0, "
                     + "1 - COALESCE(SUM(req_pur.pur_qty), 0) / (SUM(ve.qty) - COALESCE(SUM(de.sumi_qty), 0))) AS per_x_pur, ";
             
-            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 select += "i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
                         + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per, "
@@ -647,7 +646,16 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 //having = "HAVING per_pur < 1 ";
             }
             
-            where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+            if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+            }
+            else if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
+                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + " OR v.b_clo_pur) ";
+                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+                if (filter != null) {
+                    where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+                }
+            }
         }
         
         subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
@@ -771,7 +779,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                 + "AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                 + "AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                + "GROUP BY ddmr.fid_mat_req " + (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL ? ", ddmr.fid_mat_req_ety " : "")
+                + "GROUP BY ddmr.fid_mat_req " + (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL ? ", ddmr.fid_mat_req_ety " : "")
                 + "ORDER BY ddmr.fid_mat_req) AS req_pur ON "
                 + "ve.id_mat_req = req_pur.fid_mat_req AND ve.id_ety = req_pur.fid_mat_req_ety ";
         msSql += join
@@ -789,7 +797,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "id_ety", "Número partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
@@ -801,7 +809,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "pen_sumi_qty", "Cant. pendiente suministrar"));
             }
-            if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
+            if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "pur_qty", "Cant. comprada"));
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "pen_pur_qty", "Cant. pendiente comprar"));
             }
@@ -818,12 +826,12 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_sumi", "% suministro"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
-        if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
+        if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_pur", "% comprado"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_pur", "% x comprar"));
         }
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ent_cons", "Centro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "s_ent_cons", "Subcentro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cc", "Centro de costo"));
