@@ -1256,7 +1256,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moKeyProvEnt.setEnabled(enable);
         moKeyUsrReq.setEnabled(enable);
         moKeyContractor.setEnabled(enable);
-        moKeyDocNature.setEnabled(enable);
+        moKeyDocNature.setEnabled(enable && moKeyDocNature.getItemCount() > 2);
         moKeyItemRef.setEnabled(enable);
         jbPickItemRef.setEnabled(enable);
         moDateReq.setEnabled(enable);
@@ -1612,7 +1612,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
                 if (moDialogPickerItem == null) {
                 }
-                moDialogPickerItem = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
+                moDialogPickerItem = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
                 
                 moDialogPickerItem.resetPicker();
                 moDialogPickerItem.initComponentsCustom();
@@ -2031,7 +2031,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             else {
                 moTextTypeReq.setValue(SModSysConsts.TRNS_MAT_REQ_TP_C);
             }
-            moKeyDocNature.setValue(new int[] { 1 });
+            if (moKeyDocNature.getItemCount() == 2) {
+                moKeyDocNature.setValue(new int[] { 1 });
+            }
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
