@@ -284,6 +284,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
     protected int[] manAuxDpsTime;
+    protected int mnAuxAssetDpsNat;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
     */
@@ -1557,13 +1558,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int id = SDataConstantsSys.UNDEFINED;
 
         if (isDocumentPur()) {
-            id = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
+            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
+            }
+            else {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
+            }
         }
         else if (isDocumentSal()) {
             id = SDataConstantsSys.FINS_TP_ACC_ITEM_SAL;
         }
         else if (isAdjustmentPur()) {
-            id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
+            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
+            }
+            else {
+                id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
+            }
         }
         else if (isAdjustmentSal()) {
             id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DISC;
@@ -1781,6 +1792,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         return hasAccountableEntries && isPrepaymentOnly;
+    }
+
+    /**
+     * The function checks if any of the SDataDpsEntry objects in the mvDbmsDpsEntries list have a
+     * non-null value for the dbmsDpsEntryMatRequestLink property.
+     * 
+     * @return The method is returning a boolean value.
+     */
+    public boolean isMaterialRequestDocument() {
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
@@ -3401,6 +3428,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         SFinAccountConfig oAccountConfigPrepayments = null;
                         SFinAccountConfig oAccountConfigPrepaymentsToInvoice = null;
                         SFinAccountConfig oAccountConfigItem = null;
+                        
+                        String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                        mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
 
                         if (bFoundPrepayments) { // prevent from reading configuration when not needed!
                             oAccountConfigPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
@@ -3655,10 +3685,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
-
-                                            oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
-                                                    dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
-                                                    mtDate, getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId()), isDebitForOperations(), oStatement));
+                                            boolean hasMaterialRequest = false;
+                                            int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
+                                            // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza es normal
+                                            if (accItemTypeId != SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET && dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
+                                                hasMaterialRequest = true;
+                                            }
+                                            else {
+                                                oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                                        dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        mtDate, accItemTypeId, isDebitForOperations(), oStatement));
+                                            }
 
                                             sConceptEntryAux = sConceptAux;
                                             anSysAccTypeKeyItem = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
@@ -3677,10 +3715,21 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
 
                                             for (int i = 0; i < oAccountConfigItem.getAccountConfigEntries().size(); i++) {
+                                                String idCC = "";
+                                                if (! hasMaterialRequest) {
+                                                    idCC = !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId();
+                                                }
+                                                else {
+                                                    if (oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId() != null && ! oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId().isEmpty()) {
+                                                        idCC = oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId();
+                                                    }
+                                                    else {
+                                                        idCC = !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : "";
+                                                    }
+                                                }
                                                 oRecordEntry = createAccRecordEntry(
                                                         oAccountConfigItem.getAccountConfigEntries().get(i).getAccountId(),
-                                                        !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                        anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
+                                                        idCC, anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
                                                         isAdjustment() ? dpsEntry.getKeyAuxDps() : null, null);
 
                                                 if (isDebitForOperations()) {
@@ -4237,10 +4286,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         name = resultSet.getString("item");
                                     }
                                 }
-
-                                accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
-                                        entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
-                                        mtDate, getAccItemTypeId(entry.getFkDpsAdjustmentTypeId()), isDebitForOperations(), statement);
+                                
+                                int accItemTypeId = getAccItemTypeId(entry.getFkDpsAdjustmentTypeId());
+                                // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza es normal
+                                if (accItemTypeId != SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET && entry.getDbmsDpsEntryMatRequestLink() != null) {
+                                    accountConfigs = new Vector<>();
+                                    accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
+                                }
+                                else {
+                                    accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
+                                            entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
+                                            mtDate, accItemTypeId, isDebitForOperations(), statement);
+                                }
 
                                 for (SFinAccountConfigEntry config : accountConfigs) {
                                     idAccount = config.getAccountId();

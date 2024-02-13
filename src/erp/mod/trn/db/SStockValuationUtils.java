@@ -16,6 +16,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -24,6 +26,9 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona
  */
 public class SStockValuationUtils {
+    
+    static final int DEBIT = 1;
+    static final int CREDIT = 2;
     
     /**
      * The function retrieves a stock valuation configuration object from a JSON string.
@@ -68,7 +73,9 @@ public class SStockValuationUtils {
                         + "d.fid_cob, "
                         + "d.fid_wh, "
                         + "mre.fk_item_ref_n AS ref_ety, "
-                        + "mr.fk_item_ref_n ref_rm " +
+                        + "mr.fk_item_ref_n ref_rm, "
+                        + "de.fid_mat_req_n, "
+                        + "de.fid_mat_req_ety_n " +
                         "FROM " +
                         SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " d " +
                         " INNER JOIN " +
@@ -159,6 +166,13 @@ public class SStockValuationUtils {
             
             oEntry.save(session);
             System.out.println("Entry mvt: " + oEntry.getDateMove().toString());
+            
+            updateTrnStockRowCostByDiog(session, oEntry.getFkDiogYear(), 
+                                            oEntry.getFkDiogDocId(), 
+                                            oEntry.getFkDiogEntryId(), 
+                                            oEntry.getCostUnitary(), 
+                                            oEntry.getQuantityEntry(), 
+                                            DEBIT);
         }
     }
 
@@ -273,7 +287,13 @@ public class SStockValuationUtils {
                 oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
                 oConsumption.setFkStockValuationId(idValuation);
                 oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
-                oConsumption.setAuxWarehousePk(entry.getAuxWarehousePk());
+                oConsumption.setAuxWarehousePk(new int[] { res.getInt("fid_cob"), res.getInt("fid_wh") });
+                if (res.getInt("fid_mat_req_n") > 0) {
+                    oConsumption.setAuxMaterialRequestEntryPk(new int[] { res.getInt("fid_mat_req_n"), res.getInt("fid_mat_req_ety_n") });
+                }
+                else {
+                    oConsumption.setAuxMaterialRequestEntryPk(null);
+                }
                 oConsumption.setFkUserInsertId(session.getUser().getPkUserId());
                 consumptions.add(oConsumption);
 
@@ -342,5 +362,110 @@ public class SStockValuationUtils {
         session.getStatement().getConnection().createStatement().executeUpdate(sqlDelEtys);
         
         return true;
+    }
+    
+    /**
+     * The function checks if a stock valuation can be created based on a given date.
+     * 
+     * @param session The session parameter is an object of type SGuiSession, which represents the user
+     * session in the application. It is used to access the database connection and execute SQL
+     * queries.
+     * @param dtDiog The dtDiog parameter is a Date object representing the date of the document.
+     * @return The method is returning a boolean value.
+     */
+    public static boolean canCreateDiogByValuation(SGuiSession session, final Date dtDiog) {
+        try {
+            String sql = "SELECT id_stk_val "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
+                    + "WHERE NOT b_del "
+                    + "AND '" + SLibUtils.DbmsDateFormatDate.format(dtDiog) + "' BETWEEN dt_sta AND dt_end;";
+            
+            ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            
+            return ! res.next();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
+    
+    private static void updateTrnStockRowCost(SGuiSession session, final int idYear,
+                                                                final int idItem, 
+                                                                final int idUnit, 
+                                                                final int idLot, 
+                                                                final int idCob, 
+                                                                final int idWh, 
+                                                                final int idMov, 
+                                                                final double dCost,
+                                                                final double dQty,
+                                                                final int opType) throws SQLException {
+        double dTotal = SLibUtils.roundAmount(dCost * dQty);
+        String sql = "UPDATE "
+                + "" + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " SET "
+                + "cost_u = " + SLibUtils.roundAmount(dCost) + ", "
+                + "cost = " + SLibUtils.roundAmount(dTotal) + ", ";
+        
+        sql += (DEBIT == opType ? "debit = " : "credit = ") + SLibUtils.roundAmount(dTotal) + " ";
+
+        sql += "WHERE (id_year = " + idYear + ") and "
+                + "(id_item = " + idItem + ") and "
+                + "(id_unit = " + idUnit + ") and "
+                + "(id_lot = " + idLot + ") and "
+                + "(id_cob = " + idCob + ") and "
+                + "(id_wh = " + idWh + ") and "
+                + "(id_mov = " + idMov + ");";
+
+       session.getStatement().getConnection().createStatement().executeUpdate(sql);
+    }
+    
+
+    /**
+     * The function updates the cost and quantity of a row in the TRN_STK table based on the given
+     * parameters.
+     * 
+     * @param session The session parameter is an object of type SGuiSession, which represents the user
+     * session in the system. It is used to access the database connection and execute SQL queries.
+     * @param idDiogYear The year of the document.
+     * @param idDiogDoc The idDiogDoc parameter represents the ID of the document in the inventory
+     * movement.
+     * @param idDiogEty The parameter idDiogEty represents the ID of the document entry in the
+     * inventory movement document (diog) table. It is used to identify the specific entry in the diog
+     * table for which the stock row cost needs to be updated.
+     * @param dCost The parameter "dCost" represents the cost value that needs to be updated in the
+     * TrnStock table.
+     * @param dQty dQty is the quantity of the item being updated in the transaction stock row.
+     * @param opType The "opType" parameter is an integer that represents the type of operation to be
+     * performed. It is used to determine how the stock row cost should be updated. The specific values
+     * and their meanings would depend on the implementation of the "updateTrnStockRowCost" method.
+     */
+    public static void updateTrnStockRowCostByDiog(SGuiSession session, 
+                                                            final int idDiogYear, 
+                                                            final int idDiogDoc, 
+                                                            final int idDiogEty, 
+                                                            final double dCost,
+                                                            final double dQty,
+                                                            final int opType) throws SQLException {
+        String sql = "SELECT id_year, id_item, id_unit, id_lot, id_cob, id_wh, id_mov "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
+                + "WHERE fid_diog_year = " + idDiogYear + " "
+                + "AND fid_diog_doc = " + idDiogDoc + " "
+                + "AND fid_diog_ety = " + idDiogEty + " "
+                + "AND NOT b_del;";
+        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        while (res.next()) {
+            updateTrnStockRowCost(session,
+                            res.getInt("id_year"), 
+                            res.getInt("id_item"), 
+                            res.getInt("id_unit"), 
+                            res.getInt("id_lot"), 
+                            res.getInt("id_cob"), 
+                            res.getInt("id_wh"), 
+                            res.getInt("id_mov"),
+                            dCost,
+                            dQty,
+                            opType);
+        }
     }
 }

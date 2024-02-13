@@ -141,6 +141,10 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         return (double) mvValues.get(6);
     }
     
+    public void setUnitaryPrice(double price) {
+        mdUnitaryPrice = price;
+    }
+    
     public SDataItem getItem() {
         return moMatRequestEntry.getDataItem();
     }

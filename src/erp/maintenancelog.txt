@@ -8,6 +8,11 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 4) Se agrega la busqueda por centro de consumo en la vista de suministros.
 5) Creación de la vista de requisiciones pedidas a detalle
 6) Modificación a la bitácora de precios comerciales para considerar los precios administrativos.
+7) Contabilización de facturas de proveedores como activo fijo
+8) Surtido en almacén de facturas de proveedores como activo fijo
+9) Validación de fecha de movimientos de almacén vs. control de valuaciones de consumos
+10) Contabilización de facturas de proveedores en base a los CC de la RM en caso de que los haya
+11) Reflejar valor de entradas y de salidas (producto de la valuación de consumos) tanto en partidas de DIOG (diog_ety) como movimientos de salidas de almacén (trn_stk)
   
 ================================================================================
 SIIE 3.2 237.0/ 2024-01-26

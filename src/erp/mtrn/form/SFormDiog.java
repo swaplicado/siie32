@@ -37,6 +37,7 @@ import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -1638,7 +1639,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
                             iogEntry.setQuantity(stockSupplyRow.getQuantityAboutToSupply());
-                            iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
+                            // Cuando la naturaleza del documento sea diferente de la predeterminada, las partidas quedan a valor 0
+                            double diogEntryValueUnitary = moParamDpsSource.getFkDpsNatureId() == SDataConstantsSys.TRNU_DPS_NAT_DEF ? dpsEntry.getPriceUnitaryReal_r() : 0d;
+                            iogEntry.setValueUnitary(diogEntryValueUnitary);
                             iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
                             iogEntry.setOriginalQuantity(stockSupplyRow.getOriginalQuantityAboutToSupply());
                             iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0d ? 0d : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
@@ -1683,7 +1686,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     SDbMaterialRequest oMatReq = new SDbMaterialRequest();
                                     oMatReq.read(miClient.getSession(), dpsEntry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestKey());
                                     
-                                    if (oMatReq.getTypeRequest().equals("S")) {
+                                    if (oMatReq.getTypeRequest().equals(SModSysConsts.TRNS_MAT_REQ_TP_R)) {
                                         iogEntry.setFkMatRequestId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId());
                                         iogEntry.setFkMatRequestEtyId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestEntryId());
                                     }
@@ -3500,6 +3503,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         if (!validation.getIsError()) {
             if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                validation.setComponent(jftDate);
+            }
+            else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
+                validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
                 validation.setComponent(jftDate);
             }
             else if (moDiog != null && moDiog.getPkYearId() != year) {

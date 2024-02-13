@@ -108,13 +108,14 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_TRN_STK_MAT_VAL = "TRN_STK_MAT_VAL";
+    public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
+    public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
     public static final String CFG_PARAM_DOC_HRS_REP_COM = "DOC_HRS_REP_COM";
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
-    public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
@@ -1222,6 +1223,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
     
     public static final int TRNU_DPS_NAT_DEF = 1;
+    public static final int TRNU_DPS_NAT_ASSET = 2;
     
     public static final int TRNU_CT_DPS_PUR = 1;
     public static final int TRNU_CT_DPS_SAL = 2;

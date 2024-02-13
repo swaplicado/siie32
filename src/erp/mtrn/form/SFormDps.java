@@ -8011,6 +8011,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setDbmsAddElektraParts(dpsSourceEntry.getDbmsAddElektraParts());
                                                 entry.setDbmsAddElektraPartPriceUnitary(dpsSourceEntry.getDbmsAddElektraPartPriceUnitary());
                                                 entry.setDbmsAddJsonData(dpsSourceEntry.getDbmsAddJsonData());
+                                                entry.setDbmsDpsEntryMatRequest(dpsSourceEntry.getDbmsDpsEntryMatRequestLink());
 
                                                 entry.calculateTotal(miClient, moDps.getDate(),
                                                         moDps.getFkTaxIdentityEmisorTypeId(), moDps.getFkTaxIdentityReceptorTypeId(),
