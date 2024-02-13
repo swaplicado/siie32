@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 238.0/ 2024-02-13
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega la naturaleza de documento en las requisiciónes de materiales.
+2) Se agrega la consulta de los consumos de almacenes a detalle
+3) Se agrega la configuración de cuenta contable para las subentidades de consumo.
+4) Se agrega la busqueda por centro de consumo en la vista de suministros.
+5) Creación de la vista de requisiciones pedidas a detalle
+6) Modificación a la bitácora de precios comerciales para considerar los precios administrativos.
+  
+================================================================================
 SIIE 3.2 237.0/ 2024-01-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
