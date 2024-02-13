@@ -7,6 +7,11 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mitm.data.SDataItem;
+import erp.mod.fin.db.SFinUtils;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
+import erp.mod.trn.db.SDbMaterialRequestEntry;
+import erp.mtrn.data.SDataDpsMaterialRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -14,9 +19,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
+import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -426,6 +434,72 @@ public abstract class SFinAccountUtilities {
         }
 
         return accountConfigs;
+    }
+    
+    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigs(Connection connection, SDataDpsMaterialRequest oMatRequestDpsEtyLink) throws Exception {
+        if (oMatRequestDpsEtyLink == null) {
+            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (No se encontró vínculo con la Requisición de materiales)");
+        }
+        
+        // Lee la partida de la requisición de materiales y obtiene centro de costo y cuenta contable
+        ArrayList<SFinAccountConfigEntry> lConfigs = getMaterialRequestEntryAccountConfigsByMatReqEty(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId(), oMatRequestDpsEtyLink.getFkMaterialRequestEntryId());
+        if (lConfigs.size() > 0) {
+            return lConfigs;
+        }
+
+        // Lee el encabezado de la requisición de materiales y obtiene centro de costo y cuenta contable
+        return getMaterialRequestEntryAccountConfigsByMatReq(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId());
+    }
+    
+    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
+        // Proceso para obtener la información de la partida de la requisición de materiales
+        String sql = "SELECT " +
+                "re.fk_cc_n, cc.id_cc, cc.cc, se.code, se.name, se.fk_acc_fa, acc.id_acc, '1' AS per " +
+            "FROM " +
+                "trn_mat_req_ety re " +
+                    "LEFT JOIN " +
+                "fin_cc cc ON re.fk_cc_n = cc.pk_cc " +
+                    "LEFT JOIN " +
+                "trn_mat_cons_subent se ON re.fk_subent_mat_cons_ent_n = se.id_mat_cons_ent " +
+                    "AND re.fk_subent_mat_cons_subent_n = se.id_mat_cons_subent " +
+                    "LEFT JOIN " +
+                "fin_acc acc ON se.fk_acc_fa = acc.pk_acc " +
+            "WHERE re.id_mat_req = " + idMatReq + " " +
+                "AND re.id_ety = " + idMatReqEty + ";";
+
+        return executeQueryAndGetConfigs(connection, sql);
+    }
+
+    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
+        // Proceso para obtener la información del encabezado de la requisición de materiales
+        String sql = "SELECT " +
+                "rcc.id_cc AS pk_cc, cc.id_cc, cc.cc, se.fk_acc_fa, rcc.per, acc.id_acc " +
+            "FROM " +
+                "trn_mat_req r " +
+                    "LEFT JOIN " +
+                "trn_mat_req_cc rcc ON r.id_mat_req = rcc.id_mat_req " +
+                    "LEFT JOIN " +
+                "trn_mat_cons_subent se ON rcc.id_mat_subent_cons_ent = se.id_mat_cons_ent " +
+                    "AND rcc.id_mat_subent_cons_subent = se.id_mat_cons_subent " +
+                    "LEFT JOIN " +
+                "fin_acc acc ON se.fk_acc_fa = acc.pk_acc " +
+                    "LEFT JOIN " +
+                "fin_cc cc ON rcc.id_cc = cc.pk_cc " +
+            "WHERE r.id_mat_req = " + idMatReq + ";";
+
+        return executeQueryAndGetConfigs(connection, sql);
+    }
+
+    private static ArrayList<SFinAccountConfigEntry> executeQueryAndGetConfigs(Connection connection, String sql) throws SQLException {
+        ArrayList<SFinAccountConfigEntry> lConfigs = new ArrayList<>();
+        ResultSet resultSet = connection.createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            if (resultSet.getString("id_acc") != null && resultSet.getString("id_acc").length() > 0) {
+                SFinAccountConfigEntry oConfigEntry = new SFinAccountConfigEntry(resultSet.getString("id_acc"), resultSet.getString("id_cc"), resultSet.getDouble("per"));
+                lConfigs.add(oConfigEntry);
+            }
+        }
+        return lConfigs;
     }
 
     public static double[] prorateAmount(final double amount, final double[] percentages) {

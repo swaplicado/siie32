@@ -514,6 +514,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_PEND = 2024075;        // material requisitions pending
     public static final int TRNX_MAT_REQ_PEND_SUP = 2024072;        // material requisitions pending supply
     public static final int TRNX_MAT_REQ_PEND_PUR = 2024074;        // material requisitions pending purchase
+    public static final int TRNX_MAT_REQ_CLO_PUR = 2024080;        // material requisitions closed purchase
     public static final int TRNX_MAT_REQ_EST = 2024078;        // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;   // diálogo de cotizaciones
@@ -543,6 +544,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_CONS = 2024356;
     public static final int TRNX_MAT_CONS_CC = 2024357;
     public static final int TRNX_MAT_BUDGET_SUM = 2024359;
+    public static final int TRNX_WAH_CONS_DET = 2024360;
     public static final int TRNX_MAT_CONS_CC_R = 1;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)

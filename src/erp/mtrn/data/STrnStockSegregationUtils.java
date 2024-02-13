@@ -315,7 +315,7 @@ public abstract class STrnStockSegregationUtils {
         }
         
         try {
-            result = client.getSession().getStatement().executeQuery(sql);
+            result = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
             
             if (result.next()) {
                 stock.setMovementIn(result.getDouble("f_mov_in"));

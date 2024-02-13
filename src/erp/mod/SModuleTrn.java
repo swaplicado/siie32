@@ -115,6 +115,7 @@ import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewValCost;
+import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -336,6 +337,13 @@ public class SModuleTrn extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE NOT b_del "
                         + "ORDER BY id_st_mat_req ";
+                break;
+            case SModConsts.TRNU_DPS_NAT:
+                settings = new SGuiCatalogueSettings("Naturaleza de documento", 1);
+                sql = "SELECT id_dps_nat AS " + SDbConsts.FIELD_ID + "1, dps_nat AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY id_dps_nat ";
                 break;
             case SModConsts.TRNU_TP_DPS:
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
@@ -611,7 +619,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM consumo x suministrar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
                         break;
@@ -622,7 +630,7 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM resurtido x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
                         break;
@@ -633,14 +641,15 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL: title = "RM x comprar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM x pedir detalle";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PURCHASED: title = "RM compradas";
-                        break;
-                    case SLibConsts.UNDEFINED: title = "RM x comprar";
+                    case SLibConsts.UNDEFINED: title = "RM x pedir";
                         break;
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_CLO_PUR:
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, "RM pedidas detalle", params);
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
@@ -755,6 +764,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_BUDGET_SUM:
                 view = new SViewReportBudgetSummary(miClient, "Resumen presupuestos vs. gastos");
+                break;
+            case SModConsts.TRNX_WAH_CONS_DET:
+                view = new SViewWarehouseConsumptionDetail(miClient, "Consumo almacenes detalle");
                 break;
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");

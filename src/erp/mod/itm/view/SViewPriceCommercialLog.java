@@ -6,20 +6,34 @@
 package erp.mod.itm.view;
 
 import erp.mod.SModConsts;
+import erp.mod.trn.form.SDialogItemPriceCardex;
+import erp.mod.trn.view.SViewMaterialRequest;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
  * @author Isabel Servin
  */
-public class SViewPriceCommercialLog extends SGridPaneView {
+public class SViewPriceCommercialLog extends SGridPaneView implements ActionListener {
+    
+    JButton jbItemPriceCardex;
+    SDialogItemPriceCardex moDialogItemPriceCardex;
 
     /**
      * Creates view of Price commercial log.
@@ -32,7 +46,38 @@ public class SViewPriceCommercialLog extends SGridPaneView {
     }
     
     private void initComponetsCustom() {
+        jbItemPriceCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de precios comerciales de ítems", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbItemPriceCardex);
         
+        moDialogItemPriceCardex = new SDialogItemPriceCardex(miClient, "Cardex de precios comerciales de ítems");
+    }
+    
+    private void actionCardex() {
+        int[] key;
+        
+        if (jbItemPriceCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                        
+                        moDialogItemPriceCardex.setFormParams(key);
+                        moDialogItemPriceCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     @Override
@@ -49,6 +94,23 @@ public class SViewPriceCommercialLog extends SGridPaneView {
         if ((Boolean) filter) {
             sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
+        
+        String from = "FROM (SELECT pcl.* " 
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " AS pcl " 
+                + "INNER JOIN ( " 
+                + " SELECT p.id_item, p.id_unit, MAX(p.id_log) AS _max_id_log " 
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " AS p " 
+                + " INNER JOIN ( " 
+                + "  SELECT id_item, id_unit, MAX(dt) AS _max_dt " 
+                + "  FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " " 
+                + "  WHERE NOT b_del " 
+                + "  GROUP BY id_item, id_unit " 
+                + "  ORDER BY id_item, id_unit) AS t1 ON t1.id_item = p.id_item AND t1.id_unit = p.id_unit AND t1._max_dt = p.dt " 
+                + " WHERE NOT p.b_del " 
+                + " GROUP BY p.id_item, p.id_unit " 
+                + " ORDER BY p.id_item, p.id_unit) AS t2 ON t2.id_item = pcl.id_item AND t2.id_unit = pcl.id_unit AND t2._max_id_log = pcl.id_log " 
+                + "WHERE NOT pcl.b_del " 
+                + "ORDER BY pcl.id_item, pcl.id_unit) AS v ";
         
         msSql = "SELECT "
                 + "v.id_item AS " + SDbConsts.FIELD_ID + "1, " 
@@ -70,7 +132,7 @@ public class SViewPriceCommercialLog extends SGridPaneView {
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " AS v "
+                + from
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON " 
                 + "v.id_item = i.id_item " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON " 
@@ -116,5 +178,16 @@ public class SViewPriceCommercialLog extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.TRN_DPS);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);     
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbItemPriceCardex) {
+                actionCardex();
+            }
+        }
     }
 }

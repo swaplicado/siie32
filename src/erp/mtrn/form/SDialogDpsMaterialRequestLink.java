@@ -449,6 +449,8 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             entry = (SDataMaterialRequestEntryLinkRow) moTablePane.getTableRow(i);
             entry.setQuantityToLink(0d);
+            entry.setUnitaryPrice(entry.getMaterialRequestEntry().getPriceUnitary());
+            entry.prepareTableRow();
         }
 
         moTablePane.renderTableRows();
@@ -459,7 +461,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         if (moDps == null) {
             moDps = new SDataDps();
             moDps.setIsRecordAutomatic(true);
-            moDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);
+            moDps.setFkDpsNatureId(moMaterialRequest.getFkDpsNatureId());
             moDps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
             moDps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
             moDps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);

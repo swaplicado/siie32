@@ -14,6 +14,7 @@ public class SFinAccountConfigEntry implements java.io.Serializable {
     protected double mdPercentage;
     protected int mnBasicTax_n;
     protected int mnTax_n;
+    protected double mdAuxAmount;
 
     public SFinAccountConfigEntry(String account, String costCenter, double percentage) {
         setAccountId(account);
@@ -34,10 +35,12 @@ public class SFinAccountConfigEntry implements java.io.Serializable {
     public final void setPercentage(double d) { mdPercentage = d; }
     public final void setBasicTax(int n) { mnBasicTax_n = n; }
     public final void setTax(int n) { mnTax_n = n; }
+    public final void setAuxAmount(double d) { mdAuxAmount = d; }
 
     public java.lang.String getAccountId() { return msAccountId; }
     public java.lang.String getCostCenterId() { return msCostCenterId; }
     public double getPercentage() { return mdPercentage; }
     public int getBasicTax() { return mnBasicTax_n; }
     public int getTax() { return mnTax_n; }
+    public double getAuxAmount() { return mdAuxAmount; }
 }

@@ -46,6 +46,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     protected boolean mbAuxConsumed;
     protected double mdAuxConsumption;
     protected int[] maAuxWarehousePk;
+    protected int[] maAuxMaterialRequestEntryPk;
 
     public SDbStockValuationMvt() {
         super(SModConsts.TRN_STK_VAL_MVT);
@@ -75,6 +76,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     public void setAuxConsumed(boolean b) { mbAuxConsumed = b; }
     public void setAuxConsumption(double d) { mdAuxConsumption = d; }
     public void setAuxWarehousePk(int[] a) { maAuxWarehousePk = a; }
+    public void setAuxMaterialRequestEntryPk(int[] a) { maAuxMaterialRequestEntryPk = a; }
     
     public int getPkStockValuationMvtId() { return mnPkStockValuationMvtId; }
     public Date getDateMove() { return mtDateMove; }
@@ -100,6 +102,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     public boolean isAuxConsumed() { return mbAuxConsumed; }
     public double getAuxConsumption() { return mdAuxConsumption; }
     public int[] getAuxWarehousePk() { return maAuxWarehousePk; }
+    public int[] getAuxMaterialRequestEntryPk() { return maAuxMaterialRequestEntryPk; }
 
     @Override
     public void setPrimaryKey(int[] key) {

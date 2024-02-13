@@ -1,4 +1,20 @@
 ================================================================================
+SIIE 3.2 238.0/ 2024-02-13
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega la naturaleza de documento en las requisiciónes de materiales.
+2) Se agrega la consulta de los consumos de almacenes a detalle
+3) Se agrega la configuración de cuenta contable para las subentidades de consumo.
+4) Se agrega la busqueda por centro de consumo en la vista de suministros.
+5) Creación de la vista de requisiciones pedidas a detalle
+6) Modificación a la bitácora de precios comerciales para considerar los precios administrativos.
+7) Contabilización de facturas de proveedores como activo fijo
+8) Surtido en almacén de facturas de proveedores como activo fijo
+9) Validación de fecha de movimientos de almacén vs. control de valuaciones de consumos
+10) Contabilización de facturas de proveedores en base a los CC de la RM en caso de que los haya
+11) Reflejar valor de entradas y de salidas (producto de la valuación de consumos) tanto en partidas de DIOG (diog_ety) como movimientos de salidas de almacén (trn_stk)
+  
+================================================================================
 SIIE 3.2 237.0/ 2024-01-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

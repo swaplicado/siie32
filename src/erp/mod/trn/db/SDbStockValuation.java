@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -46,6 +47,12 @@ public class SDbStockValuation extends SDbRegistryUser {
         super(SModConsts.TRN_STK_VAL);
     }
     
+    /**
+     * The function computes the start date based on the end date and some conditions.
+     * 
+     * @param session The session parameter is an object of type SGuiSession, which is used to
+     * establish a connection to the database and execute SQL queries.
+     */
     private void computeStartDate(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet;
 
@@ -76,6 +83,16 @@ public class SDbStockValuation extends SDbRegistryUser {
         }
     }
     
+    /**
+     * The function checks if there are any non-deleted stock valuations after a given end date.
+     * 
+     * @param session The session parameter is an instance of the SGuiSession class, which represents
+     * the user's session in the application. It is used to access the database connection and execute
+     * SQL queries.
+     * @param dtEnd The dtEnd parameter is a Date object that represents the end date for the
+     * valuation.
+     * @return The method is returning a boolean value.
+     */
     private boolean canDeleteValuation(SGuiSession session, final Date dtEnd) throws SQLException {
         String sql = "SELECT id_stk_val FROM " + 
                 SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " " +
@@ -125,6 +142,44 @@ public class SDbStockValuation extends SDbRegistryUser {
                     summedValuation.setAuxWarehousePk(group.get(0).getAuxWarehousePk());
 
                     return summedValuation;
+                })
+                .collect(Collectors.toList());
+    }
+    
+    
+    /**
+     * The function takes a list of SDbStockValuationMvt objects, groups them based on certain
+     * criteria, and returns a new list of SDbStockValuationMvt objects with the average cost unitary
+     * value for each group.
+     * 
+     * @param stockValuations An ArrayList of SDbStockValuationMvt objects.
+     * @return The method is returning a List of SDbStockValuationMvt objects.
+     */
+    private List<SDbStockValuationMvt> groupByDiogEtyAndAverage(ArrayList<SDbStockValuationMvt> stockValuations) {
+        // Agrupar por mtDateMove, mnFkItemId, mnFkUnitId, mnFkMaterialRequestItemRef_n, mnFkStockValuationId
+        Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
+                .collect(Collectors.groupingBy(valuation ->
+                        valuation.getFkDiogYear() + "_" +
+                        valuation.getFkDiogDocId() + "_" +
+                        valuation.getFkDiogEntryId()));
+
+        // Crear nuevos objetos SDbStockValuationMvt con los valores sumados
+        return groupedValuations.values().stream()
+                .map(group -> {
+                    SDbStockValuationMvt averaged = new SDbStockValuationMvt();
+
+                    // Sumar mdQuantityConsumption y mdCost_r
+                    OptionalDouble avCostUnitary = group.stream()
+                            .mapToDouble(SDbStockValuationMvt::getCostUnitary)
+                            .average();
+
+                    // Configurar el nuevo objeto SDbStockValuationMvt
+                    averaged.setFkDiogYear(group.get(0).getFkDiogYear());  // Tomar el año del primer elemento del grupo
+                    averaged.setFkDiogDocId(group.get(0).getFkDiogDocId());  // Tomar doc del primer elemento del grupo
+                    averaged.setFkDiogEntryId(group.get(0).getFkDiogEntryId());  // Tomar id ety del primer elemento del grupo
+                    averaged.setCostUnitary(avCostUnitary.getAsDouble());
+
+                    return averaged;
                 })
                 .collect(Collectors.toList());
     }
@@ -281,9 +336,23 @@ public class SDbStockValuation extends SDbRegistryUser {
                     consumption.save(session);
                 }
                 
-//                ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
-//                lGrouped.addAll(groupAndSumStockValuations(lConsumptions));
-                
+                // The above code is grouping a list of consumptions and then updating the cost of
+                // stock rows based on the grouped data. It first creates an empty ArrayList called
+                // lGrouped. Then, it adds the grouped data to the lGrouped list using the
+                // groupByDiogEtyAndAverage method. Finally, it iterates over each row in the lGrouped
+                // list and updates the cost of the stock row using the updateTrnStockRowCostByDiog
+                // method.
+                System.out.println("Agrupando consumos...");
+                ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
+                lGrouped.addAll(groupByDiogEtyAndAverage(lConsumptions));
+                for (SDbStockValuationMvt oRow : lGrouped) {
+                     SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYear(), 
+                                            oRow.getFkDiogDocId(), 
+                                            oRow.getFkDiogEntryId(), 
+                                            oRow.getCostUnitary(), 
+                                            1d, 
+                                            SStockValuationUtils.CREDIT);
+                }
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
             }
