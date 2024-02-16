@@ -44,7 +44,7 @@ public class SDataFormerPayrollMove extends erp.lib.data.SDataRegistry implement
     public void setPkMoveId(int n) { mnPkMoveId = n; }
     public void setType(int n) { mnType = n; }
     public void setTransactionId(int n) { mnTransactionId = n; }
-    public void setTransaction(java.lang.String s) { msTransaction = s; }
+    public void setTransaction(java.lang.String s) { msTransaction = SLibUtilities.textLeft(s, 25); }
     public void setReferenceId(int n) { mnReferenceId = n; }
     public void setReference(java.lang.String s) { msReference = s; }
     public void setReferenceKey(java.lang.String s) { msReferenceKey = s; }

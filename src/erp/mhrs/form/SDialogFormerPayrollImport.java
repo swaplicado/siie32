@@ -945,7 +945,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         int nF_id_tipo = 0;
         int nF_id_aux = 0;
-        String nF_aux = "";
+        String sF_aux = "";
         int nF_id_ref = 0;
         String sF_ref = "";
         String sF_ref_cve = "";
@@ -1072,7 +1072,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                 while (oResultSet.next()) {
                     nF_id_tipo = oResultSet.getInt("f_id_tipo");
                     nF_id_aux = oResultSet.getInt("f_id_aux");
-                    nF_aux = oResultSet.getString("f_aux");
+                    sF_aux = oResultSet.getString("f_aux");
                     nF_id_ref = oResultSet.getInt("f_id_ref");
                     sF_ref = oResultSet.getString("f_ref");
                     sF_ref_cve = oResultSet.getString("f_ref_cve");
@@ -1092,13 +1092,13 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
                     switch (nF_id_tipo) {
                         case 1: // global link
-                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "'\ndel campo ";
+                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + sF_aux + "'\ndel campo ";
                             break;
                         case 2: // link by department
-                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel departamento No. " + sF_ref_cve + " '" + sF_ref + "' (" + nF_id_ref + "), del campo ";
+                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + sF_aux + "',\ndel departamento No. " + sF_ref_cve + " '" + sF_ref + "' (" + nF_id_ref + "), del campo ";
                             break;
                         case 3: // link by employee
-                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel empleado No. " + nF_id_ref + " '" + sF_ref + "', del campo ";
+                            sMsg = "La configuración de importación para la " + sType + " No. " + nF_id_aux + " '" + sF_aux + "',\ndel empleado No. " + nF_id_ref + " '" + sF_ref + "', del campo ";
                             break;
                         default:
                     }
@@ -1179,13 +1179,13 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
                     switch (nF_id_tipo) {
                         case 1: // global link
-                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux;
+                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + sF_aux;
                             break;
                         case 2: // link by department
-                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + sF_aux + "; " + sF_ref_cve + ". " + sF_ref;
                             break;
                         case 3: // link by employee
-                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + nF_id_ref + ". " + sF_ref;
+                            concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + sF_aux + "; " + nF_id_ref + ". " + sF_ref;
                             break;
                         default:
                     }
@@ -1254,7 +1254,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                     oPayrollMove.setPkMoveId(++nMoveId);
                     oPayrollMove.setType(nType);
                     oPayrollMove.setTransactionId(nF_id_aux);
-                    oPayrollMove.setTransaction(nF_aux);
+                    oPayrollMove.setTransaction(sF_aux);
                     oPayrollMove.setReferenceId(nF_id_ref);
                     oPayrollMove.setReference(sF_ref);
                     oPayrollMove.setReferenceKey(sF_ref_cve);

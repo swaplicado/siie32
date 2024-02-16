@@ -678,6 +678,12 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
+                
+                // format names and keys of items of parent generic item:
+                
+                formatItemKeysAndNames(connection.createStatement()); // once again format names and keys, due to bugs in stored procedure!!!
+                
+                // finish saving registry:
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -698,5 +704,225 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     @Override
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    public void formatItemKeysAndNames(java.sql.Statement statement) throws Exception {
+        String[] names = new String[6]; // up to 6 positions for item names
+        String[] keys = new String[5]; // up to 5 positions for item keys
+        int maxPosName = 0; // to slip positions for name if item line is applying
+        int maxPosKey = 0; // to slip positions for key if item line is applying
+        
+        // Step 1: Item name and key formatting of positions set for generic item, item line (if applicable), brand and manufacturer:
+        
+        if (mbIsItemLineApplying) {
+            // name formating as defined in item line section:
+            
+            if (mnNamingLinePosItemGeneric > 0 && mnNamingLinePosItemGeneric <= names.length) {
+                names[mnNamingLinePosItemGeneric - 1] = "erp.itmu_igen.igen";
+                
+                if (mnNamingLinePosItemGeneric > maxPosName) {
+                    maxPosName = mnNamingLinePosItemGeneric;
+                }
+            }
+            
+            if (mnNamingLinePosItemLine > 0 && mnNamingLinePosItemLine <= names.length) {
+                names[mnNamingLinePosItemLine - 1] = "COALESCE(erp.itmu_line.line, '')";
+                
+                if (mnNamingLinePosItemLine > maxPosName) {
+                    maxPosName = mnNamingLinePosItemLine;
+                }
+            }
+            
+            if (mnNamingLinePosBrand > 0 && mnNamingLinePosBrand <= names.length) {
+                names[mnNamingLinePosBrand - 1] = "erp.itmu_brd.brd";
+                
+                if (mnNamingLinePosBrand > maxPosName) {
+                    maxPosName = mnNamingLinePosBrand;
+                }
+            }
+            
+            if (mnNamingLinePosManufacturer > 0 && mnNamingLinePosManufacturer <= names.length) {
+                names[mnNamingLinePosManufacturer - 1] = "erp.itmu_mfr.mfr";
+                
+                if (mnNamingLinePosManufacturer > maxPosName) {
+                    maxPosName = mnNamingLinePosManufacturer;
+                }
+            }
+            
+            // key formating as defined in item line section:
+            
+            if (mbIsItemKeyApplying) {
+                if (mnKeyLinePosItemGeneric > 0 && mnKeyLinePosItemGeneric <= keys.length) {
+                    keys[mnKeyLinePosItemGeneric - 1] = "erp.itmu_igen.code";
+
+                    if (mnKeyLinePosItemGeneric > maxPosKey) {
+                        maxPosKey = mnKeyLinePosItemGeneric;
+                    }
+                }
+
+                if (mnKeyLinePosItemLine > 0 && mnKeyLinePosItemLine <= keys.length) {
+                    keys[mnKeyLinePosItemLine - 1] = "COALESCE(erp.itmu_line.code, '')";
+
+                    if (mnKeyLinePosItemLine > maxPosKey) {
+                        maxPosKey = mnKeyLinePosItemLine;
+                    }
+                }
+
+                if (mnKeyLinePosBrand > 0 && mnKeyLinePosBrand <= keys.length) {
+                    keys[mnKeyLinePosBrand - 1] = "erp.itmu_brd.code";
+
+                    if (mnKeyLinePosBrand > maxPosKey) {
+                        maxPosKey = mnKeyLinePosBrand;
+                    }
+                }
+
+                if (mnKeyLinePosManufacturer > 0 && mnKeyLinePosManufacturer <= keys.length) {
+                    keys[mnKeyLinePosManufacturer - 1] = "erp.itmu_mfr.code";
+
+                    if (mnKeyLinePosManufacturer > maxPosKey) {
+                        maxPosKey = mnKeyLinePosManufacturer;
+                    }
+                }
+            }
+        }
+        else {
+            // name formating as defined in default section:
+            
+            if (mnNamingOrdinaryPosItemGeneric > 0 && mnNamingOrdinaryPosItemGeneric <= names.length) {
+                names[mnNamingOrdinaryPosItemGeneric - 1] = "erp.itmu_igen.igen";
+            }
+            
+            if (mnNamingOrdinaryPosBrand > 0 && mnNamingOrdinaryPosBrand <= names.length) {
+                names[mnNamingOrdinaryPosBrand - 1] = "erp.itmu_brd.brd";
+            }
+            
+            if (mnNamingOrdinaryPosManufacturer > 0 && mnNamingOrdinaryPosManufacturer <= names.length) {
+                names[mnNamingOrdinaryPosManufacturer - 1] = "erp.itmu_mfr.mfr";
+            }
+            
+            // key formating as defined in default section:
+            
+            if (mbIsItemKeyApplying) {
+                if (mnKeyOrdinaryPosItemGeneric > 0 && mnKeyOrdinaryPosItemGeneric <= keys.length) {
+                    keys[mnKeyOrdinaryPosItemGeneric - 1] = "erp.itmu_igen.code";
+                }
+
+                if (mnKeyOrdinaryPosBrand > 0 && mnKeyOrdinaryPosBrand <= keys.length) {
+                    keys[mnKeyOrdinaryPosBrand - 1] = "erp.itmu_brd.code";
+                }
+
+                if (mnKeyOrdinaryPosManufacturer > 0 && mnKeyOrdinaryPosManufacturer <= keys.length) {
+                    keys[mnKeyOrdinaryPosManufacturer - 1] = "erp.itmu_mfr.code";
+                }
+            }
+        }
+        
+        // Step 2: Item name and key formatting of positions set for item name, presentation and code:
+        
+        int pos;
+        
+        // name formating as in default section:
+        
+        if (mnNamingOrdinaryPosName > 0) {
+            pos = !mbIsItemLineApplying ? mnNamingOrdinaryPosName : ++maxPosName;
+
+            if (pos <= names.length) {
+                names[pos - 1] = "erp.itmu_item.name";
+            }
+        }
+
+        if (mnNamingOrdinaryPosPresentation > 0) {
+            pos = !mbIsItemLineApplying ? mnNamingOrdinaryPosPresentation : ++maxPosName;
+
+            if (pos <= names.length) {
+                names[pos - 1] = "erp.itmu_item.present";
+            }
+        }
+        
+        // key formating as in default section:
+        
+        if (mbIsItemKeyApplying) {
+            if (mnKeyOrdinaryPosCode > 0) {
+                pos = !mbIsItemLineApplying ? mnKeyOrdinaryPosCode : ++maxPosKey;
+
+                if (pos <= keys.length) {
+                    keys[pos - 1] = "erp.itmu_item.code";
+                }
+            }
+        }
+        
+        // Step 3: item key, name and short name update:
+        
+        String sqlKey = "";
+        
+        for (String key : keys) {
+            if (key != null) {
+                sqlKey += (sqlKey.isEmpty() ? "CONCAT(" : ", ") + key;
+            }
+        }
+        
+        if (!sqlKey.isEmpty()) {
+            sqlKey += ")";
+        }
+        
+        String sqlName = "";
+        
+        for (String name : names) {
+            if (name != null) {
+                sqlName += (sqlName.isEmpty() ? "CONCAT(" : ", ' ', ") + name;
+            }
+        }
+        
+        if (!sqlName.isEmpty()) {
+            sqlName += ")";
+        }
+        
+        String sqlNameShort = "";
+        
+        if (mbIsItemShortApplying) {
+            for (String name : names) {
+                if (name != null) {
+                    if (!name.equals("erp.itmu_mfr.mfr")) { // name of manufacturer is not considered for short name
+                        if (name.equals("erp.itmu_item.name") || name.equals("erp.itmu_item.present")) {
+                            name += "_short";
+                        }
+
+                        sqlNameShort += (sqlNameShort.isEmpty() ? "CONCAT(" : ", ' ', ") + name;
+                    }
+                }
+            }
+
+            if (!sqlNameShort.isEmpty()) {
+                sqlNameShort += ")";
+            }
+        }
+        
+        // Step 4: update item keys and names:
+        
+        String sql = "UPDATE erp.itmu_item, erp.itmu_brd, erp.itmu_mfr, erp.itmu_igen";
+
+        if (mbIsItemLineApplying) {
+            sql += ", erp.itmu_line";
+        }
+
+        sql += " SET ";
+
+        sql += "erp.itmu_item.item_key = " + (!sqlKey.isEmpty() ? sqlKey : "erp.itmu_item.id_item") + ", ";
+
+        sql += "erp.itmu_item.item = " + sqlName + ", ";
+
+        sql += "erp.itmu_item.item_short = " + (!sqlNameShort.isEmpty() ? sqlNameShort : "''") + " ";
+
+        sql += "WHERE erp.itmu_item.fid_igen = erp.itmu_igen.id_igen AND erp.itmu_igen.id_igen = " + mnPkItemGenericId + " "
+                + "AND erp.itmu_item.fid_brd = erp.itmu_brd.id_brd "
+                + "AND erp.itmu_item.fid_mfr = erp.itmu_mfr.id_mfr ";
+
+        if (mbIsItemLineApplying) {
+            sql += "AND (erp.itmu_item.fid_line_n IS NULL OR erp.itmu_item.fid_line_n = erp.itmu_line.id_line) ";
+        }
+
+        sql += ";";
+
+        statement.execute(sql);
     }
 }
