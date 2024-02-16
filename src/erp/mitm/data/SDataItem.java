@@ -14,9 +14,11 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibUtils;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
@@ -324,6 +326,23 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public boolean isClassPurchasesConsumable() {
         return SLibUtilities.compareKeys(moDbmsDataItemGeneric.getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
+    }
+    
+    public boolean applyItemComposition(Statement statement, Date date) {
+        boolean apply = false;
+        ResultSet resultSet;
+        
+        try {
+            String sql = "SELECT * FROM itmu_item_comp " + 
+                    "WHERE NOT b_del AND id_item = " + mnPkItemId + " " + 
+                    "AND (('" + SLibUtils.DbmsDateFormatDate.format(date) + "' BETWEEN dt_sta AND dt_end_n) " +
+                    "OR ('" + SLibUtils.DbmsDateFormatDate.format(date) + "' >= dt_sta AND dt_end_n IS NULL))";
+            resultSet = statement.executeQuery(sql);
+            apply = resultSet.next();
+        }
+        catch (Exception e) { }
+        
+        return apply;
     }
 
     @Override

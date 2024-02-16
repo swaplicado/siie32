@@ -291,7 +291,7 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
                 map.put("nFidTpAdjDis", SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC);
                 map.put("nFidStDps", SDataConstantsSys.TRNS_ST_DPS_EMITED);
                 map.put("nFidStDpsVal", SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
-                map.put("bShowDetail", jrbBySummary.isSelected() ? false : true);
+                map.put("bShowDetail", !jrbBySummary.isSelected());
                 map.put("sSqlWhereWithoutRelatedParty", jckWithoutRelatedParty.isSelected() ? " AND bp.b_att_rel_pty = 0 " : "");
 
                 jasperPrint = SDataUtilities.fillReport(miClient, mbParamIsNet ? SDataConstantsSys.REP_TRN_PS_CL_ITEM_TOT : SDataConstantsSys.REP_TRN_PS_CL_ITEM, map);
@@ -331,7 +331,7 @@ public class SDialogRepSalesPurchasesNet extends javax.swing.JDialog implements 
 
         if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moFieldDateEnd.setFieldValue(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateEnd.requestFocus();
+            jftDateEnd.requestFocus();           
         }
     }
 

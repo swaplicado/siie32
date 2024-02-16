@@ -79,6 +79,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -103,6 +104,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatCfdiStampSign;
     private javax.swing.JMenuItem jmiCatCfdiStampSignPending;
     private javax.swing.JMenuItem jmiCatCfdiSendingLog;
+    private javax.swing.JMenuItem jmiCatItemComposition;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates;
     private javax.swing.JMenuItem jmiEstimatesLinkPend;
@@ -319,6 +321,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfdiStampSign = new JMenuItem("CFDI timbrados");
         jmiCatCfdiStampSignPending = new JMenuItem("CFDI por timbrar");
         jmiCatCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
+        jmiCatItemComposition = new JMenuItem("Configuración de ítems con composición");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -333,6 +336,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCatCfdi.addSeparator();
         jmCatCfdi.add(jmiCatCfdiSendingLog);
         jmCat.add(jmCatCfdi);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatItemComposition);
 
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de ventas");
@@ -724,6 +729,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfdiStampSign.addActionListener(this);
         jmiCatCfdiStampSignPending.addActionListener(this);
         jmiCatCfdiSendingLog.addActionListener(this);
+        jmiCatItemComposition.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesLinkPend.addActionListener(this);
         jmiEstimatesLinked.addActionListener(this);
@@ -1854,6 +1860,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatCfdiSendingLog) {
                 showView(SDataConstants.TRN_CFD_SND_LOG, SDataConstantsSys.TRNS_TP_CFD_INV);
+            }
+            else if (item == jmiCatItemComposition) {
+                miClient.getSession().showView(SModConsts.ITMU_ITEM_COMP, SLibConsts.UNDEFINED, null);                
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

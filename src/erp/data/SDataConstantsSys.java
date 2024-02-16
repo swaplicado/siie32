@@ -24,7 +24,8 @@ public abstract class SDataConstantsSys {
 
     public static final int[] CFGS_TP_ENT_CASH_CASH = new int[] { 1, 1 };
     public static final int[] CFGS_TP_ENT_CASH_BANK = new int[] { 1, 2 };
-    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11};
+    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11 };
+    public static final int[] CFGS_TP_ENT_WH_TL = new int[] { 2, 12 };
     public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 21 };
     public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 22 };
     public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 23 };
@@ -1240,7 +1241,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_EST = { 2, 1, 1 };
     public static final int[] TRNU_TP_DPS_SAL_CON = { 2, 1, 2 };
     public static final int[] TRNU_TP_DPS_SAL_ORD = { 2, 2, 1 };
-     public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
+    public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
     public static final int[] TRNU_TP_DPS_SAL_REM = { 2, 3, 2 };
     public static final int[] TRNU_TP_DPS_SAL_REC = { 2, 3, 3 };
     public static final int[] TRNU_TP_DPS_SAL_TIC = { 2, 3, 4 };

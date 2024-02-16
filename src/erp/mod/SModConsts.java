@@ -222,6 +222,7 @@ public abstract class SModConsts {
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
     public static final int ITMU_PRICE_COMM_LOG = 1052122;
+    public static final int ITMU_ITEM_COMP = 1052141;
     
     public static final int ITMX_IGEN_INV = 1053001;
 
@@ -402,6 +403,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_TAX = 2023020;
     public static final int TRN_DPS_ETY_COMMS = 2023021;
     public static final int TRN_DPS_ETY_HIST = 2023066;
+    public static final int TRN_DPS_ETY_ITEM_COMP = 2023072;
     public static final int TRN_DPS_ETY_ANALYSIS = 2023065;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
@@ -1046,6 +1048,7 @@ public abstract class SModConsts {
 
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
         TablesMap.put(ITMU_PRICE_COMM_LOG, "itmu_price_comm_log");
+        TablesMap.put(ITMU_ITEM_COMP, "itmu_item_comp");
         
         TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
         TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
@@ -1207,6 +1210,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
         TablesMap.put(TRN_DPS_ETY_HIST, "trn_dps_ety_hist");
+        TablesMap.put(TRN_DPS_ETY_ITEM_COMP, "trn_dps_ety_item_comp");
         TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
