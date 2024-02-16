@@ -439,7 +439,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " ";
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + ") ";
                 }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
@@ -546,6 +546,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "smr.name AS req_status, "
                 + "smp.name AS sum_status, "
                 + "smpu.name AS comp_status, "
+                + "dn.dps_nat, "
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
                 + "iref.item_key, "
@@ -610,6 +611,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_st_mat_prov = smp.id_st_mat_prov "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_MAT_PUR) + " AS smpu ON "
                 + "v.fk_st_mat_pur = smpu.id_st_mat_pur "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS dn ON "
+                + "v.fk_dps_nat = dn.id_dps_nat "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
                 + "v.fk_usr_req = ur.id_usr "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAINT_USER) + " AS mu ON "
@@ -644,6 +647,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_req", "Tipo requisición", 20));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Concepto/gasto"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "dps_nat", "Naturaleza doc."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ref", "Referencia"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_delivery_n", "Fecha entrega estimada"));

@@ -10,6 +10,7 @@ import erp.lib.SLibConstants;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -26,6 +28,9 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona
  */
 public class SStockValuationRecordUtils {
+    
+    private static final int TYPE_PUR = 1;
+    private static final int TYPE_INV = 2;
     
     /**
      * The function "makeDiogsFromConsumptions" creates record entries for expenses and warehouse
@@ -46,12 +51,11 @@ public class SStockValuationRecordUtils {
     public static boolean makeRecordEntriesFromConsumptions(SGuiSession session, final Object[] recordPk, final Date dtStart, ArrayList<SDbStockValuationMvt> lConsumptions) throws Exception {
         SDataRecordEntry oDataRecordEntry;
         SDataRecordEntry oDataRecordEntryWhs;
-        SDbStockValuationAccount oRecEtyAcc;
         SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(session.getStatement().getConnection().createStatement());
         HashMap<Integer, java.util.Vector<erp.mfin.data.SFinAccountConfigEntry>> purCfgs = new HashMap<>();
         HashMap<Integer, java.util.Vector<erp.mfin.data.SFinAccountConfigEntry>> assetCfgs = new HashMap<>();
-        java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> vConfigs;
-        java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> vConfigsWhs;
+        java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> vPurAccConfigs;
+        java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> vWhsAccConfigs;
         HashMap<Integer, SDataItem> lItems = new HashMap<>();
         SDataItem oItem;
         HashMap<Integer, SDataUnit> lUnits = new HashMap<>();
@@ -60,8 +64,7 @@ public class SStockValuationRecordUtils {
         SDataAccount oAccount;
         HashMap<String, Integer> lCC = new HashMap<>();
         int nIdCC;
-//        HashMap<String, ArrayList<SDataRecordEntry>> assetEntries = new HashMap<>();
-
+        ArrayList<SDataRecordEntry> lRecordEntries = new ArrayList<>();
         int n = lConsumptions.size();
         int i = 1;
         if ((n * 2) > oCfg.getMaxRecEntries()) {
@@ -100,264 +103,349 @@ public class SStockValuationRecordUtils {
                 oUnit = oItem.getDbmsDataUnit();
             }
             
-            /**
-             * Partida de gastos
-             */
-            oDataRecordEntry = new SDataRecordEntry();
-
-            oDataRecordEntry.setPkYearId((int) recordPk[0]);
-            oDataRecordEntry.setPkPeriodId((int) recordPk[1]);
-            oDataRecordEntry.setPkBookkeepingCenterId((int) recordPk[2]);
-            oDataRecordEntry.setPkRecordTypeId((String) recordPk[3]);
-            oDataRecordEntry.setPkNumberId((int) recordPk[4]);
-            oDataRecordEntry.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), oConsumption.getQuantityConsumption(), oUnit.getSymbol(), oCfg.getTextPurEntries()));
-            oDataRecordEntry.setReference("");
-            oDataRecordEntry.setIsReferenceTax(false);
-            oDataRecordEntry.setDebit(oConsumption.getCost_r());
-            oDataRecordEntry.setCredit(0d);
-            oDataRecordEntry.setExchangeRate(1d);
-            oDataRecordEntry.setExchangeRateSystem(1d);
-            oDataRecordEntry.setDebitCy(oConsumption.getCost_r());
-            oDataRecordEntry.setCreditCy(0d);
-            oDataRecordEntry.setUnits(0d);
-            oDataRecordEntry.setUserId(0);
-            oDataRecordEntry.setSortingPosition(0);
-            oDataRecordEntry.setOccasionalFiscalId("");
-            oDataRecordEntry.setIsExchangeDifference(false);
-            oDataRecordEntry.setIsSystem(true);
-            oDataRecordEntry.setIsDeleted(false);
-        
-            if (purCfgs.containsKey(oConsumption.getFkItemReference_n())) {
-                vConfigs = purCfgs.get(oConsumption.getFkItemReference_n());
+            ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
+            if (oConsumption.getAuxMaterialRequestEntryPk() != null) {
+                if (oConsumption.getAuxMaterialRequestEntryPk()[1] > 0) {
+                    lPurAccConfigs = SFinAccountUtilities.getMaterialRequestEntryAccountConfigsByMatReqEty(session.getStatement().getConnection(), 
+                                                                                oConsumption.getAuxMaterialRequestEntryPk()[0], 
+                                                                                oConsumption.getAuxMaterialRequestEntryPk()[1]);
+                }
+                if (lPurAccConfigs.isEmpty()) {
+                    lPurAccConfigs = SFinAccountUtilities.getMaterialRequestEntryAccountConfigsByMatReq(session.getStatement().getConnection(), 
+                                                                                oConsumption.getAuxMaterialRequestEntryPk()[0]);
+                }
             }
-            else {
-                vConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
-                                                                                (int) recordPk[2], 
-                                                                                dtStart, 
-                                                                                oCfg.getFinTpAccItemPur(),
-                                                                                true, 
-                                                                                session.getStatement().getConnection().createStatement());
-                purCfgs.put(oConsumption.getFkItemReference_n(), vConfigs);
-            }
-
-            if (vConfigs.size() > 0) {
-                if (lAccounts.containsKey(vConfigs.get(0).getAccountId())) {
-                    oAccount = lAccounts.get(vConfigs.get(0).getAccountId());
+            
+            if (lPurAccConfigs.isEmpty()) {
+                /**
+                 * Configuración para partida de gastos
+                 */
+                if (purCfgs.containsKey(oConsumption.getFkItemReference_n())) {
+                    vPurAccConfigs = purCfgs.get(oConsumption.getFkItemReference_n());
                 }
                 else {
-                    oAccount = new SDataAccount();
-                    oAccount.read(new String[] { vConfigs.get(0).getAccountId() }, session.getStatement());
-                    lAccounts.put(vConfigs.get(0).getAccountId(), oAccount);
+                    vPurAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
+                                                                                    (int) recordPk[2], 
+                                                                                    dtStart, 
+                                                                                    oCfg.getFinTpAccItemPur(),
+                                                                                    true, 
+                                                                                    session.getStatement().getConnection().createStatement());
+                    purCfgs.put(oConsumption.getFkItemReference_n(), vPurAccConfigs);
+                }
+                
+                lPurAccConfigs.addAll(vPurAccConfigs);
+            }
+            
+            if (lPurAccConfigs.size() > 0) {
+                double dTotalAmount = 0d;
+                SFinAccountConfigEntry oConfigMaj = null;
+                for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
+                    if (oConfigMaj == null || oConfigMaj.getPercentage() < oConfig.getPercentage()) {
+                        oConfigMaj = oConfig;
+                    }
+
+                    oConfig.setAuxAmount(SLibUtils.roundAmount(oConfig.getPercentage() * oConsumption.getCost_r()));
+                    dTotalAmount = SLibUtils.roundAmount(dTotalAmount + oConfig.getAuxAmount());
+                }
+                if (Math.abs(dTotalAmount - oConsumption.getCost_r()) >= 0.01d) {
+                    if (oConfigMaj != null) {
+                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + Math.abs(dTotalAmount - oConsumption.getCost_r())));
+                    }
                 }
 
-                if (lCC.containsKey(vConfigs.get(0).getCostCenterId())) {
-                    nIdCC = lCC.get(vConfigs.get(0).getCostCenterId());
-                }
-                else {
-                    nIdCC = SFinUtils.getCostCenterId(session, vConfigs.get(0).getCostCenterId());
-                    lCC.put(vConfigs.get(0).getCostCenterId(), nIdCC);
-                }
+                for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
+                    if (lAccounts.containsKey(oConfig.getAccountId())) {
+                        oAccount = lAccounts.get(oConfig.getAccountId());
+                    }
+                    else {
+                        oAccount = new SDataAccount();
+                        oAccount.read(new String[]{oConfig.getAccountId()}, session.getStatement());
+                        lAccounts.put(oConfig.getAccountId(), oAccount);
+                    }
 
-                SFinUtils.getCostCenterId(session, vConfigs.get(0).getCostCenterId());
+                    if (lCC.containsKey(oConfig.getCostCenterId())) {
+                        nIdCC = lCC.get(oConfig.getCostCenterId());
+                    }
+                    else {
+                        nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
+                        lCC.put(oConfig.getCostCenterId(), nIdCC);
+                    }
 
-                oDataRecordEntry.setFkAccountIdXXX(vConfigs.get(0).getAccountId());
-                oDataRecordEntry.setFkAccountId(oAccount.getPkAccountId());
-                oDataRecordEntry.setFkCostCenterId_n(nIdCC);
-                oDataRecordEntry.setFkAccountingMoveTypeId(oAccount.getFkAccountTypeId_r());
-                oDataRecordEntry.setFkAccountingMoveClassId(oAccount.getFkAccountClassId_r());
-                oDataRecordEntry.setFkAccountingMoveSubclassId(oAccount.getFkAccountSubclassId_r());
-                oDataRecordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_PUR[0]);
-                oDataRecordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_PUR[1]);
-                oDataRecordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
-                oDataRecordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
-                oDataRecordEntry.setFkSystemMoveCategoryIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD[0]);
-                oDataRecordEntry.setFkSystemMoveTypeIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD[1]);
-                oDataRecordEntry.setFkCurrencyId(1);
-                oDataRecordEntry.setFkCostCenterIdXXX_n(vConfigs.get(0).getCostCenterId());
+                    /**
+                     * Partida de gastos
+                     */
+                    oDataRecordEntry = createRecordEntry(session,
+                            TYPE_PUR,
+                            recordPk,
+                            oItem,
+                            oConsumption.getQuantityConsumption(),
+                            oConfig.getAuxAmount(),
+                            oUnit,
+                            oCfg.getTextPurEntries(),
+                            oAccount,
+                            nIdCC,
+                            oConfig.getCostCenterId(),
+                            sortPosition++,
+                            new int[]{oConsumption.getFkDiogYear(), oConsumption.getFkDiogDocId()},
+                            oConsumption.getFkItemReference_n(),
+                            SModSysConsts.FINS_TP_SYS_MOV_PUR,
+                            SModSysConsts.FINS_TP_SYS_ACC_NA_NA,
+                            SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD,
+                            null,
+                            oConsumption.getFkStockValuationId(),
+                            oConsumption.getPkStockValuationMvtId());
+                    lRecordEntries.add(oDataRecordEntry);
+                }
             }
             else {
                 throw new Exception("No se encontró cuenta contable para el item " + oConsumption.getFkItemId());
             }
-
-            oDataRecordEntry.setFkCheckWalletId_n(0);
-            oDataRecordEntry.setFkCheckId_n(0);
-            oDataRecordEntry.setFkBizPartnerId_nr(0);
-            oDataRecordEntry.setFkBizPartnerBranchId_n(0);
-            oDataRecordEntry.setFkReferenceCategoryId_n(0);
-            oDataRecordEntry.setFkCompanyBranchId_n(0);
-            oDataRecordEntry.setFkEntityId_n(0);
-            oDataRecordEntry.setFkPlantEntityId_n(0);
-            oDataRecordEntry.setFkTaxBasicId_n(0);
-            oDataRecordEntry.setFkTaxId_n(0);
-            oDataRecordEntry.setFkYearId_n(0);
-            oDataRecordEntry.setFkDpsYearId_n(0);
-            oDataRecordEntry.setFkDpsDocId_n(0);
-            oDataRecordEntry.setFkDpsAdjustmentYearId_n(0);
-            oDataRecordEntry.setFkDpsAdjustmentDocId_n(0);
-            oDataRecordEntry.setFkDiogYearId_n(oConsumption.getFkDiogYear());
-            oDataRecordEntry.setFkDiogDocId_n(oConsumption.getFkDiogDocId());
-            oDataRecordEntry.setFkMfgYearId_n(0);
-            oDataRecordEntry.setFkMfgOrdId_n(0);
-            oDataRecordEntry.setFkCfdId_n(0);
-            oDataRecordEntry.setFkCostGicId_n(0);
-            oDataRecordEntry.setFkPayrollFormerId_n(0);
-            oDataRecordEntry.setFkPayrollId_n(0);
-            oDataRecordEntry.setFkItemId_n(oConsumption.getFkItemId());
-            oDataRecordEntry.setFkItemAuxId_n(oConsumption.getFkItemReference_n());
-            oDataRecordEntry.setFkUnitId_n(1);
-            oDataRecordEntry.setFkBookkeepingYearId_n(0);
-            oDataRecordEntry.setFkBookkeepingNumberId_n(0);
-            oDataRecordEntry.setFkUserNewId(session.getUser().getPkUserId());
-            oDataRecordEntry.setFkUserEditId(1);
-            oDataRecordEntry.setFkUserDeleteId(1);
-            oDataRecordEntry.setSortingPosition(++sortPosition);
-
-            oDataRecordEntry.save(session.getStatement().getConnection());
-            if (oDataRecordEntry.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
-                throw new Exception("Error al guardar el movimiento contable.");
-            }
-
-            oRecEtyAcc = new SDbStockValuationAccount();
-
-            oRecEtyAcc.setFkFinRecYearId(oDataRecordEntry.getPkYearId());
-            oRecEtyAcc.setFkFinRecPerId(oDataRecordEntry.getPkPeriodId());
-            oRecEtyAcc.setFkFinRecBkcId(oDataRecordEntry.getPkBookkeepingCenterId());
-            oRecEtyAcc.setFkFinRecTpRecId(oDataRecordEntry.getPkRecordTypeId());
-            oRecEtyAcc.setFkFinRecNum(oDataRecordEntry.getPkNumberId());
-            oRecEtyAcc.setFkFinRecEty(oDataRecordEntry.getPkEntryId());
-            oRecEtyAcc.setFkStockValuationId(oConsumption.getFkStockValuationId());
-            oRecEtyAcc.setFkValuationMvtId(oConsumption.getPkStockValuationMvtId());
-
-            oRecEtyAcc.save(session);
             
             /**
-             * Partida de almacén
+             * Configuración de la partida de inventarios
              */
-            oDataRecordEntryWhs = new SDataRecordEntry();
-            
-            /** Este es el bloque para partidas individuales:
-             * 
-             */
-            oDataRecordEntryWhs.setPkYearId((int) recordPk[0]);
-            oDataRecordEntryWhs.setPkPeriodId((int) recordPk[1]);
-            oDataRecordEntryWhs.setPkBookkeepingCenterId((int) recordPk[2]);
-            oDataRecordEntryWhs.setPkRecordTypeId((String) recordPk[3]);
-            oDataRecordEntryWhs.setPkNumberId((int) recordPk[4]);
-            oDataRecordEntryWhs.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), oConsumption.getQuantityConsumption(), oUnit.getSymbol(), oCfg.getTextAssetEntries()));
-            oDataRecordEntryWhs.setReference("");
-            oDataRecordEntryWhs.setIsReferenceTax(false);
-            oDataRecordEntryWhs.setDebit(0d);
-            oDataRecordEntryWhs.setCredit(oConsumption.getCost_r());
-            oDataRecordEntryWhs.setExchangeRate(1d);
-            oDataRecordEntryWhs.setExchangeRateSystem(1d);
-            oDataRecordEntryWhs.setDebitCy(0d);
-            oDataRecordEntryWhs.setCreditCy(oConsumption.getCost_r());
-            oDataRecordEntryWhs.setUnits(0d);
-            oDataRecordEntryWhs.setUserId(0);
-            oDataRecordEntryWhs.setSortingPosition(0);
-            oDataRecordEntryWhs.setOccasionalFiscalId("");
-            oDataRecordEntryWhs.setIsExchangeDifference(false);
-            oDataRecordEntryWhs.setIsSystem(true);
-            oDataRecordEntryWhs.setIsDeleted(false);
-
             if (assetCfgs.containsKey(oConsumption.getFkItemReference_n())) {
-                vConfigsWhs = assetCfgs.get(oConsumption.getFkItemReference_n());
+                vWhsAccConfigs = assetCfgs.get(oConsumption.getFkItemReference_n());
             }
             else {
-                vConfigsWhs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
+                vWhsAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
                                                                                     (int) recordPk[2], 
                                                                                     dtStart, 
                                                                                     oCfg.getFinTpAccItemAsset(), 
                                                                                     false, 
                                                                                     session.getStatement().getConnection().createStatement());
-                assetCfgs.put(oConsumption.getFkItemReference_n(), vConfigsWhs);
+                assetCfgs.put(oConsumption.getFkItemReference_n(), vWhsAccConfigs);
             }
 
-            if (vConfigsWhs.size() > 0) {
-                if (lAccounts.containsKey(vConfigsWhs.get(0).getAccountId())) {
-                    oAccount = lAccounts.get(vConfigsWhs.get(0).getAccountId());
+            if (vWhsAccConfigs.size() > 0) {
+                double dTotalAmount = 0d;
+                SFinAccountConfigEntry oConfigMaj = null;
+                for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {
+                    if (oConfigMaj == null || oConfigMaj.getPercentage() < oConfig.getPercentage()) {
+                        oConfigMaj = oConfig;
+                    }
+                    
+                    oConfig.setAuxAmount(SLibUtils.roundAmount(oConfig.getPercentage() * oConsumption.getCost_r()));
+                    dTotalAmount = SLibUtils.roundAmount(dTotalAmount + oConfig.getAuxAmount());
                 }
-                else {
-                    oAccount = new SDataAccount();
-                    oAccount.read(new String[] { vConfigsWhs.get(0).getAccountId() }, session.getStatement());
-                    lAccounts.put(vConfigsWhs.get(0).getAccountId(), oAccount);
+                if (Math.abs(dTotalAmount - oConsumption.getCost_r()) >= 0.01d) {
+                    if (oConfigMaj != null) {
+                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + Math.abs(dTotalAmount - oConsumption.getCost_r())));
+                    }
                 }
+                for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {
+                    if (lAccounts.containsKey(oConfig.getAccountId())) {
+                        oAccount = lAccounts.get(oConfig.getAccountId());
+                    }
+                    else {
+                        oAccount = new SDataAccount();
+                        oAccount.read(new String[] { oConfig.getAccountId() }, session.getStatement());
+                        lAccounts.put(oConfig.getAccountId(), oAccount);
+                    }
 
-                oDataRecordEntryWhs.setFkAccountIdXXX(vConfigsWhs.get(0).getAccountId());
-                oDataRecordEntryWhs.setFkAccountId(oAccount.getPkAccountId());
-                oDataRecordEntryWhs.setFkCostCenterId_n(0);
-                oDataRecordEntryWhs.setFkAccountingMoveTypeId(oAccount.getFkAccountTypeId_r());
-                oDataRecordEntryWhs.setFkAccountingMoveClassId(oAccount.getFkAccountClassId_r());
-                oDataRecordEntryWhs.setFkAccountingMoveSubclassId(oAccount.getFkAccountSubclassId_r());
-                oDataRecordEntryWhs.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT[0]);
-                oDataRecordEntryWhs.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT[1]);
-                oDataRecordEntryWhs.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH[0]);
-                oDataRecordEntryWhs.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH[1]);
-                oDataRecordEntryWhs.setFkSystemMoveCategoryIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[0]);
-                oDataRecordEntryWhs.setFkSystemMoveTypeIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK[1]);
-                oDataRecordEntryWhs.setFkCurrencyId(1);
-                oDataRecordEntryWhs.setFkCostCenterIdXXX_n("");
+                    if (lCC.containsKey(oConfig.getCostCenterId())) {
+                        nIdCC = lCC.get(oConfig.getCostCenterId());
+                    }
+                    else {
+                        nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
+                        lCC.put(oConfig.getCostCenterId(), nIdCC);
+                    }
+                    
+                    /**
+                    * Partida de almacén
+                    */
+                    oDataRecordEntryWhs = createRecordEntry(session,
+                                                       TYPE_INV,
+                                                       recordPk, 
+                                                       oItem, 
+                                                       oConsumption.getQuantityConsumption(), 
+                                                       oConfig.getAuxAmount(), 
+                                                       oUnit, 
+                                                       oCfg.getTextAssetEntries(),
+                                                       oAccount,
+                                                       nIdCC,
+                                                       oConfig.getCostCenterId(), 
+                                                       sortPosition++,
+                                                       new int[] { oConsumption.getFkDiogYear(), oConsumption.getFkDiogDocId() },
+                                                       oConsumption.getFkItemReference_n(),
+                                                       SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT,
+                                                       SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH,
+                                                       SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK,
+                                                       oConsumption.getAuxWarehousePk(),
+                                                       oConsumption.getFkStockValuationId(),
+                                                       oConsumption.getPkStockValuationMvtId()
+                                                       );
+                    lRecordEntries.add(oDataRecordEntryWhs);
+                }
             }
             else {
                 throw new Exception("No se encontró cuenta contable para el item " + oConsumption.getFkItemId());
             }
-
-            oDataRecordEntryWhs.setFkCheckWalletId_n(0);
-            oDataRecordEntryWhs.setFkCheckId_n(0);
-            oDataRecordEntryWhs.setFkBizPartnerId_nr(0);
-            oDataRecordEntryWhs.setFkBizPartnerBranchId_n(0);
-            oDataRecordEntryWhs.setFkReferenceCategoryId_n(0);
-            oDataRecordEntryWhs.setFkCompanyBranchId_n(oConsumption.getAuxWarehousePk()[0]);
-            oDataRecordEntryWhs.setFkEntityId_n(oConsumption.getAuxWarehousePk()[1]);
-            oDataRecordEntryWhs.setFkPlantEntityId_n(0);
-            oDataRecordEntryWhs.setFkTaxBasicId_n(0);
-            oDataRecordEntryWhs.setFkTaxId_n(0);
-            oDataRecordEntryWhs.setFkYearId_n(0);
-            oDataRecordEntryWhs.setFkDpsYearId_n(0);
-            oDataRecordEntryWhs.setFkDpsDocId_n(0);
-            oDataRecordEntryWhs.setFkDpsAdjustmentYearId_n(0);
-            oDataRecordEntryWhs.setFkDpsAdjustmentDocId_n(0);
-            oDataRecordEntryWhs.setFkDiogYearId_n(oConsumption.getFkDiogYear());
-            oDataRecordEntryWhs.setFkDiogDocId_n(oConsumption.getFkDiogDocId());
-            oDataRecordEntryWhs.setFkMfgYearId_n(0);
-            oDataRecordEntryWhs.setFkMfgOrdId_n(0);
-            oDataRecordEntryWhs.setFkCfdId_n(0);
-            oDataRecordEntryWhs.setFkCostGicId_n(0);
-            oDataRecordEntryWhs.setFkPayrollFormerId_n(0);
-            oDataRecordEntryWhs.setFkPayrollId_n(0);
-            oDataRecordEntryWhs.setFkItemId_n(oConsumption.getFkItemId());
-            oDataRecordEntryWhs.setFkItemAuxId_n(oConsumption.getFkItemReference_n());
-            oDataRecordEntryWhs.setFkUnitId_n(1);
-            oDataRecordEntryWhs.setFkBookkeepingYearId_n(0);
-            oDataRecordEntryWhs.setFkBookkeepingNumberId_n(0);
-            oDataRecordEntryWhs.setFkUserNewId(session.getUser().getPkUserId());
-            oDataRecordEntryWhs.setFkUserEditId(1);
-            oDataRecordEntryWhs.setFkUserDeleteId(1);
-            oDataRecordEntryWhs.setSortingPosition(++sortPosition);
-            
-            oDataRecordEntryWhs.save(session.getStatement().getConnection());
-            if (oDataRecordEntryWhs.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
-                throw new Exception("Error al guardar el movimiento contable.");
-            }
-
-            oRecEtyAcc = new SDbStockValuationAccount();
-            
-            oRecEtyAcc.setFkFinRecYearId(oDataRecordEntryWhs.getPkYearId());
-            oRecEtyAcc.setFkFinRecPerId(oDataRecordEntryWhs.getPkPeriodId());
-            oRecEtyAcc.setFkFinRecBkcId(oDataRecordEntryWhs.getPkBookkeepingCenterId());
-            oRecEtyAcc.setFkFinRecTpRecId(oDataRecordEntryWhs.getPkRecordTypeId());
-            oRecEtyAcc.setFkFinRecNum(oDataRecordEntryWhs.getPkNumberId());
-            oRecEtyAcc.setFkFinRecEty(oDataRecordEntryWhs.getPkEntryId());
-            oRecEtyAcc.setFkStockValuationId(oConsumption.getFkStockValuationId());
-            oRecEtyAcc.setFkValuationMvtId(oConsumption.getPkStockValuationMvtId());
-            
-
-            oRecEtyAcc.save(session);
-            
-            i++;
         }
         
         return true;
+    }
+    
+    /**
+     * This function creates a record entry for a stock valuation transaction in a financial system.
+     * 
+     * @param session The session object represents the current user session in the system.
+     * @param movType The movType parameter is an integer that represents the type of movement. It is
+     * used to determine whether the record entry is a debit or credit entry.
+     * @param recordPk An array containing the primary key values for the record entry. The values are:
+     * [yearId, periodId, bookkeepingCenterId, recordTypeId, numberId].
+     * @param oItem The parameter "oItem" is an object of type SDataItem, which represents an item or
+     * product in the system. It contains information such as the item's name, ID, and other
+     * attributes.
+     * @param dQuantity The quantity of the item being recorded.
+     * @param dCost The parameter `dCost` represents the cost of the item.
+     * @param oUnit oUnit is an object of type SDataUnit, which represents a unit of measurement for an
+     * item. It contains information such as the unit's symbol and conversion factors to other units.
+     * @param sConceptText The parameter `sConceptText` is a string that represents the concept or
+     * description of the record entry. It is used to provide additional information about the entry,
+     * such as the purpose or reason for the transaction.
+     * @param oAccount An object of type SDataAccount, which represents the accounting account
+     * associated with the record entry.
+     * @param nIdCc The parameter "nIdCc" represents the ID of the cost center associated with the
+     * record entry.
+     * @param sIdCc The parameter "sIdCc" is a String variable that represents the ID of a cost center.
+     * @param sortPosition The sortPosition parameter is used to specify the sorting position of the
+     * record entry. It determines the order in which the record entries will be displayed or
+     * processed.
+     * @param pkDiog - pkDiog[0]: Year ID of the document
+     * @param nItemRef The parameter `nItemRef` is an integer that represents the reference item for
+     * the record entry. It is used to link the record entry to a specific item in the system.
+     * @param fkSystemMove The parameter fkSystemMove is an array of two integers. The first integer
+     * represents the foreign key of the system move class, and the second integer represents the
+     * foreign key of the system move type.
+     * @param fkSystemAccount The parameter fkSystemAccount is an array that contains two integers. The
+     * first integer represents the ID of the system account class, and the second integer represents
+     * the ID of the system account type.
+     * @param fkSystemMoveType The parameter fkSystemMoveType is an array of two integers. The first
+     * integer represents the foreign key of the system move category, and the second integer
+     * represents the foreign key of the system move type.
+     * @param pkWhs The parameter pkWhs is an array that contains the following information:
+     * @param stkValuationId The parameter stkValuationId is an integer that represents the ID of the
+     * stock valuation.
+     * @param stkValuationMvtId The parameter "stkValuationMvtId" represents the ID of the stock
+     * valuation movement. It is used to link the stock valuation movement to the record entry in the
+     * database.
+     * @return The method is returning an instance of the SDataRecordEntry class.
+     */
+    private static SDataRecordEntry createRecordEntry(SGuiSession session, 
+            final int movType, final Object[] recordPk, final SDataItem oItem, final double dQuantity, final double dCost,
+            final SDataUnit oUnit, final String sConceptText, final SDataAccount oAccount, final int nIdCc, 
+            final String sIdCc, final int sortPosition, final int[] pkDiog, final int nItemRef, final int[] fkSystemMove,
+            final int[] fkSystemAccount, final int[] fkSystemMoveType, final int[] pkWhs, final int stkValuationId, final int stkValuationMvtId) throws Exception {
+        SDataRecordEntry oRecordEntry = new SDataRecordEntry();
+
+        oRecordEntry.setPkYearId((int) recordPk[0]);
+        oRecordEntry.setPkPeriodId((int) recordPk[1]);
+        oRecordEntry.setPkBookkeepingCenterId((int) recordPk[2]);
+        oRecordEntry.setPkRecordTypeId((String) recordPk[3]);
+        oRecordEntry.setPkNumberId((int) recordPk[4]);
+        oRecordEntry.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), dQuantity, oUnit.getSymbol(), sConceptText));
+        oRecordEntry.setReference("");
+        oRecordEntry.setIsReferenceTax(false);
+        if (movType == TYPE_INV) {
+            oRecordEntry.setDebit(0d);
+            oRecordEntry.setCredit(dCost);
+            oRecordEntry.setDebitCy(0d);
+            oRecordEntry.setCreditCy(dCost);
+        }
+        else {
+            oRecordEntry.setDebit(dCost);
+            oRecordEntry.setCredit(0d);
+            oRecordEntry.setDebitCy(dCost);
+            oRecordEntry.setCreditCy(0d);
+        }
+        oRecordEntry.setExchangeRate(1d);
+        oRecordEntry.setExchangeRateSystem(1d);
+        oRecordEntry.setUnits(0d);
+        oRecordEntry.setUserId(0);
+        oRecordEntry.setSortingPosition(0);
+        oRecordEntry.setOccasionalFiscalId("");
+        oRecordEntry.setIsExchangeDifference(false);
+        oRecordEntry.setIsSystem(true);
+        oRecordEntry.setIsDeleted(false);
+
+        oRecordEntry.setFkAccountIdXXX(oAccount.getPkAccountIdXXX());
+        oRecordEntry.setFkAccountId(oAccount.getPkAccountId());
+        oRecordEntry.setFkCostCenterId_n(nIdCc);
+        oRecordEntry.setFkAccountingMoveTypeId(oAccount.getFkAccountTypeId_r());
+        oRecordEntry.setFkAccountingMoveClassId(oAccount.getFkAccountClassId_r());
+        oRecordEntry.setFkAccountingMoveSubclassId(oAccount.getFkAccountSubclassId_r());
+        oRecordEntry.setFkSystemMoveClassId(fkSystemMove[0]);
+        oRecordEntry.setFkSystemMoveTypeId(fkSystemMove[1]);
+        oRecordEntry.setFkSystemAccountClassId(fkSystemAccount[0]);
+        oRecordEntry.setFkSystemAccountTypeId(fkSystemAccount[1]);
+        oRecordEntry.setFkSystemMoveCategoryIdXXX(fkSystemMoveType[0]);
+        oRecordEntry.setFkSystemMoveTypeIdXXX(fkSystemMoveType[1]);
+        oRecordEntry.setFkCurrencyId(1);
+        oRecordEntry.setFkCostCenterIdXXX_n(sIdCc);
+
+        oRecordEntry.setFkCheckWalletId_n(0);
+        oRecordEntry.setFkCheckId_n(0);
+        oRecordEntry.setFkBizPartnerId_nr(0);
+        oRecordEntry.setFkBizPartnerBranchId_n(0);
+        oRecordEntry.setFkReferenceCategoryId_n(0);
+        if (pkWhs != null) {
+            oRecordEntry.setFkCompanyBranchId_n(pkWhs[0]);
+            oRecordEntry.setFkEntityId_n(pkWhs[1]);
+        }
+        else {
+            oRecordEntry.setFkCompanyBranchId_n(0);
+            oRecordEntry.setFkEntityId_n(0);
+        }
+        oRecordEntry.setFkPlantEntityId_n(0);
+        oRecordEntry.setFkTaxBasicId_n(0);
+        oRecordEntry.setFkTaxId_n(0);
+        oRecordEntry.setFkYearId_n(0);
+        oRecordEntry.setFkDpsYearId_n(0);
+        oRecordEntry.setFkDpsDocId_n(0);
+        oRecordEntry.setFkDpsAdjustmentYearId_n(0);
+        oRecordEntry.setFkDpsAdjustmentDocId_n(0);
+        oRecordEntry.setFkDiogYearId_n(pkDiog[0]);
+        oRecordEntry.setFkDiogDocId_n(pkDiog[1]);
+        oRecordEntry.setFkMfgYearId_n(0);
+        oRecordEntry.setFkMfgOrdId_n(0);
+        oRecordEntry.setFkCfdId_n(0);
+        oRecordEntry.setFkCostGicId_n(0);
+        oRecordEntry.setFkPayrollFormerId_n(0);
+        oRecordEntry.setFkPayrollId_n(0);
+        oRecordEntry.setFkItemId_n(oItem.getPkItemId());
+        oRecordEntry.setFkItemAuxId_n(nItemRef);
+        oRecordEntry.setFkUnitId_n(1);
+        oRecordEntry.setFkBookkeepingYearId_n(0);
+        oRecordEntry.setFkBookkeepingNumberId_n(0);
+        oRecordEntry.setFkUserNewId(session.getUser().getPkUserId());
+        oRecordEntry.setFkUserEditId(1);
+        oRecordEntry.setFkUserDeleteId(1);
+        oRecordEntry.setSortingPosition(sortPosition);
+        
+        oRecordEntry.save(session.getStatement().getConnection());
+        if (oRecordEntry.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+            throw new Exception("Error al guardar el movimiento contable.");
+        }
+        
+        SDbStockValuationAccount oRecEtyAcc = new SDbStockValuationAccount();
+            
+        oRecEtyAcc.setFkFinRecYearId(oRecordEntry.getPkYearId());
+        oRecEtyAcc.setFkFinRecPerId(oRecordEntry.getPkPeriodId());
+        oRecEtyAcc.setFkFinRecBkcId(oRecordEntry.getPkBookkeepingCenterId());
+        oRecEtyAcc.setFkFinRecTpRecId(oRecordEntry.getPkRecordTypeId());
+        oRecEtyAcc.setFkFinRecNum(oRecordEntry.getPkNumberId());
+        oRecEtyAcc.setFkFinRecEty(oRecordEntry.getPkEntryId());
+        oRecEtyAcc.setFkStockValuationId(stkValuationId);
+        oRecEtyAcc.setFkValuationMvtId(stkValuationMvtId);
+
+        oRecEtyAcc.save(session);
+        
+        if (oRecEtyAcc.getQueryResultId() != SDbConsts.SAVE_OK) {
+            throw new Exception("Error al guardar el link movimiento contable.");
+        }
+        
+        return oRecordEntry; 
     }
 
     private static String getConcept(final String itemName, final double qty, final String unit, final String text) {

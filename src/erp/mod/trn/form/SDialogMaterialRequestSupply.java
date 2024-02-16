@@ -111,6 +111,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jPanel9 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
+        jlMovDate = new javax.swing.JLabel();
+        jftMovDate = new javax.swing.JTextField();
         jPanel12 = new javax.swing.JPanel();
         jlRequest = new javax.swing.JLabel();
         moTextRequest = new sa.lib.gui.bean.SBeanFieldText();
@@ -178,6 +180,15 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moTextNumber.setBackground(new java.awt.Color(240, 240, 240));
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(moTextNumber);
+
+        jlMovDate.setText("Fecha:");
+        jlMovDate.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel9.add(jlMovDate);
+        jlMovDate.getAccessibleContext().setAccessibleName("Fecha:");
+
+        jftMovDate.setEditable(false);
+        jftMovDate.setPreferredSize(new java.awt.Dimension(165, 23));
+        jPanel9.add(jftMovDate);
 
         jPanel4.add(jPanel9);
 
@@ -389,11 +400,13 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     private javax.swing.JButton jbSign;
     private javax.swing.JButton jbSupply;
     private javax.swing.JButton jbSupplyAll;
+    private javax.swing.JTextField jftMovDate;
     private javax.swing.JLabel jlAux;
     private javax.swing.JLabel jlEntity;
     private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlMaintUser;
     private javax.swing.JLabel jlMaintUserSupervisor;
+    private javax.swing.JLabel jlMovDate;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlRequest;
     private javax.swing.JLabel jlWarehouseCompanyBranch;
@@ -654,6 +667,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      */
     private void initMaterialRequestData() {
         try {
+            jftMovDate.setText(SLibUtils.DateFormatDate.format(miClient.getSession().getCurrentDate()));
             moTextNumber.setValue(String.format("%05d", moMaterialRequest.getNumber()));
             /*
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));

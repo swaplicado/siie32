@@ -182,8 +182,8 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         stockMove.setFkMaintMovementTypeId(mnFkMaintMovementTypeId);
         
         if (SLibUtils.compareKeys(getDiogTypeKey(), SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV)) {
-            stockMove.setFkMaintUserId_n(move.getMaintUserId_n());
-            stockMove.setFkMaintUserSupervisorId(move.getMaintUserSupervisorId());
+            stockMove.setFkMaintUserId_n(0);
+            stockMove.setFkMaintUserSupervisorId(1);
         }
         else {
             stockMove.setFkMaintUserId_n(mnFkMaintUserId_n);

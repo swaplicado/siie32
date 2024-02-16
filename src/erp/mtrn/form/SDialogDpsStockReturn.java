@@ -19,6 +19,7 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDps;
@@ -34,10 +35,11 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDialogDpsStockReturn extends javax.swing.JDialog implements ActionListener, ListSelectionListener {
 
@@ -878,6 +880,9 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
                 validation.setMessage("No se ha especificado el surtido al menos para una de las partidas.");
                 validation.setComponent(moPaneDpsEntries.getTable());
             }
+        }
+        else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moParamDiog.getDate())) {
+            validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moParamDiog.getDate()) + "'");
         }
 
         return validation;

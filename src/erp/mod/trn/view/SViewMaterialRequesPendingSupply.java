@@ -226,10 +226,11 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                         + "bmu.bp LIKE '%" + text + "%' OR "
                         + "smr.name LIKE '%" + text + "%' ";
                 
-                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                     msSeekQueryText += "OR i.item LIKE '%" + text + "%' "
                             + "OR i.item_key LIKE '%" + text + "%' "
-                            + "OR u.unit LIKE '%" + text + "%' ";
+                            + "OR u.unit LIKE '%" + text + "%' "
+                            + "OR IF(ISNULL(entc.name), trn_get_cons_info(v.id_mat_req, 1), entc.name) LIKE '%" + text + "%' ";
                 }
                 
                 msSeekQueryText += ") ";
@@ -436,7 +437,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP) {
-            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 select = "i.item, i.item_key, u.unit, ve.id_ety, "
                         + "SUM(ve.qty) AS org_qty, "
                         + "COALESCE(de.sumi_qty, 0) AS sumi_qty, "
@@ -548,7 +549,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 + "GROUP BY " + subGroupOrderBy + " " 
                 + "ORDER BY " + subGroupOrderBy + " ) AS de ON " 
                 + "ve.id_mat_req = de.fid_mat_req_n ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             msSql += "AND ve.id_ety = de.fid_mat_req_ety_n ";
         }
         msSql += "LEFT JOIN (SELECT "
@@ -570,7 +571,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 + "\n #AND NOT mr.fk_usr_clo_pur "
                 + "\n GROUP BY ddmr.fid_mat_req "
                 + "ORDER BY ddmr.fid_mat_req) AS req_pur ON ve.id_mat_req = req_pur.fid_mat_req ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             msSql += "AND ve.id_ety = req_pur.fid_mat_req_ety ";
         }
         msSql += join
@@ -588,7 +589,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "id_ety", "Número partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
@@ -613,7 +614,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ent_cons", "Centro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "s_ent_cons", "Subcentro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cc", "Centro de costo"));

@@ -393,7 +393,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             moPanelDps.setDps(moDps, null);
             
             if (mnFinderType == SDataConstants.TRNX_DPS_PEND_ADJ) {
-                if (moDps.getDbmsDataCfd().getUuid().isEmpty()) {
+                if (moDps.getDbmsDataCfd() == null || moDps.getDbmsDataCfd().getUuid().isEmpty()) {
                     miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
                 }
             }

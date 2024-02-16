@@ -44,6 +44,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkMatRequestStatusId;
     protected int mnFkMatProvisionStatusId;
     protected int mnFkMatPurchaseStatusId;
+    protected int mnFkDpsNatureId;
     protected int mnFkUserRequesterId;
     protected int mnFkContractorId_n;
     protected int mnFkWarehouseCompanyBranch_n;
@@ -107,6 +108,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkMatRequestStatusId(int n) { mnFkMatRequestStatusId = n; }
     public void setFkMatProvisionStatusId(int n) { mnFkMatProvisionStatusId = n; }
     public void setFkMatPurchaseStatusId(int n) { mnFkMatPurchaseStatusId = n; }
+    public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkUserRequesterId(int n) { mnFkUserRequesterId = n; }
     public void setFkContractorId_n(int n) { mnFkContractorId_n = n; }
     public void setFkWarehouseCompanyBranch_n(int n) { mnFkWarehouseCompanyBranch_n = n; }
@@ -155,6 +157,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkMatRequestStatusId() { return mnFkMatRequestStatusId; }
     public int getFkMatProvisionStatusId() { return mnFkMatProvisionStatusId; }
     public int getFkMatPurchaseStatusId() { return mnFkMatPurchaseStatusId; }
+    public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkUserRequesterId() { return mnFkUserRequesterId; }
     public int getFkContractorId_n() { return mnFkContractorId_n; }
     public int getFkWarehouseCompanyBranch_n() { return mnFkWarehouseCompanyBranch_n; }
@@ -244,6 +247,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkMatRequestStatusId = 0;
         mnFkMatProvisionStatusId = 0;
         mnFkMatPurchaseStatusId = 0;
+        mnFkDpsNatureId = 0;
         mnFkUserRequesterId = 0;
         mnFkContractorId_n = 0;
         mnFkWarehouseCompanyBranch_n = 0;
@@ -344,6 +348,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkMatRequestStatusId = resultSet.getInt("fk_st_mat_req");
             mnFkMatProvisionStatusId = resultSet.getInt("fk_st_mat_prov");
             mnFkMatPurchaseStatusId = resultSet.getInt("fk_st_mat_pur");
+            mnFkDpsNatureId = resultSet.getInt("fk_dps_nat");
             mnFkUserRequesterId = resultSet.getInt("fk_usr_req");
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
             mnFkWarehouseCompanyBranch_n = resultSet.getInt("fk_whs_cob_n");
@@ -498,6 +503,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnFkMatRequestStatusId + ", " + 
                     mnFkMatProvisionStatusId + ", " + 
                     mnFkMatPurchaseStatusId + ", " + 
+                    mnFkDpsNatureId + ", " + 
                     mnFkUserRequesterId + ", " + 
                     (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") + 
                     (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") + 
@@ -553,6 +559,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + ", " +
                     "fk_st_mat_prov = " + mnFkMatProvisionStatusId + ", " +
                     "fk_st_mat_pur = " + mnFkMatPurchaseStatusId + ", " +
+                    "fk_dps_nat = " + mnFkDpsNatureId + ", " +
                     "fk_usr_req = " + mnFkUserRequesterId + ", " +
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
                     "fk_whs_cob_n = " + (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") +
@@ -729,6 +736,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkMatRequestStatusId(this.getFkMatRequestStatusId());
         registry.setFkMatProvisionStatusId(this.getFkMatProvisionStatusId());
         registry.setFkMatPurchaseStatusId(this.getFkMatPurchaseStatusId());
+        registry.setFkDpsNatureId(this.getFkDpsNatureId());
         registry.setFkUserRequesterId(this.getFkUserRequesterId());
         registry.setFkContractorId_n(this.getFkContractorId_n());
         registry.setFkWarehouseCompanyBranch_n(this.getFkWarehouseCompanyBranch_n());

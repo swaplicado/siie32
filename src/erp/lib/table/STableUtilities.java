@@ -548,6 +548,7 @@ public abstract class STableUtilities {
         int rows = tablePane.getTableModelRowCount();
         int cols = tablePane.getTableModelColumnCount();
         String valueToSearchUpper = valueToSearch.toUpperCase();
+        boolean found = false;
         
         if (!valueToSearchUpper.isEmpty()) {
             if (rows > 0) {
@@ -558,12 +559,17 @@ public abstract class STableUtilities {
                         if (tablePane.getTable().getValueAt(row, col) != null) {
                             if (tablePane.getTable().getValueAt(row, col).toString().toUpperCase().contains(valueToSearchUpper)) {
                                 tablePane.setTableRowSelection(row);
+                                found = true;
                                 break row;
                             }
                         }
-                    }
+                    }   
                 }
             }
+        }
+        
+        if (!found) {
+            JOptionPane.showMessageDialog(null, "No se encontraron coincidencias.");
         }
     }
     
@@ -573,24 +579,48 @@ public abstract class STableUtilities {
         int rows = tablePane.getTableModelRowCount();
         int cols = tablePane.getTableModelColumnCount();
         String valueToSearchUpper = valueToSearch.toUpperCase();
+        boolean found = false;
         
         if (!valueToSearchUpper.isEmpty()) {
             if (rows > 0) {
                 row:
                 for (row = (tablePane.getTable().getSelectedRow()); row < rows; row++) {
                     col:
-                    for (col = tablePane.getTable().getSelectedColumn() + 1; col < cols; col++) {
-                        if (col == cols - 1) tablePane.setTableColumnSelection(0);
+                    for (col = tablePane.getTable().getSelectedColumn() + 1; col <= cols; col++) {
+                        if (col == cols) {
+                            col = 0;
+                            int auxRox = row + 1;
+                            tablePane.setTableColumnSelection(0);
+                            if (auxRox != rows) {
+                                if (tablePane.getTable().getValueAt(auxRox, col) != null) {
+                                     if (tablePane.getTable().getValueAt(auxRox, col).toString().toUpperCase().contains(valueToSearchUpper)) {
+                                        tablePane.setTableRowSelection(auxRox);
+                                        tablePane.setTableColumnSelection(col);
+                                        found = true;
+                                        break row;
+                                    }
+                                    break;
+                                }
+                            }
+                            else {
+                                break row;
+                            }
+                        }
                         if (tablePane.getTable().getValueAt(row, col) != null) {
                             if (tablePane.getTable().getValueAt(row, col).toString().toUpperCase().contains(valueToSearchUpper)) {
                                 tablePane.setTableRowSelection(row);
                                 tablePane.setTableColumnSelection(col);
+                                found = true;
                                 break row;
                             }
                         }
                     }
                 }
             }
+        }
+        
+        if (!found) {
+            JOptionPane.showMessageDialog(null, "No se encontraron coincidencias.");
         }
     }
 }

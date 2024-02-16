@@ -19,6 +19,7 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDps;
@@ -1047,11 +1048,14 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
             }
         }
 
-        if (!validation.getIsError()) {
+        if (! validation.getIsError()) {
             if (supplies == 0) {
                 validation.setMessage("Se debe capturar al menos una partida.");
                 validation.setComponent(moPaneDpsEntries.getTable());
             }
+        }
+        else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moParamDiog.getDate())) {
+            validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moParamDiog.getDate()) + "'");
         }
 
         return validation;

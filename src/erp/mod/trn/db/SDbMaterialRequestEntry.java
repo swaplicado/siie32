@@ -154,6 +154,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             oConfig.setFkSubentMatConsumptionEntityId(mnFkSubentMatConsumptionEntityId_n);
             oConfig.setFkSubentMatConsumptionSubentityId(mnFkSubentMatConsumptionSubentityId_n);
             oConfig.setFkCostCenterId(mnFkCostCenterId_n);
+            oConfig.setPercentage(1d);
 
             lConfigs.add(oConfig);
         }

@@ -37,6 +37,7 @@ import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -1638,7 +1639,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
                             iogEntry.setQuantity(stockSupplyRow.getQuantityAboutToSupply());
-                            iogEntry.setValueUnitary(dpsEntry.getPriceUnitaryReal_r());
+                            // Cuando la naturaleza del documento sea diferente de la predeterminada, las partidas quedan a valor 0
+                            double diogEntryValueUnitary = moParamDpsSource.getFkDpsNatureId() == SDataConstantsSys.TRNU_DPS_NAT_DEF ? dpsEntry.getPriceUnitaryReal_r() : 0d;
+                            iogEntry.setValueUnitary(diogEntryValueUnitary);
                             iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
                             iogEntry.setOriginalQuantity(stockSupplyRow.getOriginalQuantityAboutToSupply());
                             iogEntry.setOriginalValueUnitary(iogEntry.getOriginalQuantity() == 0d ? 0d : SLibUtilities.round(iogEntry.getValue() / iogEntry.getOriginalQuantity(), decsValUnit));
@@ -1683,7 +1686,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     SDbMaterialRequest oMatReq = new SDbMaterialRequest();
                                     oMatReq.read(miClient.getSession(), dpsEntry.getDbmsDpsEntryMatRequestLink().getDbmsMaterialRequestKey());
                                     
-                                    if (oMatReq.getTypeRequest().equals("S")) {
+                                    if (oMatReq.getTypeRequest().equals(SModSysConsts.TRNS_MAT_REQ_TP_R)) {
                                         iogEntry.setFkMatRequestId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId());
                                         iogEntry.setFkMatRequestEtyId_n(dpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestEntryId());
                                     }
@@ -2362,7 +2365,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         try {
             stockMoves = STrnUtilities.obtainStockWarehouse(miClient, nYear, tDate, new int[] { moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() });
-
+            
             for (STrnStockMove stockMove : stockMoves) {
                 item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
 
@@ -2380,7 +2383,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setIsDeleted(false);
                 iogEntry.setFkItemId(item.getPkItemId());
                 iogEntry.setFkUnitId(item.getFkUnitId());
-                iogEntry.setFkOriginalUnitId(item.getFkUnitId());
+                iogEntry.setFkOriginalUnitId(item.getFkUnitId()); 
 
                 iogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
@@ -2836,6 +2839,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private void actionExternalFile() {
         if (jbExternalFile.isEnabled()) {
             try {
+                int total = 0;
                 String separador = ",";
                 String error = "Errores:\n";
                 int errors = 0;
@@ -2864,6 +2868,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         moEntryItem.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
                                         unit = resultSet.getInt(2);
                                         item = true;
+                                        total++;
                                     }
                                     else {
                                         errors++;
@@ -2871,10 +2876,18 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     }
                                 }
                                 if (item) {
-                                    sql = "SELECT id_unit FROM erp.itmu_unit WHERE symbol = '" + fields[3].toLowerCase() + "'";
+                                    sql = "SELECT id_unit FROM erp.itmu_unit WHERE lower(symbol) = '" + fields[3].toLowerCase() + "'";
                                     try (ResultSet resultSet = statement.executeQuery(sql)) {
-                                        if (resultSet.next()) {
-                                            if (unit != resultSet.getInt(1)) {
+                                        boolean exist = false;
+                                        boolean found = false;
+                                        while (resultSet.next()) {
+                                            exist = true;
+                                            if (unit == resultSet.getInt(1)) {
+                                                found = true;
+                                            }
+                                        }
+                                        if (exist) {
+                                            if (!found) {
                                                 errors++;
                                                 error += errors + "- La unidad " + fields[3].toLowerCase() + " no coincide con el ítem " + fields[0].toUpperCase() + ".\n";
                                             }
@@ -2917,6 +2930,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         errors++;
                                         error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no tiene asignada una cantidad válida.\n";
                                     }
+                                    if (SLibUtilities.parseDouble(fields[2]) == 0.0) {
+                                        warnings++;
+                                        warning += warnings + "- El ítem con la clave " + fields[0].toUpperCase() + " tiene una cantidad igual a 0.\n";
+                                    }
                                     if (fields[6].isEmpty()) {
                                         warnings++;
                                         warning += warnings + "- El ítem con la clave " + fields[0].toUpperCase() + " no tiene asignado un precio unitario.\n";
@@ -2945,61 +2962,69 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 // Volver a leer para agregar
                                 br = new BufferedReader(new FileReader(absolutePath));
                                 line = br.readLine();
-
+                                int exc = 0;
                                 while (line != null) {
                                     moStockMoveEntry = null;
                                     String[] fields = line.split(separador);
                                     if (!fields[0].toLowerCase().equals("clave")) {
-                                        String sql = "SELECT id_item FROM erp.itmu_item WHERE item_key = '" + fields[0].toUpperCase() + "'";
-                                        try (ResultSet resultSet = statement.executeQuery(sql)) {
-                                            if (resultSet.next()) {
-                                                moEntryItem = new SDataItem();
-                                                moEntryItem.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
-                                                moFieldEntryQuantity.setDouble(SLibUtilities.parseDouble(fields[2]));
-                                                moFieldEntryValueUnitary.setDouble(SLibUtilities.parseDouble(fields[6]));
-                                                moFieldEntryValue.setDouble(SLibUtilities.parseDouble(fields[7]));
-                                                if (moEntryItem.getIsLotApplying()) {
-                                                    sql = "SELECT id_lot FROM trn_lot WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + moEntryItem.getFkUnitId() + " AND lot = '" + fields[4].toUpperCase() + "'";
-                                                    ResultSet resultSetlot = miClient.getSession().getStatement().executeQuery(sql);
-                                                    if (resultSetlot.next()) {
-                                                        int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
-                                                        int[] moveKey = new int[] { 
-                                                            year, 
-                                                            moEntryItem.getPkItemId(), 
-                                                            moEntryItem.getFkUnitId(), 
-                                                            resultSetlot.getInt(1), 
-                                                            moWarehouseSource.getPkCompanyBranchId(),
-                                                            moWarehouseSource.getPkEntityId()
-                                                        };
-                                                        moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));           
-                                                        moStockMoveEntry.setFkMaintUserSupervisorId(1);
-                                                    }
-                                                    else {
-                                                        int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
-                                                        int[] moveKey = new int[] { 
-                                                            year, 
-                                                            moEntryItem.getPkItemId(), 
-                                                            moEntryItem.getFkUnitId(), 
-                                                            0, 
-                                                            moWarehouseSource.getPkCompanyBranchId(),
-                                                            moWarehouseSource.getPkEntityId()
-                                                        };
-                                                        moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));
-                                                        moStockMoveEntry.setAuxLot(fields[4].toUpperCase());
-                                                        if (!fields[5].isEmpty()) {
-                                                            String[] date = fields[5].split("/");
-                                                            moStockMoveEntry.setAuxLotDateExpiration(SLibTimeUtilities.createDate(SLibUtils.parseInt(date[2]), SLibUtils.parseInt(date[1]), SLibUtils.parseInt(date[0])));
+                                        if (SLibUtilities.parseDouble(fields[2]) == 0.0) {
+                                            exc++;
+                                        }
+                                        else {     
+                                            String sql = "SELECT id_item FROM erp.itmu_item WHERE item_key = '" + fields[0].toUpperCase() + "'";
+                                            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                                                if (resultSet.next()) {
+                                                    moEntryItem = new SDataItem();
+                                                    moEntryItem.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
+                                                    moFieldEntryQuantity.setDouble(SLibUtilities.parseDouble(fields[2]));
+                                                    moFieldEntryValueUnitary.setDouble(SLibUtilities.parseDouble(fields[6]));
+                                                    moFieldEntryValue.setDouble(SLibUtilities.parseDouble(fields[7]));
+                                                    if (moEntryItem.getIsLotApplying()) {
+                                                        sql = "SELECT id_lot FROM trn_lot WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + moEntryItem.getFkUnitId() + " AND lot = '" + fields[4].toUpperCase() + "'";
+                                                        ResultSet resultSetlot = miClient.getSession().getStatement().executeQuery(sql);
+                                                        if (resultSetlot.next()) {
+                                                            int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
+                                                            int[] moveKey = new int[] { 
+                                                                year, 
+                                                                moEntryItem.getPkItemId(), 
+                                                                moEntryItem.getFkUnitId(), 
+                                                                resultSetlot.getInt(1), 
+                                                                moWarehouseSource.getPkCompanyBranchId(),
+                                                                moWarehouseSource.getPkEntityId()
+                                                            };
+                                                            moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));           
+                                                            moStockMoveEntry.setFkMaintUserSupervisorId(1);
                                                         }
-                                                        moStockMoveEntry.setFkMaintUserSupervisorId(1);
+                                                        else {
+                                                            int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
+                                                            int[] moveKey = new int[] { 
+                                                                year, 
+                                                                moEntryItem.getPkItemId(), 
+                                                                moEntryItem.getFkUnitId(), 
+                                                                0, 
+                                                                moWarehouseSource.getPkCompanyBranchId(),
+                                                                moWarehouseSource.getPkEntityId()
+                                                            };
+                                                            moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));
+                                                            moStockMoveEntry.setAuxLot(fields[4].toUpperCase());
+                                                            if (!fields[5].isEmpty()) {
+                                                                String[] date = fields[5].split("/");
+                                                                moStockMoveEntry.setAuxLotDateExpiration(SLibTimeUtilities.createDate(SLibUtils.parseInt(date[2]), SLibUtils.parseInt(date[1]), SLibUtils.parseInt(date[0])));
+                                                            }
+                                                            moStockMoveEntry.setFkMaintUserSupervisorId(1);
+                                                        }
                                                     }
+                                                    actionEntryAdd();
                                                 }
-                                                actionEntryAdd();
                                             }
                                         }
                                     }
 
                                     line = br.readLine();
                                 }
+                                
+                                miClient.showMsgBoxInformation("Se encontraron un total de " + total + " renglones, de los cuales se omitieron " + exc + " al tener una cantidad igual a 0.\n"
+                                        + "Total renglones procesados: " + (total - exc));
                             }
                         }
                     }
@@ -3500,6 +3525,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         if (!validation.getIsError()) {
             if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                validation.setComponent(jftDate);
+            }
+            else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
+                validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
                 validation.setComponent(jftDate);
             }
             else if (moDiog != null && moDiog.getPkYearId() != year) {

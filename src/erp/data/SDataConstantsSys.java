@@ -24,7 +24,8 @@ public abstract class SDataConstantsSys {
 
     public static final int[] CFGS_TP_ENT_CASH_CASH = new int[] { 1, 1 };
     public static final int[] CFGS_TP_ENT_CASH_BANK = new int[] { 1, 2 };
-    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11};
+    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11 };
+    public static final int[] CFGS_TP_ENT_WH_TL = new int[] { 2, 12 };
     public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 21 };
     public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 22 };
     public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 23 };
@@ -108,6 +109,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_TRN_STK_MAT_VAL = "TRN_STK_MAT_VAL";
+    public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
+    public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
@@ -1221,6 +1224,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
     
     public static final int TRNU_DPS_NAT_DEF = 1;
+    public static final int TRNU_DPS_NAT_ASSET = 2;
     
     public static final int TRNU_CT_DPS_PUR = 1;
     public static final int TRNU_CT_DPS_SAL = 2;
@@ -1237,7 +1241,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_EST = { 2, 1, 1 };
     public static final int[] TRNU_TP_DPS_SAL_CON = { 2, 1, 2 };
     public static final int[] TRNU_TP_DPS_SAL_ORD = { 2, 2, 1 };
-     public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
+    public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
     public static final int[] TRNU_TP_DPS_SAL_REM = { 2, 3, 2 };
     public static final int[] TRNU_TP_DPS_SAL_REC = { 2, 3, 3 };
     public static final int[] TRNU_TP_DPS_SAL_TIC = { 2, 3, 4 };
