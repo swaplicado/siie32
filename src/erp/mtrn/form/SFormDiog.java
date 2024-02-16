@@ -2876,10 +2876,18 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     }
                                 }
                                 if (item) {
-                                    sql = "SELECT id_unit FROM erp.itmu_unit WHERE symbol = '" + fields[3].toLowerCase() + "'";
+                                    sql = "SELECT id_unit FROM erp.itmu_unit WHERE lower(symbol) = '" + fields[3].toLowerCase() + "'";
                                     try (ResultSet resultSet = statement.executeQuery(sql)) {
-                                        if (resultSet.next()) {
-                                            if (unit != resultSet.getInt(1)) {
+                                        boolean exist = false;
+                                        boolean found = false;
+                                        while (resultSet.next()) {
+                                            exist = true;
+                                            if (unit == resultSet.getInt(1)) {
+                                                found = true;
+                                            }
+                                        }
+                                        if (exist) {
+                                            if (!found) {
                                                 errors++;
                                                 error += errors + "- La unidad " + fields[3].toLowerCase() + " no coincide con el ítem " + fields[0].toUpperCase() + ".\n";
                                             }
