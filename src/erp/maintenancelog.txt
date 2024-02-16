@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 240.1/ 2024-02-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de la funcionalidad de composición de nombres y claves de ítems desde ítems genéricos y líneas de ítems.
+   NOTA 1: Queda pendiente propagar este cambio de funcionalidad también al catálogo de marcas y fabricantes.
+   NOTA 2: ¡El stored procedure itmu_item_key_name necesita una revisión a fondo para verificar si funciona apropiadamente!
+
+================================================================================
 SIIE 3.2 240.0/ 2024-02-16
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
