@@ -177,6 +177,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> mvDbmsEntryPrices;
     protected ArrayList<SDataDpsEntryAnalysis> mlDbmsDpsEntryAnalysis;
     protected SDataDpsMaterialRequest moDbmsDpsEntryMatRequest;
+    protected SDataDpsEntryItemComposition moDbmsDpsEntryItemComposition;
 
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsSource;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
@@ -213,6 +214,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryPrices = new Vector<>();
         mlDbmsDpsEntryAnalysis = new ArrayList<>();
         moDbmsDpsEntryMatRequest = null;
+        moDbmsDpsEntryItemComposition = null;
 
         mvDbmsDpsLinksAsSource = new Vector<>();
         mvDbmsDpsLinksAsDestiny = new Vector<>();
@@ -460,6 +462,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsAddElektraPartPriceUnitary(double d) { mdDbmsAddElektraPartPriceUnitary = d; }
     public void setDbmsAddJsonData(java.lang.String s) { msDbmsAddJsonData = s; }
     public void setDbmsDpsEntryMatRequest(SDataDpsMaterialRequest o) { moDbmsDpsEntryMatRequest = o; }
+    public void setDbmsDpsEntryItemComposition(SDataDpsEntryItemComposition o) { moDbmsDpsEntryItemComposition = o; }
 
     public int getDbmsFkItemGenericId() { return mnDbmsFkItemGenericId; }
     public boolean getDbmsItemGenDataShipDomesticReq() { return mbDbmsItemGenDataShipDomesticReq; }
@@ -503,6 +506,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> getDbmsEntryPrices() { return mvDbmsEntryPrices; }
     public ArrayList<SDataDpsEntryAnalysis> getDbmsDpsEntryAnalysis() { return mlDbmsDpsEntryAnalysis; }
     public SDataDpsMaterialRequest getDbmsDpsEntryMatRequestLink() { return moDbmsDpsEntryMatRequest; }
+    public SDataDpsEntryItemComposition getDbmsDpsEntryItemComposition() { return moDbmsDpsEntryItemComposition; }
 
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsSource() { return mvDbmsDpsLinksAsSource; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsDestiny() { return mvDbmsDpsLinksAsDestiny; }
@@ -701,6 +705,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryPrices.clear();
         mlDbmsDpsEntryAnalysis.clear();
         moDbmsDpsEntryMatRequest = null;
+        moDbmsDpsEntryItemComposition = null;
 
         mvDbmsDpsLinksAsSource.clear();
         mvDbmsDpsLinksAsDestiny.clear();
@@ -1014,6 +1019,16 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     else {
                         mvDbmsEntryPrices.add(prices);
                     }
+                }
+                
+                // Read aswell entry item composition
+                
+                sql = "SELECT id_item FROM trn_dps_ety_item_comp " +
+                        "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId;
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    moDbmsDpsEntryItemComposition = new SDataDpsEntryItemComposition();
+                    moDbmsDpsEntryItemComposition.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt(1) }, statementAux);
                 }
 
                 if (mbFlagReadLinksAswell) {
@@ -1368,7 +1383,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
-
+                
                 if (mbIsDeleted) {
                     mvDbmsDpsLinksAsSource.clear();
                     mvDbmsDpsLinksAsDestiny.clear();
@@ -1505,6 +1520,25 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                         if (moDbmsDpsEntryMatRequest.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
                             throw new Exception("Ocurrió un error al guardar el vínculo con la requisición, contacte a soporte técnico");
+                        }
+                    }
+                    
+                    // Save dps entry item composition
+                    
+                    if (moDbmsDpsEntryItemComposition != null) {
+                        String sql = "DELETE FROM trn_dps_ety_item_comp " + 
+                                "WHERE id_year = " + mnPkYearId + " " +
+                                "AND id_doc = " + mnPkDocId + " " + 
+                                "AND id_ety = " + mnPkEntryId + ";";
+                        statement.execute(sql);
+                        moDbmsDpsEntryItemComposition.setPkYearId(mnPkYearId);
+                        moDbmsDpsEntryItemComposition.setPkDocId(mnPkDocId);
+                        moDbmsDpsEntryItemComposition.setPkEntryId(mnPkEntryId);
+                        moDbmsDpsEntryItemComposition.setIsRegistryNew(true);
+                        moDbmsDpsEntryItemComposition.save(connection);    
+
+                        if (moDbmsDpsEntryItemComposition.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                            throw new Exception("Ocurrió un error al guardar la composición del ítem, contacte a soporte técnico");
                         }
                     }
                     
@@ -1975,6 +2009,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsEntryPrices().addAll(mvDbmsEntryPrices);
         clone.getDbmsDpsEntryAnalysis().addAll(mlDbmsDpsEntryAnalysis);
         clone.setDbmsDpsEntryMatRequest(moDbmsDpsEntryMatRequest);
+        clone.setDbmsDpsEntryItemComposition(moDbmsDpsEntryItemComposition);
 
         clone.getDbmsDpsLinksAsSource().addAll(mvDbmsDpsLinksAsSource);
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);

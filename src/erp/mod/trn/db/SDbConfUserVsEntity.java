@@ -104,9 +104,12 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
         
         statement = session.getDatabase().getConnection().createStatement();
         
-        msSql = "SELECT id_mat_cons_ent, id_link, id_ref " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " " + 
-                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
+        msSql = "SELECT u.id_mat_cons_ent, u.id_link, u.id_ref " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS u " + 
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS e ON " +
+                "u.id_mat_cons_ent = e.id_mat_cons_ent " +
+                "WHERE u.id_link = " + SModSysConsts.USRS_LINK_USR + " AND u.id_ref = " + mnPkUser + " " +
+                "AND NOT e.b_del";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             consE = new SDbMaterialConsumptionEntityUser();
@@ -114,9 +117,14 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
             maConsEntUser.add(consE);
         }
         
-        msSql = "SELECT id_mat_cons_ent, id_mat_cons_subent, id_link, id_ref " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " " + 
-                "WHERE id_link = " + SModSysConsts.USRS_LINK_USR + " AND id_ref = " + mnPkUser + " ";
+        msSql = "SELECT u.id_mat_cons_ent, u.id_mat_cons_subent, u.id_link, u.id_ref " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_USR) + " AS u " + 
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS e ON " +
+                "u.id_mat_cons_ent = e.id_mat_cons_ent " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT) + " AS se ON " +
+                "u.id_mat_cons_ent = se.id_mat_cons_ent AND u.id_mat_cons_subent = se.id_mat_cons_subent " +
+                "WHERE u.id_link = " + SModSysConsts.USRS_LINK_USR + " AND u.id_ref = " + mnPkUser + " " + 
+                "AND NOT e.b_del AND NOT se.b_del";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             consS = new SDbMaterialConsumptionSubentityUser();
@@ -124,9 +132,11 @@ public class SDbConfUserVsEntity extends SDbRegistryUser {
             maConsSubentUser.add(consS);
         }
         
-        msSql = "SELECT id_mat_prov_ent, id_usr " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " " + 
-                "WHERE id_usr = " + mnPkUser + " ";
+        msSql = "SELECT u.id_mat_prov_ent, u.id_usr " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS u " + 
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS e ON " +
+                "u.id_mat_prov_ent = e.id_mat_prov_ent " +
+                "WHERE u.id_usr = " + mnPkUser + " AND NOT e.b_del ";
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
             prov = new SDbMaterialProvisionEntityUser();

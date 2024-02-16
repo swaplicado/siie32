@@ -191,10 +191,20 @@ public abstract class STrnUtilities {
     public static Vector<STrnStockMove> obtainStockWarehouse(final SClientInterface client, final int year, final Date dateCutOff_n, final int[] warehouseKey) throws Exception {
         STrnStockMove stockMove = null;
         Vector<STrnStockMove> stockMoves = new Vector<>();
+        boolean tool = false;
+        
+        String sql = "SELECT fid_ct_ent, fid_tp_ent FROM erp.cfgu_cob_ent WHERE id_cob = " + warehouseKey[0] + " AND id_ent = " + warehouseKey[1];
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (SLibUtils.compareKeys(SDataConstantsSys.CFGS_TP_ENT_WH_TL, new int[] { resultSet.getInt(1), resultSet.getInt(2) })) {
+                    tool = true;
+                }
+            }
+        }
 
-        String sql = "SELECT s.id_item, s.id_unit, s.id_lot, " +
+        sql = "SELECT s.id_item, s.id_unit, s.id_lot, " +
                 "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
-                "s.fid_maint_user_n, s.fid_maint_user_supv, " +
+                (tool ? "s.fid_maint_user_n, s.fid_maint_user_supv, " : "") +
                 "SUM(s.mov_in - s.mov_out) AS f_stk, " +
                 "SUM(s.debit - s.credit) AS f_bal " +
                 "FROM trn_stk AS s " +
@@ -205,17 +215,18 @@ public abstract class STrnUtilities {
                 "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff_n) + "' AND " +
                 "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
                 "GROUP BY s.id_item, s.id_unit, s.id_lot, " +
-                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
-                "s.fid_maint_user_n, s.fid_maint_user_supv " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block " +
+                (tool ? ", s.fid_maint_user_n, s.fid_maint_user_supv " : "" ) +
                 "HAVING f_stk <> 0 OR f_bal <> 0 " +
                 "ORDER BY " + (client.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
-                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot, " +
-                "s.fid_maint_user_n, s.fid_maint_user_supv;";
+                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot " +
+                (tool ? ", s.fid_maint_user_n, s.fid_maint_user_supv " : "");
 
          try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resulSet.next()) {
                 stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
-                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"), resulSet.getDouble("f_bal"), resulSet.getInt("s.fid_maint_user_n"),  resulSet.getInt("s.fid_maint_user_supv"));
+                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"), resulSet.getDouble("f_bal"), 
+                        tool ? resulSet.getInt("s.fid_maint_user_n") : 0,  tool ? resulSet.getInt("s.fid_maint_user_supv") : 0);
                 
                 stockMove.setAuxLot(resulSet.getString("l.lot"));
                 stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));

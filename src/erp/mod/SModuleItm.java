@@ -8,10 +8,13 @@ package erp.mod;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mod.itm.db.SDbItem;
+import erp.mod.itm.db.SDbItemComposition;
 import erp.mod.itm.db.SDbPriceCommercialLog;
 import erp.mod.itm.db.SDbUnit;
 import erp.mod.itm.db.SDbUnitType;
+import erp.mod.itm.form.SFormItemComposition;
 import erp.mod.itm.form.SFormPriceCommercialLog;
+import erp.mod.itm.view.SViewItemComposition;
 import erp.mod.itm.view.SViewPriceCommercialLog;
 import java.util.ArrayList;
 import javax.swing.JMenu;
@@ -38,6 +41,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 public class SModuleItm extends SGuiModule {
 
     private SFormPriceCommercialLog moFormPriceCommercialLog;
+    private SFormItemComposition moFormItemComposition;
     
     private SBeanOptionPicker moPickerItem;
     private SBeanOptionPicker moPickerUnit;
@@ -68,6 +72,9 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_PRICE_COMM_LOG:
                 registry = new SDbPriceCommercialLog();
+                break;
+            case SModConsts.ITMU_ITEM_COMP:
+                registry = new SDbItemComposition();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -240,6 +247,9 @@ public class SModuleItm extends SGuiModule {
             case SModConsts.ITMU_PRICE_COMM_LOG:
                 view = new SViewPriceCommercialLog(miClient, "Bitácora precios com. ítems");
                 break;
+            case SModConsts.ITMU_ITEM_COMP:
+                view = new SViewItemComposition(miClient, "Conf. ítems con composición");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -326,6 +336,10 @@ public class SModuleItm extends SGuiModule {
             case SModConsts.ITMU_PRICE_COMM_LOG:
                 if (moFormPriceCommercialLog == null) moFormPriceCommercialLog = new SFormPriceCommercialLog(miClient, "Precio comercial de ítem");
                 form = moFormPriceCommercialLog;
+                break;
+            case SModConsts.ITMU_ITEM_COMP:
+                if (moFormItemComposition == null) moFormItemComposition = new SFormItemComposition(miClient, "Configuración de ítem con composición");
+                form = moFormItemComposition;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

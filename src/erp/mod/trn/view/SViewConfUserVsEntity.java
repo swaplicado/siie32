@@ -110,9 +110,6 @@ public class SViewConfUserVsEntity extends SGridPaneView implements ActionListen
                 + "ceu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_cons, "
                 + "peu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_prov, "
                 + "csu.fk_usr AS " + SDbConsts.FIELD_USER_INS_ID + "_sub, "
-                + "ceu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_cons, "
-                + "peu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_prov, "
-                + "csu.ts_usr AS " + SDbConsts.FIELD_USER_INS_TS + "_sub, "
                 + "v.ts_edit AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "uic.usr AS " + SDbConsts.FIELD_USER_INS_NAME + "_cons, "
                 + "uip.usr AS " + SDbConsts.FIELD_USER_INS_NAME + "_prov, "
@@ -143,7 +140,6 @@ public class SViewConfUserVsEntity extends SGridPaneView implements ActionListen
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_NAME, "Usuario"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "conf_cons", "Configurado"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME + "_cons", SGridConsts.COL_TITLE_USER_INS_NAME));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS + "_cons", SGridConsts.COL_TITLE_USER_INS_TS));
         
         return columns;
     }
