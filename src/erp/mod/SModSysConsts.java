@@ -158,8 +158,8 @@ public abstract class SModSysConsts {
     public static final int ITMS_ST_ITEM_RES = 2;
     public static final int ITMS_ST_ITEM_INA = 3;
 
-    public static final int ITMU_ITEM_NOT_INV = 0;
     public static final int ITMU_ITEM_INV = 1;
+    public static final int ITMU_ITEM_NOT_INV = 2;
     
     public static final int ITMU_UNIT_NA = 1;
     public static final int ITMU_UNIT_UNIT = 2;
