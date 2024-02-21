@@ -357,7 +357,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         groupOrderBy = "ve.id_mat_req, ve.id_ety ";
 
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
-            where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+            where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur AND ISNULL(mre.qty) ";
         }
 
         if (usrId != 2 || !mbHasAdmRight) { // SUPER

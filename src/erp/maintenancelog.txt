@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 240.2/ 2024-02-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio de valor en la constante para identificar a los ítems no inventariables.
+2) Se agrega la condición para no mostrar las partidas ya cotizadas en la vista de RM por cotizar a detalle.
+
+================================================================================
 SIIE 3.2 240.1/ 2024-02-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
