@@ -3687,8 +3687,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
                                             boolean hasMaterialRequest = false;
                                             int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
-                                            // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza es normal
-                                            if (accItemTypeId != SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET && dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                            // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
+                                            if (accItemTypeId == mnAuxAssetDpsNat && dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
                                                 oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
                                                 hasMaterialRequest = true;
                                             }
@@ -4288,8 +4288,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                                 
                                 int accItemTypeId = getAccItemTypeId(entry.getFkDpsAdjustmentTypeId());
-                                // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza es normal
-                                if (accItemTypeId != SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET && entry.getDbmsDpsEntryMatRequestLink() != null) {
+                                // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
+                                if (accItemTypeId == mnAuxAssetDpsNat && entry.getDbmsDpsEntryMatRequestLink() != null) {
                                     accountConfigs = new Vector<>();
                                     accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
                                 }
