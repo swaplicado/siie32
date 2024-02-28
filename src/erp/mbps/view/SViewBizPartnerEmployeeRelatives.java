@@ -162,11 +162,11 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.tel_num_02", "Teléfono empresa", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.tel_ext_02", "Ext. conmutador", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street", "Calle", 150);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "No. exterior", 50);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "No. interior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "Número exterior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "Número interior", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.neighborhood", "Colonia", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.zip_code", "CP", 50);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Referencia (teléfono)", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Referencia domicilio", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Localidad", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.county", "Municipio", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.state", "Estado", 100);
