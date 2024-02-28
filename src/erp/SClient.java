@@ -108,13 +108,13 @@ import sa.lib.xml.SXmlUtils;
 /**
  * SIIE Client.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Edwin Carmona, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 240.2"; // fecha release: 2024-02-21
+    public static final String APP_RELEASE = "3.2 240.3"; // fecha release: 2024-02-28
     public static final String APP_COPYRIGHT = "2007-2024";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
