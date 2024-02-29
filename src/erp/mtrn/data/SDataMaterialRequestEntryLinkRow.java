@@ -89,7 +89,8 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
         setRowPrimaryKey(moMatRequestEntry.getPrimaryKey());
         
         mvValues.clear();
-        mvValues.add(moMatRequestEntry.getDataItem().getCode());
+        mvValues.add(moMatRequestEntry.getPkEntryId());
+        mvValues.add(moMatRequestEntry.getDataItem().getKey());
         mvValues.add(moMatRequestEntry.getDataItem().getName());
         mvValues.add(moMatRequestEntry.getDataItem().getPartNumber());
         mvValues.add(moMatRequestEntry.getUserQuantity());
@@ -130,7 +131,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     }
     
     public double getQuantityToLinkV() {
-        return (double) mvValues.get(4);
+        return (double) mvValues.get(5);
     }
 
     public void setQuantityToLink(double mdToLinkQuantity) {
@@ -138,7 +139,7 @@ public class SDataMaterialRequestEntryLinkRow extends erp.lib.table.STableRow {
     }
     
     public double getUnitaryPrice() {
-        return (double) mvValues.get(6);
+        return (double) mvValues.get(7);
     }
     
     public void setUnitaryPrice(double price) {

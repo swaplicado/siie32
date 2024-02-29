@@ -240,33 +240,36 @@ public class SMaterialRequestEntryRow implements SGridRow {
         else if (mnFormType == FORM_ESTIMATE) {
             switch(col) {
                 case 0:
-                    value = msAuxItemCode;
+                    value = mnPkEntryId;
                     break;
                 case 1:
-                    value = msAuxItemName;
+                    value = msAuxItemCode;
                     break;
                 case 2:
-                    value = msAuxUnitCode;
+                    value = msAuxItemName;
                     break;
                 case 3:
-                    value = msAuxPartNum;
+                    value = msAuxUnitCode;
                     break;
                 case 4:
-                    value = msNotes;
+                    value = msAuxPartNum;
                     break;
                 case 5:
-                    value = mdQuantity;
+                    value = msNotes;
                     break;
                 case 6:
-                    value = mdAuxSupplied;
+                    value = mdQuantity;
                     break;
                 case 7:
-                    value = mdAuxToEstimate;
+                    value = mdAuxSupplied;
                     break;
                 case 8:
-                    value = mbAuxIsEstimated;
+                    value = mdAuxToEstimate;
                     break;
                 case 9:
+                    value = mbAuxIsEstimated;
+                    break;
+                case 10:
                     value = mbAuxEstimate;
                     break;
                 default:
@@ -332,8 +335,9 @@ public class SMaterialRequestEntryRow implements SGridRow {
                 case 4:
                 case 5:
                 case 6:
-                    break;
                 case 7:
+                    break;
+                case 8:
                     if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
                         JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -341,9 +345,9 @@ public class SMaterialRequestEntryRow implements SGridRow {
                         mdAuxToEstimate = (double) value;
                     }
                     break;
-                case 8:
-                    break;
                 case 9:
+                    break;
+                case 10:
                     if ((boolean) value) {
                         if (mbItemNew) {
                             JOptionPane.showMessageDialog(null, "No se puede cotizar esta partida, el ítem debe ser cambiado.", "Error", JOptionPane.ERROR_MESSAGE);

@@ -239,7 +239,8 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         moTablePane = new STablePane(miClient);
         jpOptions.add(moTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[12];
+        columns = new STableColumnForm[13];
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "# partida", STableConstants.WIDTH_NUM_SMALLINT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "# parte", 100);
