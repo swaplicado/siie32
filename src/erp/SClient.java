@@ -108,7 +108,7 @@ import sa.lib.xml.SXmlUtils;
 /**
  * SIIE Client.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Edwin Carmona, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {

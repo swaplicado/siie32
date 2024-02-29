@@ -136,7 +136,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[82];
+        STableColumn[] aoTableColumns = new STableColumn[86];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Número empleado", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -156,13 +156,17 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pos.name", "Puesto", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emp.name", "Tipo empleado", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "wrk.name", "Tipo obrero", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.email_01", "Correo electronico", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.email_01", "Correo-e personal", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.email_02", "Correo-e empresa", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.tel_num_01", "Teléfono personal", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.tel_num_02", "Teléfono empresa", 150);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.tel_ext_02", "Ext. conmutador", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street", "Calle", 150);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "No. exterior", 50);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "No. interior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "Número exterior", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "Número interior", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.neighborhood", "Colonia", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.zip_code", "CP", 50);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Referencia (teléfono)", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Referencia domicilio", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Localidad", 150);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.county", "Municipio", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.state", "Estado", 100);
@@ -389,8 +393,9 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp = 1 ";
 
         msSql = "SELECT bp.id_bp, bp.bp, bp.fiscal_id, bp.alt_id, bp.b_att_par_shh, bp.b_att_rel_pty, bp.b_del, " +
-                "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, e.b_act, e.b_mfg_ope, e.b_uni, e.place_bir, e.umf, con.email_01, addr.reference, " +
-                "addr.street, addr.street_num_ext, addr.street_num_int, addr.neighborhood, addr.locality, addr.county, addr.state, addr.zip_code, " + 
+                "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, e.b_act, e.b_mfg_ope, e.b_uni, e.place_bir, e.umf, " +
+                "con.email_01, con.email_02, con.email_01, con.tel_num_01, con.tel_num_02, con.tel_ext_02, " +
+                "addr.street, addr.street_num_ext, addr.street_num_int, addr.neighborhood, addr.locality, addr.county, addr.state, addr.zip_code, addr.reference, " + 
                 "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, " +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr, " +
                 "pay.name, emp.name, wrk.name, dep.name, pos.name, " +

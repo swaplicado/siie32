@@ -6,6 +6,14 @@ Edwin Omar CARMONA FIGUEROA
 2) Ajuste en las columnas de RM al cotizar y al importar
 
 ================================================================================
+
+SIIE 3.2 240.3/ 2024-02-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al formato de impresión de contratos para mostrar el RFC del "receptor", y que se adapte a la categoría del contrato: compras o ventas.
+2) Adición de columnas correo-e y teléfono tanto personal como de la empresa, y extensión del conmutador a la vista de datos personales de empleados.
+
+================================================================================
 SIIE 3.2 240.2/ 2024-02-21
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
