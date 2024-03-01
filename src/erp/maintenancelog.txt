@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 241.0 / 2024-03-01
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Contabilización de documentos por naturaleza activo
+2) Surtido de documentos de compra tomando en cuenta fecha de corte para valor 0 o valor documento
+
+================================================================================
 SIIE 3.2 240.4/ 2024-02-28
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

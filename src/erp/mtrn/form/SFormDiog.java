@@ -30,6 +30,7 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.form.SDialogPickerCompanyBranchEntity;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
@@ -47,6 +48,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnDpsStockReturnRow;
 import erp.mtrn.data.STrnDpsStockSupplyRow;
+import erp.mtrn.data.STrnDpsUtilities;
 import erp.mtrn.data.STrnItemFound;
 import erp.mtrn.data.STrnProdOrderStockAssignRow;
 import erp.mtrn.data.STrnProdOrderStockFinishRow;
@@ -60,7 +62,10 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1527,7 +1532,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         return bIsApropriate;
     }
 
-    private void importFromDps() {
+    private void importFromDps() throws Exception {
         int year = SLibTimeUtilities.digestYear(moFieldDate.getDate())[0];
         int decsQty = miClient.getSessionXXX().getParamsErp().getDecimalsQuantity();
         int decsValUnit = miClient.getSessionXXX().getParamsErp().getDecimalsValueUnitary();
@@ -1613,6 +1618,24 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             miClient.showMsgBoxInformation("Los ítems:\n" + sItemsInappropriate + " no están configurados para el almacén '" +
                                     moWarehouseSource.getEntity() + "', código '" + moWarehouseSource.getCode() + "'.");
                         }
+                        
+                        String sDpsAssetNat;
+                        String sCutDateAcc;
+                        int nAssetNat = 0;
+                        Date tCutDateAsset = null;
+                        try {
+                            sDpsAssetNat = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                            nAssetNat = Integer.parseInt(sDpsAssetNat);
+                            sCutDateAcc = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_PUR_DATE_CUT_ASSET);
+                            SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+                            tCutDateAsset = formatDate.parse(sCutDateAcc);
+                        }
+                        catch (SQLException ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 
                         for (int row = 0; row < stockSupplyRowsAux.size(); row++) {
                             stockSupplyRow = stockSupplyRowsAux.get(row);
@@ -1639,8 +1662,47 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setPkDocId(SLibConstants.UNDEFINED);
                             iogEntry.setPkEntryId(SLibConstants.UNDEFINED);
                             iogEntry.setQuantity(stockSupplyRow.getQuantityAboutToSupply());
-                            // Cuando la naturaleza del documento sea diferente de la predeterminada, las partidas quedan a valor 0
-                            double diogEntryValueUnitary = moParamDpsSource.getFkDpsNatureId() == SDataConstantsSys.TRNU_DPS_NAT_DEF ? dpsEntry.getPriceUnitaryReal_r() : 0d;
+                            
+                            double diogEntryValueUnitary = 0d;
+                            if (moParamDpsSource.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                                // Cuando la naturaleza del documento sea diferente a la considerada como activo
+                                if (moParamDpsSource.getFkDpsNatureId() != nAssetNat) {
+                                    // Si no existe configuración de corte de contabilización como activo
+                                    if (tCutDateAsset == null) {
+                                        diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
+                                    }
+                                    else {
+                                        // Si existe configuración la fecha a comparar se setea a la del documento
+                                        Date dpsDate = moParamDpsSource.getDate();
+                                        // Si el documento a surtirse es nota de crédito se toma en cuenta la fecha de la factura relacionada
+                                        if (moParamDpsSource.isAdjustmentPur()) {
+                                            SDataDps dps = STrnDpsUtilities.getDpsSourceFromCreditNote(miClient.getSession().getStatement(), (int[]) dpsEntry.getPrimaryKey());
+                                            if (dps != null) {
+                                                dpsDate = dps.getDate();
+                                            }
+                                        }
+                                        
+                                        // Si la fecha del documento es anterior a la fecha de corte de la configuración
+                                        if (dpsDate.before(tCutDateAsset)) {
+                                            if (moParamDpsSource.isOrderPur()) {
+                                                iogEntries.clear();
+                                                throw new Exception("No se puede realizar el surtido, el pedido de origen tiene fecha previa a la configuración de contabilización.");
+                                            }
+                                            // si el documento no es pedido (orden) de compra se surte con valor 0
+                                        }
+                                        else {
+                                            // Si la fecha del DPS es mayor o igual a la fecha de corte de la configuración, se surte con el valor del documento
+                                            diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
+                                        }
+                                    }
+                                }
+                                // si el documento tiene naturaleza considerada como activo se surte con valor 0
+                            }
+                            else {
+                                // Si la categoría del documento no es compras
+                                diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
+                            }
+                            
                             iogEntry.setValueUnitary(diogEntryValueUnitary);
                             iogEntry.setValue(SLibUtilities.round(iogEntry.getValueUnitary() * iogEntry.getQuantity(), decsQty));
                             iogEntry.setOriginalQuantity(stockSupplyRow.getOriginalQuantityAboutToSupply());
@@ -2807,31 +2869,33 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private void actionEntryImport() {
         if (jbEntryImport.isEnabled()) {
-            if (moParamDpsSource != null) {
-                importFromDps();
-            }
-            else if (moProdOrderSource != null) {
-                importFromProdOrder();
-            }
-            else if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV)) {
-                if (miClient.showMsgBoxConfirm("El almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' quedará sin existencias al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
-                    try {
-                        boolean canCancel = STrnUtilities.canStockWarehouseBeCancel(miClient, moFieldDate.getDate(), new int[] { moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() });
-                        if (canCancel || miClient.showMsgBoxConfirm("No se deberían cancelar las existencias del almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' porque existen movimientos de salida de inventario\n con fecha igual o posterior al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                            importStockWarehouse();
-                            jbEntryImport.setEnabled(moPaneDiogEntries.getTableGuiRowCount() == 0);
-                        }
-                        else {
-                            jftDate.requestFocus();
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtilities.renderException(this, e);
+            try {
+                if (moParamDpsSource != null) {
+                    importFromDps();
+                }
+                else if (moProdOrderSource != null) {
+                    importFromProdOrder();
+                }
+                else if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV)) {
+                    if (miClient.showMsgBoxConfirm("El almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' quedará sin existencias al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n ¿Desea continuar?") == JOptionPane.YES_OPTION) {
+                            boolean canCancel = STrnUtilities.canStockWarehouseBeCancel(miClient, moFieldDate.getDate(), new int[] { moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() });
+                            if (canCancel || miClient.showMsgBoxConfirm("No se deberían cancelar las existencias del almacén '" + moWarehouseSource.getEntity() + " (" + moWarehouseSource.getCode() + ")' porque existen movimientos de salida de inventario\n con fecha igual o posterior al '" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDate.getDate()) + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                                importStockWarehouse();
+                                jbEntryImport.setEnabled(moPaneDiogEntries.getTableGuiRowCount() == 0);
+                            }
+                            else {
+                                jftDate.requestFocus();
+                            }
+
                     }
                 }
+                else {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                }
             }
-            else {
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            catch (Exception e) {
+                miClient.showMsgBoxInformation(e.getMessage());
+                SLibUtilities.renderException(this, e);
             }
         }
     }

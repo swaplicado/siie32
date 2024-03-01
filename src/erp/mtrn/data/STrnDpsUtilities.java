@@ -9,6 +9,10 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -40,6 +44,34 @@ public abstract class STrnDpsUtilities {
         }
 
         return totalSupplied;
+    }
+    
+    public static SDataDps getDpsSourceFromCreditNote(final Statement statement, final int[] entryKey) {
+        try {
+            String sql = "";
+            ResultSet resulSet = null;
+            
+            sql = "SELECT id_dps_year, id_dps_doc "
+                    + "FROM trn_dps_dps_adj AS de "
+                    + "INNER JOIN trn_dps AS d ON de.id_dps_year = d.id_year AND de.id_dps_doc = d.id_doc "
+                    + "INNER JOIN trn_dps_ety AS dety ON de.id_dps_year = dety.id_year AND de.id_dps_doc = dety.id_doc AND de.id_dps_ety = dety.id_ety "
+                    + "WHERE NOT d.b_del AND NOT dety.b_del AND "
+                    + "de.id_adj_year = " + entryKey[0] + " AND de.id_adj_doc = " + entryKey[1] + " AND de.id_adj_ety = " + entryKey[2] + " ";
+            
+            resulSet = statement.getConnection().createStatement().executeQuery(sql);
+            if (resulSet.next()) {
+                SDataDps dps = new SDataDps();
+                dps.read(new int[] { resulSet.getInt("id_dps_year"), resulSet.getInt("id_dps_doc") }, statement.getConnection().createStatement());
+                
+                if (dps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                    return dps;
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnDpsUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     /**

@@ -43,4 +43,34 @@ public class SFinAccountConfigEntry implements java.io.Serializable {
     public int getBasicTax() { return mnBasicTax_n; }
     public int getTax() { return mnTax_n; }
     public double getAuxAmount() { return mdAuxAmount; }
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.msAccountId != null ? this.msAccountId.hashCode() : 0);
+        hash = 79 * hash + (this.msCostCenterId != null ? this.msCostCenterId.hashCode() : 0);
+        hash = 79 * hash + (int) (Double.doubleToLongBits(this.mdPercentage) ^ (Double.doubleToLongBits(this.mdPercentage) >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SFinAccountConfigEntry other = (SFinAccountConfigEntry) obj;
+        if ((this.msAccountId == null) ? (other.msAccountId != null) : !this.msAccountId.equals(other.msAccountId)) {
+            return false;
+        }
+        if ((this.msCostCenterId == null) ? (other.msCostCenterId != null) : !this.msCostCenterId.equals(other.msCostCenterId)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.mdPercentage) != Double.doubleToLongBits(other.mdPercentage)) {
+            return false;
+        }
+        return true;
+    }
 }

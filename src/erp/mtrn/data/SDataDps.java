@@ -2405,7 +2405,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msXtaTotalCyAsText = "";
         createXtaDpsType();
     }
-
+                        
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         int[] anKey = (int[]) pk;
@@ -3428,9 +3428,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         SFinAccountConfig oAccountConfigPrepayments = null;
                         SFinAccountConfig oAccountConfigPrepaymentsToInvoice = null;
                         SFinAccountConfig oAccountConfigItem = null;
-                        
-                        String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
-                        mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
 
                         if (bFoundPrepayments) { // prevent from reading configuration when not needed!
                             oAccountConfigPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
@@ -3678,6 +3675,42 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (mvDbmsDpsCustomAccEntries.isEmpty()) {
                             // 4.4.1 Standard accounting:
                             
+                            String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                            mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                            HashSet<erp.mfin.data.SFinAccountConfigEntry> lAccCfg = new HashSet<>();
+                            
+                            /**
+                             * Si la naturaleza del documento es igual a la configurada como activo, se recorren los entries
+                             * para determinar las partidas que sí tienen configuración y repartir las que no en estas
+                             * configuraciones.
+                             */
+                            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                                for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                                    if (dpsEntry.isAccountable()) {
+                                        switch (dpsEntry.getOperationsType()) {
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS:               // operations
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
+                                                int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
+                                                // Si el tipo de cuenta para el item es igual a activo
+                                                if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                                    // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
+                                                    if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                        ArrayList<erp.mfin.data.SFinAccountConfigEntry> lEntryCfgAcc = SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink());
+                                                        lAccCfg.addAll(lEntryCfgAcc);
+                                                    }
+                                                }
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                for (SFinAccountConfigEntry oAccCfgEntry : lAccCfg) {
+                                    oAccCfgEntry.setPercentage(1d / lAccCfg.size());
+                                }
+                            }
+                            
                             for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                                 if (dpsEntry.isAccountable()) {
                                     switch (dpsEntry.getOperationsType()) {
@@ -3686,16 +3719,43 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
                                             boolean hasMaterialRequest = false;
+                                            Date tAccDpsDate = this.getDateDoc();
+                                            if (this.isAdjustment()) {
+                                                if (! dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
+                                                    SDataDps dps = new SDataDps();
+                                                    dps.read(dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), connection.createStatement());
+
+                                                    if (dps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                                                        tAccDpsDate = dps.getDate();
+                                                    }
+                                                }
+                                            }
                                             int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
-                                            // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
-                                            if (accItemTypeId == mnAuxAssetDpsNat && dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
-                                                oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
-                                                hasMaterialRequest = true;
+                                            // Si el tipo de cuenta para el item es igual a activo
+                                            if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                                // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
+                                                if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                    oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
+                                                    hasMaterialRequest = true;
+                                                }
+                                                else {
+                                                    // Si no está vinculado a una solicitud de material, obtener la configuración de la cuenta contable del ítem
+                                                    try {
+                                                        oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                                        dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
+                                                    }
+                                                    catch (Exception e) {
+                                                        oAccountConfigItem = new SFinAccountConfig(lAccCfg);
+                                                    }
+                                                }
                                             }
                                             else {
+                                                // Si el tipo de cuenta no es activo, obtener la configuración de la cuenta contable del ítem
+
                                                 oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
                                                         dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
-                                                        mtDate, accItemTypeId, isDebitForOperations(), oStatement));
+                                                        tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
                                             }
 
                                             sConceptEntryAux = sConceptAux;
@@ -4270,6 +4330,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (mvDbmsDpsCustomAccEntries.isEmpty()) {
                     // 2.1. Standard accounting:
                     
+                    String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                    mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                    ArrayList<erp.mfin.data.SFinAccountConfigEntry> lAccConfigs = new ArrayList<>();
+                    boolean hasAccountables = false;
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                         if (entry.isAccountable()) {
                             try {
@@ -4287,16 +4351,40 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 
+                                Date tAccDpsDate = this.getDateDoc();
+                                if (this.isAdjustment()) {
+                                    if (! entry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
+                                        SDataDps dps = new SDataDps();
+                                        dps.read(entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), statement);
+                                        
+                                        if (dps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                                            tAccDpsDate = dps.getDate();
+                                        }
+                                    }
+                                }
+                                
                                 int accItemTypeId = getAccItemTypeId(entry.getFkDpsAdjustmentTypeId());
                                 // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
-                                if (accItemTypeId == mnAuxAssetDpsNat && entry.getDbmsDpsEntryMatRequestLink() != null) {
-                                    accountConfigs = new Vector<>();
-                                    accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
+                                if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                    if (entry.getDbmsDpsEntryMatRequestLink() != null) {
+                                        accountConfigs = new Vector<>();
+                                        accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
+                                    }
+                                    else {
+                                        try {
+                                            accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
+                                                entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
+                                                tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
+                                        }
+                                        catch (Exception e) {
+                                            System.out.println("No se encontró configuración para la partida.");
+                                        }
+                                    }
                                 }
                                 else {
                                     accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
                                             entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
-                                            mtDate, accItemTypeId, isDebitForOperations(), statement);
+                                            tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
                                 }
 
                                 for (SFinAccountConfigEntry config : accountConfigs) {
@@ -4314,6 +4402,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         throw new Exception(msDbmsError);
                                     }
                                 }
+                                
+                                lAccConfigs.addAll(accountConfigs);
+                                hasAccountables = true;
                             }
                             catch (Exception e) {
                                 if (msDbmsError.isEmpty()) {
@@ -4322,6 +4413,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 throw new Exception(msDbmsError);
                             }
                         }
+                    }
+                    
+                    if (hasAccountables && lAccConfigs.isEmpty()) {
+                        throw new Exception("El documento no puede guardarse, no hay configuraciones disponibles para su contabilización.");
                     }
                 }
                 else {
