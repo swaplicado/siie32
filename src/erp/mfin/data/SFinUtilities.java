@@ -144,7 +144,7 @@ public abstract class SFinUtilities {
 
         sql = "SELECT file_name " +
                "FROM erp.finu_tp_lay_bank " +
-               "WHERE NOT b_del AND id_tp_lay_bank = " + layoutTpId;
+               "WHERE NOT b_del AND id_tp_lay_bank = " + layoutTpId + ";";
 
         resulSet = session.getStatement().executeQuery(sql);
         if (resulSet.next()) {
@@ -161,7 +161,7 @@ public abstract class SFinUtilities {
 
         sql = "SELECT file_ext " +
                "FROM erp.finu_tp_lay_bank " +
-               "WHERE NOT b_del AND id_tp_lay_bank = " + layoutTpId;
+               "WHERE NOT b_del AND id_tp_lay_bank = " + layoutTpId + ";";
 
         resulSet = session.getStatement().executeQuery(sql);
         if (resulSet.next()) {
