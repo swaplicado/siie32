@@ -1512,8 +1512,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                        "Total: " + SLibUtils.DecimalFormatValue2D.format(bankLayoutParams.getOriginalTotal()) + " " + bankLayoutParams.getCurrency() +
                        (dlgSendingConfirmation.getComment().isEmpty() ? "" : "\n\n" + dlgSendingConfirmation.getComment()));
                 
-                String email = STrnUtilities.getUserEmail((SClientInterface) client);
-                sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ, pdf, subject, body, "", email);
+//                String email = STrnUtilities.getUserEmail((SClientInterface) client);
+                sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ, pdf, subject, body, ""/*, email*/);
 
                 if (sent) {
                     try {
