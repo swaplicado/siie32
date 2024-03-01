@@ -159,7 +159,7 @@ public abstract class SFinUtilities {
         String sql;
         ResultSet resulSet;
 
-        sql = "SELECT ext " +
+        sql = "SELECT file_ext " +
                "FROM erp.finu_tp_lay_bank " +
                "WHERE NOT b_del AND id_tp_lay_bank = " + layoutTpId;
 
