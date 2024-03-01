@@ -3730,13 +3730,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     }
                                                 }
                                             }
+                                            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                hasMaterialRequest = true;
+                                            }
                                             int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
                                             // Si el tipo de cuenta para el item es igual a activo
                                             if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
                                                 // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
-                                                if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                if (hasMaterialRequest) {
                                                     oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
-                                                    hasMaterialRequest = true;
                                                 }
                                                 else {
                                                     // Si no está vinculado a una solicitud de material, obtener la configuración de la cuenta contable del ítem
@@ -3752,9 +3754,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
                                             else {
                                                 // Si el tipo de cuenta no es activo, obtener la configuración de la cuenta contable del ítem
-
+                                                int idItemAcc = 0;
+                                                if (hasMaterialRequest && dpsEntry.getIsInventoriable()) {
+                                                   idItemAcc = dpsEntry.getFkItemId();
+                                                }
+                                                else {
+                                                    idItemAcc = dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId();
+                                                }
+                                                
                                                 oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
-                                                        dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        idItemAcc, oRecord.getPkBookkeepingCenterId(), 
                                                         tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
                                             }
 
@@ -4382,8 +4391,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 else {
+                                    // Si el tipo de cuenta no es activo, obtener la configuración de la cuenta contable del ítem
+                                    int idItemAcc = 0;
+                                    if (entry.getDbmsDpsEntryMatRequestLink() != null && entry.getIsInventoriable()) {
+                                       idItemAcc = entry.getFkItemId();
+                                    }
+                                    else {
+                                        idItemAcc = entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId();
+                                    }
+                                    
                                     accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
-                                            entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
+                                            idItemAcc, (Integer) keyRecord[2],
                                             tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
                                 }
 
