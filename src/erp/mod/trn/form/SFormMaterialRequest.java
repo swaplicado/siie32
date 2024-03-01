@@ -1594,16 +1594,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 ArrayList<SDbMaterialCostCenterGroup> ccg = new ArrayList<>();
                 for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
                     SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
-                    SDbMaterialCostCenterGroup aux = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
+                    ccg = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
                             new int[] { cc.getPkSubentMatConsumptionEntityId(), cc.getPkSubentMatConsumptionSubentityId() }, cc.getPkCostCenterId());
-                    ccg.add(aux);
                 }
                 if (ccg.isEmpty()) {
                     int[] pkConsSubent = moKeyConsSubentEty.getValue();
                     int pkCc = moKeyCostCenterEty.getValue()[0];
-                    SDbMaterialCostCenterGroup aux = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
+                    ccg = SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
                             pkConsSubent, pkCc);
-                    ccg.add(aux);
                 }
                 
                 SGuiParams params = new SGuiParams();

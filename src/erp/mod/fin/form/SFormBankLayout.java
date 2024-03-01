@@ -829,7 +829,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         switch (mnLayoutBank) {
             case SFinConsts.LAY_BANK_HSBC:
-                editable = mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD;
+                //editable = mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD;
+                editable = true;
                 break;
             case SFinConsts.LAY_BANK_SANT:
                 editable = true;
@@ -2071,12 +2072,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
     
     private void actionPerformedPickLayoutPath() {
-        String nameFile = "";
+        String nameFile;
+        String extFile;
         SimpleDateFormat fileNameDatetimeFormat = new SimpleDateFormat("yyMMdd HHmm");
         
         try {
-            nameFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(SFinUtilities.getFileNameLayout(miClient.getSession(), moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0]).toLowerCase().replaceAll("/", " ")));
-            nameFile = SLibUtils.validateSafePath(fileNameDatetimeFormat.format(new java.util.Date()) + " " + nameFile + ".txt");
+            nameFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(SFinUtilities.getFileNameLayout(miClient.getSession(), moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0]).toUpperCase().replaceAll("/", " ")));
+            extFile = (moKeyBankLayoutType.getSelectedIndex() <= 0 ? "" : SLibUtils.textToAscii(SFinUtilities.getFileExtLayout(miClient.getSession(), moKeyBankLayoutType.getSelectedItem().getPrimaryKey()[0]).toLowerCase().replaceAll("/", " ")));
+            nameFile = SLibUtils.validateSafePath(fileNameDatetimeFormat.format(new java.util.Date()) + " " + nameFile + (extFile.isEmpty() ? ".txt" : "." + extFile));
         
             miClient.getFileChooser().setSelectedFile(new File(nameFile));
             if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {

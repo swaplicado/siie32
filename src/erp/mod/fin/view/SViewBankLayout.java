@@ -202,7 +202,12 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         SDbBankLayout bankLayout = readBankLayout();
         
         if (bankLayout != null) {
-            SFinUtilities.writeLayout((SClientInterface) miClient, bankLayout.getLayoutText(), "");
+            try {
+                SFinUtilities.writeLayout((SClientInterface) miClient, bankLayout, "");
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
         }
     }
     

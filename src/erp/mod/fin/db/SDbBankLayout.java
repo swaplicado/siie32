@@ -293,7 +293,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             case SDataConstantsSys.FINS_TP_PAY_BANK_THIRD:
                 switch (layoutBank) {
                    case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcThird(layoutBankPaymentTexts, layoutTitle);
+                       msLayoutText = SFinUtilities.createLayoutHsbcThirdCsv(layoutBankPaymentTexts, layoutTitle);
                       break;
                   case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderThird(layoutBankPaymentTexts, mtDateLayout, layoutTitle);
@@ -337,7 +337,7 @@ public class SDbBankLayout extends SDbRegistryUser {
            case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
                 switch (layoutBank) {
                    case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdN(layoutBankPaymentTexts, layoutTitle);
+                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdNCsv(layoutBankPaymentTexts, layoutTitle);
                        break;
                   case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdN(layoutBankPaymentTexts, layoutTitle);
@@ -1512,7 +1512,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                        "Total: " + SLibUtils.DecimalFormatValue2D.format(bankLayoutParams.getOriginalTotal()) + " " + bankLayoutParams.getCurrency() +
                        (dlgSendingConfirmation.getComment().isEmpty() ? "" : "\n\n" + dlgSendingConfirmation.getComment()));
                 
-                sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ, pdf, subject, body);
+                String email = STrnUtilities.getUserEmail((SClientInterface) client);
+                sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ, pdf, subject, body, "", email);
 
                 if (sent) {
                     try {
