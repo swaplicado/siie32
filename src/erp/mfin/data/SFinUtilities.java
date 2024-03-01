@@ -165,7 +165,7 @@ public abstract class SFinUtilities {
 
         resulSet = session.getStatement().executeQuery(sql);
         if (resulSet.next()) {
-            fileExt = resulSet.getString("ext");
+            fileExt = resulSet.getString("file_ext");
         }
         
         return fileExt;
