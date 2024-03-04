@@ -1,29 +1,18 @@
 ================================================================================
-SIIE 3.2 241.1 / 2024-03-01
-Edwin Omar CARMONA FIGUEROA
---------------------------------------------------------------------------------
-1) Si el DPS tiene vínculo con una RM y el ítem es inventariable se toma en cuenta el ítem de la partida para contabilizar
-
-================================================================================
-
-SIIE 3.2 241.0 / 2024-03-01
-Edwin Omar CARMONA FIGUEROA
---------------------------------------------------------------------------------
-1) Contabilización de documentos por naturaleza activo
-2) Surtido de documentos de compra tomando en cuenta fecha de corte para valor 0 o valor documento
-
-================================================================================
 
 SIIE 3.2 241.1/ 2024-03-01
-Sergio Abraham FLORES GUTIÉRREZ
+Sergio Abraham FLORES GUTIÉRREZ / Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Corrección a la consulta para obtener la extensión del archivo de layout bancario.
+2) Si el DPS tiene vínculo con una RM y el ítem es inventariable se toma en cuenta el ítem de la partida para contabilizar
 
 ================================================================================
-SIIE 3.2 241.0/ 2024-03-01
-Isabel Danae GARCÍA SERVÍN
+SIIE 3.2 241.0/ 2024-03-01 
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Actualización de layouts bancarios de HSBC para ser emitidos en formato CSV.
+2) Contabilización de documentos por naturaleza activo
+3) Surtido de documentos de compra tomando en cuenta fecha de corte para valor 0 o valor documento
 
 ================================================================================
 SIIE 3.2 240.4/ 2024-02-28
