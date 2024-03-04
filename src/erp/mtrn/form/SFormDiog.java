@@ -1619,16 +1619,15 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                     moWarehouseSource.getEntity() + "', código '" + moWarehouseSource.getCode() + "'.");
                         }
                         
-                        String sDpsAssetNat;
-                        String sCutDateAcc;
-                        int nAssetNat = 0;
-                        Date tCutDateAsset = null;
+                        int nDpsFixedAssetNat = 0; // document nature that should be treated as fixed asset, can be zero
+                        Date tPurAccAssetStart = null; // validity start of puchases accounting as asset (inventory), can be null
+                        
                         try {
-                            sDpsAssetNat = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
-                            nAssetNat = Integer.parseInt(sDpsAssetNat);
-                            sCutDateAcc = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_PUR_DATE_CUT_ASSET);
+                            String sDpsFixedAssetNat = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                            nDpsFixedAssetNat = Integer.parseInt(sDpsFixedAssetNat);
+                            String sPurAccAssetStart = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_PUR_ACC_ASSET_START);
                             SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-                            tCutDateAsset = formatDate.parse(sCutDateAcc);
+                            tPurAccAssetStart = formatDate.parse(sPurAccAssetStart);
                         }
                         catch (SQLException ex) {
                             Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
@@ -1666,9 +1665,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             double diogEntryValueUnitary = 0d;
                             if (moParamDpsSource.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                                 // Cuando la naturaleza del documento sea diferente a la considerada como activo
-                                if (moParamDpsSource.getFkDpsNatureId() != nAssetNat) {
+                                if (moParamDpsSource.getFkDpsNatureId() != nDpsFixedAssetNat) {
                                     // Si no existe configuración de corte de contabilización como activo
-                                    if (tCutDateAsset == null) {
+                                    if (tPurAccAssetStart == null) {
                                         diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
                                     }
                                     else {
@@ -1683,7 +1682,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         }
                                         
                                         // Si la fecha del documento es anterior a la fecha de corte de la configuración
-                                        if (dpsDate.before(tCutDateAsset)) {
+                                        if (dpsDate.before(tPurAccAssetStart)) {
                                             if (moParamDpsSource.isOrderPur()) {
                                                 iogEntries.clear();
                                                 throw new Exception("No se puede realizar el surtido, el pedido de origen tiene fecha previa a la configuración de contabilización.");

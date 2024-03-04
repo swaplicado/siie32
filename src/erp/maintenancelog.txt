@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 242.1/ 2024-03-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cambio a nombre de parámetro de configuración de fecha de inicio de vigencia de contabilización de compras en cuentas contables de inventarios (activo circulante).
+
+================================================================================
 SIIE 3.2 242.0/ 2024-03-04
 Sergio Abraham FLORES GUTIÉRREZ/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
