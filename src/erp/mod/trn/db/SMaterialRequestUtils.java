@@ -397,16 +397,18 @@ public abstract class SMaterialRequestUtils {
      * @return Grupo cc
      * @throws java.lang.Exception
      */
-    public static SDbMaterialCostCenterGroup getCostCenterGroupByUser(SGuiSession session, int[] pkConsSubent, int pkCc) throws Exception {
-        SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
+    public static ArrayList<SDbMaterialCostCenterGroup> getCostCenterGroupByUser(SGuiSession session, int[] pkConsSubent, int pkCc) throws Exception {
+        ArrayList<SDbMaterialCostCenterGroup> array = new ArrayList<>();
         Statement statement = session.getDatabase().getConnection().createStatement();
         String sql = "SELECT id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
                 "WHERE id_mat_cons_ent = " + pkConsSubent[0] + " AND id_mat_cons_subent = " + pkConsSubent[1] + " AND id_cc = " + pkCc;
         ResultSet resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
+        while (resultSet.next()) {
+            SDbMaterialCostCenterGroup ccg = new SDbMaterialCostCenterGroup();
             ccg.read(session, new int[] { resultSet.getInt(1)} );
+            array.add(ccg);
         }
-        return ccg;
+        return array;
     }
     
     @SuppressWarnings("unchecked")

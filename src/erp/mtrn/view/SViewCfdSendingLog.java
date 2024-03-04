@@ -122,7 +122,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SEND_PEND);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SENT);
         mvSuscriptors.add(SDataConstants.USRU_USR);
-
+        
         populateTable();
     }
     

@@ -130,7 +130,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsumptionEntity), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
-        moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 50, 1);
+        moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 255, 1);
         moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
         
         moPanelAccount.setAccountNameWidth(500);
