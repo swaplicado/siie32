@@ -1,14 +1,19 @@
 ================================================================================
+SIIE 3.2 242.0/ 2024-03-04
+Sergio Abraham FLORES GUTIÉRREZ/ Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de la contabilización de compras en cuentas contables de inventarios para ítems inventariables.
 
+================================================================================
 SIIE 3.2 241.1/ 2024-03-01
-Sergio Abraham FLORES GUTIÉRREZ / Edwin Omar CARMONA FIGUEROA
+Sergio Abraham FLORES GUTIÉRREZ/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Corrección a la consulta para obtener la extensión del archivo de layout bancario.
-2) Si el DPS tiene vínculo con una RM y el ítem es inventariable se toma en cuenta el ítem de la partida para contabilizar
+2) Si el DPS tiene vínculo con una RM y el ítem es inventariable se toma en cuenta el ítem de la partida para contabilizar.
 
 ================================================================================
 SIIE 3.2 241.0/ 2024-03-01 
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Actualización de layouts bancarios de HSBC para ser emitidos en formato CSV.
 2) Contabilización de documentos por naturaleza activo
