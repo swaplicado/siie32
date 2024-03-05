@@ -1684,8 +1684,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         // Si la fecha del documento es anterior a la fecha de corte de la configuración
                                         if (dpsDate.before(tPurAccAssetStart)) {
                                             if (moParamDpsSource.isOrderPur()) {
-                                                iogEntries.clear();
-                                                throw new Exception("No se puede realizar el surtido, el pedido de origen tiene fecha previa a la configuración de contabilización.");
+                                                diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
                                             }
                                             // si el documento no es pedido (orden) de compra se surte con valor 0
                                         }
