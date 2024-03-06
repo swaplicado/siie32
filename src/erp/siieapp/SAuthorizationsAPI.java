@@ -132,17 +132,36 @@ public class SAuthorizationsAPI {
                 + "trn_get_cons_info(tmr.id_mat_req, 2) AS s_ent_cons, "
                 + "trn_get_cons_info(tmr.id_mat_req, 3) AS f_cc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS v ON "
-                + "v.res_pk_n1_n = tmr.id_mat_req "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
-                + "v.fk_tp_authorn = cta.id_tp_authorn "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
                 + "tmr.fk_mat_prov_ent = pe.id_mat_prov_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
                 + "tmr.fk_usr_req = ur.id_usr "
-                + "LEFT JOIN erp.trnu_mat_req_pty as pty ON tmr.fk_mat_req_pty = pty.id_mat_req_pty "
+                + "INNER JOIN erp.trnu_mat_req_pty as pty ON tmr.fk_mat_req_pty = pty.id_mat_req_pty "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS v ON "
+                + "v.res_pk_n1_n = tmr.id_mat_req AND NOT v.b_del "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
+                + "v.fk_tp_authorn = cta.id_tp_authorn AND NOT v.b_del "
                 + "WHERE "
-                + "NOT tmr.b_del ";
+                + "NOT tmr.b_del AND ( " +
+                "    v.res_pk_n1_n IS NULL OR ( " +
+                "        v.res_pk_n1_n IS NOT NULL AND ( " +
+//                "            -- Cuando authorn_grouper_n no es nulo, obtener el más alto " +
+                "            v.authorn_grouper_n = ( " +
+                "                SELECT MAX(stps.authorn_grouper_n) " +
+                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
+                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
+                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
+                "                    AND stps.res_pk_len = v.res_pk_len " +
+                "                    AND NOT stps.b_del " +
+                "            ) " +
+//                "            -- Cuando authorn_grouper_n es nulo, igualar a id_authorn_step más alto " +
+                "            OR v.id_authorn_step = ( " +
+                "                SELECT MAX(stps.id_authorn_step) " +
+                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
+                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
+                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
+                "                    AND stps.res_pk_len = v.res_pk_len " +
+                "                    AND NOT stps.b_del))));";
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataResponse dr = new SDataResponse();
