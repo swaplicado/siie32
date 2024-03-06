@@ -88,7 +88,7 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 
         switch (mnTabTypeAux01) {
             case SDataConstants.TRNX_STK_ITEM:
-                aoTableColumns = new STableColumn[8];
+                aoTableColumns = new STableColumn[7];
                 break;
             default:
                 aoTableColumns = null;
@@ -97,14 +97,14 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "priceUnit", "Ultimo precio compra", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "priceUnit", "Promedio valor", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovI", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovO", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Ultima fecha compra", STableConstants.WIDTH_DATE);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Ultima fecha compra", STableConstants.WIDTH_DATE);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -233,8 +233,7 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         }
         
         msSql = "SELECT "
-            + "(SELECT cost_u FROM trn_stk AS s WHERE id_item = i.id_item AND cost_u > 0 "
-            + "ORDER BY s.dt DESC LIMIT 1) AS priceUnit , "
+            + "AVG(s.cost_u) AS priceUnit , "
             + "i.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, i.part_num, "
             + "SUM(s.mov_in) AS _MovI, SUM(s.mov_out) AS _MovO "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "

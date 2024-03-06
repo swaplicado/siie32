@@ -419,6 +419,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         String select = "";
         String where = "";
         String join = "";
+        String provJoin = "";
         boolean needJoin = false;
         Object filter;
         int usrId = miClient.getSession().getUser().getPkUserId();
@@ -490,15 +491,33 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModConsts.TRN_MAT_CONS_ENT_USR:
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " "
-                            + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ")) ";
+                    where += (where.isEmpty() ? "" : "AND ") + "(ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") ";
                 }
+                filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
+                if (filter != null && ((int[]) filter).length == 1) {
+                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + ((int[]) filter)[0] + " ";
+                }
+                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+                if (filter != null) {
+                    where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+                }
+            break;
             case SModConsts.TRN_MAT_PROV_ENT_USR:
                 if (usrId != 2 ) { // SUPER
                     needJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + " "
-                            + "OR (peu.id_usr = " + usrId + ")) ";
+                    where += (where.isEmpty() ? "" : "AND ") + "(peu.id_usr = " + usrId + ") ";
+                    provJoin = "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
+                            + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " ";
                 }
+                filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
+                if (filter != null && ((int[]) filter).length == 1) {
+                    where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + ((int[]) filter)[0] + " ";
+                }
+                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+                if (filter != null) {
+                    where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+                }
+            break;
             default:
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
                 if (filter != null && ((int[]) filter).length == 1) {
@@ -511,9 +530,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-        join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
-                + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " " 
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
+        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
                 + "v.id_mat_req = mrc.id_mat_req "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
                 + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
@@ -632,6 +649,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (needJoin ? join : "")
+                + (provJoin)
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.dt, v.num ";
     }
