@@ -611,23 +611,23 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jpRegistry2211.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsItemLineApplying.setText("Aplica línea de ítems");
-        jckIsItemLineApplying.setPreferredSize(new java.awt.Dimension(250, 23));
+        jckIsItemLineApplying.setPreferredSize(new java.awt.Dimension(350, 23));
         jpRegistry2211.add(jckIsItemLineApplying);
 
         jpRegistry221.add(jpRegistry2211);
 
         jpRegistry2212.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsItemNameEditable.setText("Los nombres de ítems se pueden modificar");
-        jckIsItemNameEditable.setPreferredSize(new java.awt.Dimension(250, 23));
+        jckIsItemNameEditable.setText("Nombres de ítems modificables en documentos");
+        jckIsItemNameEditable.setPreferredSize(new java.awt.Dimension(350, 23));
         jpRegistry2212.add(jckIsItemNameEditable);
 
         jpRegistry221.add(jpRegistry2212);
 
         jpRegistry2213.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsItemKeyEditable.setText("Las claves de ítems se pueden modificar");
-        jckIsItemKeyEditable.setPreferredSize(new java.awt.Dimension(250, 23));
+        jckIsItemKeyEditable.setText("Claves de ítems modificables en documentos");
+        jckIsItemKeyEditable.setPreferredSize(new java.awt.Dimension(350, 23));
         jpRegistry2213.add(jckIsItemKeyEditable);
 
         jpRegistry221.add(jpRegistry2213);
@@ -907,6 +907,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jLabel1.setText("+ nom., pres., vars.");
         jPanel62.add(jLabel1);
+
+        jLabel2.setForeground(java.awt.Color.gray);
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel2.setText("(¡Opacan cfg. ítem!)");
         jPanel62.add(jLabel2);
 
         jpProperties1112.add(jPanel62);
@@ -944,6 +948,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jLabel4.setText("+ cód. ítem, vars.");
         jPanel63.add(jLabel4);
+
+        jLabel5.setForeground(java.awt.Color.gray);
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel5.setText("¡Opacan cfg. ítem!");
         jPanel63.add(jLabel5);
 
         jpProperties1112.add(jPanel63);
@@ -2620,6 +2628,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jtfNamingOrdinaryPosItemGeneric);
                     validation.setMessage("La posición para el nombre de la configuración de los nombres de ítems " + comparePositions(posNameOrd) + " esta repetida.");
                 }
+                /* 2024-02-16 Sergio Flores: Cambio de criterio de definición de posiciones de nombre: A partir de ahora la configuración estándar y la de línea de ítems se combinan, y la de línea de ítems tiene más presedencia que la estándar.
                 else if (jckIsItemLineApplying.isSelected() &&
                         moFieldNamingLinePosItemGeneric.getInteger() == 0 && moFieldNamingLinePosItemLine.getInteger() == 0 &&
                         moFieldNamingLinePosBrand.getInteger() == 0 && moFieldNamingLinePosManufacturer.getInteger() == 0) {
@@ -2627,6 +2636,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jtfNamingLinePosItemGeneric);
                     validation.setMessage("Se debe especificar al menos una posición para el nombre de la configuración de los nombres de líneas de ítems.");
                 }
+                */
                 else if (jckIsItemLineApplying.isSelected() &&
                         (moFieldNamingLinePosItemGeneric.getInteger() > SDataConstantsSys.ITMS_NAM_LINE_POS_QTY ||
                         moFieldNamingLinePosItemLine.getInteger() > SDataConstantsSys.ITMS_NAM_LINE_POS_QTY ||
@@ -2662,6 +2672,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jtfKeyOrdinaryPosItemGeneric);
                     validation.setMessage("La posición para la clave de la configuración de los nombres de ítems " + comparePositions(posKeyOrd) + " esta repetida.");
                 }
+                /* 2024-02-16 Sergio Flores: Cambio de criterio de definición de posiciones de nombre: A partir de ahora la configuración estándar y la de línea de ítems se combinan, y la de línea de ítems tiene más presedencia que la estándar.
                 else if (jckIsItemLineApplying.isSelected() && jckIsItemKeyAutomatic.isSelected() &&
                         moFieldKeyLinePosItemGeneric.getInteger() == 0 && moFieldKeyLinePosItemLine.getInteger() == 0 &&
                         moFieldKeyLinePosBrand.getInteger() == 0 && moFieldKeyLinePosManufacturer.getInteger() == 0) {
@@ -2669,6 +2680,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jtfKeyLinePosItemGeneric);
                     validation.setMessage("Se debe especificar al menos una posición para la clave de la configuración de los nombres de líneas de ítems.");
                 }
+                */
                 else if (jckIsItemLineApplying.isSelected() && jckIsItemKeyAutomatic.isSelected() &&
                         (moFieldKeyLinePosItemGeneric.getInteger() > SDataConstantsSys.ITMS_KEY_LINE_POS_QTY ||
                         moFieldKeyLinePosItemLine.getInteger() > SDataConstantsSys.ITMS_KEY_LINE_POS_QTY ||

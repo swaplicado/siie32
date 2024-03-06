@@ -4,6 +4,9 @@
  */
 package erp.mod.trn.form;
 
+import erp.data.SDataConstantsSys;
+import erp.gui.account.SAccount;
+import erp.gui.account.SAccountConsts;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbMaterialConsumptionSubentity;
@@ -57,6 +60,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         jlConsumptionSubentity = new javax.swing.JLabel();
         moTextConsumptionSubentity = new sa.lib.gui.bean.SBeanFieldText();
         jPanel25 = new javax.swing.JPanel();
+        moPanelAccount = new erp.gui.account.SBeanPanelAccount();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setPreferredSize(new java.awt.Dimension(750, 450));
@@ -99,6 +103,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         jPanel23.add(jPanel25);
 
         jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
+        jPanel1.add(moPanelAccount, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -115,6 +120,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
     private javax.swing.JLabel jlConsumptionEntity;
     private javax.swing.JLabel jlConsumptionSubentity;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsEntEty;
+    private erp.gui.account.SBeanPanelAccount moPanelAccount;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextConsumptionSubentity;
     // End of variables declaration//GEN-END:variables
@@ -124,7 +130,13 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsumptionEntity), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
-        moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 50, 1);
+        moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 255, 1);
+        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        
+        moPanelAccount.setAccountNameWidth(500);
+        //moPanelAccount.setComponentPrevious(moKeyPackExpenses);
+        //moPanelAccount.setComponentNext(moKeyPackCostCenters, moKeyBizPartner);
+        moPanelAccount.initPanel();
         
         moFields.addField(moKeyConsEntEty);
         moFields.addField(moTextCode);
@@ -169,6 +181,8 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         moTextCode.setValue(moRegistry.getCode());
         moTextConsumptionSubentity.setValue(moRegistry.getName());
         
+        moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountFixedAssetId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountFixedAssetId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
+        
         setFormEditable(true);
 
         if (moRegistry.isRegistryNew()) { }
@@ -185,6 +199,7 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         moRegistry.setPkMatConsumptionEntityId(moKeyConsEntEty.getValue()[0]);
         moRegistry.setCode(moTextCode.getValue());
         moRegistry.setName(moTextConsumptionSubentity.getValue());
+        moRegistry.setFkAccountFixedAssetId(moPanelAccount.getSelectedAccount() != null ? moPanelAccount.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
         
         return registry;
     }
@@ -192,6 +207,10 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            validation = moPanelAccount.validatePanel();
+        }
         
         return validation;
     }

@@ -200,8 +200,8 @@ public class SDialogRepAccount extends javax.swing.JDialog {
 
         jsLevel.setModel(new SpinnerNumberModel(1, 1, miClient.getSessionXXX().getParamsErp().getDeepAccounts(), 1));
 
-        moAccountBegPanel.resetPanel();
-        moAccountEndPanel.resetPanel();
+        moAccountBegPanel.initPanel();
+        moAccountEndPanel.initPanel();
 
         setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);

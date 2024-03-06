@@ -66,7 +66,7 @@ public class SDialogRepHrsPos extends SBeanDialogReport {
 
         jPanel4.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad:"));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad del reporte:"));
         jPanel8.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
         moGroup1.add(moRadDetail);

@@ -924,12 +924,26 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (moDialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                 int[] adjustmentSubtypeKey = (int[]) moDialogDpsFinder.getValue(SDataConstants.TRNS_STP_DPS_ADJ);
                 Object complement = null;
-
+                boolean isMatReqImport = false;
                 if (adjustmentSubtypeKey == null) {
-                    complement = new Object[] { getDpsTypeKey(), false, moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), null, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
+                    complement = new Object[] { 
+                                                getDpsTypeKey(), 
+                                                false, 
+                                                moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), 
+                                                null, 
+                                                moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL),
+                                                isMatReqImport
+                                            };
                 }
                 else { 
-                    complement = new Object[] { getDpsTypeKey(), true, moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), adjustmentSubtypeKey, moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL) };
+                    complement = new Object[] { 
+                                                getDpsTypeKey(), 
+                                                true, 
+                                                moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), 
+                                                adjustmentSubtypeKey, 
+                                                moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL),
+                                                isMatReqImport
+                                            };
                 }
                 
                 miClient.getGuiModule(mnModule).setFormComplement(complement);   // document type key, reference document and adjustment type (optional)

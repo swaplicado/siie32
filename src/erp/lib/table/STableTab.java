@@ -227,7 +227,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         jpSouth1.add(jbGridSearchNext);
 
         jbGridSearchNextCol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cmd_grid_next.gif"))); // NOI18N
-        jbGridSearchNextCol.setToolTipText("Siguiente renglón (F3)");
+        jbGridSearchNextCol.setToolTipText("Siguiente columna");
         jbGridSearchNextCol.setPreferredSize(new java.awt.Dimension(23, 23));
         jbGridSearchNextCol.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -305,7 +305,8 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
         SFormUtilities.createActionMap(this, this, "actionExportCsv", "exportCsv", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(this, this, "actionClearSettings", "clearSettings", KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(this, this, "actionReload", "reload", KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK);
-
+        SFormUtilities.createActionMap(this, this, "actionGridSearchNextValue", "nextValue", KeyEvent.VK_F3, 0);
+        
         moTablePane.setDoubleClickAction(this, "actionEdit");
         add(moTablePane, BorderLayout.CENTER);
     }

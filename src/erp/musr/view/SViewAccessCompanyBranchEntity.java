@@ -5,14 +5,13 @@
 
 package erp.musr.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.lib.table.STableField;
+import javax.swing.JButton;
 
 /**
  *
@@ -62,7 +61,7 @@ public class SViewAccessCompanyBranchEntity extends erp.lib.table.STableTab impl
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_del", "Eliminado sucursal", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_del", "Eliminado usuario", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "a.b_def", "Predeterminado", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "a.b_def", "Acceso predeterminado", STableConstants.WIDTH_BOOLEAN_3X);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }

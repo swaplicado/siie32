@@ -47,6 +47,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryAnalysis;
 import erp.mtrn.data.SDataDpsEntryCommissions;
 import erp.mtrn.data.SDataDpsEntryCommissionsRow;
+import erp.mtrn.data.SDataDpsEntryItemComposition;
 import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataDpsEntryNotesRow;
 import erp.mtrn.data.SDataDpsEntryPrice;
@@ -102,6 +103,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private static final int TAB_CFD_ADD = 5; // CFD addenda
     private static final int TAB_CFD_COMPL = 6; // CFD complement
     private static final int TAB_QUALITY = 7; // CFD complement
+    private static final int TAB_ITEM_COMP = 8; // item composition
     
     private static final int CFD_COMPL_VALS = 4; //number of CFD complement values
     
@@ -195,6 +197,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldComplCfdProdServ;
     private erp.lib.form.SFormField moFieldComplCfdUnit;
     private erp.lib.form.SFormField moFieldComplPredial;
+    private erp.lib.form.SFormField moFieldItemCompositionItem;
+    private erp.lib.form.SFormField moFieldItemCompositionPer;
+    private erp.lib.form.SFormField moFieldItemCompositionOriginalQuantity;
+    private erp.lib.form.SFormField moFieldItemCompositionQuantity;
     
     private int mnAuxCurrentUnitTypeId;
     private int mnAuxCurrentUnitAlternativeTypeId;
@@ -623,6 +629,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlComplPredial = new javax.swing.JLabel();
         jtfComplPredial = new javax.swing.JTextField();
         jpQuality = new javax.swing.JPanel();
+        jpItemComposition = new javax.swing.JPanel();
+        jPanel81 = new javax.swing.JPanel();
+        jPanel91 = new javax.swing.JPanel();
+        jlItemComposition = new javax.swing.JLabel();
+        jcbItemComposition = new javax.swing.JComboBox<SFormComponentItem>();
+        jbItemComposition = new javax.swing.JButton();
+        jPanel92 = new javax.swing.JPanel();
+        jlItemCompositionPer = new javax.swing.JLabel();
+        jtfItemCompositionPer = new javax.swing.JTextField();
+        jPanel93 = new javax.swing.JPanel();
+        jlItemCompositionOriginalQuantity = new javax.swing.JLabel();
+        jtfItemCompositionOriginalQuantity = new javax.swing.JTextField();
+        jPanel95 = new javax.swing.JPanel();
+        jlItemCompositionQuantity = new javax.swing.JLabel();
+        jtfItemCompositionQuantity = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -2291,6 +2312,73 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jpQuality.setLayout(new java.awt.BorderLayout());
         jTabbedPane.addTab("Calidad", jpQuality);
 
+        jpItemComposition.setLayout(new java.awt.BorderLayout());
+
+        jPanel81.setLayout(new java.awt.GridLayout(4, 0, 0, 1));
+
+        jPanel91.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemComposition.setText("Ítem composición:");
+        jlItemComposition.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel91.add(jlItemComposition);
+
+        jcbItemComposition.setMaximumRowCount(12);
+        jcbItemComposition.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel91.add(jcbItemComposition);
+
+        jbItemComposition.setText("...");
+        jbItemComposition.setToolTipText("Seleccionar ítem referencia");
+        jbItemComposition.setFocusable(false);
+        jbItemComposition.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel91.add(jbItemComposition);
+
+        jPanel81.add(jPanel91);
+
+        jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemCompositionPer.setText("Porcentaje:");
+        jlItemCompositionPer.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel92.add(jlItemCompositionPer);
+
+        jtfItemCompositionPer.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfItemCompositionPer.setText("0.00%");
+        jtfItemCompositionPer.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel92.add(jtfItemCompositionPer);
+
+        jPanel81.add(jPanel92);
+
+        jPanel93.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemCompositionOriginalQuantity.setText("Cantidad:");
+        jlItemCompositionOriginalQuantity.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel93.add(jlItemCompositionOriginalQuantity);
+
+        jtfItemCompositionOriginalQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfItemCompositionOriginalQuantity.setText("0.0000");
+        jtfItemCompositionOriginalQuantity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel93.add(jtfItemCompositionOriginalQuantity);
+
+        jPanel81.add(jPanel93);
+
+        jPanel95.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItemCompositionQuantity.setText("Cantidad equivalente:");
+        jlItemCompositionQuantity.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel95.add(jlItemCompositionQuantity);
+
+        jtfItemCompositionQuantity.setEditable(false);
+        jtfItemCompositionQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfItemCompositionQuantity.setText("0.0000");
+        jtfItemCompositionQuantity.setFocusable(false);
+        jtfItemCompositionQuantity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel95.add(jtfItemCompositionQuantity);
+
+        jPanel81.add(jPanel95);
+
+        jpItemComposition.add(jPanel81, java.awt.BorderLayout.NORTH);
+
+        jTabbedPane.addTab("Composición", jpItemComposition);
+
         jpRegistry.add(jTabbedPane, java.awt.BorderLayout.CENTER);
         jTabbedPane.getAccessibleContext().setAccessibleName("Precios");
 
@@ -2490,7 +2578,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldComplPredial = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplPredial, jlComplPredial);
         moFieldComplPredial.setLengthMax(150);
         moFieldComplPredial.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
-
+        
+        moFieldItemCompositionItem = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbItemComposition, jlItemComposition);
+        moFieldItemCompositionItem.setPickerButton(jbItemComposition);
+        moFieldItemCompositionPer = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfItemCompositionPer, jlItemCompositionPer);
+        moFieldItemCompositionPer.setIsPercent(true);
+        moFieldItemCompositionPer.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
+        moFieldItemCompositionOriginalQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfItemCompositionOriginalQuantity, jlItemCompositionOriginalQuantity);
+        moFieldItemCompositionOriginalQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+        moFieldItemCompositionOriginalQuantity.setDoubleMin(-1);
+        moFieldItemCompositionOriginalQuantity.setMinInclusive(true);
+        moFieldItemCompositionQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfItemCompositionQuantity, jlItemCompositionQuantity);
+        moFieldItemCompositionQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+        moFieldItemCompositionQuantity.setDoubleMin(-1);
+        moFieldItemCompositionQuantity.setMinInclusive(true);
+        
         mvFields.add(moFieldFkItemId);
         mvFields.add(moFieldConceptKey);
         mvFields.add(moFieldConcept);
@@ -2573,6 +2675,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldComplCfdProdServ);
         mvFields.add(moFieldComplCfdUnit);
         mvFields.add(moFieldComplPredial);
+        
+        mvFields.add(moFieldItemCompositionItem);
+        mvFields.add(moFieldItemCompositionPer);
+        mvFields.add(moFieldItemCompositionOriginalQuantity);
+        mvFields.add(moFieldItemCompositionQuantity);
 
         // Taxes pane:
 
@@ -2761,6 +2868,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbGridPriceEdit.addActionListener(this);
         jbGridPriceDelete.addActionListener(this);
         jtbGridPricesFilter.addActionListener(this);
+        jbItemComposition.addActionListener(this);
 
         // Focus listeners:
 
@@ -2778,6 +2886,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfContractBase.addFocusListener(this);
         jtfContractFuture.addFocusListener(this);
         jtfContractFactor.addFocusListener(this);
+        jtfItemCompositionPer.addFocusListener(this);
+        jtfItemCompositionOriginalQuantity.addFocusListener(this);
 
         // Item listeners:
 
@@ -2888,6 +2998,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else {
                 jTabbedPane.setEnabledAt(TAB_CFD_COMPL, false);
+            }
+            
+            if (moParamDps.isDocumentSal() && moItem == null) {
+                jTabbedPane.setEnabledAt(TAB_ITEM_COMP, false);
             }
             
             if (moParamDps != null) {
@@ -3047,6 +3161,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         calculateWeights();
         renderDpsEntryValue();
+        calculateItemCompQty();
     }
     
     private void calculateWeights() {
@@ -3090,6 +3205,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 moFieldPriceOriginalPriceUnitaryCy.setDouble(price);
             }
         }
+    }
+    
+    private void calculateItemCompQty() {
+        moFieldItemCompositionOriginalQuantity.setFieldValue(SLibUtils.roundAmount(moFieldOriginalQuantity.getDouble() * moFieldItemCompositionPer.getDouble()));
+        moFieldItemCompositionQuantity.setFieldValue(SLibUtils.roundAmount(SLibUtils.parseDouble(jtfQuantityRo.getText()) * moFieldItemCompositionPer.getDouble()));
+    }
+    
+    private void calculateItemCompPer() {
+        moFieldItemCompositionPer.setFieldValue(moFieldItemCompositionOriginalQuantity.getDouble() / moFieldOriginalQuantity.getDouble());
+        moFieldItemCompositionQuantity.setFieldValue(SLibUtils.roundAmount(SLibUtils.parseDouble(jtfQuantityRo.getText()) * moFieldItemCompositionPer.getDouble()));
     }
 
     private void renderBasicSettings() {
@@ -3404,16 +3529,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             // Initialize original unit combo box:
 
             if (mnAuxCurrentUnitTypeId != moItem.getDbmsDataUnit().getFkUnitTypeId() || 
-                    (mnAuxCurrentUnitTypeId == moItem.getDbmsDataUnit().getFkUnitTypeId() && mnAuxCurrentUnitAlternativeTypeId != moItem.getFkUnitAlternativeTypeId())) {
+                    (mnAuxCurrentUnitTypeId == moItem.getDbmsDataUnit().getFkUnitTypeId() && mnAuxCurrentUnitAlternativeTypeId != moItem.getFkUnitAlternativeTypeId()) ||
+                    moItem.getDbmsDataUnit().hasEquivalentUnits()) {
                 mnAuxCurrentUnitTypeId = moItem.getDbmsDataUnit().getFkUnitTypeId();
                 mnAuxCurrentUnitAlternativeTypeId = moItem.getFkUnitAlternativeTypeId();
 
-                if (moItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA) {
-                    SFormUtilities.populateComboBox(miClient, jcbFkOriginalUnitId, SDataConstants.ITMU_UNIT, new Object[] { moItem.getDbmsDataUnit().getFkUnitTypeId(), moItem.getFkUnitAlternativeTypeId() });
-                }
-                else {
-                    SFormUtilities.populateComboBox(miClient, jcbFkOriginalUnitId, SDataConstants.ITMU_UNIT, new int[] { moItem.getDbmsDataUnit().getFkUnitTypeId() });
-                }
+                int flagIsItemApplying = 1;
+                SFormUtilities.populateComboBox(miClient, 
+                                                jcbFkOriginalUnitId, 
+                                                SDataConstants.ITMU_UNIT, 
+                                                new int[] { moItem.getFkUnitId(), moItem.getPkItemId(), flagIsItemApplying });
+                
             }
 
             // Initialize surplus default:
@@ -3450,7 +3576,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             moFieldConceptKey.setFieldValue(!conceptKey.isEmpty() ? conceptKey : moItem.getKey());
             moFieldConcept.setFieldValue(concept);
-            moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : moItem.getFkUnitId() });
+            moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : (moItem.getFkUnitCommercial_n() > 0 ? moItem.getFkUnitCommercial_n() : moItem.getFkUnitId()) });
             moFieldIsInventoriable.setFieldValue(moItem.getIsInventoriable());
             moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
             moFieldPartNum.setFieldValue(!partNum.isEmpty() ? partNum : "S/No.Parte");
@@ -3535,6 +3661,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         mbUpdatingForm = false;
+    }
+    
+    private void itemComposition() {
+        if (moItem.applyItemComposition(miClient.getSession().getStatement(), moParamDps.getDate())) {
+            jTabbedPane.setEnabledAt(TAB_ITEM_COMP, true);
+        }
+        else {
+            jTabbedPane.setEnabledAt(TAB_ITEM_COMP, false);
+            jTabbedPane.setSelectedIndex(0);
+            moFieldItemCompositionItem.resetField();
+            moFieldItemCompositionPer.resetField();
+            moFieldItemCompositionOriginalQuantity.resetField();
+            moFieldItemCompositionQuantity.resetField();
+        }
     }
 
     private void renderItemBizPartnerDescription(int[] itemBizPartnerDescriptionKey) {
@@ -4107,6 +4247,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfComplCfdProdServ.setEnabled(false);
             jtfComplCfdUnit.setEnabled(false);
             jtfComplPredial.setEnabled(false);
+            
+            jcbItemComposition.setEnabled(false);
+            jbItemComposition.setEnabled(false);
+            jtfItemCompositionPer.setEnabled(false);
+            jtfItemCompositionOriginalQuantity.setEnabled(false);
 
             jbOk.setEnabled(false);
             
@@ -4160,6 +4305,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfComplCfdProdServ.setEnabled(true);
             jtfComplCfdUnit.setEnabled(true);
             jtfComplPredial.setEnabled(true);
+            
+            jcbItemComposition.setEnabled(true);
+            jbItemComposition.setEnabled(true);
+            jtfItemCompositionPer.setEnabled(true);
+            jtfItemCompositionOriginalQuantity.setEnabled(true);
 
             jbOk.setEnabled(true);
 
@@ -4342,6 +4492,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         renderItem(true, recalculate);
+        
+        if (moParamDps.isDocumentSal()) {
+            itemComposition();
+        }
     }
 
     private void itemChangedFkOriginalUnitId() {
@@ -4850,6 +5004,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
     }
+    
+    private void actionItemComposition() {
+        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldItemCompositionItem, null);
+    }
 
     private void actionPricesFilter() {
         if (jtbGridPricesFilter.isEnabled()) {
@@ -5042,6 +5200,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel79;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel80;
+    private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel83;
     private javax.swing.JPanel jPanel84;
@@ -5052,7 +5211,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel89;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanel90;
+    private javax.swing.JPanel jPanel91;
+    private javax.swing.JPanel jPanel92;
+    private javax.swing.JPanel jPanel93;
     private javax.swing.JPanel jPanel94;
+    private javax.swing.JPanel jPanel95;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -5072,6 +5235,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbGridPriceEdit;
     private javax.swing.JButton jbGridPriceNew;
     private javax.swing.JButton jbItemBizPartnerDescription;
+    private javax.swing.JButton jbItemComposition;
     private javax.swing.JButton jbNotesDelete;
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
@@ -5091,6 +5255,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxRegionId;
     private javax.swing.JComboBox jcbFkThirdTaxCausingId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
+    private javax.swing.JComboBox<SFormComponentItem> jcbItemComposition;
     private javax.swing.JComboBox jcbOperationsType;
     private javax.swing.JCheckBox jckAuxPreserveQuantity;
     private javax.swing.JCheckBox jckChangePrice;
@@ -5160,6 +5325,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlFkThirdTaxCausingId_n;
     private javax.swing.JLabel jlFkVehicleTypeId_n;
     private javax.swing.JLabel jlIsPriceVariable;
+    private javax.swing.JLabel jlItemComposition;
+    private javax.swing.JLabel jlItemCompositionOriginalQuantity;
+    private javax.swing.JLabel jlItemCompositionPer;
+    private javax.swing.JLabel jlItemCompositionQuantity;
     private javax.swing.JLabel jlLength;
     private javax.swing.JLabel jlMass;
     private javax.swing.JLabel jlOperationsType;
@@ -5204,6 +5373,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jpExtraDataOtherNorth;
     private javax.swing.JPanel jpExtraDataUnits;
     private javax.swing.JPanel jpExtraDataUnitsNorth;
+    private javax.swing.JPanel jpItemComposition;
     private javax.swing.JPanel jpMarketing;
     private javax.swing.JPanel jpNotes;
     private javax.swing.JPanel jpNotesControls;
@@ -5258,6 +5428,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfDpsContractFactor;
     private javax.swing.JTextField jtfDpsContractFuture;
     private javax.swing.JTextField jtfDriver;
+    private javax.swing.JTextField jtfItemCompositionOriginalQuantity;
+    private javax.swing.JTextField jtfItemCompositionPer;
+    private javax.swing.JTextField jtfItemCompositionQuantity;
     private javax.swing.JTextField jtfLength;
     private javax.swing.JTextField jtfLengthUnitSymbolRo;
     private javax.swing.JTextField jtfMass;
@@ -5699,6 +5872,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldDpsContractFuture.setDouble(0d);
         moFieldDpsContractFactor.setDouble(0.10d);
         jckIsPriceConfirm.setSelected(false);
+        
+        moFieldItemCompositionItem.resetField();
+        moFieldItemCompositionPer.resetField();
+        moFieldItemCompositionOriginalQuantity.resetField();
+        moFieldItemCompositionQuantity.resetField();
     
         actionPriceClear();
 
@@ -5717,6 +5895,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         SFormUtilities.populateComboBox(miClient, jcbFkTaxRegionId, SDataConstants.FINU_TAX_REG);
         SFormUtilities.populateComboBox(miClient, jcbFkItemReferenceId_n, SDataConstants.ITMU_ITEM);
         SFormUtilities.populateComboBox(miClient, jcbFkVehicleTypeId_n, SModConsts.LOGU_TP_VEH);
+        SFormUtilities.populateComboBox(miClient, jcbItemComposition, SDataConstants.ITMU_ITEM);
 
         mbResetingForm = false;
     }
@@ -5779,7 +5958,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setComponent(jtfOriginalQuantity);
                 }
                 else if (moDpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
-                    if (moFieldOriginalQuantity.getDouble() < moDpsEntry.getDbmsDpsEntryMatRequestLink().getQuantity()) {
+                    if (SLibUtils.parseDouble(jtfQuantityRo.getText()) < moDpsEntry.getDbmsDpsEntryMatRequestLink().getQuantity() && mbMatRequestImport) {
                         validation.setMessage("El valor para el campo '" + jlOriginalQuantity.getText() + "' no puede ser menor de lo que se vinculó con la requisición, "
                                 + "debe eliminar el renglón y agregarlo de nuevo.");
                         validation.setComponent(jtfOriginalQuantity);
@@ -6053,6 +6232,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setTabbedPaneIndex(TAB_CFD_COMPL);
                 }
             }
+            
+            if (!validation.getIsError()) {
+                if (((int[]) moFieldItemCompositionItem.getFieldValue())[0] != SLibConstants.UNDEFINED) {
+                    if (moFieldItemCompositionPer.getDouble() == 0.0 || moFieldItemCompositionOriginalQuantity.getDouble() == 0.0) {
+                        validation.setMessage("Se debe especificar un porcentaje de composición");
+                        validation.setComponent(jtfItemCompositionPer);
+                        validation.setTabbedPaneIndex(TAB_ITEM_COMP);
+                    }
+                }
+            }
         }
         
         return validation;
@@ -6210,6 +6399,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldComplPredial.setFieldValue(moDpsEntry.getDbmsDpsCfdEntry().getPredial());
         }
         
+        if (moDpsEntry.getDbmsDpsEntryItemComposition() != null) {
+            moFieldItemCompositionItem.setFieldValue(new int[] { moDpsEntry.getDbmsDpsEntryItemComposition().getPkItemId() });
+            moFieldItemCompositionPer.setFieldValue(moDpsEntry.getDbmsDpsEntryItemComposition().getPercentage());
+            moFieldItemCompositionOriginalQuantity.setFieldValue(moDpsEntry.getDbmsDpsEntryItemComposition().getOriginalQuantity());
+            moFieldItemCompositionQuantity.setFieldValue(moDpsEntry.getDbmsDpsEntryItemComposition().getQuantity());
+        }
+        
         if (mbMatRequestImport) {
             calculateTotal();
             moDpsEntry.setFlagOpenedByMatRequestImport(true);
@@ -6227,6 +6423,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (moParamDps.isDocumentOrAdjustmentSal() && mbEnableDataAddenda) {
             jTabbedPane.setEnabledAt(TAB_CFD_ADD, true);
             setAddendaData();
+        }
+        
+        if (moParamDps.isDocumentSal()) {
+            itemComposition();
         }
 
         mbResetingForm = false;
@@ -6350,9 +6550,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             cfdEntry.setCfdProdServ(moFieldComplCfdProdServ.getString());
             cfdEntry.setCfdUnit(moFieldComplCfdUnit.getString());
         }
-
+        
         if (!moFieldComplPredial.getString().isEmpty()) {
             cfdEntry.setPredial(moFieldComplPredial.getString());
+        }
+        
+        if (((int[]) moFieldItemCompositionItem.getFieldValue())[0] != SLibConstants.UNDEFINED) {
+            SDataDpsEntryItemComposition comp = new SDataDpsEntryItemComposition();
+            comp.setPkItemId(((int[]) moFieldItemCompositionItem.getFieldValue())[0]);
+            comp.setPercentage(moFieldItemCompositionPer.getDouble());
+            comp.setOriginalQuantity(moFieldItemCompositionOriginalQuantity.getDouble());
+            comp.setQuantity(moFieldItemCompositionQuantity.getDouble());
+            moDpsEntry.setDbmsDpsEntryItemComposition(comp);
         }
         
         // Is sales contract
@@ -6591,6 +6800,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbGridPriceDelete) {
                 actionPriceDelete();
             }
+            else if (button == jbItemComposition) {
+                actionItemComposition();
+            }
         }
         if (e.getSource() instanceof javax.swing.JToggleButton) {
             JToggleButton toggleButton = (JToggleButton) e.getSource();
@@ -6645,6 +6857,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (isTextFieldForContract(textField)) {
                 calculateEntryPrice();
             } 
+            else if (textField == jtfItemCompositionPer) {
+                calculateItemCompQty();
+            }
+            else if (textField == jtfItemCompositionOriginalQuantity) {
+                calculateItemCompPer();
+            }
         }
         else if (e.getSource() instanceof javax.swing.JComboBox) {
             JComboBox comboBox = (JComboBox) e.getSource();

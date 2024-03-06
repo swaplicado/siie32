@@ -15,8 +15,7 @@ import java.util.Date;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 
-/*
- * IMPORTANT:
+/* IMPORTANT:
  * Every change made to the structure of this registry apply it as well in erp.mbps.data.SDataEmployee too.
  */
 
@@ -45,18 +44,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
     protected String msSon5;
     protected Date mtSonDateBirth5;
     protected boolean mbSonDeceased5;
-    protected int mnFkCatSexClassIdMate;
-    protected int mnFkCatSexTypeIdMate;
-    protected int mnFkCatSexClassIdSon1;
-    protected int mnFkCatSexTypeIdSon1;
-    protected int mnFkCatSexClassIdSon2;
-    protected int mnFkCatSexTypeIdSon2;
-    protected int mnFkCatSexClassIdSon3;
-    protected int mnFkCatSexTypeIdSon3;
-    protected int mnFkCatSexClassIdSon4;
-    protected int mnFkCatSexTypeIdSon4;
-    protected int mnFkCatSexClassIdSon5;
-    protected int mnFkCatSexTypeIdSon5;
+    protected String msEmergenciesContact;
+    protected String msEmergenciesTelNumber;
+    protected String msBeneficiaries;
+    protected int mnFkCatSexMateClassId;
+    protected int mnFkCatSexMateTypeId;
+    protected int mnFkCatSexSon1ClassId;
+    protected int mnFkCatSexSon1TypeId;
+    protected int mnFkCatSexSon2ClassId;
+    protected int mnFkCatSexSon2TypeId;
+    protected int mnFkCatSexSon3ClassId;
+    protected int mnFkCatSexSon3TypeId;
+    protected int mnFkCatSexSon4ClassId;
+    protected int mnFkCatSexSon4TypeId;
+    protected int mnFkCatSexSon5ClassId;
+    protected int mnFkCatSexSon5TypeId;
+    protected int mnFkCatKinshipEmergenciesClassId;
+    protected int mnFkCatKinshipEmergenciesTypeId;
     
     public SDataEmployeeRelatives() {
         super(SModConsts.HRSU_EMP_REL);
@@ -81,18 +85,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
     public void setSon5(String s) { msSon5 = s; }
     public void setSonDateBirth5(Date t) { mtSonDateBirth5 = t; }
     public void setSonDeceased5(boolean b) { mbSonDeceased5 = b; }
-    public void setFkCatSexClassIdMate(int n) { mnFkCatSexClassIdMate = n; }
-    public void setFkCatSexTypeIdMate(int n) { mnFkCatSexTypeIdMate = n; }
-    public void setFkCatSexClassIdSon1(int n) { mnFkCatSexClassIdSon1 = n; }
-    public void setFkCatSexTypeIdSon1(int n) { mnFkCatSexTypeIdSon1 = n; }
-    public void setFkCatSexClassIdSon2(int n) { mnFkCatSexClassIdSon2 = n; }
-    public void setFkCatSexTypeIdSon2(int n) { mnFkCatSexTypeIdSon2 = n; }
-    public void setFkCatSexClassIdSon3(int n) { mnFkCatSexClassIdSon3 = n; }
-    public void setFkCatSexTypeIdSon3(int n) { mnFkCatSexTypeIdSon3 = n; }
-    public void setFkCatSexClassIdSon4(int n) { mnFkCatSexClassIdSon4 = n; }
-    public void setFkCatSexTypeIdSon4(int n) { mnFkCatSexTypeIdSon4 = n; }
-    public void setFkCatSexClassIdSon5(int n) { mnFkCatSexClassIdSon5 = n; }
-    public void setFkCatSexTypeIdSon5(int n) { mnFkCatSexTypeIdSon5 = n; }
+    public void setEmergenciesContact(String s) { msEmergenciesContact = s; }
+    public void setEmergenciesTelNumber(String s) { msEmergenciesTelNumber = s; }
+    public void setBeneficiaries(String s) { msBeneficiaries = s; }
+    public void setFkCatSexMateClassId(int n) { mnFkCatSexMateClassId = n; }
+    public void setFkCatSexMateTypeId(int n) { mnFkCatSexMateTypeId = n; }
+    public void setFkCatSexSon1ClassId(int n) { mnFkCatSexSon1ClassId = n; }
+    public void setFkCatSexSon1TypeId(int n) { mnFkCatSexSon1TypeId = n; }
+    public void setFkCatSexSon2ClassId(int n) { mnFkCatSexSon2ClassId = n; }
+    public void setFkCatSexSon2TypeId(int n) { mnFkCatSexSon2TypeId = n; }
+    public void setFkCatSexSon3ClassId(int n) { mnFkCatSexSon3ClassId = n; }
+    public void setFkCatSexSon3TypeId(int n) { mnFkCatSexSon3TypeId = n; }
+    public void setFkCatSexSon4ClassId(int n) { mnFkCatSexSon4ClassId = n; }
+    public void setFkCatSexSon4TypeId(int n) { mnFkCatSexSon4TypeId = n; }
+    public void setFkCatSexSon5ClassId(int n) { mnFkCatSexSon5ClassId = n; }
+    public void setFkCatSexSon5TypeId(int n) { mnFkCatSexSon5TypeId = n; }
+    public void setFkCatKinshipEmergenciesClassId(int n) { mnFkCatKinshipEmergenciesClassId = n; }
+    public void setFkCatKinshipEmergenciesTypeId(int n) { mnFkCatKinshipEmergenciesTypeId = n; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public String getMate() { return msMate; }
@@ -113,18 +122,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
     public String getSon5() { return msSon5; }
     public Date getSonDateBirth5() { return mtSonDateBirth5; }
     public boolean isSonDeceased5() { return mbSonDeceased5; }
-    public int getFkCatSexClassIdMate() { return mnFkCatSexClassIdMate; }
-    public int getFkCatSexTypeIdMate() { return mnFkCatSexTypeIdMate; }
-    public int getFkCatSexClassIdSon1() { return mnFkCatSexClassIdSon1; }
-    public int getFkCatSexTypeIdSon1() { return mnFkCatSexTypeIdSon1; }
-    public int getFkCatSexClassIdSon2() { return mnFkCatSexClassIdSon2; }
-    public int getFkCatSexTypeIdSon2() { return mnFkCatSexTypeIdSon2; }
-    public int getFkCatSexClassIdSon3() { return mnFkCatSexClassIdSon3; }
-    public int getFkCatSexTypeIdSon3() { return mnFkCatSexTypeIdSon3; }
-    public int getFkCatSexClassIdSon4() { return mnFkCatSexClassIdSon4; }
-    public int getFkCatSexTypeIdSon4() { return mnFkCatSexTypeIdSon4; }
-    public int getFkCatSexClassIdSon5() { return mnFkCatSexClassIdSon5; }
-    public int getFkCatSexTypeIdSon5() { return mnFkCatSexTypeIdSon5; }
+    public String getEmergenciesContact() { return msEmergenciesContact; }
+    public String getEmergenciesTelNumber() { return msEmergenciesTelNumber; }
+    public String getBeneficiaries() { return msBeneficiaries; }
+    public int getFkCatSexMateClassId() { return mnFkCatSexMateClassId; }
+    public int getFkCatSexMateTypeId() { return mnFkCatSexMateTypeId; }
+    public int getFkCatSexSon1ClassId() { return mnFkCatSexSon1ClassId; }
+    public int getFkCatSexSon1TypeId() { return mnFkCatSexSon1TypeId; }
+    public int getFkCatSexSon2ClassId() { return mnFkCatSexSon2ClassId; }
+    public int getFkCatSexSon2TypeId() { return mnFkCatSexSon2TypeId; }
+    public int getFkCatSexSon3ClassId() { return mnFkCatSexSon3ClassId; }
+    public int getFkCatSexSon3TypeId() { return mnFkCatSexSon3TypeId; }
+    public int getFkCatSexSon4ClassId() { return mnFkCatSexSon4ClassId; }
+    public int getFkCatSexSon4TypeId() { return mnFkCatSexSon4TypeId; }
+    public int getFkCatSexSon5ClassId() { return mnFkCatSexSon5ClassId; }
+    public int getFkCatSexSon5TypeId() { return mnFkCatSexSon5TypeId; }
+    public int getFkCatKinshipEmergenciesClassId() { return mnFkCatKinshipEmergenciesClassId; }
+    public int getFkCatKinshipEmergenciesTypeId() { return mnFkCatKinshipEmergenciesTypeId; }
 
     @Override
     public void setPrimaryKey(Object pk) {
@@ -159,18 +173,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
         msSon5 = "";
         mtSonDateBirth5 = null;
         mbSonDeceased5 = false;
-        mnFkCatSexClassIdMate = 0;
-        mnFkCatSexTypeIdMate = 0;
-        mnFkCatSexClassIdSon1 = 0;
-        mnFkCatSexTypeIdSon1 = 0;
-        mnFkCatSexClassIdSon2 = 0;
-        mnFkCatSexTypeIdSon2 = 0;
-        mnFkCatSexClassIdSon3 = 0;
-        mnFkCatSexTypeIdSon3 = 0;
-        mnFkCatSexClassIdSon4 = 0;
-        mnFkCatSexTypeIdSon4 = 0;
-        mnFkCatSexClassIdSon5 = 0;
-        mnFkCatSexTypeIdSon5 = 0;
+        msEmergenciesContact = "";
+        msEmergenciesTelNumber = "";
+        msBeneficiaries = "";
+        mnFkCatSexMateClassId = 0;
+        mnFkCatSexMateTypeId = 0;
+        mnFkCatSexSon1ClassId = 0;
+        mnFkCatSexSon1TypeId = 0;
+        mnFkCatSexSon2ClassId = 0;
+        mnFkCatSexSon2TypeId = 0;
+        mnFkCatSexSon3ClassId = 0;
+        mnFkCatSexSon3TypeId = 0;
+        mnFkCatSexSon4ClassId = 0;
+        mnFkCatSexSon4TypeId = 0;
+        mnFkCatSexSon5ClassId = 0;
+        mnFkCatSexSon5TypeId = 0;
+        mnFkCatKinshipEmergenciesClassId = 0;
+        mnFkCatKinshipEmergenciesTypeId = 0;
     }
 
     @Override
@@ -208,18 +227,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
                 msSon5 = resultSet.getString("son_5");
                 mtSonDateBirth5 = resultSet.getDate("son_dt_bir_5_n");
                 mbSonDeceased5 = resultSet.getBoolean("b_son_dec_5");
-                mnFkCatSexClassIdMate = resultSet.getInt("fk_cl_cat_sex_mate");
-                mnFkCatSexTypeIdMate = resultSet.getInt("fk_tp_cat_sex_mate");
-                mnFkCatSexClassIdSon1 = resultSet.getInt("fk_cl_cat_sex_son_1");
-                mnFkCatSexTypeIdSon1 = resultSet.getInt("fk_tp_cat_sex_son_1");
-                mnFkCatSexClassIdSon2 = resultSet.getInt("fk_cl_cat_sex_son_2");
-                mnFkCatSexTypeIdSon2 = resultSet.getInt("fk_tp_cat_sex_son_2");
-                mnFkCatSexClassIdSon3 = resultSet.getInt("fk_cl_cat_sex_son_3");
-                mnFkCatSexTypeIdSon3 = resultSet.getInt("fk_tp_cat_sex_son_3");
-                mnFkCatSexClassIdSon4 = resultSet.getInt("fk_cl_cat_sex_son_4");
-                mnFkCatSexTypeIdSon4 = resultSet.getInt("fk_tp_cat_sex_son_4");
-                mnFkCatSexClassIdSon5 = resultSet.getInt("fk_cl_cat_sex_son_5");
-                mnFkCatSexTypeIdSon5 = resultSet.getInt("fk_tp_cat_sex_son_5");
+                msEmergenciesContact = resultSet.getString("emergs_con");
+                msEmergenciesTelNumber = resultSet.getString("emergs_tel_num");
+                msBeneficiaries = resultSet.getString("benefs");
+                mnFkCatSexMateClassId = resultSet.getInt("fk_cl_cat_sex_mate");
+                mnFkCatSexMateTypeId = resultSet.getInt("fk_tp_cat_sex_mate");
+                mnFkCatSexSon1ClassId = resultSet.getInt("fk_cl_cat_sex_son_1");
+                mnFkCatSexSon1TypeId = resultSet.getInt("fk_tp_cat_sex_son_1");
+                mnFkCatSexSon2ClassId = resultSet.getInt("fk_cl_cat_sex_son_2");
+                mnFkCatSexSon2TypeId = resultSet.getInt("fk_tp_cat_sex_son_2");
+                mnFkCatSexSon3ClassId = resultSet.getInt("fk_cl_cat_sex_son_3");
+                mnFkCatSexSon3TypeId = resultSet.getInt("fk_tp_cat_sex_son_3");
+                mnFkCatSexSon4ClassId = resultSet.getInt("fk_cl_cat_sex_son_4");
+                mnFkCatSexSon4TypeId = resultSet.getInt("fk_tp_cat_sex_son_4");
+                mnFkCatSexSon5ClassId = resultSet.getInt("fk_cl_cat_sex_son_5");
+                mnFkCatSexSon5TypeId = resultSet.getInt("fk_tp_cat_sex_son_5");
+                mnFkCatKinshipEmergenciesClassId = resultSet.getInt("fk_cl_cat_kin_emergs");
+                mnFkCatKinshipEmergenciesTypeId = resultSet.getInt("fk_tp_cat_kin_emergs");
             
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -263,18 +287,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
                         "'" + msSon5 + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtSonDateBirth5) + "', " + 
                         (mbSonDeceased5 ? 1 : 0) + ", " + 
-                        mnFkCatSexClassIdMate + ", " + 
-                        mnFkCatSexTypeIdMate + ", " + 
-                        mnFkCatSexClassIdSon1 + ", " + 
-                        mnFkCatSexTypeIdSon1 + ", " + 
-                        mnFkCatSexClassIdSon2 + ", " + 
-                        mnFkCatSexTypeIdSon2 + ", " + 
-                        mnFkCatSexClassIdSon3 + ", " + 
-                        mnFkCatSexTypeIdSon3 + ", " + 
-                        mnFkCatSexClassIdSon4 + ", " + 
-                        mnFkCatSexTypeIdSon4 + ", " + 
-                        mnFkCatSexClassIdSon5 + ", " + 
-                        mnFkCatSexTypeIdSon5 + " " + 
+                        "'" + msEmergenciesContact + "', " + 
+                        "'" + msEmergenciesTelNumber + "', " + 
+                        "'" + msBeneficiaries + "', " + 
+                        mnFkCatSexMateClassId + ", " + 
+                        mnFkCatSexMateTypeId + ", " + 
+                        mnFkCatSexSon1ClassId + ", " + 
+                        mnFkCatSexSon1TypeId + ", " + 
+                        mnFkCatSexSon2ClassId + ", " + 
+                        mnFkCatSexSon2TypeId + ", " + 
+                        mnFkCatSexSon3ClassId + ", " + 
+                        mnFkCatSexSon3TypeId + ", " + 
+                        mnFkCatSexSon4ClassId + ", " + 
+                        mnFkCatSexSon4TypeId + ", " + 
+                        mnFkCatSexSon5ClassId + ", " + 
+                        mnFkCatSexSon5TypeId + ", " + 
+                        mnFkCatKinshipEmergenciesClassId + ", " + 
+                        mnFkCatKinshipEmergenciesTypeId + " " + 
                         ")";
             }
             else {
@@ -298,18 +327,23 @@ public class SDataEmployeeRelatives extends erp.lib.data.SDataRegistry implement
                         "son_5 = '" + msSon5 + "', " +
                         "son_dt_bir_5_n = '" + SLibUtils.DbmsDateFormatDate.format(mtSonDateBirth5) + "', " +
                         "b_son_dec_5 = " + (mbSonDeceased5 ? 1 : 0) + ", " +
-                        "fk_cl_cat_sex_mate = " + mnFkCatSexClassIdMate + ", " +
-                        "fk_tp_cat_sex_mate = " + mnFkCatSexTypeIdMate + ", " +
-                        "fk_cl_cat_sex_son_1 = " + mnFkCatSexClassIdSon1 + ", " +
-                        "fk_tp_cat_sex_son_1 = " + mnFkCatSexTypeIdSon1 + ", " +
-                        "fk_cl_cat_sex_son_2 = " + mnFkCatSexClassIdSon2 + ", " +
-                        "fk_tp_cat_sex_son_2 = " + mnFkCatSexTypeIdSon2 + ", " +
-                        "fk_cl_cat_sex_son_3 = " + mnFkCatSexClassIdSon3 + ", " +
-                        "fk_tp_cat_sex_son_3 = " + mnFkCatSexTypeIdSon3 + ", " +
-                        "fk_cl_cat_sex_son_4 = " + mnFkCatSexClassIdSon4 + ", " +
-                        "fk_tp_cat_sex_son_4 = " + mnFkCatSexTypeIdSon4 + ", " +
-                        "fk_cl_cat_sex_son_5 = " + mnFkCatSexClassIdSon5 + ", " +
-                        "fk_tp_cat_sex_son_5 = " + mnFkCatSexTypeIdSon5 + " " +
+                        "emergs_con = '" + msEmergenciesContact + "', " +
+                        "emergs_tel_num = '" + msEmergenciesTelNumber + "', " +
+                        "benefs = '" + msBeneficiaries + "', " +
+                        "fk_cl_cat_sex_mate = " + mnFkCatSexMateClassId + ", " +
+                        "fk_tp_cat_sex_mate = " + mnFkCatSexMateTypeId + ", " +
+                        "fk_cl_cat_sex_son_1 = " + mnFkCatSexSon1ClassId + ", " +
+                        "fk_tp_cat_sex_son_1 = " + mnFkCatSexSon1TypeId + ", " +
+                        "fk_cl_cat_sex_son_2 = " + mnFkCatSexSon2ClassId + ", " +
+                        "fk_tp_cat_sex_son_2 = " + mnFkCatSexSon2TypeId + ", " +
+                        "fk_cl_cat_sex_son_3 = " + mnFkCatSexSon3ClassId + ", " +
+                        "fk_tp_cat_sex_son_3 = " + mnFkCatSexSon3TypeId + ", " +
+                        "fk_cl_cat_sex_son_4 = " + mnFkCatSexSon4ClassId + ", " +
+                        "fk_tp_cat_sex_son_4 = " + mnFkCatSexSon4TypeId + ", " +
+                        "fk_cl_cat_sex_son_5 = " + mnFkCatSexSon5ClassId + ", " +
+                        "fk_tp_cat_sex_son_5 = " + mnFkCatSexSon5TypeId + ", " +
+                        "fk_cl_cat_kin_emergs = " + mnFkCatKinshipEmergenciesClassId + ", " +
+                        "fk_tp_cat_kin_emergs = " + mnFkCatKinshipEmergenciesTypeId + " " +
                         "WHERE id_emp = " + mnPkEmployeeId + ";";
             }
 

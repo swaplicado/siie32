@@ -78,6 +78,7 @@ public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListe
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jcbFilter.setMaximumRowCount(12);
         jcbFilter.setToolTipText("Filtrar");
         jcbFilter.setPreferredSize(new java.awt.Dimension(150, 23));
         add(jcbFilter);

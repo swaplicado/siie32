@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.db;
 
+import java.util.Date;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -13,16 +14,23 @@ import sa.lib.grid.SGridRow;
  */
 public class SProviderMailRow implements SGridRow {
     
+    public final static int GRID_ESTIMATION = 1;
+    public final static int GRID_KARDEX = 2;
+    
     int mnRowPk;
+    Date mtDateEstimation;
     String msProvider;
     String msTo;
     String msCc;
     String msCco;
     String msSubject;
     String msBody;
+    String msUserMail;
     int mnFkProviderId_n;
+    
+    int mnGridMode = 1;
 
-    public SProviderMailRow() {
+    public SProviderMailRow(final int gridMode) {
         msProvider = "Proveedor";
         msTo = "destinario@mail.com";
         msCc = "copiaa@mail.com;otro@mail.com";
@@ -30,10 +38,14 @@ public class SProviderMailRow implements SGridRow {
         msSubject = "Asunto";
         msBody = "Este sería el cuerpo del correo";
         mnFkProviderId_n = 1;
+        mnGridMode = gridMode;
     }
 
     public int getRowPk() {
         return mnRowPk;
+    }
+    public Date getDateEstimation() {
+        return mtDateEstimation;
     }
     public String getProvider() {
         return msProvider;
@@ -60,6 +72,9 @@ public class SProviderMailRow implements SGridRow {
     public void setRowPk(int n) {
         this.mnRowPk = n;
     }
+    public void setDateEstimation(Date mtDateEstimation) {
+        this.mtDateEstimation = mtDateEstimation;
+    }
     public void setProvider(String s) {
         this.msProvider = s;
     }
@@ -77,6 +92,12 @@ public class SProviderMailRow implements SGridRow {
     }
     public void setBody(String s) {
         this.msBody = s;
+    }
+    public String getUserMail() {
+        return msUserMail;
+    }
+    public void setUserMail(String s) {
+        this.msUserMail = s;
     }
     public void setFkProviderId_n(int n) {
         this.mnFkProviderId_n = n;
@@ -121,26 +142,57 @@ public class SProviderMailRow implements SGridRow {
     public Object getRowValueAt(int col) {
         Object value = null;
         
-        switch(col) {
-            case 0:
-                value = msProvider;
-                break;
-            case 1:
-                value = msTo;
-                break;
-            case 2:
-                value = msCc;
-                break;
-            case 3:
-                value = msCco;
-                break;
-            case 4:
-                value = msSubject;
-                break;
-            case 5:
-                value = msBody;
-                break;
-            default:
+        if (mnGridMode == GRID_ESTIMATION) {
+            switch(col) {
+                case 0:
+                    value = msProvider;
+                    break;
+                case 1:
+                    value = msTo;
+                    break;
+                case 2:
+                    value = msCc;
+                    break;
+                case 3:
+                    value = msCco;
+                    break;
+                case 4:
+                    value = msSubject;
+                    break;
+                case 5:
+                    value = msBody;
+                    break;
+                default:
+            }
+        }
+        else {
+            switch(col) {
+                case 0:
+                    value = mtDateEstimation;
+                    break;
+                case 1:
+                    value = msProvider;
+                    break;
+                case 2:
+                    value = msTo;
+                    break;
+                case 3:
+                    value = msCc;
+                    break;
+                case 4:
+                    value = msCco;
+                    break;
+                case 5:
+                    value = msSubject;
+                    break;
+                case 6:
+                    value = msBody;
+                    break;
+                case 7:
+                    value = msUserMail;
+                    break;
+                default:
+            }
         }
         
         return value;
@@ -148,15 +200,30 @@ public class SProviderMailRow implements SGridRow {
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        switch(col) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                break;
-            default:
+        if (mnGridMode == GRID_ESTIMATION) {
+            switch(col) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    break;
+                default:
+            }
+        }
+        else {
+            switch(col) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    break;
+                default:
+            }
         }
     }
     

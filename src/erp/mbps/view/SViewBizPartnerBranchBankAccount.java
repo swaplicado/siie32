@@ -20,13 +20,15 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private int mnBizPartnerCategory;
+    private boolean mbIsViewForEmployees;
+    private boolean mbIsViewForAllOrEmployees;
 
     public SViewBizPartnerBranchBankAccount(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, auxType);
@@ -41,13 +43,15 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
+        mbIsViewForEmployees = mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP;
+        mbIsViewForAllOrEmployees = mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP;
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[2];
 
-        if (mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP) {
+        if (mbIsViewForAllOrEmployees) {
             aoTableColumns = new STableColumn[27];
         }
         else {
@@ -62,7 +66,7 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
         }
 
         i = 0;
-        if (mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP) {
+        if (mbIsViewForAllOrEmployees) {
             moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstants.BPSU_BP);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 200);
         }
@@ -212,6 +216,10 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_del = FALSE AND bpb.b_del = FALSE AND bank_acc.b_del = FALSE ";
                 sqlCategoryWhere = " AND ct.b_del = FALSE ";
+                
+                if (mbIsViewForEmployees) {
+                    sqlWhere += "AND e.b_act ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlWhere += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : (sqlWhere.length() == 0 ? "" : "AND ") + "bpb.fid_bp = " + (Integer) setting.getSetting() + " ");
@@ -258,13 +266,13 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
             default:
         }
         
-        if (mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP) {
+        if (mbIsViewForEmployees) {
             sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp = TRUE ";
         }
 
         msSql = "SELECT bank_acc.id_bpb, bank_acc.id_bank_acc, bank_acc.bank_acc, bank_acc.bankb_num, bank_acc.acc_num, erp.f_bank_acc_num_std(bank_acc.acc_num_std) as acc_num_std, bank_acc.agree, bank_acc.ref, " +
                 "bank_acc.code, bank_acc.code_aba, bank_acc.code_swift, bank_acc.alias_baj, bank_acc.b_card, bp.b_del, bpb.b_del, bank_acc.b_def, bank_acc.b_del, " +
-                "bp.bp, " + (mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP ? "" : "ct.bp_key, ct.b_del, ") + "bpb.bpb, ct_acc_cash.ct_acc_cash, tp_acc_cash.tp_acc_cash, " +
+                "bp.bp, " + (mbIsViewForAllOrEmployees ? "" : "ct.bp_key, ct.b_del, ") + "bpb.bpb, ct_acc_cash.ct_acc_cash, tp_acc_cash.tp_acc_cash, " +
                 "bank.bp, cur.cur_key, c_issuer.card_iss, " +
                 "bank_acc.fid_usr_new, bank_acc.fid_usr_edit, bank_acc.fid_usr_del, bank_acc.ts_new, bank_acc.ts_edit, bank_acc.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bank_acc AS bank_acc " +
@@ -272,7 +280,8 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
                 "bank_acc.id_bpb = bpb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS bp ON " +
                 "bpb.fid_bp = bp.id_bp " +
-                (mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP ? "" : "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.fid_ct_bp = " + mnBizPartnerCategory + (sqlCategoryWhere.length() == 0 ? "" : sqlCategoryWhere) + " ") +
+                (mbIsViewForAllOrEmployees ? "" : "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.fid_ct_bp = " + mnBizPartnerCategory + (sqlCategoryWhere.length() == 0 ? "" : sqlCategoryWhere) + " ") +
+                (mbIsViewForEmployees ? "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " : "") +
                 "INNER JOIN erp.fins_ct_acc_cash AS ct_acc_cash ON " +
                 "bank_acc.fid_ct_acc_cash = ct_acc_cash.id_ct_acc_cash " +
                 "INNER JOIN erp.fins_tp_acc_cash AS tp_acc_cash ON " +
@@ -290,7 +299,7 @@ public class SViewBizPartnerBranchBankAccount extends erp.lib.table.STableTab im
                 "INNER JOIN erp.usru_usr AS ud ON " +
                 "bank_acc.fid_usr_del = ud.id_usr " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY " + (mnTabTypeAux01 == SDataConstants.BPSU_BANK_ACC || mnTabTypeAux01 == SDataConstants.BPSX_BANK_ACC_EMP ? "bp.bp, " : sqlOrder) + "bpb.bpb, bank_acc.bank_acc, bank_acc.id_bank_acc ";
+                "ORDER BY " + (mbIsViewForAllOrEmployees ? "bp.bp, " : sqlOrder) + "bpb.bpb, bank_acc.bank_acc, bank_acc.id_bank_acc ";
     }
 
     @Override

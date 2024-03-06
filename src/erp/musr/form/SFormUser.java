@@ -56,6 +56,8 @@ import sa.lib.srv.SSrvConsts;
  * @author Sergio Flores, Alfonso Flores, Sergio Flores
  */
 public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, erp.lib.form.SFormExtendedInterface {
+    
+    private static final int TAB_IDX_BRANCHES = 2;
 
     private int mnFormType;
     private int mnFormResult;
@@ -124,9 +126,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
+        jTabbedPane = new javax.swing.JTabbedPane();
+        jpUser = new javax.swing.JPanel();
+        jpUser1 = new javax.swing.JPanel();
         jPanel78 = new javax.swing.JPanel();
         jlUser = new javax.swing.JLabel();
         jtfUser = new javax.swing.JTextField();
@@ -147,63 +149,63 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkBizPartnerId = new javax.swing.JButton();
         jPanel82 = new javax.swing.JPanel();
         jckIsActive = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
         jPanel83 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
-        jlCompanySystem = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jltCompanySystem = new javax.swing.JList<SFormComponentItem>();
-        jpUserCompany = new javax.swing.JPanel();
-        jlCompanyUser = new javax.swing.JLabel();
-        jPanel14 = new javax.swing.JPanel();
-        jPanel15 = new javax.swing.JPanel();
-        jPanel16 = new javax.swing.JPanel();
+        jpCompanies = new javax.swing.JPanel();
+        jpCompanies1 = new javax.swing.JPanel();
+        jpCompaniesAvailable = new javax.swing.JPanel();
+        jlCompaniesAvailable = new javax.swing.JLabel();
+        jspCompaniesAvailable = new javax.swing.JScrollPane();
+        jltCompaniesAvailable = new javax.swing.JList<SFormComponentItem>();
+        jpCompaniesControls = new javax.swing.JPanel();
+        jpCompaniesControls1 = new javax.swing.JPanel();
+        jpCompaniesControls1N = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jPanel17 = new javax.swing.JPanel();
-        jPanel18 = new javax.swing.JPanel();
-        jPanel19 = new javax.swing.JPanel();
+        jpCompaniesControls1E = new javax.swing.JPanel();
+        jpCompaniesControls1W = new javax.swing.JPanel();
+        jpCompaniesControls1C = new javax.swing.JPanel();
         jbTransferCompany = new javax.swing.JButton();
         jbTransferAllCompany = new javax.swing.JButton();
         jbReturnCompany = new javax.swing.JButton();
         jbReturnAllCompany = new javax.swing.JButton();
-        jPanel71 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jPanel20 = new javax.swing.JPanel();
+        jpCompaniesUser = new javax.swing.JPanel();
+        jlCompanyUser = new javax.swing.JLabel();
+        jpBranches = new javax.swing.JPanel();
+        jpBranches0 = new javax.swing.JPanel();
         jlCompany = new javax.swing.JLabel();
         jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel8 = new javax.swing.JLabel();
         jckIsUniversalCompanyBranch = new javax.swing.JCheckBox();
-        jPanel21 = new javax.swing.JPanel();
-        jPanel22 = new javax.swing.JPanel();
-        jPanel23 = new javax.swing.JPanel();
-        jlBranchCompany = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jltCompanyBranches = new javax.swing.JList<SFormComponentItem>();
-        jpUserCompanyBranches = new javax.swing.JPanel();
-        jlBranchUser = new javax.swing.JLabel();
-        jPanel25 = new javax.swing.JPanel();
-        jPanel26 = new javax.swing.JPanel();
-        jPanel27 = new javax.swing.JPanel();
-        jPanel28 = new javax.swing.JPanel();
-        jPanel29 = new javax.swing.JPanel();
-        jPanel30 = new javax.swing.JPanel();
+        jpBranches1 = new javax.swing.JPanel();
+        jpBranches11 = new javax.swing.JPanel();
+        jpBranchesAvailable = new javax.swing.JPanel();
+        jlBranchesAvailable = new javax.swing.JLabel();
+        jspBranchesAvailable = new javax.swing.JScrollPane();
+        jltBranchesAvailable = new javax.swing.JList<SFormComponentItem>();
+        jpBranchesControls = new javax.swing.JPanel();
+        jpBranchesControls1 = new javax.swing.JPanel();
+        jpBranchesControls1N = new javax.swing.JPanel();
+        jpBranchesControls1E = new javax.swing.JPanel();
+        jpBranchesControls1W = new javax.swing.JPanel();
+        jpBranchesControls1C = new javax.swing.JPanel();
         jbTransferBranch = new javax.swing.JButton();
         jbTransferAllBranch = new javax.swing.JButton();
         jbReturnBranch = new javax.swing.JButton();
         jbReturnAllBranch = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
+        jpBranchesUser = new javax.swing.JPanel();
+        jlBranchUser = new javax.swing.JLabel();
+        jpEntities = new javax.swing.JPanel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel34 = new javax.swing.JPanel();
         jckIsUniversalCashAccount = new javax.swing.JCheckBox();
         jbSetDefaultCashAccount = new javax.swing.JButton();
         jPanel35 = new javax.swing.JPanel();
-        jPanel37 = new javax.swing.JPanel();
-        jlUserCashAccount = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jltUserCashAccount = new javax.swing.JList<SFormComponentItem>();
+        jPanel36 = new javax.swing.JPanel();
+        jlCompanyBranchCashAccount = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jltCompanyBranchCashAccount = new javax.swing.JList<SFormComponentItem>();
         jPanel38 = new javax.swing.JPanel();
         jPanel39 = new javax.swing.JPanel();
         jPanel40 = new javax.swing.JPanel();
@@ -216,10 +218,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbReturnCashAccount = new javax.swing.JButton();
         jbReturnAllCashAccounts = new javax.swing.JButton();
         jPanel42 = new javax.swing.JPanel();
-        jPanel36 = new javax.swing.JPanel();
-        jlCompanyBranchCashAccount = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jltCompanyBranchCashAccount = new javax.swing.JList<SFormComponentItem>();
+        jPanel37 = new javax.swing.JPanel();
+        jlUserCashAccount = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jltUserCashAccount = new javax.swing.JList<SFormComponentItem>();
         jPanel9 = new javax.swing.JPanel();
         jPanel45 = new javax.swing.JPanel();
         jckIsUniversalWarehouse = new javax.swing.JCheckBox();
@@ -229,10 +231,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jlCompanyBranchWarehouses = new javax.swing.JLabel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jltCompanyBranchWarehouses = new javax.swing.JList<SFormComponentItem>();
-        jPanel48 = new javax.swing.JPanel();
-        jlUserWarehouses = new javax.swing.JLabel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jltUserWarehouses = new javax.swing.JList<SFormComponentItem>();
         jPanel49 = new javax.swing.JPanel();
         jPanel50 = new javax.swing.JPanel();
         jPanel51 = new javax.swing.JPanel();
@@ -244,6 +242,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbTransferAllWarehouses = new javax.swing.JButton();
         jbReturnWarehouse = new javax.swing.JButton();
         jbReturnAllWarehouses = new javax.swing.JButton();
+        jPanel48 = new javax.swing.JPanel();
+        jlUserWarehouses = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jltUserWarehouses = new javax.swing.JList<SFormComponentItem>();
         jPanel12 = new javax.swing.JPanel();
         jPanel55 = new javax.swing.JPanel();
         jckIsUniversalPos = new javax.swing.JCheckBox();
@@ -253,10 +255,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jlCompanyBranchPos = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
         jltCompanyBranchPos = new javax.swing.JList<SFormComponentItem>();
-        jPanel58 = new javax.swing.JPanel();
-        jlUserPos = new javax.swing.JLabel();
-        jScrollPane8 = new javax.swing.JScrollPane();
-        jltUserPos = new javax.swing.JList<SFormComponentItem>();
         jPanel59 = new javax.swing.JPanel();
         jPanel60 = new javax.swing.JPanel();
         jPanel61 = new javax.swing.JPanel();
@@ -269,6 +267,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbTransferAllPos = new javax.swing.JButton();
         jbReturnPos = new javax.swing.JButton();
         jbReturnAllPos = new javax.swing.JButton();
+        jPanel58 = new javax.swing.JPanel();
+        jlUserPos = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jltUserPos = new javax.swing.JList<SFormComponentItem>();
         jPanel24 = new javax.swing.JPanel();
         jPanel66 = new javax.swing.JPanel();
         jckIsUniversalPlant = new javax.swing.JCheckBox();
@@ -278,10 +280,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jlCompanyBranchPlants = new javax.swing.JLabel();
         jScrollPane9 = new javax.swing.JScrollPane();
         jltCompanyBranchPlants = new javax.swing.JList<SFormComponentItem>();
-        jPanel69 = new javax.swing.JPanel();
-        jlUserPlants = new javax.swing.JLabel();
-        jScrollPane10 = new javax.swing.JScrollPane();
-        jltUserPlants = new javax.swing.JList<SFormComponentItem>();
         jPanel72 = new javax.swing.JPanel();
         jPanel73 = new javax.swing.JPanel();
         jPanel74 = new javax.swing.JPanel();
@@ -293,6 +291,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbTransferAllPlants = new javax.swing.JButton();
         jbReturnPlant = new javax.swing.JButton();
         jbReturnAllPlants = new javax.swing.JButton();
+        jPanel69 = new javax.swing.JPanel();
+        jlUserPlants = new javax.swing.JLabel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        jltUserPlants = new javax.swing.JList<SFormComponentItem>();
         jPanel31 = new javax.swing.JPanel();
         jPanel32 = new javax.swing.JPanel();
         jlCompanyEntity = new javax.swing.JLabel();
@@ -321,10 +323,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jpUser.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpUser.setLayout(new java.awt.BorderLayout());
 
-        jPanel13.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jpUser1.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel78.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -333,10 +335,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel78.add(jlUser);
 
         jtfUser.setText("name"); // NOI18N
-        jtfUser.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfUser.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel78.add(jtfUser);
 
-        jckIsUniversal.setText("Acceso universal"); // NOI18N
+        jckIsUniversal.setText("Con acceso universal a todas las empresas y sucursales"); // NOI18N
+        jckIsUniversal.setPreferredSize(new java.awt.Dimension(300, 23));
         jckIsUniversal.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jckIsUniversalItemStateChanged(evt);
@@ -344,7 +347,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         });
         jPanel78.add(jckIsUniversal);
 
-        jPanel13.add(jPanel78);
+        jpUser1.add(jPanel78);
 
         jPanel79.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -353,16 +356,16 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel79.add(jlUserPassword);
 
         jpfUserPassword.setText("pass");
-        jpfUserPassword.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpfUserPassword.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel79.add(jpfUserPassword);
 
-        jbEditUserPassword.setText("<");
-        jbEditUserPassword.setToolTipText("Cambiar password");
+        jbEditUserPassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditUserPassword.setToolTipText("Cambiar contraseña");
         jbEditUserPassword.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEditUserPassword.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel79.add(jbEditUserPassword);
 
-        jPanel13.add(jPanel79);
+        jpUser1.add(jPanel79);
 
         jPanel80.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -371,14 +374,14 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel80.add(jlUserPasswordConfirm);
 
         jpfUserPasswordConfirm.setText("pass");
-        jpfUserPasswordConfirm.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpfUserPasswordConfirm.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel80.add(jpfUserPasswordConfirm);
 
-        jPanel13.add(jPanel80);
+        jpUser1.add(jPanel80);
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail.setText("Cuenta correo-e:");
+        jlEmail.setText("Correo-e usuario:");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel1.add(jlEmail);
 
@@ -386,15 +389,16 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfEmail.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel1.add(jtfEmail);
 
-        jPanel13.add(jPanel1);
+        jpUser1.add(jPanel1);
 
         jPanel81.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("El usuario es el asociado de negocios:");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlBizPartner.setText("Empleado usuario:");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel81.add(jlBizPartner);
 
-        jcbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbFkBizPartnerId.setMaximumRowCount(16);
+        jcbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel81.add(jcbFkBizPartnerId);
 
         jbFkBizPartnerId.setText("jButton1");
@@ -403,220 +407,225 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel81.add(jbFkBizPartnerId);
 
-        jPanel13.add(jPanel81);
+        jpUser1.add(jPanel81);
 
         jPanel82.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsActive.setText("Registro activo");
+        jckIsActive.setText("Cuenta de usuario activa");
+        jckIsActive.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel82.add(jckIsActive);
 
-        jPanel13.add(jPanel82);
+        jLabel1.setForeground(java.awt.Color.gray);
+        jLabel1.setText("(Si la cuenta de usuario está inactiva, se denegará el acceso a SIIE.)");
+        jLabel1.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel82.add(jLabel1);
+
+        jpUser1.add(jPanel82);
 
         jPanel83.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel83.add(jckIsDeleted);
 
-        jPanel13.add(jPanel83);
+        jpUser1.add(jPanel83);
 
-        jPanel3.add(jPanel13, java.awt.BorderLayout.NORTH);
+        jpUser.add(jpUser1, java.awt.BorderLayout.NORTH);
 
-        jTabbedPane1.addTab("Datos generales", jPanel3);
+        jTabbedPane.addTab("Datos generales", jpUser);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
-        jPanel5.setLayout(new java.awt.BorderLayout());
+        jpCompanies.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
+        jpCompanies.setLayout(new java.awt.BorderLayout());
 
-        jPanel10.setLayout(new java.awt.BorderLayout());
+        jpCompanies1.setLayout(new java.awt.BorderLayout());
 
-        jPanel11.setPreferredSize(new java.awt.Dimension(230, 200));
-        jPanel11.setLayout(new java.awt.BorderLayout());
+        jpCompaniesAvailable.setPreferredSize(new java.awt.Dimension(300, 200));
+        jpCompaniesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlCompanySystem.setText("Empresas disponibles:");
-        jlCompanySystem.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel11.add(jlCompanySystem, java.awt.BorderLayout.PAGE_START);
+        jlCompaniesAvailable.setText("Empresas disponibles:");
+        jlCompaniesAvailable.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCompaniesAvailable.add(jlCompaniesAvailable, java.awt.BorderLayout.PAGE_START);
 
-        jltCompanySystem.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltCompaniesAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltCompanySystemMouseClicked(evt);
+                jltCompaniesAvailableMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(jltCompanySystem);
+        jspCompaniesAvailable.setViewportView(jltCompaniesAvailable);
 
-        jPanel11.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jpCompaniesAvailable.add(jspCompaniesAvailable, java.awt.BorderLayout.CENTER);
 
-        jPanel10.add(jPanel11, java.awt.BorderLayout.WEST);
+        jpCompanies1.add(jpCompaniesAvailable, java.awt.BorderLayout.WEST);
 
-        jpUserCompany.setPreferredSize(new java.awt.Dimension(280, 200));
-        jpUserCompany.setLayout(new java.awt.BorderLayout());
+        jpCompaniesControls.setPreferredSize(new java.awt.Dimension(200, 100));
+        jpCompaniesControls.setLayout(new java.awt.BorderLayout());
 
-        jlCompanyUser.setText("Empresas del usuario:");
-        jlCompanyUser.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpUserCompany.add(jlCompanyUser, java.awt.BorderLayout.PAGE_START);
+        jpCompaniesControls1.setPreferredSize(new java.awt.Dimension(100, 130));
+        jpCompaniesControls1.setLayout(new java.awt.BorderLayout());
 
-        jPanel10.add(jpUserCompany, java.awt.BorderLayout.EAST);
+        jpCompaniesControls1N.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCompaniesControls1N.add(jLabel4);
 
-        jPanel14.setPreferredSize(new java.awt.Dimension(200, 100));
-        jPanel14.setLayout(new java.awt.BorderLayout());
+        jpCompaniesControls1.add(jpCompaniesControls1N, java.awt.BorderLayout.NORTH);
 
-        jPanel15.setPreferredSize(new java.awt.Dimension(100, 130));
-        jPanel15.setLayout(new java.awt.BorderLayout());
+        jpCompaniesControls1E.setPreferredSize(new java.awt.Dimension(25, 100));
+        jpCompaniesControls1.add(jpCompaniesControls1E, java.awt.BorderLayout.EAST);
 
-        jPanel16.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel16.add(jLabel4);
+        jpCompaniesControls1W.setPreferredSize(new java.awt.Dimension(25, 100));
+        jpCompaniesControls1.add(jpCompaniesControls1W, java.awt.BorderLayout.WEST);
 
-        jPanel15.add(jPanel16, java.awt.BorderLayout.NORTH);
-
-        jPanel17.setPreferredSize(new java.awt.Dimension(75, 100));
-        jPanel15.add(jPanel17, java.awt.BorderLayout.EAST);
-
-        jPanel18.setPreferredSize(new java.awt.Dimension(75, 100));
-        jPanel15.add(jPanel18, java.awt.BorderLayout.WEST);
-
-        jPanel19.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
+        jpCompaniesControls1C.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
 
         jbTransferCompany.setText(">");
         jbTransferCompany.setToolTipText("Agregar");
-        jPanel19.add(jbTransferCompany);
+        jpCompaniesControls1C.add(jbTransferCompany);
 
         jbTransferAllCompany.setText(">>");
         jbTransferAllCompany.setToolTipText("Agregar todos");
-        jPanel19.add(jbTransferAllCompany);
+        jpCompaniesControls1C.add(jbTransferAllCompany);
 
         jbReturnCompany.setText("<");
         jbReturnCompany.setToolTipText("Remover");
-        jPanel19.add(jbReturnCompany);
+        jpCompaniesControls1C.add(jbReturnCompany);
 
         jbReturnAllCompany.setText("<<");
         jbReturnAllCompany.setToolTipText("Remover todos");
-        jPanel19.add(jbReturnAllCompany);
+        jpCompaniesControls1C.add(jbReturnAllCompany);
 
-        jPanel15.add(jPanel19, java.awt.BorderLayout.CENTER);
+        jpCompaniesControls1.add(jpCompaniesControls1C, java.awt.BorderLayout.CENTER);
 
-        jPanel14.add(jPanel15, java.awt.BorderLayout.NORTH);
+        jpCompaniesControls.add(jpCompaniesControls1, java.awt.BorderLayout.NORTH);
 
-        jPanel10.add(jPanel14, java.awt.BorderLayout.CENTER);
+        jpCompanies1.add(jpCompaniesControls, java.awt.BorderLayout.CENTER);
 
-        jPanel5.add(jPanel10, java.awt.BorderLayout.NORTH);
+        jpCompaniesUser.setPreferredSize(new java.awt.Dimension(350, 200));
+        jpCompaniesUser.setLayout(new java.awt.BorderLayout());
 
-        jPanel71.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jPanel5.add(jPanel71, java.awt.BorderLayout.CENTER);
+        jlCompanyUser.setText("Empresas asignadas al usuario:");
+        jlCompanyUser.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpCompaniesUser.add(jlCompanyUser, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("Acceso a empresas", jPanel5);
+        jpCompanies1.add(jpCompaniesUser, java.awt.BorderLayout.EAST);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
-        jPanel6.setLayout(new java.awt.BorderLayout(0, 5));
+        jpCompanies.add(jpCompanies1, java.awt.BorderLayout.CENTER);
 
-        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jTabbedPane.addTab("Acceso a empresas", jpCompanies);
+
+        jpBranches.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
+        jpBranches.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jpBranches0.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jlCompany.setText("Empresa:");
-        jlCompany.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel20.add(jlCompany);
+        jlCompany.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpBranches0.add(jlCompany);
 
-        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(350, 23));
         jcbCompanyBranch.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbCompanyBranchItemStateChanged(evt);
             }
         });
-        jPanel20.add(jcbCompanyBranch);
+        jpBranches0.add(jcbCompanyBranch);
 
         jLabel8.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel20.add(jLabel8);
+        jpBranches0.add(jLabel8);
 
-        jckIsUniversalCompanyBranch.setText("Acceso universal a la empresa");
+        jckIsUniversalCompanyBranch.setText("Con acceso universal a la empresa");
         jckIsUniversalCompanyBranch.setEnabled(false);
         jckIsUniversalCompanyBranch.setFocusPainted(false);
-        jckIsUniversalCompanyBranch.setPreferredSize(new java.awt.Dimension(200, 22));
-        jPanel20.add(jckIsUniversalCompanyBranch);
+        jckIsUniversalCompanyBranch.setPreferredSize(new java.awt.Dimension(250, 22));
+        jpBranches0.add(jckIsUniversalCompanyBranch);
 
-        jPanel6.add(jPanel20, java.awt.BorderLayout.PAGE_START);
+        jpBranches.add(jpBranches0, java.awt.BorderLayout.PAGE_START);
 
-        jPanel21.setLayout(new java.awt.BorderLayout());
+        jpBranches1.setLayout(new java.awt.BorderLayout());
 
-        jPanel22.setLayout(new java.awt.BorderLayout());
+        jpBranches11.setLayout(new java.awt.BorderLayout());
 
-        jPanel23.setPreferredSize(new java.awt.Dimension(230, 200));
-        jPanel23.setLayout(new java.awt.BorderLayout());
+        jpBranchesAvailable.setPreferredSize(new java.awt.Dimension(300, 200));
+        jpBranchesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlBranchCompany.setText("Sucursales de la empresa:");
-        jlBranchCompany.setPreferredSize(new java.awt.Dimension(129, 23));
-        jPanel23.add(jlBranchCompany, java.awt.BorderLayout.NORTH);
+        jlBranchesAvailable.setText("Sucursales de disponibles:");
+        jlBranchesAvailable.setPreferredSize(new java.awt.Dimension(129, 23));
+        jpBranchesAvailable.add(jlBranchesAvailable, java.awt.BorderLayout.NORTH);
 
-        jltCompanyBranches.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltBranchesAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltCompanyBranchesMouseClicked(evt);
+                jltBranchesAvailableMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(jltCompanyBranches);
+        jspBranchesAvailable.setViewportView(jltBranchesAvailable);
 
-        jPanel23.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+        jpBranchesAvailable.add(jspBranchesAvailable, java.awt.BorderLayout.CENTER);
 
-        jPanel22.add(jPanel23, java.awt.BorderLayout.WEST);
+        jpBranches11.add(jpBranchesAvailable, java.awt.BorderLayout.WEST);
 
-        jpUserCompanyBranches.setPreferredSize(new java.awt.Dimension(280, 200));
-        jpUserCompanyBranches.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls.setLayout(new java.awt.BorderLayout());
 
-        jlBranchUser.setText("Sucursales del usuario:");
-        jlBranchUser.setPreferredSize(new java.awt.Dimension(110, 23));
-        jpUserCompanyBranches.add(jlBranchUser, java.awt.BorderLayout.PAGE_START);
+        jpBranchesControls1.setPreferredSize(new java.awt.Dimension(100, 130));
+        jpBranchesControls1.setLayout(new java.awt.BorderLayout());
 
-        jPanel22.add(jpUserCompanyBranches, java.awt.BorderLayout.EAST);
+        jpBranchesControls1N.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpBranchesControls1N.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls1.add(jpBranchesControls1N, java.awt.BorderLayout.NORTH);
 
-        jPanel25.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls1E.setPreferredSize(new java.awt.Dimension(25, 100));
+        jpBranchesControls1E.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls1.add(jpBranchesControls1E, java.awt.BorderLayout.EAST);
 
-        jPanel26.setPreferredSize(new java.awt.Dimension(100, 130));
-        jPanel26.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls1W.setPreferredSize(new java.awt.Dimension(25, 100));
+        jpBranchesControls1W.setLayout(new java.awt.BorderLayout());
+        jpBranchesControls1.add(jpBranchesControls1W, java.awt.BorderLayout.LINE_START);
 
-        jPanel27.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.setLayout(new java.awt.BorderLayout());
-        jPanel26.add(jPanel27, java.awt.BorderLayout.NORTH);
-
-        jPanel28.setPreferredSize(new java.awt.Dimension(75, 100));
-        jPanel28.setLayout(new java.awt.BorderLayout());
-        jPanel26.add(jPanel28, java.awt.BorderLayout.LINE_START);
-
-        jPanel29.setPreferredSize(new java.awt.Dimension(75, 100));
-        jPanel29.setLayout(new java.awt.BorderLayout());
-        jPanel26.add(jPanel29, java.awt.BorderLayout.EAST);
-
-        jPanel30.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
+        jpBranchesControls1C.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
 
         jbTransferBranch.setText(">");
         jbTransferBranch.setToolTipText("Agregar");
-        jPanel30.add(jbTransferBranch);
+        jpBranchesControls1C.add(jbTransferBranch);
 
         jbTransferAllBranch.setText(">>");
         jbTransferAllBranch.setToolTipText("Agregar todos");
-        jPanel30.add(jbTransferAllBranch);
+        jpBranchesControls1C.add(jbTransferAllBranch);
 
         jbReturnBranch.setText("<");
         jbReturnBranch.setToolTipText("Remover");
-        jPanel30.add(jbReturnBranch);
+        jpBranchesControls1C.add(jbReturnBranch);
 
         jbReturnAllBranch.setText("<<");
         jbReturnAllBranch.setToolTipText("Remover todos");
-        jPanel30.add(jbReturnAllBranch);
+        jpBranchesControls1C.add(jbReturnAllBranch);
 
-        jPanel26.add(jPanel30, java.awt.BorderLayout.CENTER);
+        jpBranchesControls1.add(jpBranchesControls1C, java.awt.BorderLayout.CENTER);
 
-        jPanel25.add(jPanel26, java.awt.BorderLayout.NORTH);
+        jpBranchesControls.add(jpBranchesControls1, java.awt.BorderLayout.NORTH);
 
-        jPanel22.add(jPanel25, java.awt.BorderLayout.CENTER);
+        jpBranches11.add(jpBranchesControls, java.awt.BorderLayout.CENTER);
 
-        jPanel21.add(jPanel22, java.awt.BorderLayout.NORTH);
+        jpBranchesUser.setPreferredSize(new java.awt.Dimension(350, 200));
+        jpBranchesUser.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.add(jPanel21, java.awt.BorderLayout.CENTER);
+        jlBranchUser.setText("Sucursales asignadas al usuario:");
+        jlBranchUser.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpBranchesUser.add(jlBranchUser, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("Acceso a sucursales", jPanel6);
+        jpBranches11.add(jpBranchesUser, java.awt.BorderLayout.EAST);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
-        jPanel7.setLayout(new java.awt.BorderLayout(0, 5));
+        jpBranches1.add(jpBranches11, java.awt.BorderLayout.CENTER);
+
+        jpBranches.add(jpBranches1, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Acceso a sucursales de empresas", jpBranches);
+
+        jpEntities.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
+        jpEntities.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel8.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
-        jckIsUniversalCashAccount.setText("Acceso universal a cuentas de efectivo");
+        jckIsUniversalCashAccount.setText("Con acceso universal a cuentas de efectivo");
         jckIsUniversalCashAccount.setPreferredSize(new java.awt.Dimension(250, 23));
         jckIsUniversalCashAccount.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -634,23 +643,23 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel35.setLayout(new java.awt.BorderLayout());
 
-        jPanel37.setPreferredSize(new java.awt.Dimension(247, 100));
-        jPanel37.setLayout(new java.awt.BorderLayout());
+        jPanel36.setPreferredSize(new java.awt.Dimension(300, 100));
+        jPanel36.setLayout(new java.awt.BorderLayout());
 
-        jlUserCashAccount.setText("Cuentas de efectivo del usuario:");
-        jlUserCashAccount.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel37.add(jlUserCashAccount, java.awt.BorderLayout.PAGE_START);
+        jlCompanyBranchCashAccount.setText("Cuentas de efectivo disponibles:");
+        jlCompanyBranchCashAccount.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel36.add(jlCompanyBranchCashAccount, java.awt.BorderLayout.NORTH);
 
-        jltUserCashAccount.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltCompanyBranchCashAccount.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltUserCashAccountMouseClicked(evt);
+                jltCompanyBranchCashAccountMouseClicked(evt);
             }
         });
-        jScrollPane4.setViewportView(jltUserCashAccount);
+        jScrollPane2.setViewportView(jltCompanyBranchCashAccount);
 
-        jPanel37.add(jScrollPane4, java.awt.BorderLayout.CENTER);
+        jPanel36.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
-        jPanel35.add(jPanel37, java.awt.BorderLayout.EAST);
+        jPanel35.add(jPanel36, java.awt.BorderLayout.WEST);
 
         jPanel38.setLayout(new java.awt.BorderLayout());
 
@@ -664,11 +673,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel39.add(jPanel40, java.awt.BorderLayout.NORTH);
 
-        jPanel41.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel41.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel41.setLayout(new java.awt.BorderLayout());
         jPanel39.add(jPanel41, java.awt.BorderLayout.WEST);
 
-        jPanel43.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel43.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel43.setLayout(new java.awt.BorderLayout());
         jPanel39.add(jPanel43, java.awt.BorderLayout.EAST);
 
@@ -697,23 +706,23 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel35.add(jPanel38, java.awt.BorderLayout.CENTER);
 
-        jPanel36.setPreferredSize(new java.awt.Dimension(247, 100));
-        jPanel36.setLayout(new java.awt.BorderLayout());
+        jPanel37.setPreferredSize(new java.awt.Dimension(350, 100));
+        jPanel37.setLayout(new java.awt.BorderLayout());
 
-        jlCompanyBranchCashAccount.setText("Cuentas de efectivo de la sucursal:");
-        jlCompanyBranchCashAccount.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel36.add(jlCompanyBranchCashAccount, java.awt.BorderLayout.NORTH);
+        jlUserCashAccount.setText("Cuentas de efectivo asignadas al usuario:");
+        jlUserCashAccount.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel37.add(jlUserCashAccount, java.awt.BorderLayout.PAGE_START);
 
-        jltCompanyBranchCashAccount.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltUserCashAccount.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltCompanyBranchCashAccountMouseClicked(evt);
+                jltUserCashAccountMouseClicked(evt);
             }
         });
-        jScrollPane2.setViewportView(jltCompanyBranchCashAccount);
+        jScrollPane4.setViewportView(jltUserCashAccount);
 
-        jPanel36.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+        jPanel37.add(jScrollPane4, java.awt.BorderLayout.CENTER);
 
-        jPanel35.add(jPanel36, java.awt.BorderLayout.WEST);
+        jPanel35.add(jPanel37, java.awt.BorderLayout.EAST);
 
         jPanel8.add(jPanel35, java.awt.BorderLayout.CENTER);
 
@@ -723,7 +732,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
-        jckIsUniversalWarehouse.setText("Acceso universal a almacenes");
+        jckIsUniversalWarehouse.setText("Con acceso universal a almacenes");
         jckIsUniversalWarehouse.setPreferredSize(new java.awt.Dimension(250, 23));
         jckIsUniversalWarehouse.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -741,10 +750,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel46.setLayout(new java.awt.BorderLayout());
 
-        jPanel47.setPreferredSize(new java.awt.Dimension(247, 100));
+        jPanel47.setPreferredSize(new java.awt.Dimension(300, 100));
         jPanel47.setLayout(new java.awt.BorderLayout());
 
-        jlCompanyBranchWarehouses.setText("Almacenes de la sucursal:");
+        jlCompanyBranchWarehouses.setText("Almacenes disponibles:");
         jlCompanyBranchWarehouses.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel47.add(jlCompanyBranchWarehouses, java.awt.BorderLayout.NORTH);
 
@@ -759,24 +768,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel46.add(jPanel47, java.awt.BorderLayout.WEST);
 
-        jPanel48.setPreferredSize(new java.awt.Dimension(247, 100));
-        jPanel48.setLayout(new java.awt.BorderLayout());
-
-        jlUserWarehouses.setText("Almacenes del usuario:");
-        jlUserWarehouses.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel48.add(jlUserWarehouses, java.awt.BorderLayout.NORTH);
-
-        jltUserWarehouses.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltUserWarehousesMouseClicked(evt);
-            }
-        });
-        jScrollPane6.setViewportView(jltUserWarehouses);
-
-        jPanel48.add(jScrollPane6, java.awt.BorderLayout.CENTER);
-
-        jPanel46.add(jPanel48, java.awt.BorderLayout.EAST);
-
         jPanel49.setLayout(new java.awt.BorderLayout());
 
         jPanel50.setPreferredSize(new java.awt.Dimension(100, 130));
@@ -789,10 +780,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel50.add(jPanel51, java.awt.BorderLayout.NORTH);
 
-        jPanel52.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel52.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel50.add(jPanel52, java.awt.BorderLayout.WEST);
 
-        jPanel53.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel53.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel50.add(jPanel53, java.awt.BorderLayout.EAST);
 
         jPanel54.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
@@ -819,6 +810,24 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel46.add(jPanel49, java.awt.BorderLayout.CENTER);
 
+        jPanel48.setPreferredSize(new java.awt.Dimension(350, 100));
+        jPanel48.setLayout(new java.awt.BorderLayout());
+
+        jlUserWarehouses.setText("Almacenes asignados al usuario:");
+        jlUserWarehouses.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel48.add(jlUserWarehouses, java.awt.BorderLayout.NORTH);
+
+        jltUserWarehouses.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltUserWarehousesMouseClicked(evt);
+            }
+        });
+        jScrollPane6.setViewportView(jltUserWarehouses);
+
+        jPanel48.add(jScrollPane6, java.awt.BorderLayout.CENTER);
+
+        jPanel46.add(jPanel48, java.awt.BorderLayout.EAST);
+
         jPanel9.add(jPanel46, java.awt.BorderLayout.CENTER);
 
         jTabbedPane2.addTab("Acceso a almacenes", jPanel9);
@@ -827,7 +836,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel55.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
-        jckIsUniversalPos.setText("Acceso universal a puntos de venta");
+        jckIsUniversalPos.setText("Con acceso universal a puntos de venta");
         jckIsUniversalPos.setPreferredSize(new java.awt.Dimension(250, 23));
         jckIsUniversalPos.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -845,10 +854,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel56.setLayout(new java.awt.BorderLayout());
 
-        jPanel57.setPreferredSize(new java.awt.Dimension(247, 100));
+        jPanel57.setPreferredSize(new java.awt.Dimension(300, 100));
         jPanel57.setLayout(new java.awt.BorderLayout());
 
-        jlCompanyBranchPos.setText("Puntos de venta de la sucursal:");
+        jlCompanyBranchPos.setText("Puntos de venta disponibles:");
         jlCompanyBranchPos.setPreferredSize(new java.awt.Dimension(151, 23));
         jPanel57.add(jlCompanyBranchPos, java.awt.BorderLayout.PAGE_START);
 
@@ -862,24 +871,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel57.add(jScrollPane7, java.awt.BorderLayout.CENTER);
 
         jPanel56.add(jPanel57, java.awt.BorderLayout.WEST);
-
-        jPanel58.setPreferredSize(new java.awt.Dimension(247, 100));
-        jPanel58.setLayout(new java.awt.BorderLayout());
-
-        jlUserPos.setText("Puntos de venta del usuario:");
-        jlUserPos.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel58.add(jlUserPos, java.awt.BorderLayout.NORTH);
-
-        jltUserPos.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltUserPosMouseClicked(evt);
-            }
-        });
-        jScrollPane8.setViewportView(jltUserPos);
-
-        jPanel58.add(jScrollPane8, java.awt.BorderLayout.CENTER);
-
-        jPanel56.add(jPanel58, java.awt.BorderLayout.EAST);
 
         jPanel59.setLayout(new java.awt.BorderLayout());
 
@@ -895,10 +886,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel61.add(jPanel62, java.awt.BorderLayout.NORTH);
 
-        jPanel63.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel63.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel61.add(jPanel63, java.awt.BorderLayout.WEST);
 
-        jPanel64.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel64.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel61.add(jPanel64, java.awt.BorderLayout.EAST);
 
         jPanel65.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
@@ -927,6 +918,24 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel56.add(jPanel59, java.awt.BorderLayout.CENTER);
 
+        jPanel58.setPreferredSize(new java.awt.Dimension(350, 100));
+        jPanel58.setLayout(new java.awt.BorderLayout());
+
+        jlUserPos.setText("Puntos de venta asignados al usuario:");
+        jlUserPos.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel58.add(jlUserPos, java.awt.BorderLayout.NORTH);
+
+        jltUserPos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltUserPosMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(jltUserPos);
+
+        jPanel58.add(jScrollPane8, java.awt.BorderLayout.CENTER);
+
+        jPanel56.add(jPanel58, java.awt.BorderLayout.EAST);
+
         jPanel12.add(jPanel56, java.awt.BorderLayout.CENTER);
 
         jTabbedPane2.addTab("Acceso a puntos de venta", jPanel12);
@@ -935,7 +944,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
 
-        jckIsUniversalPlant.setText("Acceso universal a plantas");
+        jckIsUniversalPlant.setText("Con acceso universal a plantas");
         jckIsUniversalPlant.setPreferredSize(new java.awt.Dimension(250, 23));
         jckIsUniversalPlant.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -953,10 +962,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel67.setLayout(new java.awt.BorderLayout());
 
-        jPanel68.setPreferredSize(new java.awt.Dimension(247, 100));
+        jPanel68.setPreferredSize(new java.awt.Dimension(300, 100));
         jPanel68.setLayout(new java.awt.BorderLayout());
 
-        jlCompanyBranchPlants.setText("Plantas de la sucursal:");
+        jlCompanyBranchPlants.setText("Plantas disponibles:");
         jlCompanyBranchPlants.setPreferredSize(new java.awt.Dimension(107, 23));
         jPanel68.add(jlCompanyBranchPlants, java.awt.BorderLayout.NORTH);
 
@@ -971,24 +980,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel67.add(jPanel68, java.awt.BorderLayout.WEST);
 
-        jPanel69.setPreferredSize(new java.awt.Dimension(247, 100));
-        jPanel69.setLayout(new java.awt.BorderLayout());
-
-        jlUserPlants.setText("Plantas del usuario:");
-        jlUserPlants.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel69.add(jlUserPlants, java.awt.BorderLayout.PAGE_START);
-
-        jltUserPlants.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltUserPlantsMouseClicked(evt);
-            }
-        });
-        jScrollPane10.setViewportView(jltUserPlants);
-
-        jPanel69.add(jScrollPane10, java.awt.BorderLayout.CENTER);
-
-        jPanel67.add(jPanel69, java.awt.BorderLayout.EAST);
-
         jPanel72.setLayout(new java.awt.BorderLayout());
 
         jPanel73.setPreferredSize(new java.awt.Dimension(100, 130));
@@ -1001,10 +992,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel73.add(jPanel74, java.awt.BorderLayout.NORTH);
 
-        jPanel75.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel75.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel73.add(jPanel75, java.awt.BorderLayout.WEST);
 
-        jPanel76.setPreferredSize(new java.awt.Dimension(75, 100));
+        jPanel76.setPreferredSize(new java.awt.Dimension(25, 100));
         jPanel73.add(jPanel76, java.awt.BorderLayout.EAST);
 
         jPanel77.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
@@ -1031,21 +1022,39 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel67.add(jPanel72, java.awt.BorderLayout.CENTER);
 
+        jPanel69.setPreferredSize(new java.awt.Dimension(350, 100));
+        jPanel69.setLayout(new java.awt.BorderLayout());
+
+        jlUserPlants.setText("Plantas asignadas al usuario:");
+        jlUserPlants.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel69.add(jlUserPlants, java.awt.BorderLayout.PAGE_START);
+
+        jltUserPlants.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltUserPlantsMouseClicked(evt);
+            }
+        });
+        jScrollPane10.setViewportView(jltUserPlants);
+
+        jPanel69.add(jScrollPane10, java.awt.BorderLayout.CENTER);
+
+        jPanel67.add(jPanel69, java.awt.BorderLayout.EAST);
+
         jPanel24.add(jPanel67, java.awt.BorderLayout.CENTER);
 
         jTabbedPane2.addTab("Acceso a plantas", jPanel24);
 
-        jPanel7.add(jTabbedPane2, java.awt.BorderLayout.CENTER);
+        jpEntities.add(jTabbedPane2, java.awt.BorderLayout.CENTER);
 
         jPanel31.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jlCompanyEntity.setText("Empresa:");
-        jlCompanyEntity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCompanyEntity.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel32.add(jlCompanyEntity);
 
-        jcbCompanyEntity.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbCompanyEntity.setPreferredSize(new java.awt.Dimension(350, 23));
         jcbCompanyEntity.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbCompanyEntityItemStateChanged(evt);
@@ -1056,21 +1065,21 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         Dummy5.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel32.add(Dummy5);
 
-        jckIsUniversalCompanyEntity.setText("Acceso universal a la empresa");
+        jckIsUniversalCompanyEntity.setText("Con acceso universal a la empresa");
         jckIsUniversalCompanyEntity.setEnabled(false);
         jckIsUniversalCompanyEntity.setFocusable(false);
-        jckIsUniversalCompanyEntity.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsUniversalCompanyEntity.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel32.add(jckIsUniversalCompanyEntity);
 
         jPanel31.add(jPanel32);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
-        jlCompanyBranchEntity.setText("Sucursal de la empresa:");
-        jlCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCompanyBranchEntity.setText("Sucursal empresa:");
+        jlCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel33.add(jlCompanyBranchEntity);
 
-        jcbCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(350, 23));
         jcbCompanyBranchEntity.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jcbCompanyBranchEntityItemStateChanged(evt);
@@ -1081,19 +1090,19 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         Dummy6.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel33.add(Dummy6);
 
-        jckIsUniversalBranch.setText("Acceso universal a la sucursal");
+        jckIsUniversalBranch.setText("Con acceso universal a la sucursal");
         jckIsUniversalBranch.setEnabled(false);
         jckIsUniversalBranch.setFocusable(false);
-        jckIsUniversalBranch.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsUniversalBranch.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel33.add(jckIsUniversalBranch);
 
         jPanel31.add(jPanel33);
 
-        jPanel7.add(jPanel31, java.awt.BorderLayout.PAGE_START);
+        jpEntities.add(jPanel31, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("Acceso a entidades", jPanel7);
+        jTabbedPane.addTab("Acceso a entidades de sucursales", jpEntities);
 
-        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         jpControls.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -1143,11 +1152,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 }//GEN-LAST:event_jcbCompanyEntityItemStateChanged
 
-    private void jltCompanyBranchesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltCompanyBranchesMouseClicked
+    private void jltBranchesAvailableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltBranchesAvailableMouseClicked
         if (evt.getClickCount() == 2) {
             mouseClickedCompanyBranches();
         }
-}//GEN-LAST:event_jltCompanyBranchesMouseClicked
+}//GEN-LAST:event_jltBranchesAvailableMouseClicked
 
     private void jcbCompanyBranchItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbCompanyBranchItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -1155,11 +1164,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 }//GEN-LAST:event_jcbCompanyBranchItemStateChanged
 
-    private void jltCompanySystemMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltCompanySystemMouseClicked
+    private void jltCompaniesAvailableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltCompaniesAvailableMouseClicked
         if (evt.getClickCount() == 2) {
             mouseClickedCompanySystem();
         }
-}//GEN-LAST:event_jltCompanySystemMouseClicked
+}//GEN-LAST:event_jltCompaniesAvailableMouseClicked
 
     private void jckIsUniversalItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsUniversalItemStateChanged
         itemStateChangedIsUniversal();
@@ -1247,59 +1256,59 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moUserCompaniesPane = new STablePane(miClient);
         moUserCompaniesPane.setDoubleClickAction(this, "publicActionReturnCompany");
-        jpUserCompany.add(moUserCompaniesPane, BorderLayout.CENTER);
+        jpCompaniesUser.add(moUserCompaniesPane, BorderLayout.CENTER);
 
         moUserCompanyBranchesPane = new STablePane(miClient);
         moUserCompanyBranchesPane.setDoubleClickAction(this, "publicActionReturnBranch");
-        jpUserCompanyBranches.add(moUserCompanyBranchesPane, BorderLayout.CENTER);
+        jpBranchesUser.add(moUserCompanyBranchesPane, BorderLayout.CENTER);
 
         moFieldUser = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfUser, jlUser);
         moFieldUser.setLengthMin(5);
-        moFieldUser.setLengthMax(16);
+        moFieldUser.setLengthMax(50);
         moFieldUser.setAutoCaseType(SLibConstants.CASE_LOWER);
-        moFieldUser.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldUser.setTabbedPaneIndex(0, jTabbedPane);
         moFieldEmail = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
         moFieldEmail.setAutoCaseType(SLibConstants.CASE_LOWER);
         moFieldIsUniversalCompanies = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsUniversal);
-        moFieldIsUniversalCompanies.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsUniversalCompanies.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsDeleted = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
-        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsActive = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsActive);
-        moFieldIsActive.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsActive.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBizPartnerId, jlBizPartner);
-        moFieldFkBizPartnerId.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkBizPartnerId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkBizPartnerId.setPickerButton(jbFkBizPartnerId);
-        moFieldCompany = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanySystem, jlCompanySystem);
-        moFieldCompany.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldCompany = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompaniesAvailable, jlCompaniesAvailable);
+        moFieldCompany.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkCompanyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranch, jlCompany);
-        moFieldFkCompanyId.setTabbedPaneIndex(2, jTabbedPane1);
-        moFieldBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranches, jlBranchCompany);
-        moFieldBranch.setTabbedPaneIndex(2, jTabbedPane1);
+        moFieldFkCompanyId.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltBranchesAvailable, jlBranchesAvailable);
+        moFieldBranch.setTabbedPaneIndex(2, jTabbedPane);
         moFieldWarehouse = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranchWarehouses, jlCompanyBranchWarehouses);
         moFieldFkCompanyEntityId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyEntity, jlCompanyEntity);
-        moFieldFkCompanyEntityId.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldFkCompanyEntityId.setTabbedPaneIndex(3, jTabbedPane);
         moFieldFkCompanyBranchEntityId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCompanyBranchEntity, jlCompanyBranchEntity);
-        moFieldFkCompanyBranchEntityId.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldFkCompanyBranchEntityId.setTabbedPaneIndex(3, jTabbedPane);
         moFieldCashAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranchCashAccount, jlCompanyBranchCashAccount);
-        moFieldCashAccount.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldCashAccount.setTabbedPaneIndex(3, jTabbedPane);
         moFieldUserCashAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltUserCashAccount, jlUserCashAccount);
         moFieldUserCashAccount.setListValidationType(SLibConstants.LIST_VALIDATION_BY_CONTENT);
-        moFieldUserCashAccount.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldUserCashAccount.setTabbedPaneIndex(3, jTabbedPane);
         moFieldWarehouse = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranchWarehouses, jlCompanyBranchWarehouses);
-        moFieldWarehouse.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldWarehouse.setTabbedPaneIndex(3, jTabbedPane);
         moFieldUserWarehouse = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltUserWarehouses, jlUserWarehouses);
         moFieldUserWarehouse.setListValidationType(SLibConstants.LIST_VALIDATION_BY_CONTENT);
-        moFieldUserWarehouse.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldUserWarehouse.setTabbedPaneIndex(3, jTabbedPane);
         moFieldPos = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranchPos, jlCompanyBranchPos);
-        moFieldPos.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldPos.setTabbedPaneIndex(3, jTabbedPane);
         moFieldUserPos = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltUserPos, jlUserPos);
         moFieldUserPos.setListValidationType(SLibConstants.LIST_VALIDATION_BY_CONTENT);
-        moFieldUserPos.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldUserPos.setTabbedPaneIndex(3, jTabbedPane);
         moFieldPlant = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltCompanyBranchPlants, jlCompanyBranchPlants);
-        moFieldPlant.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldPlant.setTabbedPaneIndex(3, jTabbedPane);
         moFieldUserPlant = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltUserPlants, jlUserPlants);
         moFieldUserPlant.setListValidationType(SLibConstants.LIST_VALIDATION_BY_CONTENT);
-        moFieldUserPlant.setTabbedPaneIndex(3, jTabbedPane1);
+        moFieldUserPlant.setTabbedPaneIndex(3, jTabbedPane);
 
         mvFields = new Vector<>();
         mvFields.add(moFieldUser);
@@ -1348,10 +1357,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         i = 0;
         tableColumnsUserCompanies = new STableColumnForm[3];
-        tableColumnsUserCompanies[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empresa", 175);
-        tableColumnsUserCompanies[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Predet.", STableConstants.WIDTH_BOOLEAN);
+        tableColumnsUserCompanies[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empresa", 225);
+        tableColumnsUserCompanies[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Predeterminado", STableConstants.WIDTH_BOOLEAN);
         tableColumnsUserCompanies[i++].setEditable(true);
-        tableColumnsUserCompanies[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Univ.", STableConstants.WIDTH_BOOLEAN);
+        tableColumnsUserCompanies[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Universal", STableConstants.WIDTH_BOOLEAN);
         tableColumnsUserCompanies[i++].setEditable(true);
 
         for (i = 0; i < tableColumnsUserCompanies.length; i++) {
@@ -1360,10 +1369,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         i = 0;
         tableColumnsUserCompanyBranches = new STableColumnForm[3];
-        tableColumnsUserCompanyBranches[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal", 175);
-        tableColumnsUserCompanyBranches[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Predet.", STableConstants.WIDTH_BOOLEAN);
+        tableColumnsUserCompanyBranches[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal", 225);
+        tableColumnsUserCompanyBranches[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Predeterminado", STableConstants.WIDTH_BOOLEAN);
         tableColumnsUserCompanyBranches[i++].setEditable(true);
-        tableColumnsUserCompanyBranches[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Univ.", STableConstants.WIDTH_BOOLEAN);
+        tableColumnsUserCompanyBranches[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Universal", STableConstants.WIDTH_BOOLEAN);
         tableColumnsUserCompanyBranches[i++].setEditable(true);
 
         for (i = 0; i < tableColumnsUserCompanyBranches.length; i++) {
@@ -1391,7 +1400,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jTabbedPane1.setSelectedIndex(0);
+            jTabbedPane.setSelectedIndex(0);
             jtfUser.requestFocus();
         }
     }
@@ -1412,7 +1421,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         if (validation.getIsError()) {
             if (validation.getTabbedPaneIndex() >= 0) {
-                jTabbedPane1.setSelectedIndex(validation.getTabbedPaneIndex());
+                jTabbedPane.setSelectedIndex(validation.getTabbedPaneIndex());
             }
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
@@ -1570,9 +1579,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
        if (moFieldFkCompanyEntityId.getKeyAsIntArray()[0] > 0 && moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0] > 0) {
            for (int i = 0; i < mvUserBranches.size(); i++) {
                 for (int j = 1; j < mvUserBranches.get(i).size(); j++) {
-                    if (((int[])mvUserBranches.get(i).get(j).getPrimaryKey())[0] == moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0]) {
+                    if (((int[]) mvUserBranches.get(i).get(j).getPrimaryKey())[0] == moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0]) {
                         for (int k = 0; k < mvUserCashAccounts.size(); k++) {
-                            if (((int[])mvUserCashAccounts.get(k).get(0).getPrimaryKey())[0] == moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0] && mvUserCashAccounts.get(k).size() > 1 && jckIsUniversalCashAccount.isSelected()) {
+                            if (((int[]) mvUserCashAccounts.get(k).get(0).getPrimaryKey())[0] == moFieldFkCompanyBranchEntityId.getKeyAsIntArray()[0] && mvUserCashAccounts.get(k).size() > 1 && jckIsUniversalCashAccount.isSelected()) {
                                 if (miClient.showMsgBoxConfirm("Si define un acceso universal se eliminará la configuración actual para las cuentas de efectivo de la sucursal '" + ((SFormComponentItem)jcbCompanyBranchEntity.getSelectedItem()).getItem() + "'.\n" +
                                         "¿Desea continuar?") == JOptionPane.YES_OPTION) {
                                     actionReturnAllCashAccounts();
@@ -1719,10 +1728,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         String company = "";
         STableRowCustom row = null;
 
-        if (jltCompanySystem.getSelectedIndex() != -1) {
-            pkCompany = ((int[])((SFormComponentItem)jltCompanySystem.getModel().getElementAt(jltCompanySystem.getSelectedIndex())).getPrimaryKey())[0];
-            company = ((SFormComponentItem)jltCompanySystem.getModel().getElementAt(jltCompanySystem.getSelectedIndex())).getItem();
-            SFormUtilities.removeListSelectedItem(jltCompanySystem);
+        if (jltCompaniesAvailable.getSelectedIndex() != -1) {
+            pkCompany = ((int[])((SFormComponentItem)jltCompaniesAvailable.getModel().getElementAt(jltCompaniesAvailable.getSelectedIndex())).getPrimaryKey())[0];
+            company = ((SFormComponentItem)jltCompaniesAvailable.getModel().getElementAt(jltCompaniesAvailable.getSelectedIndex())).getItem();
+            SFormUtilities.removeListSelectedItem(jltCompaniesAvailable);
             row = new STableRowCustom();
             row.getValues().add(company);
             row.getValues().add(false);
@@ -1730,8 +1739,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             row.setPrimaryKey(new int[] { pkCompany });
             moUserCompaniesPane.addTableRow(row);
             moUserCompaniesPane.renderTableRows();
-            if (jltCompanySystem.getModel().getSize() >=0) {
-                jltCompanySystem.setSelectedIndex(0);
+            if (jltCompaniesAvailable.getModel().getSize() >=0) {
+                jltCompaniesAvailable.setSelectedIndex(0);
             }
             
             populateComboBoxCompany();
@@ -1746,11 +1755,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         String company = "";
         STableRowCustom row = null;
 
-        if (jltCompanySystem.getModel().getSize() > 0) {
-            for (int i = 0; i < jltCompanySystem.getModel().getSize(); i++) {
-                jltCompanySystem.setSelectedIndex(i);
-                pkCompany = ((int[]) ((SFormComponentItem) jltCompanySystem.getModel().getElementAt(jltCompanySystem.getSelectedIndex())).getPrimaryKey())[0];
-                company = ((SFormComponentItem)jltCompanySystem.getModel().getElementAt(jltCompanySystem.getSelectedIndex())).getItem();
+        if (jltCompaniesAvailable.getModel().getSize() > 0) {
+            for (int i = 0; i < jltCompaniesAvailable.getModel().getSize(); i++) {
+                jltCompaniesAvailable.setSelectedIndex(i);
+                pkCompany = ((int[]) ((SFormComponentItem) jltCompaniesAvailable.getModel().getElementAt(jltCompaniesAvailable.getSelectedIndex())).getPrimaryKey())[0];
+                company = ((SFormComponentItem)jltCompaniesAvailable.getModel().getElementAt(jltCompaniesAvailable.getSelectedIndex())).getItem();
                 row = new STableRowCustom();
                 row.getValues().add(company);
                 row.getValues().add(false);
@@ -1762,7 +1771,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             populateComboBoxCompany();
             renderButtonsBranch();
             moUserCompaniesPane.renderTableRows();
-            jltCompanySystem.setListData(mvEmptyListItems);
+            jltCompaniesAvailable.setListData(mvEmptyListItems);
         }
         
         renderComboBoxCompany();
@@ -1778,14 +1787,14 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     removeBranches(((int[])moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0]);
                     item = new SFormComponentItem(new int[] { ((int[])moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0] }, (String) moUserCompaniesPane.getSelectedTableRow().getValues().get(0));
                     moUserCompaniesPane.removeTableRow(moUserCompaniesPane.getTable().getSelectedRow());
-                    SFormUtilities.addListItem(jltCompanySystem, item);
+                    SFormUtilities.addListItem(jltCompaniesAvailable, item);
                     moUserCompaniesPane.renderTableRows();
                 }
             }
             else {
                 item = new SFormComponentItem(new int[] { ((int[]) moUserCompaniesPane.getSelectedTableRow().getPrimaryKey())[0] }, (String) moUserCompaniesPane.getSelectedTableRow().getValues().get(0));
                 moUserCompaniesPane.removeTableRow(moUserCompaniesPane.getTable().getSelectedRow());
-                SFormUtilities.addListItem(jltCompanySystem, item);
+                SFormUtilities.addListItem(jltCompaniesAvailable, item);
                 moUserCompaniesPane.renderTableRows();
             }
             
@@ -1816,7 +1825,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         }
         for (i = 0; i < vListCompanies.size(); i++) {
-            SFormUtilities.addListItem(jltCompanySystem, vListCompanies.get(i));
+            SFormUtilities.addListItem(jltCompaniesAvailable, vListCompanies.get(i));
 
             for (int j = 0; j < moUserCompaniesPane.getTableModel().getRowCount(); j++) {
                 if (((int []) moUserCompaniesPane.getTableRow(j).getPrimaryKey())[0] == ((int []) vListCompanies.get(i).getPrimaryKey())[0]) {
@@ -1838,11 +1847,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         String branch = "";
         STableRowCustom row = null;
 
-        if (jltCompanyBranches.getSelectedIndex() != -1) {
-            pkBranch = ((int[]) ((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(jltCompanyBranches.getSelectedIndex())).getPrimaryKey())[0];
-            pkCompany = ((int[]) ((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(jltCompanyBranches.getSelectedIndex())).getPrimaryKey())[1];
-            branch = ((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(jltCompanyBranches.getSelectedIndex())).getItem();
-            SFormUtilities.removeListSelectedItem(jltCompanyBranches);
+        if (jltBranchesAvailable.getSelectedIndex() != -1) {
+            pkBranch = ((int[]) ((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(jltBranchesAvailable.getSelectedIndex())).getPrimaryKey())[0];
+            pkCompany = ((int[]) ((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(jltBranchesAvailable.getSelectedIndex())).getPrimaryKey())[1];
+            branch = ((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(jltBranchesAvailable.getSelectedIndex())).getItem();
+            SFormUtilities.removeListSelectedItem(jltBranchesAvailable);
             row = new STableRowCustom();
             row.setPrimaryKey(new int[] { pkBranch, pkCompany });
             row.getValues().add(branch);
@@ -1869,13 +1878,13 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         int pkBranch = 0;
         int pkCompany = 0;
 
-        if (jltCompanyBranches.getModel().getSize() > 0) {
-            for (int i = 0; i < jltCompanyBranches.getModel().getSize(); i++) {
+        if (jltBranchesAvailable.getModel().getSize() > 0) {
+            for (int i = 0; i < jltBranchesAvailable.getModel().getSize(); i++) {
                 row = new STableRowCustom();
-                pkBranch = ((int[]) ((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(i)).getPrimaryKey())[0];
-                pkCompany = ((int[]) ((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(i)).getPrimaryKey())[1];
+                pkBranch = ((int[]) ((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(i)).getPrimaryKey())[0];
+                pkCompany = ((int[]) ((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(i)).getPrimaryKey())[1];
                 row.setPrimaryKey(new int[] { pkBranch, pkCompany });
-                row.getValues().add(((SFormComponentItem) jltCompanyBranches.getModel().getElementAt(i)).getItem());
+                row.getValues().add(((SFormComponentItem) jltBranchesAvailable.getModel().getElementAt(i)).getItem());
                 row.getValues().add(false);
                 row.getValues().add(false);
                 row.getValues().add(false);
@@ -1891,7 +1900,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             
             populateTableUserBranches();
-            jltCompanyBranches.setListData(mvEmptyListItems);
+            jltBranchesAvailable.setListData(mvEmptyListItems);
             moUserCompanyBranchesPane.renderTableRows();
         }
     }
@@ -1909,7 +1918,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             item = new SFormComponentItem(new int[] { ((int[]) moUserCompanyBranchesPane.getSelectedTableRow().getPrimaryKey())[0] }, (String) moUserCompanyBranchesPane.getSelectedTableRow().getValues().get(0));
                             mvUserBranches.get(i).remove(moUserCompanyBranchesPane.getTable().getSelectedRow() + 1);
                             moUserCompanyBranchesPane.removeTableRow(moUserCompanyBranchesPane.getTable().getSelectedRow());
-                            SFormUtilities.addListItem(jltCompanyBranches, item);
+                            SFormUtilities.addListItem(jltBranchesAvailable, item);
                         }
                     }
 
@@ -1923,7 +1932,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                         item = new SFormComponentItem(moUserCompanyBranchesPane.getSelectedTableRow().getPrimaryKey(), (String)moUserCompanyBranchesPane.getSelectedTableRow().getValues().get(0));
                         mvUserBranches.get(i).remove(moUserCompanyBranchesPane.getTable().getSelectedRow() + 1);
                         moUserCompanyBranchesPane.removeTableRow(moUserCompanyBranchesPane.getTable().getSelectedRow());
-                        SFormUtilities.addListItem(jltCompanyBranches, item);
+                        SFormUtilities.addListItem(jltBranchesAvailable, item);
                     }
                 }
 
@@ -1955,7 +1964,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         for (x = 0; x < vListBranches.size(); x++) {
-            SFormUtilities.addListItem(jltCompanyBranches, vListBranches.get(x));
+            SFormUtilities.addListItem(jltBranchesAvailable, vListBranches.get(x));
 
             for (int j = 0; j < moUserCompanyBranchesPane.getTableModel().getRowCount(); j++) {
                 if (((int []) moUserCompanyBranchesPane.getTableRow(j).getPrimaryKey())[0] == ((int []) vListBranches.get(x).getPrimaryKey())[0]) {
@@ -2587,7 +2596,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 renderButtonsWarehouse();
                 renderButtonsPos();
                 renderButtonsPlants();
-                jltCompanySystem.setListData(mvEmptyListItems);
+                jltCompaniesAvailable.setListData(mvEmptyListItems);
             }
         }
         else {
@@ -2628,7 +2637,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 }
             }
 
-            jltCompanySystem.setListData(vListCompanies);
+            jltCompaniesAvailable.setListData(vListCompanies);
         }
     }
 
@@ -2701,7 +2710,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     }
                 }
 
-                jltCompanyBranches.setListData(vListBranches);
+                jltBranchesAvailable.setListData(vListBranches);
             }
         }
     }
@@ -3132,7 +3141,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         if (moUserCompaniesPane.getTableModel().getRowCount() == 0) {
             jcbCompanyBranch.setEnabled(false);
             jcbCompanyEntity.setEnabled(false);
-            jltCompanyBranches.setListData(mvEmptyListItems);
+            jltBranchesAvailable.setListData(mvEmptyListItems);
         }
         else {
             jcbCompanyBranch.setEnabled(true);
@@ -3403,24 +3412,35 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         return isUniv;
     }
 
-    private java.lang.String validateDefaultBranch() {
-        String company = "";
-        boolean isDefault = false;
+    private java.lang.String validateDefaultBranchOnEachCompany() {
+        String companyWithMoreThanOneDefaultBranch = "";
+        
+        for (Vector<STableRowCustom> vectorOfBranchTableRows : mvUserBranches) {
+            /* IMPORTANT NOTE FOR CLARIFYING BIZARRE DATA STRUCTURE OF SETTINGS OF EACH COMPANY AND ITS BRANCHES:
+             * Table row at index 0 is the company!!!
+             *  On each table row for company, data in vector values per index is: 0 = "company name", and that's it!!!
+             * Table rows starting at index 1 are the branches of the company!!!
+             *  On each table row for branch, data in vector values per index is: 0 = "branch name"; 1 = flag "is default"; 2 = flag "is universal"; and in the following indexes more other flags for universal access to branch entities!!!
+             */
 
-        for (int i = 0; i < mvUserBranches.size(); i++) {
-            if (mvUserBranches.get(i).size() > 2) {
-                for (int j = 1; j < mvUserBranches.get(i).size(); j++) {
-                    if (!isDefault) {
-                        isDefault = (Boolean) mvUserBranches.get(i).get(j).getValues().get(1);
+            if (vectorOfBranchTableRows.size() > 2) { // (2 = 1 company + 1 branch) current company has more than one branch
+                int defaultBranchesCount = 0;
+                String currentCompany = (String) vectorOfBranchTableRows.get(0).getValues().get(0);
+
+                for (int branchIndex = 1; branchIndex < vectorOfBranchTableRows.size(); branchIndex++) { // remember that branches start at index 1 in vector of table rows, bizarre!!!
+                    if ((Boolean) vectorOfBranchTableRows.get(branchIndex).getValues().get(1)) { // flag "is default" is at index 1, bizarre!!!
+                        defaultBranchesCount++;
                     }
-                    else if (isDefault && (Boolean) mvUserBranches.get(i).get(j).getValues().get(1)) {
-                        company = (String) mvUserBranches.get(i).get(0).getValues().get(0);
-                    }
+                }
+
+                if (defaultBranchesCount > 1) {
+                    companyWithMoreThanOneDefaultBranch = currentCompany;
+                    break;
                 }
             }
         }
-
-        return company;
+        
+        return companyWithMoreThanOneDefaultBranch;
     }
 
     public void publicActionReturnCompany() {
@@ -3434,6 +3454,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Dummy5;
     private javax.swing.JLabel Dummy6;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel21;
@@ -3441,28 +3462,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
@@ -3482,7 +3483,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel49;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel50;
     private javax.swing.JPanel jPanel51;
     private javax.swing.JPanel jPanel52;
@@ -3493,7 +3493,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel57;
     private javax.swing.JPanel jPanel58;
     private javax.swing.JPanel jPanel59;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
     private javax.swing.JPanel jPanel61;
     private javax.swing.JPanel jPanel62;
@@ -3504,8 +3503,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel71;
     private javax.swing.JPanel jPanel72;
     private javax.swing.JPanel jPanel73;
     private javax.swing.JPanel jPanel74;
@@ -3520,17 +3517,15 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel83;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbEditUserPassword;
@@ -3579,8 +3574,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsUniversalPos;
     private javax.swing.JCheckBox jckIsUniversalWarehouse;
     private javax.swing.JLabel jlBizPartner;
-    private javax.swing.JLabel jlBranchCompany;
     private javax.swing.JLabel jlBranchUser;
+    private javax.swing.JLabel jlBranchesAvailable;
+    private javax.swing.JLabel jlCompaniesAvailable;
     private javax.swing.JLabel jlCompany;
     private javax.swing.JLabel jlCompanyBranchCashAccount;
     private javax.swing.JLabel jlCompanyBranchEntity;
@@ -3588,7 +3584,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlCompanyBranchPos;
     private javax.swing.JLabel jlCompanyBranchWarehouses;
     private javax.swing.JLabel jlCompanyEntity;
-    private javax.swing.JLabel jlCompanySystem;
     private javax.swing.JLabel jlCompanyUser;
     private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlUser;
@@ -3598,23 +3593,48 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlUserPlants;
     private javax.swing.JLabel jlUserPos;
     private javax.swing.JLabel jlUserWarehouses;
+    private javax.swing.JList<SFormComponentItem> jltBranchesAvailable;
+    private javax.swing.JList<SFormComponentItem> jltCompaniesAvailable;
     private javax.swing.JList<SFormComponentItem> jltCompanyBranchCashAccount;
     private javax.swing.JList<SFormComponentItem> jltCompanyBranchPlants;
     private javax.swing.JList<SFormComponentItem> jltCompanyBranchPos;
     private javax.swing.JList<SFormComponentItem> jltCompanyBranchWarehouses;
-    private javax.swing.JList<SFormComponentItem> jltCompanyBranches;
-    private javax.swing.JList<SFormComponentItem> jltCompanySystem;
     private javax.swing.JList<SFormComponentItem> jltUserCashAccount;
     private javax.swing.JList<SFormComponentItem> jltUserPlants;
     private javax.swing.JList<SFormComponentItem> jltUserPos;
     private javax.swing.JList<SFormComponentItem> jltUserWarehouses;
+    private javax.swing.JPanel jpBranches;
+    private javax.swing.JPanel jpBranches0;
+    private javax.swing.JPanel jpBranches1;
+    private javax.swing.JPanel jpBranches11;
+    private javax.swing.JPanel jpBranchesAvailable;
+    private javax.swing.JPanel jpBranchesControls;
+    private javax.swing.JPanel jpBranchesControls1;
+    private javax.swing.JPanel jpBranchesControls1C;
+    private javax.swing.JPanel jpBranchesControls1E;
+    private javax.swing.JPanel jpBranchesControls1N;
+    private javax.swing.JPanel jpBranchesControls1W;
+    private javax.swing.JPanel jpBranchesUser;
+    private javax.swing.JPanel jpCompanies;
+    private javax.swing.JPanel jpCompanies1;
+    private javax.swing.JPanel jpCompaniesAvailable;
+    private javax.swing.JPanel jpCompaniesControls;
+    private javax.swing.JPanel jpCompaniesControls1;
+    private javax.swing.JPanel jpCompaniesControls1C;
+    private javax.swing.JPanel jpCompaniesControls1E;
+    private javax.swing.JPanel jpCompaniesControls1N;
+    private javax.swing.JPanel jpCompaniesControls1W;
+    private javax.swing.JPanel jpCompaniesUser;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpControls1;
     private javax.swing.JPanel jpControls2;
-    private javax.swing.JPanel jpUserCompany;
-    private javax.swing.JPanel jpUserCompanyBranches;
+    private javax.swing.JPanel jpEntities;
+    private javax.swing.JPanel jpUser;
+    private javax.swing.JPanel jpUser1;
     private javax.swing.JPasswordField jpfUserPassword;
     private javax.swing.JPasswordField jpfUserPasswordConfirm;
+    private javax.swing.JScrollPane jspBranchesAvailable;
+    private javax.swing.JScrollPane jspCompaniesAvailable;
     private javax.swing.JTextField jtfEmail;
     private javax.swing.JTextField jtfPkUserId_Ro;
     private javax.swing.JTextField jtfUser;
@@ -3655,7 +3675,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsDeleted.setEnabled(false);
         jckIsActive.setEnabled(false);
         jbEditUserPassword.setEnabled(false);
-        jltCompanyBranches.setListData(mvEmptyListItems);
+        jltBranchesAvailable.setListData(mvEmptyListItems);
         jltCompanyBranchCashAccount.setListData(mvEmptyListItems);
         jltUserCashAccount.setListData(mvEmptyListItems);
         jltCompanyBranchWarehouses.setListData(mvEmptyListItems);
@@ -3664,7 +3684,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jltUserPos.setListData(mvEmptyListItems);
         jltCompanyBranchPlants.setListData(mvEmptyListItems);
         jltUserPlants.setListData(mvEmptyListItems);
-        jTabbedPane1.setSelectedIndex(0);
+        jTabbedPane.setSelectedIndex(0);
         jTabbedPane2.setSelectedIndex(0);
         jcbCompanyBranch.removeAllItems();
         jcbCompanyBranch.setEnabled(false);
@@ -3685,8 +3705,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public void formRefreshCatalogues() {
         mbResetingForm = true;
-        SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, SDataConstants.BPSU_BP);
-        SFormUtilities.populateList(miClient, jltCompanySystem, SDataConstants.CFGU_CO);
+        SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId, SDataConstants.BPSX_BP_EMP);
+        SFormUtilities.populateList(miClient, jltCompaniesAvailable, SDataConstants.CFGU_CO);
     }
 
     @Override
@@ -3715,34 +3735,38 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
                 validation.setMessage(SLibConstants.MSG_ERR_DB_STP);
             }
-            else if (validateDefaultBranch().length() > 0) {
-                validation.setTabbedPaneIndex(2);
-                validation.setMessage("Solo se puede definir una sucursal como predeterminada para la empresa \n" + "'" + validateDefaultBranch() + "'");
-            }
             else {
-                procUserNameVal = (erp.musr.data.SProcUserNameVal) response.getPacket();
-
-                if ((java.lang.Integer) procUserNameVal.getParamsOut().get(0) > 0) {
-                    validation.setMessage("El valor del campo '" + jlUser.getText() + "' ya existe.");
-                    validation.setComponent(jtfUser);
+                String companyWithMoreThanOneDefaultBranch = validateDefaultBranchOnEachCompany();
+                
+                if (!companyWithMoreThanOneDefaultBranch.isEmpty()) {
+                    validation.setTabbedPaneIndex(TAB_IDX_BRANCHES);
+                    validation.setMessage("Solo se puede definir una sucursal predeterminada para la empresa:\n" + "'" + companyWithMoreThanOneDefaultBranch + "'");
                 }
-                else if (jpfUserPassword.isEnabled()) {
-                    password = new String(jpfUserPassword.getPassword());
+                else {
+                    procUserNameVal = (erp.musr.data.SProcUserNameVal) response.getPacket();
 
-                    if (password.length() < 1) {
-                        validation.setMessage("La longitud de la contraseña no puede ser menor a 1.");
+                    if ((java.lang.Integer) procUserNameVal.getParamsOut().get(0) > 0) {
+                        validation.setMessage("El valor del campo '" + jlUser.getText() + "' ya existe.");
+                        validation.setComponent(jtfUser);
                     }
-                    else if (password.length() > 16) {
-                        validation.setMessage("La longitud de la contraseña no puede ser mayor a 16.");
-                    }
-                    else if (password.compareTo(new String(jpfUserPasswordConfirm.getPassword())) != 0) {
-                        validation.setMessage("La confirmación de la contraseña no coincide.");
-                    }
+                    else if (jpfUserPassword.isEnabled()) {
+                        password = new String(jpfUserPassword.getPassword());
 
-                    if (validation.getIsError()) {
-                        jpfUserPassword.setText("");
-                        jpfUserPasswordConfirm.setText("");
-                        validation.setComponent(jpfUserPassword);
+                        if (password.length() < 1) {
+                            validation.setMessage("La longitud de la contraseña no puede ser menor a 1.");
+                        }
+                        else if (password.length() > 16) {
+                            validation.setMessage("La longitud de la contraseña no puede ser mayor a 16.");
+                        }
+                        else if (password.compareTo(new String(jpfUserPasswordConfirm.getPassword())) != 0) {
+                            validation.setMessage("La confirmación de la contraseña no coincide.");
+                        }
+
+                        if (validation.getIsError()) {
+                            jpfUserPassword.setText("");
+                            jpfUserPasswordConfirm.setText("");
+                            validation.setComponent(jpfUserPassword);
+                        }
                     }
                 }
             }
@@ -3795,16 +3819,16 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsDeleted.setEnabled(moUser.getIsCanDelete());
 
         for (i = 0; i < moUser.getDbmsAccessCompanies().size(); i++) {
-            for (j = 0; j < jltCompanySystem.getModel().getSize(); j++ ) {
-                if(((int[]) ((SFormComponentItem) jltCompanySystem.getModel().getElementAt(j)).getPrimaryKey())[0] == moUser.getDbmsAccessCompanies().get(i).getPkCompanyId()) {
-                    jltCompanySystem.setSelectedIndex(j);
+            for (j = 0; j < jltCompaniesAvailable.getModel().getSize(); j++ ) {
+                if(((int[]) ((SFormComponentItem) jltCompaniesAvailable.getModel().getElementAt(j)).getPrimaryKey())[0] == moUser.getDbmsAccessCompanies().get(i).getPkCompanyId()) {
+                    jltCompaniesAvailable.setSelectedIndex(j);
                     row = new STableRowCustom();
                     row.setPrimaryKey(new int[] { moUser.getDbmsAccessCompanies().get(i).getPkCompanyId() });
-                    row.getValues().add(((SFormComponentItem) jltCompanySystem.getModel().getElementAt(jltCompanySystem.getSelectedIndex())).getItem());
+                    row.getValues().add(((SFormComponentItem) jltCompaniesAvailable.getModel().getElementAt(jltCompaniesAvailable.getSelectedIndex())).getItem());
                     row.getValues().add(moUser.getDbmsAccessCompanies().get(i).getIsDefault());
                     row.getValues().add(moUser.getDbmsAccessCompanies().get(i).getIsUniversal());
                     moUserCompaniesPane.addTableRow(row);
-                    SFormUtilities.removeListSelectedItem(jltCompanySystem);
+                    SFormUtilities.removeListSelectedItem(jltCompaniesAvailable);
                 }
             }
         }

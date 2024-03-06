@@ -400,7 +400,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                 validation.setComponent(moPanelAccountNewId.getFieldAccount().getComponent());
             }
             else {
-                accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                 
                 if (accountMajor.getIsRequiredCostCenter() && moCostCenterNew == null) {
                     validation.setMessage("La cuenta contable ('" + moAccountNew.getAccount() + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");

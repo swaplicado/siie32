@@ -5,7 +5,6 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
@@ -24,7 +23,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
      * @param title
      */
     public SDialogRepHrsActiveEmployees(SGuiClient client, String title) {
-        setFormSettings(client, SModConsts.HRSR_ACT_EMP, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SModConsts.HRSR_ACT_EMP, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -40,27 +39,30 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
 
         moGroupOrderByEmployee = new javax.swing.ButtonGroup();
         moGroupOrderByDepartament = new javax.swing.ButtonGroup();
+        moGroupMode = new javax.swing.ButtonGroup();
+        jPanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel12 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel19 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
+        jPanel22 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel23 = new javax.swing.JPanel();
+        moRadModeDetail = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadModeSummary = new sa.lib.gui.bean.SBeanFieldRadio();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
+        jPanel.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel1.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -69,7 +71,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         jPanel11.add(jlDateStart);
         jPanel11.add(moDateDateStart);
 
-        jPanel2.add(jPanel11);
+        jPanel1.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -78,68 +80,110 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         jPanel12.add(jlDateEnd);
         jPanel12.add(moDateDateEnd);
 
-        jPanel2.add(jPanel12);
+        jPanel1.add(jPanel12);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jPanel.add(jPanel1, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
+        jPanel21.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
-        jPanel8.add(moRadOrderByNumEmployee);
+        jPanel21.add(moRadOrderByNumEmployee);
 
         moGroupOrderByEmployee.add(moRadOrderByNameEmployee);
         moRadOrderByNameEmployee.setText("Nombre del empleado");
-        jPanel8.add(moRadOrderByNameEmployee);
+        jPanel21.add(moRadOrderByNameEmployee);
 
-        jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel21);
 
-        jPanel19.setLayout(new java.awt.BorderLayout());
-
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
-        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel22.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
+        jPanel22.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
         moRadOrderByNumDepartament.setText("Código del departamento");
-        jPanel10.add(moRadOrderByNumDepartament);
+        jPanel22.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
         moRadOrderByNameDepartament.setText("Nombre del departamento");
-        jPanel10.add(moRadOrderByNameDepartament);
+        jPanel22.add(moRadOrderByNameDepartament);
 
-        jPanel19.add(jPanel10, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel22);
 
-        jPanel4.add(jPanel19, java.awt.BorderLayout.CENTER);
+        jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad del reporte:"));
+        jPanel23.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel1.add(jPanel4, java.awt.BorderLayout.CENTER);
+        moGroupMode.add(moRadModeDetail);
+        moRadModeDetail.setText("Detalle");
+        jPanel23.add(moRadModeDetail);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        moGroupMode.add(moRadModeSummary);
+        moRadModeSummary.setText("Resumen");
+        jPanel23.add(moRadModeSummary);
+
+        jPanel2.add(jPanel23);
+
+        jPanel.add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
+    private javax.swing.ButtonGroup moGroupMode;
     private javax.swing.ButtonGroup moGroupOrderByDepartament;
     private javax.swing.ButtonGroup moGroupOrderByEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadModeDetail;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadModeSummary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNameEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     // End of variables declaration//GEN-END:variables
     
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 560, 350);
+
+        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
+        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
+        moRadOrderByNumEmployee.setBooleanSettings(moRadOrderByNumEmployee.getText(), false);
+        moRadOrderByNameEmployee.setBooleanSettings(moRadOrderByNameEmployee.getText(), false);
+        moRadOrderByNumDepartament.setBooleanSettings(moRadOrderByNumDepartament.getText(), false);
+        moRadOrderByNameDepartament.setBooleanSettings(moRadOrderByNameDepartament.getText(), false);
+        moRadModeDetail.setBooleanSettings(moRadModeDetail.getText(), false);
+        moRadModeSummary.setBooleanSettings(moRadModeSummary.getText(), false);
+        
+        moFields.addField(moDateDateStart);
+        moFields.addField(moDateDateEnd);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
+        moFields.addField(moRadModeDetail);
+        moFields.addField(moRadModeSummary);
+
+        moFields.setFormButton(jbPrint);
+        
+        moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
+        moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
+        moRadModeDetail.setSelected(true);
+    }
+
     private String getOrderBy() {
         String orderBy = "";
         
@@ -162,27 +206,6 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         return orderBy;
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
-
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
-        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
-        
-        moFields.addField(moDateDateStart);
-        moFields.addField(moDateDateEnd);
-        moFields.addField(moRadOrderByNumEmployee);
-        moFields.addField(moRadOrderByNameEmployee);
-        moFields.addField(moRadOrderByNumDepartament);
-        moFields.addField(moRadOrderByNameDepartament);;
-
-        moFields.setFormButton(jbPrint);
-        
-        moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
-        moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
-        moRadOrderByNameEmployee.setSelected(true);
-        moRadOrderByNameDepartament.setSelected(true);
-    }
-
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
@@ -203,5 +226,6 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         moParamsMap.put("tDateStart", moDateDateStart.getValue());
         moParamsMap.put("tDateEnd", moDateDateEnd.getValue());
         moParamsMap.put("sSqlOrderBy", getOrderBy());
+        moParamsMap.put("bDetail", moRadModeDetail.isSelected());
     }
 }

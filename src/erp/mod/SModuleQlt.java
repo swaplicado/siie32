@@ -78,7 +78,7 @@ public class SModuleQlt extends SGuiModule {
         switch (type) {
             case SModConsts.QLT_TP_ANALYSIS:
                 settings = new SGuiCatalogueSettings("Tipo de análisis", 1);
-                sql = "SELECT id_analysis_type AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name)  AS " + SDbConsts.FIELD_ITEM + " "
+                sql = "SELECT id_tp_analysis AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name)  AS " + SDbConsts.FIELD_ITEM + " "
                         + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
                         + "ORDER BY name ASC ";
                 break;
@@ -120,13 +120,13 @@ public class SModuleQlt extends SGuiModule {
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
 
         switch (type) {
             case SModConsts.QLT_TP_ANALYSIS:
-                sql = "SELECT ta.id_analysis_type AS " + SDbConsts.FIELD_ID + "1, "
+                sql = "SELECT ta.id_tp_analysis AS " + SDbConsts.FIELD_ID + "1, "
                         + "ta.code AS " + SDbConsts.FIELD_PICK + "1, ta.name AS " + SDbConsts.FIELD_PICK + "2 "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta "
                         + "WHERE ta.b_del = 0 "

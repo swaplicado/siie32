@@ -8,8 +8,14 @@ package erp.mod;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mod.itm.db.SDbItem;
+import erp.mod.itm.db.SDbItemComposition;
+import erp.mod.itm.db.SDbPriceCommercialLog;
 import erp.mod.itm.db.SDbUnit;
 import erp.mod.itm.db.SDbUnitType;
+import erp.mod.itm.form.SFormItemComposition;
+import erp.mod.itm.form.SFormPriceCommercialLog;
+import erp.mod.itm.view.SViewItemComposition;
+import erp.mod.itm.view.SViewPriceCommercialLog;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -30,10 +36,13 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Edwin Carmona
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín
  */
 public class SModuleItm extends SGuiModule {
 
+    private SFormPriceCommercialLog moFormPriceCommercialLog;
+    private SFormItemComposition moFormItemComposition;
+    
     private SBeanOptionPicker moPickerItem;
     private SBeanOptionPicker moPickerUnit;
     
@@ -60,6 +69,12 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 registry = new SDbItem();
+                break;
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                registry = new SDbPriceCommercialLog();
+                break;
+            case SModConsts.ITMU_ITEM_COMP:
+                registry = new SDbItemComposition();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -175,15 +190,28 @@ public class SModuleItm extends SGuiModule {
                 break;
             case SModConsts.ITMU_ITEM:
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
+                settings.setCodeSettings(true, false);
+                String where = "";
+                switch (subtype) {
+                    case SModSysConsts.ITMU_ITEM_INV: where += "AND i.b_inv "; break;
+                    case SModSysConsts.ITMU_ITEM_NOT_INV: where += "AND NOT i.b_inv "; break;
+                    default:
+                }
+                
+                if (params != null) {
+                    where += "AND i.fid_st_item = " + params.getParamsMap().get(SModConsts.ITMS_ST_ITEM) + " ";
+                }
+                
                 sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +
                         (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item " :
                         (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", " +
+                        "CONCAT(i.item_key, ' - ', i.item) " : "CONCAT(i.item, ' - ', i.item_key) ")) + " AS " + SDbConsts.FIELD_ITEM + ", i.item_key AS " + SDbConsts.FIELD_CODE + ", " +
                         "i.fid_igen AS " + SDbConsts.FIELD_FK + "1, u.symbol AS f_comp " +
                         "FROM " + SModConsts.TablesMap.get(type) + " AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                         "WHERE i.b_del = 0 " +
+                        where +
                         "ORDER BY " + (!((SDataParamsErp) miClient.getSession().getConfigSystem()).getIsItemKeyApplying() ? "i.item, " :
                         ((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") + "id_item ";
                 break;
@@ -213,14 +241,26 @@ public class SModuleItm extends SGuiModule {
     @Override
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
-
+        String title = "";
+        
+        switch (type) {
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                view = new SViewPriceCommercialLog(miClient, "Bitácora precios com. ítems");
+                break;
+            case SModConsts.ITMU_ITEM_COMP:
+                view = new SViewItemComposition(miClient, "Conf. ítems con composición");
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return view;
     }
 
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
         
@@ -292,6 +332,19 @@ public class SModuleItm extends SGuiModule {
     public SGuiForm getForm(final int type, final int subtype, final SGuiParams params) {
         SGuiForm form = null;
 
+        switch (type) {
+            case SModConsts.ITMU_PRICE_COMM_LOG:
+                if (moFormPriceCommercialLog == null) moFormPriceCommercialLog = new SFormPriceCommercialLog(miClient, "Precio comercial de ítem");
+                form = moFormPriceCommercialLog;
+                break;
+            case SModConsts.ITMU_ITEM_COMP:
+                if (moFormItemComposition == null) moFormItemComposition = new SFormItemComposition(miClient, "Configuración de ítem con composición");
+                form = moFormItemComposition;
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         return form;
     }
 

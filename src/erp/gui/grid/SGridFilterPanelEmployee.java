@@ -102,6 +102,7 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         jbClearPaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
         add(jbClearPaymentType);
 
+        moKeyDepartment.setMaximumRowCount(16);
         moKeyDepartment.setPreferredSize(new java.awt.Dimension(250, 23));
         add(moKeyDepartment);
 

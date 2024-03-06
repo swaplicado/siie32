@@ -58,6 +58,8 @@ public abstract class SModSysConsts {
     public static final int CFGX_IVM_FIFO = 1;
     public static final int CFGX_IVM_LIFO = 2;
     public static final int CFGX_IVM_AVG = 3;
+    
+    public static final String CFG_CUSTOM_REP_FSC = "VENTAS_FSC";
 
     /*
      * Users
@@ -156,6 +158,9 @@ public abstract class SModSysConsts {
     public static final int ITMS_ST_ITEM_RES = 2;
     public static final int ITMS_ST_ITEM_INA = 3;
 
+    public static final int ITMU_ITEM_INV = 1;
+    public static final int ITMU_ITEM_NOT_INV = 2;
+    
     public static final int ITMU_UNIT_NA = 1;
     public static final int ITMU_UNIT_UNIT = 2;
     public static final int ITMU_UNIT_PCE = 3;
@@ -699,8 +704,6 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
     public static final int TRNS_TP_MAINT_MOV_OUT_CONS_MAT = 261; // out consumption of material
     
-    public static final int TRNU_MAT_PRES_NA = 1; // not applicable
-    
     public static final int TRNS_ST_MAT_REQ_NEW = 1; // new
     public static final int TRNS_ST_MAT_REQ_AUTH = 2; // in authorization
     public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision
@@ -717,9 +720,15 @@ public abstract class SModSysConsts {
     public static final int TRNS_ST_MAT_PUR_PROC = 3; // processing
     public static final int TRNS_ST_MAT_PUR_DONE = 9; // done
     
+    public static final String TRNS_MAT_REQ_TP_R = "R"; // Resurtido
+    public static final String TRNS_MAT_REQ_TP_C = "C"; // Consumo
+    
     public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
     public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
     public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All
+    
+    public static final int TRNX_ST_MAT_REQ_PROV_PROV = 100;
+    public static final int TRNX_ST_MAT_REQ_PROV_PUR = 101;
 
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
@@ -754,10 +763,10 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_REV = 2; // Revisor
     public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
     public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
-    public static final int TRNX_MAT_REQ_AUTHO_RECH = 100; // autorizado/rechazado
-    public static final int TRNX_MAT_REQ_PEND_DETAIL = 101; // pendiente a detalle
+    public static final int TRNX_MAT_REQ_AUTHO = 100; // autorizado
+    public static final int TRNX_MAT_REQ_AUTHO_RECH = 106; // rechazado
+    public static final int TRNX_MAT_REQ_DETAIL = 101; // a detalle
     public static final int TRNX_MAT_REQ_PROVIDED = 102; // suministrado
-    public static final int TRNX_MAT_REQ_PURCHASED = 103; // comprado
     public static final int TRNX_MAT_REQ_ESTIMATED = 104; // comprado
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
     
@@ -893,9 +902,10 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_PAY_SHT_SPE = 2;    // Special
     public static final int HRSS_TP_PAY_SHT_EXT = 3;    // Extraordinary
 
-    public static final int HRSS_TP_SAL_FIX = 1;    // Fixed
-    public static final int HRSS_TP_SAL_VAR = 2;    // Variable
-    public static final int HRSS_TP_SAL_MIX = 3;    // Mixed
+    public static final int HRSS_TP_SAL_FIX = 1;        // Fixed
+    public static final int HRSS_TP_SAL_VAR = 2;        // Variable
+    public static final int HRSS_TP_SAL_MIX = 3;        // Mixed
+    public static final int HRSS_CL_HRS_CAT_KIN = 5;    // Kinship
 
     public static final int HRSS_TP_ACC_GBL = 1;    // Global
     public static final int HRSS_TP_ACC_DEP = 2;    // Department
@@ -1081,7 +1091,11 @@ public abstract class SModSysConsts {
 
     public static final int HRSU_SHT_NA = 1; // Not applicable
 
+    public static final int HRSU_PACK_EXP_NA = 1; // Not applicable
+    
     public static final int HRS_BEN_ND = 0; // Not defined
+    
+    public static final int HRS_PACK_CC_NA = 1; // Not applicable
     
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;

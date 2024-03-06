@@ -19,6 +19,8 @@ import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbMaterialRequestEntryNote;
 import erp.mod.trn.db.SMaterialRequestEntryRow;
 import erp.mod.trn.db.SMaterialRequestEstimationUtils;
+import erp.mod.trn.db.SMaterialRequestSupplyRow;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SProviderMailRow;
 import erp.mtrn.form.SPanelMaterialRequest;
 import java.awt.BorderLayout;
@@ -353,8 +355,14 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     lRows.add(row);
                 }
             }
-
-            msBodyRows = SMaterialRequestEstimationUtils.getBodyEntries(lRows);
+            if (moMaterialRequest.getAuxNotes() != null && ! moMaterialRequest.getAuxNotes().isEmpty()) {
+                msBodyRows = moMaterialRequest.getAuxNotes() + "\n";
+            }
+            else {
+                msBodyRows = "";
+            }
+            
+            msBodyRows += SMaterialRequestEstimationUtils.getBodyEntries(lRows);
         }
         else {
             msBodyRows = "---";
@@ -439,12 +447,14 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "# partida"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Concepto"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "# Parte"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Especificaciones"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Especificaciones"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Requerido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Surtido"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "A Cotizar");
                 col.setEditable(true);
                 gridColumnsForm.add(col);
@@ -458,7 +468,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         };
         jpOptions.add(moGridMatReqEty, BorderLayout.CENTER);
         
-        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SLibConsts.UNDEFINED, "Proveedores para cotización") {
+        moGridProviderRows = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_EST_PROVID_ROW, SProviderMailRow.GRID_ESTIMATION, "Proveedores para cotización") {
             @Override
             public void initGrid() {
                 jbRowNew.setEnabled(false);
@@ -584,29 +594,46 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         try {
             moGridMatReqEty.clearGridRows();
             
+            double qtySupplied;
             mlMaterialRequestEntries = moMaterialRequest.getChildEntries();
             for (SDbMaterialRequestEntry oMaterialRequestEntry : mlMaterialRequestEntries) {
-                SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
-                                                                            SMaterialRequestEntryRow.FORM_ESTIMATE,
-                                                                            oMaterialRequestEntry.getFkItemId(), 
-                                                                            oMaterialRequestEntry.getFkUnitId(),
-                                                                            oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
-                                                                                    moMaterialRequest.getConsumptionInfo() : 
-                                                                                    oMaterialRequestEntry.getConsumptionInfo()
-                                                                            );
-                
-                oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
-                oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
-                oRow.setQuantity(oMaterialRequestEntry.getQuantity());
-                oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
-                String notes = "";
-                for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
-                    notes += oNote.getNotes();
+                if (! oMaterialRequestEntry.isDeleted()) {
+                    SMaterialRequestEntryRow oRow = new SMaterialRequestEntryRow((SClientInterface) miClient, 
+                                                                                SMaterialRequestEntryRow.FORM_ESTIMATE,
+                                                                                oMaterialRequestEntry.getFkItemId(), 
+                                                                                oMaterialRequestEntry.getFkUnitId(),
+                                                                                oMaterialRequestEntry.getFkUserUnitId(),
+                                                                                oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
+                                                                                        moMaterialRequest.getConsumptionInfo() : 
+                                                                                        oMaterialRequestEntry.getConsumptionInfo()
+                                                                                );
+                    ArrayList<SMaterialRequestSupplyRow> lEntrySuppliesRows = SMaterialRequestUtils.getMaterialRequestSupplies(miClient, oMaterialRequestEntry.getPkMatRequestId(), oMaterialRequestEntry.getPkEntryId());
+                    /**
+                     * Surtido desde la base de datos
+                     */
+                    qtySupplied = 0d;
+                    if (lEntrySuppliesRows.size() > 0) {
+                        qtySupplied = lEntrySuppliesRows.stream()
+                                    .filter(row -> (row.getFkMatRequestId() == oMaterialRequestEntry.getPkMatRequestId() 
+                                                    && row.getFkMatRequestEntryId() == oMaterialRequestEntry.getPkEntryId()
+                                                    && ! row.isDeleted()))
+                                    .mapToDouble(o -> o.getQuantity())
+                                    .sum();
+                    }
+                    oRow.setPkMatRequestId(oMaterialRequestEntry.getPkMatRequestId());
+                    oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
+                    oRow.setQuantity(oMaterialRequestEntry.getQuantity());
+                    oRow.setAuxSupplied(qtySupplied);
+                    oRow.setDateRequest(oMaterialRequestEntry.getDateRequest_n());
+                    oRow.setAuxIsEstimated(SMaterialRequestUtils.hasMatReqEtyEstimation(miClient.getSession(), oMaterialRequestEntry.getPrimaryKey()));
+                    oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
+                    String notes = "";
+                    for (SDbMaterialRequestEntryNote oNote : oMaterialRequestEntry.getChildNotes()) {
+                        notes += oNote.getNotes();
+                    }
+                    oRow.setNotes(notes);
+                    rows.add(oRow);
                 }
-                
-                oRow.setNotes(notes);
-                
-                rows.add(oRow);
             }
 
             moGridMatReqEty.populateGrid(rows, this);
@@ -627,10 +654,14 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
      */
     private void actionEstimateAll() {
         SMaterialRequestEntryRow oMatReqRow;
+        double dToEstimate = 0d;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            oMatReqRow.setAuxToEstimate(oMatReqRow.getQuantity());
-            oMatReqRow.setAuxIsToEstimate(true);
+            if (! oMatReqRow.isItemNew()) {
+                dToEstimate = oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied();
+                oMatReqRow.setAuxToEstimate(dToEstimate < 0d ? 0d : dToEstimate);
+                oMatReqRow.setAuxIsToEstimate(dToEstimate > 0d);
+            }
         }
         
         moGridMatReqEty.renderGridRows();
@@ -682,7 +713,6 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                 }
                 
                 bpName = oBp.getBizPartner();
-                
             }
             catch (Exception ex) {
                 Logger.getLogger(SDialogMaterialRequestEstimation.class.getName()).log(Level.SEVERE, null, ex);
@@ -747,7 +777,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         
         SProviderMailRow oRow;
         if (moProviderRow == null) {
-            oRow = new SProviderMailRow();
+            oRow = new SProviderMailRow(SProviderMailRow.GRID_ESTIMATION);
         }
         else {
             oRow = moProviderRow;
@@ -878,6 +908,10 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             }
             else if (button == jbNext) {
                 jTPGeneralPanel.setSelectedIndex(1);
+                String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
+                String body = msBodyDefault.replace("---", msBodyRows);
+                moTextSubject.setValue(subject);
+                jtAreaBody.setText(body);
             }
             else if (button == jbPrevious) {
                 jTPGeneralPanel.setSelectedIndex(0);
@@ -892,29 +926,39 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             return;
         }
         
-        jbSave.setEnabled(false);
-        
-        ArrayList<SMaterialRequestEntryRow> lEtyRows = new ArrayList<>();
-        SMaterialRequestEntryRow etyRow;
-        for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
-            etyRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            if (etyRow.isToEstimate()) {
-                lEtyRows.add(etyRow);
-            }
-        }
-        
-        ArrayList<SProviderMailRow> lRows = new ArrayList<>();
-        SProviderMailRow oProviderRow;
-        for (int i = 0; i < moGridProviderRows.getTable().getRowCount(); i++) {
-            oProviderRow = (SProviderMailRow) moGridProviderRows.getGridRow(i);
-            lRows.add(oProviderRow);
-        }
-        
-        SMaterialRequestEstimationUtils.sendMails(miClient, lRows);
-        String res = SMaterialRequestEstimationUtils.saveEstimationRequest(miClient, moMaterialRequest.getPkMatRequestId(), lEtyRows, lRows);
-        mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
-        moGridProviderRows.clearGridRows();
+        try {
+            SGuiUtils.setCursorWait(miClient);
+            jbSave.setEnabled(false);
 
-        jbSave.setEnabled(true);
+            ArrayList<SMaterialRequestEntryRow> lEtyRows = new ArrayList<>();
+            SMaterialRequestEntryRow etyRow;
+            for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
+                etyRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
+                if (etyRow.isToEstimate()) {
+                    lEtyRows.add(etyRow);
+                }
+            }
+
+            ArrayList<SProviderMailRow> lRows = new ArrayList<>();
+            SProviderMailRow oProviderRow;
+            for (int i = 0; i < moGridProviderRows.getTable().getRowCount(); i++) {
+                oProviderRow = (SProviderMailRow) moGridProviderRows.getGridRow(i);
+                lRows.add(oProviderRow);
+            }
+
+            SMaterialRequestEstimationUtils.sendMails(miClient, lRows);
+            String res = SMaterialRequestEstimationUtils.saveEstimationRequest(miClient, moMaterialRequest.getPkMatRequestId(), lEtyRows, lRows);
+            mnMailNumber = SMaterialRequestEstimationUtils.getNextMailNumberOfMatRequest(miClient.getSession().getStatement(), moMaterialRequest.getPkMatRequestId());
+            moGridProviderRows.clearGridRows();
+            
+            this.setValue(SModConsts.TRN_MAT_REQ, moMaterialRequest.getPrimaryKey());
+        }
+        catch (Exception e) {
+            
+        }
+        finally {
+            SGuiUtils.setCursorDefault(miClient);
+            jbSave.setEnabled(true);
+        }
     }
 }

@@ -7,7 +7,6 @@ package erp.gui;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
 import erp.form.SFormOptionPicker;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
@@ -18,7 +17,6 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.mqlt.data.*;
 import erp.mqlt.form.*;
-import erp.mtrn.data.SDataDps;
 
 /**
  *

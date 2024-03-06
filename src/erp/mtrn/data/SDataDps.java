@@ -28,13 +28,7 @@ import cfd.ext.interfactura.DElementFacturaInterfactura;
 import cfd.ext.soriana.DElementArticulos;
 import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
-import cfd.ver2.DAttributeOptionTipoDeComprobante;
-import cfd.ver3.cce11.DCce11Catalogs;
-import cfd.ver3.cce11.DElementDescripcionesEspecificas;
-import cfd.ver3.clf10.DElementLeyenda;
-import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver40.DCfdi40Catalogs;
-import cfd.ver40.DElementInformacionGlobal;
 import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -65,6 +59,7 @@ import erp.mfin.data.SFinAmount;
 import erp.mfin.data.SFinAmounts;
 import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
+import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
@@ -289,6 +284,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
     protected int[] manAuxDpsTime;
+    protected int mnAuxAssetDpsNat;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
     */
@@ -1562,13 +1558,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int id = SDataConstantsSys.UNDEFINED;
 
         if (isDocumentPur()) {
-            id = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
+            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
+            }
+            else {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_PUR;
+            }
         }
         else if (isDocumentSal()) {
             id = SDataConstantsSys.FINS_TP_ACC_ITEM_SAL;
         }
         else if (isAdjustmentPur()) {
-            id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
+            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
+            }
+            else {
+                id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_PUR_ADJ_DISC;
+            }
         }
         else if (isAdjustmentSal()) {
             id = adjustmentType == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET ? SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DEV : SDataConstantsSys.FINS_TP_ACC_ITEM_SAL_ADJ_DISC;
@@ -1786,6 +1792,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         return hasAccountableEntries && isPrepaymentOnly;
+    }
+
+    /**
+     * The function checks if any of the SDataDpsEntry objects in the mvDbmsDpsEntries list have a
+     * non-null value for the dbmsDpsEntryMatRequestLink property.
+     * 
+     * @return The method is returning a boolean value.
+     */
+    public boolean isMaterialRequestDocument() {
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
@@ -2383,7 +2405,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msXtaTotalCyAsText = "";
         createXtaDpsType();
     }
-
+                        
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         int[] anKey = (int[]) pk;
@@ -2951,6 +2973,31 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 nSortingPosition = 0;
 
+                double addPrice = 0.0;
+                
+                if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
+                    int admCpt = SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
+                            SDataConstantsSys.CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT));
+                    int inv = 0;
+                    double admPrice = 0.0;
+                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                        SDataItem item = new SDataItem();
+                        item.read(new int[] { dpsEntry.getFkItemId() } , oStatement);
+                        if (admCpt != 0 && item.getFkAdministrativeConceptTypeId() == admCpt) {
+                            admPrice += dpsEntry.getPriceUnitary();
+                        }
+                        else if (item.getIsInventoriable()) {
+                            inv++;
+                            dpsEntry.setXtaIsPurInvoiceInventoriable(true);
+                        }
+                    }
+                    try {
+                        addPrice = admPrice / inv;
+                    } catch(Exception e) {
+                        System.err.println(e.getMessage());
+                    }
+                }
+                
                 for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                     if (dpsEntry.getIsRegistryNew() || dpsEntry.getIsRegistryEdited()) {
                         dpsEntry.setPkYearId(mnPkYearId);
@@ -2961,6 +3008,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         else {
                             dpsEntry.setSortingPosition(++nSortingPosition);
+                        }
+                        
+                        if (dpsEntry.getXtaIsPurInvoiceInventoriable()) {
+                            dpsEntry.setXtaPriceCommUnitary(dpsEntry.getPriceUnitary() + (addPrice / dpsEntry.getQuantity()));
                         }
 
                         if (dpsEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
@@ -3381,7 +3432,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (bFoundPrepayments) { // prevent from reading configuration when not needed!
                             oAccountConfigPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), null, oStatement));
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), null, oStatement));
                             
                             oAccountConfigPrepayments.setTaxKey(new int[] { 0, 0 });
                             
@@ -3394,7 +3445,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                         mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
+                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
                                 
                                 if (accountConfigEntries != null) {
                                     SFinAccountConfig accountConfig = new SFinAccountConfig(accountConfigEntries);
@@ -3407,9 +3458,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         
                         if (bFoundPrepaymentsToInvoice) { // prevent from reading configuration when not needed!
-                            oAccountConfigPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), null, oStatement));
+                            oAccountConfigPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY, isDebitForBizPartner(), null, oStatement));
                             
                             oAccountConfigPrepaymentsToInvoice.setTaxKey(new int[] { 0, 0 });
                             
@@ -3420,9 +3470,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     continue;
                                 }
                                 
-                                Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                        mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
+                                Vector<erp.mfin.data.SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                        mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY, isDebitForBizPartner(), tax.getTaxKey(), oStatement);
                                 
                                 if (accountConfigEntries != null) {
                                     SFinAccountConfig accountConfig = new SFinAccountConfig(accountConfigEntries);
@@ -3626,6 +3675,42 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (mvDbmsDpsCustomAccEntries.isEmpty()) {
                             // 4.4.1 Standard accounting:
                             
+                            String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                            mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                            HashSet<erp.mfin.data.SFinAccountConfigEntry> lAccCfg = new HashSet<>();
+                            
+                            /**
+                             * Si la naturaleza del documento es igual a la configurada como activo, se recorren los entries
+                             * para determinar las partidas que sí tienen configuración y repartir las que no en estas
+                             * configuraciones.
+                             */
+                            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                                for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                                    if (dpsEntry.isAccountable()) {
+                                        switch (dpsEntry.getOperationsType()) {
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS:               // operations
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
+                                            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
+                                                int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
+                                                // Si el tipo de cuenta para el item es igual a activo
+                                                if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                                    // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
+                                                    if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                        ArrayList<erp.mfin.data.SFinAccountConfigEntry> lEntryCfgAcc = SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink());
+                                                        lAccCfg.addAll(lEntryCfgAcc);
+                                                    }
+                                                }
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                for (SFinAccountConfigEntry oAccCfgEntry : lAccCfg) {
+                                    oAccCfgEntry.setPercentage(1d / lAccCfg.size());
+                                }
+                            }
+                            
                             for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                                 if (dpsEntry.isAccountable()) {
                                     switch (dpsEntry.getOperationsType()) {
@@ -3633,10 +3718,54 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:    // operations - application of advance invoiced as discount
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
+                                            boolean hasMaterialRequest = false;
+                                            Date tAccDpsDate = this.getDateDoc();
+                                            if (this.isAdjustment()) {
+                                                if (! dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
+                                                    SDataDps dps = new SDataDps();
+                                                    dps.read(dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), connection.createStatement());
 
-                                            oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
-                                                    dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
-                                                    mtDate, getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId()), isDebitForOperations(), oStatement));
+                                                    if (dps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                                                        tAccDpsDate = dps.getDate();
+                                                    }
+                                                }
+                                            }
+                                            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                                hasMaterialRequest = true;
+                                            }
+                                            int accItemTypeId = getAccItemTypeId(dpsEntry.getFkDpsAdjustmentTypeId());
+                                            // Si el tipo de cuenta para el item es igual a activo
+                                            if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                                // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
+                                                if (hasMaterialRequest) {
+                                                    oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
+                                                }
+                                                else {
+                                                    // Si no está vinculado a una solicitud de material, obtener la configuración de la cuenta contable del ítem
+                                                    try {
+                                                        oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                                        dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
+                                                    }
+                                                    catch (Exception e) {
+                                                        oAccountConfigItem = new SFinAccountConfig(lAccCfg);
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                // Si el tipo de cuenta no es activo, obtener la configuración de la cuenta contable del ítem
+                                                int idItemAcc = 0;
+                                                if (hasMaterialRequest && dpsEntry.getIsInventoriable()) {
+                                                   idItemAcc = dpsEntry.getFkItemId();
+                                                }
+                                                else {
+                                                    idItemAcc = dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId();
+                                                }
+                                                
+                                                oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
+                                                        idItemAcc, oRecord.getPkBookkeepingCenterId(), 
+                                                        tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
+                                            }
 
                                             sConceptEntryAux = sConceptAux;
                                             anSysAccTypeKeyItem = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
@@ -3655,10 +3784,21 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
 
                                             for (int i = 0; i < oAccountConfigItem.getAccountConfigEntries().size(); i++) {
+                                                String idCC = "";
+                                                if (! hasMaterialRequest) {
+                                                    idCC = !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId();
+                                                }
+                                                else {
+                                                    if (oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId() != null && ! oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId().isEmpty()) {
+                                                        idCC = oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId();
+                                                    }
+                                                    else {
+                                                        idCC = !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : "";
+                                                    }
+                                                }
                                                 oRecordEntry = createAccRecordEntry(
                                                         oAccountConfigItem.getAccountConfigEntries().get(i).getAccountId(),
-                                                        !dpsEntry.getFkCostCenterId_n().isEmpty() ? dpsEntry.getFkCostCenterId_n() : oAccountConfigItem.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                        anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
+                                                        idCC, anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
                                                         isAdjustment() ? dpsEntry.getKeyAuxDps() : null, null);
 
                                                 if (isDebitForOperations()) {
@@ -4199,6 +4339,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (mvDbmsDpsCustomAccEntries.isEmpty()) {
                     // 2.1. Standard accounting:
                     
+                    String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
+                    mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                    ArrayList<erp.mfin.data.SFinAccountConfigEntry> lAccConfigs = new ArrayList<>();
+                    boolean hasAccountables = false;
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                         if (entry.isAccountable()) {
                             try {
@@ -4215,10 +4359,51 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         name = resultSet.getString("item");
                                     }
                                 }
-
-                                accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
-                                        entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
-                                        mtDate, getAccItemTypeId(entry.getFkDpsAdjustmentTypeId()), isDebitForOperations(), statement);
+                                
+                                Date tAccDpsDate = this.getDateDoc();
+                                if (this.isAdjustment()) {
+                                    if (! entry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
+                                        SDataDps dps = new SDataDps();
+                                        dps.read(entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), statement);
+                                        
+                                        if (dps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                                            tAccDpsDate = dps.getDate();
+                                        }
+                                    }
+                                }
+                                
+                                int accItemTypeId = getAccItemTypeId(entry.getFkDpsAdjustmentTypeId());
+                                // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
+                                if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
+                                    if (entry.getDbmsDpsEntryMatRequestLink() != null) {
+                                        accountConfigs = new Vector<>();
+                                        accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
+                                    }
+                                    else {
+                                        try {
+                                            accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
+                                                entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
+                                                tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
+                                        }
+                                        catch (Exception e) {
+                                            System.out.println("No se encontró configuración para la partida.");
+                                        }
+                                    }
+                                }
+                                else {
+                                    // Si el tipo de cuenta no es activo, obtener la configuración de la cuenta contable del ítem
+                                    int idItemAcc = 0;
+                                    if (entry.getDbmsDpsEntryMatRequestLink() != null && entry.getIsInventoriable()) {
+                                       idItemAcc = entry.getFkItemId();
+                                    }
+                                    else {
+                                        idItemAcc = entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId();
+                                    }
+                                    
+                                    accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
+                                            idItemAcc, (Integer) keyRecord[2],
+                                            tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
+                                }
 
                                 for (SFinAccountConfigEntry config : accountConfigs) {
                                     idAccount = config.getAccountId();
@@ -4235,6 +4420,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         throw new Exception(msDbmsError);
                                     }
                                 }
+                                
+                                lAccConfigs.addAll(accountConfigs);
+                                hasAccountables = true;
                             }
                             catch (Exception e) {
                                 if (msDbmsError.isEmpty()) {
@@ -4243,6 +4431,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 throw new Exception(msDbmsError);
                             }
                         }
+                    }
+                    
+                    if (hasAccountables && lAccConfigs.isEmpty()) {
+                        throw new Exception("El documento no puede guardarse, no hay configuraciones disponibles para su contabilización.");
                     }
                 }
                 else {
@@ -5511,6 +5703,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return payment;
     }
 
+    @Deprecated
     private cfd.DElement createCfdiNodeComplementoComercioExterior11() throws java.lang.Exception {
         cfd.ver3.cce11.DElementComercioExterior comercioExterior = null;
         
@@ -5567,7 +5760,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
                     mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
                     mercancia.getAttUnidadAduana().setString(customsUnit);
-                    if (customsUnit.equals(DCce11Catalogs.UA_SERV)) {
+                    if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
                         mercancia.getAttValorUnitarioAduana().setDouble(0.0);
                         mercancia.getAttValorDolares().setDouble(0.0);
                         comercioExterior.getAttTotalUSD().setDouble(
@@ -5581,7 +5774,92 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     
                     // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
                     if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
-                        DElementDescripcionesEspecificas descripcionesEspecificas = new DElementDescripcionesEspecificas();
+                        cfd.ver3.cce11.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver3.cce11.DElementDescripcionesEspecificas();
+                        descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
+                        mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
+                    }
+                    
+                    // add node Mercancia to complement:
+
+                    comercioExterior.getEltMercancias().addMercancia(mercancia);
+                }
+            }
+        }
+        
+        return comercioExterior;
+    }
+
+    private cfd.DElement createCfdiNodeComplementoComercioExterior20() throws java.lang.Exception {
+        cfd.ver4.cce20.DElementComercioExterior comercioExterior = null;
+        
+        if (moDbmsDataDpsCfd != null) {
+            comercioExterior = new cfd.ver4.cce20.DElementComercioExterior();
+            //comercioExterior.getAttMotivoTraslado().setString(...); // required only if comprobant type is "T" (traslado)
+            //comercioExterior.getAttTipoOperacion().setString(moDbmsDataDpsCfd.getCfdCceTipoOperacion()); // deprecated in version 2.0, since 2024-01-18
+            comercioExterior.getAttClaveDePedimento().setString(moDbmsDataDpsCfd.getCfdCceClaveDePedimento());
+            comercioExterior.getAttCertificadoOrigen().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceCertificadoOrigen()));
+            comercioExterior.getAttNumCertificadoOrigen().setString(moDbmsDataDpsCfd.getCfdCceNumCertificadoOrigen());
+            comercioExterior.getAttNumeroExportadorConfiable().setString(moDbmsDataDpsCfd.getCfdCceNumeroExportadorConfiable());
+            comercioExterior.getAttIncoterm().setString(moDbmsDataDpsCfd.getCfdCceIncoterm());
+            //comercioExterior.getAttSubdivision().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision())); // deprecated in version 2.0, since 2024-01-18
+            //comercioExterior.getAttObservaciones(...); // optional, not implemented
+            comercioExterior.getAttTipoCambioUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()).doubleValue());
+            comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUsd()).doubleValue());
+            comercioExterior.setEltMercancias(new cfd.ver4.cce20.DElementMercancias());
+
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
+            
+            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                if (dpsEntry.isAccountable()) {
+                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
+                    }
+                    
+                    double valueMxn = SLibUtils.roundAmount((dpsEntry.getSubtotalCy_r() * mdExchangeRate));
+                    double valueUsd = SLibUtils.roundAmount((valueMxn / exr));
+                    
+                    // compose node Mercancia:
+                    
+                    cfd.ver4.cce20.DElementMercancia mercancia = new cfd.ver4.cce20.DElementMercancia();
+                    
+                    mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
+                    mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariff());
+                    
+                    double equivUnitOriginal;
+                    double equivUnitCustoms;
+                    String customsUnit;
+                    
+                    if (!dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        // special conversion required:
+                        equivUnitOriginal = dpsEntry.getDbmsOriginalUnitBaseEquivalence();
+                        equivUnitCustoms = dpsEntry.getDbmsItemCustomsUnitEquivalence();
+                        customsUnit = dpsEntry.getDbmsItemCustomsUnitSymbol();
+                    }
+                    else {
+                        // no special conversion needed:
+                        equivUnitOriginal = 1;
+                        equivUnitCustoms = 1;
+                        customsUnit = dpsEntry.getDbmsCustomsUnitSymbol();
+                    }
+                    
+                    double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
+                    mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
+                    mercancia.getAttUnidadAduana().setString(customsUnit);
+                    if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
+                        mercancia.getAttValorUnitarioAduana().setDouble(0.0);
+                        mercancia.getAttValorDolares().setDouble(0.0);
+                        comercioExterior.getAttTotalUSD().setDouble(
+                                new BigDecimal(String.valueOf(comercioExterior.getAttTotalUSD().getDouble())).subtract(
+                                new BigDecimal(String.valueOf(valueUsd))).doubleValue());
+                    }
+                    else {
+                        mercancia.getAttValorUnitarioAduana().setDouble(SLibUtils.roundAmount(valueUsd / quantityCustoms));
+                        mercancia.getAttValorDolares().setDouble(valueUsd);
+                    }
+                    
+                    // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
+                    if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
+                        cfd.ver4.cce20.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver4.cce20.DElementDescripcionesEspecificas();
                         descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
                         mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
                     }
@@ -5597,11 +5875,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private cfd.DElement createCfdiNodeComplementoLeyendasFiscales10() throws java.lang.Exception {
-        DElementLeyendasFiscales leyendasFiscales = new DElementLeyendasFiscales();
+        cfd.ver3.clf10.DElementLeyendasFiscales leyendasFiscales = new cfd.ver3.clf10.DElementLeyendasFiscales();
         
         for (SDataDpsNotes dpsNotes : mvDbmsDpsNotes) {
             if (dpsNotes.getIsCfdComplement() && !dpsNotes.getIsDeleted()) {
-                DElementLeyenda leyenda = new DElementLeyenda();
+                cfd.ver3.clf10.DElementLeyenda leyenda = new cfd.ver3.clf10.DElementLeyenda();
                 
                 leyenda.getAttDisposicionFiscal().setString(dpsNotes.getCfdComplementDisposition());
                 leyenda.getAttNorma().setString(dpsNotes.getCfdComplementRule());
@@ -5992,7 +6270,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int getComprobanteTipoDeComprobante() { // CFDI 3.2
-        return isDocument() ? DAttributeOptionTipoDeComprobante.CFD_INGRESO : DAttributeOptionTipoDeComprobante.CFD_EGRESO;
+        return isDocument() ? cfd.ver2.DAttributeOptionTipoDeComprobante.CFD_INGRESO : cfd.ver2.DAttributeOptionTipoDeComprobante.CFD_EGRESO;
     }
 
     @Override
@@ -6047,15 +6325,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public DElement getElementInformacionGlobal() { // CFDI 4.0
-        DElementInformacionGlobal global = null;
-        if (!moDbmsDataDpsCfd.getGlobalPeriodocity().isEmpty() && 
-                !moDbmsDataDpsCfd.getGlobalMonths().isEmpty() &&
-                moDbmsDataDpsCfd.getGlobalYear() != 0) {
-            global = new DElementInformacionGlobal();
+        cfd.ver40.DElementInformacionGlobal global = null;
+        
+        if (!moDbmsDataDpsCfd.getGlobalPeriodocity().isEmpty() && !moDbmsDataDpsCfd.getGlobalMonths().isEmpty() && moDbmsDataDpsCfd.getGlobalYear() != 0) {
+            global = new cfd.ver40.DElementInformacionGlobal();
             global.getAttPeriodicidad().setString(moDbmsDataDpsCfd.getGlobalPeriodocity());
             global.getAttMeses().setString(moDbmsDataDpsCfd.getGlobalMonths());
             global.getAttAño().setInteger(moDbmsDataDpsCfd.getGlobalYear());
         }
+        
         return global;
     }
     
@@ -6229,7 +6507,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (requireComplementoComercioExterior()) {
             complemento = new cfd.ver40.DElementComplemento();
-            complemento.getElements().add(createCfdiNodeComplementoComercioExterior11());
+            //complemento.getElements().add(createCfdiNodeComplementoComercioExterior11()); // valid until 2024-01-17
+            complemento.getElements().add(createCfdiNodeComplementoComercioExterior20()); // valid since 2024-01-18
         }
         
         if (requireComplementoLeyendasFiscales()) {
@@ -6241,21 +6520,32 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (moDbmsDataCfdBol != null) {
             cfd.ver40.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi40(moDbmsDataCfdBol.getDocXml());
-            cfd.ver3.ccp20.DElementCartaPorte ccp = null;
+            cfd.ver3.ccp20.DElementCartaPorte ccp20 = null;
+            cfd.ver4.ccp30.DElementCartaPorte ccp30 = null;
             if (comprobanteCartaPorte.getEltOpcComplemento() != null) {
                 for (DElement element : comprobanteCartaPorte.getEltOpcComplemento().getElements()) {
                     if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
-                        ccp = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        ccp20 = (cfd.ver3.ccp20.DElementCartaPorte) element;
+                        break;
+                    }
+                    else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
+                        ccp30 = (cfd.ver4.ccp30.DElementCartaPorte) element;
                         break;
                     }
                 }
             }
             
-            if (ccp != null) {
+            if (ccp20 != null) {
                 if (complemento == null) {
                     complemento = new cfd.ver40.DElementComplemento();
                 }
-                complemento.getElements().add((DElement) ccp);
+                complemento.getElements().add((DElement) ccp20);
+            }
+            else if (ccp30 != null) {
+                if (complemento == null) {
+                    complemento = new cfd.ver40.DElementComplemento();
+                }
+                complemento.getElements().add((DElement) ccp30);
             }
         }
         

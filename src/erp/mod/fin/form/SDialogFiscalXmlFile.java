@@ -562,9 +562,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadRequestCompen.setEnabled(false);
         jbgRequest.clearSelection();
 
-        moPanelAccountStart.resetPanel();
+        moPanelAccountStart.initPanel();
         moPanelAccountStart.setPanelEditable(false);
-        moPanelAccountEnd.resetPanel();
+        moPanelAccountEnd.initPanel();
         moPanelAccountEnd.setPanelEditable(false);
 
         if (moRadXmlFileChartOfAccounts.isSelected()) {

@@ -576,7 +576,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     private void readMaterialProvisionEntities() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_mat_prov_ent FROM trn_mat_prov_ent";
+            String sql = "SELECT id_mat_prov_ent FROM trn_mat_prov_ent WHERE NOT b_del";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
@@ -601,7 +601,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     private void readMaterialConsumptionEntities() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_mat_cons_ent FROM trn_mat_cons_ent";
+            String sql = "SELECT id_mat_cons_ent FROM trn_mat_cons_ent WHERE NOT b_del";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
@@ -626,7 +626,7 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
     private void readMaterialConsumptionSubentities() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_mat_cons_ent, id_mat_cons_subent FROM trn_mat_cons_subent ORDER BY id_mat_cons_ent, id_mat_cons_subent";
+            String sql = "SELECT id_mat_cons_ent, id_mat_cons_subent FROM trn_mat_cons_subent WHERE NOT b_del ORDER BY id_mat_cons_ent, id_mat_cons_subent";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;
@@ -971,10 +971,10 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
                 }
             }
             if (defaults == 0) {
-                validation.setMessage("No ha seleccionado ninguna entidad de consumo como predeterminada.");
+                validation.setMessage("No ha seleccionado ningun centro de consumo como predeterminada.");
             }
             else if (defaults > 1) {
-                validation.setMessage("Hay mas de una entidad de consumo seleccionada como predeterminada.");
+                validation.setMessage("Hay mas de un centro de consumo seleccionada como predeterminada.");
             }
         }
         
@@ -986,10 +986,10 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
                 }
             }
             if (defaults == 0) {
-                validation.setMessage("No ha seleccionado ninguna subentidad de consumo como predeterminada.");
+                validation.setMessage("No ha seleccionado ningun subcentro de consumo como predeterminado.");
             }
             else if (defaults > 1) {
-                validation.setMessage("Hay mas de una entidad de subconsumo seleccionada como predeterminada.");
+                validation.setMessage("Hay mas de un subcentro de consumo seleccionado como predeterminado.");
             }
         }
         
@@ -1001,10 +1001,10 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
                 }
             }
             if (defaults == 0) {
-                validation.setMessage("No ha seleccionado ninguna entidad de suministro como predeterminada.");
+                validation.setMessage("No ha seleccionado ningun centro de suministro como predeterminado.");
             }
             else if (defaults > 1) {
-                validation.setMessage("Hay mas de una entidad de suministro seleccionada como predeterminada.");
+                validation.setMessage("Hay mas de un centro de suministro seleccionado como predeterminado.");
             }
         }
         
@@ -1012,11 +1012,19 @@ public class SFormConfUserVsEntity extends SBeanForm implements ActionListener {
             for (SDbMaterialConsumptionEntityUser eu : maMatConsEntSelected) {
                 for (SDbMaterialConsumptionSubentityUser seu : maMatConsSubentSelected) {
                     if (seu.getPkMatConsumptionEntityId() == eu.getPkMatConsumptionEntityId()) {
-                        validation.setMessage("No es necesario configurar subentidades de consumo que dependan de una entidad de consumo que ya esté configurada.");
+                        validation.setMessage("No es necesario configurar subcentros de consumo que dependan de un centro de consumo que ya esté configurado.");
                         break;
                     }
                 }
             }
+        }
+        
+        if (validation.isValid() && (maMatConsEntSelected.isEmpty() && maMatConsSubentSelected.isEmpty())) {
+            validation.setMessage("Se debe de configurar al menos un centro o subcentro de consumo.");
+        }
+        
+        if (validation.isValid() && maMatProvEntSelected.isEmpty()) {
+            validation.setMessage("Se debe de configurar al menos un centro de suministro.");
         }
         
         return validation;

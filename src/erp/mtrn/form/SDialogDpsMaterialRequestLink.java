@@ -224,7 +224,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(900, 600));
+        setSize(new java.awt.Dimension(976, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -239,17 +239,12 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         moTablePane = new STablePane(miClient);
         jpOptions.add(moTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[11];
+        columns = new STableColumnForm[13];
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "# partida", STableConstants.WIDTH_NUM_SMALLINT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "# parte", 100);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. surt.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. vinc.", STableConstants.WIDTH_QUANTITY);
-        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a vinc.", STableConstants.WIDTH_QUANTITY);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. actual", STableConstants.WIDTH_QUANTITY);
         columns[i].setEditable(true);
@@ -258,6 +253,13 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio.", STableConstants.WIDTH_VALUE);
         columns[i].setEditable(true);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererCurrency());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. a vinc.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. surt.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cant. vinc.", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "% excedente", STableConstants.WIDTH_PERCENTAGE);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
 
@@ -312,7 +314,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         if (moMaterialRequest != null) {
             for (SDbMaterialRequestEntry entry : moMaterialRequest.getChildEntries()) {
-                if (! entry.isDeleted()) {
+                if (! entry.isDeleted() && ! entry.isNewItem()) {
                     SDataMaterialRequestEntryLinkRow entryLink = null;
                     if (moDps == null) {
                         entryLink = new SDataMaterialRequestEntryLinkRow(miClient, 
@@ -448,6 +450,8 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             entry = (SDataMaterialRequestEntryLinkRow) moTablePane.getTableRow(i);
             entry.setQuantityToLink(0d);
+            entry.setUnitaryPrice(entry.getMaterialRequestEntry().getPriceUnitary());
+            entry.prepareTableRow();
         }
 
         moTablePane.renderTableRows();
@@ -458,7 +462,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         if (moDps == null) {
             moDps = new SDataDps();
             moDps.setIsRecordAutomatic(true);
-            moDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);
+            moDps.setFkDpsNatureId(moMaterialRequest.getFkDpsNatureId());
             moDps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
             moDps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
             moDps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
@@ -486,15 +490,23 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oEntry.setConceptKey(oTableRow.getItem().getKey());
                 oEntry.setConcept(oTableRow.getItem().getName());
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
-                oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
+                oEntry.setFkItemId(oTableRow.getMaterialRequestEntry().getFkItemId());
+                oEntry.setFkUnitId(oTableRow.getMaterialRequestEntry().getFkUnitId());
+                
+                if (oTableRow.getMaterialRequestEntry().getFkUnitId() != oTableRow.getMaterialRequestEntry().getFkUserUnitId()) {
+                    oEntry.setFkOriginalUnitId(oTableRow.getMaterialRequestEntry().getFkUserUnitId());
+                }
+                else {
+                    oEntry.setFkOriginalUnitId(oEntry.getFkUnitId());
+                }
+                
+                oEntry.setQuantity(SLibUtilities.round(oEntry.getOriginalQuantity() * 
+                                                        ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(oEntry.getFkItemId(), oEntry.getFkOriginalUnitId(), oEntry.getFkUnitId()), miClient.getSessionXXX().getParamsErp().getDecimalsQuantity()));
                 oEntry.setPriceUnitary(oTableRow.getUnitaryPrice());
                 oEntry.setPriceUnitarySystem(oTableRow.getUnitaryPrice());
                 oEntry.setOriginalPriceUnitaryCy(oTableRow.getUnitaryPrice());
                 oEntry.setOriginalPriceUnitarySystemCy(oTableRow.getUnitaryPrice());
-
-                oEntry.setFkItemId(oTableRow.getItem().getPkItemId());
-                oEntry.setFkUnitId(oTableRow.getItem().getFkUnitId());
-                oEntry.setFkOriginalUnitId(oTableRow.getItem().getFkUnitId());
+                
                 oEntry.setIsPrepayment(oTableRow.getItem().getIsPrepayment());
                 oEntry.setIsInventoriable(oTableRow.getItem().getIsInventoriable());
 
@@ -515,7 +527,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 if (idCc > 0) {
                     oEntry.setFkCostCenterId_n(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), idCc));
                 }
-                oEntry.setFkItemRefId_n(oTableRow.getMaterialRequestEntry().getFkItemReferenceId_n());
+                oEntry.setFkItemRefId_n(oTableRow.getMaterialRequestEntry().getFkItemReferenceId_n() > 0 ? oTableRow.getMaterialRequestEntry().getFkItemReferenceId_n() : moMaterialRequest.getFkItemReferenceId_n());
                 oEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 oEntry.setIsTaxesAutomaticApplying(true);
 
@@ -530,7 +542,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
                 // Links con requisición de materiales
                 SDataDpsMaterialRequest oDpsMatReqLink = new SDataDpsMaterialRequest();
-                oDpsMatReqLink.setQuantity(oEntry.getOriginalQuantity());
+                oDpsMatReqLink.setQuantity(oEntry.getQuantity());
                 oDpsMatReqLink.setValue(oEntry.getPriceUnitary());
                 oDpsMatReqLink.setValueCy(oEntry.getPriceUnitaryCy());
                 oDpsMatReqLink.setFkDpsYearId(oEntry.getPkYearId());

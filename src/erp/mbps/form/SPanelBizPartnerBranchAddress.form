@@ -269,7 +269,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="jtfReference">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Referencia"/>
+            <Property name="toolTipText" type="java.lang.String" value="Referencia del domicilio, p. ej. coordenadas"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[230, 23]"/>
             </Property>
@@ -305,7 +305,7 @@
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero exterior"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[100, 23]"/>
+              <Dimension value="[114, 23]"/>
             </Property>
           </Properties>
         </Component>
@@ -313,7 +313,7 @@
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="N&#xfa;mero interior"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[100, 23]"/>
+              <Dimension value="[114, 23]"/>
             </Property>
           </Properties>
         </Component>

@@ -865,6 +865,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         
         maGridItems = new ArrayList<>();
         maGridItemsSelected = new ArrayList<>();
+        maAllItems = null;
     }
 
     @Override

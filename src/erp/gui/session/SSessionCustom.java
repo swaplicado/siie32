@@ -62,6 +62,7 @@ public class SSessionCustom implements SGuiSessionCustom {
     //private BizPartnerCompanyRegistry...
 
     private HashMap<Integer, SSessionUnit> moUnitsMap;
+    private HashMap<String, SSessionEquivalentUnit> moUnitsEquivalencesMap;
     private HashMap<Integer, SSessionItem> moItemsMap;
     private HashMap<Integer, SSessionTaxGroup> moTaxGroupsMap;
     private HashMap<SLibKey, SSessionTax> moTaxesMap;
@@ -80,6 +81,7 @@ public class SSessionCustom implements SGuiSessionCustom {
     
     private SCfdXmlCatalogs moCfdXmlCatalogs;
     private HashMap<Integer, Integer> mhmCfdTypeXmlTypes;  // CFDI type, XML type (version)
+    private HashMap<Integer, Integer> mhmCfdTypeXmlCompVer;  // CFDI type, XML Complement version
 
     /**
      * Creates new SSessionCustom object.
@@ -88,6 +90,7 @@ public class SSessionCustom implements SGuiSessionCustom {
     public SSessionCustom(SGuiSession session) {
         moSession = session;
         moUnitsMap = new HashMap<>();
+        moUnitsEquivalencesMap = new HashMap<>();
         moItemsMap = new HashMap<>();
         moTaxGroupsMap = new HashMap<>();
         moTaxesMap = new HashMap<>();
@@ -106,6 +109,7 @@ public class SSessionCustom implements SGuiSessionCustom {
         
         moCfdXmlCatalogs = null;
         mhmCfdTypeXmlTypes = null;
+        mhmCfdTypeXmlCompVer = null;
     }
 
     /*
@@ -139,7 +143,7 @@ public class SSessionCustom implements SGuiSessionCustom {
             }
             else {
                 // Source and destiny units are different type, use alternative unit if possible:
-                
+                boolean withAlternative = true;
                 sessionItem = getSessionItem(idItem);
                 if (sessionItem != null) {
                     if (sessionUnitSource.getFkUnitTypeId() == sessionItem.getFkUnitAlternativeTypeId()) {
@@ -149,6 +153,26 @@ public class SSessionCustom implements SGuiSessionCustom {
                             }
                             else {
                                 factor = 1d / sessionUnitSource.getUnitBaseEquivalence() * sessionItem.getUnitAlternativeBaseEquivalence();
+                            }
+                        }
+                    }
+                    else {
+                        withAlternative = false;
+                    }
+                }
+                else {
+                    withAlternative = false;
+                }
+                
+                if (! withAlternative) {
+                    SSessionEquivalentUnit oU = moUnitsEquivalencesMap.get(idUnitSource + "_" + idUnitDestiny);
+                    if (oU != null) {
+                        if (oU.getUnitEquivalence() != 0d) {
+                            if (isForQuantity) {
+                                factor = oU.getUnitEquivalence();
+                            }
+                            else {
+                                factor = 1d / oU.getUnitEquivalence();
                             }
                         }
                     }
@@ -249,6 +273,12 @@ public class SSessionCustom implements SGuiSessionCustom {
      */
     public HashMap<Integer, Integer> getCfdTypeXmlTypes() { return mhmCfdTypeXmlTypes; }
 
+    /**
+     * Hash map of CFD type's XML Complement versions.
+     * @return 
+     */
+    public HashMap<Integer, Integer> getCfdTypeXmlCompVer() { return mhmCfdTypeXmlCompVer; }
+
     @Override
     public int[] getLocalCountryKey() {
         return manLocalCountryKey;
@@ -336,6 +366,7 @@ public class SSessionCustom implements SGuiSessionCustom {
         Statement statementAux = null;
         Statement[] statements = null;
         SSessionUnit unit = null;
+        SSessionEquivalentUnit unitEquiv = null;
         SSessionItem item = null;
         SSessionTax tax = null;
         SSessionTaxGroup taxGroup = null;
@@ -382,6 +413,60 @@ public class SSessionCustom implements SGuiSessionCustom {
                 unit.setFkUnitTypeId(resultSet.getInt("fid_tp_unit"));
                 unit.setUnitBaseEquivalence(resultSet.getDouble("unit_base_equiv"));
                 moUnitsMap.put(unit.getPkUnitId(), unit);
+            }
+            
+            // Units (equivalences table):
+
+            moUnitsEquivalencesMap.clear();
+            sql = "SELECT  " +
+                    "    iue.id_unit, " +
+                    "    iue.id_unit_equiv, " +
+                    "    iue.equiv, " +
+                    "    uu1.unit, " +
+                    "    uu1.fid_tp_unit, " +
+                    "    uu2.unit, " +
+                    "    uu2.fid_tp_unit AS fid_tp_unit_equiv " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT_EQUIV) + " iue " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " uu1 ON iue.id_unit = uu1.id_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_UNIT) + " utp1 ON uu1.fid_tp_unit = utp1.id_tp_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " uu2 ON iue.id_unit_equiv = uu2.id_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_UNIT) + " utp2 ON uu2.fid_tp_unit = utp2.id_tp_unit " +
+                    "WHERE " +
+                    "    NOT iue.b_del " +
+                    "UNION  " +
+                    "SELECT  " +
+                    "    iue.id_unit_equiv, " +
+                    "    iue.id_unit, " +
+                    "    IF (iue.equiv = 0, 0, 1 / iue.equiv), " +
+                    "    uu2.unit, " +
+                    "    uu2.fid_tp_unit, " +
+                    "    uu1.unit, " +
+                    "    uu1.fid_tp_unit AS fid_tp_unit_equiv " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT_EQUIV) + " iue " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " uu1 ON iue.id_unit = uu1.id_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_UNIT) + " utp1 ON uu1.fid_tp_unit = utp1.id_tp_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " uu2 ON iue.id_unit_equiv = uu2.id_unit " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_TP_UNIT) + " utp2 ON uu2.fid_tp_unit = utp2.id_tp_unit " +
+                    "WHERE " +
+                    "    NOT iue.b_del;";
+            
+            resultSet = moSession.getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                unitEquiv = new SSessionEquivalentUnit(resultSet.getInt("id_unit"), resultSet.getInt("id_unit_equiv"));
+                unitEquiv.setFkUnitTypeId(resultSet.getInt("fid_tp_unit"));
+                unitEquiv.setFkEquivalentUnitTypeId(resultSet.getInt("fid_tp_unit_equiv"));
+                unitEquiv.setUnitEquivalence(resultSet.getDouble("equiv"));
+                moUnitsEquivalencesMap.put(unitEquiv.getPkUnitId() + "_" + unitEquiv.getPkEquivalentUnitId(), unitEquiv);
             }
 
             // Items (all registries):
@@ -650,6 +735,18 @@ public class SSessionCustom implements SGuiSessionCustom {
                 int typeCfd = resultSetAux.getInt("id_tp_cfd"); // convenience variable
                 String typeXml = paramValues.getKeyValue("" + typeCfd); // check if CFD type is overloaded for this company
                 mhmCfdTypeXmlTypes.put(typeCfd, typeXml != null ? SLibUtils.parseInt(typeXml) : resultSetAux.getInt("fid_tp_xml"));
+            }
+            
+            mhmCfdTypeXmlCompVer = new HashMap<>();
+            sql = "SELECT id_tp_cfd, comp_ver "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_CFD) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_tp_cfd ";
+            resultSetAux = statementAux.executeQuery(sql);
+            while (resultSetAux.next()) {
+                int typeCfd = resultSetAux.getInt("id_tp_cfd"); // convenience variable
+                String typeXml = paramValues.getKeyValue("" + typeCfd); // check if CFD type is overloaded for this company
+                mhmCfdTypeXmlCompVer.put(typeCfd, typeXml != null ? SLibUtils.parseInt(typeXml) : resultSetAux.getInt("comp_ver"));
             }
         }
         catch (SQLException e) {

@@ -27,6 +27,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     protected String msPlate;
     protected int mnVehicleYear;
     protected String msVehicleConfiguration;
+    protected double mdGrossWeight;
     protected String msPermissonSctType;
     protected String msPermissonSctNumber;
     protected String msInsurancePolicy;
@@ -52,6 +53,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     public void setPlate(String s) { msPlate = s; }
     public void setVehicleYear(int n) { mnVehicleYear = n; }
     public void setVehicleConfiguration(String s) { msVehicleConfiguration = s; }
+    public void setGrossWeight(double d) { mdGrossWeight = d; }
     public void setPermissonSctType(String s) { msPermissonSctType = s; }
     public void setPermissonSctNumber(String s) { msPermissonSctNumber = s; }
     public void setInsurancePolicy(String s) { msInsurancePolicy = s; }
@@ -69,6 +71,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     public String getPlate() { return msPlate; }
     public int getVehicleYear() { return mnVehicleYear; }
     public String getVehicleConfiguration() { return msVehicleConfiguration; }
+    public double getGrossWeight() { return mdGrossWeight; }
     public String getPermissonSctType() { return msPermissonSctType; }
     public String getPermissonSctNumber() { return msPermissonSctNumber; }
     public String getInsurancePolicy() { return msInsurancePolicy; }
@@ -104,6 +107,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         msPlate = "";
         mnVehicleYear = 0;
         msVehicleConfiguration = "";
+        mdGrossWeight = 0;
         msPermissonSctType = "";
         msPermissonSctNumber = "";
         msInsurancePolicy = "";
@@ -168,6 +172,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
             msPlate = resultSet.getString("plate");
             mnVehicleYear = resultSet.getInt("veh_year");
             msVehicleConfiguration = resultSet.getString("veh_conf");
+            mdGrossWeight = resultSet.getDouble("gross_weight");
             msPermissonSctType = resultSet.getString("perm_sct_tp");
             msPermissonSctNumber = resultSet.getString("perm_sct_num");
             msInsurancePolicy = resultSet.getString("insurance_policy");
@@ -208,6 +213,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
                     "'" + msPlate + "', " +
                     mnVehicleYear + ", " + 
                     "'" + msVehicleConfiguration + "', " + 
+                    mdGrossWeight + ", " + 
                     "'" + msPermissonSctType + "', " + 
                     "'" + msPermissonSctNumber + "', " + 
                     "'" + msInsurancePolicy + "', " + 
@@ -230,6 +236,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
                     "plate = '" + msPlate + "', " +
                     "veh_year = " + mnVehicleYear + ", " +
                     "veh_conf = '" + msVehicleConfiguration + "', " +
+                    "gross_weight = " + mdGrossWeight + ", " +
                     "perm_sct_tp = '" + msPermissonSctType + "', " +
                     "perm_sct_num = '" + msPermissonSctNumber + "', " +
                     "insurance_policy = '" + msInsurancePolicy + "', " +
@@ -258,6 +265,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         registry.setPlate(this.getPlate());
         registry.setVehicleYear(this.getVehicleYear());
         registry.setVehicleConfiguration(this.getVehicleConfiguration());
+        registry.setGrossWeight(this.getGrossWeight());
         registry.setPermissonSctType(this.getPermissonSctType());
         registry.setPermissonSctNumber(this.getPermissonSctNumber());
         registry.setInsurancePolicy(this.getInsurancePolicy());

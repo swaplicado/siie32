@@ -5,6 +5,7 @@
 
 package erp.mod.hrs.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.utils.SAnniversary;
@@ -38,11 +39,14 @@ public class SDbEmployee extends SDbRegistryUser {
     public static final int FIELD_ACTIVE = FIELD_BASE + 1;
     public static final int FIELD_DATE_LAST_HIRE = FIELD_BASE + 2;
     public static final int FIELD_DATE_LAST_DISMISS = FIELD_BASE + 3;
+    public static final int FIELD_ZIP_CODE = FIELD_BASE + 11;
+    public static final int FIELD_BRANCH_HQ = FIELD_BASE + 12;
 
     protected int mnPkEmployeeId;
     protected String msNumber;
     protected String msLastname1;
     protected String msLastname2;
+    protected String msZipCode;
     protected String msSocialSecurityNumber;
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
@@ -124,6 +128,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setNumber(String s) { msNumber = s; }
     public void setLastname1(String s) { msLastname1 = s; }
     public void setLastname2(String s) { msLastname2 = s; }
+    public void setZipCode(String s) { msZipCode = s; }
     public void setSocialSecurityNumber(String s) { msSocialSecurityNumber = s; }
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
@@ -182,6 +187,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public String getNumber() { return msNumber; }
     public String getLastname1() { return msLastname1; }
     public String getLastname2() { return msLastname2; }
+    public String getZipCode() { return msZipCode; }
     public String getSocialSecurityNumber() { return msSocialSecurityNumber; }
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
@@ -376,6 +382,7 @@ public class SDbEmployee extends SDbRegistryUser {
         msNumber = "";
         msLastname1 = "";
         msLastname2 = "";
+        msZipCode = "";
         msSocialSecurityNumber = "";
         mtDateBirth = null;
         mtDateBenefits = null;
@@ -485,6 +492,7 @@ public class SDbEmployee extends SDbRegistryUser {
             msNumber = resultSet.getString("num");
             msLastname1 = resultSet.getString("lastname1");
             msLastname2 = resultSet.getString("lastname2");
+            msZipCode = resultSet.getString("zip_code");
             msSocialSecurityNumber = resultSet.getString("ssn");
             mtDateBirth = resultSet.getDate("dt_bir");
             mtDateBenefits = resultSet.getDate("dt_ben");
@@ -613,6 +621,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + msNumber + "', " + 
                     "'" + msLastname1 + "', " + 
                     "'" + msLastname2 + "', " + 
+                    "'" + msZipCode + "', " + 
                     "'" + msSocialSecurityNumber + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " + 
@@ -678,6 +687,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "num = '" + msNumber + "', " +
                     "lastname1 = '" + msLastname1 + "', " +
                     "lastname2 = '" + msLastname2 + "', " +
+                    "zip_code = '" + msZipCode + "', " +
                     "ssn = '" + msSocialSecurityNumber + "', " +
                     "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                     "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
@@ -792,6 +802,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setNumber(this.getNumber());
         registry.setLastname1(this.getLastname1());
         registry.setLastname2(this.getLastname2());
+        registry.setZipCode(this.getZipCode());
         registry.setSocialSecurityNumber(this.getSocialSecurityNumber());
         registry.setDateBirth(this.getDateBirth());
         registry.setDateBenefits(this.getDateBenefits());
@@ -880,6 +891,12 @@ public class SDbEmployee extends SDbRegistryUser {
             case FIELD_CODE:
                 msSql += "num FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp = " + pk[0] + ";";
                 break;
+            case FIELD_ZIP_CODE:
+                msSql += "zip_code FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " WHERE id_emp = " + pk[0] + ";";
+                break;
+            case FIELD_BRANCH_HQ:
+                msSql += "id_bpb FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " WHERE fid_bp = " + pk[0] + " AND fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + ";";
+                break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -893,7 +910,11 @@ public class SDbEmployee extends SDbRegistryUser {
             switch (field) {
                 case FIELD_NAME:
                 case FIELD_CODE:
+                case FIELD_ZIP_CODE:
                     value = resultSet.getString(1);
+                    break;
+                case FIELD_BRANCH_HQ:
+                    value = resultSet.getInt(1);
                     break;
                 default:
             }

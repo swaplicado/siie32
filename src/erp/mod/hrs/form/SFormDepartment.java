@@ -4,13 +4,22 @@
  */
 package erp.mod.hrs.form;
 
+import erp.data.SDataConstantsSys;
+import erp.gui.account.SAccount;
+import erp.gui.account.SAccountConsts;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbCfgAccountingDepartment;
 import erp.mod.hrs.db.SDbDepartment;
-import sa.lib.SLibConsts;
+import erp.mod.hrs.db.SHrsConsts;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
@@ -20,15 +29,16 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
-public class SFormDepartment extends SBeanForm {
+public class SFormDepartment extends SBeanForm implements ActionListener {
 
     private SDbDepartment moRegistry;
+    private int mnParamPayrollAccProcess;
 
     /**
      * Creates new form SFormDepartment
      */
     public SFormDepartment(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_DEP, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -57,9 +67,27 @@ public class SFormDepartment extends SBeanForm {
         jPanel13 = new javax.swing.JPanel();
         jlEmployeeHead = new javax.swing.JLabel();
         moKeyEmployeeHead = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jlExpenseType = new javax.swing.JLabel();
+        moKeyExpenseType = new sa.lib.gui.bean.SBeanFieldKey();
+        moPanelAccount = new erp.gui.account.SBeanPanelAccount();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jlBizPartner = new javax.swing.JLabel();
+        moKeyBizPartner = new sa.lib.gui.bean.SBeanFieldKey();
+        jbPickBizPartner = new javax.swing.JButton();
+        jbClearBizPartner = new javax.swing.JButton();
+        jPanel19 = new javax.swing.JPanel();
+        jlTax = new javax.swing.JLabel();
+        moKeyTax = new sa.lib.gui.bean.SBeanFieldKey();
+        jbPickTax = new javax.swing.JButton();
+        jbClearTax = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
@@ -78,7 +106,7 @@ public class SFormDepartment extends SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);
@@ -107,65 +135,228 @@ public class SFormDepartment extends SBeanForm {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel11.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlExpenseType.setText("Tipo gasto:*");
+        jlExpenseType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlExpenseType);
+
+        moKeyExpenseType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel12.add(moKeyExpenseType);
+
+        jPanel11.add(jPanel12, java.awt.BorderLayout.NORTH);
+        jPanel11.add(moPanelAccount, java.awt.BorderLayout.SOUTH);
+
+        jPanel7.add(jPanel11, java.awt.BorderLayout.NORTH);
+
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jPanel9.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner.setText("Asociado negocios:");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlBizPartner);
+
+        moKeyBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel10.add(moKeyBizPartner);
+
+        jbPickBizPartner.setText("...");
+        jbPickBizPartner.setToolTipText("Seleccionar asociado de negocios");
+        jbPickBizPartner.setFocusable(false);
+        jbPickBizPartner.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbPickBizPartner);
+
+        jbClearBizPartner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_del.gif"))); // NOI18N
+        jbClearBizPartner.setToolTipText("Limpiar asociado de negocios");
+        jbClearBizPartner.setFocusable(false);
+        jbClearBizPartner.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbClearBizPartner);
+
+        jPanel9.add(jPanel10);
+
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTax.setText("Impuesto:");
+        jlTax.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jlTax);
+
+        moKeyTax.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel19.add(moKeyTax);
+
+        jbPickTax.setText("...");
+        jbPickTax.setToolTipText("Seleccionar impuesto");
+        jbPickTax.setFocusable(false);
+        jbPickTax.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel19.add(jbPickTax);
+
+        jbClearTax.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_del.gif"))); // NOI18N
+        jbClearTax.setToolTipText("Limpiar impuesto");
+        jbClearTax.setFocusable(false);
+        jbClearTax.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel19.add(jbClearTax);
+
+        jPanel9.add(jPanel19);
+
+        jPanel8.add(jPanel9, java.awt.BorderLayout.NORTH);
+
+        jPanel7.add(jPanel8, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(jPanel7, java.awt.BorderLayout.CENTER);
+
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbClearBizPartner;
+    private javax.swing.JButton jbClearTax;
+    private javax.swing.JButton jbPickBizPartner;
+    private javax.swing.JButton jbPickTax;
+    private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDepartmentSuperior;
     private javax.swing.JLabel jlEmployeeHead;
+    private javax.swing.JLabel jlExpenseType;
     private javax.swing.JLabel jlName;
+    private javax.swing.JLabel jlTax;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyBizPartner;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDepartmentSuperior;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployeeHead;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyExpenseType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
+    private erp.gui.account.SBeanPanelAccount moPanelAccount;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
+        SGuiUtils.setWindowBounds(this, 640, 400);
         
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
-        
-        moKeyEmployeeHead.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployeeHead.getText()), false);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moKeyDepartmentSuperior.setKeySettings(miClient, SGuiUtils.getLabelName(jlDepartmentSuperior), false);
+        moKeyEmployeeHead.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployeeHead), false);
+        moKeyExpenseType.setKeySettings(miClient, SGuiUtils.getLabelName(jlExpenseType), true);
+        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, true);
+        moKeyBizPartner.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartner), false);
+        moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax), false);
+
+        moPanelAccount.setAccountNameWidth(500);
+        moPanelAccount.setComponentPrevious(moKeyEmployeeHead);
+        moPanelAccount.setComponentNext(moKeyBizPartner);
+        moPanelAccount.initPanel();
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
         moFields.addField(moKeyDepartmentSuperior);
         moFields.addField(moKeyEmployeeHead);
+        moFields.addField(moKeyExpenseType);
+        moFields.addField(moKeyBizPartner);
+        moFields.addField(moKeyTax);
 
         moFields.setFormButton(jbSave);
+        
+        moKeyExpenseType.setNextField(moPanelAccount.getTextNumberFirst());
+        
+        try {
+            mnParamPayrollAccProcess = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_PROCESS));
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
+    private void actionPickBizPartner() {
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_BPS_N).getOptionPicker(SModConsts.BPSU_BP, 0, null);
+        picker.resetPicker();
+        picker.setPickerVisible(true);
+
+        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            int[] key = (int[]) picker.getOption();
+
+            if (key != null) {
+                if (key[0] != 0) {
+                    moKeyBizPartner.setValue(new int[] { key[0] });
+                }
+            }
+        }
+    }
+    
+    private void actionPickTax() {
+        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_FIN_N).getOptionPicker(SModConsts.FINU_TAX, 0, null);
+        picker.resetPicker();
+        picker.setPickerVisible(true);
+
+        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            int[] key = (int[]) picker.getOption();
+
+            if (key != null) {
+                if (key[0] != 0) {
+                    moKeyTax.setValue(new int[] { key[0], key[1] });
+                }
+            }
+        }
+    }
+    
+    private void actionClearBizPartner() {
+        moKeyBizPartner.setSelectedIndex(0);
+        moKeyBizPartner.requestFocus();
+    }
+
+    private void actionClearTax() {
+        moKeyTax.setSelectedIndex(0);
+        moKeyTax.requestFocus();
+    }
+    
     @Override
     public void addAllListeners() {
-
+        jbPickBizPartner.addActionListener(this);
+        jbPickTax.addActionListener(this);
+        jbClearBizPartner.addActionListener(this);
+        jbClearTax.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-
+        jbPickBizPartner.removeActionListener(this);
+        jbPickTax.removeActionListener(this);
+        jbClearBizPartner.removeActionListener(this);
+        jbClearTax.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyDepartmentSuperior, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyEmployeeHead, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 
-                        new SGuiParams(SGuiConsts.PARAM_REGS_ALL));
+        miClient.getSession().populateCatalogue(moKeyDepartmentSuperior, SModConsts.HRSU_DEP, 0, null);
+        miClient.getSession().populateCatalogue(moKeyEmployeeHead, SModConsts.HRSU_EMP, 0, new SGuiParams(SGuiConsts.PARAM_REGS_ALL));
+        miClient.getSession().populateCatalogue(moKeyExpenseType, SModConsts.HRSU_TP_EXP, 0, null);
+        miClient.getSession().populateCatalogue(moKeyBizPartner, SModConsts.BPSU_BP, 0, null);
+        miClient.getSession().populateCatalogue(moKeyTax, SModConsts.FINU_TAX, 0, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
         moRegistry = (SDbDepartment) registry;
 
-        mnFormResult = SLibConsts.UNDEFINED;
+        mnFormResult = 0;
         mbFirstActivation = true;
 
         removeAllListeners();
@@ -173,7 +364,7 @@ public class SFormDepartment extends SBeanForm {
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.setSystem(false);    // all editable registries are non-system
+            moRegistry.setSystem(false); // all editable registries are non-system
             jtfRegistryKey.setText("");
         }
         else {
@@ -185,6 +376,52 @@ public class SFormDepartment extends SBeanForm {
         
         moKeyEmployeeHead.setValue(new int[] { moRegistry.getFkTitularEmployeeId_n() });
         moKeyDepartmentSuperior.setValue(new int[] { moRegistry.getFkSuperiorDepartmentId_n()});
+        
+        // setting accounting configuration:
+        
+        moKeyExpenseType.resetField();
+        moPanelAccount.setSelectedAccount(null);
+        moKeyBizPartner.resetField();
+        moKeyTax.resetField();
+        
+        switch (mnParamPayrollAccProcess) {
+            case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
+                moKeyExpenseType.setEnabled(false);
+                moPanelAccount.setPanelEditable(false);
+                moKeyBizPartner.setEnabled(false);
+                jbPickBizPartner.setEnabled(false);
+                jbClearBizPartner.setEnabled(false);
+                moKeyTax.setEnabled(false);
+                jbPickTax.setEnabled(false);
+                jbClearTax.setEnabled(false);
+                
+                break;
+                
+            case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
+                moKeyExpenseType.setEnabled(true);
+                moPanelAccount.setPanelEditable(true);
+                moKeyBizPartner.setEnabled(true);
+                jbPickBizPartner.setEnabled(true);
+                jbClearBizPartner.setEnabled(true);
+                moKeyTax.setEnabled(true);
+                jbPickTax.setEnabled(true);
+                jbClearTax.setEnabled(true);
+                
+                SDbCfgAccountingDepartment child = moRegistry.getChildCfgAccountingDepartment();
+                
+                if (child != null) {
+                    moKeyExpenseType.setValue(new int[] { child.getFkExpenseTypeId() });
+                    moPanelAccount.setSelectedAccount(new SAccount(child.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { child.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
+                    moKeyBizPartner.setValue(new int[] { child.getFkBizPartnerId_n() });
+                    moKeyTax.setValue(new int[] { child.getFkTaxBasicId_n(), child.getFkTaxTaxId_n() });
+                }
+                break;
+                
+            default:
+                // nothing
+        }
+        
+        // finish setting this form:
 
         setFormEditable(true);
 
@@ -202,6 +439,32 @@ public class SFormDepartment extends SBeanForm {
         
         registry.setFkTitularEmployeeId_n(moKeyEmployeeHead.getSelectedIndex() <= 0 ? 0 : moKeyEmployeeHead.getValue()[0]);
         registry.setFkSuperiorDepartmentId_n(moKeyDepartmentSuperior.getSelectedIndex() <= 0 ? 0 : moKeyDepartmentSuperior.getValue()[0]);
+        
+        // getting accounting configuration:
+        
+        switch (mnParamPayrollAccProcess) {
+            case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
+                registry.setChildCfgAccountingDepartment(null);
+                break;
+                
+            case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
+                SDbCfgAccountingDepartment child = registry.getChildCfgAccountingDepartment();
+                
+                if (child == null) {
+                    child = new SDbCfgAccountingDepartment();
+                    registry.setChildCfgAccountingDepartment(child);
+                }
+                
+                child.setFkExpenseTypeId(moKeyExpenseType.getValue()[0]);
+                child.setFkAccountId(moPanelAccount.getSelectedAccount() != null ? moPanelAccount.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
+                child.setFkBizPartnerId_n(moKeyBizPartner.getSelectedIndex() <= 0 ? 0 : moKeyBizPartner.getValue()[0]);
+                child.setFkTaxBasicId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[0]);
+                child.setFkTaxTaxId_n(moKeyTax.getSelectedIndex() <= 0 ? 0 : moKeyTax.getValue()[1]);
+                break;
+                
+            default:
+                // nothing
+        }
 
         return registry;
     }
@@ -215,8 +478,56 @@ public class SFormDepartment extends SBeanForm {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDepartmentSuperior) + "'.");
                 validation.setComponent(moKeyDepartmentSuperior);
             }
+            else {
+                switch (mnParamPayrollAccProcess) {
+                    case SHrsConsts.CFG_ACC_PROCESS_ORIGINAL:
+                        break;
+
+                    case SHrsConsts.CFG_ACC_PROCESS_DYNAMIC:
+                        validation = moPanelAccount.validatePanel();
+            
+                        if (validation.isValid()) {
+                            boolean isAccountNonSet = moPanelAccount.getSelectedAccount() == null || moPanelAccount.getSelectedAccount().getAccountId() == SDataConstantsSys.NA;
+
+                            if (isAccountNonSet) {
+                                if (moKeyBizPartner.getSelectedIndex() > 0) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyBizPartner.getFieldName() + "'.");
+                                    validation.setComponent(moKeyBizPartner);
+                                }
+                                else if (moKeyTax.getSelectedIndex() > 0) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ_NOT + "'" + moKeyTax.getFieldName() + "'.");
+                                    validation.setComponent(moKeyTax);
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        // nothing
+                }
+            }
         }
         
         return validation;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbPickBizPartner) {
+                actionPickBizPartner();
+            }
+            else if (button == jbPickTax) {
+                actionPickTax();
+            }
+            else if (button == jbClearBizPartner) {
+                actionClearBizPartner();
+            }
+            else if (button == jbClearTax) {
+                actionClearTax();
+            }
+        }
     }
 }

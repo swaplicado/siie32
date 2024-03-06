@@ -24,7 +24,8 @@ public abstract class SDataConstantsSys {
 
     public static final int[] CFGS_TP_ENT_CASH_CASH = new int[] { 1, 1 };
     public static final int[] CFGS_TP_ENT_CASH_BANK = new int[] { 1, 2 };
-    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11};
+    public static final int[] CFGS_TP_ENT_WH_SP = new int[] { 2, 11 };
+    public static final int[] CFGS_TP_ENT_WH_TL = new int[] { 2, 12 };
     public static final int[] CFGS_TP_ENT_WH_MFG_RM = new int[] { 2, 21 };
     public static final int[] CFGS_TP_ENT_WH_MFG_WP = new int[] { 2, 22 };
     public static final int[] CFGS_TP_ENT_WH_MFG_FG = new int[] { 2, 23 };
@@ -89,6 +90,10 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE = "HRS_PAYROLL_ACC_DYN_EMP_MODE";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_EMP = "E";
+    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP = "D";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_HRS_SIIEAPP = "HRS_SIIEAPP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
@@ -103,6 +108,10 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
+    public static final String CFG_PARAM_TRN_STK_MAT_VAL = "TRN_STK_MAT_VAL";
+    public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
+    public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
+    public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
@@ -566,7 +575,9 @@ public abstract class SDataConstantsSys {
     public static final int ITMU_VAR_NA = 1;
     public static final int ITMU_BRD_NA = 1;
     public static final int ITMU_MFR_NA = 1;
+    public static final int ITMU_TP_EMT_DEF = 1;
     public static final int ITMU_EMT_NA = 1;
+    public static final int ITMU_TP_MAT_NA = 1;
 
     public static final int ITMS_NAM_ORD_POS_QTY = 5;
     public static final int ITMS_NAM_LINE_POS_QTY = 4;
@@ -881,6 +892,7 @@ public abstract class SDataConstantsSys {
     public static final int FINS_TP_ACC_BP_OP = 1;
     public static final int FINS_TP_ACC_BP_PAY = 2;
     public static final int FINS_TP_ACC_BP_ADV_BILL = 3;
+    public static final int FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY = 4;
 
     public static final int FINS_TP_ACC_ITEM_ASSET = 1;
     public static final int FINS_TP_ACC_ITEM_INV_MFG_CO = 2;
@@ -1179,6 +1191,9 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_TP_CFD_BOL = 2;        // bill of lading
     public static final int TRNS_TP_CFD_PAY_REC = 6;    // payment receipt
     public static final int TRNS_TP_CFD_PAYROLL = 11;   // payroll
+    
+    public static final int TRNS_CFD_BOL_VER_20 = 20;        // bol version 20
+    public static final int TRNS_CFD_BOL_VER_30 = 30;        // bol version 30
 
     public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
     public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order
@@ -1210,6 +1225,7 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_BOL_TRANSP_PART = 35;  // BOL: transport part
     
     public static final int TRNU_DPS_NAT_DEF = 1;
+    public static final int TRNU_DPS_NAT_ASSET = 2;
     
     public static final int TRNU_CT_DPS_PUR = 1;
     public static final int TRNU_CT_DPS_SAL = 2;
@@ -1226,7 +1242,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_EST = { 2, 1, 1 };
     public static final int[] TRNU_TP_DPS_SAL_CON = { 2, 1, 2 };
     public static final int[] TRNU_TP_DPS_SAL_ORD = { 2, 2, 1 };
-     public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
+    public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
     public static final int[] TRNU_TP_DPS_SAL_REM = { 2, 3, 2 };
     public static final int[] TRNU_TP_DPS_SAL_REC = { 2, 3, 3 };
     public static final int[] TRNU_TP_DPS_SAL_TIC = { 2, 3, 4 };
@@ -1343,6 +1359,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_PUR_TOT_BY_AGS_ITEM = 211;
     public static final int TRNX_PUR_TOT_BY_TP_BP = 212;
     public static final int TRNX_PUR_TOT_BY_TP_BP_BP = 213;
+    public static final int TRNX_PUR_TOT_BY_IGEN_IREF = 219;
+    public static final int TRNX_PUR_TOT_BY_IREF = 220;
     /** All document entries purchase at once. What type of document is needed must be provided: invoices or credit notes. */
     public static final int TRNX_PUR_DPS_BY_ITEM_N_BP_ALL = 214;
     /** Purchase document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
@@ -1364,6 +1382,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_TOT_BY_AGS_ITEM = 311;
     public static final int TRNX_SAL_TOT_BY_TP_BP = 312;
     public static final int TRNX_SAL_TOT_BY_TP_BP_BP = 313;
+    public static final int TRNX_SAL_TOT_BY_IGEN_IREF = 316;
+    public static final int TRNX_SAL_TOT_BY_IREF = 317;
     /** All sales document entries at once. What type of document is needed must be provided: invoices or credit notes. */
     public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ALL = 314;
     /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
@@ -1732,6 +1752,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_STK_MOV_SUM_SUM = 207034;   // sumary of stock movements summary
     public static final int REP_TRN_PS_CL_ITEM_TOT_COMM = 207035;
     public static final int REP_TRN_ADV = 207037;
+    public static final int REP_TRN_MAT_CONS_BUDGET = 207039;
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;

@@ -37,6 +37,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
  */
 public class SModuleBps extends SGuiModule {
 
+    private SBeanOptionPicker moPickerBizPartner;
     private SBeanOptionPicker moPickerBankAccount;
 
     public SModuleBps(SGuiClient client) {
@@ -204,7 +205,7 @@ public class SModuleBps extends SGuiModule {
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
 
@@ -223,11 +224,11 @@ public class SModuleBps extends SGuiModule {
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "RFC"));
                 settings = new SGuiOptionPickerSettings(SBpsUtils.getBizPartnerCategoryName(subtype, SUtilConsts.NUM_PLR), sql, gridColumns, 1);
 
-                if (moPickerBankAccount == null) {
-                    moPickerBankAccount = new SBeanOptionPicker();
-                    moPickerBankAccount.setPickerSettings(miClient, type, subtype, settings);
+                if (moPickerBizPartner == null) {
+                    moPickerBizPartner = new SBeanOptionPicker();
+                    moPickerBizPartner.setPickerSettings(miClient, type, subtype, settings);
                 }
-                picker = moPickerBankAccount;
+                picker = moPickerBizPartner;
                 break;
 
             case SModConsts.BPSU_BANK_ACC:

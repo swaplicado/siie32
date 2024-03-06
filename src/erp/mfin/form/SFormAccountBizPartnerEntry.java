@@ -494,6 +494,9 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
 //                            message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA }) + "'";
 //                        }
                         break;
+                        
+                    case SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY:
+                        break;
 
                     default:
                         message = SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION;
@@ -509,14 +512,16 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
                         // Validación de cuenta contable impuesto
                         val = SValidationUtils.validateAccTax(miClient.getSession(),
                                 new int [] { moAccountBizPartnerEntry.getPkAccountBizPartnerTypeId(), moAccountBizPartnerEntry.getPkAccountBizPartnerId(), moAccountBizPartnerEntry.getPkEntryId()} ,
-                                moPanelFkAccountId.getFieldAccount().getString(), new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n(), moAccountBizPartnerEntry.getFkTaxId_n() });
+                                moAccountBizPartnerEntry.getPkAccountBizPartnerTypeId(),
+                                moPanelFkAccountId.getFieldAccount().getString(), 
+                                new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n(), moAccountBizPartnerEntry.getFkTaxId_n() });
                     }
                     catch (SQLException ex) {
                         Logger.getLogger(SFormAccountBizPartnerEntry.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     
                     if (! val) {
-                        validation.setMessage("La combinación cuenta contable vs impuesto ya existe.");
+                        validation.setMessage("La combinación de tipo, cuenta contable e impuesto ya existe.");
                     }
                     else {
                         if (!moPanelFkCostCenterId_n.isEmptyAccountId()) {

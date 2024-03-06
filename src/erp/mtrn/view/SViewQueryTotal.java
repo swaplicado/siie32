@@ -81,6 +81,10 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
             case SDataConstantsSys.TRNX_SAL_TOT_BY_BP:
             case SDataConstantsSys.TRNX_PUR_TOT_BY_BP_ITEM:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(moTabFilterBizPartner);
                 break;
@@ -107,7 +111,9 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
             maoTableColumns = new STableColumn[12];
         }
         else if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP
-                || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN) {
+                || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN
+                || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF 
+                || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF) {
             maoTableColumns = new STableColumn[11];
         }
         else  if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP) {
@@ -155,8 +161,14 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN:
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "igen", "Ítem genérico", 200);
                 break;
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem referencia", 200);
+                    break;
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP:
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP:
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "igen", "Ítem genérico", 200);
@@ -321,7 +333,8 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
 
         if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_BP_ITEM ||
                 mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP ||
-                mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP) {
+                mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP ||
+                mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF) {
             purchase = true;
         }
 
@@ -536,9 +549,17 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN:
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
                 sqlColumns = "igen, ";
                 sqlGroupOrder = "GROUP BY " + sqlCurrency + "igen ORDER BY " + sqlCurrency +
                         (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "igen " : "igen ");
+                break;
+            case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
+                sqlColumns = "item, ";
+                sqlGroupOrder = "GROUP BY " + sqlCurrency + "item ORDER BY " + sqlCurrency +
+                        (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item " : "item ");
                 break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP:
@@ -607,11 +628,15 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + (isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON " +
                 "ct.fid_ct_bp = tp.id_ct_bp AND ct.fid_tp_bp = tp.id_tp_bp " +
-                "INNER JOIN erp.itmu_item AS i ON " +
-                "e.fid_item = i.id_item " +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                        "" : "INNER JOIN erp.itmu_item AS i ON e.fid_item = i.id_item ") +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN ||
                     mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP ?
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " : "" ) +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                        "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
@@ -645,11 +670,15 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + (isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON " +
                 "ct.fid_ct_bp = tp.id_ct_bp AND ct.fid_tp_bp = tp.id_tp_bp " +
-                "INNER JOIN erp.itmu_item AS i ON " +
-                "o.fid_item = i.id_item " +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                    "" : "INNER JOIN erp.itmu_item AS i ON o.fid_item = i.id_item ") +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN ||
                 mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP ?
                     "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " : "" ) +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                        "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
@@ -684,11 +713,15 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "bp.id_bp = ct.id_bp AND ct.id_ct_bp = " + (isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON " +
                 "ct.fid_ct_bp = tp.id_ct_bp AND ct.fid_tp_bp = tp.id_tp_bp " +
-                "INNER JOIN erp.itmu_item AS i ON " +
-                "o.fid_item = i.id_item " +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                    "" : "INNER JOIN erp.itmu_item AS i ON o.fid_item = i.id_item ") +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN ||
                     mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP ?
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " : "" ) +
+                (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF || 
+                    mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IREF || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IREF ? 
+                        "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +

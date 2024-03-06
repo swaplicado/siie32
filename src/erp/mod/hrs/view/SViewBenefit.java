@@ -235,19 +235,19 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         // # employee's benefit table and bonus benefit table (if applicable):
         String sqlBenDayId = "COALESCE("
                 + "(SELECT b.id_ben FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS b "
-                + "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + benefitTypeId + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + benefitTypeId + ") AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n = e.fk_tp_pay "
+                + "WHERE NOT b.b_del AND b.uni = e.b_uni AND b.fk_tp_ben = IF(" + benefitTypeId + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + benefitTypeId + ") AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n = e.fk_tp_pay "
                 + "ORDER BY b.dt_sta DESC, b.id_ben LIMIT 1), "
                 + "(SELECT b.id_ben FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS b "
-                + "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + benefitTypeId + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + benefitTypeId + ") AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n IS NULL "
+                + "WHERE NOT b.b_del AND b.uni = e.b_uni AND b.fk_tp_ben = IF(" + benefitTypeId + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + benefitTypeId + ") AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n IS NULL "
                 + "ORDER BY b.dt_sta DESC, b.id_ben LIMIT 1))";
         String sqlBenBonId = "COALESCE("
                 + "IF(" + benefitTypeId + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, "
                 + "(SELECT b.id_ben FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS b "
-                + "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n = e.fk_tp_pay "
+                + "WHERE NOT b.b_del AND b.uni = e.b_uni AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n = e.fk_tp_pay "
                 + "ORDER BY b.dt_sta DESC, b.id_ben LIMIT 1)), "
                 + "IF(" + benefitTypeId + " <> " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", 0, "
                 + "(SELECT b.id_ben FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS b "
-                + "WHERE NOT b.b_del AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n IS NULL "
+                + "WHERE NOT b.b_del AND b.uni = e.b_uni AND b.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + " AND b.dt_sta <= " + sqlCutoff + " AND b.fk_tp_pay_n IS NULL "
                 + "ORDER BY b.dt_sta DESC, b.id_ben LIMIT 1)))";
         
         msSql += "(SELECT b.name FROM hrs_ben AS b WHERE b.id_ben = " + sqlBenDayId + ") AS _ben_day_name, ";

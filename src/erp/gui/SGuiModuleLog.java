@@ -14,8 +14,10 @@ import erp.lib.form.SFormOptionPickerInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.log.form.SDialogRepRate;
+import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -44,6 +46,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiShipmentDpsSales;
     private javax.swing.JMenuItem jmiShipmentBol;
     private javax.swing.JMenuItem jmiShipmentBolInvoice;
+    private javax.swing.JMenuItem jmiUuidSearch;
 
     private javax.swing.JMenu jmShipmentSales;
     private javax.swing.JMenuItem jmiShipmentDps;
@@ -131,6 +134,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentDpsSales = new JMenuItem("Embarques vs. facturas ventas facturadas");
         jmiShipmentBol = new JMenuItem("Carta porte traslados");
         jmiShipmentBolInvoice = new JMenuItem("Carta porte facturas");
+        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
 
         jmCatalogue = new JMenu("Catálogos");
         jmiCatalogueSpot = new JMenuItem("Lugares");
@@ -174,6 +178,8 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmShipment.addSeparator();
         jmShipment.add(jmiShipmentBol);
         jmShipment.add(jmiShipmentBolInvoice);
+        jmShipment.addSeparator();
+        jmShipment.add(jmiUuidSearch);
 
         jmShipmentSales.add(jmiShipmentDpsPending);
         jmShipmentSales.add(jmiShipmentDpsPendingDetail);
@@ -235,6 +241,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentDpsSales.addActionListener(this);
         jmiShipmentBol.addActionListener(this);
         jmiShipmentBolInvoice.addActionListener(this);
+        jmiUuidSearch.addActionListener(this);
 
         jmiCatalogueSpot.addActionListener(this);
         jmiCatalogueSpotCompanyBranch.addActionListener(this);
@@ -486,6 +493,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiShipmentBolInvoice) {
                 miClient.getSession().showView(SModConsts.LOG_BOL, SDataConstantsSys.TRNS_TP_CFD_INV, null);
+            }
+            else if (item == jmiUuidSearch) {
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiRepRate) {
                 new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);

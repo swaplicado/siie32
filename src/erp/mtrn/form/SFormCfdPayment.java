@@ -386,6 +386,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayTotalPaymentsLocalCurRo = new javax.swing.JTextField();
         jpAccountingConcept = new javax.swing.JPanel();
         jpControls = new javax.swing.JPanel();
+        jpControls1 = new javax.swing.JPanel();
+        jtfPk = new javax.swing.JTextField();
+        jpControls2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -1385,16 +1388,31 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpDialog.add(jpRegistryRows, java.awt.BorderLayout.CENTER);
 
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpControls1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPk.setEditable(false);
+        jtfPk.setForeground(java.awt.Color.gray);
+        jtfPk.setText("PK");
+        jtfPk.setFocusable(false);
+        jtfPk.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpControls1.add(jtfPk);
+
+        jpControls.add(jpControls1);
+
+        jpControls2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar"); // NOI18N
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbOk);
+        jpControls2.add(jbOk);
 
         jbCancel.setText("Cancelar"); // NOI18N
         jbCancel.setToolTipText("[Escape]");
-        jpControls.add(jbCancel);
+        jpControls2.add(jbCancel);
+
+        jpControls.add(jpControls2);
 
         jpDialog.add(jpControls, java.awt.BorderLayout.SOUTH);
 
@@ -3715,6 +3733,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlVouTotal;
     private javax.swing.JPanel jpAccountingConcept;
     private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpControls1;
+    private javax.swing.JPanel jpControls2;
     private javax.swing.JPanel jpDialog;
     private javax.swing.JPanel jpDocument;
     private javax.swing.JPanel jpDocuments;
@@ -3771,6 +3791,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfPayTotalPaymentsPacCurRo;
     private javax.swing.JTextField jtfPayTotalPaymentsPacRo;
     private javax.swing.JTextField jtfPayTotalPaymentsRo;
+    private javax.swing.JTextField jtfPk;
     private javax.swing.JTextField jtfRecCfdRelatedNumberRo;
     private javax.swing.JTextField jtfRecCfdRelatedUuid;
     private javax.swing.JTextField jtfRecCfdRelatedVersionRo;
@@ -3880,6 +3901,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouPlaceIssueRo.setText("");
         jtfVouDatetimeRo.setText("");
         jtfVouStatusRo.setText("");
+        jtfPk.setText("");
         
         actionPerformedVouResume();
         itemStateChangedRecBizPartner();
@@ -4272,6 +4294,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         jtfVouStatusRo.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_ST_DPS, new int[] { cfd.getFkXmlStatusId() }));
         jtfVouStatusRo.setCaretPosition(0);
+        
+        jtfPk.setText(SLibUtils.textKey((int[]) moDataCfdPayment.getDbmsReceiptPayment().getPrimaryKey()));
         
         moDataComBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { moDataCfdPayment.getDbmsDataCfd().getFkCompanyBranchId_n()}, SLibConstants.EXEC_MODE_VERBOSE);
         SFormUtilities.populateComboBox(miClient, jcbPayAccountDest, SDataConstants.FIN_ACC_CASH, new int[] { moDataComBranch.getPkBizPartnerBranchId() });

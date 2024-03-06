@@ -258,7 +258,20 @@ public class SDbPayroll extends SDbRegistryUser {
         SDbPayrollReceipt payrollReceipt = null;
         
         for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
-            if (SLibUtils.compareKeys(key, pr.getPrimaryKey())) {
+            if (SLibUtils.compareKeys(pr.getPrimaryKey(), key)) {
+                payrollReceipt = pr;
+                break;
+            }
+        }
+        
+        return payrollReceipt;
+    }
+    
+    public SDbPayrollReceipt getChildPayrollReceipt(final int employeeId) {
+        SDbPayrollReceipt payrollReceipt = null;
+        
+        for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
+            if (pr.getPkEmployeeId() == employeeId) {
                 payrollReceipt = pr;
                 break;
             }

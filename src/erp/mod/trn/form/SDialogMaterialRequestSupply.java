@@ -111,6 +111,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jPanel9 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
+        jlMovDate = new javax.swing.JLabel();
+        jftMovDate = new javax.swing.JTextField();
         jPanel12 = new javax.swing.JPanel();
         jlRequest = new javax.swing.JLabel();
         moTextRequest = new sa.lib.gui.bean.SBeanFieldText();
@@ -178,6 +180,15 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         moTextNumber.setBackground(new java.awt.Color(240, 240, 240));
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(moTextNumber);
+
+        jlMovDate.setText("Fecha:");
+        jlMovDate.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel9.add(jlMovDate);
+        jlMovDate.getAccessibleContext().setAccessibleName("Fecha:");
+
+        jftMovDate.setEditable(false);
+        jftMovDate.setPreferredSize(new java.awt.Dimension(165, 23));
+        jPanel9.add(jftMovDate);
 
         jPanel4.add(jPanel9);
 
@@ -389,11 +400,13 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     private javax.swing.JButton jbSign;
     private javax.swing.JButton jbSupply;
     private javax.swing.JButton jbSupplyAll;
+    private javax.swing.JTextField jftMovDate;
     private javax.swing.JLabel jlAux;
     private javax.swing.JLabel jlEntity;
     private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlMaintUser;
     private javax.swing.JLabel jlMaintUserSupervisor;
+    private javax.swing.JLabel jlMovDate;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlRequest;
     private javax.swing.JLabel jlWarehouseCompanyBranch;
@@ -506,8 +519,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         try {
             moKeyMaintUser.setSelectedIndex(0);
             moKeyWarehouseCompanyBranch.setSelectedIndex(0);
-//            moKeyWarehouseCompanyBranch.setValue(((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey());
-//            SGuiUtils.locateItem(moKeyWarehouseCompanyBranch, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey());
         }
         catch (NullPointerException ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
@@ -552,6 +563,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                                                                             SMaterialRequestEntryRow.FORM_SUPPLY,
                                                                             oMaterialRequestEntry.getFkItemId(), 
                                                                             oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getFkUserUnitId(),
                                                                             oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                     moMaterialRequest.getConsumptionInfo() : 
                                                                                     oMaterialRequestEntry.getConsumptionInfo()
@@ -561,6 +573,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                 oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+                oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
                 
                 double dSegregated = 0d;
                 if (mnSegregationId > 0) {
@@ -654,6 +667,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      */
     private void initMaterialRequestData() {
         try {
+            jftMovDate.setText(SLibUtils.DateFormatDate.format(miClient.getSession().getCurrentDate()));
             moTextNumber.setValue(String.format("%05d", moMaterialRequest.getNumber()));
             /*
             moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moDps.getDateDelivery_n()));
@@ -685,7 +699,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         SMaterialRequestEntryRow oMatReqRow;
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
-            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0) {
+            if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0 && ! oMatReqRow.isItemNew()) {
                 oMatReqRow.setAuxToSupply(oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied());
             }
         }
@@ -708,7 +722,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSupply() > 0) {
-                if (oMatReqRow.getFkItemId() == mnItemDefaultId) {
+                if (oMatReqRow.getFkItemId() == mnItemDefaultId || oMatReqRow.isItemNew()) {
                     miClient.showMsgBoxWarning("No se puede suministrar esta partida, el ítem debe ser cambiado.");
                     return;
                 }
@@ -737,6 +751,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 oSupplyEty = new SMaterialRequestSupplyRow((SClientInterface) miClient, 
                                                             oMatReqRow.getFkItemId(), 
                                                             oMatReqRow.getFkUnitId(),
+                                                            oMatReqRow.getFkUnitOrigId(),
                                                             moKeyWarehouseEntity.getValue()[0],
                                                             moKeyWarehouseEntity.getValue()[1]
                                                             );
@@ -824,7 +839,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             */
             int user = moKeyMaintUser.getSelectedIndex() <= 0 ? 0 : moKeyMaintUser.getValue()[0];
             int userSup = moKeyMaintUserSupervisor.getSelectedIndex() <= 0 ? 1 : moKeyMaintUserSupervisor.getValue()[0];
-            ArrayList<SDataDiog> lDiogs = SMaterialRequestUtils.makeDiogs(miClient.getSession().getCurrentYear(), 
+            ArrayList<SDataDiog> lDiogs = SMaterialRequestUtils.makeDiogs(miClient,
+                                                                miClient.getSession().getCurrentYear(), 
                                                                 miClient.getSession().getCurrentDate(), 
                                                                 miClient.getSession().getUser().getPkUserId(),
                                                                 mlMemoryMaterialRequestSupplies,
@@ -904,10 +920,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             miClient.getSession().populateCatalogue(moKeyMaintUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(moKeyMaintUser.getValue()));
             moKeyMaintUserSupervisor.setEnabled(true);
         }
-        
-//        int idBp = ((SGuiItem) moKeyMaintUser.getSelectedItem()).getPrimaryKey()[0];
-//        int idConsumeEntity = STrnConsumeUtils.getDefaultEntityOfBp(miClient.getSession(), idBp);
-//        SGuiUtils.locateItem(jcbEntryConsEntity, new int[] { idConsumeEntity });
     }
     
     private boolean shouldEnableMaintUserSupervisor() {

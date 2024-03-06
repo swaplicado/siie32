@@ -113,6 +113,7 @@ import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
+import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.data.SDataCtr;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
@@ -229,6 +230,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmFinCfdiMassiveValidation;
     private javax.swing.JMenuItem jmiFinCfdiMassiveValidationPur;
     private javax.swing.JMenuItem jmiFinCfdiMassiveValidationSal;
+    private javax.swing.JMenuItem jmiUuidSearch;
     
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepTrialBal;
@@ -584,6 +586,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinCfdiMassiveValidation = new JMenu("Validación masiva de estatus de CFDI");
         jmiFinCfdiMassiveValidationPur = new JMenuItem("Validación masiva de estatus de CFDI recibidos...");
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
+        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinBankNbDay);
@@ -616,6 +619,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmFinCfdiMassiveValidation);
         jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationPur);
         jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationSal);
+        jmFin.addSeparator();
+        jmFin.add(jmiUuidSearch);
         
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
@@ -918,6 +923,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinImportPayments.addActionListener(this);
         jmiFinCfdiMassiveValidationPur.addActionListener(this);
         jmiFinCfdiMassiveValidationSal.addActionListener(this);
+        jmiUuidSearch.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
         jmiCfgAbpEntityWarehouse.addActionListener(this);
@@ -1128,7 +1134,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
         jmFinCfdiMassiveValidation.setEnabled(hasRightMoveAccCash);
         jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
-        jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdiMassiveValidationSal.setEnabled(hasRightMoveAccCash);
+        jmiUuidSearch.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
         jmRepTrialBal.setEnabled(hasRightRep);
@@ -2142,6 +2149,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinCfdiMassiveValidationSal) {
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_FIN, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
+            }
+            else if (item == jmiUuidSearch) {
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);

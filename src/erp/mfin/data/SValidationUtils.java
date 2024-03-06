@@ -17,7 +17,20 @@ import sa.lib.gui.SGuiSession;
  */
 public class SValidationUtils {
     
-    public static boolean validateAccTax(final SGuiSession session, final int[] pk, final String account, final int[] taxPk) throws SQLException {
+    /**
+     * Valida que la combinación de tipo de cuenta, cuenta y contable e impuesto no se repita en las configuraciones
+     * 
+     * @param session
+     * @param pk
+     * @param finTpAcc tipo de cuenta contable
+     * @param account cuenta contable
+     * @param taxPk llave primaria del impuesto
+     * 
+     * @return true, si la combinación no existe y es válida
+     * 
+     * @throws SQLException 
+     */
+    public static boolean validateAccTax(final SGuiSession session, final int[] pk, final int finTpAcc, final String account, final int[] taxPk) throws SQLException {
         String sql = "";
         ResultSet resultSet = null;
         
@@ -27,9 +40,10 @@ public class SValidationUtils {
                 "    fin_acc_bp_ety " +
                 "WHERE " +
                 (pk[1] == 0 ? "" : " id_acc_bp <> " + pk[0] + " AND id_tp_acc_bp <> " + pk[1] + " AND id_ety <> " + pk[2] + " AND ") +
-                " fid_acc = '" + account.trim() + "' " +
-                " AND fid_tax_bas_n " + (taxPk[0] == 0 ? "is null" : "= " + taxPk[0]) + " " +
-                " AND fid_tax_n " + (taxPk[1] == 0 ? "is null" : "= " + taxPk[1]) + ";";
+                "fid_acc = '" + account.trim() + "' " +
+                "AND id_tp_acc_bp = " + finTpAcc + " " +
+                "AND fid_tax_bas_n " + (taxPk[0] == 0 ? "is null" : "= " + taxPk[0]) + " " +
+                "AND fid_tax_n " + (taxPk[1] == 0 ? "is null" : "= " + taxPk[1]) + ";";
         
         resultSet = session.getStatement().executeQuery(sql);
         

@@ -7,6 +7,7 @@ package erp.mod.trn.form;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbMaterialConsumptionEntityBudget;
+import java.sql.ResultSet;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -78,7 +79,7 @@ public class SFormMaterialConsumptionEntityBudget extends sa.lib.gui.bean.SBeanF
         jlConsumption.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel22.add(jlConsumption);
 
-        moKeyConsumption.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyConsumption.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel22.add(moKeyConsumption);
 
         jPanel23.add(jPanel22);
@@ -176,6 +177,24 @@ public class SFormMaterialConsumptionEntityBudget extends sa.lib.gui.bean.SBeanF
         moFields.setFormButton(jbSave);
     }
     
+    private boolean validatePrimaryKey() {
+        boolean val = false;
+        
+        try {
+            String sql = "SELECT * FROM trn_mat_cons_ent_budget WHERE id_mat_cons_ent = " + moKeyConsumption.getValue()[0] + " " + 
+                    "AND id_year = " + moCalYear.getValue() + " AND id_period = " + moIntPeriod.getValue();
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                val = true;
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+        
+        return val;
+    }
+    
     @Override
     public void addAllListeners() {
         
@@ -203,6 +222,7 @@ public class SFormMaterialConsumptionEntityBudget extends sa.lib.gui.bean.SBeanF
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            jtfRegistryKey.setText("");
             moDateStart.setValue(miClient.getSession().getSystemDate());
             moDateEnd.setValue(miClient.getSession().getSystemDate());
             moCalYear.setValue(miClient.getSession().getSystemYear());
@@ -245,6 +265,13 @@ public class SFormMaterialConsumptionEntityBudget extends sa.lib.gui.bean.SBeanF
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            if (validatePrimaryKey()) {
+                validation.setMessage("No es posible crear el registro debido a que ya hay un presupuesto para el centro de consumo, año y periodo indicados.");
+                validation.setComponent(moKeyConsumption);
+            }
+        }
         
         return validation;
     }

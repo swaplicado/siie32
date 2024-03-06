@@ -30,8 +30,10 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected Date mtDateRequest;
     protected String msNotes;
     //protected boolean mbDeleted;
+    protected boolean mbItemNew;
     protected int mnFkItemId;
     protected int mnFkUnitId;
+    protected int mnFkUnitOrigId;
     protected int mnFkConsumeEntityId_n;
     protected int mnFkSubConsumeEntityId_n;
     
@@ -47,6 +49,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     protected double mdAuxToSupply;
     protected double mdAuxToEstimate;
     protected boolean mbAuxBulk;
+    protected boolean mbAuxIsEstimated;
     protected boolean mbAuxEstimate;
     
     SClientInterface miClient;
@@ -57,16 +60,18 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public static int FORM_SUPPLY = 2;
     public static int FORM_ESTIMATE = 3;
     
-    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, String consumeEntity) {
+    public SMaterialRequestEntryRow(SClientInterface client, final int formType, final int fkItem, final int fkUnit, final int fkUnitOrig, String consumeEntity) {
         miClient = client;
         mnFormType = formType;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
+        mnFkUnitOrigId = fkUnitOrig;
         mnFkConsumeEntityId_n = 0;
         mnFkSubConsumeEntityId_n = 0;
         msAuxConsumeEntity = consumeEntity;
         mtDateRequest = null;
         msNotes = "";
+        mbAuxIsEstimated = false;
         
         try {
             this.readAuxs();
@@ -92,12 +97,14 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public void setQuantity(double d) { mdQuantity = d; }
     public void setDateRequest(Date t) { mtDateRequest = t; }
     public void setNotes(String s) { msNotes = s; }
+    public void setIsItemNew(boolean b) { mbItemNew = b; }
 
     public void setAuxSegregated(double mdAuxSegregated) { this.mdAuxSegregated = mdAuxSegregated; }
     public void setAuxSupplied(double mdAuxSupplied) { this.mdAuxSupplied = mdAuxSupplied; }
     public void setAuxStock(double mdAuxStock) { this.mdAuxStock = mdAuxStock; }
     public void setAuxToSegregate(double mdAuxToSegregate) { this.mdAuxToSegregate = mdAuxToSegregate; }
     public void setAuxToSupply(double mdAuxToSupply) { this.mdAuxToSupply = mdAuxToSupply; }
+    public void setAuxIsEstimated(boolean mbAuxIsEstimated) { this.mbAuxIsEstimated = mbAuxIsEstimated; }
     public void setAuxToEstimate(double mdAuxToEstimate) { this.mdAuxToEstimate = mdAuxToEstimate; }
     public void setAuxIsToEstimate(boolean mbAuxEstimate) { this.mbAuxEstimate = mbAuxEstimate; }
 
@@ -106,9 +113,11 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getQuantity() { return mdQuantity; }
     public Date getDateRequired() { return mtDateRequest; }
     public String getNotes() { return msNotes; }
+    public boolean isItemNew() { return mbItemNew; }
     
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkUnitOrigId() { return mnFkUnitOrigId; }
     public int getFkConsumeEntityId_n() { return mnFkConsumeEntityId_n; }
     public int getFkSubConsumeEntityId_n() { return mnFkSubConsumeEntityId_n; }
     
@@ -122,6 +131,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getAuxToSegregate() { return mdAuxToSegregate; }
     public double getAuxToSupply() { return mdAuxToSupply; }
     public double getAuxQuantityToEstimate() { return mdAuxToEstimate; }
+    public boolean getAuxIsEstimated() { return mbAuxIsEstimated; }
     public boolean isToEstimate() { return mbAuxEstimate; }
 
     @Override
@@ -230,30 +240,36 @@ public class SMaterialRequestEntryRow implements SGridRow {
         else if (mnFormType == FORM_ESTIMATE) {
             switch(col) {
                 case 0:
-                    value = msAuxItemCode;
+                    value = mnPkEntryId;
                     break;
                 case 1:
-                    value = msAuxItemName;
+                    value = msAuxItemCode;
                     break;
                 case 2:
-                    value = msAuxUnitCode;
+                    value = msAuxItemName;
                     break;
                 case 3:
-                    value = msAuxPartNum;
+                    value = msAuxUnitCode;
                     break;
                 case 4:
-                    value = msNotes;
+                    value = msAuxPartNum;
                     break;
                 case 5:
-                    value = mdQuantity;
+                    value = msNotes;
                     break;
                 case 6:
-                    value = mdAuxToEstimate;
+                    value = mdQuantity;
                     break;
                 case 7:
-                    value = false;
+                    value = mdAuxSupplied;
                     break;
                 case 8:
+                    value = mdAuxToEstimate;
+                    break;
+                case 9:
+                    value = mbAuxIsEstimated;
+                    break;
+                case 10:
                     value = mbAuxEstimate;
                     break;
                 default:
@@ -318,8 +334,10 @@ public class SMaterialRequestEntryRow implements SGridRow {
                 case 3:
                 case 4:
                 case 5:
-                    break;
                 case 6:
+                case 7:
+                    break;
+                case 8:
                     if (SMaterialRequestEntryRow.hasDecimals((double) value) && !mbAuxBulk) {
                         JOptionPane.showMessageDialog(null, "El ítem no es a granel.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -327,9 +345,16 @@ public class SMaterialRequestEntryRow implements SGridRow {
                         mdAuxToEstimate = (double) value;
                     }
                     break;
-                case 7:
+                case 9:
                     break;
-                case 8:
+                case 10:
+                    if ((boolean) value) {
+                        if (mbItemNew) {
+                            JOptionPane.showMessageDialog(null, "No se puede cotizar esta partida, el ítem debe ser cambiado.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                    
                     mbAuxEstimate = (boolean) value;
                     if (mbAuxEstimate) {
                         mdAuxToEstimate = mdQuantity;

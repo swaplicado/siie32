@@ -101,7 +101,8 @@ public abstract class SModConsts {
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
-
+    public static final int CFG_CUSTOM_REP = 1013531;
+    
     /*
      * Users
      */
@@ -207,6 +208,7 @@ public abstract class SModConsts {
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
     public static final int ITMU_UNIT = 1052503;
+    public static final int ITMU_UNIT_EQUIV = 1052514;
     public static final int ITMU_TP_VAR = 1052504;
     public static final int ITMU_VAR = 1052505;
     public static final int ITMU_TP_BRD = 1052506;
@@ -219,6 +221,8 @@ public abstract class SModConsts {
     public static final int ITMU_MAT_ATT = 1052513;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
+    public static final int ITMU_PRICE_COMM_LOG = 1052122;
+    public static final int ITMU_ITEM_COMP = 1052141;
     
     public static final int ITMX_IGEN_INV = 1053001;
 
@@ -373,8 +377,7 @@ public abstract class SModConsts {
     public static final int TRNU_TP_IOG_ADJ = 2022004;
     public static final int TRNU_TP_DPS_ANN = 2022005;
     public static final int TRNU_MAT_REQ_PTY = 2022007;
-    public static final int TRNU_MAT_PRES = 2022008;
-
+    
     public static final int TRN_DNS_DPS = 2023001;
     public static final int TRN_DNS_DIOG = 2023002;
     public static final int TRN_DNC_DPS_COB = 2023003;
@@ -400,6 +403,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_TAX = 2023020;
     public static final int TRN_DPS_ETY_COMMS = 2023021;
     public static final int TRN_DPS_ETY_HIST = 2023066;
+    public static final int TRN_DPS_ETY_ITEM_COMP = 2023072;
     public static final int TRN_DPS_ETY_ANALYSIS = 2023065;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
@@ -433,6 +437,9 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
     public static final int TRN_STK_SEG_X = 2023065;
+    public static final int TRN_STK_VAL = 2023068;
+    public static final int TRN_STK_VAL_MVT = 2023069;
+    public static final int TRN_STK_VAL_ACC = 2023070;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
@@ -509,6 +516,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_PEND = 2024075;        // material requisitions pending
     public static final int TRNX_MAT_REQ_PEND_SUP = 2024072;        // material requisitions pending supply
     public static final int TRNX_MAT_REQ_PEND_PUR = 2024074;        // material requisitions pending purchase
+    public static final int TRNX_MAT_REQ_CLO_PUR = 2024080;        // material requisitions closed purchase
     public static final int TRNX_MAT_REQ_EST = 2024078;        // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;   // diálogo de cotizaciones
@@ -534,8 +542,11 @@ public abstract class SModConsts {
     public static final int TRNX_DET_WHS_VS_CON_ENT = 2024353;
     public static final int TRNX_MAT_REQ_ITM_SUP = 2024354;
     public static final int TRNX_MAT_REQ_ITM_SUP_SEL = 2024355;
+    public static final int TRNX_MAT_REQ_DOCS_KAR = 2024358;
     public static final int TRNX_MAT_CONS = 2024356;
     public static final int TRNX_MAT_CONS_CC = 2024357;
+    public static final int TRNX_MAT_BUDGET_SUM = 2024359;
+    public static final int TRNX_WAH_CONS_DET = 2024360;
     public static final int TRNX_MAT_CONS_CC_R = 1;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
@@ -545,6 +556,7 @@ public abstract class SModConsts {
     public static final int TRNR_CON_STA_BP = 2025003;
     public static final int TRNR_CON_MON_DVY_PROG = 2025004;
     public static final int TRNR_DPS_CON = 2025005;
+    public static final int TRNR_VTAS_FSC = 2025006;
 
     /*
      * Marketing
@@ -744,9 +756,12 @@ public abstract class SModConsts {
     public static final int HRS_DEP_CC = 2062034;
     public static final int HRSU_EMP = 2062051;
     public static final int HRSU_EMP_REL = 2062052;
-    public static final int HRSU_EMP_SUA = 2062053;
-    public static final int HRSU_EMP_IDSE = 2062054;
-    public static final int HRSU_TP_COD = 2062055;
+    public static final int HRSU_TP_EXP = 2062301;
+    public static final int HRSU_PACK_EXP = 2062311;
+    public static final int HRSU_PACK_EXP_ITEM = 2062312;
+    
+    public static final int HRSU_EMP_SUA = 2062053; // XXX 2023-09-07 Sergio Flores: Remove or change, it does not correspond to a DB table!
+    public static final int HRSU_EMP_IDSE = 2062054; // XXX 2023-09-07 Sergio Flores: Remove or change, it does not correspond to a DB table!
 
     public static final int HRS_SIE_PAY = 2063001;
     public static final int HRS_SIE_PAY_EMP = 2063002;
@@ -787,6 +802,16 @@ public abstract class SModConsts {
     public static final int HRS_AUT_DED = 2063122;
     public static final int HRS_ACC_EAR = 2063131;
     public static final int HRS_ACC_DED = 2063132;
+    public static final int HRS_TP_EXP_ACC = 2063301;
+    public static final int HRS_PACK_CC = 2063311;
+    public static final int HRS_PACK_CC_CC = 2063312;
+    public static final int HRS_CFG_ACC_DEP = 2063321;
+    public static final int HRS_CFG_ACC_DEP_PACK_CC = 2063322;
+    public static final int HRS_CFG_ACC_EMP_PACK_CC = 2063326;
+    public static final int HRS_CFG_ACC_EMP_EAR = 2063327;
+    public static final int HRS_CFG_ACC_EMP_DED = 2063328;
+    public static final int HRS_CFG_ACC_EAR = 2063331;
+    public static final int HRS_CFG_ACC_DED = 2063332;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
     public static final int HRS_PAY_RCP_IMPORT = 2063215;
@@ -832,6 +857,9 @@ public abstract class SModConsts {
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
     public static final int HRSX_PTU = 2064106;
+    public static final int HRSX_BEN_ANN_BON = 2064107;
+    public static final int HRSX_BANK_PAY_DISP = 2064108;
+    public static final int HRSX_EMP_CC = 2064109;
     public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_EMP_LOG_SUA = 2064161;
     public static final int HRSX_EMP_LOG_IDSE = 2064162;
@@ -919,6 +947,7 @@ public abstract class SModConsts {
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
+        TablesMap.put(CFG_CUSTOM_REP, "cfg_custom_rep");
 
         TablesMap.put(USRS_TP_USR, "erp.usrs_tp_usr");
         TablesMap.put(USRS_TP_LEV, "erp.usrs_tp_lev");
@@ -1005,6 +1034,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
+        TablesMap.put(ITMU_UNIT_EQUIV, "erp.itmu_unit_equiv");
         TablesMap.put(ITMU_TP_VAR, "erp.itmu_tp_var");
         TablesMap.put(ITMU_VAR, "erp.itmu_var");
         TablesMap.put(ITMU_TP_BRD, "erp.itmu_tp_brd");
@@ -1017,6 +1047,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_MAT_ATT, "erp.itmu_mat_att");
 
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
+        TablesMap.put(ITMU_PRICE_COMM_LOG, "itmu_price_comm_log");
+        TablesMap.put(ITMU_ITEM_COMP, "itmu_item_comp");
         
         TablesMap.put(FINS_TP_BKR, "erp.fins_tp_bkr");
         TablesMap.put(FINS_TP_ACC_MOV, "erp.fins_tp_acc_mov");
@@ -1153,7 +1185,6 @@ public abstract class SModConsts {
         TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
         TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
         TablesMap.put(TRNU_MAT_REQ_PTY, "erp.trnu_mat_req_pty");
-        TablesMap.put(TRNU_MAT_PRES, "erp.trnu_mat_pres");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
         TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");
@@ -1179,6 +1210,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_TAX, "trn_dps_ety_tax");
         TablesMap.put(TRN_DPS_ETY_COMMS, "trn_dps_ety_comms");
         TablesMap.put(TRN_DPS_ETY_HIST, "trn_dps_ety_hist");
+        TablesMap.put(TRN_DPS_ETY_ITEM_COMP, "trn_dps_ety_item_comp");
         TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
@@ -1211,6 +1243,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_SEG, "trn_stk_seg");
         TablesMap.put(TRN_STK_SEG_WHS, "trn_stk_seg_whs");
         TablesMap.put(TRN_STK_SEG_WHS_ETY, "trn_stk_seg_whs_ety");
+        TablesMap.put(TRN_STK_VAL, "trn_stk_val");
+        TablesMap.put(TRN_STK_VAL_MVT, "trn_stk_val_mvt");
+        TablesMap.put(TRN_STK_VAL_ACC, "trn_stk_val_acc");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");
@@ -1408,7 +1443,6 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_CON, "erp.hrss_tp_con");
         TablesMap.put(HRSS_TP_REC_SCHE, "erp.hrss_tp_rec_sche");
         TablesMap.put(HRSS_TP_POS_RISK, "erp.hrss_tp_pos_risk");
-        TablesMap.put(HRSU_TP_COD, "erp.locu_sta");
         TablesMap.put(HRSS_TP_WORK_DAY, "erp.hrss_tp_work_day");
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
@@ -1429,6 +1463,9 @@ public abstract class SModConsts {
         TablesMap.put(HRSU_SHT, "erp.hrsu_sht");
         TablesMap.put(HRSU_EMP, "erp.hrsu_emp");
         TablesMap.put(HRSU_EMP_REL, "erp.hrsu_emp_rel");
+        TablesMap.put(HRSU_TP_EXP, "erp.hrsu_tp_exp");
+        TablesMap.put(HRSU_PACK_EXP, "erp.hrsu_pack_exp");
+        TablesMap.put(HRSU_PACK_EXP_ITEM, "erp.hrsu_pack_exp_item");
 
         TablesMap.put(HRS_SIE_PAY, "hrs_sie_pay");
         TablesMap.put(HRS_SIE_PAY_EMP, "hrs_sie_pay_emp");
@@ -1470,6 +1507,16 @@ public abstract class SModConsts {
         TablesMap.put(HRS_AUT_DED, "hrs_aut_ded");
         TablesMap.put(HRS_ACC_EAR, "hrs_acc_ear");
         TablesMap.put(HRS_ACC_DED, "hrs_acc_ded");
+        TablesMap.put(HRS_TP_EXP_ACC, "hrs_tp_exp_acc");
+        TablesMap.put(HRS_PACK_CC, "hrs_pack_cc");
+        TablesMap.put(HRS_PACK_CC_CC, "hrs_pack_cc_cc");
+        TablesMap.put(HRS_CFG_ACC_DEP, "hrs_cfg_acc_dep");
+        TablesMap.put(HRS_CFG_ACC_DEP_PACK_CC, "hrs_cfg_acc_dep_pack_cc");
+        TablesMap.put(HRS_CFG_ACC_EMP_PACK_CC, "hrs_cfg_acc_emp_pack_cc");
+        TablesMap.put(HRS_CFG_ACC_EMP_EAR, "hrs_cfg_acc_emp_ear");
+        TablesMap.put(HRS_CFG_ACC_EMP_DED, "hrs_cfg_acc_emp_ded");
+        TablesMap.put(HRS_CFG_ACC_EAR, "hrs_cfg_acc_ear");
+        TablesMap.put(HRS_CFG_ACC_DED, "hrs_cfg_acc_ded");
         TablesMap.put(HRS_PAY, "hrs_pay");
         TablesMap.put(HRS_PAY_RCP, "hrs_pay_rcp");
         TablesMap.put(HRS_PAY_RCP_ISS, "hrs_pay_rcp_iss");

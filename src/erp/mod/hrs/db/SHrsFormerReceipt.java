@@ -614,6 +614,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         
         boolean requireSubsidioEmpleo = mnTipoRegimen == SModSysConsts.HRSS_TP_REC_SCHE_WAG;
         boolean containsSubsidioEmpleo = false;
+        int countPerceptions = 0;
+        int countPerceptionsAreNotSalary = 0;
         
         for (SHrsFormerReceiptConcept concept : moChildConcepts) {
             if (concept.getTotalImporte() != 0) {
@@ -652,8 +654,13 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
                                     default:
                                 }
 
-                                if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BONUS, SModSysConsts.HRSS_TP_EAR_SETT, SModSysConsts.HRSS_TP_EAR_COMP })) { 
+                                countPerceptions++;
+                                
+                                if (!DCfdi40Catalogs.TiposPercepcionesQueNoSonSueldos.contains(percepcion.getAttTipoPercepcion().getString())) { 
                                     dTotalSueldos = SLibUtils.roundAmount(dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble()));
+                                }
+                                else {
+                                    countPerceptionsAreNotSalary++;
                                 }
 
                                 dTotalGravado = SLibUtils.roundAmount(dTotalGravado + percepcion.getAttImporteGravado().getDouble());
@@ -714,7 +721,13 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         
         if (!percepciones.getEltHijosPercepcion().isEmpty()) {
             percepciones.getAttTotalSueldos().setDouble(dTotalSueldos);
+            
+            if (countPerceptions == countPerceptionsAreNotSalary) {
+                percepciones.getAttTotalSueldos().setCanBeZero(false); // all perceptions are of type non-salaries
+            }
+            
             percepciones.getAttTotalSeparacionIndemnizacion().setDouble(dTotalSeparacionIndemnizacion);
+            
             percepciones.getAttTotalGravado().setDouble(dTotalGravado);
             percepciones.getAttTotalExento().setDouble(dTotalExento);
             

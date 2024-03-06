@@ -10,12 +10,15 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterYear;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -23,17 +26,22 @@ import sa.lib.gui.SGuiClient;
  */
 public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implements ActionListener {
 
+    private SGridFilterYear moFilterYear;
+    
     /**
      * @param client GUI client.
      * @param title View's GUI tab title.
      */
     public SViewMaterialConsumptionEntityBudget(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_MAT_CONS_ENT_BUDGET, SLibConsts.UNDEFINED, title, null);
+        setRowButtonsEnabled(true, true, true, false, false);
         initComponents();
     }
     
     private void initComponents() {
-        
+        moFilterYear = new SGridFilterYear(miClient, this);
+        moFilterYear.initFilter(new int[] { SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0] });
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
     }
     
     @Override
@@ -47,6 +55,11 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
         moPaneSettings.setSystemApplying(false);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
+        
+        filter = (int[]) moFiltersMap.get(SGridConsts.FILTER_YEAR).getValue();
+        int year = ((int[]) filter)[0];
+        
+        where += "v.id_year = " + year + " ";
 
         msSql = "SELECT v.id_mat_cons_ent AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_year AS " + SDbConsts.FIELD_ID + "2, "
@@ -56,6 +69,7 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
                 + "v.dt_start, "
                 + "v.dt_end, "
                 + "v.budget, "
+                + "e.code, "
                 + "e.name, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -78,9 +92,10 @@ public class SViewMaterialConsumptionEntityBudget extends SGridPaneView implemen
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "e.code", "Código"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "name", "Centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, SDbConsts.FIELD_CODE, "Año"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, SDbConsts.FIELD_NAME, "Periodo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, SDbConsts.FIELD_NAME, "Período"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_start", "Fecha inicial"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha final"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "budget", "Presupuesto $"));

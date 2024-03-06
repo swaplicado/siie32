@@ -57,7 +57,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private int mnFormResult;
     private boolean mbFirstTime;
     private boolean mbDocuentsLockedError;
-    private erp.lib.table.STablePane moConceptTablePane; 
+    private erp.lib.table.STablePane moDocEntriesTablePane; 
     
     private SDataDps moDps;
     private SFormOptionPickerItems moPickerItems;
@@ -131,7 +131,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jpCfdiData.setLayout(new java.awt.BorderLayout());
 
-        jpCfdiHeader.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales del CFDI:"));
+        jpCfdiHeader.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales del Documento:"));
         jpCfdiHeader.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -158,7 +158,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoiceCfdi.setText("Folio CFDI:");
+        jlInvoiceCfdi.setText("Folio doc.:");
         jlInvoiceCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jlInvoiceCfdi);
 
@@ -172,7 +172,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel12.add(jtfPaymentType);
 
-        jlDateCfdi.setText("  Fecha CFDI:");
+        jlDateCfdi.setText("  Fecha doc.:");
         jlDateCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jlDateCfdi);
 
@@ -187,7 +187,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jpCfdiChangeItem.add(jpCfdiData, java.awt.BorderLayout.NORTH);
 
-        jpCfdiConcepts.setBorder(javax.swing.BorderFactory.createTitledBorder("Conceptos del CFDI:"));
+        jpCfdiConcepts.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas del documento:"));
         jpCfdiConcepts.setLayout(new java.awt.BorderLayout(0, 5));
 
         jpCfdiConceptsGrid.setName(""); // NOI18N
@@ -196,16 +196,15 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jpCfdiConceptsDataNorth.setLayout(new java.awt.BorderLayout());
 
-        jpCfdiConceptSetup.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones del concepto del CFDI:"));
         jpCfdiConceptSetup.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbSelectItem.setText("Elegir ítem");
+        jbSelectItem.setText("Cambiar ítem referencia");
         jbSelectItem.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jbSelectItem);
 
-        jbCostCenter.setText("Elegir centro costo");
+        jbCostCenter.setText("Cambiar centro costo");
         jbCostCenter.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jbCostCenter);
 
@@ -232,7 +231,6 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
@@ -248,7 +246,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            moConceptTablePane.getTable().requestFocus();
+            moDocEntriesTablePane.getTable().requestFocus();
         }
         if(mbDocuentsLockedError) {
             /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
@@ -267,25 +265,26 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         int i = 0;
         STableColumnForm[] columns;
         
-        moConceptTablePane = new STablePane(miClient);
-        jpCfdiConceptsGrid.add(moConceptTablePane, BorderLayout.CENTER);
+        moDocEntriesTablePane = new STablePane(miClient);
+        jpCfdiConceptsGrid.add(moDocEntriesTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[10];
+        columns = new STableColumnForm[11];
       
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. identificación", STableConstants.WIDTH_ITEM_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem anterior", STableConstants.WIDTH_ITEM_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem anterior", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave concepto", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia anterior", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia anterior", 250);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave centro costo anterior", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo anterior", STableConstants.WIDTH_ACCOUNT);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem nuevo", STableConstants.WIDTH_ITEM_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem nuevo", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia nuevo", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia nuevo", 250);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave centro costo nuevo", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo nuevo", STableConstants.WIDTH_ACCOUNT);
         
         
         for (i = 0; i < columns.length; i++) {
-            moConceptTablePane.addTableColumn(columns[i]);
+            moDocEntriesTablePane.addTableColumn(columns[i]);
         }
         
         // Listeners:
@@ -538,27 +537,27 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
     
     private void populateTable() {
-        moConceptTablePane.createTable();
+        moDocEntriesTablePane.createTable();
         
         for (int i = 0; i < moDps.getDbmsDpsEntries().size(); i++) {
             SRowDpsEdit row = new SRowDpsEdit(miClient, moDps.getDbmsDpsEntries().get(i));
-            moConceptTablePane.addTableRow(row);
+            moDocEntriesTablePane.addTableRow(row);
         }
         
-        moConceptTablePane.renderTableRows();
-        moConceptTablePane.setTableRowSelection(0);
-        moConceptTablePane.getTable().getTableHeader().setReorderingAllowed(false);
+        moDocEntriesTablePane.renderTableRows();
+        moDocEntriesTablePane.setTableRowSelection(0);
+        moDocEntriesTablePane.getTable().getTableHeader().setReorderingAllowed(false);
     }
     
-    private void actionSelectItem() { 
+    private void actionSelectItemReference() { 
         if (jbSelectItem.isEnabled()) {
-            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
             
             if (selectedRow == -1) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
             }
             else {
-                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moConceptTablePane.getSelectedTableRow();
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
 
                 if (moPickerItems == null) {
                     moPickerItems = SFormOptionPickerItems.createOptionPicker(miClient, SDataConstants.ITMX_ITEM_IOG, moPickerItems);
@@ -567,19 +566,19 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 
                 moPickerItems.setFilterKey(SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
                 moPickerItems.formRefreshOptionPane();
-                moPickerItems.setSelectedPrimaryKey(rowDpsEdit.getItemNew() == null ? 
-                        new int [] { rowDpsEdit.getItemOld().getPkItemId() } : new int [] { rowDpsEdit.getItemNew().getPkItemId() });
+                moPickerItems.setSelectedPrimaryKey(rowDpsEdit.getItemRefNew() == null ? 
+                        (new int [] { rowDpsEdit.getItemRefOld() != null ? rowDpsEdit.getItemRefOld().getPkItemId() : 0 }) : new int [] { rowDpsEdit.getItemRefNew().getPkItemId() });
                 moPickerItems.setFormVisible(true); 
 
                 if (moPickerItems.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient,
                         SDataConstants.ITMU_ITEM, (int[]) moPickerItems.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                    rowDpsEdit.setItemNew(item);
+                    rowDpsEdit.setItemRefNew(item);
                     
                     rowDpsEdit.prepareTableRow();
-                    moConceptTablePane.renderTableRows();
-                    moConceptTablePane.setTableRowSelection(selectedRow);
+                    moDocEntriesTablePane.renderTableRows();
+                    moDocEntriesTablePane.setTableRowSelection(selectedRow);
                 }
             }
         }
@@ -587,20 +586,20 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
     private void actionCostCenter() {
         if (jbCostCenter.isEnabled()) {
-            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
             if (selectedRow == -1) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
             }
             else {
-                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moConceptTablePane.getSelectedTableRow();
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
                 if (moPickerCostCenter == null) {        
                     moPickerCostCenter = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.FIN_CC, moPickerCostCenter);
                 }
                 moPickerCostCenter.formReset();
                 moPickerCostCenter.formRefreshOptionPane();
                 try {
-                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient, rowDpsEdit.getItemNew() == null ? 
-                            rowDpsEdit.getItemOld().getPkItemId() : rowDpsEdit.getItemNew().getPkItemId()));
+                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient, rowDpsEdit.getItemRefNew() == null ? 
+                            rowDpsEdit.getItemRefOld().getPkItemId() : rowDpsEdit.getItemRefNew().getPkItemId()));
                 }
                 catch (Exception e){
                     SLibUtils.printException(this, e);
@@ -614,8 +613,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                             SDataConstants.FIN_CC, key, SLibConstants.EXEC_MODE_SILENT);
                     rowDpsEdit.setCostCenterNew(costCenter);
                     rowDpsEdit.prepareTableRow();
-                    moConceptTablePane.renderTableRows();
-                    moConceptTablePane.setTableRowSelection(selectedRow);
+                    moDocEntriesTablePane.renderTableRows();
+                    moDocEntriesTablePane.setTableRowSelection(selectedRow);
                 }
             }
         }
@@ -629,10 +628,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             for (SDataDps document : moDocuments) {
                 SDataDpsEntry entry = document.getDbmsDpsEntry(updateDocumentEntryKey);
                 if (entry != null) {
-                    if (rowDpsEdit.getItemNew() != null) {
-                        entry.setConceptKey(rowDpsEdit.getItemNew().getCode());
-                        entry.setConcept(rowDpsEdit.getItemNew().getItem());
-                        entry.setFkItemId(rowDpsEdit.getItemNew().getPkItemId());
+                    if (rowDpsEdit.getItemRefNew() != null) {
+                        entry.setFkItemRefId_n(rowDpsEdit.getItemRefNew().getPkItemId());
                         entry.setIsRegistryEdited(true);
                     }
                     if (rowDpsEdit.getCostCenterNew() != null) {
@@ -751,10 +748,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         boolean isAnyEntryChanged = false;
         SFormValidation validation = new SFormValidation();
         
-        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-            SRowDpsEdit row = (SRowDpsEdit) moConceptTablePane.getTableRow(i); 
+        for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
+            SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i); 
             
-            if (row.getItemNew() != null || row.getCostCenterNew() != null) {
+            if (row.getItemRefNew() != null || row.getCostCenterNew() != null) {
                 isAnyEntryChanged = true;
             }
         }
@@ -778,13 +775,11 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
     
     private SDataDps comprobateRegistry(){
-        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-            SRowDpsEdit row = (SRowDpsEdit) moConceptTablePane.getTableRow(i);
+        for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
+            SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
             SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) row.getDpsEntryPK());
-            if (row.getItemNew() != null) {
-                entry.setConceptKey(row.getItemNew().getCode());
-                entry.setConcept(row.getItemNew().getItem());
-                entry.setFkItemId(row.getItemNew().getPkItemId());
+            if (row.getItemRefNew() != null) {
+                entry.setFkItemRefId_n(row.getItemRefNew().getPkItemId());
                 entry.setIsRegistryEdited(true);
             }
             if (row.getCostCenterNew() != null) {
@@ -812,7 +807,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         moDps = null;
         moDocuments = null;
         moUpdateDocumentEntryKeys = null;
-        moConceptTablePane.clearTableRows();
+        moDocEntriesTablePane.clearTableRows();
     }
 
     @Override
@@ -838,6 +833,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     public void setRegistry(SDataRegistry registry) {
         moDps = (SDataDps) registry;
         
+        if (! SDataUtilities.isPeriodOpen(miClient, moDps.getDateDoc())) {
+            miClient.showMsgBoxWarning("El periodo contable está cerrado, no se puede realizar esta acción");
+        }
+        
         moDocuments = new ArrayList<>();
         getAssociatedDocuments(moDps);
         
@@ -858,16 +857,16 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jtfInvoiceCfdi.setCaretPosition(0);
         jtfPaymentType.setCaretPosition(0);
         jtfDateCfdi.setCaretPosition(0);
+        
         populateTable();
-
     }
 
     @Override
     public SDataRegistry getRegistry() {
-        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-            SRowDpsEdit row = (SRowDpsEdit) moConceptTablePane.getTableRow(i);
+        for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
+            SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
             SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) row.getDpsEntryPK());
-            if (row.getItemNew() != null || row.getCostCenterNew() != null) {
+            if (row.getItemRefNew() != null || row.getCostCenterNew() != null) {
                 updateAssocDocuments(entry.getPrimaryKey(), row);
             }
         }
@@ -904,7 +903,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 actionCancel();
             }
             else if (button == jbSelectItem) {
-                actionSelectItem();
+                actionSelectItemReference();
             }
             else if (button == jbCostCenter) {
                 actionCostCenter();

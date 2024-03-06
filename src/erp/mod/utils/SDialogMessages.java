@@ -5,6 +5,7 @@
  */
 package erp.mod.utils;
 
+import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -101,6 +102,16 @@ public class SDialogMessages extends SBeanFormDialog {
             mnMessagesCount++;
             jtaMessages.setText(jtaMessages.getText() + ((jtaMessages.getText().isEmpty() ? "" : "\n\n") + mnMessagesCount + ". " + message));
             jtaMessages.setCaretPosition(0);
+        }
+    }
+    
+    /**
+     * Append messages, and increment messages count by number of messages.
+     * @param messages Messages to append.
+     */
+    public void appendMessages(final ArrayList<String> messages) {
+        for (String message : messages) {
+            appendMessage(message);
         }
     }
     

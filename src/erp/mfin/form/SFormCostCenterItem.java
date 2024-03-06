@@ -207,7 +207,7 @@ public class SFormCostCenterItem extends javax.swing.JDialog implements erp.lib.
         mvFields.add(moFieldPkReferenceId);
         mvFields.add(moFieldIsDeleted);
 
-        moCostCentertPanel.resetPanel();
+        moCostCentertPanel.initPanel();
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -423,7 +423,7 @@ public class SFormCostCenterItem extends javax.swing.JDialog implements erp.lib.
             mvFields.get(i).resetField();
         }
 
-        moCostCentertPanel.resetPanel();
+        moCostCentertPanel.setSelectedAccount(null);
 
         jcbPkLinkTypeId.setEnabled(true);
         jbPkLinkTypeId.setEnabled(true);

@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -21,7 +22,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public class SDbMaterialRequest extends SDbRegistryUser {
     
@@ -30,6 +31,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnNumber;
     protected Date mtDate;
     protected Date mtDateRequest_n;
+    protected Date mtDateDelivery_n;
     protected String msReference;
     protected double mdTotal_r;
     protected boolean mbExternalSystem;
@@ -42,6 +44,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkMatRequestStatusId;
     protected int mnFkMatProvisionStatusId;
     protected int mnFkMatPurchaseStatusId;
+    protected int mnFkDpsNatureId;
     protected int mnFkUserRequesterId;
     protected int mnFkContractorId_n;
     protected int mnFkWarehouseCompanyBranch_n;
@@ -68,12 +71,14 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected String msAuxAuthStatus;
     protected String msAuxProvStatus;
     protected String msAuxPurStatus;
+    protected String msAuxNotes;
     
     protected int mnAuxReqStatusIdOld;
     protected int mnAuxReqAuthStatusId;
     protected int mnAuxReqAuthStatusIdOld;
     protected int mnAuxReqProvStatusIdOld;
     protected int mnAuxReqPurStatusIdOld;
+    protected String msAuxNotesChangeStatus_n;
     protected String msAuxProvEntName;
     
     protected String msAuxAuthUser;
@@ -90,6 +95,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setNumber(int n) { mnNumber = n; }
     public void setDate(Date t) { mtDate = t; }
     public void setDateRequest_n(Date t) { mtDateRequest_n = t; }
+    public void setDateDelivery_n(Date t) { mtDateDelivery_n = t; }
     public void setReference(String s) { msReference = s; }
     public void setTotal_r(double d) { mdTotal_r = d; }
     public void setExternalSystem(boolean b) { mbExternalSystem = b; }
@@ -102,6 +108,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkMatRequestStatusId(int n) { mnFkMatRequestStatusId = n; }
     public void setFkMatProvisionStatusId(int n) { mnFkMatProvisionStatusId = n; }
     public void setFkMatPurchaseStatusId(int n) { mnFkMatPurchaseStatusId = n; }
+    public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkUserRequesterId(int n) { mnFkUserRequesterId = n; }
     public void setFkContractorId_n(int n) { mnFkContractorId_n = n; }
     public void setFkWarehouseCompanyBranch_n(int n) { mnFkWarehouseCompanyBranch_n = n; }
@@ -127,6 +134,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
     public void setAuxReqProvStatusIdOld(int n) { mnAuxReqProvStatusIdOld = n; }
     public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
+    public void setAuxNotesChangeStatus_n(String s) { msAuxNotesChangeStatus_n = s; }
     
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
@@ -136,6 +144,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getNumber() { return mnNumber; }
     public Date getDate() { return mtDate; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
+    public Date getDateDelivery_n() { return mtDateDelivery_n; }
     public String getReference() { return msReference; }
     public double getTotal_r() { return mdTotal_r; }
     public boolean isExternalSystem() { return mbExternalSystem; }
@@ -148,6 +157,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkMatRequestStatusId() { return mnFkMatRequestStatusId; }
     public int getFkMatProvisionStatusId() { return mnFkMatProvisionStatusId; }
     public int getFkMatPurchaseStatusId() { return mnFkMatPurchaseStatusId; }
+    public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkUserRequesterId() { return mnFkUserRequesterId; }
     public int getFkContractorId_n() { return mnFkContractorId_n; }
     public int getFkWarehouseCompanyBranch_n() { return mnFkWarehouseCompanyBranch_n; }
@@ -170,12 +180,14 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public String getAuxAuthStatus() { return msAuxAuthStatus; }
     public String getAuxProvStatus() { return msAuxProvStatus; }
     public String getAuxPurStatus() { return msAuxPurStatus; }
+    public String getAuxNotes() { return msAuxNotes; }
 
     public int getAuxReqStatusIdOld() { return mnAuxReqStatusIdOld; }
     public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
     public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
     public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
-    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; } 
+    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; }
+    public String getAuxNotesChangeStatus_n() { return msAuxNotesChangeStatus_n; }
     
     public String getAuxProvEntName() { return msAuxProvEntName; }
     
@@ -194,6 +206,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     private void saveLog(SGuiSession session) throws Exception {
         SDbMaterialRequestStatusLog log = new SDbMaterialRequestStatusLog();
         log.setPkMatRequestId(mnPkMatRequestId);
+        log.setNotes_n(msAuxNotesChangeStatus_n == null ? "" : msAuxNotesChangeStatus_n);
         log.setFkMatRequestStatusId(mnFkMatRequestStatusId);
         log.setFkMatRequestAuthotizationStatusId(mnAuxReqAuthStatusId);
         log.setFkMatProvisionStatusId(mnFkMatProvisionStatusId);
@@ -221,6 +234,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnNumber = 0;
         mtDate = null;
         mtDateRequest_n = null;
+        mtDateDelivery_n = null;
         msReference = "";
         mdTotal_r = 0;
         mbExternalSystem = false;
@@ -233,6 +247,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkMatRequestStatusId = 0;
         mnFkMatProvisionStatusId = 0;
         mnFkMatPurchaseStatusId = 0;
+        mnFkDpsNatureId = 0;
         mnFkUserRequesterId = 0;
         mnFkContractorId_n = 0;
         mnFkWarehouseCompanyBranch_n = 0;
@@ -261,10 +276,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = 0;
         mnAuxReqProvStatusIdOld = 0;
         mnAuxReqPurStatusIdOld = 0;
+        msAuxNotesChangeStatus_n = null;
         
         msAuxProvEntName = "";
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
+        msAuxNotes = "";
     }
 
     @Override
@@ -318,6 +335,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnNumber = resultSet.getInt("num");
             mtDate = resultSet.getDate("dt");
             mtDateRequest_n = resultSet.getDate("dt_req_n");
+            mtDateDelivery_n = resultSet.getDate("dt_delivery_n");
             msReference = resultSet.getString("ref");
             mdTotal_r = resultSet.getDouble("tot_r");
             mbExternalSystem = resultSet.getBoolean("b_ext_sys");
@@ -330,6 +348,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkMatRequestStatusId = resultSet.getInt("fk_st_mat_req");
             mnFkMatProvisionStatusId = resultSet.getInt("fk_st_mat_prov");
             mnFkMatPurchaseStatusId = resultSet.getInt("fk_st_mat_pur");
+            mnFkDpsNatureId = resultSet.getInt("fk_dps_nat");
             mnFkUserRequesterId = resultSet.getInt("fk_usr_req");
             mnFkContractorId_n = resultSet.getInt("fk_contractor_n");
             mnFkWarehouseCompanyBranch_n = resultSet.getInt("fk_whs_cob_n");
@@ -361,6 +380,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 note = new SDbMaterialRequestNote();
                 note.read(session, new int[] { mnPkMatRequestId, resultSet.getInt(1) });
                 maChildNotes.add(note);
+                msAuxNotes += note.getNotes() + "\n";
             }
             
             // Read aswell cost centers:
@@ -454,6 +474,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        boolean updateProvisionStatus = false;
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -469,6 +490,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                     (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") + 
+                    (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") + 
                     "'" + msReference + "', " + 
                     mdTotal_r + ", " + 
                     (mbExternalSystem ? 1 : 0) + ", " + 
@@ -481,6 +503,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mnFkMatRequestStatusId + ", " + 
                     mnFkMatProvisionStatusId + ", " + 
                     mnFkMatPurchaseStatusId + ", " + 
+                    mnFkDpsNatureId + ", " + 
                     mnFkUserRequesterId + ", " + 
                     (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") + 
                     (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") + 
@@ -497,7 +520,6 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     ")";
         }
         else {
-            boolean updateProvisionStatus = false;
             boolean updatePurchaseStatus = false;
             
             mnFkUserUpdateId = session.getUser().getPkUserId();
@@ -524,6 +546,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "num = " + mnNumber + ", " +
                     "dt = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                     "dt_req_n = " + (mtDateRequest_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequest_n) + "', ") +
+                    "dt_delivery_n = " + (mtDateDelivery_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDelivery_n) + "', ") +
                     "ref = '" + msReference + "', " +
                     "tot_r = " + mdTotal_r + ", " +
                     "b_ext_sys = " + (mbExternalSystem ? 1 : 0) + ", " +
@@ -536,6 +559,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + ", " +
                     "fk_st_mat_prov = " + mnFkMatProvisionStatusId + ", " +
                     "fk_st_mat_pur = " + mnFkMatPurchaseStatusId + ", " +
+                    "fk_dps_nat = " + mnFkDpsNatureId + ", " +
                     "fk_usr_req = " + mnFkUserRequesterId + ", " +
                     "fk_contractor_n = " + (mnFkContractorId_n == 0 ? "NULL, " : mnFkContractorId_n + ", ") +
                     "fk_whs_cob_n = " + (mnFkWarehouseCompanyBranch_n == 0 ? "NULL, " : mnFkWarehouseCompanyBranch_n + ", ") +
@@ -588,12 +612,31 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
         mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
         if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
-                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId) {
+                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateProvisionStatus) {
+            if (updateProvisionStatus && mnAuxReqStatusIdOld == mnFkMatRequestStatusId && mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
+                String st = "";
+                if (! mbAuxLastProvClosedSta) {
+                    st = "Abierto ";
+                }
+                else {
+                    st = "Cerrado ";
+                }
+                
+                if (msAuxNotesChangeStatus_n == null || msAuxNotesChangeStatus_n.isEmpty()) {
+                    msAuxNotesChangeStatus_n = st + "para suministro.";
+                }
+                else {
+                    msAuxNotesChangeStatus_n += " " + st + "para suministro.";
+                }
+            }
+            
             saveLog(session);
         }
         
         // Si el estatus de requisición esta "En autorización"
         if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_AUTH) {
+            String prov = "";
+            String pur = "";
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
             boolean reset = false;
             SAuthorizationUtils.processAuthorizations(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId }, reset);
@@ -602,7 +645,9 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
             // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización", este pasa a "En suministro"
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV; 
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV;
+                prov += "b_clo_prov = 0 ";
+                pur += "b_clo_pur = 1 ";
             }
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
@@ -610,6 +655,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             }
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 
+                    (prov.isEmpty() ? "" : ", " + prov + " ") +
+                    (pur.isEmpty() ? "" : ", " + pur + " ") +
                     getSqlWhere();
             session.getStatement().execute(msSql);
             
@@ -618,8 +665,53 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             }
         }
         
+        /**
+        * Actualización de estatus específicos
+        */
+        if (mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV || mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+           /**
+            * Actualización de estatus de compras
+            */
+           double percPurchasedByOrd = SMaterialRequestUtils.getPurchasedPercent(session, mnPkMatRequestId, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+           if (percPurchasedByOrd == 0d) {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_PEND);
+           }
+           else if (percPurchasedByOrd > 0d && percPurchasedByOrd < 1d) {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_PROC);
+           }
+           else {
+               setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_DONE);
+           }
+
+           /**
+            * Actualización de estatus de suministro
+            */
+           double percSupplied = SMaterialRequestUtils.getSuppliedPercent(session, mnPkMatRequestId);
+           if (percSupplied == 0d) {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_PEND);
+           }
+           else if (percSupplied > 0d && percSupplied < 1d) {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_PROC);
+           }
+           else {
+               setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_DONE);
+           }
+           
+           msSql = "UPDATE " + getSqlTable() + " SET " + 
+                    "fk_st_mat_prov = " + mnFkMatProvisionStatusId + ", " + 
+                    "fk_st_mat_pur = " + mnFkMatPurchaseStatusId + " " +
+                    getSqlWhere();
+           
+            session.getStatement().execute(msSql);
+       }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
+    public void cancel(SGuiSession session) throws Exception {
+        msSql = "UPDATE " + getSqlTable() + " SET fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_CAN + " " + getSqlWhere();
+        session.getStatement().execute(msSql);
     }
 
     @Override
@@ -631,6 +723,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setNumber(this.getNumber());
         registry.setDate(this.getDate());
         registry.setDateRequest_n(this.getDateRequest_n());
+        registry.setDateDelivery_n(this.getDateDelivery_n());
         registry.setReference(this.getReference());
         registry.setTotal_r(this.getTotal_r());
         registry.setExternalSystem(this.isExternalSystem());
@@ -643,6 +736,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkMatRequestStatusId(this.getFkMatRequestStatusId());
         registry.setFkMatProvisionStatusId(this.getFkMatProvisionStatusId());
         registry.setFkMatPurchaseStatusId(this.getFkMatPurchaseStatusId());
+        registry.setFkDpsNatureId(this.getFkDpsNatureId());
         registry.setFkUserRequesterId(this.getFkUserRequesterId());
         registry.setFkContractorId_n(this.getFkContractorId_n());
         registry.setFkWarehouseCompanyBranch_n(this.getFkWarehouseCompanyBranch_n());

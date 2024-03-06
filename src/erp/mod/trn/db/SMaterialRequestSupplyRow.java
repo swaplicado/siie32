@@ -36,6 +36,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     protected boolean mbDeleted;
     protected int mnFkItemId;
     protected int mnFkUnitId;
+    protected int mnFkOrigUnitId;
     protected int mnFkCompanyBranchId;
     protected int mnFkWarehouseId;
     
@@ -51,14 +52,16 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     protected double mdAuxToSegregate;
     protected double mdAuxToSupply;
     protected boolean mbAuxBulk;
-    protected boolean mbAuxIsInv; 
+    protected boolean mbAuxIsInv;
     
     SClientInterface miClient;
+    protected SDbMaterialRequestEntry moAuxMatReqEty;
     
-    public SMaterialRequestSupplyRow(SClientInterface client, final int fkItem, final int fkUnit, final int fkCoB, final int fkWhs) {
+    public SMaterialRequestSupplyRow(SClientInterface client, final int fkItem, final int fkUnit, final int fkOrigUnit, final int fkCoB, final int fkWhs) {
         miClient = client;
         mnFkItemId = fkItem;
         mnFkUnitId = fkUnit;
+        mnFkOrigUnitId = fkOrigUnit;
         mnFkCompanyBranchId = fkCoB;
         mnFkWarehouseId = fkWhs;
         mnFkConsumeEntityId_n = 0;
@@ -66,6 +69,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
         mnFkSubConsumeSubEntityId_n = 0;
         
         mbDeleted = false;
+        moAuxMatReqEty = null;
         
         msAuxItemCode = "";
         msAuxItemName = "";
@@ -158,6 +162,7 @@ public class SMaterialRequestSupplyRow implements SGridRow {
     public boolean isDeleted() { return mbDeleted; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkOrigUnitId() { return mnFkOrigUnitId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkWarehouseId() { return mnFkWarehouseId; }
     

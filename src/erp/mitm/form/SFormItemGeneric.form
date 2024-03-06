@@ -554,7 +554,7 @@
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="Aplica l&#xed;nea de &#xed;tems"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[350, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -569,9 +569,9 @@
                               <SubComponents>
                                 <Component class="javax.swing.JCheckBox" name="jckIsItemNameEditable">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Los nombres de &#xed;tems se pueden modificar"/>
+                                    <Property name="text" type="java.lang.String" value="Nombres de &#xed;tems modificables en documentos"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[350, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -586,9 +586,9 @@
                               <SubComponents>
                                 <Component class="javax.swing.JCheckBox" name="jckIsItemKeyEditable">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Las claves de &#xed;tems se pueden modificar"/>
+                                    <Property name="text" type="java.lang.String" value="Claves de &#xed;tems modificables en documentos"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[350, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -1233,6 +1233,13 @@
                                   </Properties>
                                 </Component>
                                 <Component class="javax.swing.JLabel" name="jLabel2">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                                    </Property>
+                                    <Property name="horizontalAlignment" type="int" value="11"/>
+                                    <Property name="text" type="java.lang.String" value="(&#xa1;Opacan cfg. &#xed;tem!)"/>
+                                  </Properties>
                                 </Component>
                               </SubComponents>
                             </Container>
@@ -1302,6 +1309,13 @@
                                   </Properties>
                                 </Component>
                                 <Component class="javax.swing.JLabel" name="jLabel5">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                                    </Property>
+                                    <Property name="horizontalAlignment" type="int" value="11"/>
+                                    <Property name="text" type="java.lang.String" value="&#xa1;Opacan cfg. &#xed;tem!"/>
+                                  </Properties>
                                 </Component>
                               </SubComponents>
                             </Container>

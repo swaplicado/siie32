@@ -169,7 +169,7 @@ public class SDataAnalysisItem extends erp.lib.data.SDataRegistry implements jav
             sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                     + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                     + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
-                    + "ON qa.fk_tp_analysis_id = qtp.id_analysis_type "
+                    + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
                     + "WHERE qa.id_analysis = " + mnPkAnalysisId;
             
             resultSetAux = statement.getConnection().createStatement().executeQuery(sql);

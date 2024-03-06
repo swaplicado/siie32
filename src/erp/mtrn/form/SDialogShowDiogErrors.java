@@ -98,7 +98,7 @@ public class SDialogShowDiogErrors extends javax.swing.JDialog implements Action
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 800, 500);
         jbOk.addActionListener(this);
         
         jlText.setText("Se encontraron " + mnErrors + " error(es) y " + mnWarnings + " advertencia(s).");

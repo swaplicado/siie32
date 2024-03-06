@@ -19,14 +19,15 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
-
     private int mnBizPartnerCategory;
+    private boolean mbIsViewForEmployees;
+    private boolean mbIsViewForAllOrEmployees;
 
     public SViewBizPartnerBranchAddress(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, auxType);
@@ -41,13 +42,15 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDeleted = new STabFilterDeleted(this);
+        mbIsViewForEmployees = mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP;
+        mbIsViewForAllOrEmployees = mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP;
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[2];
 
-        if (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP) {
+        if (mbIsViewForAllOrEmployees) {
             aoTableColumns = new STableColumn[25];
         }
         else {
@@ -62,7 +65,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
         }
 
         i = 0;
-        if (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP) {
+        if (mbIsViewForAllOrEmployees) {
             moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstants.BPSU_BP);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 200);
         }
@@ -137,7 +140,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ad.b_def", "Predeterminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);
         
-        if (mnTabTypeAux01 != SDataConstants.BPSU_BPB_ADD && mnTabTypeAux01 != SDataConstants.BPSX_BPB_ADD_EMP) {
+        if (!mbIsViewForAllOrEmployees) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ct.b_del", "Categoría eliminada", STableConstants.WIDTH_BOOLEAN);
         }
         
@@ -182,6 +185,10 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_del = FALSE AND bpb.b_del = FALSE AND ad.b_del = FALSE ";
                 sqlCategoryWhere = " AND ct.b_del = FALSE ";
+                
+                if (mbIsViewForEmployees) {
+                    sqlWhere += "AND e.b_act ";
+                }
             }
 
             if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
@@ -189,7 +196,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
             }
         }
 
-        if (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP) {
+        if (mbIsViewForAllOrEmployees) {
             sqlOrder = "bp.bp, bp.id_bp, ";
         }
         else {
@@ -234,20 +241,21 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
             }
         }
         
-        if (mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP) {
+        if (mbIsViewForEmployees) {
             sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp = TRUE ";
         }
 
         msSql = "SELECT ad.id_bpb, ad.id_add, ad.bpb_add, ad.bpb_add_code, ad.street, ad.street_num_ext, ad.street_num_int, ad.neighborhood, " +
                 "ad.zip_code, ad.po_box, ad.b_def, bp.b_del, bpb.b_del, ad.b_del, ad.ts_new, ad.ts_edit, ad.ts_del, " +
-                "bpb.bpb, bp.bp, " + (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP ? "" :"ct.bp_key, ct.b_del, ") +
+                "bpb.bpb, bp.bp, " + (mbIsViewForAllOrEmployees ? "" :"ct.bp_key, ct.b_del, ") +
                 "tp.tp_add, ad.locality, ad.county, ad.state, COALESCE(cty.cty_abbr, '" + miClient.getSession().getSessionCustom().getLocalCountryCode() + "') AS f_cty_abbr, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bpb_add AS ad " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON " +
                 "ad.id_bpb = bpb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS bp ON " +
                 "bpb.fid_bp = bp.id_bp " +
-                (mnTabTypeAux01 == SDataConstants.BPSU_BPB_ADD || mnTabTypeAux01 == SDataConstants.BPSX_BPB_ADD_EMP ? "" : "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.fid_ct_bp = " + mnBizPartnerCategory + (sqlCategoryWhere.length() == 0 ? "" : sqlCategoryWhere) + " ") +
+                (mbIsViewForAllOrEmployees ? "" : "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND ct.fid_ct_bp = " + mnBizPartnerCategory + (sqlCategoryWhere.length() == 0 ? "" : sqlCategoryWhere) + " ") +
+                (mbIsViewForEmployees ? "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " : "") +
                 "INNER JOIN erp.bpss_tp_add AS tp ON " +
                 "ad.fid_tp_add = tp.id_tp_add " +
                 "INNER JOIN erp.usru_usr AS un ON " +

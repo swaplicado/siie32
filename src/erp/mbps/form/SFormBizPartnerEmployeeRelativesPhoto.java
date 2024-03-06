@@ -120,7 +120,7 @@ public class SFormBizPartnerEmployeeRelativesPhoto extends javax.swing.JDialog i
 
         jPanel1.add(jpPhotoContainer, java.awt.BorderLayout.CENTER);
 
-        jpEmployeeData.setLayout(new java.awt.GridLayout());
+        jpEmployeeData.setLayout(new java.awt.GridLayout(1, 0));
 
         jlData.setText("Nombre");
         jlData.setPreferredSize(new java.awt.Dimension(300, 23));

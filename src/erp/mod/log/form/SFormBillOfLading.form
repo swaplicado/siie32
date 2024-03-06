@@ -59,7 +59,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                 <Property name="columns" type="int" value="1"/>
-                <Property name="rows" type="int" value="17"/>
+                <Property name="rows" type="int" value="18"/>
                 <Property name="verticalGap" type="int" value="5"/>
               </Layout>
               <SubComponents>
@@ -465,6 +465,23 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Container class="javax.swing.JPanel" name="jPanel32">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolRevLog">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Log&#xed;stica inversa, recolecci&#xf3;n, devoluci&#xf3;n"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[270, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
               </SubComponents>
             </Container>
           </SubComponents>
@@ -526,7 +543,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlPlate">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Placa:"/>
+                        <Property name="text" type="java.lang.String" value="Placa y peso veh.:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[125, 23]"/>
                         </Property>
@@ -536,6 +553,15 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="enabled" type="boolean" value="false"/>
+                      </Properties>
+                    </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecimalVehWei">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value=""/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[95, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                   </SubComponents>

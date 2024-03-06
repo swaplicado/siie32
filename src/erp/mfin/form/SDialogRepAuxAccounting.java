@@ -509,10 +509,10 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
         moPanelCostCenterEnd.setComponentPrevious(moPanelCostCenterStart);
         moPanelCostCenterEnd.setComponentNext(((JSpinner.DefaultEditor) jsLevel.getEditor()).getTextField());   // proper model of JSpiner must be set before!
 
-        moPanelAccountStart.resetPanel();
-        moPanelAccountEnd.resetPanel();
-        moPanelCostCenterStart.resetPanel();
-        moPanelCostCenterEnd.resetPanel();
+        moPanelAccountStart.initPanel();
+        moPanelAccountEnd.initPanel();
+        moPanelCostCenterStart.initPanel();
+        moPanelCostCenterEnd.initPanel();
 
         SFormUtilities.populateComboBox(miClient, jcbEntity, SDataConstants.CFGU_COB_ENT);
         SFormUtilities.populateComboBox(miClient, jcbItem, SDataConstants.ITMU_ITEM);

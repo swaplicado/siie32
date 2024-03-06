@@ -10,10 +10,11 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  *
- * @author TRON
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SDataItemLine extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -268,6 +269,17 @@ public class SDataItemLine extends erp.lib.data.SDataRegistry implements java.io
                 throw new Exception(msDbmsError);
             }
             else {
+                // format names and keys of items of parent generic item:
+                
+                try (Statement statement = connection.createStatement()) {
+                    SDataItemGeneric itemGeneric = new SDataItemGeneric();
+                    
+                    itemGeneric.read(new int[] { mnFkItemGenericId }, statement);
+                    itemGeneric.formatItemKeysAndNames(statement); // once again format names and keys, due to bugs in stored procedure!!!
+                }
+                
+                // finish saving registry:
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }

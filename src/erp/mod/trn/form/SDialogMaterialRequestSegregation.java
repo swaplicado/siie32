@@ -404,6 +404,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                                                                             SMaterialRequestEntryRow.FORM_SEGREGATION,
                                                                             oMaterialRequestEntry.getFkItemId(), 
                                                                             oMaterialRequestEntry.getFkUnitId(),
+                                                                            oMaterialRequestEntry.getFkUserUnitId(),
                                                                             oMaterialRequestEntry.getConsumptionInfo().isEmpty() ? 
                                                                                     moMaterialRequest.getConsumptionInfo() : 
                                                                                     oMaterialRequestEntry.getConsumptionInfo());
@@ -411,6 +412,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
                 oRow.setPkEntryId(oMaterialRequestEntry.getPkEntryId());
                 oRow.setQuantity(oMaterialRequestEntry.getQuantity());
                 oRow.setAuxStock(params.getPkWarehouseId() == 0 ? 0d : oStock.getAvailableStock());
+                oRow.setIsItemNew(oMaterialRequestEntry.isNewItem());
                 
                 double dSegregated = 0d;
                 if (mnSegregationId > 0) {

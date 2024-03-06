@@ -6,16 +6,20 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SMaterialRequestUtils;
-import erp.mod.trn.form.SDialogMaterialRequestSupply;
+import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
+import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -27,7 +31,6 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
-import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
@@ -44,16 +47,25 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewMaterialRequesPendingSupply extends SGridPaneView implements ActionListener {
 
-    //private JButton mjbSupply;
+    private JButton jbPrint;
+    private JButton jbAuthCardex;
+    private JButton jbLogCardex;
+    private JButton jbSegregate;
+    private JButton mjbSupply;
+    private JButton mjbCloseOpenSupply;
     private JButton mjbToNew;
+    private JButton mjbToSupply;
     private JButton mjbToPur;
-    //private JButton mjbToSupply;
+    private JButton mjbToEstimate;
+    private JButton jbDocsCardex;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
     //private JButton mjbClose;
     //private JButton mjbOpen;
-    private SGridFilterDatePeriod moFilterDatePeriod;
-    private SDialogMaterialRequestSupply moDialogSupply;
+    //private SGridFilterDatePeriod moFilterDatePeriod;
+    private SDialogAuthorizationCardex moDialogAuthCardex;
+    private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
+    private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -71,12 +83,19 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
     }
     
     private void initComponents() {
-//        mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
-        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_new_main.gif")), "Regresar estatus nuevo", this);
-        mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar para compra", this);
-        //mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
-        mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
-        mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
+        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
+        jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de autorizaciones", this);
+        jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
+        jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
+        mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
+        mjbCloseOpenSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mfg_rm_con_del.gif")), "Cerrar/abrir suministro", this);
+        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar a nuevo", this);
+        mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
+        mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
+        mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
+        mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtrar", this);
+        mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
 //        mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
 //        mjbOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
 //        mjbClose.setToolTipText("Cerrar para suministro");
@@ -89,68 +108,39 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
         jbRowDelete.setEnabled(false);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
+        jbPrint.setEnabled(true);
+        jbAuthCardex.setEnabled(true);
+        jbLogCardex.setEnabled(true);
+        jbSegregate.setEnabled(false);
+        mjbToEstimate.setEnabled(false);
+        mjbSupply.setEnabled(false);
+        mjbToSupply.setEnabled(false);
+        mjbCloseOpenSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED);
+        mjbToNew.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED);
+        mjbToPur.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED);
         
-        //getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSupply);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSupply);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCloseOpenSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
-        //getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
         
-        //mjbSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP);
-        mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
-        //mjbToSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR && mnGridSubtype == SLibConsts.UNDEFINED);
-        mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
-
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
-            moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
-            if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_PUR) {
-                moFilterDatePeriod.initFilter(null);
-            }
-            else {
-                moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-            }
-            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        }
-        
-        moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
+        moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
+        moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos de la requisición");
         
         msSeekQueryText = "";
-    }
-    
-    private void actionSupply() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-            }
-            else {
-                try {
-                    int[] key = (int[]) gridRow.getRowPrimaryKey();
-                    
-                    moDialogSupply.setFormParams(key, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);
-                    moDialogSupply.setVisible(true);
-                    
-                    miClient.getSession().notifySuscriptors(mnGridType);
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-            }
-        }
     }
     
     private void actionToNew() {
@@ -236,10 +226,11 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                         + "bmu.bp LIKE '%" + text + "%' OR "
                         + "smr.name LIKE '%" + text + "%' ";
                 
-                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+                if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                     msSeekQueryText += "OR i.item LIKE '%" + text + "%' "
                             + "OR i.item_key LIKE '%" + text + "%' "
-                            + "OR u.unit LIKE '%" + text + "%' ";
+                            + "OR u.unit LIKE '%" + text + "%' "
+                            + "OR IF(ISNULL(entc.name), trn_get_cons_info(v.id_mat_req, 1), entc.name) LIKE '%" + text + "%' ";
                 }
                 
                 msSeekQueryText += ") ";
@@ -248,6 +239,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 msSeekQueryText = "";
             }
 
+            moTextToSearch.requestFocus();
             actionGridReload();
         }
     }
@@ -255,7 +247,156 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
     private void actionCleanSearch() {
         moTextToSearch.setText("");
         msSeekQueryText = "";
+        moTextToSearch.requestFocus();
         actionGridReload();
+    }
+    
+    private void actionPrint() {
+        if (jbPrint.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        print(gridRow.getRowPrimaryKey()[0]);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void print(int idMatReq) throws Exception {
+        HashMap<String, Object> params;
+        
+        params = miClient.createReportParams();
+        params.put("nMatReqId", idMatReq);
+        
+        miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
+    }
+    
+    private void actionCardex() {
+        int[] key;
+        
+        if (jbAuthCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogAuthCardex.setFormParams(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ), key);
+                        moDialogAuthCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    private void actionLog() {
+        int[] key;
+        
+        if (jbLogCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogLogsCardex.setFormParams(key[0]);
+                        moDialogLogsCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    private void actionCloseOpenToSupply() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                int[] key = (int[]) gridRow.getRowPrimaryKey();
+                String message = SMaterialRequestUtils.openOrCloseToSupply(miClient.getSession(), key);
+                if (! message.isEmpty()) {
+                    miClient.showMsgBoxError(message);
+                }
+
+                miClient.getSession().notifySuscriptors(mnGridType);
+            }
+        }
+    }
+    
+    private void actionDocsKardex() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                    moDialogDocsCardex.setFormParams(key[0]);
+                    moDialogDocsCardex.setVisible(true);
+                    
+                    miClient.getSession().notifySuscriptors(mnGridType);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
     }
     
     @Override
@@ -296,7 +437,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 SAuthorizationUtils.AUTH_STATUS_NA + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP) {
-            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 select = "i.item, i.item_key, u.unit, ve.id_ety, "
                         + "SUM(ve.qty) AS org_qty, "
                         + "COALESCE(de.sumi_qty, 0) AS sumi_qty, "
@@ -309,7 +450,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
                 groupOrderBy = "ve.id_mat_req, ve.id_ety ";
                 subGroupOrderBy = "de.fid_mat_req_n, de.fid_mat_req_ety_n ";
-                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'S' ";
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 //having = "HAVING per < 1 "; // Descomentar para mostrar unicamente los que faltan por suministrar
             }
@@ -317,7 +458,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
                         + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
-                where += (where.isEmpty() ? "" : "AND ") + " v.tp_req = 'S' ";
+                where += (where.isEmpty() ? "" : "AND ") + " v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
                 having = "HAVING per_sumi >= 1 OR v.b_clo_prov ";
@@ -326,7 +467,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_sumi, " 
                         + "1 - COALESCE(de.sumi_qty, 0) / SUM(ve.qty) AS per_x_sumi, ";
-                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = 'S' ";
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' ";
                 subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
                 subGroupOrderBy = "de.fid_mat_req_n ";
@@ -408,7 +549,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 + "GROUP BY " + subGroupOrderBy + " " 
                 + "ORDER BY " + subGroupOrderBy + " ) AS de ON " 
                 + "ve.id_mat_req = de.fid_mat_req_n ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             msSql += "AND ve.id_ety = de.fid_mat_req_ety_n ";
         }
         msSql += "LEFT JOIN (SELECT "
@@ -430,7 +571,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 + "\n #AND NOT mr.fk_usr_clo_pur "
                 + "\n GROUP BY ddmr.fid_mat_req "
                 + "ORDER BY ddmr.fid_mat_req) AS req_pur ON ve.id_mat_req = req_pur.fid_mat_req ";
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             msSql += "AND ve.id_ety = req_pur.fid_mat_req_ety ";
         }
         msSql += join
@@ -448,7 +589,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "id_ety", "Número partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
@@ -473,7 +614,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_DETAIL) {
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ent_cons", "Centro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "s_ent_cons", "Subcentro consumo"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cc", "Centro de costo"));
@@ -522,14 +663,26 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             else if (button == mjbToPur) {
                 actionToPur();
             }
-//            else if (button == mjbToSupply) {
-//                actionToSupply();
-//            }
             else if (button == mjbToSearch) {
                 actionSearch();
             }
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
+            }
+            else if (button == jbPrint) {
+                actionPrint();
+            }
+            else if (button == jbAuthCardex) {
+                actionCardex();
+            }
+            else if (button == jbLogCardex) {
+                actionLog();
+            }
+            else if (button == mjbCloseOpenSupply) {
+                actionCloseOpenToSupply();
+            }
+            else if (button == jbDocsCardex) {
+                actionDocsKardex();
             }
         }
     }

@@ -79,6 +79,7 @@ public class SViewVehicle extends SGridPaneView {
                 + "v.plate, " 
                 + "v.veh_year, "
                 + "v.veh_conf, "
+                + "v.gross_weight, "
                 + "v.perm_sct_tp, "
                 + "v.perm_sct_num, "
                 + "v.insurance_policy, "
@@ -105,13 +106,14 @@ public class SViewVehicle extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[15];
+        SGridColumnView[] columns = new SGridColumnView[16];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_tp_code", SGridConsts.COL_TITLE_CODE + " tipo");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.plate", "Placa");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "v.veh_year", "Año modelo");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.gross_weight", "Peso bruto");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.veh_conf", "Configuración vehicular");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_tp", "Tipo de permiso SCT");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_num", "Número de permiso SCT");

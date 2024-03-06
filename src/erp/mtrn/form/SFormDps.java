@@ -141,7 +141,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
@@ -7847,10 +7847,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             miClient.showMsgBoxWarning("El documento origen debe estar emitido.");
                         }
                         else {
+                            //BizParther is internacional
+                            if (moBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)){
+                                // document sales
+                                if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
                             // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
-
-                            if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
-                                miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
+                                    if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
+                                        miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
+                                    }
+                                }
                             }
                             
                             for (SDataDpsEntry dpsSourceEntry : oDpsSource.getDbmsDpsEntries()) {
@@ -8006,6 +8011,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setDbmsAddElektraParts(dpsSourceEntry.getDbmsAddElektraParts());
                                                 entry.setDbmsAddElektraPartPriceUnitary(dpsSourceEntry.getDbmsAddElektraPartPriceUnitary());
                                                 entry.setDbmsAddJsonData(dpsSourceEntry.getDbmsAddJsonData());
+                                                entry.setDbmsDpsEntryMatRequest(dpsSourceEntry.getDbmsDpsEntryMatRequestLink());
 
                                                 entry.calculateTotal(miClient, moDps.getDate(),
                                                         moDps.getFkTaxIdentityEmisorTypeId(), moDps.getFkTaxIdentityReceptorTypeId(),

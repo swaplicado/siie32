@@ -781,55 +781,57 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         
         for (SCfdPaymentEntryDoc paymentEntryDoc : PaymentEntryDocs) {
             for (SDataReceiptPaymentPayDocTax payDocTax : paymentEntryDoc.ReceiptPaymentPayDocTaxes) {
-                boolean found = false;
-                for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
-                    if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
-                        if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId()&&
-                                payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId()) {
-                            BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
-                            BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
-                            BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
-                            BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
-                            BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
-                            
-                            payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
-                            payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
-                            found = true;
+                if (payDocTax.getBase() != 0.0) { 
+                    boolean found = false;
+                    for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
+                        if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+                            if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId()&&
+                                    payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId()) {
+                                BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                                BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                                BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+                                BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
+                                BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
+
+                                payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                                payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                                found = true;
+                            }
+                        }
+                        else if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                            if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId() &&
+                                    payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId() &&
+                                    payDocTax.getRate() == payTax.getRate() &&
+                                    payDocTax.getFactorCode().equals(payTax.getFactorCode())) {
+                                BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                                BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                                BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+                                BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
+                                BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
+
+                                payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                                payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
+                                found = true;
+                            }
                         }
                     }
-                    else if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                        if (payDocTax.getFkCfdTaxId() == payTax.getFkCfdTaxId() &&
-                                payDocTax.getFkTaxTypeId() == payTax.getFkTaxTypeId() &&
-                                payDocTax.getRate() == payTax.getRate() &&
-                                payDocTax.getFactorCode().equals(payTax.getFactorCode())) {
-                            BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
-                            BigDecimal docBase = new BigDecimal(String.valueOf(payDocTax.getBase()));
-                            BigDecimal docTax = new BigDecimal(String.valueOf(payDocTax.getTax()));
-                            BigDecimal base = new BigDecimal(String.valueOf(payTax.getBase()));
-                            BigDecimal tax = new BigDecimal(String.valueOf(payTax.getTax()));
-                            
-                            payTax.setBase(base.add(docBase.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
-                            payTax.setTax(tax.add(docTax.divide(excRate, 12, RoundingMode.FLOOR)).doubleValue());
-                            found = true;
+                    if (!found) {
+                        BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
+                        BigDecimal base = new BigDecimal(String.valueOf(payDocTax.getBase()));
+                        BigDecimal tax = new BigDecimal(String.valueOf(payDocTax.getTax()));
+
+                        SDataReceiptPaymentPayTax payTax = new SDataReceiptPaymentPayTax();
+                        payTax.setBase(base.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
+                        payTax.setTax(tax.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
+
+                        payTax.setFkCfdTaxId(payDocTax.getFkCfdTaxId());
+                        payTax.setFkTaxTypeId(payDocTax.getFkTaxTypeId());
+                        if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                            payTax.setFactorCode(payDocTax.getFactorCode());
+                            payTax.setRate(payDocTax.getRate());
                         }
+                        ReceiptPaymentPayTaxes.add(payTax);
                     }
-                }
-                if (!found) {
-                    BigDecimal excRate = new BigDecimal(String.valueOf(paymentEntryDoc.ExchangeRate));
-                    BigDecimal base = new BigDecimal(String.valueOf(payDocTax.getBase()));
-                    BigDecimal tax = new BigDecimal(String.valueOf(payDocTax.getTax()));
-                    
-                    SDataReceiptPaymentPayTax payTax = new SDataReceiptPaymentPayTax();
-                    payTax.setBase(base.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
-                    payTax.setTax(tax.divide(excRate, 12, RoundingMode.FLOOR).doubleValue());
-                    
-                    payTax.setFkCfdTaxId(payDocTax.getFkCfdTaxId());
-                    payTax.setFkTaxTypeId(payDocTax.getFkTaxTypeId());
-                    if (payDocTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                        payTax.setFactorCode(payDocTax.getFactorCode());
-                        payTax.setRate(payDocTax.getRate());
-                    }
-                    ReceiptPaymentPayTaxes.add(payTax);
                 }
             }
         }
