@@ -269,7 +269,7 @@ public class SAuthorizationsAPI {
                 SAuthorizationEty auEty = new SAuthorizationEty();
                 auEty.setIdEty(res.getInt("id_mat_req"));
                 auEty.setQty(res.getFloat("qty"));
-                auEty.setFactConv(res.getFloat("fact_conv"));
+//                auEty.setFactConv(res.getFloat("fact_conv"));
                 auEty.setPriceUnitSys(res.getFloat("price_u_sys"));
                 auEty.setPriceUnit(res.getFloat("price_u"));
                 auEty.setTotal(res.getFloat("tot_r"));
