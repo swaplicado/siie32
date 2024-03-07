@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import java.sql.ResultSet;
@@ -142,7 +143,7 @@ public class SAuthorizationsAPI {
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
                 + "v.fk_tp_authorn = cta.id_tp_authorn AND NOT v.b_del "
                 + "WHERE "
-                + "NOT tmr.b_del AND ( " +
+                + "NOT tmr.b_del AND tmr.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " AND ( " +
                 "    v.res_pk_n1_n IS NULL OR ( " +
                 "        v.res_pk_n1_n IS NOT NULL AND ( " +
 //                "            -- Cuando authorn_grouper_n no es nulo, obtener el más alto " +
