@@ -1136,6 +1136,11 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
+        /**
+         * Esta misma funcionalidad se realizó en la clase SDialogRecordPaymentMultiple en la función getRegistry().
+         * Cualquier modificación que se realice en este archivo debe realizarse en ese también.
+         * Edwin Carmona: 2024-03-06
+         */
         ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), 
                 SLibTimeUtils.digestYear(moParamRecord.getDate())[0], 
                 moDps.getPkYearId(), moDps.getPkDocId(), 

@@ -1,8 +1,16 @@
 ================================================================================
+SIIE 3.2 243.1/ 2024-03-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Réplica (copia) la funcionalidad ya existente en el diálogo de pagos a asociados de negocio en el diálogo de pagos integrales a 
+asociados de negocios. Y en ambos casos, en ambos diálogos, se agrega un comentario para advertir al programador que cualquier 
+cambio que se realice a esa sección de código fuente debe replicarse tal cual en el el código fuente de su contraparte.
+
+================================================================================
 SIIE 3.2 243.0/ 2024-03-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de omición de validación de restricción de timbrado de facturas en moneda extranjera en la configuración de clientes.
+1) Implementación de omisión de validación de restricción de timbrado de facturas en moneda extranjera en la configuración de clientes.
 
 ================================================================================
 SIIE 3.2 242.3/ 2024-03-06
