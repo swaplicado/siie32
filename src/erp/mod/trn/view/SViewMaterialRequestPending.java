@@ -206,7 +206,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         }
         
         if(hasRightMatReqPur) {
-            mjbToSupply.setEnabled(false);
+            mjbSupply.setEnabled(false);
             mjbCloseOpenSupply.setEnabled(false);
             jbSegregate.setEnabled(false);
         }
