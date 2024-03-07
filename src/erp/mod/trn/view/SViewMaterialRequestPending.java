@@ -200,6 +200,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             jbLogCardex.setEnabled(true);
             mjbToSupply.setEnabled(false);
             mjbToEstimate.setEnabled(false);
+            mjbEstimationKardex.setEnabled(false);
             jbDocsCardex.setEnabled(true);
             mjbToSearch.setEnabled(true);
             mjbCleanSearch.setEnabled(true);
