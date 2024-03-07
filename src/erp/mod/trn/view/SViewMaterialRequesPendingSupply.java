@@ -161,21 +161,21 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         
-        if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP && hasRightMatReqPur) {
-            jbPrint.setEnabled(false);
-            jbAuthCardex.setEnabled(false);
-            jbLogCardex.setEnabled(false);
-            jbSegregate.setEnabled(false);
-            mjbSupply.setEnabled(false);
-            mjbCloseOpenSupply.setEnabled(false);
-            mjbToNew.setEnabled(false);
-            mjbToSupply.setEnabled(false);
-            mjbToPur.setEnabled(false);
-            mjbToEstimate.setEnabled(false);
-            jbDocsCardex.setEnabled(false);
-            mjbToSearch.setEnabled(false);
-            mjbCleanSearch.setEnabled(false);
-        }
+//        if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP && hasRightMatReqProv) {
+//            jbPrint.setEnabled(true);
+//            jbAuthCardex.setEnabled(true);
+//            jbLogCardex.setEnabled(true);
+//            jbSegregate.setEnabled(true);
+//            mjbSupply.setEnabled(true);
+//            mjbCloseOpenSupply.setEnabled(true);
+//            mjbToNew.setEnabled(true);
+//            mjbToSupply.setEnabled(false);
+//            mjbToPur.setEnabled(true);
+//            mjbToEstimate.setEnabled(false);
+//            jbDocsCardex.setEnabled(true);
+//            mjbToSearch.setEnabled(true);
+//            mjbCleanSearch.setEnabled(true);
+//        }
         
         msSeekQueryText = "";
     }

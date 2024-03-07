@@ -14,6 +14,7 @@ import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
+import erp.mod.trn.form.SDialogMaterialRequestEstimationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SDialogMaterialRequestSupply;
@@ -64,6 +65,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private JButton jbDocsCardex;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
+    private JButton mjbEstimationKardex;
     //private JButton mjbClose;
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
@@ -73,6 +75,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private SDialogMaterialRequestEstimation moDialogEstimate;
     private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
+    private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private boolean mbHasAdmRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -107,6 +110,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
+        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
@@ -133,6 +137,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         moTextToSearch = new JTextField("");
@@ -141,74 +146,107 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
         
-        jbPrint.setEnabled(true);
-        jbAuthCardex.setEnabled(true);
-        jbLogCardex.setEnabled(true);
-        jbSegregate.setEnabled(true);
-        mjbSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL );
-        mjbCloseOpenSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED);
-        mjbToSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
-        mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
-        mjbToEstimate.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
-        mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
-        jbDocsCardex.setEnabled(true);
-        
+//        jbPrint.setEnabled(true);
+//        jbAuthCardex.setEnabled(true);
+//        jbLogCardex.setEnabled(true);
+//        jbSegregate.setEnabled(true);
+//        mjbSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL );
+//        mjbCloseOpenSupply.setEnabled(mnGridSubtype == SLibConstants.UNDEFINED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED);
+//        mjbToSupply.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
+//        mjbToPur.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && mnGridSubtype == SLibConsts.UNDEFINED);
+//        mjbToEstimate.setEnabled(mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR);
+//        mjbToNew.setEnabled(mnGridSubtype == SLibConsts.UNDEFINED);
+//        jbDocsCardex.setEnabled(true);
+//        
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL)){
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
-        
+//        
         if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-            mjbSupply.setEnabled(false);
-            jbSegregate.setEnabled(false);
-            jbRowEdit.setEnabled(false);
+//            mjbSupply.setEnabled(false);
+//            jbSegregate.setEnabled(false);
+//            jbRowEdit.setEnabled(false);
         }
+        
+        jbPrint.setEnabled(false);
+        jbAuthCardex.setEnabled(false);
+        jbLogCardex.setEnabled(false);
+        jbSegregate.setEnabled(false);
+        mjbSupply.setEnabled(false);
+        mjbCloseOpenSupply.setEnabled(false);
+        mjbToNew.setEnabled(false);
+        mjbToSupply.setEnabled(false);
+        mjbToPur.setEnabled(false);
+        mjbToEstimate.setEnabled(false);
+        jbDocsCardex.setEnabled(false);
+        mjbToSearch.setEnabled(false);
+        mjbCleanSearch.setEnabled(false);
         
         moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos de la requisición");
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
+        moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
         
-        if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && hasRightMatReqPur) {
-            jbPrint.setEnabled(false);
-            jbAuthCardex.setEnabled(false);
-            jbLogCardex.setEnabled(false);
-            jbSegregate.setEnabled(false);
-            mjbSupply.setEnabled(false);
-            mjbCloseOpenSupply.setEnabled(false);
-            mjbToNew.setEnabled(false);
+        if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && hasRightMatReqProv) {
+            jbPrint.setEnabled(true);
+            jbAuthCardex.setEnabled(true);
+            jbLogCardex.setEnabled(true);
             mjbToSupply.setEnabled(false);
-            mjbToPur.setEnabled(false);
             mjbToEstimate.setEnabled(false);
-            jbDocsCardex.setEnabled(false);
-            mjbToSearch.setEnabled(false);
-            mjbCleanSearch.setEnabled(false);
+            jbDocsCardex.setEnabled(true);
+            mjbToSearch.setEnabled(true);
+            mjbCleanSearch.setEnabled(true);
+            if (mnGridSubtype == SLibConstants.UNDEFINED) {
+                jbSegregate.setEnabled(true);
+                mjbSupply.setEnabled(true);
+                mjbCloseOpenSupply.setEnabled(true);
+                mjbToNew.setEnabled(true);
+                mjbToPur.setEnabled(true);
+            }
+            else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
+                jbSegregate.setEnabled(false);
+                mjbSupply.setEnabled(true);
+                mjbCloseOpenSupply.setEnabled(false);
+                mjbToNew.setEnabled(false);
+                mjbToPur.setEnabled(false);
+            }
+            else {
+                jbSegregate.setEnabled(false);
+                mjbSupply.setEnabled(false);
+                mjbCloseOpenSupply.setEnabled(false);
+                mjbToNew.setEnabled(false);
+                mjbToPur.setEnabled(false);
+            }
         }
-        if ((mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) && hasRightMatReqProv) {
-            jbPrint.setEnabled(false);
-            jbAuthCardex.setEnabled(false);
-            jbLogCardex.setEnabled(false);
+        if ((mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) && hasRightMatReqPur) {
+            jbPrint.setEnabled(true);
+            jbAuthCardex.setEnabled(true);
+            jbLogCardex.setEnabled(true);
+            mjbToEstimate.setEnabled(false);
+            jbDocsCardex.setEnabled(true);
+            mjbToSearch.setEnabled(true);
+            mjbCleanSearch.setEnabled(true);
+            mjbToPur.setEnabled(false);
             jbSegregate.setEnabled(false);
             mjbSupply.setEnabled(false);
             mjbCloseOpenSupply.setEnabled(false);
-            mjbToNew.setEnabled(false);
-            mjbToSupply.setEnabled(false);
-            mjbToPur.setEnabled(false);
-            mjbToEstimate.setEnabled(false);
-            jbDocsCardex.setEnabled(false);
-            mjbToSearch.setEnabled(false);
-            mjbCleanSearch.setEnabled(false);
-        }
-        
-        if(hasRightMatReqPur) {
-            mjbSupply.setEnabled(false);
-            mjbCloseOpenSupply.setEnabled(false);
-            jbSegregate.setEnabled(false);
+            if (mnGridSubtype == SLibConstants.UNDEFINED) {
+                mjbToSupply.setEnabled(true);
+                mjbToNew.setEnabled(true);
+                mjbToEstimate.setEnabled(true);
+            }
+            else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
+                mjbToNew.setEnabled(true);
+                mjbToEstimate.setEnabled(true);
+                
+            }
         }
         
         msSeekQueryText = "";
@@ -591,6 +629,30 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         actionGridReload();
     }
     
+    private void actionEstRequestKardex() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
+                int[] key = (int[]) gridRow.getRowPrimaryKey();
+                moDialogEstimationKardex.setValue(SModConsts.TRN_MAT_REQ_ETY, key);
+                moDialogEstimationKardex.setVisible(true);
+            }
+        }
+    }
     
     @Override
     public void prepareSqlQuery() {
@@ -988,6 +1050,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
+            }
+            else if (button == mjbEstimationKardex) {
+                actionEstRequestKardex();
             }
         }
     }

@@ -661,8 +661,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurPendDet = new JMenuItem("RM por pedir a detalle");
         jmiReqPurClosed = new JMenuItem("RM pedidas");
         jmiReqPurClosedDet = new JMenuItem("RM pedidas a detalle");
-        jmiReqEstDet = new JMenuItem("RM por solicitar cotización");
-        jmiReqPendEstDet = new JMenuItem("RM solicitadas para cotización");
+        jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
+        jmiReqPendEstDet = new JMenuItem("RM por solicitar para cotización");
         
         jmiReqAll = new JMenuItem("Todas las RM");
         
