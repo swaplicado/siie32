@@ -65,7 +65,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
     private JButton jbDocsCardex;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
-    private JButton mjbEstimationKardex;
+    //private JButton mjbEstimationKardex;
     //private JButton mjbClose;
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
@@ -110,7 +110,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
-        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
+        //mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
@@ -137,7 +137,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
+//        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         moTextToSearch = new JTextField("");
@@ -192,7 +192,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos de la requisición");
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
-        moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
+        //moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && hasRightMatReqProv) {
             jbPrint.setEnabled(true);
@@ -200,7 +200,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             jbLogCardex.setEnabled(true);
             mjbToSupply.setEnabled(false);
             mjbToEstimate.setEnabled(false);
-            mjbEstimationKardex.setEnabled(false);
+            //mjbEstimationKardex.setEnabled(false);
             jbDocsCardex.setEnabled(true);
             mjbToSearch.setEnabled(true);
             mjbCleanSearch.setEnabled(true);
@@ -245,6 +245,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 mjbToNew.setEnabled(true);
+                mjbToSupply.setEnabled(true);
                 mjbToEstimate.setEnabled(true);
                 
             }
@@ -1052,9 +1053,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
             }
-            else if (button == mjbEstimationKardex) {
-                actionEstRequestKardex();
-            }
+//            else if (button == mjbEstimationKardex) {
+//                actionEstRequestKardex();
+//            }
         }
     }
 }
