@@ -623,6 +623,8 @@ public class SModuleTrn extends SGuiModule {
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
                         break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM consumo suministradas detalle";
+                        break;
                     case SLibConsts.UNDEFINED: title = "RM consumo x suministrar";
                         break;
                 }
@@ -633,6 +635,8 @@ public class SModuleTrn extends SGuiModule {
                     case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a detalle";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
+                        break;
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM resurtido suministradas detalle";
                         break;
                     case SLibConsts.UNDEFINED: title = "RM resurtido x suministrar";
                         break;
@@ -649,15 +653,21 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_CLO_PUR:
-                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, "RM pedidas detalle", params);
+                switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM pedidas detalle";
+                       break;
+                    default: title = "RM pedidas";
+                        break;
+                }
+                view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x cotizar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x solicitar cotización";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM cotizadas detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM solicitada cotización";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM x cotizar";
+                    case SLibConsts.UNDEFINED: title = "RM x solicitar cotización";
                         break;
                 }
                 view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
