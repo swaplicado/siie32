@@ -644,7 +644,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAllSupEnt = new JMenuItem("RM de mis centros de suministro");
         
         jmiReqRevTbAuth = new JMenuItem("RM por autorizar");
-        jmiReqRevAuth = new JMenuItem("RM autotizadas");
+        jmiReqRevAuth = new JMenuItem("RM autorizadas");
         jmiReqRevNoAuth = new JMenuItem("RM rechazadas");
         
         jmiReqConsSupPend = new JMenuItem("RM de consumo por suministrar");
@@ -1940,6 +1940,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqEstDet) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);
+            }
+            else if (item == jmiReqPendEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);

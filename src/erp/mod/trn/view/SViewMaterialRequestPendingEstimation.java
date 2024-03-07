@@ -18,6 +18,7 @@ import erp.mod.trn.form.SDialogMaterialRequestEstimationCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -55,6 +56,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     private JButton jbDocsCardex;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
+    private JButton mjbToNew;
     //private JButton mjbClose;
     //private JButton mjbOpen;
     private SGridFilterDatePeriod moFilterDatePeriod;
@@ -85,6 +87,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
+        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         
         jbRowNew.setEnabled(false);
@@ -97,6 +100,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
@@ -312,6 +316,47 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         actionGridReload();
     }
     
+    private void actionToNew() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de devolver la requisición a estatus de nuevo?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
+                        int[] key = (int[]) gridRow.getRowPrimaryKey();
+                        String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
+                        if (! message.isEmpty()) {
+                            miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);
+                        }
+                        else {
+                            message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
+                            if (! message.isEmpty()) {
+                                miClient.showMsgBoxError(message);
+                            }
+                            
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        }
+                    }
+                }
+                catch (SQLException ex) {
+                    Logger.getLogger(SViewMaterialRequestPending.class.getName()).log(Level.SEVERE, null, ex);
+                    SLibUtils.showException(this, ex);
+                }
+            }
+        }
+    }
     
     @Override
     public void prepareSqlQuery() {
@@ -525,6 +570,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             }
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
+            }
+            else if (button == mjbToNew) {
+                actionToNew();
             }
         }
     }
