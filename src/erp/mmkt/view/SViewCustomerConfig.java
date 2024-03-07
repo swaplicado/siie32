@@ -18,11 +18,11 @@ import erp.lib.table.STableSetting;
  *
  * @author Néstor Ávalos, Sergio Flores
  */
-public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
+public class SViewCustomerConfig extends erp.lib.table.STableTab {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
-    public SViewCustomerConfiguration(erp.client.SClientInterface client, java.lang.String tabTitle) {
+    public SViewCustomerConfig(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.MKT_CFG_CUS);
         initComponents();
     }
@@ -36,7 +36,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[20];
+        STableColumn[] aoTableColumns = new STableColumn[21];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cus");
@@ -55,6 +55,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bps.bp", "Supervisor ventas", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_sign_restrict", "Restringido al timbrar CFDI", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_sign_immex", "IMMEX al timbrar CFDI", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_skip_sign_for_cur_restrict", "Omitir restricción timbrado moneda extranjera", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_disc_doc", "S/descuento", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_free_comms", "S/comisiones", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp1.b_del", "Asoc. negocios eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -122,7 +123,7 @@ public class SViewCustomerConfiguration extends erp.lib.table.STableTab {
             }
         }
 
-        msSql = "SELECT bp1.bp, c.id_cus, c.b_sign_restrict, c.b_sign_immex, c.b_free_disc_doc, c.b_free_comms, "
+        msSql = "SELECT bp1.bp, c.id_cus, c.b_sign_restrict, c.b_sign_immex, c.b_skip_sign_for_cur_restrict, c.b_free_disc_doc, c.b_free_comms, "
                 + "bp1.b_del, ct.b_del, ct.fid_usr_ana_n, "
                 + "tp.tp_cus, bp.bp, bps.bp, sg.mkt_segm, su.mkt_segm_sub, dis.dist_chan, "
                 + "c.fid_usr_edit, c.ts_new, c.ts_edit, c.ts_del, un.usr, ue.usr, ud.usr, uan.usr "

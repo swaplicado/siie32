@@ -380,7 +380,7 @@
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckIsSignRestricted">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Es restringido al timbrar CFDI"/>
+                    <Property name="text" type="java.lang.String" value="Es cliente restringido al timbrar CFDI"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlIsSignRestrictedHint">
@@ -388,12 +388,12 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="(Validar permiso especial al timbrar.)"/>
+                    <Property name="text" type="java.lang.String" value="(Validar permiso especial al timbrar CFDI de facturas.)"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckIsSignImmex">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Es IMMEX al timbrar CFDI"/>
+                    <Property name="text" type="java.lang.String" value="Es cliente IMMEX al timbrar CFDI"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlIsSignImmexHint">
@@ -401,11 +401,19 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="(Validar permiso especial al timbrar.)"/>
+                    <Property name="text" type="java.lang.String" value="(Validar permiso especial al timbrar CFDI de facturas.)"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="jckIsSkipSignForeignCurrencyRestriction">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Omitir restricci&#xf3;n de timbrado de CFDI en moneda extranjera"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckIsDeleted">
                   <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
+                    </Property>
                     <Property name="text" type="java.lang.String" value="Registro eliminado"/>
                   </Properties>
                 </Component>

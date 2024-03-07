@@ -144,6 +144,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
     private erp.lib.form.SFormField moFieldIsSignRestricted;
     private erp.lib.form.SFormField moFieldIsSignImmex;
+    private erp.lib.form.SFormField moFieldIsSkipSignForeignCurrencyRestriction;
 
     private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
     private erp.mbps.form.SFormBizPartnerBranch moFormBizPartnerBranch;
@@ -407,6 +408,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel73 = new javax.swing.JPanel();
         jckIsSignImmex = new javax.swing.JCheckBox();
         jlIsSignImmexHint = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jckIsSkipSignForeignCurrencyRestriction = new javax.swing.JCheckBox();
         jpCusBranchConfig = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
         jbNewCusBranchConfig = new javax.swing.JButton();
@@ -1176,7 +1179,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jpMarketing1.setLayout(new java.awt.BorderLayout());
 
         jpCusConfig.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del cliente:"));
-        jpCusConfig.setLayout(new java.awt.GridLayout(10, 1, 0, 2));
+        jpCusConfig.setLayout(new java.awt.GridLayout(11, 1, 0, 2));
 
         jPanel64.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1312,11 +1315,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel72.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsSignRestricted.setText("Es cliente restringido al timbrar CFDI");
-        jckIsSignRestricted.setPreferredSize(new java.awt.Dimension(225, 23));
+        jckIsSignRestricted.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel72.add(jckIsSignRestricted);
 
         jlIsSignRestrictedHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar CFDI de facturas)");
+        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar CFDI de facturas.)");
         jlIsSignRestrictedHint.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel72.add(jlIsSignRestrictedHint);
 
@@ -1325,15 +1328,23 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel73.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsSignImmex.setText("Es cliente IMMEX al timbrar CFDI");
-        jckIsSignImmex.setPreferredSize(new java.awt.Dimension(225, 23));
+        jckIsSignImmex.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel73.add(jckIsSignImmex);
 
         jlIsSignImmexHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar CFDI de facturas)");
+        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar CFDI de facturas.)");
         jlIsSignImmexHint.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel73.add(jlIsSignImmexHint);
 
         jpCusConfig.add(jPanel73);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsSkipSignForeignCurrencyRestriction.setText("Omitir restricción de timbrado de CFDI en moneda extranjera");
+        jckIsSkipSignForeignCurrencyRestriction.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel4.add(jckIsSkipSignForeignCurrencyRestriction);
+
+        jpCusConfig.add(jPanel4);
 
         jpMarketing1.add(jpCusConfig, java.awt.BorderLayout.NORTH);
 
@@ -1631,6 +1642,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldIsSignRestricted.setTabbedPaneIndex(2, jTabbedPane1);
         moFieldIsSignImmex = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignImmex);
         moFieldIsSignImmex.setTabbedPaneIndex(2, jTabbedPane1);
+        moFieldIsSkipSignForeignCurrencyRestriction = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSkipSignForeignCurrencyRestriction);
+        moFieldIsSkipSignForeignCurrencyRestriction.setTabbedPaneIndex(2, jTabbedPane1);
 
         mvFields.add(moFieldFkBizPartnerIdentityTypeId);
         mvFields.add(moFieldBizPartnerCommercial);
@@ -1685,6 +1698,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCustomerConfig.add(moFieldIsFreeCommissions);
         mvFieldsCustomerConfig.add(moFieldIsSignRestricted);
         mvFieldsCustomerConfig.add(moFieldIsSignImmex);
+        mvFieldsCustomerConfig.add(moFieldIsSkipSignForeignCurrencyRestriction);
 
         moFormBizPartnerBranch = new SFormBizPartnerBranch(miClient);
 
@@ -2226,6 +2240,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jckIsFreeCommissions.setEnabled(true);
             jckIsSignRestricted.setEnabled(true);
             jckIsSignImmex.setEnabled(true);
+            jckIsSkipSignForeignCurrencyRestriction.setEnabled(true);
             jlFkCfdAddendaTypeId.setEnabled(true);
             jcbFkCfdAddendaTypeId.setEnabled(true);
             jbModifyCusBranchConfig.setEnabled(true);
@@ -2257,6 +2272,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jckIsFreeCommissions.setEnabled(false);
             jckIsSignRestricted.setEnabled(false);
             jckIsSignImmex.setEnabled(false);
+            jckIsSkipSignForeignCurrencyRestriction.setEnabled(false);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jcbFkCfdAddendaTypeId.setEnabled(false);
             jbModifyCusBranchConfig.setEnabled(false);
@@ -2737,6 +2753,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
@@ -2834,6 +2851,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
     private javax.swing.JCheckBox jckIsSignImmex;
     private javax.swing.JCheckBox jckIsSignRestricted;
+    private javax.swing.JCheckBox jckIsSkipSignForeignCurrencyRestriction;
     private javax.swing.JFormattedTextField jftAlternativeId;
     private javax.swing.JFormattedTextField jftDateEnd_n;
     private javax.swing.JFormattedTextField jftDateStart;
@@ -3501,6 +3519,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 moFieldIsFreeCommissions.setFieldValue(moCustomerConfig.getIsFreeCommissions());
                 moFieldIsSignRestricted.setFieldValue(moCustomerConfig.getIsSignRestricted());
                 moFieldIsSignImmex.setFieldValue(moCustomerConfig.getIsSignImmex());
+                moFieldIsSkipSignForeignCurrencyRestriction.setFieldValue(moCustomerConfig.getIsSkipSignForeignCurrencyRestriction());
             }
 
             int row = 0;
@@ -3752,6 +3771,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moCustomerConfig.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
             moCustomerConfig.setIsSignRestricted(moFieldIsSignRestricted.getBoolean());
             moCustomerConfig.setIsSignImmex(moFieldIsSignImmex.getBoolean());
+            moCustomerConfig.setIsSkipSignForeignCurrencyRestriction(moFieldIsSkipSignForeignCurrencyRestriction.getBoolean());
 
             SDataCustomerBranchConfig customerBranchConfigHq = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsDataCustomerBranchConfig();
             

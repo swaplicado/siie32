@@ -40,11 +40,10 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Sergio Flores
  */
 public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -481,7 +480,7 @@ public class SGuiModuleMkt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     sViewTitle = "Tipos cliente";
                     break;
                 case SDataConstants.MKT_CFG_CUS:
-                    oViewClass = erp.mmkt.view.SViewCustomerConfiguration.class;
+                    oViewClass = erp.mmkt.view.SViewCustomerConfig.class;
                     sViewTitle = "Configuraciones clientes";
                     break;
                 case SDataConstants.MKTU_MKT_SEGM:

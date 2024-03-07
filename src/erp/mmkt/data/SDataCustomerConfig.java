@@ -21,6 +21,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
     protected int mnPkCustomerId;
     protected boolean mbIsSignRestricted;
     protected boolean mbIsSignImmex;
+    protected boolean mbIsSkipSignForeignCurrencyRestriction;
     protected boolean mbIsFreeDiscountDoc;
     protected boolean mbIsFreeCommissions;
     protected boolean mbIsDeleted;
@@ -45,6 +46,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
     public void setPkCustomerId(int n) { mnPkCustomerId = n; }
     public void setIsSignRestricted(boolean b) { mbIsSignRestricted = b; }
     public void setIsSignImmex(boolean b) { mbIsSignImmex = b; }
+    public void setIsSkipSignForeignCurrencyRestriction(boolean b) { mbIsSkipSignForeignCurrencyRestriction = b; }
     public void setIsFreeDiscountDoc(boolean b) { mbIsFreeDiscountDoc = b; }
     public void setIsFreeCommissions(boolean b) { mbIsFreeCommissions = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
@@ -64,6 +66,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
     public int getPkCustomerId() { return mnPkCustomerId; }
     public boolean getIsSignRestricted() { return mbIsSignRestricted; }
     public boolean getIsSignImmex() { return mbIsSignImmex; }
+    public boolean getIsSkipSignForeignCurrencyRestriction() { return mbIsSkipSignForeignCurrencyRestriction; }
     public boolean getIsFreeDiscountDoc() { return mbIsFreeDiscountDoc; }
     public boolean getIsFreeCommissions() { return mbIsFreeCommissions; }
     public boolean getIsDeleted() { return mbIsDeleted; }
@@ -97,6 +100,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
         mnPkCustomerId = 0;
         mbIsSignRestricted = false;
         mbIsSignImmex = false;
+        mbIsSkipSignForeignCurrencyRestriction = false;
         mbIsFreeDiscountDoc = false;
         mbIsFreeCommissions = false;
         mbIsDeleted = false;
@@ -135,6 +139,7 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
                 mnPkCustomerId = resultSet.getInt("id_cus");
                 mbIsSignRestricted = resultSet.getBoolean("b_sign_restrict");
                 mbIsSignImmex = resultSet.getBoolean("b_sign_immex");
+                mbIsSkipSignForeignCurrencyRestriction = resultSet.getBoolean("b_skip_sign_for_cur_restrict");
                 mbIsFreeDiscountDoc = resultSet.getBoolean("b_free_disc_doc");
                 mbIsFreeCommissions = resultSet.getBoolean("b_free_comms");
                 mbIsDeleted = resultSet.getBoolean("b_del");
@@ -177,12 +182,12 @@ public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements j
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL mkt_cfg_cus_save(" +
-                    "?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkCustomerId);
             callableStatement.setBoolean(nParam++, mbIsSignRestricted);
             callableStatement.setBoolean(nParam++, mbIsSignImmex);
+            callableStatement.setBoolean(nParam++, mbIsSkipSignForeignCurrencyRestriction);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountDoc);
             callableStatement.setBoolean(nParam++, mbIsFreeCommissions);
             callableStatement.setBoolean(nParam++, mbIsDeleted);

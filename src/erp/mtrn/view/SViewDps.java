@@ -84,7 +84,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Claudio Peña, Edwin Carmona, Sergio Flores
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -2416,11 +2416,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionSignXml() throws Exception {
         if (jbSignXml.isEnabled()) {
            if (isRowSelected()) {
-                boolean canEmitCompMonExt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
-                boolean canEmitCompSignRestricted = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_RESTRICT).HasRight;
-                boolean canEmitCompSignImmex = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_RESTRICT).HasRight;
+                boolean hasRightEmitCompForeignCurrency = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_MON_EXT).HasRight;
+                boolean hasRightEmitCompSignRestrict = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_RESTRICT).HasRight;
+                boolean hasRightEmitCompSignImmex = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_COMP_SIGN_IMMEX).HasRight;
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataCustomerConfig customerConfig = (SDataCustomerConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUS, new int[] { dps.getFkBizPartnerId_r() } , SLibConstants.EXEC_MODE_SILENT);
+                boolean isDpsForeignCurrency = !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() });
                 
                 if (dps.getIsDeleted()) {
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
@@ -2434,13 +2435,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (dps.getDbmsDataCfd() == null) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento '" + dps.getDpsNumber() + "'.");
                 }
-                else if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { dps.getFkCurrencyId() }) && !canEmitCompMonExt) {
+                else if (isDpsForeignCurrency && !hasRightEmitCompForeignCurrency && (customerConfig == null || !customerConfig.getIsSkipSignForeignCurrencyRestriction())) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes en moneda extranjera.");
                 }
-                else if (customerConfig != null && customerConfig.getIsSignRestricted() && !canEmitCompSignRestricted) {
+                else if (customerConfig != null && customerConfig.getIsSignRestricted() && !hasRightEmitCompSignRestrict) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes restringidos.");
                 }
-                else if (customerConfig != null && customerConfig.getIsSignImmex()&& !canEmitCompSignImmex) {
+                else if (customerConfig != null && customerConfig.getIsSignImmex()&& !hasRightEmitCompSignImmex) {
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no puede emitir comprobantes de clientes IMMEX.");
                 }
                 else {

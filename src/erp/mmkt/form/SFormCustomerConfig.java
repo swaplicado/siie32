@@ -63,6 +63,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
     private erp.lib.form.SFormField moFieldIsSignRestricted;
     private erp.lib.form.SFormField moFieldIsSignImmex;
+    private erp.lib.form.SFormField moFieldIsSkipSignForeignCurrencyRestriction;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     private erp.lib.table.STablePane moCusBranchConfigPane;
@@ -127,6 +128,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         jlIsSignRestrictedHint = new javax.swing.JLabel();
         jckIsSignImmex = new javax.swing.JCheckBox();
         jlIsSignImmexHint = new javax.swing.JLabel();
+        jckIsSkipSignForeignCurrencyRestriction = new javax.swing.JCheckBox();
         jckIsDeleted = new javax.swing.JCheckBox();
         jpCusBranchConfig = new javax.swing.JPanel();
         jpNotesAction = new javax.swing.JPanel();
@@ -262,20 +264,24 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         jckIsFreeCommissions.setText("Sin comisiones");
         jPanel4.add(jckIsFreeCommissions);
 
-        jckIsSignRestricted.setText("Es restringido al timbrar CFDI");
+        jckIsSignRestricted.setText("Es cliente restringido al timbrar CFDI");
         jPanel4.add(jckIsSignRestricted);
 
         jlIsSignRestrictedHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar.)");
+        jlIsSignRestrictedHint.setText("(Validar permiso especial al timbrar CFDI de facturas.)");
         jPanel4.add(jlIsSignRestrictedHint);
 
-        jckIsSignImmex.setText("Es IMMEX al timbrar CFDI");
+        jckIsSignImmex.setText("Es cliente IMMEX al timbrar CFDI");
         jPanel4.add(jckIsSignImmex);
 
         jlIsSignImmexHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar.)");
+        jlIsSignImmexHint.setText("(Validar permiso especial al timbrar CFDI de facturas.)");
         jPanel4.add(jlIsSignImmexHint);
 
+        jckIsSkipSignForeignCurrencyRestriction.setText("Omitir restricción de timbrado de CFDI en moneda extranjera");
+        jPanel4.add(jckIsSkipSignForeignCurrencyRestriction);
+
+        jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
         jPanel4.add(jckIsDeleted);
 
@@ -348,6 +354,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
         moFieldIsSignRestricted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignRestricted);
         moFieldIsSignImmex = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSignImmex);
+        moFieldIsSkipSignForeignCurrencyRestriction = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSkipSignForeignCurrencyRestriction);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldPkCustomerId);
@@ -360,6 +367,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         mvFields.add(moFieldIsFreeCommissions);
         mvFields.add(moFieldIsSignRestricted);
         mvFields.add(moFieldIsSignImmex);
+        mvFields.add(moFieldIsSkipSignForeignCurrencyRestriction);
         mvFields.add(moFieldIsDeleted);
 
         jbOK.addActionListener(this);
@@ -634,6 +642,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
     private javax.swing.JCheckBox jckIsSignImmex;
     private javax.swing.JCheckBox jckIsSignRestricted;
+    private javax.swing.JCheckBox jckIsSkipSignForeignCurrencyRestriction;
     private javax.swing.JLabel jlFkCustomerTypeId;
     private javax.swing.JLabel jlFkDistributionChannelId;
     private javax.swing.JLabel jlFkMarketSegmentId;
@@ -762,6 +771,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         moFieldIsFreeCommissions.setFieldValue(moCustomerConfiguration.getIsFreeCommissions());
         moFieldIsSignRestricted.setFieldValue(moCustomerConfiguration.getIsSignRestricted());
         moFieldIsSignImmex.setFieldValue(moCustomerConfiguration.getIsSignImmex());
+        moFieldIsSkipSignForeignCurrencyRestriction.setFieldValue(moCustomerConfiguration.getIsSkipSignForeignCurrencyRestriction());
         moFieldIsDeleted.setFieldValue(moCustomerConfiguration.getIsDeleted());
 
         readCustomerBranchConfig();
@@ -801,6 +811,7 @@ public class SFormCustomerConfig extends javax.swing.JDialog implements erp.lib.
         moCustomerConfiguration.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
         moCustomerConfiguration.setIsSignRestricted(moFieldIsSignRestricted.getBoolean());
         moCustomerConfiguration.setIsSignImmex(moFieldIsSignImmex.getBoolean());
+        moCustomerConfiguration.setIsSkipSignForeignCurrencyRestriction(moFieldIsSkipSignForeignCurrencyRestriction.getBoolean());
         moCustomerConfiguration.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         for (int i = 1; i < moBizPartner.getDbmsBizPartnerBranches().size(); i++) {
