@@ -127,6 +127,14 @@ public class SAuthorizationsAPI {
                 + "pe.name AS prov_ent, "
                 + "ur.usr AS usr_req, "
                 + "tmr.id_mat_req, "
+                + " (IF(v.id_authorn_step IS NULL, "
+                + "        'NO APLICA', "
+                + "        (SELECT "
+                + "                usr "
+                + "            FROM "
+                + "                " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " "
+                + "            WHERE "
+                + "                id_usr = v.fk_usr_step))) AS authorn_usr, "
                 + "tmr.fk_mat_req_pty, "
                 + "pty.name as priority, "
                 + "trn_get_cons_info(tmr.id_mat_req, 1) AS ent_cons, "
@@ -228,6 +236,8 @@ public class SAuthorizationsAPI {
                 au.setAuthorizationStatusName(res.getString("doc_authorn_status"));
                 au.setAuthorizationTypeName(res.getString("authorn_type"));
                 au.setAuthorizationStatus(res.getInt("authorn_status"));
+                au.setAuthorizationUser(res.getString("authorn_usr"));
+                
                 lAuthData.add(au);
             }
 

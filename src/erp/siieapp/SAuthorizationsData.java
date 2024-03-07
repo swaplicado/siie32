@@ -17,6 +17,7 @@ public class SAuthorizationsData {
     String dataTypeName;
     String userCreator;
     String userUpdator;
+    String authorizationUser;
     String consumeEntity;
     String subConsumeEntity;
     String supplierEntity;
@@ -149,6 +150,14 @@ public class SAuthorizationsData {
 
     public void setUserUpdator(String userUpdator) {
         this.userUpdator = userUpdator;
+    }
+
+    public String getAuthorizationUser() {
+        return authorizationUser;
+    }
+
+    public void setAuthorizationUser(String authorizationUser) {
+        this.authorizationUser = authorizationUser;
     }
 
     public String getConsumeEntity() {
