@@ -64,7 +64,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
     private JButton mjbCleanSearch;
     //private JButton mjbClose;
     //private JButton mjbOpen;
-    private JButton mjbEstimationKardex;
+    //private JButton mjbEstimationKardex;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private SDialogAuthorizationCardex moDialogAuthCardex;
@@ -104,7 +104,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
-        mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
+        //mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtrar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
@@ -141,7 +141,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSupply);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToPur);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
+//        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         moTextToSearch = new JTextField("");
@@ -161,21 +161,21 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         
-//        if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP && hasRightMatReqProv) {
-//            jbPrint.setEnabled(true);
-//            jbAuthCardex.setEnabled(true);
-//            jbLogCardex.setEnabled(true);
-//            jbSegregate.setEnabled(true);
-//            mjbSupply.setEnabled(true);
-//            mjbCloseOpenSupply.setEnabled(true);
-//            mjbToNew.setEnabled(true);
-//            mjbToSupply.setEnabled(false);
-//            mjbToPur.setEnabled(true);
-//            mjbToEstimate.setEnabled(false);
-//            jbDocsCardex.setEnabled(true);
-//            mjbToSearch.setEnabled(true);
-//            mjbCleanSearch.setEnabled(true);
-//        }
+        if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP && hasRightMatReqPur) {
+            jbPrint.setEnabled(false);
+            jbAuthCardex.setEnabled(false);
+            jbLogCardex.setEnabled(false);
+            jbSegregate.setEnabled(false);
+            mjbSupply.setEnabled(false);
+            mjbCloseOpenSupply.setEnabled(false);
+            mjbToNew.setEnabled(false);
+            mjbToSupply.setEnabled(false);
+            mjbToPur.setEnabled(false);
+            mjbToEstimate.setEnabled(false);
+            jbDocsCardex.setEnabled(false);
+            mjbToSearch.setEnabled(false);
+            mjbCleanSearch.setEnabled(false);
+        }
         
         msSeekQueryText = "";
     }
@@ -774,9 +774,9 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             else if (button == jbDocsCardex) {
                 actionDocsKardex();
             }
-            else if (button == mjbEstimationKardex) {
-                actionEstRequestKardex();
-            }
+//            else if (button == mjbEstimationKardex) {
+//                actionEstRequestKardex();
+//            }
         }
     }
 }

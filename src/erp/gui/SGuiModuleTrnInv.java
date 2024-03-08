@@ -635,9 +635,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq = new JMenu("Requisiciones materiales");
         
         jmiReqPetNew = new JMenuItem("Mis RM nuevas");
-        jmiReqPetTbAuth = new JMenuItem("Mis RM por autorizar");
-        jmiReqPetTbProccProv = new JMenuItem("Mis RM por suministrar");
-        jmiReqPetTbProccPur = new JMenuItem("Mis RM por comprar");
+        jmiReqPetTbAuth = new JMenuItem("Mis RM en autorización");
+        jmiReqPetTbProccProv = new JMenuItem("Mis RM en suministro");
+        jmiReqPetTbProccPur = new JMenuItem("Mis RM en compras");
         jmiReqPetAll = new JMenuItem("Todas mis RM");
         
         jmiReqAllConsEnt = new JMenuItem("RM de mis centros de consumo");
@@ -661,8 +661,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurPendDet = new JMenuItem("RM por pedir a detalle");
         jmiReqPurClosed = new JMenuItem("RM pedidas");
         jmiReqPurClosedDet = new JMenuItem("RM pedidas a detalle");
-        jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
         jmiReqPendEstDet = new JMenuItem("RM por solicitar para cotización");
+        jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
         
         jmiReqAll = new JMenuItem("Todas las RM");
         
@@ -695,8 +695,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmiReqPurPendDet);
         jmMenuReq.add(jmiReqPurClosed);
         jmMenuReq.add(jmiReqPurClosedDet);
-        jmMenuReq.add(jmiReqEstDet);
+        jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqPendEstDet);
+        jmMenuReq.add(jmiReqEstDet);
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqAll);
         jmMenuReq.addSeparator();
@@ -958,10 +959,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqConsSupPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqConsSup.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqConsSupDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
-        jmiReqStockSupPend.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
-        jmiReqStockSupPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
-        jmiReqStockSup.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
-        jmiReqStockSupDet.setEnabled(hasRightMatReqProv || hasRightMatReqAdm);
+        jmiReqStockSupPend.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqStockSupPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqStockSup.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqStockSupDet.setEnabled(hasRightMatReqProv|| hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurPend.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurClosed.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);

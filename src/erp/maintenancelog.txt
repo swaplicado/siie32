@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 243.2/ 2024-03-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del boton Abrir/cerrar compras en las vistas de compras.
+2) Cambio de posición en las opciones de menú de las RM cotizadas y por cotizar.
+3) Cambio de nombre en las vistas de RM de solicitante.
+
+================================================================================
 SIIE 3.2 243.1/ 2024-03-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

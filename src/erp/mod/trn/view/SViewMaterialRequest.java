@@ -535,7 +535,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
                 + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
-        if (usrId != 2 ) { // SUPER
+        if (usrId != 2 && mnGridSubtype != SLibConstants.UNDEFINED ) { // SUPER & ALL REQ
             needJoin = true;
             if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR && mnGridMode != SModConsts.TRN_MAT_PROV_ENT_USR && mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV) {
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";

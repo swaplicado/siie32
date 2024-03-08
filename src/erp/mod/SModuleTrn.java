@@ -591,11 +591,11 @@ public class SModuleTrn extends SGuiModule {
                     case SModSysConsts.TRNX_MAT_REQ_PET:
                         switch (params.getType()) {
                             case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis RM nuevas"; break;
-                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis RM x autorizar"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis RM en autorización"; break;
                             case SModSysConsts.TRNS_ST_MAT_REQ_PROV: 
                                 switch (params.getSubtype()) {
-                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PROV: title = "Mis RM x suministrar"; break;
-                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PUR: title = "Mis RM x comprar"; break;
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PROV: title = "Mis RM en suministro"; break;
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PUR: title = "Mis RM en compras"; break;
                                 }
                                 break;
                             case SLibConsts.UNDEFINED: title = "Todas mis RM"; break;
