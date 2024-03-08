@@ -610,6 +610,7 @@ public class SModuleTrn extends SGuiModule {
                             case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "RM rechazadas"; break;
                         }
                         break;
+                    default: title = "Todas las RM"; break;
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
