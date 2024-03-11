@@ -501,6 +501,11 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 if (filter != null) {
                     where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
                 }
+                join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
+                        + "v.id_mat_req = mrc.id_mat_req "
+                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
+                        + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
+
             break;
             case SModConsts.TRN_MAT_PROV_ENT_USR:
                 if (usrId != 2 ) { // SUPER
@@ -530,19 +535,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
-                + "v.id_mat_req = mrc.id_mat_req "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
-        
         if (usrId != 2 && mnGridSubtype != SLibConstants.UNDEFINED ) { // SUPER & ALL REQ
             needJoin = true;
             if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR && mnGridMode != SModConsts.TRN_MAT_PROV_ENT_USR && mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV) {
                 where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
             }
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
-                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_ins = " + usrId + " "
-                        + "OR (ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") OR aut.fk_usr_step = " + usrId + ") ";
+                where += (where.isEmpty() ? "" : "AND ") + "(aut.fk_usr_step = " + usrId + ") ";
             }
         }
         
