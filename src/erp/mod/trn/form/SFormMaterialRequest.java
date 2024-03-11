@@ -84,6 +84,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private SDialogItemPicker moDialogPickerItemRef;
     private SDialogUnitPicker moDialogPickerUnit;
     
+    private boolean isReqInv;
     private boolean isEtyNew;
     private boolean isCapturingData;
     private boolean isRegistryEditable;
@@ -1607,6 +1608,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 SGuiParams params = new SGuiParams();
                 params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
                 params.getParamsMap().put(SModConsts.TRN_MAT_CC_GRP, ccg);
+                
+                if (moGridMatReqList.getTable().getRowCount() > 0) {
+                    params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, isReqInv);
+                }
 
                 if (moDialogPickerItem == null) {
                 }
@@ -1638,6 +1643,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moItemEty = new SDataItem();
         moUnitEty = new SDataUnit();
         moItemEty.read(itemId, miClient.getSession().getStatement());
+        
+        if (moGridMatReqList.getTable().getRowCount() == 0) {
+            isReqInv = moItemEty.getIsInventoriable();
+        }
+        
         moTextItemKey.setValue(moItemEty.getKey());
         moTextItemName.setValue(moItemEty.getName());
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
@@ -2001,6 +2011,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         miClient.getSession().populateCatalogue(moKeyPriEty, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        
+        isReqInv = false;
     }
 
     @Override
@@ -2063,6 +2075,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         maMatReqNotes = moRegistry.getChildNotes();
         maMatReqEntries = new ArrayList<>();
         maMatReqEntries = moRegistry.getChildEntries();
+        
+        if (!maMatReqEntries.isEmpty()) {
+            isReqInv = maMatReqEntries.get(0).getDataItem().getIsInventoriable();
+        }
         
         populateMatReqCC();
         

@@ -427,6 +427,12 @@ public abstract class SMaterialRequestUtils {
                             in += (in.isEmpty() ? "(" : ", ") + ccg.getPkMaterialCostCenterGroupId();
                         }
                         in += (in.isEmpty() ? "" : ")");
+                        
+                        String inv = "";
+                        if (params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV) != null) {
+                            inv += ((boolean) params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV)) ? "AND a.b_inv " : "AND NOT a.b_inv ";
+                        }
+                        
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
@@ -443,6 +449,7 @@ public abstract class SMaterialRequestUtils {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
                                 + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
                                 + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
+                                + inv
                                 + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " " 
                                 + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
                                 + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
@@ -937,6 +944,33 @@ public abstract class SMaterialRequestUtils {
             SDbMaterialRequest req = new SDbMaterialRequest();
             req.read(session, pkMatReq);
             req.setCloseProvision(! req.isCloseProvision());
+            req.setAuxNotesChangeStatus_n(reason);
+            req.save(session);
+            
+            return "";
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
+    }
+    
+    public static String openOrCloseToPurchase(SGuiSession session, int[] pkMatReq) {
+        try {
+            JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese comentario/observación:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+            String reason = "";
+            if (option == JOptionPane.OK_OPTION) {
+                reason = textArea.getText();
+            }
+            else {
+                return "Acción cancelada";
+            }
+            
+            SDbMaterialRequest req = new SDbMaterialRequest();
+            req.read(session, pkMatReq);
+            req.setClosePurchase(! req.isClosePurchase());
             req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             
