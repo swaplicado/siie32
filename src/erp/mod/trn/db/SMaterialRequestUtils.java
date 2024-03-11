@@ -760,7 +760,7 @@ public abstract class SMaterialRequestUtils {
         return 0d;
     }
     
-    /*
+    /**
      * Devuelve la cantidad de presupuesto que ha sido pedido a un centro de consumo, se excluyen los documentos eliminados y rechazados
      * @param session 
      * @param pkBudget 
