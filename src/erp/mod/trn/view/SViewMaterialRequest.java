@@ -54,6 +54,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbAuthCardex;
     private JButton jbLogCardex;
     private JButton jbAuthorize;
+    private JButton jbHardAuthorize;
     private JButton jbReject;
     private JButton jbSegregate;
     private JButton jbDocsCardex;
@@ -67,6 +68,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private boolean hasSupReq;
     private boolean hasAuthRight;
     private boolean hasPetSupRight;
+    private boolean hasMatReqAdmorPriv;
     
     /**
      * @param client GUI client.
@@ -87,12 +89,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
+        hasMatReqAdmorPriv = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de autorizaciones", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Ver bitácora de cambios", this);
         jbAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Autorizar", this);
+        jbHardAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up_c.gif")), "Autorización forzada", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
@@ -103,6 +107,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbReject);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbHardAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         
@@ -112,6 +117,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbLogCardex.setEnabled(true);
         jbAuthorize.setEnabled(false);
         jbReject.setEnabled(false);
+        jbHardAuthorize.setEnabled(false);
         jbSegregate.setEnabled(false);
         jbDocsCardex.setEnabled(true);
 
@@ -147,6 +153,19 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbAuthorize.setEnabled(hasAuthRight);
             jbReject.setEnabled(hasAuthRight);
             //jbSegregate.setEnabled(hasAuthRight);
+        }
+        
+        if (mnGridMode == SModSysConsts.TRNS_ST_MAT_REQ_AUTH && mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ADM) {
+            moFilterMatReqStatus.initFilter(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+            moFilterMatReqStatus.setEnabled(false);
+            jbHardAuthorize.setEnabled(hasMatReqAdmorPriv);
+            jbAuthorize.setEnabled(false);
+            jbReject.setEnabled(false);
+        }
+        else {
+            moFilterMatReqStatus.setEnabled(true);
+            jbAuthorize.setEnabled(hasAuthRight);
+            jbReject.setEnabled(hasAuthRight);
         }
         
         jbRowDisable.setToolTipText("Cancelar");
@@ -289,6 +308,46 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
+    private void actionHardAuthorize() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    SDbMaterialRequest req = new SDbMaterialRequest();
+                    req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
+                    String response = SAuthorizationUtils.hardAuthorize(miClient.getSession(), 
+                                                                    req.getPrimaryKey(), 
+                                                                    SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST,
+                                                                    miClient.getSession().getUser().getPkUserId());
+                    if (response.length() > 0) {
+                        miClient.showMsgBoxError(response);
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("Autorizado con éxito");
+                        req.save(miClient.getSession());
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+    
     private void actionSegregateOrRelease() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -419,8 +478,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         String select = "";
         String where = "";
         String join = "";
+        String authJoin = "";
         String provJoin = "";
-        boolean needJoin = false;
+        boolean needAuthJoin = false;
+        boolean needCcConsEntJoin = false;
         Object filter;
         int usrId = miClient.getSession().getUser().getPkUserId();
         
@@ -439,19 +500,20 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
-                    needJoin = true;
+                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + ") ";
                 }
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
-                join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
+                needAuthJoin = true;
+                authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
                         + "v.id_mat_req = aut.res_pk_n1_n ";
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " ";
                 break;
             case SModSysConsts.TRNX_MAT_REQ_AUTHO:
-                needJoin = true;
+                needAuthJoin = true;
                 select += "uaut.usr AS autorizo, ";
-                join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
+                authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
                         + "v.id_mat_req = aut.res_pk_n1_n "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uaut ON " 
                         + "aut.fk_usr_authorn_n = uaut.id_usr "
@@ -464,9 +526,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 where += (where.isEmpty() ? "" : "AND ") + "aut.fk_usr_authorn_n IS NOT NULL AND aut.fk_usr_step = " + usrId + " ";
                 break;
             case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH:
-                needJoin = true;
+                needAuthJoin = true;
                 select += "urej.usr AS rechazo, ";
-                join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
+                authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
                         + "v.id_mat_req = aut.res_pk_n1_n "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uaut ON " 
                         + "aut.fk_usr_authorn_n = uaut.id_usr "
@@ -490,7 +552,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 break;
             case SModConsts.TRN_MAT_CONS_ENT_USR:
                 if (usrId != 2 ) { // SUPER
-                    needJoin = true;
+                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") ";
                 }
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
@@ -509,7 +571,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
             case SModConsts.TRN_MAT_PROV_ENT_USR:
                 if (usrId != 2 ) { // SUPER
-                    needJoin = true;
+                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(peu.id_usr = " + usrId + ") ";
                     provJoin = "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
                             + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " ";
@@ -535,13 +597,42 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-        if (usrId != 2 && mnGridSubtype != SLibConstants.UNDEFINED ) { // SUPER & ALL REQ
-            needJoin = true;
-            if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR && mnGridMode != SModConsts.TRN_MAT_PROV_ENT_USR && mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV) {
-                where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
+        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
+                + "v.id_mat_req = mrc.id_mat_req "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
+                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
+        
+        if (usrId != 2) { // SUPER
+            // Verificar si el modo de la cuadrícula no es ni TRN_MAT_CONS_ENT_USR ni TRN_MAT_PROV_ENT_USR
+            // y si el subtipo de la cuadrícula no es TRNX_MAT_REQ_REV ni TRNX_MAT_REQ_ADM
+            if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR &&
+                    mnGridMode != SModConsts.TRN_MAT_PROV_ENT_USR &&
+                    mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV &&
+                    mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_ADM) {
+                // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
+                if (!hasMatReqAdmorPriv) {
+                    needCcConsEntJoin = true;
+                    where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
+                }
+                else {
+                    needAuthJoin = false;
+                    needCcConsEntJoin = false;
+                }
             }
+            // Verificar si el subtipo de la cuadrícula es TRNX_MAT_REQ_REV
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
-                where += (where.isEmpty() ? "" : "AND ") + "(aut.fk_usr_step = " + usrId + ") ";
+                needAuthJoin = false;
+                // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
+                if (!hasMatReqAdmorPriv) {
+                    needAuthJoin = true;
+                    where += (where.isEmpty() ? "" : "AND ") + "(aut.fk_usr_step = " + usrId + ") ";
+                }
+            }
+            // Verificar si el subtipo de la cuadrícula es TRNX_MAT_REQ_ADM
+            if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ADM) {
+                // Condiciones que aplican cuando la vista es RM administrador
+                needAuthJoin = false;
+                needCcConsEntJoin = false;
             }
         }
         
@@ -647,7 +738,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
-                + (needJoin ? join : "")
+                + (needAuthJoin ? authJoin : "")
+                + (needCcConsEntJoin ? join : "")
                 + (provJoin)
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.dt, v.num ";
@@ -735,6 +827,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbReject) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
+            }
+            else if (button == jbHardAuthorize) {
+                actionHardAuthorize();
             }
             else if (button == jbSegregate) {
                 actionSegregateOrRelease();

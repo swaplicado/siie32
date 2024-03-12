@@ -763,6 +763,7 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_REV = 2; // Revisor
     public static final int TRNX_MAT_REQ_PROV = 3; // Suministrador
     public static final int TRNX_MAT_REQ_PUR = 4; // Comprador
+    public static final int TRNX_MAT_REQ_ADM = 5; // Administrador
     public static final int TRNX_MAT_REQ_AUTHO = 100; // autorizado
     public static final int TRNX_MAT_REQ_AUTHO_RECH = 106; // rechazado
     public static final int TRNX_MAT_REQ_DETAIL = 101; // a detalle

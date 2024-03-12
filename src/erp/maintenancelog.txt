@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 243.4/ 2024-03-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) fix: Consulta Requisiciones de materiales por autorizar.
+2) feat: Se agrega nuevo menú para administradores de RM para consultar vistas por autorizar.
+3) feat: Se agrega nueva funcionalidad para autorizar RM de manera "forzada" solo para el administrador de RM.
+
+================================================================================
 SIIE 3.2 243.3/ 2024-03-11
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

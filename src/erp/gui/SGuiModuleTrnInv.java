@@ -148,6 +148,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPetTbProccProv;
     private javax.swing.JMenuItem jmiReqPetTbProccPur;
     private javax.swing.JMenuItem jmiReqPetAll;
+    private javax.swing.JMenuItem jmiReqAdmAuth;
     private javax.swing.JMenuItem jmiReqRevTbAuth;
     private javax.swing.JMenuItem jmiReqRevAuth;
     private javax.swing.JMenuItem jmiReqRevNoAuth;
@@ -643,6 +644,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAllConsEnt = new JMenuItem("RM de mis centros de consumo");
         jmiReqAllSupEnt = new JMenuItem("RM de mis centros de suministro");
         
+        jmiReqAdmAuth = new JMenuItem("Todas las RM por autorizar (admin)");
         jmiReqRevTbAuth = new JMenuItem("RM por autorizar");
         jmiReqRevAuth = new JMenuItem("RM autorizadas");
         jmiReqRevNoAuth = new JMenuItem("RM rechazadas");
@@ -677,6 +679,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmiReqAllConsEnt);
         jmMenuReq.add(jmiReqAllSupEnt);
         jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqAdmAuth);
         jmMenuReq.add(jmiReqRevTbAuth);
         jmMenuReq.add(jmiReqRevAuth);
         jmMenuReq.add(jmiReqRevNoAuth);
@@ -711,6 +714,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPetTbProccPur.addActionListener(this);
         jmiReqPetNew.addActionListener(this);
         jmiReqPetAll.addActionListener(this);
+        jmiReqAdmAuth.addActionListener(this);
         jmiReqRevTbAuth.addActionListener(this);
         jmiReqRevAuth.addActionListener(this);
         jmiReqRevNoAuth.addActionListener(this);
@@ -952,6 +956,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPetTbProccProv.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqPetTbProccPur.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqPetAll.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
+        jmiReqAdmAuth.setEnabled(hasRightMatReqAdm);
         jmiReqRevTbAuth.setEnabled(hasRightMatReqRev || hasRightMatReqAdm);
         jmiReqRevAuth.setEnabled(hasRightMatReqRev || hasRightMatReqAdm);
         jmiReqRevNoAuth.setEnabled(hasRightMatReqRev || hasRightMatReqAdm);
@@ -1878,6 +1883,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiReqPetAll) {
                 SGuiParams params = new SGuiParams(SLibConstants.UNDEFINED);
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_PET, params);
+            }
+            else if (item == jmiReqAdmAuth) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
+                miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModSysConsts.TRNX_MAT_REQ_ADM, params);
             }
             else if (item == jmiReqRevTbAuth) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);

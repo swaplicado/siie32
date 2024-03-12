@@ -284,6 +284,73 @@ public abstract class SAuthorizationUtils {
     }
     
     /**
+     * Funcionalidad para aprobar de manera 'forzada' un recurso mediante su llave primaria.
+     * Esta funcionalidad obtiene todos los pasos de autorización que no estén eliminados,
+     * que no estén autorizados, y los marca como autorizados por el usuario que hace la acción, 
+     * agregando la leyenda "Autorización forzada".
+     * 
+     * @param session
+     * @param pk
+     * @param resourceType
+     * @param userId
+     * @return 
+     */
+    public static String hardAuthorize(SGuiSession session, final int[] pk, final int resourceType, final int userId) {
+        String condPk = "";
+        switch(resourceType) {
+            case AUTH_TYPE_MAT_REQUEST:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                
+                break;
+            case AUTH_TYPE_DPS:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                
+                break;
+        }
+        
+        String sql = "SELECT id_authorn_step "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                + "WHERE NOT b_del AND "
+                    + "fk_tp_authorn = " + resourceType + " AND "
+                    + "b_req AND NOT b_authorn AND "
+                    + condPk + ";";
+        
+        SDbAuthorizationStep oStepAux;
+        try {
+            ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+            boolean bHasSteps = false;
+            while (res.next()) {
+                bHasSteps = true;
+                oStepAux = new SDbAuthorizationStep();
+                oStepAux.read(session, new int[] { res.getInt("id_authorn_step") });
+                oStepAux.setDateTimeAuthorized_n(new Date());
+                oStepAux.setFkUserAuthorizationId_n(userId);
+                oStepAux.setAuthorized(true);
+                oStepAux.setDateTimeRejected_n(null);
+                oStepAux.setFkUserRejectId_n(0);
+                oStepAux.setRejected(false);
+                oStepAux.setComments("Autorización forzada.");
+                
+                oStepAux.save(session);
+            }
+            
+            if (! bHasSteps) {
+                return "No hay autorizaciones pendientes para este documento.";
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "Ocurrió un error en la base de datos al realizar el proceso " + ex.getMessage();
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "Ocurrió un error al realizar el proceso. " + ex.getMessage();
+        }
+        
+        return "";
+    }
+    
+    /**
      * Autorizar o rechazar recurso
      * 
      * @param session
@@ -364,7 +431,19 @@ public abstract class SAuthorizationUtils {
                 }
             }
             else {
-                return "No se encontró la autorización para el usuario recibido.";
+                String userReject = "SELECT usr "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.USRU_USR) 
+                    + " WHERE id_usr = " + userId;
+        
+                String name = "";
+                ResultSet resultSetReject = session.getStatement().getConnection().createStatement().executeQuery(userReject);
+                if (resultSetReject.next()) {
+                    name = resultSetReject.getString("usr");
+                    return "El usuario " + name + " no puede autorizar este documento.";
+                }
+                else {
+                    return "El usuario no puede autorizar este documento.";
+                }
             }
         }
         catch (SQLException ex) {
