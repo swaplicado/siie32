@@ -68,7 +68,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private boolean hasSupReq;
     private boolean hasAuthRight;
     private boolean hasPetSupRight;
-    private boolean hasMatReqAdmorPriv;
+    private boolean hasMatReqAdmorRight;
+    private boolean hasMatReqPurRight;
+    private boolean hasMatReqProvRight;
     
     /**
      * @param client GUI client.
@@ -89,7 +91,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasAuthRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
         hasPetSupRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REQ).HasRight &&
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
-        hasMatReqAdmorPriv = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        hasMatReqAdmorRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        hasMatReqPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
+        hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
@@ -158,7 +162,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         if (mnGridMode == SModSysConsts.TRNS_ST_MAT_REQ_AUTH && mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ADM) {
             moFilterMatReqStatus.initFilter(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
             moFilterMatReqStatus.setEnabled(false);
-            jbHardAuthorize.setEnabled(hasMatReqAdmorPriv);
+            jbHardAuthorize.setEnabled(hasMatReqAdmorRight);
             jbAuthorize.setEnabled(false);
             jbReject.setEnabled(false);
         }
@@ -610,7 +614,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV &&
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_ADM) {
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
-                if (!hasMatReqAdmorPriv) {
+                if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight) {
                     needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
                 }
@@ -623,7 +627,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
                 needAuthJoin = false;
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
-                if (!hasMatReqAdmorPriv) {
+                if (!hasMatReqAdmorRight) {
                     needAuthJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(aut.fk_usr_step = " + usrId + ") ";
                 }
