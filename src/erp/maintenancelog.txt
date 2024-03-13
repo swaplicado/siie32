@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 244.0/ 2024-03-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al atributo 'Exportacion' del CFDI 4.0 factura electrónica cuando se opta por no incorporar el Complemento de Comercio Exterior.
+
+================================================================================
 SIIE 3.2 243.4/ 2024-03-12
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -12414,7 +12414,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
 
-                if (isCfdIntCommerceRequired()) {
+                if (isCfdIntCommerceRequired() && jckCfdCceApplies.isSelected()) {
                     // include International Commerce data:
                     dpsCfd.setCfdCceMotivoTraslado(jcbCfdCceMoveReason.getSelectedIndex() <= 0 ? "" : moFieldCfdCceMoveReason.getFieldValue().toString());
                     dpsCfd.setCfdCceTipoOperacion(jcbCfdCceOperationType.getSelectedIndex() <= 0 ? "" : moFieldCfdCceOperationType.getFieldValue().toString());
