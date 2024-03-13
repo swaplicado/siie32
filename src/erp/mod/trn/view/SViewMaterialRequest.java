@@ -601,10 +601,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
-                + "v.id_mat_req = mrc.id_mat_req "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
+//        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
+//                + "v.id_mat_req = mrc.id_mat_req "
+//                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
+//                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
         
         if (usrId != 2) { // SUPER
             // Verificar si el modo de la cuadrícula no es ni TRN_MAT_CONS_ENT_USR ni TRN_MAT_PROV_ENT_USR
