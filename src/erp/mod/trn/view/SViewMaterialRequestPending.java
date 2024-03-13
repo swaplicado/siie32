@@ -220,14 +220,14 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
                 jbSegregate.setEnabled(false);
                 mjbSupply.setEnabled(true);
-                mjbCloseOpenSupply.setEnabled(false);
+                mjbCloseOpenSupply.setEnabled(true);
                 mjbToNew.setEnabled(false);
                 mjbToPur.setEnabled(false);
             }
             else {
                 jbSegregate.setEnabled(false);
                 mjbSupply.setEnabled(false);
-                mjbCloseOpenSupply.setEnabled(false);
+                mjbCloseOpenSupply.setEnabled(true);
                 mjbToNew.setEnabled(false);
                 mjbToPur.setEnabled(false);
             }
@@ -257,7 +257,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 
             }
         }
-        
+
         msSeekQueryText = "";
     }
     
