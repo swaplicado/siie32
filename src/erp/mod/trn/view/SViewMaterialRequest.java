@@ -481,11 +481,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     public void prepareSqlQuery() {
         String select = "";
         String where = "";
-        String join = "";
         String authJoin = "";
         String provJoin = "";
         boolean needAuthJoin = false;
-        boolean needCcConsEntJoin = false;
         Object filter;
         int usrId = miClient.getSession().getUser().getPkUserId();
         
@@ -504,7 +502,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
                 if (usrId != 2 ) { // SUPER
-                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + ") ";
                 }
                 break;
@@ -556,8 +553,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 break;
             case SModConsts.TRN_MAT_CONS_ENT_USR:
                 if (usrId != 2 ) { // SUPER
-                    needCcConsEntJoin = true;
-                    where += (where.isEmpty() ? "" : "AND ") + "(ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + ") ";
+                    where += (where.isEmpty() ? "" : "AND ") + "v.id_mat_req IN ( " +
+                        "SELECT DISTINCT rc.id_mat_req FROM trn_mat_req_cc AS rc " +
+                        "INNER JOIN " +
+                        "(SELECT s.id_mat_cons_ent, s.id_mat_cons_subent FROM trn_mat_cons_ent_usr AS u " +
+                        "INNER JOIN trn_mat_cons_subent AS s ON s.id_mat_cons_ent = u.id_mat_cons_ent " +
+                        "WHERE u.id_link = 1 and u.id_ref = " + usrId + " " +
+                        "UNION " +
+                        "SELECT s.id_mat_cons_ent, s.id_mat_cons_subent FROM trn_mat_cons_subent_usr AS u " +
+                        "INNER JOIN trn_mat_cons_subent AS s ON s.id_mat_cons_ent = u.id_mat_cons_ent AND s.id_mat_cons_subent = u.id_mat_cons_subent " +
+                        "WHERE u.id_link = 1 and u.id_ref = " + usrId + ") AS c ON " +
+                        "rc.id_mat_ent_cons_ent = c.id_mat_cons_ent " +
+                        "AND rc.id_mat_subent_cons_ent = c.id_mat_cons_ent AND rc.id_mat_subent_cons_subent = c.id_mat_cons_subent) ";
                 }
                 filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.TRNS_ST_MAT_REQ)).getValue();
                 if (filter != null && ((int[]) filter).length == 1) {
@@ -567,15 +574,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 if (filter != null) {
                     where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
                 }
-                join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
-                        + "v.id_mat_req = mrc.id_mat_req "
-                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-                        + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
 
             break;
             case SModConsts.TRN_MAT_PROV_ENT_USR:
                 if (usrId != 2 ) { // SUPER
-                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(peu.id_usr = " + usrId + ") ";
                     provJoin = "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
                             + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " ";
@@ -601,11 +603,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-//        join += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrc ON " 
-//                + "v.id_mat_req = mrc.id_mat_req "
-//                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT_USR) + " AS ceu ON "
-//                + "mrc.id_mat_ent_cons_ent = ceu.id_mat_cons_ent AND ceu.id_link = " + SModSysConsts.USRS_LINK_USR + " AND ceu.id_ref = " + usrId + " ";
-        
         if (usrId != 2) { // SUPER
             // Verificar si el modo de la cuadrícula no es ni TRN_MAT_CONS_ENT_USR ni TRN_MAT_PROV_ENT_USR
             // y si el subtipo de la cuadrícula no es TRNX_MAT_REQ_REV ni TRNX_MAT_REQ_ADM
@@ -615,12 +612,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_ADM) {
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
                 if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight) {
-                    needCcConsEntJoin = true;
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
                 }
                 else {
                     needAuthJoin = false;
-                    needCcConsEntJoin = false;
                 }
             }
             // Verificar si el subtipo de la cuadrícula es TRNX_MAT_REQ_REV
@@ -636,11 +631,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ADM) {
                 // Condiciones que aplican cuando la vista es RM administrador
                 needAuthJoin = false;
-                needCcConsEntJoin = false;
             }
         }
         
-        msSql = "SELECT DISTINCT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
+        msSql = "SELECT v.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
@@ -743,7 +737,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (needAuthJoin ? authJoin : "")
-                + (needCcConsEntJoin ? join : "")
                 + (provJoin)
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.dt, v.num ";
