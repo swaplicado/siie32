@@ -592,14 +592,9 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            
-            if (jckDontShowIncludeCounts.isSelected()) {
-               report = SDataConstantsSys.REP_FIN_AUX_ACC_DON;
-            }
-            else {
-               report = SDataConstantsSys.REP_FIN_AUX_ACC;
-            }
-            
+                      
+            report = SDataConstantsSys.REP_FIN_AUX_ACC;
+                        
             aMask = composeMaskAccount();
 
             map = miClient.createReportParams();
@@ -644,6 +639,7 @@ public class SDialogRepAuxAccounting extends JDialog implements ActionListener, 
             map.put("bShowBizPartner", jckShowBizPartner.isSelected());
             map.put("bShowItem", jckShowItems.isSelected());
             map.put("bShowTax", jckShowTax.isSelected());
+            map.put("bWithZeroBalance", jckDontShowIncludeCounts.isSelected());
             map.put("bOrderItemName", miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() != SDataConstantsSys.CFGS_TP_SORT_KEY_NAME);
             map.put("bStrechWithOverflow", jckStrechWithOverflow.isSelected());
             map.put("sSqlWhere", (!jckShowRecordAdjYearEnd.isSelected() ? " AND  b_adj_year = 0 " : "") +
