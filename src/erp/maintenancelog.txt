@@ -40,18 +40,21 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 243.1/ 2024-03-07
-Isabel Danae GARCÍA SERVÍN
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Corrección de ortografía.
 2) Se agrega el botón de "Enviar al solicitante" en la vista de cotizaciones.
 3) Mejora en la consulta de RM por autorizar.
 4) Se cambió la lógica en los permisos en las vistas de suministros y de compras.
+5) Réplica (copia) la funcionalidad ya existente en el diálogo de pagos a asociados de negocio en el diálogo de pagos integrales a 
+asociados de negocios. Y en ambos casos, en ambos diálogos, se agrega un comentario para advertir al programador que cualquier 
+cambio que se realice a esa sección de código fuente debe replicarse tal cual en el el código fuente de su contraparte.
 
 ================================================================================
 SIIE 3.2 243.0/ 2024-03-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de omición de validación de restricción de timbrado de facturas en moneda extranjera en la configuración de clientes.
+1) Implementación de omisión de validación de restricción de timbrado de facturas en moneda extranjera en la configuración de clientes.
 
 ================================================================================
 SIIE 3.2 242.3/ 2024-03-06
