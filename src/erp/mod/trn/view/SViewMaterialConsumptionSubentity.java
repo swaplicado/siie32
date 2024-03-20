@@ -64,6 +64,8 @@ public class SViewMaterialConsumptionSubentity extends SGridPaneView implements 
                 + "c.name AS entidad, "
                 + "f.id_acc, "
                 + "f.acc, "
+                + "fa.id_acc, "
+                + "fa.acc, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -74,7 +76,9 @@ public class SViewMaterialConsumptionSubentity extends SGridPaneView implements 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS c ON "
                 + "v.id_mat_cons_ent = c.id_mat_cons_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS f ON "
-                + "v.fk_acc_fa = f.pk_acc "
+                + "v.fk_acc_cons_whs = f.pk_acc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS fa ON "
+                + "v.fk_acc_fa = fa.pk_acc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
@@ -91,8 +95,10 @@ public class SViewMaterialConsumptionSubentity extends SGridPaneView implements 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Subcentro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "entidad_c", "Código centro de consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "entidad", "Centro de consumo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "id_acc", "Número cuenta contable"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "acc", "Cuenta contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f.id_acc", "Núm. cta. contable consumos almacén"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "f.acc", "Cta contable consumos almacén"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "fa.id_acc", "Núm. cta. contable adquisiciones act. fijo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "fa.acc", "Cta contable adquisiciones act. fijo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

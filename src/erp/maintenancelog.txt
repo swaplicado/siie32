@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 245.0/ 2024-03-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó la cuenta contable para procesar los pagos de consumo de almacén y los consumo de activo fijo en los subcentros de consumo.
+
+================================================================================
 SIIE 3.2 244.2/ 2024-03-19
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Correción de auxiliares contables con cuentas en 0
+
 ================================================================================
 SIIE 3.2 244.1/ 2024-03-19
 Isabel Danae GARCÍA SERVÍN

@@ -60,7 +60,16 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         jlConsumptionSubentity = new javax.swing.JLabel();
         moTextConsumptionSubentity = new sa.lib.gui.bean.SBeanFieldText();
         jPanel25 = new javax.swing.JPanel();
-        moPanelAccount = new erp.gui.account.SBeanPanelAccount();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        moPanelAccountConsWah = new erp.gui.account.SBeanPanelAccount();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        moPanelAccountFixedActive = new erp.gui.account.SBeanPanelAccount();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setPreferredSize(new java.awt.Dimension(750, 450));
@@ -103,40 +112,81 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         jPanel23.add(jPanel25);
 
         jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
-        jPanel1.add(moPanelAccount, java.awt.BorderLayout.CENTER);
+
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel1.setText("Cuenta contable para contabilizar consumos de almacén:*");
+        jPanel5.add(jLabel1);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_START);
+        jPanel2.add(moPanelAccountConsWah, java.awt.BorderLayout.CENTER);
+
+        jPanel4.add(jPanel2);
+
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel2.setText("Cuenta contable para contabilizar adquisiciones de activo fijo:*");
+        jPanel8.add(jLabel2);
+
+        jPanel7.add(jPanel8, java.awt.BorderLayout.PAGE_START);
+        jPanel7.add(moPanelAccountFixedActive, java.awt.BorderLayout.CENTER);
+
+        jPanel4.add(jPanel7);
+
+        jPanel6.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel6, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlConsumptionEntity;
     private javax.swing.JLabel jlConsumptionSubentity;
     private sa.lib.gui.bean.SBeanFieldKey moKeyConsEntEty;
-    private erp.gui.account.SBeanPanelAccount moPanelAccount;
+    private erp.gui.account.SBeanPanelAccount moPanelAccountConsWah;
+    private erp.gui.account.SBeanPanelAccount moPanelAccountFixedActive;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextConsumptionSubentity;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 800, 500);
         
         moKeyConsEntEty.setKeySettings(miClient, SGuiUtils.getLabelName(jlConsumptionEntity), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
         moTextConsumptionSubentity.setTextSettings(SGuiUtils.getLabelName(jlConsumptionSubentity), 255, 1);
-        moPanelAccount.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        moPanelAccountConsWah.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        moPanelAccountFixedActive.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
         
-        moPanelAccount.setAccountNameWidth(500);
-        //moPanelAccount.setComponentPrevious(moKeyPackExpenses);
-        //moPanelAccount.setComponentNext(moKeyPackCostCenters, moKeyBizPartner);
-        moPanelAccount.initPanel();
+        moPanelAccountConsWah.setAccountNameWidth(500);
+        moPanelAccountConsWah.initPanel();
+        moPanelAccountFixedActive.setAccountNameWidth(500);
+        moPanelAccountFixedActive.initPanel();
         
         moFields.addField(moKeyConsEntEty);
         moFields.addField(moTextCode);
@@ -181,7 +231,8 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         moTextCode.setValue(moRegistry.getCode());
         moTextConsumptionSubentity.setValue(moRegistry.getName());
         
-        moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountFixedAssetId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountFixedAssetId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
+        moPanelAccountConsWah.setSelectedAccount(new SAccount(moRegistry.getFkAccountConsumptionWarehouseId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountConsumptionWarehouseId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
+        moPanelAccountFixedActive.setSelectedAccount(new SAccount(moRegistry.getFkAccountFixedAssetId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountFixedAssetId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
         
         setFormEditable(true);
 
@@ -199,7 +250,8 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         moRegistry.setPkMatConsumptionEntityId(moKeyConsEntEty.getValue()[0]);
         moRegistry.setCode(moTextCode.getValue());
         moRegistry.setName(moTextConsumptionSubentity.getValue());
-        moRegistry.setFkAccountFixedAssetId(moPanelAccount.getSelectedAccount() != null ? moPanelAccount.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
+        moRegistry.setFkAccountConsumptionWarehouseId(moPanelAccountConsWah.getSelectedAccount() != null ? moPanelAccountConsWah.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
+        moRegistry.setFkAccountFixedAssetId(moPanelAccountFixedActive.getSelectedAccount() != null ? moPanelAccountFixedActive.getSelectedAccount().getAccountId() : SDataConstantsSys.NA);
         
         return registry;
     }
@@ -209,7 +261,10 @@ public class SFormMaterialConsumptionSubentity extends sa.lib.gui.bean.SBeanForm
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            validation = moPanelAccount.validatePanel();
+            validation = moPanelAccountConsWah.validatePanel();
+        }
+        if (validation.isValid()) {
+            validation = moPanelAccountFixedActive.validatePanel();
         }
         
         return validation;

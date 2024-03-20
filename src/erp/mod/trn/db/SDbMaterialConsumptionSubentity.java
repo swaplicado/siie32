@@ -30,6 +30,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
     protected boolean mbDeleted;
     protected boolean mbSystem;
     */
+    protected int mnFkAccountConsumptionWarehouseId ;
     protected int mnFkAccountFixedAssetId;
     /*
     protected int mnFkUserInsertId;
@@ -50,6 +51,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
     public void setName(String s) { msName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
+    public void setFkAccountConsumptionWarehouseId (int n) { mnFkAccountConsumptionWarehouseId  = n; }
     public void setFkAccountFixedAssetId(int n) { mnFkAccountFixedAssetId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -64,6 +66,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
     public String getName() { return msName; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
+    public int getFkAccountConsumptionWarehouseId() { return mnFkAccountConsumptionWarehouseId; }
     public int getFkAccountFixedAssetId() { return mnFkAccountFixedAssetId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -93,6 +96,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
         msName = "";
         mbDeleted = false;
         mbSystem = false;
+        mnFkAccountConsumptionWarehouseId = 0;
         mnFkAccountFixedAssetId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -156,6 +160,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
             msName = resultSet.getString("s.name");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
+            mnFkAccountConsumptionWarehouseId = resultSet.getInt("fk_acc_cons_whs");
             mnFkAccountFixedAssetId = resultSet.getInt("fk_acc_fa");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -188,6 +193,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
                     "'" + msName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
+                    mnFkAccountConsumptionWarehouseId + ", " + 
                     mnFkAccountFixedAssetId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -205,6 +211,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
                     "name = '" + msName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    "fk_acc_cons_whs = " + mnFkAccountConsumptionWarehouseId + ", " +
                     "fk_acc_fa = " + mnFkAccountFixedAssetId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -228,6 +235,7 @@ public class SDbMaterialConsumptionSubentity extends SDbRegistryUser implements 
         registry.setName(this.getName());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
+        registry.setFkAccountConsumptionWarehouseId(this.getFkAccountConsumptionWarehouseId());
         registry.setFkAccountFixedAssetId(this.getFkAccountFixedAssetId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
