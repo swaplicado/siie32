@@ -14,8 +14,8 @@ import java.util.List;
 public class SPrepayrollRow {
     
     private int employee_id;
-    private double double_overtime;
-    private double triple_overtime;
+    private String double_overtime;
+    private String triple_overtime;
     private List<SDay> days;
 
     public int getEmployee_id() {
@@ -26,19 +26,19 @@ public class SPrepayrollRow {
         this.employee_id = employee_id;
     }
 
-    public double getDouble_overtime() {
+    public String getDouble_overtime() {
         return double_overtime;
     }
 
-    public void setDouble_overtime(double double_overtime) {
+    public void setDouble_overtime(String double_overtime) {
         this.double_overtime = double_overtime;
     }
 
-    public double getTriple_overtime() {
+    public String getTriple_overtime() {
         return triple_overtime;
     }
 
-    public void setTriple_overtime(double triple_overtime) {
+    public void setTriple_overtime(String triple_overtime) {
         this.triple_overtime = triple_overtime;
     }
 

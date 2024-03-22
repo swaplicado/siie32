@@ -225,7 +225,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
                 row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
                 row.setAbsences(ppRow.getAbsences());
-                row.setOvertime(ppRow.getDouble_overtime());
+                row.setOvertime(Double.parseDouble(ppRow.getDouble_overtime()));
                 row.setSundays(ppRow.getSundays());
                 row.setDaysOff(ppRow.getDaysOff());
                 row.setHolidays(ppRow.getHolidays());

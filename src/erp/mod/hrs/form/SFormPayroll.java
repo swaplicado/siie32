@@ -2128,6 +2128,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             for (SPrepayrollRow row : ppayroll.getRows()) {
                 for (SPrepayrollRow rowVar : ppayrollVar.getRows()) {
+                    if (! SPrepayrollUtils.isNumber(rowVar.getDouble_overtime()) || ! SPrepayrollUtils.isNumber(rowVar.getTriple_overtime())) {
+                        miClient.showMsgBoxError("El valor de la etiqueta de tiempo extra no es correcto (" + rowVar.getDouble_overtime() + ", " + rowVar.getTriple_overtime() + "), "
+                                + "por favor contacte a soporte técnico.");
+                        return;
+                    }
                     if (row.getEmployee_id() == rowVar.getEmployee_id()) {
                         row.getDays().clear();
                         row.getDays().addAll(rowVar.getDays());
@@ -2201,17 +2206,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
-            if (timeClockRow.getOvertime() > 0d) {
+            double doubleOvertimeValue = ((Number) timeClockRow.getOvertime()).doubleValue();
+            if (doubleOvertimeValue > 0d) {
                 int perceptionId = 0;
-                double factor = timeClockRow.getOvertime();
-                
+                double factor = doubleOvertimeValue;
+
                 if (moModuleConfig.getTimeClockPolicy() == SHrsConsts.PPAYROLL_POL_LIMITED_DATA) {
                     perceptionId = moModuleConfig.getFkEarningOvertime2Id_n();
                 }
                 else {
                     perceptionId = moModuleConfig.getFkEarningOvertime3Id_n();
                 }
-                
+
                 this.addPerception(receipt, perceptionId, factor, true, 0);
             }
             
