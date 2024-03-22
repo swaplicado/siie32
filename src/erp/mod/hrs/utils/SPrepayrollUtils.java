@@ -347,4 +347,28 @@ public class SPrepayrollUtils {
         
         return false;
     }
+    
+    /**
+     * Método para validar si una cadena es un número
+     *
+     * @param str
+     * @return booleano que indica si es un número o no.
+     * @throws NumberFormatException
+     */
+    public static boolean isNumber(String str) {
+        try {
+            if (str == null || str.isEmpty()) {
+                return false;
+            }
+            if (str.matches("-?\\d+(\\.\\d+)?")) { // Acepta números enteros o decimales
+                Double.parseDouble(str);
+                return true;
+            }
+            
+            return false;
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

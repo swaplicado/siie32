@@ -12,9 +12,11 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 
 ================================================================================
 SIIE 3.2 244.1/ 2024-03-19
-Isabel Danae GARCÍA SERVÍN
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
+
 1) Cambio a la consulta de la vista de requisiciones de mis centros de consumo para optimizarla.
+2) Validación de los campos tiempo extra doble y tiempo extra triple en la importación de prenómina.
 
 ================================================================================
 SIIE 3.2 244.0/ 2024-03-13
