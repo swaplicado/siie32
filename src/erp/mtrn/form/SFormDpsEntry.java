@@ -52,6 +52,7 @@ import erp.mtrn.data.SDataDpsEntryNotes;
 import erp.mtrn.data.SDataDpsEntryNotesRow;
 import erp.mtrn.data.SDataDpsEntryPrice;
 import erp.mtrn.data.SDataDpsEntryPriceRow;
+import erp.mtrn.data.SDataDpsEntryQuantityChange;
 import erp.mtrn.data.SDataDpsEntryTax;
 import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.STrnUtilities;
@@ -130,6 +131,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldDiscountEntryPercentage;
     private erp.lib.form.SFormField moFieldIsDiscountDocApplying;
     private erp.lib.form.SFormField moFieldOriginalQuantity;
+    private erp.lib.form.SFormField moFieldDateQuantityChg;
     private erp.lib.form.SFormField moFieldOriginalPriceUnitaryCy;
     private erp.lib.form.SFormField moFieldOriginalDiscountUnitaryCy;
     private erp.lib.form.SFormField moFieldSalesPriceUnitaryCy;
@@ -315,6 +317,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlOriginalQuantity = new javax.swing.JLabel();
         jtfOriginalQuantity = new javax.swing.JTextField();
         jtfOriginalUnitSymbolRo = new javax.swing.JTextField();
+        jckIsQuantityChg = new javax.swing.JCheckBox();
+        jLabel13 = new javax.swing.JLabel();
+        jftDateQuantityChg = new javax.swing.JFormattedTextField();
+        jbDateQuantityChg = new javax.swing.JButton();
         jPanel23 = new javax.swing.JPanel();
         jlQuantity = new javax.swing.JLabel();
         jtfQuantityRo = new javax.swing.JTextField();
@@ -851,6 +857,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfOriginalUnitSymbolRo.setFocusable(false);
         jtfOriginalUnitSymbolRo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jtfOriginalUnitSymbolRo);
+
+        jckIsQuantityChg.setForeground(new java.awt.Color(255, 0, 0));
+        jckIsQuantityChg.setText("Registrar cambio cantidad");
+        jckIsQuantityChg.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel15.add(jckIsQuantityChg);
+
+        jLabel13.setPreferredSize(new java.awt.Dimension(17, 23));
+        jPanel15.add(jLabel13);
+
+        jftDateQuantityChg.setText("yyyy/mm/dd");
+        jftDateQuantityChg.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel15.add(jftDateQuantityChg);
+
+        jbDateQuantityChg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateQuantityChg.setToolTipText("Seleccionar fecha");
+        jbDateQuantityChg.setFocusable(false);
+        jbDateQuantityChg.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel15.add(jbDateQuantityChg);
 
         jPanel4.add(jPanel15);
 
@@ -2438,6 +2462,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldOriginalQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
         moFieldOriginalQuantity.setDoubleMin(-1);
         moFieldOriginalQuantity.setMinInclusive(true);
+        moFieldDateQuantityChg = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateQuantityChg, jckIsQuantityChg);
+        moFieldDateQuantityChg.setPickerButton(jbDateQuantityChg);
         moFieldOriginalPriceUnitaryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfOriginalPriceUnitaryCy, jlOriginalPriceUnitaryCy);
         moFieldOriginalPriceUnitaryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
         moFieldOriginalDiscountUnitaryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfOriginalDiscountUnitaryCy, jlOriginalDiscountUnitaryCy);
@@ -2603,6 +2629,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldDiscountEntryPercentage);
         mvFields.add(moFieldIsDiscountDocApplying);
         mvFields.add(moFieldOriginalQuantity);
+        mvFields.add(moFieldDateQuantityChg);
         mvFields.add(moFieldOriginalPriceUnitaryCy);
         mvFields.add(moFieldOriginalDiscountUnitaryCy);
         mvFields.add(moFieldSalesPriceUnitaryCy);
@@ -2869,6 +2896,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbGridPriceDelete.addActionListener(this);
         jtbGridPricesFilter.addActionListener(this);
         jbItemComposition.addActionListener(this);
+        jbDateQuantityChg.addActionListener(this);
 
         // Focus listeners:
 
@@ -3162,6 +3190,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         calculateWeights();
         renderDpsEntryValue();
         calculateItemCompQty();
+        
+        if (moParamDps != null) {
+            if (moParamDps.isDpsTypeContract() && !moDpsEntry.getIsRegistryNew() && 
+                    (moDpsEntry.getAuxOriginalQuantityOld() != moFieldOriginalQuantity.getDouble() || moDpsEntry.getAuxFkOriginalUnitOld() != ((int[]) moFieldFkOriginalUnitId.getKey())[0])) {
+                jckIsQuantityChg.setVisible(true);
+                jftDateQuantityChg.setVisible(true);
+                jbDateQuantityChg.setVisible(true);
+            } 
+        }
     }
     
     private void calculateWeights() {
@@ -5008,6 +5045,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void actionItemComposition() {
         miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldItemCompositionItem, null);
     }
+    
+    private void actionDateQuantityChg() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateQuantityChg.getDate(), moFieldDateQuantityChg);
+    }
 
     private void actionPricesFilter() {
         if (jtbGridPricesFilter.isEnabled()) {
@@ -5110,6 +5151,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
@@ -5223,6 +5265,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbConcept;
     private javax.swing.JButton jbConceptKey;
+    private javax.swing.JButton jbDateQuantityChg;
     private javax.swing.JButton jbEditFkThirdTaxCausingId_n;
     private javax.swing.JButton jbEditLogistics;
     private javax.swing.JButton jbEditNotes;
@@ -5270,11 +5313,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JCheckBox jckIsInventoriable;
     private javax.swing.JCheckBox jckIsPrepayment;
     private javax.swing.JCheckBox jckIsPriceConfirm;
+    private javax.swing.JCheckBox jckIsQuantityChg;
     private javax.swing.JCheckBox jckIsSalesFreightAddPrice;
     private javax.swing.JCheckBox jckIsSalesFreightConfirm;
     private javax.swing.JCheckBox jckIsSalesFreightRequired;
     private javax.swing.JCheckBox jckIsSurplusPercentageApplying;
     private javax.swing.JCheckBox jckIsTaxesAutomaticApplying;
+    private javax.swing.JFormattedTextField jftDateQuantityChg;
     private javax.swing.JFormattedTextField jftfAddAmc71PurchaseOrderDate;
     private javax.swing.JLabel jlAccOptions;
     private javax.swing.JLabel jlAddAmc71PurchaseOrder;
@@ -5882,6 +5927,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         mbPostEmissionEdition = false;
         mbPostEmissionEditionDone = false;
+        
+        jckIsQuantityChg.setSelected(false);
+        jckIsQuantityChg.setVisible(false);
+        jftDateQuantityChg.setVisible(false);
+        jbDateQuantityChg.setVisible(false);
     }
 
     @Override
@@ -6085,6 +6135,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                             "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
                     validation.setComponent(jtfOriginalQuantity);
                 }
+                else if (jckIsQuantityChg.isSelected() && moFieldDateQuantityChg.getDate() == null) {
+                    validation.setMessage("Debe seleccionar una fecha para el registro de cambio de cantidad.");
+                    validation.setComponent(jftDateQuantityChg);
+                }
                 else {
                     // Validate unitary price vs unitary month price in monthly order:
 
@@ -6273,10 +6327,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbResetingForm = true;
 
         moDpsEntry = (SDataDpsEntry) registry;
-
+        
         moFieldFkItemId.setFieldValue(new int[] { moDpsEntry.getFkItemId() });
         itemChangedFkItemId(false);
-
+   
         moFieldConceptKey.setFieldValue(moDpsEntry.getConceptKey());
         moFieldConcept.setFieldValue(moDpsEntry.getConcept());
         moFieldFkOriginalUnitId.setFieldValue(new int[] { moDpsEntry.getFkOriginalUnitId() });
@@ -6445,7 +6499,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         calculateTotal();
-
+        
         moDpsEntry.setConceptKey(moFieldConceptKey.getString());
         moDpsEntry.setConcept(moFieldConcept.getString());
         moDpsEntry.setReference(moFieldReference.getString());
@@ -6579,6 +6633,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setDbmsDpsCfdEntry(cfdEntry);
         
         moDpsEntry.setFlagMinorChangesEdited(mbPostEmissionEditionDone);
+        
+        if (jckIsQuantityChg.isSelected()) {
+            SDataDpsEntryQuantityChange chg = new SDataDpsEntryQuantityChange();
+            chg.setDate(moFieldDateQuantityChg.getDate());
+            chg.setQuantityOld(moDpsEntry.getAuxQuantityOld());
+            chg.setQuantityNew(SLibUtils.parseDouble(jtfQuantityRo.getText()));
+            chg.setOriginalQuantityOld(moDpsEntry.getAuxOriginalQuantityOld());
+            chg.setOriginalQuantityNew(moFieldOriginalQuantity.getDouble());
+            chg.setFkUnitOldId(moDpsEntry.getAuxFkUnitOld());
+            chg.setFkUnitNewId(moItem.getFkUnitId());
+            chg.setFkOriginalUnitOldId(moDpsEntry.getAuxFkOriginalUnitOld());
+            chg.setFkOriginalUnitNewId(((int[])moFieldFkOriginalUnitId.getKey())[0]);
+            moDpsEntry.getDbmsDpsEntryQuantityChange().add(chg);
+        }
         
         return moDpsEntry;
     }
@@ -6802,6 +6870,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else if (button == jbItemComposition) {
                 actionItemComposition();
+            }
+            else if (button == jbDateQuantityChg) {
+                actionDateQuantityChg();
             }
         }
         if (e.getSource() instanceof javax.swing.JToggleButton) {

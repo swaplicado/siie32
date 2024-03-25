@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 245.0*/ 2024-03-20
+Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exclusión de la validación de periodo cerrado al guardar una cotización, contrato o pedido.
+2) Implementación del historial de cambios de cantidad para los contratos. 
+
+================================================================================
 SIIE 3.2 245.0/ 2024-03-20
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

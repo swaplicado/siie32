@@ -176,6 +176,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> mvDbmsEntryCommissions;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> mvDbmsEntryPrices;
     protected ArrayList<SDataDpsEntryAnalysis> mlDbmsDpsEntryAnalysis;
+    protected ArrayList<SDataDpsEntryQuantityChange> mlDbmsDpsEntryQuantityChange;
     protected SDataDpsMaterialRequest moDbmsDpsEntryMatRequest;
     protected SDataDpsEntryItemComposition moDbmsDpsEntryItemComposition;
 
@@ -202,6 +203,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected boolean mbXtaIsPurInvoiceInventoriable; 
     protected double mnXtaPriceCommUnitary;
     
+    protected int mnAuxFkItemOld;
+    protected double mdAuxQuantityOld;
+    protected double mdAuxOriginalQuantityOld;
+    protected int mnAuxFkUnitOld;
+    protected int mnAuxFkOriginalUnitOld;
+    
     /**
      * Overrides java.lang.Object.clone() function.
      */
@@ -213,6 +220,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions = new Vector<>();
         mvDbmsEntryPrices = new Vector<>();
         mlDbmsDpsEntryAnalysis = new ArrayList<>();
+        mlDbmsDpsEntryQuantityChange = new ArrayList<>();
         moDbmsDpsEntryMatRequest = null;
         moDbmsDpsEntryItemComposition = null;
 
@@ -505,6 +513,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryCommissions> getDbmsEntryCommissions() { return mvDbmsEntryCommissions; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryPrice> getDbmsEntryPrices() { return mvDbmsEntryPrices; }
     public ArrayList<SDataDpsEntryAnalysis> getDbmsDpsEntryAnalysis() { return mlDbmsDpsEntryAnalysis; }
+    public ArrayList<SDataDpsEntryQuantityChange> getDbmsDpsEntryQuantityChange() { return mlDbmsDpsEntryQuantityChange; }
     public SDataDpsMaterialRequest getDbmsDpsEntryMatRequestLink() { return moDbmsDpsEntryMatRequest; }
     public SDataDpsEntryItemComposition getDbmsDpsEntryItemComposition() { return moDbmsDpsEntryItemComposition; }
 
@@ -546,6 +555,18 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     
     public boolean getXtaIsPurInvoiceInventoriable() { return mbXtaIsPurInvoiceInventoriable; }
     public double getXtaPriceCommUnitary() { return mnXtaPriceCommUnitary; }
+    
+    public void setAuxFkItemOld(int i) { mnAuxFkItemOld = i; }
+    public void setAuxQuantityOld(double n) { mdAuxQuantityOld = n; }
+    public void setAuxOriginalQuantityOld(double n) { mdAuxOriginalQuantityOld = n; }
+    public void setAuxFkUnitOld(int i) { mnAuxFkUnitOld = i; }
+    public void setAuxFkOriginalUnitOld(int i) { mnAuxFkOriginalUnitOld = i; }
+    
+    public int getAuxFkItemOld() { return mnAuxFkItemOld; }
+    public double getAuxQuantityOld() { return mdAuxQuantityOld; }
+    public double getAuxOriginalQuantityOld() { return mdAuxOriginalQuantityOld; }
+    public int getAuxFkUnitOld() { return mnAuxFkUnitOld; }
+    public int getAuxFkOriginalUnitOld() { return mnAuxFkOriginalUnitOld; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -704,6 +725,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsEntryCommissions.clear();
         mvDbmsEntryPrices.clear();
         mlDbmsDpsEntryAnalysis.clear();
+        mlDbmsDpsEntryQuantityChange.clear();
         moDbmsDpsEntryMatRequest = null;
         moDbmsDpsEntryItemComposition = null;
 
@@ -729,6 +751,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         
         mbXtaIsPurInvoiceInventoriable = false;
         mnXtaPriceCommUnitary = 0;
+        
+        mnAuxFkItemOld = 0;
+        mdAuxQuantityOld = 0;
+        mdAuxOriginalQuantityOld = 0;
+        mnAuxFkUnitOld = 0;
+        mnAuxFkOriginalUnitOld = 0;
     }
 
     @Override
@@ -874,6 +902,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mtUserEditTs = resultSet.getTimestamp("de.ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("de.ts_del");
 
+                mnAuxFkItemOld = resultSet.getInt("de.fid_item");
+                mdAuxQuantityOld = resultSet.getDouble("de.qty");
+                mdAuxOriginalQuantityOld = resultSet.getDouble("de.orig_qty");
+                mnAuxFkUnitOld = resultSet.getInt("de.fid_unit");
+                mnAuxFkOriginalUnitOld = resultSet.getInt("de.fid_orig_unit");
+                
                 nCveProdSerItem_n = resultSet.getInt("i.fid_cfd_prod_serv_n");
                 nCveProdSerIgen = resultSet.getInt("igen.fid_cfd_prod_serv");
                 
@@ -1147,6 +1181,27 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         mlDbmsDpsEntryAnalysis.add(oEtyAnalysis);
                     }
                     
+                    // Read Quantity changes of Dps Ety
+                    
+                    sql = "SELECT " 
+                            + "id_chg " 
+                            + "FROM " 
+                            + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_QTY_CHG) + " "
+                            + "WHERE "
+                            + "id_year = " + mnPkYearId + " AND "
+                            + "id_doc = " + mnPkDocId + " AND "
+                            + "id_ety = " + mnPkEntryId + " AND "
+                            + "NOT b_del "
+                            + "ORDER BY id_year, id_doc, id_ety, id_chg;";
+                    
+                    mlDbmsDpsEntryQuantityChange = new ArrayList<>();
+                    resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        SDataDpsEntryQuantityChange o = new SDataDpsEntryQuantityChange();
+                        o.read(new int[] { mnPkYearId, mnPkDocId, mnPkEntryId, resultSet.getInt(1) }, statement.getConnection().createStatement());
+                        mlDbmsDpsEntryQuantityChange.add(o);
+                    }
+                    
                     // Read Dps Ety links to Material Requests
                     sql = "SELECT "
                             + " id_dps_mat_req "
@@ -1390,6 +1445,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     mvDbmsDpsAdjustmentsAsDps.clear();
                     mvDbmsDpsAdjustmentsAsAdjustment.clear();
                     mlDbmsDpsEntryAnalysis.clear();
+                    mlDbmsDpsEntryQuantityChange.clear();
                 }
                 else {
                     // Save aswell DPS entry links as source:
@@ -1501,6 +1557,28 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             oEtyAnalysis.setPkEntryAnalysisId(0);
                             
                             oEtyAnalysis.save(connection);
+                        }
+                    }
+                    
+                    if (mlDbmsDpsEntryQuantityChange.size() > 0) {
+                        if (mnAuxFkItemOld != mnFkItemId) {
+                            String sql = "UPDATE trn_dps_ety_qty_chg " +
+                                "SET b_del = 1 WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+                            statement.execute(sql);
+                            mlDbmsDpsEntryQuantityChange.clear();
+                        }
+                        for (SDataDpsEntryQuantityChange chg : mlDbmsDpsEntryQuantityChange) {
+                            if (chg.getIsRegistryNew()) {
+                                chg.setPkYearId(mnPkYearId);
+                                chg.setPkDocId(mnPkDocId);
+                                chg.setPkEntryId(mnPkEntryId);
+                                chg.setFkUserNewId(mnFkUserEditId);
+                                chg.save(connection);
+                                
+                                if (chg.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                                    throw new Exception("Ocurrió un error al guardar el cambio de la cantidad, contacte a soporte técnico");
+                                }
+                            }
                         }
                     }
                     
@@ -2015,6 +2093,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.getDbmsDpsLinksAsDestiny().addAll(mvDbmsDpsLinksAsDestiny);
         clone.getDbmsDpsAdjustmentsAsDps().addAll(mvDbmsDpsAdjustmentsAsDps);
         clone.getDbmsDpsAdjustmentsAsAdjustment().addAll(mvDbmsDpsAdjustmentsAsAdjustment);
+        
+        clone.getDbmsDpsEntryQuantityChange().addAll(mlDbmsDpsEntryQuantityChange);
 
         clone.setDbmsDpsCfdEntry(moDbmsDpsCfdEntry == null ? null : moDbmsDpsCfdEntry.clone());
 
@@ -2029,6 +2109,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         clone.setXtaIsPurInvoiceInventoriable(mbXtaIsPurInvoiceInventoriable);
         clone.setXtaPriceCommUnitary(mnXtaPriceCommUnitary);
+        
+        clone.setAuxFkItemOld(mnAuxFkItemOld);
+        clone.setAuxQuantityOld(mdAuxQuantityOld);
+        clone.setAuxOriginalQuantityOld(mdAuxOriginalQuantityOld);
+        clone.setAuxFkUnitOld(mnAuxFkUnitOld);
+        clone.setAuxFkOriginalUnitOld(mnAuxFkOriginalUnitOld);
         
         return clone;
     }

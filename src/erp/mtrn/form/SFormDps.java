@@ -11129,9 +11129,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     validation.setMessage("¡No se han especificado la clave de esta empresa como proveedor del cliente " + moBizPartner.getBizPartner() + ".\n" +
                             "Actualizar este dato en el Módulo Configuración, vista 'Clientes', forma de captura 'Cliente', pestaña 'Información adicional', campo 'Clave de la empresa'.");
                 }
-                else if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                    validation.setComponent(jftDate);
+                else if (!moDps.isEstimate() && !moDps.isOrder()) {
+                    if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                        validation.setComponent(jftDate);
+                    }
                 }
                 else if (moDps.getPkYearId() != SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
@@ -12148,7 +12150,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) ||
                 (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||
                 (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml())));
-
+        
         jbEditHelp.setEnabled(!jbEdit.isEnabled());
         jbOk.setEnabled(false);
         
