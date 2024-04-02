@@ -117,7 +117,7 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
                 + "v.id_unit AS " + SDbConsts.FIELD_ID + "2, " 
                 + "v.id_log AS " + SDbConsts.FIELD_ID + "3, " 
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", " 
-                + "v.dt AS " + SDbConsts.FIELD_CODE + ", " 
+                + "i.item_key AS " + SDbConsts.FIELD_CODE + ", " 
                 + "i.item AS " + SDbConsts.FIELD_NAME + ", "  
                 + "u.symbol, "  
                 + "v.price, " 
@@ -154,6 +154,7 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, "Clave ítem"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Ítem"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "price", "Precio comercial"));
