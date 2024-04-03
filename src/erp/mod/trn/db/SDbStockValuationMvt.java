@@ -23,21 +23,25 @@ import sa.lib.gui.SGuiSession;
 public class SDbStockValuationMvt extends SDbRegistryUser {
     
     protected int mnPkStockValuationMvtId;
-    protected Date mtDateMove;
-    protected double mdQuantityEntry;
-    protected double mdQuantityConsumption_r;
+    protected Date mtDate;
+    protected double mdQuantityMovement;
     protected double mdCostUnitary;
     protected double mdCost_r;
     //protected boolean mbDeleted;
-    protected int mnFkDiogCategoryId;
-    protected int mnFkItemId;
-    protected int mnFkUnitId;
-    protected int mnFktemReferenceId_n;
-    protected int mnFkDiogYear;
-    protected int mnFkDiogDocId;
-    protected int mnFkDiogEntryId;
     protected int mnFkStockValuationId;
     protected int mnFkStockValuationMvtId_n;
+    protected int mnFkDiogCategoryId;
+    protected int mnFkDiogYearInId;
+    protected int mnFkDiogDocInId;
+    protected int mnFkDiogEntryInId;
+    protected int mnFkDiogYearOutId_n;
+    protected int mnFkDiogDocOutId_n;
+    protected int mnFkDiogEntryOutId_n;
+    protected int mnFkItemId;
+    protected int mnFkUnitId;
+    protected int mnFkLotId;
+    protected int mnFkCompanyBranchId;
+    protected int mnFkWarehouseId;
     //protected int mnFkUserInsertId;
     //protected int mnFkUserUpdateId;
     //protected Date mtTsUserInsert;
@@ -53,21 +57,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     }
     
     public void setPkStockValuationMvtId(int n) { mnPkStockValuationMvtId = n; }
-    public void setDateMove(Date t) { mtDateMove = t; }
-    public void setQuantityEntry(double d) { mdQuantityEntry = d; }
-    public void setQuantityConsumption_r(double d) { mdQuantityConsumption_r = d; }
+    public void setDateMove(Date t) { mtDate = t; }
+    public void setQuantityMovement(double d) { mdQuantityMovement = d; }
     public void setCostUnitary(double d) { mdCostUnitary = d; }
     public void setCost_r(double d) { mdCost_r = d; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkDiogCategoryId(int n) { mnFkDiogCategoryId = n; }
-    public void setFkItemId(int n) { mnFkItemId = n; }
-    public void setFkUnitId(int n) { mnFkUnitId = n; }
-    public void setFkItemReference_n(int n) { mnFktemReferenceId_n = n; }
-    public void setFkDiogYear(int n) { mnFkDiogYear = n; }
-    public void setFkDiogDocId(int n) { mnFkDiogDocId = n; }
-    public void setFkDiogEntryId(int n) { mnFkDiogEntryId = n; }
     public void setFkStockValuationId(int n) { mnFkStockValuationId = n; }
     public void setFkStockValuationMvtId_n(int n) { mnFkStockValuationMvtId_n = n; }
+    public void setFkDiogCategoryId(int n) { mnFkDiogCategoryId = n; }
+    public void setFkDiogYearInId(int n) { mnFkDiogYearInId = n; }
+    public void setFkDiogDocInId(int n) { mnFkDiogDocInId = n; }
+    public void setFkDiogEntryInId(int n) { mnFkDiogEntryInId = n; }
+    public void setFkDiogYearOutId_n(int n) { mnFkDiogYearOutId_n = n; }
+    public void setFkDiogDocOutId_n(int n) { mnFkDiogDocOutId_n = n; }
+    public void setFkDiogEntryOutId_n(int n) { mnFkDiogEntryOutId_n = n; }
+    public void setFkItemId(int n) { mnFkItemId = n; }
+    public void setFkUnitId(int n) { mnFkUnitId = n; }
+    public void setFkLotId(int n) { mnFkLotId = n; }
+    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkWarehouseId(int n) { mnFkWarehouseId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -79,21 +87,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     public void setAuxMaterialRequestEntryPk(int[] a) { maAuxMaterialRequestEntryPk = a; }
     
     public int getPkStockValuationMvtId() { return mnPkStockValuationMvtId; }
-    public Date getDateMove() { return mtDateMove; }
-    public double getQuantityEntry() { return mdQuantityEntry; }
-    public double getQuantityConsumption() { return mdQuantityConsumption_r; }
+    public Date getDateMove() { return mtDate; }
+    public double getQuantityMovement() { return mdQuantityMovement; }
     public double getCostUnitary() { return mdCostUnitary; }
     public double getCost_r() { return mdCost_r; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkDiogCategoryId() { return mnFkDiogCategoryId; }
-    public int getFkItemId() { return mnFkItemId; }
-    public int getFkUnitId() { return mnFkUnitId; }
-    public int getFkItemReference_n() { return mnFktemReferenceId_n; }
-    public int getFkDiogYear() { return mnFkDiogYear; }
-    public int getFkDiogDocId() { return mnFkDiogDocId; }
-    public int getFkDiogEntryId() { return mnFkDiogEntryId; }
     public int getFkStockValuationId() { return mnFkStockValuationId; }
     public int getFkStockValuationMvtId_n() { return mnFkStockValuationMvtId_n; }
+    public int getFkDiogCategoryId() { return mnFkDiogCategoryId; }
+    public int getFkDiogYearInId() { return mnFkDiogYearInId; }
+    public int getFkDiogDocInId() { return mnFkDiogDocInId; }
+    public int getFkDiogEntryInId() { return mnFkDiogEntryInId; }
+    public int getFkDiogYearOutId_n() { return mnFkDiogYearOutId_n; }
+    public int getFkDiogDocOutId_n() { return mnFkDiogDocOutId_n; }
+    public int getFkDiogEntryOutId_n() { return mnFkDiogEntryOutId_n; }
+    public int getFkItemId() { return mnFkItemId; }
+    public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkLotId() { return mnFkLotId; }
+    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkWarehouseId() { return mnFkWarehouseId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -119,21 +131,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkStockValuationMvtId = 0;
-        mtDateMove = null;
-        mdQuantityEntry = 0d;
-        mdQuantityConsumption_r = 0d;
+        mtDate = null;
+        mdQuantityMovement = 0d;
         mdCostUnitary = 0d;
         mdCost_r = 0d;
         mbDeleted = false;
-        mnFkDiogCategoryId = 0;
-        mnFkItemId = 0;
-        mnFkUnitId = 0;
-        mnFktemReferenceId_n = 0;
-        mnFkDiogYear = 0;
-        mnFkDiogDocId = 0;
-        mnFkDiogEntryId = 0;
         mnFkStockValuationId = 0;
         mnFkStockValuationMvtId_n = 0;
+        mnFkDiogCategoryId = 0;
+        mnFkDiogYearInId = 0;
+        mnFkDiogDocInId = 0;
+        mnFkDiogEntryInId = 0;
+        mnFkDiogYearOutId_n = 0;
+        mnFkDiogDocOutId_n = 0;
+        mnFkDiogEntryOutId_n = 0;
+        mnFkItemId = 0;
+        mnFkUnitId = 0;
+        mnFkLotId = 0;
+        mnFkCompanyBranchId = 0;
+        mnFkWarehouseId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -185,21 +201,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
         }
         else {
             mnPkStockValuationMvtId = resultSet.getInt("id_stk_val_mvt");
-            mtDateMove = resultSet.getDate("dt_mov");
-            mdQuantityEntry = resultSet.getDouble("qty_entry");
-            mdQuantityConsumption_r = resultSet.getDouble("qty_cons_r");
+            mtDate = resultSet.getDate("dt_mov");
+            mdQuantityMovement = resultSet.getDouble("qty_mov");
             mdCostUnitary = resultSet.getDouble("cost_u");
             mdCost_r = resultSet.getDouble("cost_r");
             mbDeleted = resultSet.getBoolean("b_del");
-            mnFkDiogCategoryId = resultSet.getInt("fk_ct_iog");
-            mnFkItemId = resultSet.getInt("fk_item");
-            mnFkUnitId = resultSet.getInt("fk_unit");
-            mnFktemReferenceId_n = resultSet.getInt("fk_item_ref_n");
-            mnFkDiogYear = resultSet.getInt("fk_diog_year");
-            mnFkDiogDocId = resultSet.getInt("fk_diog_doc");
-            mnFkDiogEntryId = resultSet.getInt("fk_diog_ety");
             mnFkStockValuationId = resultSet.getInt("fk_stk_val");
             mnFkStockValuationMvtId_n = resultSet.getInt("fk_stk_val_mvt_n");
+            mnFkDiogCategoryId = resultSet.getInt("fk_ct_iog");
+            mnFkDiogYearInId = resultSet.getInt("fk_diog_year_in");
+            mnFkDiogDocInId = resultSet.getInt("fk_diog_doc_in");
+            mnFkDiogEntryInId = resultSet.getInt("fk_diog_entry_in");
+            mnFkDiogYearOutId_n = resultSet.getInt("fk_diog_year_out_n");
+            mnFkDiogDocOutId_n = resultSet.getInt("fk_diog_doc_out_n");
+            mnFkDiogEntryOutId_n = resultSet.getInt("fk_diog_entry_out_n");
+            mnFkItemId = resultSet.getInt("fk_item");
+            mnFkUnitId = resultSet.getInt("fk_unit");
+            mnFkLotId = resultSet.getInt("fk_lot");
+            mnFkCompanyBranchId = resultSet.getInt("fk_cob");
+            mnFkWarehouseId = resultSet.getInt("fk_wh");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -224,24 +244,28 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkStockValuationMvtId + ", " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateMove) + "', " + 
-                    mdQuantityEntry + ", " +
-                    mdQuantityConsumption_r + ", " +
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
+                    mdQuantityMovement + ", " +
                     mdCostUnitary + ", " +
                     mdCost_r + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
-                    mnFkDiogCategoryId + ", " +
-                    mnFkItemId + ", " +
-                    mnFkUnitId + ", " +
-                    (mnFktemReferenceId_n > 0 ? mnFktemReferenceId_n : "null") + ", " +
-                    mnFkDiogYear + ", " +
-                    mnFkDiogDocId + ", " +
-                    mnFkDiogEntryId + ", " +
                     mnFkStockValuationId + ", " +
                     (mnFkStockValuationMvtId_n > 0 ? mnFkStockValuationMvtId_n : "null") + ", " +
-                    mnFkUserInsertId + ", " + 
-                    mnFkUserUpdateId + ", " + 
-                    "NOW()" + ", " + 
+                    mnFkDiogCategoryId + ", " +
+                    mnFkDiogYearInId + ", " +
+                    mnFkDiogDocInId + ", " +
+                    mnFkDiogEntryInId + ", " +
+                    (mnFkDiogYearOutId_n > 0 ? mnFkDiogYearOutId_n : "null") + ", " +
+                    (mnFkDiogDocOutId_n > 0 ? mnFkDiogDocOutId_n : "null") + ", " +
+                    (mnFkDiogEntryOutId_n > 0 ? mnFkDiogEntryOutId_n : "null") + ", " +
+                    mnFkItemId + ", " +
+                    mnFkUnitId + ", " +
+                    mnFkLotId + ", " +
+                    mnFkCompanyBranchId + ", " +
+                    mnFkWarehouseId + ", " +
+                    mnFkUserInsertId + ", " +
+                    mnFkUserUpdateId + ", " +
+                    "NOW()" + ", " +
                     "NOW()" + " " +
                     ")" ;
         }
@@ -250,21 +274,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
             
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_stk_val_mvt = " + mnPkValuationEntryId + ", " +
-                    "dt_mov = '" + SLibUtils.DbmsDateFormatDate.format(mtDateMove) + "', " +
-                    "qty_entry = " + mdQuantityEntry + ", " +
-                    "qty_cons_r = " + mdQuantityConsumption_r + ", " +
+                    "dt_mov = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
+                    "qty_mov = " + mdQuantityMovement + ", " +
                     "cost_u = " + mdCostUnitary + ", " +
                     "cost_r = " + mdCost_r + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "fk_ct_iog = " + mnFkDiogCategoryId + ", " +
-                    "fk_item = " + mnFkItemId + ", " +
-                    "fk_unit = " + mnFkUnitId + ", " +
-                    "fk_item_ref_n = " + (mnFktemReferenceId_n > 0 ? mnFktemReferenceId_n : "null") + ", " +
-                    "fk_diog_year = " + mnFkDiogYear + ", " +
-                    "fk_diog_doc = " + mnFkDiogDocId + ", " +
-                    "fk_diog_ety = " + mnFkDiogEntryId + ", " +
                     "fk_stk_val = " + mnFkStockValuationId + ", " +
                     "fk_stk_val_mvt_n = " + (mnFkStockValuationMvtId_n > 0 ? mnFkStockValuationMvtId_n : "null") + ", " +
+                    "fk_ct_iog = " + mnFkDiogCategoryId + ", " +
+                    "fk_diog_year_in = " + mnFkDiogYearInId + ", " +
+                    "fk_diog_doc_in = " + mnFkDiogDocInId + ", " +
+                    "fk_diog_entry_in = " + mnFkDiogEntryInId + ", " +
+                    "fk_diog_year_out_n = " + (mnFkDiogYearOutId_n > 0 ? mnFkDiogYearOutId_n : "null") + ", " +
+                    "fk_diog_doc_out_n = " + (mnFkDiogDocOutId_n > 0 ? mnFkDiogDocOutId_n : "null") + ", " +
+                    "fk_diog_entry_out_n = " + (mnFkDiogEntryOutId_n > 0 ? mnFkDiogEntryOutId_n : "null") + ", " +
+                    "fk_item = " + mnFkItemId + ", " +
+                    "fk_unit = " + mnFkUnitId + ", " +
+                    "fk_lot = " + mnFkLotId + ", " +
+                    "fk_cob = " + mnFkCompanyBranchId + ", " +
+                    "fk_wh = " + mnFkWarehouseId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -284,21 +312,25 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
         
         registry.setPkStockValuationMvtId(this.getPkStockValuationMvtId());
         registry.setDateMove(this.getDateMove());
-        registry.setQuantityEntry(this.getQuantityEntry());
-        registry.setQuantityConsumption_r(this.getQuantityConsumption());
+        registry.setQuantityMovement(this.getQuantityMovement());
         registry.setCostUnitary(this.getCostUnitary());
         registry.setCost_r(this.getCost_r());
         registry.setAuxConsumed(this.isAuxConsumed());
         registry.setDeleted(this.isDeleted());
-        registry.setFkDiogCategoryId(this.getFkDiogCategoryId());
-        registry.setFkItemId(this.getFkItemId());
-        registry.setFkUnitId(this.getFkUnitId());
-        registry.setFkItemReference_n(this.getFkItemReference_n());
-        registry.setFkDiogYear(this.getFkDiogYear());
-        registry.setFkDiogDocId(this.getFkDiogDocId());
-        registry.setFkDiogEntryId(this.getFkDiogEntryId());
         registry.setFkStockValuationId(this.getFkStockValuationId());
         registry.setFkStockValuationMvtId_n(this.getFkStockValuationMvtId_n());
+        registry.setFkDiogCategoryId(this.getFkDiogCategoryId());
+        registry.setFkDiogYearInId(this.getFkDiogYearInId());
+        registry.setFkDiogDocInId(this.getFkDiogDocInId());
+        registry.setFkDiogEntryInId(this.getFkDiogEntryInId());
+        registry.setFkDiogYearOutId_n(this.getFkDiogYearOutId_n());
+        registry.setFkDiogDocOutId_n(this.getFkDiogDocOutId_n());
+        registry.setFkDiogEntryOutId_n(this.getFkDiogEntryOutId_n());
+        registry.setFkItemId(this.getFkItemId());
+        registry.setFkUnitId(this.getFkUnitId());
+        registry.setFkLotId(this.getFkLotId());
+        registry.setFkCompanyBranchId(this.getFkCompanyBranchId());
+        registry.setFkWarehouseId(this.getFkWarehouseId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

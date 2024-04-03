@@ -13,9 +13,15 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbStockValuation;
+import erp.mod.trn.db.SStockValuationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -298,6 +304,39 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
+            try {
+                String res = SStockValuationUtils.isValidValuation(miClient.getSession(), moDateDateEnd.getValue());
+                if (! res.isEmpty()) {
+                    if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {
+                        String canDelete = SStockValuationUtils.canDeleteValuations((SClientInterface) miClient, moDateDateEnd.getValue());
+                        if (! canDelete.isEmpty()) {
+                            validation.setMessage(canDelete);
+                        }
+                        else {
+                            ArrayList<SDbStockValuation> lValuations = SStockValuationUtils.deleteValuations(miClient, moDateDateEnd.getValue());
+                            if (lValuations == null) {
+                                validation.setMessage("Error al eliminar las valuaciones, contacte a soporte técnico.");
+                            }
+                            
+                            String result = SStockValuationUtils.revaluateValuations(miClient, lValuations);
+                            if (! result.isEmpty()) {
+                                validation.setMessage(result);
+                            }
+                        }
+                    }
+                    else {
+                        validation.setMessage(res);
+                    }
+                }
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(SFormStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+                validation.setMessage(ex.getMessage());
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SFormStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+                validation.setMessage(ex.getMessage());
+            }
         }
 
         return validation;

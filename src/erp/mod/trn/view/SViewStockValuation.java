@@ -63,6 +63,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
 
         moPaneSettings = new SGridPaneSettings(1);
 
+        moPaneSettings.setUpdatableApplying(false);
         moPaneSettings.setDeletedApplying(true);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
@@ -85,6 +86,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "v.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
                 + "dt_sta, "
                 + "dt_end, "
+                + "IF(va.fk_fin_rec_year IS NULL, '', CONCAT(va.fk_fin_rec_year, '-', fk_fin_rec_per, '-', fk_fin_rec_tp_rec, '-', fk_fin_rec_num)) AS rec, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -97,6 +99,17 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
+                + "LEFT JOIN (SELECT DISTINCT "
+                + "  fk_stk_val, "
+                + "  fk_fin_rec_year, "
+                + "  fk_fin_rec_per, "
+                + "  fk_fin_rec_bkc, "
+                + "  fk_fin_rec_tp_rec, "
+                + "  fk_fin_rec_num "
+                + "  FROM "
+                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS tsva "
+                + "  ORDER BY ts_usr_upd DESC) AS va ON "
+                + "va.fk_stk_val = v.id_stk_val "
                 + (where.isEmpty() ? "" : ("WHERE " + where));
     }
 
@@ -106,6 +119,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Fecha inicio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha fin"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "rec", "Pólza contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

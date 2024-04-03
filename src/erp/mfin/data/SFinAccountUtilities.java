@@ -7,10 +7,6 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mitm.data.SDataItem;
-import erp.mod.fin.db.SFinUtils;
-import erp.mod.trn.db.SDbMaterialRequest;
-import erp.mod.trn.db.SDbMaterialRequestCostCenter;
-import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mtrn.data.SDataDpsMaterialRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -23,13 +19,11 @@ import java.util.ArrayList;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
-import sa.lib.db.SDbConsts;
-import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public abstract class SFinAccountUtilities {
     
@@ -436,22 +430,39 @@ public abstract class SFinAccountUtilities {
         return accountConfigs;
     }
     
-    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigs(Connection connection, SDataDpsMaterialRequest oMatRequestDpsEtyLink) throws Exception {
+    /**
+     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición de materiales.
+     *
+     * @param connection
+     * @param oMatRequestDpsEtyLink
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<SFinAccountConfigEntry> getMatReqEtyFixedAssetAccountConfigs(Connection connection, SDataDpsMaterialRequest oMatRequestDpsEtyLink) throws Exception {
         if (oMatRequestDpsEtyLink == null) {
             throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (No se encontró vínculo con la Requisición de materiales)");
         }
         
         // Lee la partida de la requisición de materiales y obtiene centro de costo y cuenta contable
-        ArrayList<SFinAccountConfigEntry> lConfigs = getMaterialRequestEntryAccountConfigsByMatReqEty(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId(), oMatRequestDpsEtyLink.getFkMaterialRequestEntryId());
+        ArrayList<SFinAccountConfigEntry> lConfigs = getFixedAssetAccountConfigsByMatReqEty(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId(), oMatRequestDpsEtyLink.getFkMaterialRequestEntryId());
         if (lConfigs.size() > 0) {
             return lConfigs;
         }
 
         // Lee el encabezado de la requisición de materiales y obtiene centro de costo y cuenta contable
-        return getMaterialRequestEntryAccountConfigsByMatReq(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId());
+        return getFixedAssetAccountConfigsByMatReq(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId());
     }
     
-    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
+    /**
+     * Método para obtener la configuración de cuenta contable de activos fijos de la partida de la requisición de materiales.
+     *
+     * @param connection
+     * @param idMatReq
+     * @param idMatReqEty
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<SFinAccountConfigEntry> getFixedAssetAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
         // Proceso para obtener la información de la partida de la requisición de materiales
         String sql = "SELECT " +
                 "re.fk_cc_n, cc.id_cc, cc.cc, se.code, se.name, se.fk_acc_fa, acc.id_acc, '1' AS per " +
@@ -470,7 +481,15 @@ public abstract class SFinAccountUtilities {
         return executeQueryAndGetConfigs(connection, sql);
     }
 
-    public static ArrayList<SFinAccountConfigEntry> getMaterialRequestEntryAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
+    /**
+     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición de materiales.
+     * 
+     * @param connection
+     * @param idMatReq
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<SFinAccountConfigEntry> getFixedAssetAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
         // Proceso para obtener la información del encabezado de la requisición de materiales
         String sql = "SELECT " +
                 "rcc.id_cc AS pk_cc, cc.id_cc, cc.cc, se.fk_acc_fa, rcc.per, acc.id_acc " +
@@ -489,7 +508,77 @@ public abstract class SFinAccountUtilities {
 
         return executeQueryAndGetConfigs(connection, sql);
     }
+    
+    /**
+     * Método para obtener la configuración de cuenta contable de consumo de almacén por partida de la requisición de materiales por partida.
+     * 
+     * @param connection
+     * @param idMatReq
+     * @param idMatReqEty
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<SFinAccountConfigEntry> getConsumptionWhsAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
+        // Proceso para obtener la información de la partida de la requisición de materiales
+        String sql = "SELECT " +
+                "re.fk_cc_n, cc.id_cc, cc.cc, se.code, se.name, se.fk_acc_cons_whs, acc.id_acc, '1' AS per " +
+            "FROM " +
+                "trn_mat_req_ety re " +
+                    "LEFT JOIN " +
+                "fin_cc cc ON re.fk_cc_n = cc.pk_cc " +
+                    "LEFT JOIN " +
+                "trn_mat_cons_subent se ON re.fk_subent_mat_cons_ent_n = se.id_mat_cons_ent " +
+                    "AND re.fk_subent_mat_cons_subent_n = se.id_mat_cons_subent " +
+                    "LEFT JOIN " +
+                "fin_acc acc ON se.fk_acc_cons_whs = acc.pk_acc " +
+            "WHERE re.id_mat_req = " + idMatReq + " " +
+                "AND re.id_ety = " + idMatReqEty + ";";
 
+        return executeQueryAndGetConfigs(connection, sql);
+    }
+
+    /**
+     * Método para obtener la configuración de cuenta contable de consumo de almacén por encabezado de la requisición de materiales.
+     *
+     * @param connection
+     * @param idMatReq
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<SFinAccountConfigEntry> getConsumptionWhsAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
+        // Proceso para obtener la información del encabezado de la requisición de materiales
+        String sql = "SELECT " +
+                "rcc.id_cc AS pk_cc, cc.id_cc, cc.cc, se.fk_acc_cons_whs, rcc.per, acc.id_acc " +
+            "FROM " +
+                "trn_mat_req r " +
+                    "LEFT JOIN " +
+                "trn_mat_req_cc rcc ON r.id_mat_req = rcc.id_mat_req " +
+                    "LEFT JOIN " +
+                "trn_mat_cons_subent se ON rcc.id_mat_subent_cons_ent = se.id_mat_cons_ent " +
+                    "AND rcc.id_mat_subent_cons_subent = se.id_mat_cons_subent " +
+                    "LEFT JOIN " +
+                "fin_acc acc ON se.fk_acc_cons_whs = acc.pk_acc " +
+                    "LEFT JOIN " +
+                "fin_cc cc ON rcc.id_cc = cc.pk_cc " +
+            "WHERE r.id_mat_req = " + idMatReq + ";";
+
+        return executeQueryAndGetConfigs(connection, sql);
+    }
+
+    /**
+     * This Java function executes a SQL query on a database connection and retrieves a list of
+     * SFinAccountConfigEntry objects based on the query results.
+     * 
+     * @param connection The `connection` parameter in the `executeQueryAndGetConfigs` method
+     * represents the database connection that is used to execute the SQL query provided in the `sql`
+     * parameter. This connection allows the method to interact with the database to retrieve the
+     * results of the query and process them to create a list of `
+     * @param sql The `sql` parameter in the `executeQueryAndGetConfigs` method is a SQL query string
+     * that is used to retrieve data from a database. It should be a valid SQL SELECT statement that
+     * fetches data from the database tables. For example, it could be something like:
+     * @return The method `executeQueryAndGetConfigs` returns an ArrayList of `SFinAccountConfigEntry`
+     * objects.
+     */
     private static ArrayList<SFinAccountConfigEntry> executeQueryAndGetConfigs(Connection connection, String sql) throws SQLException {
         ArrayList<SFinAccountConfigEntry> lConfigs = new ArrayList<>();
         ResultSet resultSet = connection.createStatement().executeQuery(sql);
@@ -502,6 +591,17 @@ public abstract class SFinAccountUtilities {
         return lConfigs;
     }
 
+    /**
+     * The function `prorateAmount` calculates prorated amounts based on given percentages and adjusts
+     * them to match the total amount if necessary.
+     * 
+     * @param amount The `amount` parameter represents the total amount that needs to be prorated among
+     * the given percentages.
+     * @param percentages An array of percentages that represent how the total amount should be
+     * prorated among different entities or categories.
+     * @return An array of double values representing the prorated amounts based on the input amount
+     * and percentages.
+     */
     public static double[] prorateAmount(final double amount, final double[] percentages) {
         int index = -1;
         double total = 0;

@@ -3697,7 +3697,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
                                                     // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
                                                     if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
-                                                        ArrayList<erp.mfin.data.SFinAccountConfigEntry> lEntryCfgAcc = SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink());
+                                                        ArrayList<erp.mfin.data.SFinAccountConfigEntry> lEntryCfgAcc = SFinAccountUtilities.getMatReqEtyFixedAssetAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink());
                                                         lAccCfg.addAll(lEntryCfgAcc);
                                                     }
                                                 }
@@ -3738,7 +3738,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
                                                 // Si la partida de DPS está vinculada a una solicitud de material, tener en cuenta la configuración de la cuenta contable del subcentro de suministro
                                                 if (hasMaterialRequest) {
-                                                    oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
+                                                    oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.getMatReqEtyFixedAssetAccountConfigs(connection, dpsEntry.getDbmsDpsEntryMatRequestLink()));
                                                 }
                                                 else {
                                                     // Si no está vinculado a una solicitud de material, obtener la configuración de la cuenta contable del ítem
@@ -4377,7 +4377,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
                                     if (entry.getDbmsDpsEntryMatRequestLink() != null) {
                                         accountConfigs = new Vector<>();
-                                        accountConfigs.addAll(SFinAccountUtilities.getMaterialRequestEntryAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
+                                        accountConfigs.addAll(SFinAccountUtilities.getMatReqEtyFixedAssetAccountConfigs(connection, entry.getDbmsDpsEntryMatRequestLink()));
                                     }
                                     else {
                                         try {

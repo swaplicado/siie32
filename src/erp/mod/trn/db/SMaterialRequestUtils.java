@@ -822,6 +822,38 @@ public abstract class SMaterialRequestUtils {
         }
     }
     
+    public static int getReferenceItemFromMaterialRequest(Connection conn, final int[] pkMatRequestEntry) throws SQLException {
+        String query = "";
+        if (pkMatRequestEntry.length == 1) {
+            query = "SELECT fk_item_ref_n "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " "
+                + "WHERE id_mat_req = " + pkMatRequestEntry[0] + " AND fk_item_ref_n IS NOT NULL;";
+        }
+        else if (pkMatRequestEntry.length == 2) {
+            query = "SELECT fk_item_ref_n "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " "
+                + "WHERE id_mat_req = " + pkMatRequestEntry[0] + " AND id_ety = " + pkMatRequestEntry[1] + " "
+                + "AND fk_item_ref_n IS NOT NULL;";
+            
+            ResultSet resultSet = conn.createStatement().executeQuery(query);
+            if (resultSet.next()) {
+                return resultSet.getInt("fk_item_ref_n");
+            }
+            else {
+                query = "SELECT fk_item_ref_n "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " "
+                + "WHERE id_mat_req = " + pkMatRequestEntry[0] + " AND fk_item_ref_n IS NOT NULL;";
+            }
+        }
+        
+        ResultSet resultSet = conn.createStatement().executeQuery(query);
+        if (resultSet.next()) {
+            return resultSet.getInt("fk_item_ref_n");
+        }
+        
+        return 0;
+    }
+    
     public static ArrayList<SMatConsumeSubEntCcConfig> getCcConfigsFromMatReqEty(Connection conn, final int[] pkMatRequestEntry) {
         ResultSet resultSet;
         

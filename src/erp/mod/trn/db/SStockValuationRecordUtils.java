@@ -73,6 +73,8 @@ public class SStockValuationRecordUtils {
         SDataRecord oRecord = new SDataRecord();
         oRecord.read((Object) recordPk, session.getStatement());
         int sortPosition = oRecord.getLastSortingPosition();
+        sortPosition = sortPosition == 0 ? 1 : sortPosition;
+        int nItemReference;
         for (SDbStockValuationMvt oConsumption : lConsumptions) {
             System.out.println("Contabilizando " + i + " de " + n);
             /**
@@ -83,7 +85,7 @@ public class SStockValuationRecordUtils {
             }
             else {
                 oItem = new SDataItem();
-                oItem.read(new int[] { oConsumption.getFkItemId() }, session.getStatement());
+                oItem.read(new int[]{oConsumption.getFkItemId()}, session.getStatement());
                 lItems.put(oConsumption.getFkItemId(), oItem);
             }
             /**
@@ -95,47 +97,60 @@ public class SStockValuationRecordUtils {
                 }
                 else {
                     oUnit = new SDataUnit();
-                    oUnit.read(new int[] { oConsumption.getFkUnitId() }, session.getStatement().getConnection().createStatement());
+                    oUnit.read(new int[]{oConsumption.getFkUnitId()}, session.getStatement().getConnection().createStatement());
                     lUnits.put(oConsumption.getFkUnitId(), oUnit);
                 }
             }
             else {
                 oUnit = oItem.getDbmsDataUnit();
             }
-            
+
+            nItemReference = 0;
             ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
+            /**
+             * Si el consumo tiene asociada una Requisición de materiales
+             */
             if (oConsumption.getAuxMaterialRequestEntryPk() != null) {
                 if (oConsumption.getAuxMaterialRequestEntryPk()[1] > 0) {
-                    lPurAccConfigs = SFinAccountUtilities.getMaterialRequestEntryAccountConfigsByMatReqEty(session.getStatement().getConnection(), 
-                                                                                oConsumption.getAuxMaterialRequestEntryPk()[0], 
-                                                                                oConsumption.getAuxMaterialRequestEntryPk()[1]);
+                    lPurAccConfigs = SFinAccountUtilities.getConsumptionWhsAccountConfigsByMatReqEty(session.getStatement().getConnection(),
+                            oConsumption.getAuxMaterialRequestEntryPk()[0],
+                            oConsumption.getAuxMaterialRequestEntryPk()[1]);
                 }
-                if (lPurAccConfigs.isEmpty()) {
-                    lPurAccConfigs = SFinAccountUtilities.getMaterialRequestEntryAccountConfigsByMatReq(session.getStatement().getConnection(), 
-                                                                                oConsumption.getAuxMaterialRequestEntryPk()[0]);
+                if (lPurAccConfigs.isEmpty() || (! lPurAccConfigs.isEmpty() && lPurAccConfigs.get(0).getCostCenterId().isEmpty())) {
+                    lPurAccConfigs = SFinAccountUtilities.getConsumptionWhsAccountConfigsByMatReq(session.getStatement().getConnection(),
+                            oConsumption.getAuxMaterialRequestEntryPk()[0]);
                 }
+
+                nItemReference = SMaterialRequestUtils.getReferenceItemFromMaterialRequest(session.getStatement().getConnection(), oConsumption.getAuxMaterialRequestEntryPk());
             }
-            
+
+            if (nItemReference == 0) {
+//                int itmR = 15119;
+                nItemReference = oConsumption.getFkItemId();
+//                nItemReference = itmR;
+            }
+
+            // Si la configuración es vacía se toma en cuenta la configuración del paquete contable
             if (lPurAccConfigs.isEmpty()) {
                 /**
-                 * Configuración para partida de gastos
+                 * Configuración para partida de gastos (debit)
                  */
-                if (purCfgs.containsKey(oConsumption.getFkItemReference_n())) {
-                    vPurAccConfigs = purCfgs.get(oConsumption.getFkItemReference_n());
+                if (purCfgs.containsKey(oConsumption.getFkItemId())) {
+                    vPurAccConfigs = purCfgs.get(oConsumption.getFkItemId());
                 }
                 else {
-                    vPurAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
-                                                                                    (int) recordPk[2], 
-                                                                                    dtStart, 
-                                                                                    oCfg.getFinTpAccItemPur(),
-                                                                                    true, 
-                                                                                    session.getStatement().getConnection().createStatement());
-                    purCfgs.put(oConsumption.getFkItemReference_n(), vPurAccConfigs);
+                    vPurAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemId(),
+                            (int) recordPk[2],
+                            dtStart,
+                            oCfg.getFinTpAccItemAsset(),
+                            true,
+                            session.getStatement().getConnection().createStatement());
+                    purCfgs.put(oConsumption.getFkItemId(), vPurAccConfigs);
                 }
-                
+
                 lPurAccConfigs.addAll(vPurAccConfigs);
             }
-            
+
             if (lPurAccConfigs.size() > 0) {
                 double dTotalAmount = 0d;
                 SFinAccountConfigEntry oConfigMaj = null;
@@ -170,15 +185,19 @@ public class SStockValuationRecordUtils {
                         nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
                         lCC.put(oConfig.getCostCenterId(), nIdCC);
                     }
+                    
+                    if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
+                        throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                    }
 
                     /**
-                     * Partida de gastos
+                     * Partida de gastos (debit)
                      */
                     oDataRecordEntry = createRecordEntry(session,
                             TYPE_PUR,
                             recordPk,
                             oItem,
-                            oConsumption.getQuantityConsumption(),
+                            oConsumption.getQuantityMovement(),
                             oConfig.getAuxAmount(),
                             oUnit,
                             oCfg.getTextPurEntries(),
@@ -186,8 +205,8 @@ public class SStockValuationRecordUtils {
                             nIdCC,
                             oConfig.getCostCenterId(),
                             sortPosition++,
-                            new int[]{oConsumption.getFkDiogYear(), oConsumption.getFkDiogDocId()},
-                            oConsumption.getFkItemReference_n(),
+                            new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
+                            nItemReference,
                             SModSysConsts.FINS_TP_SYS_MOV_PUR,
                             SModSysConsts.FINS_TP_SYS_ACC_NA_NA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD,
@@ -201,20 +220,22 @@ public class SStockValuationRecordUtils {
                 throw new Exception("No se encontró cuenta contable para el item " + oConsumption.getFkItemId());
             }
             
+            /***********************************************************************************************************************************************/
+
             /**
-             * Configuración de la partida de inventarios
+             * Configuración de la partida de inventarios (credit)
              */
-            if (assetCfgs.containsKey(oConsumption.getFkItemReference_n())) {
-                vWhsAccConfigs = assetCfgs.get(oConsumption.getFkItemReference_n());
+            if (assetCfgs.containsKey(oConsumption.getFkItemId())) {
+                vWhsAccConfigs = assetCfgs.get(oConsumption.getFkItemId());
             }
             else {
-                vWhsAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemReference_n(), 
-                                                                                    (int) recordPk[2], 
-                                                                                    dtStart, 
-                                                                                    oCfg.getFinTpAccItemAsset(), 
-                                                                                    false, 
-                                                                                    session.getStatement().getConnection().createStatement());
-                assetCfgs.put(oConsumption.getFkItemReference_n(), vWhsAccConfigs);
+                vWhsAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(oConsumption.getFkItemId(),
+                        (int) recordPk[2],
+                        dtStart,
+                        oCfg.getFinTpAccItemPur(),
+                        false,
+                        session.getStatement().getConnection().createStatement());
+                assetCfgs.put(oConsumption.getFkItemId(), vWhsAccConfigs);
             }
 
             if (vWhsAccConfigs.size() > 0) {
@@ -224,7 +245,7 @@ public class SStockValuationRecordUtils {
                     if (oConfigMaj == null || oConfigMaj.getPercentage() < oConfig.getPercentage()) {
                         oConfigMaj = oConfig;
                     }
-                    
+
                     oConfig.setAuxAmount(SLibUtils.roundAmount(oConfig.getPercentage() * oConsumption.getCost_r()));
                     dTotalAmount = SLibUtils.roundAmount(dTotalAmount + oConfig.getAuxAmount());
                 }
@@ -239,7 +260,7 @@ public class SStockValuationRecordUtils {
                     }
                     else {
                         oAccount = new SDataAccount();
-                        oAccount.read(new String[] { oConfig.getAccountId() }, session.getStatement());
+                        oAccount.read(new String[]{oConfig.getAccountId()}, session.getStatement());
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
 
@@ -250,39 +271,41 @@ public class SStockValuationRecordUtils {
                         nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
                         lCC.put(oConfig.getCostCenterId(), nIdCC);
                     }
-                    
+
                     /**
-                    * Partida de almacén
-                    */
+                     * Partida de almacén (credit)
+                     */
                     oDataRecordEntryWhs = createRecordEntry(session,
-                                                       TYPE_INV,
-                                                       recordPk, 
-                                                       oItem, 
-                                                       oConsumption.getQuantityConsumption(), 
-                                                       oConfig.getAuxAmount(), 
-                                                       oUnit, 
-                                                       oCfg.getTextAssetEntries(),
-                                                       oAccount,
-                                                       nIdCC,
-                                                       oConfig.getCostCenterId(), 
-                                                       sortPosition++,
-                                                       new int[] { oConsumption.getFkDiogYear(), oConsumption.getFkDiogDocId() },
-                                                       oConsumption.getFkItemReference_n(),
-                                                       SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT,
-                                                       SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH,
-                                                       SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK,
-                                                       oConsumption.getAuxWarehousePk(),
-                                                       oConsumption.getFkStockValuationId(),
-                                                       oConsumption.getPkStockValuationMvtId()
-                                                       );
+                            TYPE_INV,
+                            recordPk,
+                            oItem,
+                            oConsumption.getQuantityMovement(),
+                            oConfig.getAuxAmount(),
+                            oUnit,
+                            oCfg.getTextAssetEntries(),
+                            oAccount,
+                            nIdCC,
+                            oConfig.getCostCenterId(),
+                            sortPosition++,
+                            new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
+                            nItemReference,
+                            SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT,
+                            SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH,
+                            SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK,
+                            oConsumption.getAuxWarehousePk(),
+                            oConsumption.getFkStockValuationId(),
+                            oConsumption.getPkStockValuationMvtId()
+                    );
                     lRecordEntries.add(oDataRecordEntryWhs);
                 }
             }
             else {
                 throw new Exception("No se encontró cuenta contable para el item " + oConsumption.getFkItemId());
             }
+            
+            i++;
         }
-        
+
         return true;
     }
     
@@ -413,8 +436,8 @@ public class SStockValuationRecordUtils {
         oRecordEntry.setFkCostGicId_n(0);
         oRecordEntry.setFkPayrollFormerId_n(0);
         oRecordEntry.setFkPayrollId_n(0);
-        oRecordEntry.setFkItemId_n(oItem.getPkItemId());
-        oRecordEntry.setFkItemAuxId_n(nItemRef);
+        oRecordEntry.setFkItemId_n(nItemRef);
+        oRecordEntry.setFkItemAuxId_n(oItem.getPkItemId());
         oRecordEntry.setFkUnitId_n(1);
         oRecordEntry.setFkBookkeepingYearId_n(0);
         oRecordEntry.setFkBookkeepingNumberId_n(0);
