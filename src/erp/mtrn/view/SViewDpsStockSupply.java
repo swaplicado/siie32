@@ -36,6 +36,7 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -332,7 +333,7 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
             }
             else {
                 if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_CLOSE) == JOptionPane.YES_OPTION) {
-                    Vector<Object> params = new Vector<Object>();
+                    Vector<Object> params = new Vector<>();
 
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
@@ -358,7 +359,7 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 }
                 else {
                     if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_OPEN) == JOptionPane.YES_OPTION) {
-                        Vector<Object> params = new Vector<Object>();
+                        Vector<Object> params = new Vector<>();
 
                         params.add(((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                         params.add(((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
@@ -408,7 +409,6 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
     @Override
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
-        int[] key = null;
         String sqlFilter = "";
         String sqlDiogPeriod = "";
         String sqlBizPartner = "";
@@ -416,28 +416,43 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
         String sqlOrderByDocEty = "";
 
         for (STableSetting setting : mvTableSettings) {
+            String filter = "";
+            
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 if (isViewForSupply()) {
-                    sqlDiogPeriod += setting.getSetting() == null ? "" : "g.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format((Date) setting.getSetting()) + "' AND ";
+                    Date date = (Date) setting.getSetting();
+                    if (date != null) {
+                        sqlDiogPeriod += (sqlDiogPeriod.isEmpty() ? "" : "AND ") + "g.dt <= '" + SLibUtils.DbmsDateFormatDate.format(date) + "' ";
+                    }
                 }
                 else {
-                    sqlFilter += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+                    filter = SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_TP) {
-                key = (int[]) setting.getSetting();
-                sqlFilter += key == null ? "" : "AND d.fid_ct_dps = " + key[0] + " AND d.fid_cl_dps = " + key[1] + " AND d.fid_tp_dps = " + key[2] + " ";
+                int[] key = (int[]) setting.getSetting();
+                if (key != null) {
+                    filter = "d.fid_ct_dps = " + key[0] + " AND d.fid_cl_dps = " + key[1] + " AND d.fid_tp_dps = " + key[2] + " ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
-                sqlFilter += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
+                if ((Integer) setting.getSetting() != 0) {
+                    filter = "d.fid_cob = " + (Integer) setting.getSetting() + " ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
-                sqlFilter += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+                if ((Integer) setting.getSetting() != 0) {
+                    filter = "d.fid_bp_r = " + (Integer) setting.getSetting() + " ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFilter += (sqlFilter.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    filter = "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
+            }
+            
+            if (!filter.isEmpty()) {
+                sqlFilter += (sqlFilter.isEmpty() ? "" : "AND ") + filter;
             }
         }
 
@@ -524,16 +539,16 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "da.b_del = 0 AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_orig_qty, " +
                 "COALESCE((SELECT SUM(ge.qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE " +
                 "ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND " +
-                "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND " + sqlDiogPeriod +
+                "ge.id_year = g.id_year AND ge.id_doc = g.id_doc " + (sqlDiogPeriod.isEmpty() ? "" : "AND " + sqlDiogPeriod) + "AND " +
                 "ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_qty, " +
                 "COALESCE((SELECT SUM(ge.orig_qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN 1 ELSE -1 END) FROM trn_diog_ety AS ge, trn_diog AS g WHERE " +
                 "ge.fid_dps_year_n = de.id_year AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND " +
-                "ge.id_year = g.id_year AND ge.id_doc = g.id_doc AND " + sqlDiogPeriod +
+                "ge.id_year = g.id_year AND ge.id_doc = g.id_doc " + (sqlDiogPeriod.isEmpty() ? "" : "AND " + sqlDiogPeriod) + "AND " +
                 "ge.b_del = 0 AND g.b_del = 0), 0) AS f_sup_orig_qty " +
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND " +
                 "d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND " +
-                "d.fid_ct_dps = " + mnTabTypeAux01 + " AND d.fid_cl_dps = " + mnTabTypeAux02 + " " + sqlFilter +
+                "d.fid_ct_dps = " + mnTabTypeAux01 + " AND d.fid_cl_dps = " + mnTabTypeAux02 + " " + (sqlFilter.isEmpty() ? "" : "AND " + sqlFilter) +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
