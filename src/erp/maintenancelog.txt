@@ -1,8 +1,20 @@
 ================================================================================
-SIIE 3.2 247.0/ 2024-04-03
+SIIE 3.2 247.0/ 2024-04-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1)Refactorización, reconfiguración y corrección de Valuación de Inventarios
+1) Refactorización, reconfiguración y corrección de Valuación de Inventarios
+
+================================================================================
+SIIE 3.2 246.3/ 2024-04-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Contabilización de facturas en base al ítem no importa el caso.
+
+================================================================================
+SIIE 3.2 246.2/ 2024-04-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a los filtros SQL de la vista de DPS por surtir, porque causaban error de sintáxis SQL.
 
 ================================================================================
 SIIE 3.2 246.1/ 2024-04-02
@@ -31,7 +43,7 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 
 ================================================================================
 SIIE 3.2 244.1/ 2024-03-19
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 
 1) Cambio a la consulta de la vista de requisiciones de mis centros de consumo para optimizarla.
