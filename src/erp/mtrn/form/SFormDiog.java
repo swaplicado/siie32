@@ -1247,6 +1247,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             jbEntryImport.setEnabled(moParamDpsSource != null || moProdOrderSource != null || SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV));
             jbExternalFile.setEnabled(true);
             jcbDiogAdjustmentType.setEnabled(STrnUtilities.isIogTypeAdjustment(manParamIogTypeKey));
+            
+            if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR)) {
+                enableEntryAdd(false);
+            }
+            else {
+                enableEntryAdd(enable);
+            }
         }
 
         jbEntryViewLots.setEnabled(true);
@@ -3254,6 +3261,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 jtbSwitchProdOrderDestiny.isSelected() ?
                     new Object[] { STrnUtilities.getProdOrderActiveStatus() } :
                     new Object[] { STrnUtilities.getProdOrderActiveStatus(), moFieldProdOrderSource.getKey() });
+    }
+    
+    private void enableEntryAdd(boolean enable) {
+        jtfEntryTextToFind.setText("");
+        jtfEntryTextToFind.setEditable(enable);
+        jbEntryFind.setEnabled(enable);
+        jbEntryAdd.setEnabled(enable);
     }
 
     public void actionOk() {

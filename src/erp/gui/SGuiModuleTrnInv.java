@@ -167,6 +167,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqEstDet;
     private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenuItem jmiReqAll;
+    private javax.swing.JMenuItem jmiReqAllReclass;
     private javax.swing.JMenuItem jmiCatMatCostCenterGrp;
     private javax.swing.JMenuItem jmiCatMatConsumptionEnt;
     private javax.swing.JMenuItem jmiCatMatConsumptionSubent;
@@ -278,6 +279,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqProv = false;
         boolean hasRightMatReqPur = false;
         boolean hasRightMatReqAdm = false;
+        boolean hasRightMatReqReclass = false;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -667,6 +669,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
         
         jmiReqAll = new JMenuItem("Todas las RM");
+        jmiReqAllReclass = new JMenuItem("Todas las RM (Reclasificación contable)");
         
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
         
@@ -704,6 +707,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqAll);
         jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqAllReclass);
+        jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqMatConsumptionEntBudget);
         
         jmiReqAllConsEnt.addActionListener(this);
@@ -733,6 +738,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqEstDet.addActionListener(this);
         jmiReqPendEstDet.addActionListener(this);
         jmiReqAll.addActionListener(this);
+        jmiReqAllReclass.addActionListener(this);
         jmiReqMatConsumptionEntBudget.addActionListener(this);
                
         jmMenuStk = new JMenu("Inventarios");
@@ -869,6 +875,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMatReqProv = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmiCatMatCostCenterGrp.setEnabled(hasRightMatReqAdm);
@@ -975,6 +982,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1956,6 +1964,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqAllReclass) {
+                SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_RECLASS);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_RECLASS, SModConsts.TRNX_MAT_REQ_RECLASS, params);
             }
             else if (item == jmiCatMatCostCenterGrp) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_CC_GRP, SLibConstants.UNDEFINED, null);

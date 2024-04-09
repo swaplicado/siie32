@@ -333,6 +333,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_REQ_MAT_PROV = 105063;      // suministrador
     public static final int PRV_INV_REQ_MAT_PUR = 105064;       // comprador
     public static final int PRV_INV_REQ_MAT_ADMOR = 105065;     //administrador
+    public static final int PRV_INV_REQ_MAT_RECLASS = 105066;     // contabilidad
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;

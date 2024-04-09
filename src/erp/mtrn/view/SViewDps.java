@@ -728,6 +728,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         mvSuscriptors.add(SModConsts.TRN_MAT_REQ);
         mvSuscriptors.add(SModConsts.TRNX_MAT_REQ_PEND_SUP);
         mvSuscriptors.add(SModConsts.TRNX_MAT_REQ_PEND_PUR);
+        mvSuscriptors.add(SModConsts.TRNX_MAT_REQ_RECLASS);
 
         populateTable();
     }

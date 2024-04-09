@@ -352,6 +352,7 @@ public class SDbStockValuation extends SDbRegistryUser {
             
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
+                System.out.println("Creando entries...");
                 SStockValuationUtils.createEntries(session, SModSysConsts.TRNS_CT_IOG_IN, mtDateStart, mtDateEnd, mnPkStockValuationId);
 
                 ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, SModSysConsts.TRNS_CT_IOG_OUT, mtDateStart, mtDateEnd, mnPkStockValuationId);
@@ -369,6 +370,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 System.out.println("Agrupando consumos...");
                 ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
                 lGrouped.addAll(groupByDiogEtyAndAverage(lConsumptions));
+                System.out.println("Actualizando costos en stock...");
                 for (SDbStockValuationMvt oRow : lGrouped) {
                      SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
                                             oRow.getFkDiogDocOutId_n(), 
@@ -379,6 +381,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 }
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
+                System.out.println("Terminado.");
             }
             else {
                 throw new Exception("Se desconoce el identificador de la póliza contable.");

@@ -166,11 +166,9 @@ public class SStockValuationUtils {
             oEntry.setFkLotId(res.getInt("id_lot"));
             oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
             oEntry.setFkWarehouseId(res.getInt("id_wh"));
-            oEntry.setAuxWarehousePk(new int[] { oEntry.getFkCompanyBranchId(), oEntry.getFkWarehouseId() });
             oEntry.setFkUserInsertId(session.getUser().getPkUserId());
             
             oEntry.save(session);
-            System.out.println("Entry mvt: " + oEntry.getDateMove().toString());
         }
     }
 
@@ -225,8 +223,6 @@ public class SStockValuationUtils {
             oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
             oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
             oEntry.setFkWarehouseId(res.getInt("fk_wh"));
-            
-            oEntry.setAuxWarehousePk(new int[] { res.getInt("fk_cob"), res.getInt("fk_wh") });
 
             entries.add(oEntry);
         }
@@ -303,14 +299,11 @@ public class SStockValuationUtils {
 
                         oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
                         oConsumption.setFkWarehouseId(res.getInt("id_wh"));
-                        oConsumption.setAuxWarehousePk(new int[]{res.getInt("id_cob"), res.getInt("id_wh")});
                         oConsumption.setFkUserInsertId(session.getUser().getPkUserId());
                         
                         if (res.getInt("fid_mat_req_n") > 0) {
-                            oConsumption.setAuxMaterialRequestEntryPk(new int[] { res.getInt("fid_mat_req_n"), res.getInt("fid_mat_req_ety_n") });
-                        }
-                        else {
-                            oConsumption.setAuxMaterialRequestEntryPk(null);
+                            oConsumption.setFkMaterialRequestId_n(res.getInt("fid_mat_req_n"));
+                            oConsumption.setFkMaterialRequestEntryId_n(res.getInt("fid_mat_req_ety_n"));
                         }
                         
                         lTempConsumptions.add(oConsumption);
@@ -541,7 +534,8 @@ public class SStockValuationUtils {
 
         ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
         while (res.next()) {
-            if (! isValuationValid(session, res.getInt("id_stk_val")).isEmpty()) {
+            if (! isValuationDiogsValidById(session, res.getInt("id_stk_val")).isEmpty() || 
+                ! isValuationMatReqValidById(session, res.getInt("id_stk_val")).isEmpty()) {
                 return res.getDate("dt_sta");
             }
         }
@@ -559,7 +553,7 @@ public class SStockValuationUtils {
      * @throws SQLException
      * @throws Exception 
      */
-    public static String isValidValuation(SGuiSession session, Date endDate) throws SQLException, Exception {
+    public static String arePastValuationsValid(SGuiSession session, Date endDate) throws SQLException, Exception {
         String sql = "SELECT id_stk_val, dt_sta, dt_end "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
                 + "WHERE NOT b_del "
@@ -569,9 +563,10 @@ public class SStockValuationUtils {
 
         ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
         ArrayList<SDataDiog> lDiogs = null;
+        ArrayList<SDbMaterialRequest> lMatReqs = null;
         String result = "";
         while (res.next()) {
-            lDiogs = isValuationValid(session, res.getInt("id_stk_val"));
+            lDiogs = isValuationDiogsValidById(session, res.getInt("id_stk_val"));
             if (! lDiogs.isEmpty()) {
                 for (SDataDiog oDiog : lDiogs) {
                     result += "El movimiento de almacén: " + oDiog.getDbmsDiogCategory() + "-"
@@ -579,6 +574,16 @@ public class SStockValuationUtils {
                             + oDiog.getDbmsDiogType() + " "
                             + "Numero: " + oDiog.getNumber() + " "
                             + "Fecha: '" + SLibUtils.DateFormatDate.format(oDiog.getDate()) + "' "
+                            + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
+                            + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
+                }
+            }
+            
+            lMatReqs = isValuationMatReqValidById(session, res.getInt("id_stk_val"));
+            if (! lMatReqs.isEmpty()) {
+                for (SDbMaterialRequest oMatReq : lMatReqs) {
+                    result += "La requisición con folio: " + oMatReq.getNumber() + ", "
+                            + "Fecha: '" + SLibUtils.DateFormatDate.format(oMatReq.getDate()) + "' "
                             + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
                             + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
                 }
@@ -600,7 +605,7 @@ public class SStockValuationUtils {
      * @return
      * @throws Exception 
      */
-    public static ArrayList<SDataDiog> isValuationValid(SGuiSession session, final int idValuation) throws Exception {
+    public static ArrayList<SDataDiog> isValuationDiogsValidById(SGuiSession session, final int idValuation) throws Exception {
         SDbStockValuation oVal = new SDbStockValuation();
         oVal.read(session, new int[] { idValuation });
         
@@ -623,6 +628,43 @@ public class SStockValuationUtils {
         }
         
         return lDiogs;
+    }
+    
+    /**
+     * Determina si la valuación con el ID recibida es válida.
+     * Consulta en la BD si hay una Requisición de Materiales que se haya actualizado después del timestamp de la fecha de última 
+     * actualización de la valuación.
+     * Si hay requisiciones que cumplan con este criterio las devuelve en la lista, si la lista está vacía 
+     * significa que la valuación es válida.
+     * 
+     * @param session
+     * @param idValuation
+     * @return
+     * @throws Exception 
+     */
+    public static ArrayList<SDbMaterialRequest> isValuationMatReqValidById(SGuiSession session, final int idValuation) throws Exception {
+        String sql = "SELECT DISTINCT " +
+                    " mr.id_mat_req " +
+                    "FROM " +
+                    " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS v " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS vm ON v.id_stk_val = vm.fk_stk_val " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre ON vm.fk_mat_req_n = mre.id_mat_req " +
+                    " AND vm.fk_mat_req_ety_n = mre.id_ety " +
+                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON mre.id_mat_req = mr.id_mat_req " +
+                    "WHERE " +
+                    "    NOT v.b_del AND NOT vm.b_del " +
+                    "    AND v.id_stk_val = " + idValuation + " " +
+                    "    AND mr.ts_usr_chg >= v.ts_usr_upd;";
+            
+        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        ArrayList<SDbMaterialRequest> lMatReqs = new ArrayList<>();
+        while (res.next()) {
+            SDbMaterialRequest oMatReq = new SDbMaterialRequest();
+            oMatReq.read(session, new int[] { res.getInt("id_mat_req") });
+            lMatReqs.add(oMatReq);
+        }
+        
+        return lMatReqs;
     }
     
     private static void updateTrnStockRowCost(SGuiSession session, final int idYear,

@@ -771,6 +771,7 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PROVIDED_DETAIL = 103; // suministrado a detalle
     public static final int TRNX_MAT_REQ_ESTIMATED = 104; // comprado
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
+    public static final int TRNX_MAT_REQ_RECLASS = 107; // reclasificación contable
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";

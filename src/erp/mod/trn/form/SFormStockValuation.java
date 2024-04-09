@@ -305,7 +305,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         
         if (validation.isValid()) {
             try {
-                String res = SStockValuationUtils.isValidValuation(miClient.getSession(), moDateDateEnd.getValue());
+                String res = SStockValuationUtils.arePastValuationsValid(miClient.getSession(), moDateDateEnd.getValue());
                 if (! res.isEmpty()) {
                     if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {
                         String canDelete = SStockValuationUtils.canDeleteValuations((SClientInterface) miClient, moDateDateEnd.getValue());

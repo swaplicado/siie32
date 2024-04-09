@@ -71,6 +71,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private boolean hasMatReqAdmorRight;
     private boolean hasMatReqPurRight;
     private boolean hasMatReqProvRight;
+    private boolean hasMatReqEditRight;
     
     /**
      * @param client GUI client.
@@ -79,7 +80,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
      * @param params
      */
     public SViewMaterialRequest(SGuiClient client, int subType, String title, SGuiParams params) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_MAT_REQ, subType, title, params);
+        super(client, SGridConsts.GRID_PANE_VIEW, subType != SModConsts.TRNX_MAT_REQ_RECLASS ? SModConsts.TRN_MAT_REQ : SModConsts.TRNX_MAT_REQ_RECLASS, subType, title, params);
         initComponents();
     }
     
@@ -94,6 +95,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqAdmorRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasMatReqPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
+        hasMatReqEditRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
@@ -137,7 +139,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterMatReqStatus);
         }
         else if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_AUTHO
-                || mnGridMode == SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH) {
+                || mnGridMode == SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH
+                || mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         
@@ -166,10 +169,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbAuthorize.setEnabled(false);
             jbReject.setEnabled(false);
         }
-        else {
+        else if (mnGridMode != SModSysConsts.TRNX_MAT_REQ_RECLASS) {
             moFilterMatReqStatus.setEnabled(true);
             jbAuthorize.setEnabled(hasAuthRight);
             jbReject.setEnabled(hasAuthRight);
+        }
+        
+        if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
+            jbRowEdit.setEnabled(hasMatReqEditRight);
         }
         
         jbRowDisable.setToolTipText("Cancelar");
@@ -699,10 +706,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_clo_prov, "
                 + "v.ts_usr_clo_pur, "
+                + "v.ts_usr_chg, "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "uc.usr AS usr_clo, "
                 + "ucp.usr AS usr_pur, "
+                + "uch.usr AS usr_chg, "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS v "
@@ -732,6 +741,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ucp ON "
                 + "v.fk_usr_clo_pur = ucp.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uch ON "
+                + "v.fk_usr_chg = uch.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
@@ -777,6 +788,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_clo", "Usr terminado compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_clo_prov", "Usr TS terminado compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
+        if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_chg", "Usr cambio contb."));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_chg", "Usr TS cambio contb."));
+        }
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));

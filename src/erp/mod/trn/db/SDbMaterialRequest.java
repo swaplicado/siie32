@@ -52,12 +52,14 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkItemReferenceId_n;
     protected int mnFkUserCloseProvisionId;
     protected int mnFkUserClosePurchaseId;
+    protected int mnFkUserChangeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     */
     protected Date mtTsUserCloseProvision;
     protected Date mtTsUserClosePurchase;
+    protected Date mtTsUserChange;
     /*
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
@@ -83,6 +85,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     
     protected String msAuxAuthUser;
     
+    protected boolean mbAuxChangeStatus;
     protected boolean mbAuxLastProvClosedSta;
     protected boolean mbAuxLastPurClosedSta;
 
@@ -116,10 +119,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkItemReferenceId_n(int n) { mnFkItemReferenceId_n = n; }
     public void setFkUserCloseProvisionId(int n) { mnFkUserCloseProvisionId = n; }
     public void setFkUserClosePurchaseId(int n) { mnFkUserClosePurchaseId = n; }
+    public void setFkUserChangeId(int n) { mnFkUserChangeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserCloseProvision(Date t) { mtTsUserCloseProvision = t; }
     public void setTsUserClosePurchase(Date t) { mtTsUserClosePurchase = t; }
+    public void setTsUserChange(Date t) { mtTsUserChange = t; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
@@ -136,6 +141,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
     public void setAuxNotesChangeStatus_n(String s) { msAuxNotesChangeStatus_n = s; }
     
+    public void setAuxChangeStatus(boolean b) { mbAuxChangeStatus = b; }
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
     
@@ -165,10 +171,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     public int getFkUserCloseProvisionId() { return mnFkUserCloseProvisionId; }
     public int getFkUserClosePurchaseId() { return mnFkUserClosePurchaseId; }
+    public int getFkUserChangeId() { return mnFkUserChangeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserCloseProvision() { return mtTsUserCloseProvision; }
     public Date getTsUserClosePurchase() { return mtTsUserClosePurchase; }
+    public Date getTsUserChange() { return mtTsUserChange; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
@@ -191,6 +199,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     
     public String getAuxProvEntName() { return msAuxProvEntName; }
     
+    public boolean getAuxChangeStatus() { return mbAuxChangeStatus; }
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
     
@@ -255,10 +264,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkItemReferenceId_n = 0;
         mnFkUserCloseProvisionId = 0;
         mnFkUserClosePurchaseId = 0;
+        mnFkUserChangeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserCloseProvision = null;
         mtTsUserClosePurchase = null;
+        mtTsUserChange = null;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
@@ -279,6 +290,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         msAuxNotesChangeStatus_n = null;
         
         msAuxProvEntName = "";
+        mbAuxChangeStatus = false;
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
         msAuxNotes = "";
@@ -356,10 +368,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkItemReferenceId_n = resultSet.getInt("fk_item_ref_n");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
+            mnFkUserChangeId = resultSet.getInt("fk_usr_chg");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserCloseProvision = resultSet.getTimestamp("ts_usr_clo_prov");
             mtTsUserClosePurchase = resultSet.getTimestamp("ts_usr_clo_pur");
+            mtTsUserChange = resultSet.getTimestamp("ts_usr_chg");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
@@ -483,6 +497,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             mnFkUserCloseProvisionId = mbCloseProvision ? session.getUser().getPkUserId() : SUtilConsts.USR_NA_ID;
             mnFkUserClosePurchaseId = mbClosePurchase ? session.getUser().getPkUserId() : SUtilConsts.USR_NA_ID;
+            mnFkUserChangeId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkMatRequestId + ", " + 
@@ -511,8 +526,10 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") + 
                     mnFkUserCloseProvisionId + ", " + 
                     mnFkUserClosePurchaseId + ", " + 
+                    mnFkUserChangeId + ", " +
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
+                    "NOW()" + ", " + 
                     "NOW()" + ", " + 
                     "NOW()" + ", " + 
                     "NOW()" + ", " + 
@@ -539,6 +556,10 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 mnFkUserClosePurchaseId = SUtilConsts.USR_NA_ID;
             }
             mnFkMatRequestStatusId = mnFkMatRequestStatusId == 0 ? mnAuxReqStatusIdOld : mnFkMatRequestStatusId;
+            
+            if (mbAuxChangeStatus) {
+                mnFkUserChangeId = session.getUser().getPkUserId();
+            }
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     //"id_mat_req = " + mnPkMatRequestId + ", " +
@@ -567,8 +588,10 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_item_ref_n = " + (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
+                    "fk_usr_chg = " + mnFkUserChangeId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    (mbAuxChangeStatus ? "ts_usr_chg = " + "NOW()" + ", " : "") +
                     (updateProvisionStatus ? "ts_usr_clo_prov = " + "NOW()" + ", " : "") +
                     (updatePurchaseStatus ? "ts_usr_clo_pur = " + "NOW()" + ", " : "") +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -744,10 +767,12 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
         registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
         registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
+        registry.setFkUserChangeId(this.getFkUserChangeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserCloseProvision(this.getTsUserCloseProvision());
         registry.setTsUserClosePurchase(this.getTsUserClosePurchase());
+        registry.setTsUserChange(this.getTsUserChange());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
         

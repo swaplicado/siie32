@@ -5,6 +5,7 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsItem;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsUser;
 import erp.mod.trn.db.SDbConfEmployeeVsEntity;
@@ -269,6 +270,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
             case SModConsts.TRNX_MAT_REQ_EST:
+            case SModConsts.TRNX_MAT_REQ_RECLASS:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -617,6 +619,10 @@ public class SModuleTrn extends SGuiModule {
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
+            case SModConsts.TRNX_MAT_REQ_RECLASS:
+                title = "Todas las RM (Reclasificación contable)";
+                view = new SViewMaterialRequest(miClient, subtype, title, params);
+                break;
             case SModConsts.TRN_STK_VAL:
                 title = "Valuación de inventarios";
                 view = new SViewStockValuation(miClient, title);
@@ -878,12 +884,31 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ: 
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
             case SModConsts.TRNX_MAT_REQ_EST:
-                if (moFormMaterialReq == null) moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                if (moFormMaterialReq == null) { 
+                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                }
+                else {
+                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición de materiales");
+                }
+                form = moFormMaterialReq;
+                break;
+            case SModConsts.TRNX_MAT_REQ_RECLASS:
+                if (moFormMaterialReq == null) { 
+                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales (Reclasificación contable)", subtype);
+                }
+                else {
+                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subtype, "Requisición de materiales (Reclasificación contable)");
+                }
                 form = moFormMaterialReq;
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
-                if (moFormMaterialReqSup == null) moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                if (moFormMaterialReqSup == null) { 
+                    moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                }
+                else {
+                    moFormMaterialReqSup.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición de materiales");
+                }
                 form = moFormMaterialReqSup;
                 break;
             case SModConsts.TRN_MAT_REQ_CC:

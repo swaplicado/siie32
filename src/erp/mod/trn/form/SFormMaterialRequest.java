@@ -94,6 +94,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private boolean hasUserProvRight;
     private boolean hasUserPurRight;
     private boolean hasUserProvPurRight;
+    private boolean hasUserReclassRight;
     private boolean hasLinkMatReq;
     
     private int mnStatusReqId;
@@ -1167,6 +1168,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         hasUserPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasUserProvPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight ||
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
+        hasUserReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         moDialogPickerItem = null;
         moDialogPickerItemRef = null;
@@ -1252,25 +1254,48 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     }
     
     private void enableReqControls(boolean enable) {
-        moTextTypeReq.setEnabled(false);
-        moDecTotal.setEnabled(false);
-        moKeyProvEnt.setEnabled(enable);
-        moKeyUsrReq.setEnabled(enable);
-        moKeyContractor.setEnabled(enable);
-        moKeyDocNature.setEnabled(enable && moKeyDocNature.getItemCount() > 2);
-        moKeyItemRef.setEnabled(enable);
-        jbPickItemRef.setEnabled(enable);
-        moDateReq.setEnabled(enable);
-        moKeyPriReq.setEnabled(enable);
-        moTextReqNotes.setEnabled(enable);
-        jbItemStk.setEnabled(enable && getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP);
-        
-        jbNewEty.setEnabled(enable);
-        moGridMatReqCC.setRowButtonsEnabled(enable);
-        moGridMatReqCC.setEnabled(enable);
-        
-        jbSave.setEnabled(enable);
-        jbSaveAndSend.setEnabled(enable);
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS && hasUserReclassRight && enable) {
+            moTextTypeReq.setEnabled(false);
+            moDecTotal.setEnabled(false);
+            moKeyProvEnt.setEnabled(false);
+            moKeyUsrReq.setEnabled(false);
+            moKeyContractor.setEnabled(false);
+            moKeyDocNature.setEnabled(enable && moKeyDocNature.getItemCount() > 2);
+            moKeyItemRef.setEnabled(enable);
+            jbPickItemRef.setEnabled(enable);
+            moDateReq.setEnabled(false);
+            moKeyPriReq.setEnabled(false);
+            moTextReqNotes.setEnabled(false);
+            jbItemStk.setEnabled(false && getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP);
+
+            jbNewEty.setEnabled(false);
+            moGridMatReqCC.setRowButtonsEnabled(enable);
+            moGridMatReqCC.setEnabled(enable);
+
+            jbSave.setEnabled(enable);
+            jbSaveAndSend.setEnabled(false);
+        }
+        else {
+            moTextTypeReq.setEnabled(false);
+            moDecTotal.setEnabled(false);
+            moKeyProvEnt.setEnabled(enable);
+            moKeyUsrReq.setEnabled(enable);
+            moKeyContractor.setEnabled(enable);
+            moKeyDocNature.setEnabled(enable && moKeyDocNature.getItemCount() > 2);
+            moKeyItemRef.setEnabled(enable);
+            jbPickItemRef.setEnabled(enable);
+            moDateReq.setEnabled(enable);
+            moKeyPriReq.setEnabled(enable);
+            moTextReqNotes.setEnabled(enable);
+            jbItemStk.setEnabled(enable && getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP);
+
+            jbNewEty.setEnabled(enable);
+            moGridMatReqCC.setRowButtonsEnabled(enable);
+            moGridMatReqCC.setEnabled(enable);
+
+            jbSave.setEnabled(enable);
+            jbSaveAndSend.setEnabled(enable);
+        }
     }
     
     private void clearEntryControls() {
@@ -1298,31 +1323,60 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     }
     
     private void enableEntryControls(boolean enable) {
-        moDecUnitPriceSis.setEnabled(false);
-        moDecTotalEty.setEnabled(false);
-        moDecUnitPriceUsr.setEnabled(false); // se deja en falso temporalmente para que tome el mismo valor que el precio de sistema, regresar a enable para funcionalidad predefinida 24/01/2024
-        moTextUnitPriceRef.setEnabled(enable);
-        moTextItemKey.setEnabled(enable);
-        jbPickItem.setEnabled(enable);
-        moBoolNewItem.setEnabled(enable); 
-        moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
-        moDecQtyUsr.setEnabled(enable);
-        moIntConsDays.setEnabled(enable);
-        moKeyConsEntEty.setEnabled(enable);
-        moKeyItemRefEty.setEnabled(enable);
-        jbPickItemRefEty.setEnabled(enable);
-        jbPickUnitUsr.setEnabled(enable);
-        moDateReqEty.setEnabled(enable);
-        moDateDeliveryEty.setEnabled(false);
-        moKeyPriEty.setEnabled(enable);
-        moTextEtyNotes.setEnabled(enable);
-        
-        moKeyConsSubentEty.setEnabled(isCapturingData && moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
-        moKeyCostCenterEty.setEnabled(isCapturingData && moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
-        
-        jbRegisterEty.setEnabled(enable);
-        jbCancelEty.setEnabled(enable);
-        jbNewEty.setEnabled(isRegistryEditable && !enable);
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS && hasUserReclassRight && enable) {
+            moDecUnitPriceSis.setEnabled(false);
+            moDecTotalEty.setEnabled(false);
+            moDecUnitPriceUsr.setEnabled(false); // se deja en falso temporalmente para que tome el mismo valor que el precio de sistema, regresar a enable para funcionalidad predefinida 24/01/2024
+            moTextUnitPriceRef.setEnabled(false);
+            moTextItemKey.setEnabled(false);
+            jbPickItem.setEnabled(false);
+            moBoolNewItem.setEnabled(false); 
+            moTextItemDescription.setEnabled(false);
+            moDecQtyUsr.setEnabled(false);
+            moIntConsDays.setEnabled(false);
+            moKeyConsEntEty.setEnabled(enable);
+            moKeyItemRefEty.setEnabled(enable);
+            jbPickItemRefEty.setEnabled(enable);
+            jbPickUnitUsr.setEnabled(false);
+            moDateReqEty.setEnabled(false);
+            moDateDeliveryEty.setEnabled(false);
+            moKeyPriEty.setEnabled(false);
+            moTextEtyNotes.setEnabled(false);
+
+            moKeyConsSubentEty.setEnabled(moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
+            moKeyCostCenterEty.setEnabled(moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
+
+            jbRegisterEty.setEnabled(enable);
+            jbCancelEty.setEnabled(enable);
+            jbNewEty.setEnabled(false);
+        }
+        else {
+            moDecUnitPriceSis.setEnabled(false);
+            moDecTotalEty.setEnabled(false);
+            moDecUnitPriceUsr.setEnabled(false); // se deja en falso temporalmente para que tome el mismo valor que el precio de sistema, regresar a enable para funcionalidad predefinida 24/01/2024
+            moTextUnitPriceRef.setEnabled(enable);
+            moTextItemKey.setEnabled(enable);
+            jbPickItem.setEnabled(enable);
+            moBoolNewItem.setEnabled(enable); 
+            moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
+            moDecQtyUsr.setEnabled(enable);
+            moIntConsDays.setEnabled(enable);
+            moKeyConsEntEty.setEnabled(enable);
+            moKeyItemRefEty.setEnabled(enable);
+            jbPickItemRefEty.setEnabled(enable);
+            jbPickUnitUsr.setEnabled(enable);
+            moDateReqEty.setEnabled(enable);
+            moDateDeliveryEty.setEnabled(false);
+            moKeyPriEty.setEnabled(enable);
+            moTextEtyNotes.setEnabled(enable);
+
+            moKeyConsSubentEty.setEnabled(isCapturingData && moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
+            moKeyCostCenterEty.setEnabled(isCapturingData && moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
+
+            jbRegisterEty.setEnabled(enable);
+            jbCancelEty.setEnabled(enable);
+            jbNewEty.setEnabled(isRegistryEditable && !enable && getFormSubtype() != SModConsts.TRNX_MAT_REQ_RECLASS);
+        }
     }
     
     private void setComponetsEntryData(SDbMaterialRequestEntry ety) {
@@ -1480,7 +1534,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private void enableGridButtons() {
         if (moGridMatReqList.getTable().getSelectedRow() >= 0 && isRegistryEditable) {
             jbEditEty.setEnabled(true);
-            jbDeleteEty.setEnabled(true);
+            jbDeleteEty.setEnabled(true && getFormSubtype() != SModConsts.TRNX_MAT_REQ_RECLASS);
         }
         else {
             if (moGridMatReqList.getSelectedGridRow() != null) {
@@ -2095,13 +2149,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             enableReqControls(true);
             isRegistryEditable = true;
         }
-        else if (moRegistry.getFkMatRequestStatusId() != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
-            enableReqControls(false);
-            isRegistryEditable = false;
-        }
-        else {
+        else if (moRegistry.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_NEW || getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS) {
             enableReqControls(true);
             isRegistryEditable = true;
+        }
+        else {
+            enableReqControls(false);
+            isRegistryEditable = false;
         }
         
         moDateDelivery.setEnabled(moRegistry.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR);
@@ -2167,6 +2221,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         registry.setFkWarehouseCompanyBranch_n(moWahId[0]);
         registry.setFkWarehouseWarehouse_n(moWahId[1]);
         registry.setFkItemReferenceId_n(moKeyItemRef.getSelectedIndex() == 0 ? 0 : moKeyItemRef.getValue()[0]);
+        
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS) {
+            registry.setAuxChangeStatus(true);
+        }
         
         registry.getChildCostCenters().clear();
         for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
