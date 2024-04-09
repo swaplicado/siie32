@@ -8,6 +8,7 @@ package erp.mod.trn.db;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataBookkeepingNumber;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
@@ -75,6 +76,12 @@ public class SStockValuationRecordUtils {
         int sortPosition = oRecord.getLastSortingPosition();
         sortPosition = sortPosition == 0 ? 1 : sortPosition;
         int nItemReference;
+        SDataBookkeepingNumber bookkeepingNumber = new SDataBookkeepingNumber();
+        bookkeepingNumber.setPkYearId(oRecord.getPkYearId());
+        bookkeepingNumber.setFkUserNewId(session.getUser().getPkUserId());
+        if (bookkeepingNumber.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+        }
         for (SDbStockValuationMvt oConsumption : lConsumptions) {
             System.out.println("Contabilizando " + i + " de " + n);
             /**
@@ -212,7 +219,8 @@ public class SStockValuationRecordUtils {
                             SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD,
                             null,
                             oConsumption.getFkStockValuationId(),
-                            oConsumption.getPkStockValuationMvtId());
+                            oConsumption.getPkStockValuationMvtId(),
+                            bookkeepingNumber);
                     lRecordEntries.add(oDataRecordEntry);
                 }
             }
@@ -290,11 +298,14 @@ public class SStockValuationRecordUtils {
                             new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
                             nItemReference,
                             SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT,
-                            SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH,
-                            SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK,
+//                            SModSysConsts.FINS_TP_SYS_ACC_ENT_WAH_WAH,
+                            SModSysConsts.FINS_TP_SYS_ACC_NA_NA,
+//                            SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK,
+                            SDataConstantsSys.FINS_TP_SYS_MOV_NA,
                             oConsumption.getAuxWarehousePk(),
                             oConsumption.getFkStockValuationId(),
-                            oConsumption.getPkStockValuationMvtId()
+                            oConsumption.getPkStockValuationMvtId(),
+                            bookkeepingNumber
                     );
                     lRecordEntries.add(oDataRecordEntryWhs);
                 }
@@ -359,7 +370,8 @@ public class SStockValuationRecordUtils {
             final int movType, final Object[] recordPk, final SDataItem oItem, final double dQuantity, final double dCost,
             final SDataUnit oUnit, final String sConceptText, final SDataAccount oAccount, final int nIdCc, 
             final String sIdCc, final int sortPosition, final int[] pkDiog, final int nItemRef, final int[] fkSystemMove,
-            final int[] fkSystemAccount, final int[] fkSystemMoveType, final int[] pkWhs, final int stkValuationId, final int stkValuationMvtId) throws Exception {
+            final int[] fkSystemAccount, final int[] fkSystemMoveType, final int[] pkWhs, final int stkValuationId, final int stkValuationMvtId,
+            final SDataBookkeepingNumber bookkeepingNumber) throws Exception {
         SDataRecordEntry oRecordEntry = new SDataRecordEntry();
 
         oRecordEntry.setPkYearId((int) recordPk[0]);
@@ -439,8 +451,8 @@ public class SStockValuationRecordUtils {
         oRecordEntry.setFkItemId_n(nItemRef);
         oRecordEntry.setFkItemAuxId_n(oItem.getPkItemId());
         oRecordEntry.setFkUnitId_n(1);
-        oRecordEntry.setFkBookkeepingYearId_n(0);
-        oRecordEntry.setFkBookkeepingNumberId_n(0);
+        oRecordEntry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
+        oRecordEntry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
         oRecordEntry.setFkUserNewId(session.getUser().getPkUserId());
         oRecordEntry.setFkUserEditId(1);
         oRecordEntry.setFkUserDeleteId(1);
