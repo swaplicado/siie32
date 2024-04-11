@@ -1,8 +1,8 @@
 ================================================================================
-SIIE 3.2 247.1/ 2024-04-09
+SIIE 3.2 248.0/ 2024-04-10
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Modificación de Requisiciones de materiales para usuarios de contabilidad (modificación de naturaleza, CC y Concepto de gasto.
+1) Modificación de Requisiciones de materiales para usuarios de contabilidad (modificación de naturaleza, CC y Concepto de gasto.)
 2) Validación de valuación de inventarios tomando en cuenta la modificación de RM por contabilidad.
 3) Modificación de la forma de captura de surtido de documentos para impedir inserción de renglones que no estén vinculados.
 
