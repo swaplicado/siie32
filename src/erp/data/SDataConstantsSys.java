@@ -233,6 +233,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_REP = 102901;
     public static final int PRV_FIN_REP_STATS = 102902;
     public static final int PRV_FIN_REP_INDEX = 102903;
+    public static final int PRV_FIN_REP_AUX_CUSTOM = 102906;
 
     public static final int PRV_PUR_DPS_DNS = 103001;
     public static final int PRV_PUR_DPS_DNC = 103002;
