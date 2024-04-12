@@ -14,24 +14,24 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SDataBizPartnerItemDescription extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataItemConfigBizPartnerItems extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkBizPartnerId;
 
-    protected java.util.Vector<erp.mitm.data.SDataItemBizPartnerDescription> mvDbmsItemBizPartnerDescriptions;
+    protected java.util.Vector<erp.mitm.data.SDataItemConfigBizPartner> mvDbmsItemConfigs;
 
-    public SDataBizPartnerItemDescription() {
+    public SDataItemConfigBizPartnerItems() {
         super(SDataConstants.BPSX_BP_ITEM_DESC);
-        mvDbmsItemBizPartnerDescriptions = new Vector<SDataItemBizPartnerDescription>();
+        mvDbmsItemConfigs = new Vector<>();
         reset();
     }
 
     public void setPkBizPartnerId(int n) { mnPkBizPartnerId = n; }
     public int getPkBizPartnerId() { return mnPkBizPartnerId; }
 
-    public java.util.Vector<SDataItemBizPartnerDescription> getDbmsItemBizPartnerDescriptions() { return mvDbmsItemBizPartnerDescriptions; }
+    public java.util.Vector<SDataItemConfigBizPartner> getDbmsItemConfigs() { return mvDbmsItemConfigs; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -49,7 +49,7 @@ public class SDataBizPartnerItemDescription extends erp.lib.data.SDataRegistry i
 
         mnPkBizPartnerId = 0;
 
-        mvDbmsItemBizPartnerDescriptions.clear();
+        mvDbmsItemConfigs.clear();
     }
 
     @Override
@@ -69,12 +69,12 @@ public class SDataBizPartnerItemDescription extends erp.lib.data.SDataRegistry i
             sql = "SELECT id_item, id_bp, id_cfg FROM erp.itmu_cfg_item_bp WHERE id_bp = " + key[0] + " ORDER BY id_bp, id_item ";
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                erp.mitm.data.SDataItemBizPartnerDescription desc = new SDataItemBizPartnerDescription();
-                if (desc.read(new int[] { resultSet.getInt("id_item"), resultSet.getInt("id_bp"), resultSet.getInt("id_cfg") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                erp.mitm.data.SDataItemConfigBizPartner itemConfig = new SDataItemConfigBizPartner();
+                if (itemConfig.read(new int[] { resultSet.getInt("id_item"), resultSet.getInt("id_bp"), resultSet.getInt("id_cfg") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsItemBizPartnerDescriptions.add(desc);
+                        mvDbmsItemConfigs.add(itemConfig);
                     }
             }
 
@@ -95,15 +95,12 @@ public class SDataBizPartnerItemDescription extends erp.lib.data.SDataRegistry i
 
     @Override
     public int save(java.sql.Connection connection) {
-        int i;
-
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-
-            for (i = 0; i < mvDbmsItemBizPartnerDescriptions.size(); i++) {
-                mvDbmsItemBizPartnerDescriptions.get(i).setPkBizPartnerId(mnPkBizPartnerId);
-                if (mvDbmsItemBizPartnerDescriptions.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+            for (int i = 0; i < mvDbmsItemConfigs.size(); i++) {
+                mvDbmsItemConfigs.get(i).setPkBizPartnerId(mnPkBizPartnerId);
+                if (mvDbmsItemConfigs.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                 }
             }

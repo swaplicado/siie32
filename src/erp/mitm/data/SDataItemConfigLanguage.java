@@ -13,9 +13,9 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SDataItemForeignLanguage extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataItemConfigLanguage extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkItemId;
     protected int mnPkLanguageId;
@@ -25,7 +25,7 @@ public class SDataItemForeignLanguage extends erp.lib.data.SDataRegistry impleme
 
     protected java.lang.String msDbmsLanguage;
 
-    public SDataItemForeignLanguage() {
+    public SDataItemConfigLanguage() {
         super(SDataConstants.ITMU_CFG_ITEM_LAN);
         reset();
     }

@@ -50,7 +50,7 @@ import erp.mfin.form.SDialogRecordPicker;
 import erp.mfin.form.SPanelAccount;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemBizPartnerDescription;
+import erp.mitm.data.SDataItemConfigBizPartner;
 import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
@@ -141,7 +141,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
@@ -11736,10 +11736,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                                     SDataDpsEntry entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData());
 
-                                    for (SDataItemBizPartnerDescription description : moBizPartner.getDbmsItemBizPartnerDescription()) {
-                                        if (entry.getFkItemId() == description.getPkItemId() && !description.getCfdiUsage().isEmpty() && !description.getIsDeleted()) {
-                                            if (!moFieldCfdiCfdiUsage.getKey().toString().equals(description.getCfdiUsage())) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + description.getCfdiUsage() + "'.");
+                                    for (SDataItemConfigBizPartner itemConfig : moBizPartner.getDbmsItemConfigs()) {
+                                        if (entry.getFkItemId() == itemConfig.getPkItemId() && !itemConfig.getCfdiUsage().isEmpty() && !itemConfig.getIsDeleted()) {
+                                            if (!moFieldCfdiCfdiUsage.getKey().toString().equals(itemConfig.getCfdiUsage())) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + itemConfig.getCfdiUsage() + "'.");
                                                 validation.setComponent(jcbCfdiCfdiUsage);
                                                 validation.setTabbedPaneIndex(TAB_CFD_XML);
                                                 break;

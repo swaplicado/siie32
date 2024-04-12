@@ -85,7 +85,7 @@ import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataElement;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemBizPartnerDescription;
+import erp.mitm.data.SDataItemConfigBizPartner;
 import erp.mitm.data.SDataItemFamily;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataItemGroup;
@@ -220,7 +220,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public abstract class SDataUtilities {
 
@@ -640,7 +640,7 @@ public abstract class SDataUtilities {
                 break;
 
             case SDataConstants.ITMU_CFG_ITEM_BP:
-                registry = new SDataItemBizPartnerDescription();
+                registry = new SDataItemConfigBizPartner();
                 break;
             case SDataConstants.ITMU_TP_UNIT:
                 registry = new SDataUnitType();

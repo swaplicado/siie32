@@ -19,9 +19,9 @@ import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
-import erp.mitm.data.SDataBizPartnerItemDescription;
-import erp.mitm.data.SDataItemBizPartnerDescription;
-import erp.mitm.data.SDataItemBizPartnerDescriptionRow;
+import erp.mitm.data.SDataItemConfigBizPartner;
+import erp.mitm.data.SDataItemConfigBizPartnerItems;
+import erp.mitm.data.SDataItemConfigBizPartnerRow;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -30,9 +30,9 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SFormBizPartnerDescription extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormItemConfigBizPartnerItems extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -42,14 +42,14 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mitm.data.SDataBizPartnerItemDescription moBizPartnerItemDescription;
+    private erp.mitm.data.SDataItemConfigBizPartnerItems moItemConfigs;
     private erp.lib.form.SFormField moFieldPkBizPartnerId;
 
-    private erp.lib.table.STablePane moItemBizPartnerDescriptionPane;
-    private erp.mitm.form.SFormItemDescription moFormItemDescription;
+    private erp.lib.table.STablePane moItemConfigBizPartnersPane;
+    private erp.mitm.form.SFormItemConfigBizPartner moFormItemConfigBizPartner;
 
     /** Creates new form SFormBizPartnerDescription */
-    public SFormBizPartnerDescription(erp.client.SClientInterface client) {
+    public SFormItemConfigBizPartnerItems(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.ITMU_CFG_ITEM_BP;
@@ -147,8 +147,8 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-400)/2, 600, 400);
+        setSize(new java.awt.Dimension(816, 539));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -157,20 +157,20 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
 
     private void initComponentsExtra() {
         int i;
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         erp.lib.table.STableColumnForm tableColumnsItemBizPartnerDescription[];
 
-        moItemBizPartnerDescriptionPane = new STablePane(miClient);
-        moItemBizPartnerDescriptionPane.setDoubleClickAction(this, "publicActionModifyItemDescription");
-        jpItemDescriptions.add(moItemBizPartnerDescriptionPane, BorderLayout.CENTER);
+        moItemConfigBizPartnersPane = new STablePane(miClient);
+        moItemConfigBizPartnersPane.setDoubleClickAction(this, "publicActionModifyItemDescription");
+        jpItemDescriptions.add(moItemConfigBizPartnersPane, BorderLayout.CENTER);
 
         moFieldPkBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkBizPartnerId, jlPkBizPartnerId);
         moFieldPkBizPartnerId.setPickerButton(jbPkBizPartnerId);
 
         mvFields.add(moFieldPkBizPartnerId);
 
-        moFormItemDescription = new SFormItemDescription(miClient);
+        moFormItemConfigBizPartner = new SFormItemConfigBizPartner(miClient);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -181,14 +181,14 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
         i = 0;
         tableColumnsItemBizPartnerDescription = new STableColumnForm[6];
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
-        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 200);
-        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem corto", 100);
+        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 400);
+        tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem corto", 200);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Uso CFDI", 100);
         tableColumnsItemBizPartnerDescription[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
 
         for (i = 0; i < tableColumnsItemBizPartnerDescription.length; i++) {
-            moItemBizPartnerDescriptionPane.addTableColumn(tableColumnsItemBizPartnerDescription[i]);
+            moItemConfigBizPartnersPane.addTableColumn(tableColumnsItemBizPartnerDescription[i]);
         }
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionAddItemDescription", "addBarcode", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
@@ -212,11 +212,11 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            if (moBizPartnerItemDescription == null) {
+            if (moItemConfigs == null) {
                 jcbPkBizPartnerId.requestFocus();
             }
             else {
-                moItemBizPartnerDescriptionPane.requestFocus();
+                moItemConfigBizPartnersPane.requestFocus();
             }
         }
     }
@@ -249,32 +249,32 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
 
     private void actionAddItemDescription() {
         if (jbAddItemDescription.isEnabled()) {
-            moFormItemDescription.formRefreshCatalogues();
-            moFormItemDescription.formReset();
-            moFormItemDescription.setFormVisible(true);
+            moFormItemConfigBizPartner.formRefreshCatalogues();
+            moFormItemConfigBizPartner.formReset();
+            moFormItemConfigBizPartner.setFormVisible(true);
 
-            if (moFormItemDescription.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                moItemBizPartnerDescriptionPane.addTableRow(new SDataItemBizPartnerDescriptionRow(moFormItemDescription.getRegistry()));
-                moItemBizPartnerDescriptionPane.renderTableRows();
-                moItemBizPartnerDescriptionPane.setTableRowSelection(moItemBizPartnerDescriptionPane.getTableGuiRowCount() - 1);
+            if (moFormItemConfigBizPartner.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                moItemConfigBizPartnersPane.addTableRow(new SDataItemConfigBizPartnerRow(moFormItemConfigBizPartner.getRegistry()));
+                moItemConfigBizPartnersPane.renderTableRows();
+                moItemConfigBizPartnersPane.setTableRowSelection(moItemConfigBizPartnersPane.getTableGuiRowCount() - 1);
             }
         }
     }
 
     private void actionModifyItemDescription() {
-        int index = moItemBizPartnerDescriptionPane.getTable().getSelectedRow();
+        int index = moItemConfigBizPartnersPane.getTable().getSelectedRow();
 
         if (jbModifyItemDescription.isEnabled()) {
             if (index != -1) {
-                moFormItemDescription.formRefreshCatalogues();
-                moFormItemDescription.formReset();
-                moFormItemDescription.setRegistry((SDataItemBizPartnerDescription) moItemBizPartnerDescriptionPane.getTableRow(index).getData());
-                moFormItemDescription.setVisible(true);
+                moFormItemConfigBizPartner.formRefreshCatalogues();
+                moFormItemConfigBizPartner.formReset();
+                moFormItemConfigBizPartner.setRegistry((SDataItemConfigBizPartner) moItemConfigBizPartnersPane.getTableRow(index).getData());
+                moFormItemConfigBizPartner.setVisible(true);
 
-                if (moFormItemDescription.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                    moItemBizPartnerDescriptionPane.getTableModel().getTableRows().set(index, new SDataItemBizPartnerDescriptionRow(moFormItemDescription.getRegistry()));
-                    moItemBizPartnerDescriptionPane.renderTableRows();
-                    moItemBizPartnerDescriptionPane.setTableRowSelection(index);
+                if (moFormItemConfigBizPartner.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                    moItemConfigBizPartnersPane.getTableModel().getTableRows().set(index, new SDataItemConfigBizPartnerRow(moFormItemConfigBizPartner.getRegistry()));
+                    moItemConfigBizPartnersPane.renderTableRows();
+                    moItemConfigBizPartnersPane.setTableRowSelection(index);
                 }
             }
         }
@@ -323,14 +323,14 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        moBizPartnerItemDescription = null;
+        moItemConfigs = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        moItemBizPartnerDescriptionPane.createTable(null);
-        moItemBizPartnerDescriptionPane.clearTableRows();
+        moItemConfigBizPartnersPane.createTable(null);
+        moItemConfigBizPartnersPane.clearTableRows();
         renderComboBoxBizPartner(true);
     }
 
@@ -353,7 +353,7 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
         }
 
         if (!validation.getIsError()) {
-            if (moItemBizPartnerDescriptionPane.getTable().getRowCount() == 0) {
+            if (moItemConfigBizPartnersPane.getTable().getRowCount() == 0) {
                 validation.setMessage("Se debe ingresar al menos una descripción para un ítem en particular.");
             }
         }
@@ -383,42 +383,36 @@ public class SFormBizPartnerDescription extends javax.swing.JDialog implements e
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        int i;
-        moBizPartnerItemDescription = (SDataBizPartnerItemDescription) registry;
-        SDataItemBizPartnerDescriptionRow itemBizPartnerDescriptionRow = null;
+        moItemConfigs = (SDataItemConfigBizPartnerItems) registry;
+        
+        moFieldPkBizPartnerId.setFieldValue(new int[] { moItemConfigs.getPkBizPartnerId() });
 
-        moFieldPkBizPartnerId.setFieldValue(new int[] { moBizPartnerItemDescription.getPkBizPartnerId() });
-
-        for (i = 0; i < moBizPartnerItemDescription.getDbmsItemBizPartnerDescriptions().size(); i++) {
-            itemBizPartnerDescriptionRow = new SDataItemBizPartnerDescriptionRow(moBizPartnerItemDescription.getDbmsItemBizPartnerDescriptions().get(i));
-            moItemBizPartnerDescriptionPane.addTableRow(itemBizPartnerDescriptionRow);
+        for (int i = 0; i < moItemConfigs.getDbmsItemConfigs().size(); i++) {
+            SDataItemConfigBizPartnerRow itemBizPartnerDescriptionRow = new SDataItemConfigBizPartnerRow(moItemConfigs.getDbmsItemConfigs().get(i));
+            moItemConfigBizPartnersPane.addTableRow(itemBizPartnerDescriptionRow);
         }
 
-        moItemBizPartnerDescriptionPane.renderTableRows();
-        moItemBizPartnerDescriptionPane.setTableRowSelection(0);
+        moItemConfigBizPartnersPane.renderTableRows();
+        moItemConfigBizPartnersPane.setTableRowSelection(0);
 
         renderComboBoxBizPartner(false);
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataItemBizPartnerDescription itemBizPartnerDescription = null;
-        int i = 0;
-
-        if (moBizPartnerItemDescription == null) {
-            moBizPartnerItemDescription = new SDataBizPartnerItemDescription();
+        if (moItemConfigs == null) {
+            moItemConfigs = new SDataItemConfigBizPartnerItems();
         }
 
-        moBizPartnerItemDescription.setPkBizPartnerId(moFieldPkBizPartnerId.getKeyAsIntArray()[0]);
+        moItemConfigs.setPkBizPartnerId(moFieldPkBizPartnerId.getKeyAsIntArray()[0]);
 
-        moBizPartnerItemDescription.getDbmsItemBizPartnerDescriptions().clear();
-        for (i = 0; i < moItemBizPartnerDescriptionPane.getTable().getRowCount(); i++) {
-            itemBizPartnerDescription = new SDataItemBizPartnerDescription();
-            itemBizPartnerDescription = (erp.mitm.data.SDataItemBizPartnerDescription) moItemBizPartnerDescriptionPane.getTableRow(i).getData();
-            moBizPartnerItemDescription.getDbmsItemBizPartnerDescriptions().add(itemBizPartnerDescription);
+        moItemConfigs.getDbmsItemConfigs().clear();
+        for (int i = 0; i < moItemConfigBizPartnersPane.getTable().getRowCount(); i++) {
+            SDataItemConfigBizPartner itemConfig = (erp.mitm.data.SDataItemConfigBizPartner) moItemConfigBizPartnersPane.getTableRow(i).getData();
+            moItemConfigs.getDbmsItemConfigs().add(itemConfig);
         }
 
-        return moBizPartnerItemDescription;
+        return moItemConfigs;
     }
 
     @Override

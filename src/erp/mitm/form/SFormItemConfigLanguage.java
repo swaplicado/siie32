@@ -16,7 +16,7 @@ import erp.lib.SLibConstants;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.mitm.data.SDataItemForeignLanguage;
+import erp.mitm.data.SDataItemConfigLanguage;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -24,9 +24,9 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
-public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormItemConfigLanguage extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -36,7 +36,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mitm.data.SDataItemForeignLanguage moItemForeignLanguageDescription;
+    private erp.mitm.data.SDataItemConfigLanguage moItemConfigLanguage;
     private erp.lib.form.SFormField moFieldPkLanguageId;
     private erp.lib.form.SFormField moFieldItem;
     private erp.lib.form.SFormField moFieldItemShort;
@@ -46,7 +46,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     private java.util.Vector<Integer> mvParamLanguageIds;
 
     /** Creates new form SFormItemForeignLanguage */
-    public SFormItemForeignLanguage(erp.client.SClientInterface client) {
+    public SFormItemConfigLanguage(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.ITMU_CFG_ITEM_LAN;
@@ -65,19 +65,22 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jlPkLanguageId = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        jbPkLanguageId = new javax.swing.JButton();
         jcbPkLanguageId = new javax.swing.JComboBox();
+        jbPkLanguageId = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
         jlItem = new javax.swing.JLabel();
         jtfItem = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
         jlItemShort = new javax.swing.JLabel();
         jtfItemShort = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel2 = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Descripción de ítem");
@@ -88,64 +91,82 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jPanel5.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setLayout(new java.awt.GridLayout(4, 2, 0, 1));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPkLanguageId.setForeground(java.awt.Color.blue);
         jlPkLanguageId.setText("Idioma: *");
-        jlPkLanguageId.setPreferredSize(new java.awt.Dimension(45, 23));
-        jPanel3.add(jlPkLanguageId);
+        jlPkLanguageId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlPkLanguageId);
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jcbPkLanguageId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbPkLanguageId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel6.add(jcbPkLanguageId);
 
         jbPkLanguageId.setText("jButton3");
         jbPkLanguageId.setToolTipText("Seleccionar idioma");
         jbPkLanguageId.setFocusable(false);
         jbPkLanguageId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbPkLanguageId, java.awt.BorderLayout.LINE_END);
+        jPanel6.add(jbPkLanguageId);
 
-        jcbPkLanguageId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel4.add(jcbPkLanguageId, java.awt.BorderLayout.CENTER);
+        jPanel5.add(jPanel6);
 
-        jPanel3.add(jPanel4);
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Nombre ítem: *");
-        jPanel3.add(jlItem);
+        jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlItem);
 
-        jtfItem.setText("ITEM DESCRIPTION");
-        jPanel3.add(jtfItem);
+        jtfItem.setText("ITEM NAME");
+        jtfItem.setPreferredSize(new java.awt.Dimension(425, 23));
+        jPanel7.add(jtfItem);
+
+        jPanel5.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItemShort.setText("Nombre corto: *");
-        jPanel3.add(jlItemShort);
+        jlItemShort.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlItemShort);
 
         jtfItemShort.setText("ITEM SHORT");
-        jPanel3.add(jtfItemShort);
+        jtfItemShort.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jtfItemShort);
+
+        jPanel5.add(jPanel8);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
         jckIsDeleted.setText("Registro eliminado");
-        jPanel3.add(jckIsDeleted);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel9.add(jckIsDeleted);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel5.add(jPanel9);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        jPanel1.add(jPanel5, java.awt.BorderLayout.NORTH);
 
-        setSize(new java.awt.Dimension(400, 300));
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel2.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jPanel2.add(jbCancel);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -154,14 +175,14 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         
-        mvParamLanguageIds = new Vector<Integer>();
+        mvParamLanguageIds = new Vector<>();
 
         moFieldPkLanguageId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkLanguageId, jlPkLanguageId);
         moFieldPkLanguageId.setPickerButton(jbPkLanguageId);
         moFieldItem = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItem, jlItem);
-        moFieldItem.setLengthMax(255);
+        moFieldItem.setLengthMax(355);
         moFieldItemShort = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfItemShort, jlItemShort);
         moFieldItemShort.setLengthMax(130);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
@@ -193,7 +214,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            if (moItemForeignLanguageDescription != null ) {
+            if (moItemConfigLanguage != null ) {
                 jtfItem.requestFocus();
             }
             else {
@@ -238,7 +259,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     }
 
     private void renderComboBoxLanguage() {
-        if (moItemForeignLanguageDescription.getPkItemId() > 0) {
+        if (moItemConfigLanguage.getPkItemId() > 0) {
             jcbPkLanguageId.setEnabled(false);
             jbPkLanguageId.setEnabled(false);
         }
@@ -251,8 +272,11 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbPkLanguageId;
@@ -276,7 +300,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        moItemForeignLanguageDescription = null;
+        moItemConfigLanguage = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
@@ -313,7 +337,7 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
             }
             else {
                 for (int j = 0; j < mvParamLanguageIds.size(); j++) {
-                    if (moFieldPkLanguageId.getKeyAsIntArray()[0] == mvParamLanguageIds.get(j) && moItemForeignLanguageDescription == null) {
+                    if (moFieldPkLanguageId.getKeyAsIntArray()[0] == mvParamLanguageIds.get(j) && moItemConfigLanguage == null) {
                         validation.setMessage("Ya existe una configuración para el idioma seleccionado.");
                         validation.setComponent(jcbPkLanguageId);
                     }
@@ -346,12 +370,12 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        moItemForeignLanguageDescription = (SDataItemForeignLanguage) registry;
 
-        moFieldPkLanguageId.setFieldValue(new int[] { moItemForeignLanguageDescription.getPkLanguageId() });
-        moFieldItem.setFieldValue(moItemForeignLanguageDescription.getItem());
-        moFieldItemShort.setFieldValue(moItemForeignLanguageDescription.getItemShort());
-        moFieldIsDeleted.setFieldValue(moItemForeignLanguageDescription.getIsDeleted());
+
+        moFieldPkLanguageId.setFieldValue(new int[] { moItemConfigLanguage.getPkLanguageId() });
+        moFieldItem.setFieldValue(moItemConfigLanguage.getItem());
+        moFieldItemShort.setFieldValue(moItemConfigLanguage.getItemShort());
+        moFieldIsDeleted.setFieldValue(moItemConfigLanguage.getIsDeleted());
 
         jckIsDeleted.setEnabled(true);
         renderTextFieldItemShort();
@@ -360,17 +384,17 @@ public class SFormItemForeignLanguage extends javax.swing.JDialog implements erp
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        if (moItemForeignLanguageDescription == null) {
-            moItemForeignLanguageDescription = new SDataItemForeignLanguage();
+        if (moItemConfigLanguage == null) {
+            moItemConfigLanguage = new SDataItemConfigLanguage();
         }
 
-        moItemForeignLanguageDescription.setPkLanguageId(moFieldPkLanguageId.getKeyAsIntArray()[0]);
-        moItemForeignLanguageDescription.setItem(moFieldItem.getString());
-        moItemForeignLanguageDescription.setItemShort(moFieldItemShort.getString());
-        moItemForeignLanguageDescription.setDbmsLanguage(jcbPkLanguageId.getSelectedItem().toString());
-        moItemForeignLanguageDescription.setIsDeleted(moFieldIsDeleted.getBoolean());
+        moItemConfigLanguage.setPkLanguageId(moFieldPkLanguageId.getKeyAsIntArray()[0]);
+        moItemConfigLanguage.setItem(moFieldItem.getString());
+        moItemConfigLanguage.setItemShort(moFieldItemShort.getString());
+        moItemConfigLanguage.setDbmsLanguage(jcbPkLanguageId.getSelectedItem().toString());
+        moItemConfigLanguage.setIsDeleted(moFieldIsDeleted.getBoolean());
 
-        return moItemForeignLanguageDescription;
+        return moItemConfigLanguage;
     }
 
     @Override

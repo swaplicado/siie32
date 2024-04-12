@@ -23,7 +23,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Cesar Orozco, Claudio Peña
+ * @author Alfonso Flores, Cesar Orozco, Claudio Peña, Sergio Flores
  */
 public class SViewItem extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -75,10 +75,10 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         i = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 300);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 400);
         }
         else {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 300);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 400);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 150);

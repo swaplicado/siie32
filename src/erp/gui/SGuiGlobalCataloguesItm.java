@@ -8,18 +8,55 @@ package erp.gui;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.form.SFormOptionPicker;
+import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
-import erp.mitm.data.*;
-import erp.mitm.form.*;
+import erp.mitm.data.SDataBrand;
+import erp.mitm.data.SDataBrandType;
+import erp.mitm.data.SDataElement;
+import erp.mitm.data.SDataElementType;
+import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataItemConfigBizPartnerItems;
+import erp.mitm.data.SDataItemFamily;
+import erp.mitm.data.SDataItemGeneric;
+import erp.mitm.data.SDataItemGroup;
+import erp.mitm.data.SDataItemLevelType;
+import erp.mitm.data.SDataItemLine;
+import erp.mitm.data.SDataManufacturer;
+import erp.mitm.data.SDataManufacturerType;
+import erp.mitm.data.SDataMaterialAttribute;
+import erp.mitm.data.SDataMaterialType;
+import erp.mitm.data.SDataUnit;
+import erp.mitm.data.SDataUnitType;
+import erp.mitm.data.SDataVariety;
+import erp.mitm.data.SDataVarietyType;
+import erp.mitm.form.SFormBrand;
+import erp.mitm.form.SFormBrandType;
+import erp.mitm.form.SFormElement;
+import erp.mitm.form.SFormElementType;
+import erp.mitm.form.SFormItem;
+import erp.mitm.form.SFormItemConfigBizPartnerItems;
+import erp.mitm.form.SFormItemFamily;
+import erp.mitm.form.SFormItemGeneric;
+import erp.mitm.form.SFormItemGroup;
+import erp.mitm.form.SFormItemLevelType;
+import erp.mitm.form.SFormItemLine;
+import erp.mitm.form.SFormItemSimplified;
+import erp.mitm.form.SFormManufacturer;
+import erp.mitm.form.SFormManufacturerType;
+import erp.mitm.form.SFormMaterialAttribute;
+import erp.mitm.form.SFormMaterialType;
+import erp.mitm.form.SFormUnit;
+import erp.mitm.form.SFormUnitType;
+import erp.mitm.form.SFormVariety;
+import erp.mitm.form.SFormVarietyType;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import erp.form.SFormOptionPickerItems;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -75,7 +112,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private erp.mitm.form.SFormUnitType moFormUnitType;
     private erp.mitm.form.SFormItemLevelType moFormItemLevelType;
     private erp.mitm.form.SFormMaterialType moFormMaterialType;
-    private erp.mitm.form.SFormBizPartnerDescription moFormBizPartnerDescription;
+    private erp.mitm.form.SFormItemConfigBizPartnerItems moFormItemConfigBizPartnerItems;
 
     private erp.form.SFormOptionPicker moPickerItemCategory;
     private erp.form.SFormOptionPicker moPickerItemClass;
@@ -228,7 +265,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         moFormUnitType = null;
         moFormItemLevelType = null;
         moFormMaterialType = null;
-        moFormBizPartnerDescription = null;
+        moFormItemConfigBizPartnerItems = null;
 
         moPickerItemCategory = null;
         moPickerItemClass = null;
@@ -458,13 +495,13 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     miForm = moFormMaterialAttribute;
                     break;
                 case SDataConstants.ITMU_CFG_ITEM_BP:
-                    if (moFormBizPartnerDescription == null) {
-                        moFormBizPartnerDescription = new SFormBizPartnerDescription(miClient);
+                    if (moFormItemConfigBizPartnerItems == null) {
+                        moFormItemConfigBizPartnerItems = new SFormItemConfigBizPartnerItems(miClient);
                     }
                     if (pk != null) {
-                        moRegistry = new SDataBizPartnerItemDescription();
+                        moRegistry = new SDataItemConfigBizPartnerItems();
                     }
-                    miForm = moFormBizPartnerDescription;
+                    miForm = moFormItemConfigBizPartnerItems;
                     break;
                 case SDataConstants.ITMX_ITEM_SIMPLE:
                     if (moFormItemSimplified == null) {
@@ -566,7 +603,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     sViewTitle = "Códigos barras ítems";
                     break;
                 case SDataConstants.ITMU_CFG_ITEM_BP:
-                    oViewClass = erp.mitm.view.SViewItemBizPartnerDescription.class;
+                    oViewClass = erp.mitm.view.SViewItemConfigBizPartner.class;
                     sViewTitle = "Descrip. ítems asoc. negocios ";
                     break;
                 case SDataConstants.ITMU_IGEN_BA:

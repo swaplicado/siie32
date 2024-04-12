@@ -13,9 +13,9 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores
  */
-public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataItemConfigBizPartner extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkItemId;
     protected int mnPkBizPartnerId;
@@ -40,7 +40,7 @@ public class SDataItemBizPartnerDescription extends erp.lib.data.SDataRegistry i
 
     protected erp.mitm.data.SDataUnit moDbmsDataUnit;
 
-    public SDataItemBizPartnerDescription() {
+    public SDataItemConfigBizPartner() {
         super(SDataConstants.ITMU_CFG_ITEM_BP);
         reset();
     }

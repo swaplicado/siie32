@@ -22,7 +22,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemForeignLanguage;
+import erp.mitm.data.SDataItemConfigLanguage;
 import erp.mmfg.data.SDataBom;
 import erp.mmfg.data.SDataBomSubgoods;
 import erp.mmfg.data.SDataBomSubstitute;
@@ -63,7 +63,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author  Néstor Ávalos, Uriel Castañeda, Edwin Carmona
+ * @author  Néstor Ávalos, Uriel Castañeda, Edwin Carmona, Sergio Flores
  */
 public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -1588,9 +1588,9 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                 // Item concept:
 
                 if (moDps.getFkLanguajeId() != miClient.getSessionXXX().getParamsErp().getFkLanguageId()) {
-                    for (SDataItemForeignLanguage description : moItem.getDbmsItemForeignLanguageDescriptions()) {
-                        if (moDps.getFkLanguajeId() == description.getPkLanguageId()) {
-                            item = description.getItemShort();
+                    for (SDataItemConfigLanguage itemConfigLanguage : moItem.getDbmsItemConfigLanguages()) {
+                        if (moDps.getFkLanguajeId() == itemConfigLanguage.getPkLanguageId()) {
+                            item = itemConfigLanguage.getItemShort();
                             break;
                         }
                     }

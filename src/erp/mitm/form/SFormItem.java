@@ -29,8 +29,8 @@ import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemBarcode;
 import erp.mitm.data.SDataItemBarcodeRow;
-import erp.mitm.data.SDataItemForeignLanguage;
-import erp.mitm.data.SDataItemForeignLanguageRow;
+import erp.mitm.data.SDataItemConfigLanguage;
+import erp.mitm.data.SDataItemConfigLanguageRow;
 import erp.mitm.data.SDataItemGeneric;
 import erp.mitm.data.SDataItemLine;
 import erp.mitm.data.SDataItemMaterialAttribute;
@@ -64,7 +64,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores, Claudio Peña, Edwin Carmona
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 
@@ -169,11 +169,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldAttribute14;
     private erp.lib.form.SFormField moFieldAttribute15;
 
-    private erp.lib.table.STablePane moItemForeignLanguagePane;
+    private erp.lib.table.STablePane moItemConfigLanguagesPane;
     private erp.lib.table.STablePane moItemBarcodePane;
 
     private erp.mitm.form.SFormItemBarcode moFormItemBarcode;
-    private erp.mitm.form.SFormItemForeignLanguage moFormItemForeignLanguage;
+    private erp.mitm.form.SFormItemConfigLanguage moFormItemConfigLanguage;
     private erp.mitm.form.SFormNewItemCode moFormNewItemCode;
 
     private erp.mitm.data.SDataItemGeneric moItemGeneric;
@@ -424,13 +424,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpAttributes = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jtfMaterialItemName = new javax.swing.JTextField();
+        jlMaterialItemNameRo = new javax.swing.JLabel();
+        jtfMaterialItemNameRo = new javax.swing.JTextField();
         jPanel19 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jtfMaterialType = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jtfPartNumberReadOnly = new javax.swing.JTextField();
+        jlMaterialTypeRo = new javax.swing.JLabel();
+        jtfMaterialTypeRo = new javax.swing.JTextField();
+        jlPartNumberRo = new javax.swing.JLabel();
+        jtfPartNumberRo = new javax.swing.JTextField();
         jPanel21 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel20 = new javax.swing.JPanel();
@@ -551,7 +551,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel54.add(jlName);
 
-        jtfName.setPreferredSize(new java.awt.Dimension(300, 23));
+        jtfName.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel54.add(jtfName);
 
         jPanel50.add(jPanel54);
@@ -646,7 +646,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfItemNameRo.setText("ITEM");
         jtfItemNameRo.setFocusable(false);
         jtfItemNameRo.setMinimumSize(new java.awt.Dimension(6, 23));
-        jtfItemNameRo.setPreferredSize(new java.awt.Dimension(400, 23));
+        jtfItemNameRo.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel58.add(jtfItemNameRo);
 
         jPanel50.add(jPanel58);
@@ -660,7 +660,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfItemNameShortRo.setEditable(false);
         jtfItemNameShortRo.setText("ITEM CORTO");
         jtfItemNameShortRo.setFocusable(false);
-        jtfItemNameShortRo.setPreferredSize(new java.awt.Dimension(400, 23));
+        jtfItemNameShortRo.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel59.add(jtfItemNameShortRo);
 
         jPanel50.add(jPanel59);
@@ -956,11 +956,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfProductionCostUnit.setEditable(false);
         jtfProductionCostUnit.setFocusable(false);
         jtfProductionCostUnit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jtfProductionCostUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfProductionCostUnitActionPerformed(evt);
-            }
-        });
         jPanel15.add(jtfProductionCostUnit);
 
         jPanel10.add(jPanel15);
@@ -1439,33 +1434,34 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
-        jLabel2.setText("Nombre del ítem:");
-        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel18.add(jLabel2);
+        jlMaterialItemNameRo.setText("Nombre del ítem:");
+        jlMaterialItemNameRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jlMaterialItemNameRo);
 
-        jtfMaterialItemName.setEditable(false);
-        jtfMaterialItemName.setPreferredSize(new java.awt.Dimension(500, 23));
-        jPanel18.add(jtfMaterialItemName);
+        jtfMaterialItemNameRo.setEditable(false);
+        jtfMaterialItemNameRo.setPreferredSize(new java.awt.Dimension(510, 23));
+        jPanel18.add(jtfMaterialItemNameRo);
 
         jPanel17.add(jPanel18);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
-        jLabel3.setText("Familia de insumo:");
-        jLabel3.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel19.add(jLabel3);
+        jlMaterialTypeRo.setText("Familia de insumo:");
+        jlMaterialTypeRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jlMaterialTypeRo);
 
-        jtfMaterialType.setEditable(false);
-        jtfMaterialType.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel19.add(jtfMaterialType);
+        jtfMaterialTypeRo.setEditable(false);
+        jtfMaterialTypeRo.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel19.add(jtfMaterialTypeRo);
 
-        jLabel5.setText("Número de parte:");
-        jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel19.add(jLabel5);
+        jlPartNumberRo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPartNumberRo.setText("Número de parte:");
+        jlPartNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jlPartNumberRo);
 
-        jtfPartNumberReadOnly.setEditable(false);
-        jtfPartNumberReadOnly.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel19.add(jtfPartNumberReadOnly);
+        jtfPartNumberRo.setEditable(false);
+        jtfPartNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jtfPartNumberRo);
 
         jPanel17.add(jPanel19);
 
@@ -1704,10 +1700,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jtfProductionCostUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfProductionCostUnitActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfProductionCostUnitActionPerformed
-
     /*
      * Private methods:
      */
@@ -1723,9 +1715,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItemBarcodePane.setDoubleClickAction(this, "publicActionModifyItemBarcode");
         jpItemBarcode.add(moItemBarcodePane, BorderLayout.CENTER);
 
-        moItemForeignLanguagePane = new STablePane(miClient);
-        moItemForeignLanguagePane.setDoubleClickAction(this, "publicActionModifyItemForeignLanguage");
-        jpConfig2Language.add(moItemForeignLanguagePane, BorderLayout.CENTER);
+        moItemConfigLanguagesPane = new STablePane(miClient);
+        moItemConfigLanguagesPane.setDoubleClickAction(this, "publicActionModifyItemForeignLanguage");
+        jpConfig2Language.add(moItemConfigLanguagesPane, BorderLayout.CENTER);
 
         moFieldFkItemGenericId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemGenericId, jlFkItemGenericId);
         moFieldFkItemGenericId.setPickerButton(jbFkItemGenericId);
@@ -1734,7 +1726,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkItemLineId_n.setPickerButton(jbFkItemLineId_n);
         moFieldFkItemLineId_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfName, jlName);
-        moFieldName.setLengthMax(50);
+        moFieldName.setLengthMax(150);
         moFieldName.setTabbedPaneIndex(0, jTabbedPane);
         moFieldNameShort = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfNameShort, jlNameShort);
         moFieldNameShort.setLengthMax(25);
@@ -2031,7 +2023,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldAttribute15);
 
         moFormItemBarcode = new SFormItemBarcode(miClient);
-        moFormItemForeignLanguage = new SFormItemForeignLanguage(miClient);
+        moFormItemConfigLanguage = new SFormItemConfigLanguage(miClient);
         moFormNewItemCode = new SFormNewItemCode(miClient);
 
         jbOk.addActionListener(this);
@@ -2095,18 +2087,18 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         i = 0;
         tableColumnsItemForeignLanguage = new STableColumnForm[4];
-        tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 400);
+        tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 350);
         tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem corto", 200);
         tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Idioma", 100);
         tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
 
         for (i = 0; i < tableColumnsItemForeignLanguage.length; i++) {
-            moItemForeignLanguagePane.addTableColumn(tableColumnsItemForeignLanguage[i]);
+            moItemConfigLanguagesPane.addTableColumn(tableColumnsItemForeignLanguage[i]);
         }
 
         i = 0;
         tableColumnsItemBarcode = new STableColumnForm[2];
-        tableColumnsItemBarcode[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código barras", 400);
+        tableColumnsItemBarcode[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código barras", 250);
         tableColumnsItemBarcode[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
 
         for (i = 0; i < tableColumnsItemBarcode.length; i++) {
@@ -2148,7 +2140,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private void readItemGenericParams() {
         jtfItemNameRo.setText("");
+        jtfItemNameRo.setToolTipText(null);
         jtfItemNameShortRo.setText("");
+        jtfItemNameShortRo.setToolTipText(null);
 
         if (jcbFkItemGenericId.getSelectedIndex() <= 0) {
             moItemGeneric = null;
@@ -2581,8 +2575,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private java.util.Vector<Integer> getItemLanguages() {
         java.util.Vector<Integer> languages = new Vector<Integer>();
 
-        for (int i = 0; i < moItemForeignLanguagePane.getTableGuiRowCount(); i++) {
-            languages.add(((SDataItemForeignLanguage) moItemForeignLanguagePane.getTableRow(i).getData()).getPkLanguageId());
+        for (int i = 0; i < moItemConfigLanguagesPane.getTableGuiRowCount(); i++) {
+            languages.add(((SDataItemConfigLanguage) moItemConfigLanguagesPane.getTableRow(i).getData()).getPkLanguageId());
         }
 
         return languages;
@@ -2741,7 +2735,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jtfItemNameRo.setText(SLibUtilities.textTrim(name));
             jtfItemNameRo.setCaretPosition(0);
-            jtfMaterialItemName.setText(SLibUtilities.textTrim(name));
+            jtfItemNameRo.setToolTipText(!jtfItemNameRo.getText().isEmpty() ? jtfItemNameRo.getText() : null);
+            
+            jtfMaterialItemNameRo.setText(jtfItemNameRo.getText());
+            jtfMaterialItemNameRo.setCaretPosition(0);
+            jtfMaterialItemNameRo.setToolTipText(!jtfMaterialItemNameRo.getText().isEmpty() ? jtfMaterialItemNameRo.getText() : null);
         }
     }
 
@@ -2786,6 +2784,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             
             jtfItemNameShortRo.setText(SLibUtilities.textTrim(nameShort));
             jtfItemNameShortRo.setCaretPosition(0);
+            jtfItemNameShortRo.setToolTipText(!jtfItemNameShortRo.getText().isEmpty() ? jtfItemNameShortRo.getText() : null);
         }
     }
     
@@ -2841,8 +2840,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 msItemMaterialName += " " + jtfAttribute15.getText();
             }
 
-            jtfMaterialItemName.setText(msItemMaterialName);
+            jtfMaterialItemNameRo.setText(msItemMaterialName);
+            jtfMaterialItemNameRo.setCaretPosition(0);
+            
             jtfName.setText(msItemMaterialName);
+            jtfName.setCaretPosition(0);
             
             focusLostName();
         }
@@ -3114,16 +3116,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private void actionAddItemForeignLanguage() {
         if (jbAddItemForeignLanguage.isEnabled()) {
-            moFormItemForeignLanguage.formRefreshCatalogues();
-            moFormItemForeignLanguage.formReset();
-            moFormItemForeignLanguage.setParamIsItemShortEnable(jtfNameShort.isEnabled());
-            moFormItemForeignLanguage.setParamLanguageIds(getItemLanguages());
-            moFormItemForeignLanguage.setVisible(true);
+            moFormItemConfigLanguage.formRefreshCatalogues();
+            moFormItemConfigLanguage.formReset();
+            moFormItemConfigLanguage.setParamIsItemShortEnable(jtfNameShort.isEnabled());
+            moFormItemConfigLanguage.setParamLanguageIds(getItemLanguages());
+            moFormItemConfigLanguage.setVisible(true);
 
-            if (moFormItemForeignLanguage.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                moItemForeignLanguagePane.addTableRow(new SDataItemForeignLanguageRow(moFormItemForeignLanguage.getRegistry()));
-                moItemForeignLanguagePane.renderTableRows();
-                moItemForeignLanguagePane.setTableRowSelection(moItemForeignLanguagePane.getTableGuiRowCount() - 1);
+            if (moFormItemConfigLanguage.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                moItemConfigLanguagesPane.addTableRow(new SDataItemConfigLanguageRow(moFormItemConfigLanguage.getRegistry()));
+                moItemConfigLanguagesPane.renderTableRows();
+                moItemConfigLanguagesPane.setTableRowSelection(moItemConfigLanguagesPane.getTableGuiRowCount() - 1);
             }
         }
     }
@@ -3132,20 +3134,20 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         int index = 0;
 
         if (jbModifyItemForeignLanguage.isEnabled()) {
-            index = moItemForeignLanguagePane.getTable().getSelectedRow();
+            index = moItemConfigLanguagesPane.getTable().getSelectedRow();
 
             if (index != -1) {
-                moFormItemForeignLanguage.formRefreshCatalogues();
-                moFormItemForeignLanguage.formReset();
-                moFormItemForeignLanguage.setParamIsItemShortEnable(jtfNameShort.isEnabled());
-                moFormItemForeignLanguage.setParamLanguageIds(getItemLanguages());
-                moFormItemForeignLanguage.setRegistry((SDataItemForeignLanguage) moItemForeignLanguagePane.getTableRow(index).getData());
-                moFormItemForeignLanguage.setVisible(true);
+                moFormItemConfigLanguage.formRefreshCatalogues();
+                moFormItemConfigLanguage.formReset();
+                moFormItemConfigLanguage.setParamIsItemShortEnable(jtfNameShort.isEnabled());
+                moFormItemConfigLanguage.setParamLanguageIds(getItemLanguages());
+                moFormItemConfigLanguage.setRegistry((SDataItemConfigLanguage) moItemConfigLanguagesPane.getTableRow(index).getData());
+                moFormItemConfigLanguage.setVisible(true);
 
-                if (moFormItemForeignLanguage.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                    moItemForeignLanguagePane.getTableModel().getTableRows().set(index, new SDataItemForeignLanguageRow(moFormItemForeignLanguage.getRegistry()));
-                    moItemForeignLanguagePane.renderTableRows();
-                    moItemForeignLanguagePane.setTableRowSelection(index);
+                if (moFormItemConfigLanguage.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                    moItemConfigLanguagesPane.getTableModel().getTableRows().set(index, new SDataItemConfigLanguageRow(moFormItemConfigLanguage.getRegistry()));
+                    moItemConfigLanguagesPane.renderTableRows();
+                    moItemConfigLanguagesPane.setTableRowSelection(index);
                 }
             }
         }
@@ -3236,11 +3238,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     }
     
     private void focusLostPartNum() {
-        jtfPartNumberReadOnly.setText(jtfPartNumber.getText());
+        jtfPartNumberRo.setText(jtfPartNumber.getText());
+        jtfPartNumberRo.setCaretPosition(0);
     }
     
     private void focusLostAtt(JTextField jtfAtt) {
         jtfAtt.setText(jtfAtt.getText().toUpperCase());
+        jtfAtt.setCaretPosition(0);
     }
 
     /*
@@ -3340,13 +3344,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             mlAttributesCfg = SMaterialUtils.getAttributesOfType(miClient.getSession().getStatement(), idMaterialType);
             
             if (moItem == null || moItem.getIsRegistryNew()) {
-                jtfMaterialItemName.setText(moKeyFkMaterialTypeId_n.getSelectedItem().getItem().substring(0, moKeyFkMaterialTypeId_n.getSelectedItem().getItem().indexOf('-')));
+                jtfMaterialItemNameRo.setText(moKeyFkMaterialTypeId_n.getSelectedItem().getItem().substring(0, moKeyFkMaterialTypeId_n.getSelectedItem().getItem().indexOf('-')));
             }
             else {
-                jtfMaterialItemName.setText(moItem.getName());
+                jtfMaterialItemNameRo.setText(moItem.getName());
             }
             
-            jtfMaterialType.setText(moKeyFkMaterialTypeId_n.getSelectedItem().getItem());
+            jtfMaterialItemNameRo.setCaretPosition(0);
+            
+            jtfMaterialTypeRo.setText(moKeyFkMaterialTypeId_n.getSelectedItem().getItem());
+            jtfMaterialTypeRo.setCaretPosition(0);
         }
         
         if (mlAttributesCfg != null) {
@@ -3497,10 +3504,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -3678,10 +3682,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlLengthUnitary;
     private javax.swing.JLabel jlMass;
     private javax.swing.JLabel jlMassUnitary;
+    private javax.swing.JLabel jlMaterialItemNameRo;
     private javax.swing.JLabel jlMaterialType;
+    private javax.swing.JLabel jlMaterialTypeRo;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameShort;
     private javax.swing.JLabel jlPartNumber;
+    private javax.swing.JLabel jlPartNumberRo;
     private javax.swing.JLabel jlPresent;
     private javax.swing.JLabel jlPresentShort;
     private javax.swing.JLabel jlProductionCost;
@@ -3747,14 +3754,14 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfLengthUnitary;
     private javax.swing.JTextField jtfMass;
     private javax.swing.JTextField jtfMassUnitary;
-    private javax.swing.JTextField jtfMaterialItemName;
-    private javax.swing.JTextField jtfMaterialType;
+    private javax.swing.JTextField jtfMaterialItemNameRo;
+    private javax.swing.JTextField jtfMaterialTypeRo;
     private javax.swing.JTextField jtfName;
     private javax.swing.JTextField jtfNameShort;
     private javax.swing.JTextField jtfNetContent;
     private javax.swing.JTextField jtfNetContentUnitary;
     private javax.swing.JTextField jtfPartNumber;
-    private javax.swing.JTextField jtfPartNumberReadOnly;
+    private javax.swing.JTextField jtfPartNumberRo;
     private javax.swing.JTextField jtfPkItemId_Ro;
     private javax.swing.JTextField jtfPresentation;
     private javax.swing.JTextField jtfPresentationShort;
@@ -3805,8 +3812,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfPkItemId_Ro.setText("");
         jrbStatusActive.setSelected(true);
-        moItemForeignLanguagePane.createTable(null);
-        moItemForeignLanguagePane.clearTableRows();
+        moItemConfigLanguagesPane.createTable(null);
+        moItemConfigLanguagesPane.clearTableRows();
         moItemBarcodePane.createTable(null);
         moItemBarcodePane.clearTableRows();
 
@@ -4052,10 +4059,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-        int i = 0;
-        SDataItemBarcodeRow itemBarcodeRow = null;
-        SDataItemForeignLanguageRow itemForeignLanguageDescriptionRow = null;
-
         mbResetingForm = true;
 
         moItem = (SDataItem) registry;
@@ -4074,7 +4077,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldPartNumber.setFieldValue(moItem.getPartNumber());
         moFieldItemKey.setFieldValue(moItem.getKey());
         jtfItemNameRo.setText(moItem.getItem());
+        jtfItemNameRo.setCaretPosition(0);
+        jtfItemNameRo.setToolTipText(!jtfItemNameRo.getText().isEmpty() ? jtfItemNameRo.getText() : null);
         jtfItemNameShortRo.setText(moItem.getItemShort());
+        jtfItemNameShortRo.setCaretPosition(0);
+        jtfItemNameShortRo.setToolTipText(!jtfItemNameShortRo.getText().isEmpty() ? jtfItemNameShortRo.getText() : null);
         moFieldIsDeleted.setFieldValue(moItem.getIsDeleted());
         moFieldIsBulk.setFieldValue(moItem.getIsBulk());
         moFieldIsInventoriable.setFieldValue(mbWasInventoriable = moItem.getIsInventoriable());
@@ -4173,18 +4180,18 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Read the item foreign language descriptions:
 
-        for (i = 0; i < moItem.getDbmsItemForeignLanguageDescriptions().size(); i++) {
-            itemForeignLanguageDescriptionRow = new SDataItemForeignLanguageRow(moItem.getDbmsItemForeignLanguageDescriptions().get(i));
-            moItemForeignLanguagePane.addTableRow(itemForeignLanguageDescriptionRow);
+        for (int i = 0; i < moItem.getDbmsItemConfigLanguages().size(); i++) {
+            SDataItemConfigLanguageRow row = new SDataItemConfigLanguageRow(moItem.getDbmsItemConfigLanguages().get(i));
+            moItemConfigLanguagesPane.addTableRow(row);
         }
-        moItemForeignLanguagePane.renderTableRows();
-        moItemForeignLanguagePane.setTableRowSelection(0);
+        moItemConfigLanguagesPane.renderTableRows();
+        moItemConfigLanguagesPane.setTableRowSelection(0);
 
         // Read the item barcodes:
 
-        for (i = 0; i < moItem.getDbmsItemBarcodes().size(); i++) {
-            itemBarcodeRow = new SDataItemBarcodeRow(moItem.getDbmsItemBarcodes().get(i));
-            moItemBarcodePane.addTableRow(itemBarcodeRow);
+        for (int i = 0; i < moItem.getDbmsItemBarcodes().size(); i++) {
+            SDataItemBarcodeRow row = new SDataItemBarcodeRow(moItem.getDbmsItemBarcodes().get(i));
+            moItemBarcodePane.addTableRow(row);
         }
         moItemBarcodePane.renderTableRows();
         moItemBarcodePane.setTableRowSelection(0);
@@ -4367,10 +4374,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Save item foreign language descriptions:
 
-        moItem.getDbmsItemForeignLanguageDescriptions().clear();
-        for (i = 0; i < moItemForeignLanguagePane.getTable().getRowCount(); i++) {
-            moItem.getDbmsItemForeignLanguageDescriptions().add(
-                    (erp.mitm.data.SDataItemForeignLanguage) moItemForeignLanguagePane.getTableRow(i).getData());
+        moItem.getDbmsItemConfigLanguages().clear();
+        for (i = 0; i < moItemConfigLanguagesPane.getTable().getRowCount(); i++) {
+            moItem.getDbmsItemConfigLanguages().add((erp.mitm.data.SDataItemConfigLanguage) moItemConfigLanguagesPane.getTableRow(i).getData());
         }
 
         // Save the item barcodes:

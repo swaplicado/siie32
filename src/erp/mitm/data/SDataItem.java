@@ -22,7 +22,7 @@ import sa.lib.SLibUtils;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Claudio Peña, Sergio Flores
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -113,13 +113,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected erp.mitm.data.SDataItemGeneric moDbmsDataItemGeneric;
     protected erp.mitm.data.SDataUnit moDbmsDataCommercialUnit;
     protected java.util.Vector<erp.mitm.data.SDataItemBarcode> mvDbmsItemBarcodes;
-    protected java.util.Vector<erp.mitm.data.SDataItemForeignLanguage> mvDbmsItemForeignLanguageDescriptions;
+    protected java.util.Vector<erp.mitm.data.SDataItemConfigLanguage> mvDbmsItemConfigLanguages;
     protected ArrayList<SDataItemMaterialAttribute> mlItemAttributes;
 
     public SDataItem() {
         super(SDataConstants.ITMU_ITEM);
         mvDbmsItemBarcodes = new Vector<>();
-        mvDbmsItemForeignLanguageDescriptions = new Vector<>();
+        mvDbmsItemConfigLanguages = new Vector<>();
         mlItemAttributes = new ArrayList<>();
         reset();
     }
@@ -294,7 +294,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public erp.mitm.data.SDataUnit getDbmsDataCommercialUnit() { return moDbmsDataCommercialUnit; }
     public erp.mitm.data.SDataItemGeneric getDbmsDataItemGeneric() { return moDbmsDataItemGeneric; }
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
-    public java.util.Vector<SDataItemForeignLanguage> getDbmsItemForeignLanguageDescriptions() { return mvDbmsItemForeignLanguageDescriptions; }
+    public java.util.Vector<SDataItemConfigLanguage> getDbmsItemConfigLanguages() { return mvDbmsItemConfigLanguages; }
     public ArrayList<SDataItemMaterialAttribute> getDbmsItemAttributes() { return mlItemAttributes; }
 
     public int getDbmsFkDefaultItemRefId_n() {
@@ -446,7 +446,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         moDbmsDataCommercialUnit = null;
         moDbmsDataItemGeneric = null;
         mvDbmsItemBarcodes.clear();
-        mvDbmsItemForeignLanguageDescriptions.clear();
+        mvDbmsItemConfigLanguages.clear();
         mlItemAttributes.clear();
     }
 
@@ -595,12 +595,12 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 sql = "SELECT id_item, id_lan FROM erp.itmu_cfg_item_lan WHERE id_item = " + key[0] + " ORDER BY id_lan ";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    erp.mitm.data.SDataItemForeignLanguage desc = new SDataItemForeignLanguage();
-                    if (desc.read(new int[] { resultSet.getInt("id_item"), resultSet.getInt("id_lan") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    erp.mitm.data.SDataItemConfigLanguage config = new SDataItemConfigLanguage();
+                    if (config.read(new int[] { resultSet.getInt("id_item"), resultSet.getInt("id_lan") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsItemForeignLanguageDescriptions.add(desc);
+                        mvDbmsItemConfigLanguages.add(config);
                     }
                 }
                 
@@ -760,9 +760,9 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 sql = "DELETE FROM erp.itmu_cfg_item_lan WHERE id_item = " + mnPkItemId + " ";
                 statement.execute(sql);
 
-                for (i = 0; i < mvDbmsItemForeignLanguageDescriptions.size(); i++) {
-                    mvDbmsItemForeignLanguageDescriptions.get(i).setPkItemId(mnPkItemId);
-                    if (mvDbmsItemForeignLanguageDescriptions.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                for (i = 0; i < mvDbmsItemConfigLanguages.size(); i++) {
+                    mvDbmsItemConfigLanguages.get(i).setPkItemId(mnPkItemId);
+                    if (mvDbmsItemConfigLanguages.get(i).save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }

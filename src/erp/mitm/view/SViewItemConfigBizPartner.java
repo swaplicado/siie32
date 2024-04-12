@@ -18,13 +18,13 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores
  */
-public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewItemConfigBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
-    public SViewItemBizPartnerDescription(erp.client.SClientInterface client, java.lang.String tabTitle) {
+    public SViewItemConfigBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.ITMU_CFG_ITEM_BP);
         initComponents();
     }
@@ -48,14 +48,14 @@ public class SViewItemBizPartnerDescription extends erp.lib.table.STableTab impl
         }
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Asociado negocios", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_short", "Ítem corto", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Asociado negocios", 250);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 400);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_short", "Ítem corto", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uo.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item_key", "Clave asoc. neg.", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item", "Ítem asoc. neg.", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item_short", "Ítem corto asoc. neg.", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item_key", "Clave asoc. neg.", STableConstants.WIDTH_ITEM_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item", "Ítem asoc. neg.", 400);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.item_short", "Ítem corto asoc. neg.", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad asoc. neg.", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cfd_use", "Uso CFDI", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "c.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);

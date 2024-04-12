@@ -5,14 +5,14 @@
 
 package erp.mbps.data;
 
+import erp.mitm.data.SDataItemConfigBizPartnerItems;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.diot.SDiotConsts;
-import erp.mitm.data.SDataBizPartnerItemDescription;
-import erp.mitm.data.SDataItemBizPartnerDescription;
+import erp.mitm.data.SDataItemConfigBizPartner;
 import erp.mmkt.data.SDataConfigurationSalesAgent;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mmkt.data.SDataCustomerConfig;
@@ -72,7 +72,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     protected erp.mbps.data.SDataBizPartnerCategory[] maoDbmsCategorySettings;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerBranch> mvDbmsBizPartnerBranches;
     protected java.util.Vector<erp.mbps.data.SDataBizPartnerNote> mvDbmsBizPartnerNotes;
-    protected java.util.Vector<erp.mitm.data.SDataItemBizPartnerDescription> mvDbmsItemBizPartnerDescription;
+    protected java.util.Vector<erp.mitm.data.SDataItemConfigBizPartner> mvDbmsItemConfigs;
     protected erp.mmkt.data.SDataCustomerConfig moDbmsDataCustomerConfig;
     protected erp.mmkt.data.SDataConfigurationSalesAgent moDbmsDataConfigurationSalesAgent;
     protected erp.mbps.data.SDataEmployee moDbmsDataEmployee;
@@ -85,7 +85,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         maoDbmsCategorySettings = null;
         mvDbmsBizPartnerBranches = new Vector<>();
         mvDbmsBizPartnerNotes = new Vector<>();
-        mvDbmsItemBizPartnerDescription = new Vector<>();
+        mvDbmsItemConfigs = new Vector<>();
         reset();
     }
     
@@ -191,7 +191,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
     public java.util.Vector<SDataBizPartnerBranch> getDbmsBizPartnerBranches() { return mvDbmsBizPartnerBranches; }
     public java.util.Vector<SDataBizPartnerNote> getDbmsBizPartnerNotes() { return mvDbmsBizPartnerNotes; }
-    public java.util.Vector<SDataItemBizPartnerDescription> getDbmsItemBizPartnerDescription() { return mvDbmsItemBizPartnerDescription; }
+    public java.util.Vector<SDataItemConfigBizPartner> getDbmsItemConfigs() { return mvDbmsItemConfigs; }
     public erp.mmkt.data.SDataCustomerConfig getDbmsDataCustomerConfig() { return moDbmsDataCustomerConfig; }
     public erp.mmkt.data.SDataConfigurationSalesAgent getDbmsDataConfigurationSalesAgent() { return moDbmsDataConfigurationSalesAgent; }
     public erp.mbps.data.SDataEmployee getDbmsDataEmployee() { return moDbmsDataEmployee; }
@@ -283,7 +283,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         maoDbmsCategorySettings = new SDataBizPartnerCategory[SDataConstantsSys.BPSX_CT_BP_QTY];
         mvDbmsBizPartnerBranches.clear();
         mvDbmsBizPartnerNotes.clear();
-        mvDbmsItemBizPartnerDescription.clear();
+        mvDbmsItemConfigs.clear();
         moDbmsDataCustomerConfig = null;
         moDbmsDataConfigurationSalesAgent = null;
         moDbmsDataEmployee = null;
@@ -419,13 +419,13 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
                 // Read as well business partner ítems descriptions:
 
-                SDataBizPartnerItemDescription description = new SDataBizPartnerItemDescription();
+                SDataItemConfigBizPartnerItems itemConfigs = new SDataItemConfigBizPartnerItems();
 
-                if (description.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                if (itemConfigs.read(new int[] { mnPkBizPartnerId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
-                    mvDbmsItemBizPartnerDescription = description.getDbmsItemBizPartnerDescriptions();
+                    mvDbmsItemConfigs = itemConfigs.getDbmsItemConfigs();
                 }
 
                 // Read as well customer configuration, if exists:

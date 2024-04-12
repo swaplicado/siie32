@@ -21,7 +21,7 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemBizPartnerDescription;
+import erp.mitm.data.SDataItemConfigBizPartner;
 import erp.mitm.data.SDataUnit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -34,9 +34,9 @@ import javax.swing.JComboBox;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores
  */
-public class SFormItemDescription extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
+public class SFormItemConfigBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -46,7 +46,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.mitm.data.SDataItemBizPartnerDescription moItemBizPartnerDescription;
+    private erp.mitm.data.SDataItemConfigBizPartner moItemConfigBizPartner;
     private erp.lib.form.SFormField moFieldPkItemId;
     private erp.lib.form.SFormField moFieldIsItemDescriptionApplying;
     private erp.lib.form.SFormField moFieldKey;
@@ -59,7 +59,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private erp.mitm.data.SDataItem moItem;
 
     /** Creates new form SFormItemDescription */
-    public SFormItemDescription(erp.client.SClientInterface client) {
+    public SFormItemConfigBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         mnFormType = SDataConstants.ITMU_CFG_ITEM_BP;
@@ -98,6 +98,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel9 = new javax.swing.JPanel();
         jlOriginalUnit = new javax.swing.JLabel();
         jtfOriginalUnit = new javax.swing.JTextField();
+        jPanel5 = new javax.swing.JPanel();
         jckIsItemDescriptionApplying = new javax.swing.JCheckBox();
         jPanel10 = new javax.swing.JPanel();
         jlKey = new javax.swing.JLabel();
@@ -112,6 +113,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jlFkUnitId = new javax.swing.JLabel();
         jcbFkUnitId = new javax.swing.JComboBox();
         jbFkUnitId = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlCfdiUsage = new javax.swing.JLabel();
         jcbCfdiUsage = new javax.swing.JComboBox();
@@ -142,7 +144,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(14, 1, 0, 2));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -189,9 +191,9 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel7.add(jlOriginalItem);
 
         jtfOriginalItem.setEditable(false);
-        jtfOriginalItem.setText("ORIGINAL ITEM");
+        jtfOriginalItem.setText("ORIGINAL ITEM NAME");
         jtfOriginalItem.setFocusable(false);
-        jtfOriginalItem.setPreferredSize(new java.awt.Dimension(400, 23));
+        jtfOriginalItem.setPreferredSize(new java.awt.Dimension(550, 23));
         jPanel7.add(jtfOriginalItem);
 
         jPanel3.add(jPanel7);
@@ -205,7 +207,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jtfOriginalItemShort.setEditable(false);
         jtfOriginalItemShort.setText("ORIGINAL ITEM SHORT");
         jtfOriginalItemShort.setFocusable(false);
-        jtfOriginalItemShort.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfOriginalItemShort.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel8.add(jtfOriginalItemShort);
 
         jPanel3.add(jPanel8);
@@ -219,10 +221,13 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jtfOriginalUnit.setEditable(false);
         jtfOriginalUnit.setText("ORIGINAL UNIT");
         jtfOriginalUnit.setFocusable(false);
-        jtfOriginalUnit.setPreferredSize(new java.awt.Dimension(50, 23));
+        jtfOriginalUnit.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jtfOriginalUnit);
 
         jPanel3.add(jPanel9);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel3.add(jPanel5);
 
         jckIsItemDescriptionApplying.setText("Aplica descripción personalizada");
         jPanel3.add(jckIsItemDescriptionApplying);
@@ -233,7 +238,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jlKey.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel10.add(jlKey);
 
-        jtfKey.setText("KEY");
+        jtfKey.setText("BP KEY");
         jtfKey.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jtfKey);
 
@@ -245,8 +250,8 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jlItem.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel11.add(jlItem);
 
-        jtfItem.setText("ITEM");
-        jtfItem.setPreferredSize(new java.awt.Dimension(400, 23));
+        jtfItem.setText("BP ITEM NAME");
+        jtfItem.setPreferredSize(new java.awt.Dimension(550, 23));
         jtfItem.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 jtfItemFocusLost(evt);
@@ -262,8 +267,8 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jlItemShort.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel12.add(jlItemShort);
 
-        jtfItemShort.setText("ITEM SHORT");
-        jtfItemShort.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfItemShort.setText("BP ITEM SHORT");
+        jtfItemShort.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel12.add(jtfItemShort);
 
         jPanel3.add(jPanel12);
@@ -285,6 +290,9 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         jPanel13.add(jbFkUnitId);
 
         jPanel3.add(jPanel13);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel3.add(jPanel15);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -323,7 +331,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     }//GEN-LAST:event_jtfItemFocusLost
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPkItemId, jlPkItemId);
         moFieldPkItemId.setPickerButton(jbPkItemId);
@@ -331,7 +339,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         moFieldKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfKey, jlKey);
         moFieldKey.setLengthMax(35);
         moFieldItem = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItem, jlItem);
-        moFieldItem.setLengthMax(255);
+        moFieldItem.setLengthMax(355);
         moFieldItemShort = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItemShort, jlItemShort);
         moFieldItemShort.setLengthMax(130);
         moFieldFkUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkUnitId, jlFkUnitId);
@@ -375,7 +383,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            if (moItemBizPartnerDescription != null ) {
+            if (moItemConfigBizPartner != null ) {
                 jtfKey.requestFocus();
             }
             else {
@@ -518,9 +526,11 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -566,7 +576,7 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        moItemBizPartnerDescription = null;
+        moItemConfigBizPartner = null;
         moItem = null;
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -639,20 +649,18 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
         
-        moItemBizPartnerDescription = (SDataItemBizPartnerDescription) registry;
-
-        moFieldPkItemId.setFieldValue(new int[] { moItemBizPartnerDescription.getPkItemId() });
+        moFieldPkItemId.setFieldValue(new int[] { moItemConfigBizPartner.getPkItemId() });
         renderItemSettings();   // units combobox populated aswell
         
-        moFieldIsItemDescriptionApplying.setFieldValue(moItemBizPartnerDescription.getIsItemDescription());
+        moFieldIsItemDescriptionApplying.setFieldValue(moItemConfigBizPartner.getIsItemDescription());
         renderIsItemDescriptionApplying();
         
-        moFieldKey.setFieldValue(moItemBizPartnerDescription.getKey());
-        moFieldItem.setFieldValue(moItemBizPartnerDescription.getItem());
-        moFieldItemShort.setFieldValue(moItemBizPartnerDescription.getItemShort());
-        moFieldFkUnitId.setFieldValue(new int[] { moItemBizPartnerDescription.getFkUnitId() });
-        moFieldCfdiUsage.setFieldValue(moItemBizPartnerDescription.getCfdiUsage());
-        moFieldIsDeleted.setFieldValue(moItemBizPartnerDescription.getIsDeleted());
+        moFieldKey.setFieldValue(moItemConfigBizPartner.getKey());
+        moFieldItem.setFieldValue(moItemConfigBizPartner.getItem());
+        moFieldItemShort.setFieldValue(moItemConfigBizPartner.getItemShort());
+        moFieldFkUnitId.setFieldValue(new int[] { moItemConfigBizPartner.getFkUnitId() });
+        moFieldCfdiUsage.setFieldValue(moItemConfigBizPartner.getCfdiUsage());
+        moFieldIsDeleted.setFieldValue(moItemConfigBizPartner.getIsDeleted());
 
         jcbPkItemId.setEnabled(false);
         jbPkItemId.setEnabled(false);
@@ -664,25 +672,25 @@ public class SFormItemDescription extends javax.swing.JDialog implements erp.lib
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        if (moItemBizPartnerDescription == null) {
-            moItemBizPartnerDescription = new SDataItemBizPartnerDescription();
-            moItemBizPartnerDescription.setPkItemId(moFieldPkItemId.getKeyAsIntArray()[0]);
-            moItemBizPartnerDescription.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        if (moItemConfigBizPartner == null) {
+            moItemConfigBizPartner = new SDataItemConfigBizPartner();
+            moItemConfigBizPartner.setPkItemId(moFieldPkItemId.getKeyAsIntArray()[0]);
+            moItemConfigBizPartner.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
         else  {
-            moItemBizPartnerDescription.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moItemConfigBizPartner.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
         
-        moItemBizPartnerDescription.setKey(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldKey.getString());
-        moItemBizPartnerDescription.setItem(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItem.getString());
-        moItemBizPartnerDescription.setItemShort(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItemShort.getString());
-        moItemBizPartnerDescription.setCfdiUsage(jcbCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiUsage.getKey().toString());
-        moItemBizPartnerDescription.setIsItemDescription(moFieldIsItemDescriptionApplying.getBoolean());
-        moItemBizPartnerDescription.setIsDeleted(moFieldIsDeleted.getBoolean());
-        moItemBizPartnerDescription.setFkUnitId(!jckIsItemDescriptionApplying.isSelected() ? SDataConstantsSys.ITMU_UNIT_NA : moFieldFkUnitId.getKeyAsIntArray()[0]);
-        moItemBizPartnerDescription.setDbmsUnit(readUnitSymbol(moItemBizPartnerDescription.getFkUnitId()));
+        moItemConfigBizPartner.setKey(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldKey.getString());
+        moItemConfigBizPartner.setItem(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItem.getString());
+        moItemConfigBizPartner.setItemShort(!jckIsItemDescriptionApplying.isSelected() ? "" : moFieldItemShort.getString());
+        moItemConfigBizPartner.setCfdiUsage(jcbCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiUsage.getKey().toString());
+        moItemConfigBizPartner.setIsItemDescription(moFieldIsItemDescriptionApplying.getBoolean());
+        moItemConfigBizPartner.setIsDeleted(moFieldIsDeleted.getBoolean());
+        moItemConfigBizPartner.setFkUnitId(!jckIsItemDescriptionApplying.isSelected() ? SDataConstantsSys.ITMU_UNIT_NA : moFieldFkUnitId.getKeyAsIntArray()[0]);
+        moItemConfigBizPartner.setDbmsUnit(readUnitSymbol(moItemConfigBizPartner.getFkUnitId()));
 
-        return moItemBizPartnerDescription;
+        return moItemConfigBizPartner;
     }
 
     @Override

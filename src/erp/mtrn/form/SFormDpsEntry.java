@@ -30,8 +30,8 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.form.SPanelAccount;
 import erp.mitm.data.SDataItem;
-import erp.mitm.data.SDataItemBizPartnerDescription;
-import erp.mitm.data.SDataItemForeignLanguage;
+import erp.mitm.data.SDataItemConfigBizPartner;
+import erp.mitm.data.SDataItemConfigLanguage;
 import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -90,7 +90,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Sergio Flores, Isabel Servín, Claudio Peña
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -222,7 +222,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.mtrn.data.SDataDps moParamDps;
     private erp.mbps.data.SDataBizPartner moParamBizPartner;
     private erp.mbps.data.SDataBizPartnerBranch moParamBizPartnerBranch;
-    private erp.mitm.data.SDataItemBizPartnerDescription moDataItemBizPartnerDescription;
+    private erp.mitm.data.SDataItemConfigBizPartner moDataItemConfigBizPartner;
     private int mnParamAdjustmentTypeId;
 
     private int[] manItemClassFilterKey;
@@ -3530,12 +3530,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             jbItemBizPartnerDescription.setEnabled(false);
             
-            if (moParamBizPartner.getDbmsItemBizPartnerDescription().size() > 0) {
-                for (SDataItemBizPartnerDescription description : moParamBizPartner.getDbmsItemBizPartnerDescription()) {
-                    if (moItem.getPkItemId() == description.getPkItemId() && description.getIsItemDescription() && !description.getIsDeleted()) {
-                        conceptKey = description.getKey();
-                        concept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
-                        unitId = description.getFkUnitId();
+            if (moParamBizPartner.getDbmsItemConfigs().size() > 0) {
+                for (SDataItemConfigBizPartner itemConfigBizPartner : moParamBizPartner.getDbmsItemConfigs()) {
+                    if (moItem.getPkItemId() == itemConfigBizPartner.getPkItemId() && itemConfigBizPartner.getIsItemDescription() && !itemConfigBizPartner.getIsDeleted()) {
+                        conceptKey = itemConfigBizPartner.getKey();
+                        concept = itemConfigBizPartner.getItem().length() <= moFieldConcept.getLengthMax() ? itemConfigBizPartner.getItem() : itemConfigBizPartner.getItemShort();
+                        unitId = itemConfigBizPartner.getFkUnitId();
 
                         jbItemBizPartnerDescription.setEnabled(true);
                         break;
@@ -3547,9 +3547,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 // custom item description for language:
                 
                 if (moParamDps.getFkLanguajeId() != miClient.getSessionXXX().getParamsErp().getFkLanguageId()) {
-                    for (SDataItemForeignLanguage description : moItem.getDbmsItemForeignLanguageDescriptions()) {
-                        if (moParamDps.getFkLanguajeId() == description.getPkLanguageId() && !description.getIsDeleted()) {
-                            concept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
+                    for (SDataItemConfigLanguage itemConfigLanguage : moItem.getDbmsItemConfigLanguages()) {
+                        if (moParamDps.getFkLanguajeId() == itemConfigLanguage.getPkLanguageId() && !itemConfigLanguage.getIsDeleted()) {
+                            concept = itemConfigLanguage.getItem().length() <= moFieldConcept.getLengthMax() ? itemConfigLanguage.getItem() : itemConfigLanguage.getItemShort();
                             break;
                         }
                     }
@@ -3715,11 +3715,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     private void renderItemBizPartnerDescription(int[] itemBizPartnerDescriptionKey) {
-        moDataItemBizPartnerDescription = (SDataItemBizPartnerDescription) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_CFG_ITEM_BP, itemBizPartnerDescriptionKey, SLibConstants.EXEC_MODE_SILENT);
+        moDataItemConfigBizPartner = (SDataItemConfigBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_CFG_ITEM_BP, itemBizPartnerDescriptionKey, SLibConstants.EXEC_MODE_SILENT);
 
-        moFieldConceptKey.setFieldValue(moDataItemBizPartnerDescription.getKey());
-        moFieldConcept.setFieldValue(moDataItemBizPartnerDescription.getItem());
-        moFieldFkOriginalUnitId.setFieldValue(new int[] { moDataItemBizPartnerDescription.getFkUnitId() });
+        moFieldConceptKey.setFieldValue(moDataItemConfigBizPartner.getKey());
+        moFieldConcept.setFieldValue(moDataItemConfigBizPartner.getItem());
+        moFieldFkOriginalUnitId.setFieldValue(new int[] { moDataItemConfigBizPartner.getFkUnitId() });
     }
 
     private void renderOriginalUnitSymbol() {
@@ -5846,7 +5846,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moParamDps = null;
         moParamBizPartner = null;
         moParamBizPartnerBranch = null;
-        moDataItemBizPartnerDescription = null;
+        moDataItemConfigBizPartner = null;
         mnParamAdjustmentTypeId = SDataConstantsSys.UNDEFINED;
 
         manItemClassFilterKey = null;
