@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 249.0/ 2024-04-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ampliación del tamaño del nombre de ítems, de 50 a 150 caracteres en su forma segmentada, para aumentar de 255 a 355 de forma completa en:
+- catálogo de ítems;
+- configuraciones de ítems para idioma;
+- configuraciones de ítems para asociados de negocio.
+
+================================================================================
 SIIE 3.2 248.0/ 2024-04-10
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
