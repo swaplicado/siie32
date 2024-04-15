@@ -71,7 +71,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private boolean hasMatReqAdmorRight;
     private boolean hasMatReqPurRight;
     private boolean hasMatReqProvRight;
-    private boolean hasMatReqEditRight;
+    private boolean hasMatReqReclassRight;
     
     /**
      * @param client GUI client.
@@ -95,7 +95,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqAdmorRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasMatReqPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
-        hasMatReqEditRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
@@ -176,7 +176,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
         
         if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
-            jbRowEdit.setEnabled(hasMatReqEditRight);
+            jbRowEdit.setEnabled(hasMatReqReclassRight);
         }
         
         jbRowDisable.setToolTipText("Cancelar");
@@ -618,7 +618,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV &&
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_ADM) {
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
-                if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight) {
+                if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight && !hasMatReqReclassRight) {
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
                 }
                 else {
@@ -646,7 +646,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
                 + "v.tp_req, "
-                + "LPAD(v.num, 6, 0) AS folio, "
+                + "LPAD(v.num, " + SDataConstantsSys.NUM_LEN_MAT_REQ + ", 0) AS folio, "
                 + "v.dt_req_n, "
                 + "v.dt_delivery_n, "
                 + "v.ref, "

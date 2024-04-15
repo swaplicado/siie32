@@ -598,7 +598,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 moPickerCostCenter.formReset();
                 moPickerCostCenter.formRefreshOptionPane();
                 try {
-                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient, rowDpsEdit.getItemRefNew() == null ? 
+                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient.getSession(), rowDpsEdit.getItemRefNew() == null ? 
                             rowDpsEdit.getItemRefOld().getPkItemId() : rowDpsEdit.getItemRefNew().getPkItemId()));
                 }
                 catch (Exception e){

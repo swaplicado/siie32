@@ -7038,7 +7038,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moPanelFkCostCenterId_n.enableFields(isCustomAccEnableable());
 
             try {
-                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient, moAccItem.getPkItemId()));
+                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId()));
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);

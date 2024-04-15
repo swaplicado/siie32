@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 248.1/ 2024-04-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Vista de valuación de inventarios a detalle.
+2) Modificación en vista de reclasificación de contab de RM.
+3) Asignación de almacén a movimientos contables con cuentas de inventario.
+4) Determinación de CC y GP para movimientos de valuación sin RM.
+
+================================================================================
 SIIE 3.2 248.0/ 2024-04-10
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

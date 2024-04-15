@@ -723,6 +723,13 @@ public abstract class SModSysConsts {
     public static final String TRNS_MAT_REQ_TP_R = "R"; // Resurtido
     public static final String TRNS_MAT_REQ_TP_C = "C"; // Consumo
     
+    public static final int TRNX_TP_VAL_MVT_ALL = 0;
+    public static final int TRNX_TP_VAL_MVT_ENTRY = 1;
+    public static final int TRNX_TP_VAL_MVT_CONS = 2;
+    public static final String TRNX_TP_NM_VAL_MVT_ALL = "TODAS";
+    public static final String TRNX_TP_NM_VAL_MVT_ENTRY = "ENTRADAS";
+    public static final String TRNX_TP_NM_VAL_MVT_CONS = "CONSUMOS";
+    
     public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
     public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
     public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All

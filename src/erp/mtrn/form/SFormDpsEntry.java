@@ -3912,7 +3912,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moPanelFkCostCenterId_n.enableFields(true);
 
             try {
-                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient, moItem.getPkItemId()));
+                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId()));
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);

@@ -115,6 +115,7 @@ import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewStockValuation;
+import erp.mod.trn.view.SViewStockValuationDetail;
 import erp.mod.trn.view.SViewValCost;
 import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
 import javax.swing.JMenu;
@@ -626,6 +627,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_STK_VAL:
                 title = "Valuación de inventarios";
                 view = new SViewStockValuation(miClient, title);
+                break;
+            case SModConsts.TRNX_STK_VAL_DET:
+                title = "Valuación de inventarios a detalle";
+                view = new SViewStockValuationDetail(miClient, title);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {

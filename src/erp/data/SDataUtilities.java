@@ -3713,11 +3713,13 @@ public abstract class SDataUtilities {
     /**
      * Obtains center cost for specified item.
      *
-     * @param client SClientInterface.
+     * @param session
      * @param nItemId Item ID whose center cost is requiered.
+     * @return 
+     * @throws java.lang.Exception 
      */
     @SuppressWarnings("unchecked")
-    public static java.lang.String obtainCostCenterItem(erp.client.SClientInterface client, int nItemId) throws java.lang.Exception {
+    public static java.lang.String obtainCostCenterItem(SGuiSession session, int nItemId) throws java.lang.Exception {
         String sql = "";
         ResultSet resultSet = null;
         String costCenter = "";
@@ -3737,7 +3739,7 @@ public abstract class SDataUtilities {
                 "(cci.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_ALL + " AND cci.id_ref = " + SLibConstants.UNDEFINED + ")) " +
                 "ORDER BY cci.id_tp_link DESC ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
+        resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             costCenter = resultSet.getString("cci.fid_cc");
         }

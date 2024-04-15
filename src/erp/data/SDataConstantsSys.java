@@ -1799,6 +1799,7 @@ public abstract class SDataConstantsSys {
     public static final int NUM_LEN_IOG = 6;
     public static final int NUM_LEN_MFG_ORD = 6;
     public static final int NUM_LEN_MFG_CHG = 3;
+    public static final int NUM_LEN_MAT_REQ = 6;
 
     public static final int UPD_DPS_FL_LINK = 1;        // set field
     public static final int UPD_DPS_FL_CLOSE = 2;       // set field
