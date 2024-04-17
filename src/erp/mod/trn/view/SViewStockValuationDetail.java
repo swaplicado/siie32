@@ -5,10 +5,8 @@
 package erp.mod.trn.view;
 
 import erp.data.SDataConstantsSys;
-import erp.gui.grid.SGridFilterPanelMatReqStatus;
 import erp.gui.grid.SGridFilterPanelValMovType;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,7 +22,6 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
-import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterDateRange;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;

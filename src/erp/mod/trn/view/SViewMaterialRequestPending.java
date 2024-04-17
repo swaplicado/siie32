@@ -819,14 +819,20 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             
             if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR) {
-                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur  ";
+                where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " "
+                        + "AND v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_PEND + " "
+                        + "AND NOT v.b_clo_pur ";
+                
+                having += "HAVING (org_qty - sumi_qty) > COALESCE(SUM(req_pur.pur_qty), 0) ";
             }
             else if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
-                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + " OR v.b_clo_pur) ";
+                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + ") ";
                 filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
                 if (filter != null) {
                     where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
                 }
+                
+                having += "HAVING COALESCE(SUM(req_pur.pur_qty), 0) >= (org_qty - sumi_qty) OR (v.b_clo_pur AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") ";
             }
         }
         
@@ -985,7 +991,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "pur_qty", "Cant. comprada"));
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "pen_pur_qty", "Cant. pendiente comprar"));
             }
-            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "unit", "unidad"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "unit", "Unidad"));
             if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per", "% suministro"));
             }
