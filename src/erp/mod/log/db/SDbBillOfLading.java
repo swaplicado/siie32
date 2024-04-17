@@ -1269,7 +1269,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
                 }
             }
             
-            ArrayList<cfd.ver4.ccp30.DElementCantidadTransporta> transporta = mercancia.getEltCantidadTransporta();
+            ArrayList<cfd.ver4.ccp30.DElementCantidadTransporta> transporta = mercancia.getEltCantidadTransportas();
             
             for (SDbBolMerchandiseQuantity or : qtyOr) {
                 if (or.getQuantity() > 0) {

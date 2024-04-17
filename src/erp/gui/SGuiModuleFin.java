@@ -101,6 +101,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
+import erp.mod.fin.form.SDialogChoseAccountingCustomReport;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
@@ -149,6 +150,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgAbpLinkItem;
     private javax.swing.JMenuItem jmiCfgAccItemLink;
     private javax.swing.JMenuItem jmiCfgTaxItemLink;
+    private javax.swing.JMenuItem jmiCfgAbpRep;
 
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatAccount;
@@ -318,6 +320,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepFiscalXmlFiles;
     private javax.swing.JMenuItem jmiRepFiscalMonthRepCfd;
     private javax.swing.JMenuItem jmiRepFiscalMonthRepCf;
+    private javax.swing.JMenuItem jmiRepAccCus;
     private javax.swing.JMenuItem jmiGlobalStatement;
 
     private erp.mfin.form.SFormRecord moFormRecord;
@@ -426,9 +429,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAbpLink.add(jmiCfgAbpLinkItem);
         jmCfgAbpLink.add(jmiCfgTaxItemLink);
         jmCfgAbpLink.add(jmiCfgAccItemLink);
+        
+        jmiCfgAbpRep = new JMenuItem("Configuración reportes personalizados aux. contables");
 
         jmCfg.add(jmiCfgAbp);
         jmCfg.add(jmCfgAbpLink);
+        jmCfg.add(jmiCfgAbpRep);
 
         jmCat = new JMenu("Catálogos");
 
@@ -723,6 +729,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepFiscalMonthRepCfd = new JMenuItem("Informe mensual de comprobantes digitales...");
         jmiRepFiscalMonthRepCf = new JMenuItem("Informe mensual de comprobantes impresos...");
         
+        jmiRepAccCus = new JMenuItem("Reportes personalizables de auxiliares contables...");
+        
         jmiGlobalStatement = new JMenuItem("Informe de situación general...");
         
         jmRepTrialBal.add(jmiRepTrialBalStandard);
@@ -850,6 +858,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmRep.addSeparator();
         
+        jmRep.add(jmiRepAccCus);
+        
+        jmRep.addSeparator();
+        
         jmRep.add(jmiGlobalStatement);
         
         jmiCatAccount.addActionListener(this);
@@ -938,6 +950,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAbpLinkItem.addActionListener(this);
         jmiCfgAccItemLink.addActionListener(this);
         jmiCfgTaxItemLink.addActionListener(this);
+        jmiCfgAbpRep.addActionListener(this);
 
         jmiRepTrialBalStandard.addActionListener(this);
         jmiRepTrialBalCostCenter.addActionListener(this);
@@ -1011,6 +1024,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepFiscalXmlFiles.addActionListener(this);
         jmiRepFiscalMonthRepCfd.addActionListener(this);
         jmiRepFiscalMonthRepCf.addActionListener(this);
+        jmiRepAccCus.addActionListener(this);
         jmiGlobalStatement.addActionListener(this);
 
         // User rights:
@@ -1041,6 +1055,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
 
         jmCfgAbpLink.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem);
+        jmiCfgAbpRep.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkCashAccount.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkWarehouse.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkPlant.setEnabled(hasRightGblCatAccCfg);
@@ -2366,6 +2381,16 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepFiscalMonthRepCf) {
                 new SDialogRepDpsMonthReport(miClient, SDialogRepDpsMonthReport.CF).setVisible(true);
             }
+            else if (item == jmiRepAccCus) {
+                SDialogChoseAccountingCustomReport dialog = new SDialogChoseAccountingCustomReport((SGuiClient) miClient);
+                dialog.setVisible(true);
+                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    int subType = (int) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_ID);
+                    SGuiParams params = new SGuiParams();
+                    params.getParamsMap().put(subType, (String) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_NAME));
+                    miClient.getSession().showView(SModConsts.FINX_REP_CUS_ACC, subType, params);
+                }
+            }
             else if (item == jmiGlobalStatement) {
                 new SDialogRepGlobalStatement(miClient).setVisible(true);
             }
@@ -2407,6 +2432,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgAccItemLink) {
                 miClient.getSession().showView(SModConsts.FIN_ACC_ITEM_LINK, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCfgAbpRep) {
+                miClient.getSession().showView(SModConsts.FIN_REP_CUS_ACC, SLibConstants.UNDEFINED, null);
             }
         }
     }

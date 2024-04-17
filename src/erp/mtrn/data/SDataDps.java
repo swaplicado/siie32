@@ -305,6 +305,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
     
+    protected boolean mbXtaTestLinks;
+    
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
@@ -1042,15 +1044,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
                     */
                     case 205:
-                        sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
-                        sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
+                        if (mbXtaTestLinks) {
+                            sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
+                            sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
+                        }
                         break;
                     case 206:
-                        sSql = "SELECT COUNT(*) AS f_count " +
-                                "FROM trn_diog AS d " +
-                                "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                                "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND de.b_del = 0 AND d.b_del = 0 ";
-                        sMsgAux = "¡El documento está asociado con un surtido de almacén!";
+                        if (mbXtaTestLinks) {
+                            sSql = "SELECT COUNT(*) AS f_count " +
+                                    "FROM trn_diog AS d " +
+                                    "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                                    "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND de.b_del = 0 AND d.b_del = 0 ";
+                            sMsgAux = "¡El documento está asociado con un surtido de almacén!";
+                        }
                         break;
                     case 207:
                         sSql = "SELECT COUNT(*) AS f_count " +
@@ -2135,6 +2141,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getOldDate() { return mtOldDate; }
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
+    
+    public void setTestLinks(boolean b) { mbXtaTestLinks = b; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -2404,6 +2412,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtOldDate = null;
         msXtaTotalCyAsText = "";
         createXtaDpsType();
+        
+        mbXtaTestLinks = true;
     }
                         
     @Override
