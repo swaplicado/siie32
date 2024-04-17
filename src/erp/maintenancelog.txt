@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 250.0/ 2024-04-17
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación del reporte personalizado de auxiliares contables.
+2) Creación de la funcionalidad para el movimiento de los vínculos de movimientos de almacén de facturas hacia pedidos 
+    con el fin de eliminar las facturas posteriormente.
+
+================================================================================
 SIIE 3.2 249.0/ 2024-04-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
