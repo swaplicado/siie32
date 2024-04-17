@@ -7,7 +7,6 @@ Isabel Danae GARCÍA SERVÍN
     con el fin de eliminar las facturas posteriormente.
 
 ================================================================================
-
 SIIE 3.2 249.1/ 2024-04-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -26,14 +25,6 @@ Requisiciones de materiales. 15/04/24
 5) RM x pedir a detalle
 	- solo que aparezca lo pendiente x pedir.
 6) Refactorización de Vistas de RM de resurtido
-
-================================================================================
-SIIE 3.2 250.0/ 2024-04-17
-Isabel Danae GARCÍA SERVÍN
---------------------------------------------------------------------------------
-1) Creación del reporte personalizado de auxiliares contables.
-2) Creación de la funcionalidad para el movimiento de los vínculos de movimientos de almacén de facturas hacia pedidos 
-    con el fin de eliminar las facturas posteriormente.
 
 ================================================================================
 SIIE 3.2 249.0/ 2024-04-12
