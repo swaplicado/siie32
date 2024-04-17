@@ -1508,7 +1508,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 moPickerCostCenter.formReset();
                 moPickerCostCenter.formRefreshOptionPane();
                 try {
-                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient, rowCfdiImport.getItem().getPkItemId()));
+                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient.getSession(), rowCfdiImport.getItem().getPkItemId()));
                 }
                 catch (Exception e){
                     SLibUtils.printException(this, e);
@@ -1619,7 +1619,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         SDataCostCenter costCenter = null;
         
         try {
-            String[] pkcc = { SDataUtilities.obtainCostCenterItem(miClient, item.getPkItemId()) };
+            String[] pkcc = { SDataUtilities.obtainCostCenterItem(miClient.getSession(), item.getPkItemId()) };
             if (!pkcc[0].equals("")) {
                 costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient,
                     SDataConstants.FIN_CC, pkcc , SLibConstants.EXEC_MODE_SILENT);
