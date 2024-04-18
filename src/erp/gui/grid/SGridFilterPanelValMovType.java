@@ -78,7 +78,7 @@ public class SGridFilterPanelValMovType extends JPanel implements SGridFilter, A
     /*
      * Private methods
      */
-    
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         moKeyTpValMvt.removeAllItems();
         SGuiItem oItem;
