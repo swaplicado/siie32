@@ -443,7 +443,7 @@ public class SModuleFin extends SGuiModule {
                 
                 break;
             case SModConsts.FIN_REP_CUS_ACC:
-                settings = new SGuiCatalogueSettings("Reporte personalizado aux. contab.", 1);
+                settings = new SGuiCatalogueSettings("Consulta personalizada aux. contables", 1);
                 settings.setCodeApplying(false);
                 sql = "SELECT a.id_rep_cus_acc " + SDbConsts.FIELD_ID + "1, a.name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " AS a "
@@ -559,10 +559,10 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewImportFile(miClient, subtype, "Importación de archivos");
                 break;
             case SModConsts.FIN_REP_CUS_ACC:
-                view = new SViewAccoutingCustomizableReport(miClient, "Conf. rep. personalizables aux. contab.");
+                view = new SViewAccoutingCustomizableReport(miClient, "Config. consultas personalizadas aux. contables");
                 break;
             case SModConsts.FINX_REP_CUS_ACC:
-                view = new SViewReportAccountingCustomizableReport(miClient, subtype, (String) params.getParamsMap().get(subtype));
+                view = new SViewReportAccountingCustomizableReport(miClient, subtype, "Aux. contables: " + (String) params.getParamsMap().get(subtype));
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -731,7 +731,7 @@ public class SModuleFin extends SGuiModule {
                 form = moFormImportPayments;
                 break;
             case SModConsts.FIN_REP_CUS_ACC:
-                if (moFormAccountingCustomizableReport == null) moFormAccountingCustomizableReport = new SFormAccountingCustomizableReport(miClient, "Configuración reporte personalizable auxiliares contables");
+                if (moFormAccountingCustomizableReport == null) moFormAccountingCustomizableReport = new SFormAccountingCustomizableReport(miClient, "Configuración de consulta personalizada de aux. contables");
                 form = moFormAccountingCustomizableReport;
                 break;
             case SModConsts.FIN_REP_CUS_ACC_ACC:

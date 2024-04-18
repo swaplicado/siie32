@@ -65,7 +65,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlTitle">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Titulo reporte:*"/>
+                    <Property name="text" type="java.lang.String" value="T&#xed;tulo:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -80,7 +80,10 @@
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel1">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="(Aparecer&#xe1; en la pesta&#xf1;a de la vista)"/>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="99" green="99" red="99" type="rgb"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="(Aparecer&#xe1; en la pesta&#xf1;a de la vista.)"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -111,81 +114,65 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
+        <Container class="javax.swing.JPanel" name="jPanel8">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="Configuraci&#xf3;n adicional:"/>
+              </Border>
+            </Property>
+          </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
               <BorderConstraints direction="Center"/>
             </Constraint>
           </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jpAcc">
+            <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
               <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Cuentas contables">
-                    <Property name="tabTitle" type="java.lang.String" value="Cuentas contables"/>
-                  </JTabbedPaneConstraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
                 </Constraint>
               </Constraints>
 
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-            </Container>
-            <Container class="javax.swing.JPanel" name="jpCc">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Centros de costo">
-                    <Property name="tabTitle" type="java.lang.String" value="Centros de costo"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-            </Container>
-            <Container class="javax.swing.JPanel" name="jpUsr">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Usuarios">
-                    <Property name="tabTitle" type="java.lang.String" value="Usuarios"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jpProvAvailable">
+                <Container class="javax.swing.JPanel" name="jpAcc">
                   <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                      <BorderConstraints direction="Center"/>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Cuentas contables">
+                        <Property name="tabTitle" type="java.lang.String" value="Cuentas contables"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jpCc">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Centros de costo">
+                        <Property name="tabTitle" type="java.lang.String" value="Centros de costo"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jpUsr">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Usuarios">
+                        <Property name="tabTitle" type="java.lang.String" value="Usuarios"/>
+                      </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                   <SubComponents>
-                    <Container class="javax.swing.JPanel" name="jpProvAvailableLabel">
-                      <Constraints>
-                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                          <BorderConstraints direction="North"/>
-                        </Constraint>
-                      </Constraints>
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                        <Property name="alignment" type="int" value="0"/>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlConsAvailable">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Usuarios disponibles:"/>
-                          </Properties>
-                        </Component>
-                      </SubComponents>
-                    </Container>
-                    <Container class="javax.swing.JPanel" name="jpGridUsrAva">
-                      <Properties>
-                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[350, 330]"/>
-                        </Property>
-                      </Properties>
+                    <Container class="javax.swing.JPanel" name="jpProvAvailable">
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                           <BorderConstraints direction="Center"/>
@@ -193,131 +180,169 @@
                       </Constraints>
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jpProvAvailableLabel">
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="North"/>
+                            </Constraint>
+                          </Constraints>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlConsAvailable">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Usuarios disponibles:"/>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jpGridUsrAva">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[350, 300]"/>
+                            </Property>
+                          </Properties>
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="Center"/>
+                            </Constraint>
+                          </Constraints>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jpProvButtons">
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="East"/>
+                            </Constraint>
+                          </Constraints>
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                            <Property name="columns" type="int" value="0"/>
+                            <Property name="rows" type="int" value="14"/>
+                          </Layout>
+                          <SubComponents>
+                            <Container class="javax.swing.JPanel" name="jPanel2">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel4">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                              <SubComponents>
+                                <Component class="javax.swing.JButton" name="jbUsrAdd">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&gt;"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel5">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                              <SubComponents>
+                                <Component class="javax.swing.JButton" name="jbUsrAddAll">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Agregar todos"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel6">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                              <SubComponents>
+                                <Component class="javax.swing.JButton" name="jbUsrRemove">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&lt;"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Quitar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Container class="javax.swing.JPanel" name="jPanel7">
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                              <SubComponents>
+                                <Component class="javax.swing.JButton" name="jbUsrRemoveAll">
+                                  <Properties>
+                                    <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Quitar todos"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[100, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jpProvButtons">
+                    <Container class="javax.swing.JPanel" name="jpProvSelected">
+                      <Properties>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[453, 300]"/>
+                        </Property>
+                      </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                           <BorderConstraints direction="East"/>
                         </Constraint>
                       </Constraints>
 
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                        <Property name="columns" type="int" value="0"/>
-                        <Property name="rows" type="int" value="14"/>
-                      </Layout>
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                       <SubComponents>
-                        <Container class="javax.swing.JPanel" name="jPanel2">
+                        <Container class="javax.swing.JPanel" name="jpProvSelectedLabel">
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="North"/>
+                            </Constraint>
+                          </Constraints>
 
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-                        </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel4">
-
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                          </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbUsrAdd">
+                            <Component class="javax.swing.JLabel" name="jlConsSelected">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="&gt;"/>
+                                <Property name="text" type="java.lang.String" value="Usuarios seleccionados:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[50, 23]"/>
+                                  <Dimension value="[370, 16]"/>
                                 </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel5">
-
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-                          <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbUsrAddAll">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[50, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                          </SubComponents>
-                        </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel6">
-
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-                          <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbUsrRemove">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="&lt;"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[50, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                          </SubComponents>
-                        </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel7">
-
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-                          <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbUsrRemoveAll">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[50, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                          </SubComponents>
-                        </Container>
-                      </SubComponents>
-                    </Container>
-                  </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="jpProvSelected">
-                  <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[475, 356]"/>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                      <BorderConstraints direction="East"/>
-                    </Constraint>
-                  </Constraints>
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-                  <SubComponents>
-                    <Container class="javax.swing.JPanel" name="jpProvSelectedLabel">
-                      <Constraints>
-                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                          <BorderConstraints direction="North"/>
-                        </Constraint>
-                      </Constraints>
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                        <Property name="alignment" type="int" value="0"/>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlConsSelected">
+                        <Container class="javax.swing.JPanel" name="jpGridUsrSel">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Usuarios seleccionados:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[370, 16]"/>
+                              <Dimension value="[200, 250]"/>
                             </Property>
                           </Properties>
-                        </Component>
-                      </SubComponents>
-                    </Container>
-                    <Container class="javax.swing.JPanel" name="jpGridUsrSel">
-                      <Properties>
-                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[380, 315]"/>
-                        </Property>
-                      </Properties>
-                      <Constraints>
-                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                          <BorderConstraints direction="Center"/>
-                        </Constraint>
-                      </Constraints>
+                          <Constraints>
+                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                              <BorderConstraints direction="Center"/>
+                            </Constraint>
+                          </Constraints>
 
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                        </Container>
+                      </SubComponents>
                     </Container>
                   </SubComponents>
                 </Container>

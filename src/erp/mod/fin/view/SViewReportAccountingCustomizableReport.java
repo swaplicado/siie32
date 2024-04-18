@@ -57,9 +57,6 @@ public class SViewReportAccountingCustomizableReport extends SGridPaneView imple
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAcc);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCc);
         
-        jbAcc.addActionListener(this);
-        jbCc.addActionListener(this);
-        
         moDialogReportAccountingAcc = new SDialogReportAccountingAcc(miClient, mnGridSubtype);
     }
     

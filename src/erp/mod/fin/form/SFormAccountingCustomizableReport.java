@@ -83,6 +83,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
         jPanel21 = new javax.swing.JPanel();
         jlDescription = new javax.swing.JLabel();
         moTextDescription = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel8 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jpAcc = new javax.swing.JPanel();
         jpCc = new javax.swing.JPanel();
@@ -113,14 +114,15 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTitle.setText("Titulo reporte:*");
+        jlTitle.setText("Título:*");
         jlTitle.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlTitle);
 
         moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel25.add(moTextName);
 
-        jLabel1.setText("(Aparecerá en la pestaña de la vista)");
+        jLabel1.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel1.setText("(Aparecerá en la pestaña de la vista.)");
         jPanel25.add(jLabel1);
 
         jPanel23.add(jPanel25);
@@ -137,6 +139,9 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
         jPanel23.add(jPanel21);
 
         jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración adicional:"));
+        jPanel8.setLayout(new java.awt.BorderLayout());
 
         jpAcc.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Cuentas contables", jpAcc);
@@ -155,7 +160,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
 
         jpProvAvailable.add(jpProvAvailableLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridUsrAva.setPreferredSize(new java.awt.Dimension(350, 330));
+        jpGridUsrAva.setPreferredSize(new java.awt.Dimension(350, 300));
         jpGridUsrAva.setLayout(new java.awt.BorderLayout());
         jpProvAvailable.add(jpGridUsrAva, java.awt.BorderLayout.CENTER);
 
@@ -163,25 +168,29 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
         jpProvButtons.add(jPanel2);
 
         jbUsrAdd.setText(">");
-        jbUsrAdd.setPreferredSize(new java.awt.Dimension(50, 23));
+        jbUsrAdd.setToolTipText("Agregar");
+        jbUsrAdd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jbUsrAdd);
 
         jpProvButtons.add(jPanel4);
 
         jbUsrAddAll.setText(">>");
-        jbUsrAddAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jbUsrAddAll.setToolTipText("Agregar todos");
+        jbUsrAddAll.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jbUsrAddAll);
 
         jpProvButtons.add(jPanel5);
 
         jbUsrRemove.setText("<");
-        jbUsrRemove.setPreferredSize(new java.awt.Dimension(50, 23));
+        jbUsrRemove.setToolTipText("Quitar");
+        jbUsrRemove.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jbUsrRemove);
 
         jpProvButtons.add(jPanel6);
 
         jbUsrRemoveAll.setText("<<");
-        jbUsrRemoveAll.setPreferredSize(new java.awt.Dimension(50, 23));
+        jbUsrRemoveAll.setToolTipText("Quitar todos");
+        jbUsrRemoveAll.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jbUsrRemoveAll);
 
         jpProvButtons.add(jPanel7);
@@ -190,7 +199,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
 
         jpUsr.add(jpProvAvailable, java.awt.BorderLayout.CENTER);
 
-        jpProvSelected.setPreferredSize(new java.awt.Dimension(475, 356));
+        jpProvSelected.setPreferredSize(new java.awt.Dimension(453, 300));
         jpProvSelected.setLayout(new java.awt.BorderLayout());
 
         jpProvSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -201,7 +210,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
 
         jpProvSelected.add(jpProvSelectedLabel, java.awt.BorderLayout.NORTH);
 
-        jpGridUsrSel.setPreferredSize(new java.awt.Dimension(380, 315));
+        jpGridUsrSel.setPreferredSize(new java.awt.Dimension(200, 250));
         jpGridUsrSel.setLayout(new java.awt.BorderLayout());
         jpProvSelected.add(jpGridUsrSel, java.awt.BorderLayout.CENTER);
 
@@ -209,7 +218,9 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
 
         jTabbedPane1.addTab("Usuarios", jpUsr);
 
-        jPanel1.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jPanel8.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(jPanel8, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -226,6 +237,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton jbUsrAdd;
     private javax.swing.JButton jbUsrAddAll;
@@ -326,7 +338,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario", 400));
 
                 return columns;
             }
@@ -345,7 +357,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario", 400));
 
                 return columns;
             }
@@ -383,7 +395,7 @@ public class SFormAccountingCustomizableReport extends sa.lib.gui.bean.SBeanForm
     private void readUsers() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_usr FROM erp.usru_usr WHERE b_act AND NOT b_del";
+            String sql = "SELECT id_usr FROM erp.usru_usr WHERE b_act AND NOT b_del AND id_usr <> 1";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 boolean found = false;

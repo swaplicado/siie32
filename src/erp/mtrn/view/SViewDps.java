@@ -321,7 +321,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbRevertLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
         jbRevertLinks.setPreferredSize(new Dimension(23, 23));
         jbRevertLinks.addActionListener(this);
-        jbRevertLinks.setToolTipText("Mover vínculos a pedidos");
+        jbRevertLinks.setToolTipText("Mover vínculos de movimientos de almacén a pedidos");
 
         jbViewAccountingRecord = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_REC));
         jbViewAccountingRecord.setPreferredSize(new Dimension(23, 23));
@@ -1191,7 +1191,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
                         if (!ords) {
                             if (movs) {
-                                miClient.showMsgBoxWarning("El documento no tiene pedidos, elimine los siguientes docs. de inventarios de manera manual: \n" + message);
+                                miClient.showMsgBoxInformation("El documento no tiene pedidos, elimine los siguientes docs. de inventarios de manera manual: \n" + message);
                             }
                         }
                         else {
@@ -1234,14 +1234,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                             }
                             if (noMovLink) {
-                                miClient.showMsgBoxWarning("No se pueden mover los vínculos a pedidos debido que hay vínculos no relacionados a un pedido.\nElimine los siguientes docs. de inventarios de forma manual\n" + message);
+                                miClient.showMsgBoxInformation("No se pueden mover los vínculos a pedidos debido que hay vínculos no relacionados a un pedido.\nElimine los siguientes docs. de inventarios de forma manual\n" + message);
                             }
                             else if (dps.canDelete(miClient.getSession().getDatabase().getConnection()) != SLibConstants.DB_CAN_DELETE_YES) {
                                 miClient.showMsgBoxWarning(dps.getDbmsError());
                             }
                             else {
                                 // cambiar la referencia de los diog
-                                if (miClient.showMsgBoxConfirm("¿Está seguro de mover los vínculos a pedidos? Esta acción no se puede revertir") == JOptionPane.OK_OPTION) {
+                                if (miClient.showMsgBoxConfirm("¿Está seguro de mover los vínculos de movimientos de almacén del documento a sus pedidos?\nEsta acción no se puede revertir.") == JOptionPane.OK_OPTION) {
                                     int cont = 0;
                                     Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
                                     sql = "SELECT de.id_year year_ord, de.id_doc doc_ord, de.id_ety ety_ord, de.orig_qty qty_ord, de.fid_item, de.fid_unit, s.id_des_ety ety_fac, die.id_year year_diog, die.id_doc doc_diog, die.id_ety ety_diog, die.orig_qty qty_diog, " +
@@ -1293,13 +1293,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                         }
                                     }
 
-                                    miClient.showMsgBoxInformation("Se movieron " + cont + " vínculos a los pedidos correspondientes.");
+                                    miClient.showMsgBoxInformation("Se movieron " + cont + " vínculos de movimientos de almacén a los pedidos correspondientes.");
                                 }
                             }
                         }
                     }
                     else {
-                        miClient.showMsgBoxWarning("El documento no tiene vínculos con surtidos de almacén.");                                
+                        miClient.showMsgBoxInformation("El documento no tiene vínculos con movimientos de almacén.");                                
                     }                    
                 }
             }

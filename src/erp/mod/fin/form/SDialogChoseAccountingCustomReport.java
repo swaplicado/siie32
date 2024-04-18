@@ -49,36 +49,19 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jlReport = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        moKeyAccCusRep = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jlAccCusRep = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        moKeyAccCusRep = new sa.lib.gui.bean.SBeanFieldKey();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Seleccionar reporte de auxiliares contables");
+        setTitle("Consulta personalizada de aux. contables");
         setResizable(false);
-
-        jPanel1.setLayout(new java.awt.GridLayout(2, 0));
-
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jlReport.setText("Seleccione el reporte:*");
-        jPanel2.add(jlReport);
-
-        jPanel1.add(jPanel2);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        moKeyAccCusRep.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel3.add(moKeyAccCusRep);
-
-        jPanel1.add(jPanel3);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -92,23 +75,49 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de la consulta:"));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jPanel6.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlAccCusRep.setText("Seleccionar opción:");
+        jlAccCusRep.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(jlAccCusRep);
+
+        jPanel6.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moKeyAccCusRep.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(moKeyAccCusRep);
+
+        jPanel6.add(jPanel8);
+
+        jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel5, java.awt.BorderLayout.CENTER);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JLabel jlReport;
+    private javax.swing.JLabel jlAccCusRep;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAccCusRep;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        moKeyAccCusRep.setKeySettings(miClient, SGuiUtils.getLabelName(jlReport), true);
+        SGuiUtils.setWindowBounds(this, 400, 250);
+        moKeyAccCusRep.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccCusRep), true);
         
         SGuiParams params = new SGuiParams(miClient.getSession().getUser().getPkUserId());
         miClient.getSession().populateCatalogue(moKeyAccCusRep, SModConsts.FIN_REP_CUS_ACC, SLibConsts.UNDEFINED, params);
@@ -142,7 +151,8 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
             this.setVisible(false);
         }
         else {
-            miClient.showMsgBoxInformation("Debe seleccionar un reporte para mostrar.");
+            miClient.showMsgBoxInformation("Debe seleccionar una opción para mostrar.");
+            moKeyAccCusRep.requestFocus();
         }
     }
 
