@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 250.2/ 2024-04-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la actualización en los movimientos de stock cuando se crea una factura a partir de un pedido que ya tiene un surtido de almacén.
+2) Adición del campo de almacén en las RM de resurtido para que siempre se tenga que agregar en dichas RM.
+
+================================================================================
 SIIE 3.2 250.1/ 2024-04-18
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
