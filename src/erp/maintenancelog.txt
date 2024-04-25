@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 250.4/ 2024-04-25
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Precarga de los comboboxes en las RM al abrir la ventana de elección de centros de consumo.
+2) Eliminación de la configuración dependiente de la tabla de subCConsumo x CC x GpoCC, para poder insertar una configuración
+    de subCConsumo x CC.
+
+================================================================================
 SIIE 3.2 250.3/ 2024-04-24
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-
 1) Corrección en vista de Requisiciones de materiales pedidas y pedidas a detalle
 
 ================================================================================

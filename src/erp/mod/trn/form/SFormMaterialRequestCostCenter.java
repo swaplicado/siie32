@@ -216,6 +216,8 @@ public class SFormMaterialRequestCostCenter extends sa.lib.gui.bean.SBeanForm im
 
         moKeyConsEnt.setValue(new int[] { moRegistry.getPkEntMatConsumptionEntityId() });
         moKeyConsSubent.setValue(new int[] { moRegistry.getPkSubentMatConsumptionEntityId(), moRegistry.getPkSubentMatConsumptionSubentityId()});
+        stateChangeConsEnt();
+        stateChangeConsSubent();
         moKeyCC.setValue(new int[] { moRegistry.getPkCostCenterId() });
         moKeyBudget.setValue(new int[] { moRegistry.getFkBudgetMatConsumptionEntityId(), moRegistry.getFkBudgetYearId(), moRegistry.getFkBudgetPeriodId() });
         jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
