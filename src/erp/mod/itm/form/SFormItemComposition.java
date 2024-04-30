@@ -238,7 +238,8 @@ public class SFormItemComposition extends sa.lib.gui.bean.SBeanForm implements A
 
             moDialogPickerItem.resetPicker();
             moDialogPickerItem.initComponentsCustom();
-            moDialogPickerItem.setItemPickerInvDefault(true);
+            //moDialogPickerItem.setItemPickerInvDefault(true);
+            moDialogPickerItem.setDefaultEnableRadio(SDialogItemPicker.INV_ITEMS);
             moDialogPickerItem.setPickerVisible(true);
 
             if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {

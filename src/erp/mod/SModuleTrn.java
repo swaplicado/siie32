@@ -5,7 +5,6 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsItem;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsUser;
 import erp.mod.trn.db.SDbConfEmployeeVsEntity;
@@ -625,11 +624,11 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_STK_VAL:
-                title = "Valuación de inventarios";
+                title = "Valuación consumos materiales";
                 view = new SViewStockValuation(miClient, title);
                 break;
             case SModConsts.TRNX_STK_VAL_DET:
-                title = "Valuación de inventarios a detalle";
+                title = "Valuación consumos materiales detalle";
                 view = new SViewStockValuationDetail(miClient, title);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:

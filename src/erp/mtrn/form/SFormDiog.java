@@ -2694,12 +2694,12 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryQuantity.getText() + "'.");
                 jtfEntryQuantity.requestFocus();
             }
-            else if (!mbImportExternalDoc) {
-                if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
-                    jtfEntryValueUnitary.requestFocus();
-                }
-            }
+//            else if (!mbImportExternalDoc) {
+//                if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
+//                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
+//                    jtfEntryValueUnitary.requestFocus();
+//                }
+//            }
             else {
                 msg = validateAppropriateWarehouses();
 

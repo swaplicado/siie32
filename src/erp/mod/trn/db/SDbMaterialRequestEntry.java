@@ -566,7 +566,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 2: value = mbNewItem ? "" : moDataItem.getPartNumber(); break;
             case 3: value = moDataItemRef == null ? "" : moDataItemRef.getKey(); break;
             case 4: value = mdUserQuantity; break;
-            case 5: value = moDataUnitUsr.getSymbol(); break;
+            case 5: value = moDataUnitUsr != null ? moDataUnitUsr.getSymbol() : ""; break;
             case 6: value = mdQuantity; break;
             case 7: value = moDataItem.getDbmsDataUnit().getSymbol(); break;
             case 8: value = mdTotal_r; break;

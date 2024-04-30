@@ -4623,7 +4623,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionPriceHistory() {
         moDialogItemPriceHistory.refreshForm();
-        moDialogItemPriceHistory.showPriceHistory(moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR ? true : false,
+        moDialogItemPriceHistory.showPriceHistory(moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR,
             moFieldFkItemId.getKeyAsIntArray()[0], moParamBizPartner.getPkBizPartnerId(), new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId()});
     }
 

@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -121,28 +122,46 @@ public class SDbConfMatConsSubentityVsCostCenter extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         Statement statement = session.getDatabase().getConnection().createStatement();
         
-        msSql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
+        msSql = "SELECT id_mat_cons_ent, id_mat_cons_subent, id_cc, id_mat_cc_grp FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC_CC_GRP) + " " +
                 "WHERE id_mat_cons_ent = " + mnPkConsumptionEntity + " " +
                 "AND id_mat_cons_subent = " + mnPkConsumptionSubentity + " ";
         ResultSet resultSet = statement.executeQuery(msSql);
-        if (resultSet.next()) {
-            throw new Exception("No se puede modificar debido a que ya hay una configuración en un registro dependiente, favor de eliminar la configuración existente.\n"
-                    + "Subcentro de consumo x centro de costo x grupo de centro de costo.");
+        ArrayList<SDbMaterialConsumptionSubentityCostCenterCCGroup> arr = new ArrayList<>();
+        while (resultSet.next()) {
+            SDbMaterialConsumptionSubentityCostCenterCCGroup o = new SDbMaterialConsumptionSubentityCostCenterCCGroup();
+            o.read(session, new int [] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4) });
+            o.delete(session);
+            arr.add(o);
         }
-        else {
-            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC) + " " +
-                    "WHERE id_mat_cons_ent = " + mnPkConsumptionEntity + " " +
-                    "AND id_mat_cons_subent = " + mnPkConsumptionSubentity + " ";
-            session.getStatement().execute(msSql);
+        
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_SUBENT_CC) + " " +
+                "WHERE id_mat_cons_ent = " + mnPkConsumptionEntity + " " +
+                "AND id_mat_cons_subent = " + mnPkConsumptionSubentity + " ";
+        session.getStatement().execute(msSql);
+        for (SDbMaterialConsumptionSubentityCostCenter ent : maMatConsSubCC) {
+            ent.setPkMatConsumptionEntityId(mnPkConsumptionEntity);
+            ent.setPkMatConsumptionSubentityId(mnPkConsumptionSubentity);
+            ent.setRegistryNew(true);
+            ent.save(session);
+        }
+        
+        for (SDbMaterialConsumptionSubentityCostCenterCCGroup o : arr) {
             for (SDbMaterialConsumptionSubentityCostCenter ent : maMatConsSubCC) {
-                ent.setPkMatConsumptionEntityId(mnPkConsumptionEntity);
-                ent.setPkMatConsumptionSubentityId(mnPkConsumptionSubentity);
-                ent.setRegistryNew(true);
-                ent.save(session);
+                if (ent.getPkMatConsumptionEntityId() == o.getPkMatConsumptionEntityId() && 
+                        ent.getPkMatConsumptionSubentityId() == o.getPkMatConsumptionSubentityId() &&
+                        ent.getPkCostCenterId() == o.getPkCostCenterId()) {
+                    o.setRegistryNew(true);
+                    o.save(session);
+                    break;
+                }
             }
+        }
 
-            mbRegistryNew = false;
-            mnQueryResultId = SDbConsts.SAVE_OK;
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
+        
+        if (mnQueryResultId == SDbConsts.SAVE_OK) {
+            JOptionPane.showMessageDialog(null, "Registro guardado con éxito, recuerde configurar los registros nuevos en:\nSubentidades de consumo x Centros de costo x Grupos de CC.");
         }
     }
 

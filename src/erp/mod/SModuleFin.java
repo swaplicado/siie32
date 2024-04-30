@@ -399,7 +399,7 @@ public class SModuleFin extends SGuiModule {
                                 + "INNER JOIN trn_mat_cons_subent_cc AS cscc ON " 
                                 + "cc.pk_cc = cscc.id_cc "
                                 + "INNER JOIN trn_mat_cons_subent_cc_cc_grp AS csccg ON "
-                                + "cscc.id_cc = csccg.id_cc " 
+                                + "cscc.id_mat_cons_ent = csccg.id_mat_cons_ent AND cscc.id_mat_cons_subent = csccg.id_mat_cons_subent AND cscc.id_cc = csccg.id_cc " 
                                 + "INNER JOIN trn_mat_cc_grp_usr AS ccgu ON " 
                                 + "csccg.id_mat_cc_grp = ccgu.id_mat_cc_grp " 
                                 + "WHERE cscc.id_mat_cons_ent = " + pkConsSub[0] + " AND cscc.id_mat_cons_subent = " + pkConsSub[1] + " "

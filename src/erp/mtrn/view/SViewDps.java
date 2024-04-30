@@ -1275,6 +1275,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                             sql = "UPDATE trn_diog SET fid_dps_year_n = " + resultSet.getInt("year_ord") + ", fid_dps_doc_n = " + resultSet.getInt("doc_ord") + " " +
                                                     "WHERE id_year = " + resultSet.getInt("year_diog") + " AND id_doc = " + resultSet.getInt("doc_diog") + " ";
                                             statement.execute(sql);
+                                            
+                                            sql = "UPDATE trn_stk SET fid_dps_year_n = " + resultSet.getInt("year_ord") + ", fid_dps_doc_n = " + resultSet.getInt("doc_ord") + ", fid_dps_ety_n = " + resultSet.getInt("ety_ord") + " " +
+                                                    "WHERE fid_dps_year_n = " + dps.getPkYearId() + " AND fid_dps_doc_n = " + dps.getPkDocId() + " AND fid_dps_ety_n = " + resultSet.getInt("ety_fac") + " ";
+                                            statement.execute(sql);
 
                                             sql = "DELETE FROM trn_dps_dps_supply WHERE id_des_year = " + dps.getPkYearId() + " AND id_des_doc = " + dps.getPkDocId();
                                             statement.execute(sql);

@@ -50,6 +50,7 @@ import sa.lib.gui.SGuiSession;
 public abstract class SMaterialRequestUtils {
 
     public static String ITEM_INV = "is_inv";
+    public static String ITEM_REF = "is_ref";
     public static final int EQUIVALENCES = 1;
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
@@ -436,7 +437,8 @@ public abstract class SMaterialRequestUtils {
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
-                                + "a.b_inv AS " + ITEM_INV + " "
+                                + "a.b_inv AS " + ITEM_INV + ", "
+                                + "0 AS " + ITEM_REF + " "
                                 + "FROM ("
                                 + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
@@ -459,8 +461,11 @@ public abstract class SMaterialRequestUtils {
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
-                                + "a.b_inv AS " + ITEM_INV + " "
+                                + "a.b_inv AS " + ITEM_INV + ", "
+                                + "IF(b.fid_ct_item IN (1, 2, 4), 1, 0) AS " + ITEM_REF + " "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS b ON "
+                                + "a.fid_igen = b.id_igen "
                                 + "WHERE NOT a.b_del "
                                 + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " ";
                 }

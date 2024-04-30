@@ -37,6 +37,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.CellEditorListener;
@@ -59,6 +60,7 @@ import sa.lib.gui.SGuiFields;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
 
 /**
  *
@@ -83,6 +85,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private SDialogItemPicker moDialogPickerItem;
     private SDialogItemPicker moDialogPickerItemRef;
     private SDialogUnitPicker moDialogPickerUnit;
+    
+    private JLabel jlKeyWhs;
+    private SBeanFieldKey moKeyWhs;
     
     private boolean isReqInv;
     private boolean isEtyNew;
@@ -1173,6 +1178,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moDialogPickerItem = null;
         moDialogPickerItemRef = null;
         moDialogPickerUnit = null;
+        
+        jlKeyWhs = new JLabel("Almacén: ");
+        moKeyWhs = new SBeanFieldKey();
+        moKeyWhs.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyWhs.setKeySettings(miClient, SGuiUtils.getLabelName("Almacén"), false);
+        moFields.addField(moKeyWhs);
     }
     
     private void populateMatReqCC() {
@@ -1193,23 +1204,32 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         }
     }
     
-    private void nonRepeatRows() {
-        ArrayList<SPkMatCC> arrpk = new ArrayList<>();
-        for (int i = 0; i < moGridMatReqCC.getTable().getRowCount(); i++) {
-            boolean found = false;
-            for (SPkMatCC pk : arrpk) {
-                if (SLibUtils.compareKeys(moGridMatReqCC.getGridRow(i).getRowPrimaryKey(), pk.getPrimaryKey())){
-                    miClient.showMsgBoxInformation("Ya existe el centro de costo seleccionado.");
-                    moGridMatReqCC.removeGridRow(i);
-                    moGridMatReqCC.renderGridRows();
-                    found = true;
-                    break;
+    private void canAddRows() {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP) {
+            if (moGridMatReqCC.getTable().getRowCount() > 1) {
+                moGridMatReqCC.removeGridRow(1);
+                moGridMatReqCC.renderGridRows();
+                miClient.showMsgBoxInformation("Sólo puede haber un solo centro de consumo en RM de resurtido.");
+            }      
+        }
+        else {
+            ArrayList<SPkMatCC> arrpk = new ArrayList<>();
+            for (int i = 0; i < moGridMatReqCC.getTable().getRowCount(); i++) {
+                boolean found = false;
+                for (SPkMatCC pk : arrpk) {
+                    if (SLibUtils.compareKeys(moGridMatReqCC.getGridRow(i).getRowPrimaryKey(), pk.getPrimaryKey())){
+                        miClient.showMsgBoxInformation("Ya existe el centro de costo seleccionado.");
+                        moGridMatReqCC.removeGridRow(i);
+                        moGridMatReqCC.renderGridRows();
+                        found = true;
+                        break;
+                    }
                 }
-            }
-            if (!found) {
-                SPkMatCC pk = new SPkMatCC();
-                pk.setPrimaryKey(moGridMatReqCC.getGridRow(i).getRowPrimaryKey());
-                arrpk.add(pk);
+                if (!found) {
+                    SPkMatCC pk = new SPkMatCC();
+                    pk.setPrimaryKey(moGridMatReqCC.getGridRow(i).getRowPrimaryKey());
+                    arrpk.add(pk);
+                }
             }
         }
     }
@@ -1235,6 +1255,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDecTotal.setValue(reqBudget);
         moDecAsign.setValue(reqAsign);
+    }
+    
+    private void populateWhs() {
+        if (moGridMatReqCC.getModel().getRowCount() > 0) {
+            SGuiParams params = new SGuiParams(((SDbMaterialRequestCostCenter) moGridMatReqCC.getModel().getGridRows().get(0)).getPkEntMatConsumptionEntityId());
+            miClient.getSession().populateCatalogue(moKeyWhs, SModConsts.CFGU_COB_ENT, SLibConsts.UNDEFINED, params);
+        }
     }
     
     private void populateMatReqEntries() throws Exception {
@@ -1361,7 +1388,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             moTextItemDescription.setEnabled(!enable ? enable : moBoolNewItem.getValue());
             moDecQtyUsr.setEnabled(enable);
             moIntConsDays.setEnabled(enable);
-            moKeyConsEntEty.setEnabled(enable);
+            moKeyConsEntEty.setEnabled(enable && getFormSubtype() != SModConsts.TRNX_MAT_REQ_STK_SUP);
             moKeyItemRefEty.setEnabled(enable);
             jbPickItemRefEty.setEnabled(enable);
             jbPickUnitUsr.setEnabled(enable);
@@ -1615,12 +1642,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                     sup.setVisible(true);
                     if (sup.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                         moWahId = (int[]) sup.getValue(SDialogMaterialRequestItemSupply.PARAM_WAH_ID);
+                        moKeyWhs.setValue(moWahId);
+                        moKeyWhs.setEnabled(false);
                         maMatReqItemSupply = (ArrayList<SRowMaterialRequestItemSupply>) sup.getValue(SDialogMaterialRequestItemSupply.PARAM_ARR_ITM_SELECTED);
                         for(SRowMaterialRequestItemSupply is : maMatReqItemSupply) {
                             SDbMaterialRequestEntry ety = new SDbMaterialRequestEntry();
                             SDataItem item = new SDataItem();
                             item.read(new int[] { is.mnItemId }, miClient.getSession().getStatement());
                             ety.setDataItem(item);
+                            ety.setDataUnitUsr(item.getDbmsDataUnit());
+                            ety.setFkUserUnitId(item.getFkUnitId());
                             ety.setQuantity(is.mdQty);
                             ety.setNewItem(false);
                             ety.setPriceUnitarySystem(1.0);
@@ -1673,7 +1704,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 
                 moDialogPickerItem.resetPicker();
                 moDialogPickerItem.initComponentsCustom();
-                moDialogPickerItem.setItemPickerInvDefault(true);
+                //moDialogPickerItem.setItemPickerInvDefault(true);
+                moDialogPickerItem.setDefaultEnableRadio(SDialogItemPicker.INV_ITEMS);
                 moDialogPickerItem.setPickerVisible(true);
 
                 if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1707,6 +1739,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
         moTextUnitUsr.setValue(moUnitEty.getSymbol());
         moTextUnit.setValue(moUnitEty.getSymbol());
+        moKeyItemRefEty.setValue(new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
         obtainItemPrice();
     }
     
@@ -1727,7 +1760,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
-        moDialogPickerItemRef.setItemPickerInvDefault(false);
+        //moDialogPickerItemRef.setItemPickerInvDefault(false);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1748,7 +1782,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
-        moDialogPickerItemRef.setItemPickerInvDefault(false);
+        //moDialogPickerItemRef.setItemPickerInvDefault(false);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -2170,9 +2205,21 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             hasLinkMatReq = !SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), moRegistry.getPrimaryKey()).isEmpty();
         }
         
+        populateWhs();
         if (!moRegistry.isRegistryNew()) {
             jbAuthorize.setEnabled(hasUserRevRight && !isProvPurForm);
             jbReject.setEnabled(hasUserRevRight && !isProvPurForm);
+            if (moRegistry.getTypeRequest().equals(SModSysConsts.TRNS_MAT_REQ_TP_R)){
+                moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlKeyWhs);
+                moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moKeyWhs);
+                moKeyWhs.setValue(new int[] { moRegistry.getFkWarehouseCompanyBranch_n(), moRegistry.getFkWarehouseWarehouse_n() });
+                moKeyWhs.setEnabled(false);
+            } 
+        }
+        
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP) {
+            moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlKeyWhs);
+            moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moKeyWhs);
         }
         
         addAllListeners();
@@ -2218,8 +2265,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
         registry.setFkDpsNatureId(moKeyDocNature.getValue()[0]);
-        registry.setFkWarehouseCompanyBranch_n(moWahId[0]);
-        registry.setFkWarehouseWarehouse_n(moWahId[1]);
+        registry.setFkWarehouseCompanyBranch_n(moKeyWhs.getSelectedIndex() == 0 ? 0 : moKeyWhs.getValue()[0]);
+        registry.setFkWarehouseWarehouse_n(moKeyWhs.getSelectedIndex() == 0 ? 0 : moKeyWhs.getValue()[1]);
         registry.setFkItemReferenceId_n(moKeyItemRef.getSelectedIndex() == 0 ? 0 : moKeyItemRef.getValue()[0]);
         
         if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS) {
@@ -2259,6 +2306,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         if (validation.isValid() && maMatReqEntries.size() <= 0) { 
             validation.setMessage("Debe agregar al menos un ítem para solicitar.");
+        }
+        
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP) {
+            if (moKeyWhs.getSelectedIndex() == 0) {
+                validation.setMessage("Debe seleccionar un almacén");
+                validation.setComponent(moKeyWhs);
+            }
         }
         
         return validation;
@@ -2339,8 +2393,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
         switch (gridType) {
             case SModConsts.TRN_MAT_REQ_CC:
-                nonRepeatRows();
+                canAddRows();
                 updateReqAsignBudgetRows();
+                populateWhs();
                 break;
         }
     }

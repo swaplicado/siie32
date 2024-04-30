@@ -1479,7 +1479,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                                 "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " ",
                                 "UPDATE trn_diog_ety SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + ", fid_dps_ety_n = " + mnPkEntryId + " " +
                                 "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " " +
-                                "AND fid_dps_ety_n = " + link.getPkSourceEntryId() + " " };
+                                "AND fid_dps_ety_n = " + link.getPkSourceEntryId() + " ",
+                                "UPDATE trn_stk SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + ", fid_dps_ety_n = " + mnPkEntryId + " " +
+                                "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " " +
+                                "AND fid_dps_ety_n = " + link.getPkSourceEntryId() + " "
+                            };
 
                             for (String sql : aSql) {
                                statement.execute(sql);

@@ -892,6 +892,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
                     "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + "))) AS comp_doc, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "v.fk_st_mat_req, "
                 + "v.fk_usr_clo_prov, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
