@@ -57,6 +57,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -1133,6 +1135,150 @@ public abstract class STrnUtilities {
         }
 
         return bIsAppropiate;
+    }
+    
+    public static int[] getAppropiateWarehouseForItem(final Connection oConnection, final int itemId) throws Exception {
+        String sql = "";
+        ResultSet resulSet = null;
+        for (int tp_link = SDataConstantsSys.TRNS_TP_LINK_ITEM; tp_link >= SDataConstantsSys.TRNS_TP_LINK_ALL; tp_link--) {
+            switch(tp_link) {
+                case SDataConstantsSys.TRNS_TP_LINK_ITEM:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM trn_stk_cfg_item AS stk_it " +
+                    "INNER JOIN erp.itmu_item AS i ON i.id_item = stk_it.id_ref " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "WHERE stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_ITEM +  " AND stk_it.id_ref = " + itemId + " " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_MFR:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_mfr AS mfr " +
+                    "INNER JOIN erp.itmu_item AS i ON mfr.id_mfr = i.fid_mfr AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_MFR +  " AND stk_it.id_ref = i.fid_mfr " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_BRD:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_brd AS brd " +
+                    "INNER JOIN erp.itmu_item AS i ON brd.id_brd = i.fid_brd AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_BRD +  " AND stk_it.id_ref = i.fid_brd " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_LINE:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_line AS line " +
+                    "INNER JOIN erp.itmu_item AS i ON line.id_line = i.fid_line_n AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_LINE +  " AND stk_it.id_ref = i.fid_line_n " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_IGEN:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_igen AS gen " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IGEN +  " AND stk_it.id_ref = i.fid_igen " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_IGRP:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_igrp AS grp " +
+                    "INNER JOIN erp.itmu_igen AS gen ON grp.id_igrp = gen.fid_igrp " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IGRP +  " AND stk_it.id_ref = grp.id_igrp " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_IFAM:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itmu_ifam AS fam " +
+                    "INNER JOIN erp.itmu_igrp AS grp ON fam.id_ifam = grp.fid_ifam " +
+                    "INNER JOIN erp.itmu_igen AS gen ON gen.fid_igrp = grp.id_igrp " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IFAM +  " AND stk_it.id_ref = fam.id_ifam " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itms_ct_item AS ct " +
+                    "INNER JOIN erp.itms_cl_item AS cl ON ct.id_ct_item = cl.id_ct_item " +
+                    "INNER JOIN erp.itms_tp_item AS tp ON tp.id_ct_item = ct.id_ct_item AND tp.id_cl_item = cl.id_cl_item " +
+                    "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item AND gen.fid_cl_item = cl.id_cl_item AND gen.fid_tp_item = tp.id_tp_item " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_TP_ITEM +  " AND stk_it.id_ref = tp.id_tp_item " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_CL_ITEM:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itms_ct_item AS ct " +
+                    "INNER JOIN erp.itms_cl_item AS cl ON ct.id_ct_item = cl.id_ct_item " +
+                    "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item AND gen.fid_cl_item = cl.id_cl_item " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_CL_ITEM +  " AND stk_it.id_ref = cl.id_cl_item " + 
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_CT_ITEM:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM erp.itms_ct_item AS ct " +
+                    "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item " +
+                    "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
+                    "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_CT_ITEM +  " AND stk_it.id_ref = ct.id_ct_item " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                case SDataConstantsSys.TRNS_TP_LINK_ALL:
+                    sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
+                    "FROM trn_stk_cfg_item AS stk_it " +
+                    "INNER JOIN erp.cfgu_cob_ent AS cbe ON cbe.id_cob = stk_it.id_cob AND cbe.id_ent = stk_it.id_wh " +
+                    "WHERE stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_ALL +  " AND stk_it.id_ref = 0 " +
+                    "ORDER BY cbe.b_def DESC, cbe.fid_ct_ent ASC, cbe.fid_tp_ent ASC, cbe.ent ASC, stk_it.ts_edit ASC ";
+                    break;
+
+                default:
+            }
+
+            resulSet = oConnection.createStatement().executeQuery(sql);
+            if (resulSet.next()) {
+                return new int[] { resulSet.getInt("stk_it.id_cob"), resulSet.getInt("stk_it.id_wh") };
+            }
+        }
+        
+        return null;
+    }
+    
+    public static int[] getDefaultCompanyBranchWarehouse(final Connection oConnection, final int coBranch) {
+        String sql = "SELECT id_cob, id_ent " +
+            "FROM erp.cfgu_cob_ent " +
+            "WHERE b_del = 0 AND id_cob = " + coBranch + " " +
+            "AND b_def = 1 " +
+            "ORDER BY b_def DESC, fid_ct_ent ASC, fid_tp_ent ASC, ent ASC";
+
+        try {
+            ResultSet resulSet = oConnection.createStatement().executeQuery(sql);
+            if (resulSet.next()) {
+                return new int [] { resulSet.getInt("id_cob"), resulSet.getInt("id_ent") };
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 
     /**

@@ -12,6 +12,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
@@ -20,6 +21,7 @@ import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -58,6 +60,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbReject;
     private JButton jbSegregate;
     private JButton jbDocsCardex;
+    private JButton mjbToNew;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
@@ -71,7 +74,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private boolean hasMatReqAdmorRight;
     private boolean hasMatReqPurRight;
     private boolean hasMatReqProvRight;
-    private boolean hasMatReqEditRight;
+    private boolean hasMatReqReclassRight;
     
     /**
      * @param client GUI client.
@@ -95,7 +98,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqAdmorRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasMatReqPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
-        hasMatReqEditRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
@@ -106,6 +109,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
+        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
@@ -116,6 +120,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbHardAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         
         jbNewSupReq.setEnabled(true);
         jbPrint.setEnabled(true);
@@ -126,6 +131,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbHardAuthorize.setEnabled(false);
         jbSegregate.setEnabled(false);
         jbDocsCardex.setEnabled(true);
+        mjbToNew.setEnabled(hasMatReqPurRight || hasMatReqProvRight || hasMatReqAdmorRight);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -176,7 +182,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
         
         if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
-            jbRowEdit.setEnabled(hasMatReqEditRight);
+            jbRowEdit.setEnabled(hasMatReqReclassRight);
         }
         
         jbRowDisable.setToolTipText("Cancelar");
@@ -423,6 +429,48 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
+    private void actionToNew() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de devolver la requisición a estatus de nuevo?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
+                        int[] key = (int[]) gridRow.getRowPrimaryKey();
+                        String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
+                        if (! message.isEmpty()) {
+                            miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);
+                        }
+                        else {
+                            message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
+                            if (! message.isEmpty()) {
+                                miClient.showMsgBoxError(message);
+                            }
+                            
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        }
+                    }
+                }
+                catch (SQLException ex) {
+                    Logger.getLogger(SViewMaterialRequestPending.class.getName()).log(Level.SEVERE, null, ex);
+                    SLibUtils.showException(this, ex);
+                }
+            }
+        }
+    }
+    
     private void createParamsMap(int idMatReq) throws Exception {
         String aut = "";
         String rec = "";
@@ -618,7 +666,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_REV &&
                     mnGridSubtype != SModSysConsts.TRNX_MAT_REQ_ADM) {
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
-                if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight) {
+                if (!hasMatReqAdmorRight && !hasMatReqPurRight && !hasMatReqProvRight && !hasMatReqReclassRight) {
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + ") ";
                 }
                 else {
@@ -646,7 +694,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt AS " + SDbConsts.FIELD_DATE + ", "
                 + "v.tp_req, "
-                + "LPAD(v.num, 6, 0) AS folio, "
+                + "LPAD(v.num, " + SDataConstantsSys.NUM_LEN_MAT_REQ + ", 0) AS folio, "
                 + "v.dt_req_n, "
                 + "v.dt_delivery_n, "
                 + "v.ref, "
@@ -848,6 +896,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbDocsCardex) {
                 actionDocsKardex();
+            }
+            else if (button == mjbToNew) {
+                actionToNew();
             }
         }
     }

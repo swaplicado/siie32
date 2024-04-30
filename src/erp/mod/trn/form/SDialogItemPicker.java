@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.form;
 
+import erp.mod.SModConsts;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SRowItemPicker;
 import java.awt.BorderLayout;
@@ -36,6 +37,11 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
      * Creates new form SBeanItemPicker
      */
     
+    public static final int ALL_ITEMS = 1;
+    public static final int INV_ITEMS = 2;
+    public static final int NOINV_ITEMS = 3;
+    public static final int REF_ITEMS = 4;
+    
     private javax.swing.JPanel jpControl;
     private sa.lib.gui.bean.SBeanFieldText moTextItem;
     protected Vector<SGridRow> moAllRows;
@@ -43,6 +49,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.JRadioButton jrbAllItems;
     private javax.swing.JRadioButton jrbInvItem;
     private javax.swing.JRadioButton jrbNoInvItem;
+    private javax.swing.JRadioButton jrbRefItem;
     private javax.swing.ButtonGroup jbgItems;
     
     /**
@@ -62,7 +69,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     // End of variables declaration//GEN-END:variables
 
     public void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
+        SGuiUtils.setWindowBounds(this, 880, 550);
         
         jpControl = new javax.swing.JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         
@@ -70,7 +77,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         
         jrbAllItems = new javax.swing.JRadioButton();
         jrbAllItems.setText("Todos los ítems");
-        jrbAllItems.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbAllItems.setPreferredSize(new java.awt.Dimension(125, 23));
         jrbAllItems.addItemListener(this);
         jbgItems.add(jrbAllItems);
         
@@ -86,6 +93,12 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         jrbNoInvItem.addItemListener(this);
         jbgItems.add(jrbNoInvItem);
         
+        jrbRefItem = new javax.swing.JRadioButton();
+        jrbRefItem.setText("Ítems de referencia");
+        jrbRefItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbRefItem.addItemListener(this);
+        jbgItems.add(jrbRefItem);
+        
         moAllRows = new Vector<>(moGridPicker.getModel().getGridRows());
         moAllRowsAux = new Vector<>(moGridPicker.getModel().getGridRows());
         
@@ -98,6 +111,10 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         jpControl.add(jrbAllItems);
         jpControl.add(jrbInvItem);
         jpControl.add(jrbNoInvItem);
+        
+        if (mnPickerSubtype != SModConsts.TRN_MAT_REQ) {
+            jpControl.add(jrbRefItem);            
+        }
     }
     
     private void stateChangeAllItems() {
@@ -125,14 +142,45 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         moGridPicker.populateGrid(moAllRowsAux);
     }
     
-    public void setItemPickerInvDefault(boolean inv) {
-        if (inv) {
-            jrbInvItem.setSelected(true);
-            stateChangeInvItem();
+    private void stateChangeRefItem() {
+        moAllRowsAux.clear();
+        for (SGridRow row : moAllRows) {
+            if (((SRowItemPicker) row).getRef()) {
+                moAllRowsAux.add(row);
+            }
         }
-        else {
-            jrbNoInvItem.setSelected(true);
-            stateChangeNoInvItem();
+        moGridPicker.populateGrid(moAllRowsAux);
+    }
+    
+//    public void setItemPickerInvDefault(boolean inv) {
+//        if (inv) {
+//            jrbInvItem.setSelected(true);
+//            stateChangeInvItem();
+//        }
+//        else {
+//            jrbNoInvItem.setSelected(true);
+//            stateChangeNoInvItem();
+//        }
+//    }
+    
+    public void setDefaultEnableRadio(int radio){
+        switch (radio) {
+            case ALL_ITEMS:
+                jrbAllItems.setSelected(true);
+                stateChangeAllItems();
+                break;
+            case INV_ITEMS:
+                jrbInvItem.setSelected(true);
+                stateChangeInvItem();
+                break;
+            case NOINV_ITEMS:
+                jrbNoInvItem.setSelected(true);
+                stateChangeNoInvItem();
+                break;
+            case REF_ITEMS:
+                jrbRefItem.setSelected(true);
+                stateChangeRefItem();
+                break;
         }
     }
     
@@ -220,6 +268,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
                     }
                 }
                 row.setInv(resultSet.getBoolean(SMaterialRequestUtils.ITEM_INV));
+                row.setRef(resultSet.getBoolean(SMaterialRequestUtils.ITEM_REF));
 
                 rows.add(row);
             }
@@ -276,8 +325,11 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
             else if (radioButton == jrbInvItem) {
                 stateChangeInvItem();
             }
-            if (radioButton == jrbNoInvItem) {
+            else if (radioButton == jrbNoInvItem) {
                 stateChangeNoInvItem();
+            }
+            else if (radioButton == jrbRefItem) {
+                stateChangeRefItem();
             }
         }
     }

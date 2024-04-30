@@ -40,6 +40,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataDpsEntryIogEntryTransfer;
 import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
@@ -65,6 +66,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
@@ -103,6 +106,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbSetReferenceCommissions;
     private javax.swing.JButton jbViewNotes;
     private javax.swing.JButton jbViewLinks;
+    private javax.swing.JButton jbRevertLinks;
     private javax.swing.JButton jbViewContractAnalysis;
     private javax.swing.JButton jbViewAccountingRecord;
     private javax.swing.JButton jbViewAccountingDetailsDps;
@@ -313,6 +317,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbViewContractAnalysis.setPreferredSize(new Dimension(23, 23));
         jbViewContractAnalysis.addActionListener(this);
         jbViewContractAnalysis.setToolTipText("Ver detalles de vínculos");
+        
+        jbRevertLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
+        jbRevertLinks.setPreferredSize(new Dimension(23, 23));
+        jbRevertLinks.addActionListener(this);
+        jbRevertLinks.setToolTipText("Mover vínculos de movimientos de almacén a pedidos");
 
         jbViewAccountingRecord = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_REC));
         jbViewAccountingRecord.setPreferredSize(new Dimension(23, 23));
@@ -481,6 +490,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewContractAnalysis);
         addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbRevertLinks);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewAccountingRecord);
         addTaskBarUpperComponent(jbViewAccountingDetailsDps);
         addTaskBarUpperComponent(jbViewAccountingDetailsBizPartner);
@@ -531,6 +542,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbSetReferenceCommissions.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightEdit);
         jbViewNotes.setEnabled(true);
         jbViewLinks.setEnabled(true);
+        jbRevertLinks.setEnabled(mbIsDoc);
         jbViewContractAnalysis.setEnabled(mbIsEstCon);
         jbViewAccountingRecord.setEnabled(mbIsDoc || mbIsDocAdj);
         jbViewAccountingDetailsDps.setEnabled(mbIsDoc);
@@ -1142,6 +1154,162 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 moDialogContractAnalysis.setValue(SDataConstants.TRN_DPS, dps);
                 moDialogContractAnalysis.setFormVisible(true);
             }
+        }
+    }
+    
+    private void actionRevertLinks() {
+        try {
+            if (jbRevertLinks.isEnabled()) {
+                if (isRowSelected()) {
+                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                    dps.setTestLinks(false);
+                    boolean movs = false;
+                    String message = "";
+                    String sql = "SELECT DISTINCT 6 AS f_id_type, 'SURTIDO ALMACÉN' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, 0 AS f_tot, 0 AS f_tot_cur, 'N/A' AS f_cur, b.code AS f_cob " +
+                            "FROM trn_diog AS d " +
+                            "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                            "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                            "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                            "WHERE de.fid_dps_year_n = " + dps.getPkYearId() + " AND de.fid_dps_doc_n = " + dps.getPkDocId() + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL ;";
+                    try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                        while (resultSet.next()) {
+                            movs = true;
+                            message += "Fecha doc.: " + SLibUtils.DateFormatDate.format(resultSet.getDate("dt")) + ", Folio doc.: " + resultSet.getString("f_num") + ", Código: " + resultSet.getString("f_code") + "\n";
+                        }
+                    }
+                    if (movs) {
+                        boolean ords = false;
+                        sql = "SELECT DISTINCT d.* " +
+                                "FROM trn_dps_dps_supply AS s " +
+                                "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 " +
+                                "WHERE s.id_des_year = " + dps.getPkYearId() + " " +
+                                "AND s.id_des_doc = " + dps.getPkDocId() + " AND fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_ORD + ";";
+                        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                            if (resultSet.next()) {
+                                ords = true;
+                            }
+                        }
+                        if (!ords) {
+                            if (movs) {
+                                miClient.showMsgBoxInformation("El documento no tiene pedidos, elimine los siguientes docs. de inventarios de manera manual: \n" + message);
+                            }
+                        }
+                        else {
+                            boolean noMovLink = false;
+                            message = "";
+                            //Muestra todos los movimientos de compra, el left hace la exclucion de los que no se pueden relacionar
+                            sql = "SELECT DISTINCT d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.id_year, d.id_doc, a.year_ord, a.doc_ord " +
+                                    "FROM trn_diog AS d " +
+                                    "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                                    "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                                    "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                                    "LEFT JOIN " +
+                                    "( SELECT de.id_year year_ord, de.id_doc doc_ord, de.id_ety ety_ord, de.orig_qty qty_ord, de.fid_item, de.fid_unit, s.id_des_ety ety_fac, die.id_year year_diog, die.id_doc doc_diog, die.id_ety ety_diog, die.orig_qty qty_diog, " +
+                                    "de.orig_qty - COALESCE((SELECT SUM(orig_qty) " +
+                                    "FROM trn_diog AS d " +
+                                    "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                                    "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                                    "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                                    "WHERE de.fid_dps_year_n = de.id_year AND de.fid_dps_doc_n = de.id_doc AND de.fid_dps_ety_n = de.id_ety AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL) , 0) surt_ord " +
+                                    "FROM trn_dps_dps_supply AS s " +
+                                    "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 " +
+                                    "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0 " +
+                                    "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps " +
+                                    "INNER JOIN trn_diog_ety AS die ON s.id_des_year = die.fid_dps_year_n AND s.id_des_doc = die.fid_dps_doc_n AND s.id_des_ety = die.fid_dps_ety_n AND die.fid_item = de.fid_item and die.fid_unit= de.fid_unit AND NOT die.b_del " +
+                                    "INNER JOIN trn_diog AS di ON die.id_year = di.id_year AND die.id_doc = di.id_doc AND NOT di.b_del " +
+                                    "WHERE s.id_des_year = " + dps.getPkYearId() + " AND s.id_des_doc = " + dps.getPkDocId() + " " +
+                                    //"#Cantidad pendiente de surir de la OC, si la cantidad pendiente es mayor o igual al movimiento, si se puede relacionar " +
+                                    "AND (de.orig_qty - COALESCE((SELECT SUM(orig_qty) " +
+                                    "FROM trn_diog AS d " +
+                                    "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                                    "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                                    "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                                    "WHERE de.fid_dps_year_n = de.id_year AND de.fid_dps_doc_n = de.id_doc AND de.fid_dps_ety_n = de.id_ety AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL) , 0)) >= die.orig_qty ) " +
+                                    "AS a ON a.year_diog = d.id_year AND a.doc_diog = d.id_doc " +
+                                    "WHERE de.fid_dps_year_n = " + dps.getPkYearId() + " AND de.fid_dps_doc_n = " + dps.getPkDocId() + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND year_ord IS NULL;";
+                            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                                while (resultSet.next()) {
+                                    noMovLink = true;
+                                    message += "Fecha doc.: " + SLibUtils.DateFormatDate.format(resultSet.getDate("dt")) + ", Folio doc.: " + resultSet.getString("f_num") + ", Código: " + resultSet.getString("f_code") + "\n";
+                                }
+                            }
+                            if (noMovLink) {
+                                miClient.showMsgBoxInformation("No se pueden mover los vínculos a pedidos debido que hay vínculos no relacionados a un pedido.\nElimine los siguientes docs. de inventarios de forma manual\n" + message);
+                            }
+                            else if (dps.canDelete(miClient.getSession().getDatabase().getConnection()) != SLibConstants.DB_CAN_DELETE_YES) {
+                                miClient.showMsgBoxWarning(dps.getDbmsError());
+                            }
+                            else {
+                                // cambiar la referencia de los diog
+                                if (miClient.showMsgBoxConfirm("¿Está seguro de mover los vínculos de movimientos de almacén del documento a sus pedidos?\nEsta acción no se puede revertir.") == JOptionPane.OK_OPTION) {
+                                    int cont = 0;
+                                    Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+                                    sql = "SELECT de.id_year year_ord, de.id_doc doc_ord, de.id_ety ety_ord, de.orig_qty qty_ord, de.fid_item, de.fid_unit, s.id_des_ety ety_fac, die.id_year year_diog, die.id_doc doc_diog, die.id_ety ety_diog, die.orig_qty qty_diog, " +
+                                            "de.orig_qty - COALESCE((SELECT SUM(orig_qty) " +
+                                            "FROM trn_diog AS d " +
+                                            "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                                            "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                                            "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                                            "WHERE de.fid_dps_year_n = de.id_year AND de.fid_dps_doc_n = de.id_doc AND de.fid_dps_ety_n = de.id_ety AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL) , 0) surt_ord " +
+                                            "FROM trn_dps_dps_supply AS s " +
+                                            "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc AND d.b_del = 0 " +
+                                            "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0 " +
+                                            "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps " +
+                                            "INNER JOIN trn_diog_ety AS die ON s.id_des_year = die.fid_dps_year_n AND s.id_des_doc = die.fid_dps_doc_n AND s.id_des_ety = die.fid_dps_ety_n AND die.fid_item = de.fid_item and die.fid_unit= de.fid_unit AND NOT die.b_del " +
+                                            "INNER JOIN trn_diog AS di ON die.id_year = di.id_year AND die.id_doc = di.id_doc AND NOT di.b_del " +
+                                            "WHERE s.id_des_year = " + dps.getPkYearId() + " AND s.id_des_doc = " + dps.getPkDocId() + " " +
+                                            //"#Cantidad pendiente de surir de la OC, si la cantidad pendiente es mayor o igual al movimiento, si se puede relacionar " +
+                                            "AND (de.orig_qty - COALESCE((SELECT SUM(orig_qty) " +
+                                            "FROM trn_diog AS d " +
+                                            "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 " +
+                                            "INNER JOIN erp.trns_tp_iog AS t ON d.fid_ct_iog = t.id_ct_iog AND d.fid_cl_iog = t.id_cl_iog AND d.fid_tp_iog = t.id_tp_iog " +
+                                            "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
+                                            "WHERE de.fid_dps_year_n = de.id_year AND de.fid_dps_doc_n = de.id_doc AND de.fid_dps_ety_n = de.id_ety AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL) , 0)) >= die.orig_qty;";
+                                    try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                                        while (resultSet.next()) {
+                                            cont++;
+                                            sql = "UPDATE trn_diog_ety SET fid_dps_year_n = " + resultSet.getInt("year_ord") + ", fid_dps_doc_n = " + resultSet.getInt("doc_ord") + ", fid_dps_ety_n = " + resultSet.getInt("ety_ord") + " " +
+                                                    "WHERE id_year = " + resultSet.getInt("year_diog") + " AND id_doc = " + resultSet.getInt("doc_diog") + " AND id_ety = " + resultSet.getInt("ety_diog");
+                                            statement.execute(sql);
+
+                                            sql = "UPDATE trn_diog SET fid_dps_year_n = " + resultSet.getInt("year_ord") + ", fid_dps_doc_n = " + resultSet.getInt("doc_ord") + " " +
+                                                    "WHERE id_year = " + resultSet.getInt("year_diog") + " AND id_doc = " + resultSet.getInt("doc_diog") + " ";
+                                            statement.execute(sql);
+                                            
+                                            sql = "UPDATE trn_stk SET fid_dps_year_n = " + resultSet.getInt("year_ord") + ", fid_dps_doc_n = " + resultSet.getInt("doc_ord") + ", fid_dps_ety_n = " + resultSet.getInt("ety_ord") + " " +
+                                                    "WHERE fid_dps_year_n = " + dps.getPkYearId() + " AND fid_dps_doc_n = " + dps.getPkDocId() + " AND fid_dps_ety_n = " + resultSet.getInt("ety_fac") + " ";
+                                            statement.execute(sql);
+
+                                            sql = "DELETE FROM trn_dps_dps_supply WHERE id_des_year = " + dps.getPkYearId() + " AND id_des_doc = " + dps.getPkDocId();
+                                            statement.execute(sql);
+                                            
+                                            SDataDpsEntryIogEntryTransfer tr = new SDataDpsEntryIogEntryTransfer();
+                                            tr.setPkDpsSourceYearId(dps.getPkYearId());
+                                            tr.setPkDpsSourceDocId(dps.getPkDocId());
+                                            tr.setPkDpsSourceEntryId(resultSet.getInt("ety_fac"));
+                                            tr.setPkDpsDestinyYearId(resultSet.getInt("year_ord"));
+                                            tr.setPkDpsDestinyDocId(resultSet.getInt("doc_ord"));
+                                            tr.setPkDpsDestinyEntryId(resultSet.getInt("ety_ord"));
+                                            tr.setPkDiogYearId(resultSet.getInt("year_diog"));
+                                            tr.setPkDiogDocId(resultSet.getInt("doc_diog"));
+                                            tr.setPkDiogEntryId(resultSet.getInt("ety_diog"));
+                                            tr.save(statement.getConnection());
+                                        }
+                                    }
+
+                                    miClient.showMsgBoxInformation("Se movieron " + cont + " vínculos de movimientos de almacén a los pedidos correspondientes.");
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("El documento no tiene vínculos con movimientos de almacén.");                                
+                    }                    
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
 
@@ -2905,6 +3073,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbViewContractAnalysis) {
                     actionViewContractAnalysis();
+                }
+                else if (button == jbRevertLinks) {
+                    actionRevertLinks();
                 }
                 else if (button == jbViewAccountingRecord) {
                     actionViewAccountingRecord();

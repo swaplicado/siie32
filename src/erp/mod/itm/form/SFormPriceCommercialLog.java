@@ -267,7 +267,8 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         
         moDialogPickerItem.resetPicker();
         moDialogPickerItem.initComponentsCustom();
-        moDialogPickerItem.setItemPickerInvDefault(true);
+        moDialogPickerItem.setDefaultEnableRadio(SDialogItemPicker.INV_ITEMS);
+        //moDialogPickerItem.setItemPickerInvDefault(true);
         moDialogPickerItem.setPickerVisible(true);
 
         if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {

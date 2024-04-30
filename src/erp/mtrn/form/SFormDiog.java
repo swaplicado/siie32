@@ -38,7 +38,6 @@ import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
-import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -151,6 +150,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForReturn;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForReturn;
+    
+    private boolean mbImportExternalDoc;
 
     /** Creates new form SFormDiog
      * @param client */
@@ -1044,6 +1045,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 }
             }
         }
+        
+        mbImportExternalDoc = false;
     }
 
     private void renderWarehouseSource(int[] key, boolean validateIsOpen) {
@@ -2691,10 +2694,12 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryQuantity.getText() + "'.");
                 jtfEntryQuantity.requestFocus();
             }
-            else if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
-                jtfEntryValueUnitary.requestFocus();
-            }
+//            else if (!mbImportExternalDoc) {
+//                if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
+//                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
+//                    jtfEntryValueUnitary.requestFocus();
+//                }
+//            }
             else {
                 msg = validateAppropriateWarehouses();
 
@@ -3028,6 +3033,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 ans = miClient.showMsgBoxConfirm("¿Desea continuar con la inserción a pesar de las advertencias?");
                             }
                             if (ans == JOptionPane.OK_OPTION) {
+                                mbImportExternalDoc = true;
                                 // Volver a leer para agregar
                                 br = new BufferedReader(new FileReader(absolutePath));
                                 line = br.readLine();
@@ -3603,10 +3609,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                 validation.setComponent(jftDate);
             }
-            else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
-                validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
-                validation.setComponent(jftDate);
-            }
+//            else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
+//                validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
+//                validation.setComponent(jftDate);
+//            }
             else if (moDiog != null && moDiog.getPkYearId() != year) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
                 validation.setComponent(jftDate);

@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataBookkeepingNumber;
@@ -132,9 +133,15 @@ public class SStockValuationRecordUtils {
             }
 
             if (nItemReference == 0) {
-//                int itmR = 15119;
-                nItemReference = oConsumption.getFkItemId();
-//                nItemReference = itmR;
+                if (oItem.getFkDefaultItemRefId_n() > 0) {
+                    nItemReference = oItem.getFkDefaultItemRefId_n();
+                }
+                else if (oItem.getDbmsDataItemGeneric().getFkDefaultItemRefId_n() > 0) {
+                    nItemReference = oItem.getDbmsDataItemGeneric().getFkDefaultItemRefId_n();
+                }
+                else {
+                    nItemReference = oConsumption.getFkItemId();
+                }
             }
 
             // Si la configuración es vacía se toma en cuenta la configuración del paquete contable
@@ -171,7 +178,7 @@ public class SStockValuationRecordUtils {
                 }
                 if (Math.abs(dTotalAmount - oConsumption.getCost_r()) >= 0.01d) {
                     if (oConfigMaj != null) {
-                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + Math.abs(dTotalAmount - oConsumption.getCost_r())));
+                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + (oConsumption.getCost_r() - dTotalAmount)));
                     }
                 }
 
@@ -193,8 +200,16 @@ public class SStockValuationRecordUtils {
                         lCC.put(oConfig.getCostCenterId(), nIdCC);
                     }
                     
+                    String sCc;
                     if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
-                        throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                        sCc = SDataUtilities.obtainCostCenterItem(session, oConsumption.getFkItemId());
+                        if (sCc.isEmpty()) {
+                            throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                        }
+                        nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                    }
+                    else {
+                        sCc = oConfig.getCostCenterId();
                     }
 
                     /**
@@ -210,7 +225,7 @@ public class SStockValuationRecordUtils {
                             oCfg.getTextPurEntries(),
                             oAccount,
                             nIdCC,
-                            oConfig.getCostCenterId(),
+                            sCc,
                             sortPosition++,
                             new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
                             nItemReference,
@@ -259,7 +274,7 @@ public class SStockValuationRecordUtils {
                 }
                 if (Math.abs(dTotalAmount - oConsumption.getCost_r()) >= 0.01d) {
                     if (oConfigMaj != null) {
-                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + Math.abs(dTotalAmount - oConsumption.getCost_r())));
+                        oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + (oConsumption.getCost_r() - dTotalAmount)));
                     }
                 }
                 for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {

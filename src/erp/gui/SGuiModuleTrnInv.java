@@ -207,6 +207,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockRotation;
     private javax.swing.JMenuItem jmiStkStockRotationLot;
     private javax.swing.JMenuItem jmiStkStockValuation;
+    private javax.swing.JMenuItem jmiStkStockValuationDetail;
     private javax.swing.JMenuItem jmiStkStockClosing;
     private javax.swing.JMenuItem jmiItemHistoric;
     
@@ -279,6 +280,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqProv = false;
         boolean hasRightMatReqPur = false;
         boolean hasRightMatReqAdm = false;
+        boolean hasRightValMatCons = false;
+        int levelRightValMatCons = 0;
         boolean hasRightMatReqReclass = false;
 
         jmMenuCat = new JMenu("Catálogos");
@@ -752,7 +755,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
-        jmiStkStockValuation = new JMenuItem("Valuación de inventarios");
+        jmiStkStockValuation = new JMenuItem("Valuación de conumos de materiales");
+        jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiItemHistoric = new JMenuItem("Historial ítems");
         
@@ -771,6 +775,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.add(jmiStkStockRotationLot);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockValuation);
+        jmMenuStk.add(jmiStkStockValuationDetail);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockClosing);
         jmMenuStk.addSeparator();
@@ -787,6 +792,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockRotation.addActionListener(this);
         jmiStkStockRotationLot.addActionListener(this);
         jmiStkStockValuation.addActionListener(this);
+        jmiStkStockValuationDetail.addActionListener(this);
         jmiStkStockClosing.addActionListener(this);
         jmiItemHistoric.addActionListener(this);
 
@@ -875,6 +881,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMatReqProv = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
+        levelRightValMatCons = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
@@ -984,10 +992,20 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
-        jmMenuStk.setEnabled(hasRightStock);
-        jmiStkStockValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons);
+        jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiStkStockLot.setEnabled(hasRightStock);
+        jmiStkStockCommPrice.setEnabled(hasRightStock);
+        jmiStkStockWarehouse.setEnabled(hasRightStock);
+        jmiStkStockWarehouseLot.setEnabled(hasRightStock);
+        jmiStkStockMovements.setEnabled(hasRightStock);
+        jmiStkStockMovementsEntry.setEnabled(hasRightStock);
+        jmiStkStockRotation.setEnabled(hasRightStock);
+        jmiStkStockRotationLot.setEnabled(hasRightStock);
+        jmiStkStockValuation.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
+        jmiStkStockValuationDetail.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
+        jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
@@ -1311,6 +1329,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRN_STK_VAL:
                     viewClass = erp.mod.trn.view.SViewStockValuation.class;
                     title = "Valuación de inventario";
+                    break;
+                case SDataConstants.TRNX_STK_VAL_DET:
+                    viewClass = erp.mod.trn.view.SViewStockValuationDetail.class;
+                    title = "Valuación de inventario a detalle";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
@@ -2070,6 +2092,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStockValuation) {
                 miClient.getSession().showView(SModConsts.TRN_STK_VAL, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiStkStockValuationDetail) {
+                miClient.getSession().showView(SModConsts.TRNX_STK_VAL_DET, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStockClosing) {
                 moDialogUtilStockClosing.resetForm();

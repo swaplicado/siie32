@@ -101,6 +101,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
+import erp.mod.fin.form.SDialogChoseAccountingCustomReport;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
@@ -149,6 +150,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgAbpLinkItem;
     private javax.swing.JMenuItem jmiCfgAccItemLink;
     private javax.swing.JMenuItem jmiCfgTaxItemLink;
+    private javax.swing.JMenuItem jmiCfgAbpRep;
 
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatAccount;
@@ -207,6 +209,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecBookkeepingMoves;
     private javax.swing.JMenuItem jmiRecDpsBizPartnerCus;
     private javax.swing.JMenuItem jmiRecDpsBizPartnerSup;
+    private javax.swing.JMenuItem jmiRecAccCus;
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
@@ -230,7 +233,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmFinCfdiMassiveValidation;
     private javax.swing.JMenuItem jmiFinCfdiMassiveValidationPur;
     private javax.swing.JMenuItem jmiFinCfdiMassiveValidationSal;
-    private javax.swing.JMenuItem jmiUuidSearch;
+    private javax.swing.JMenuItem jmiFinUuidSearch;
     
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepTrialBal;
@@ -426,9 +429,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAbpLink.add(jmiCfgAbpLinkItem);
         jmCfgAbpLink.add(jmiCfgTaxItemLink);
         jmCfgAbpLink.add(jmiCfgAccItemLink);
+        
+        jmiCfgAbpRep = new JMenuItem("Configuración de consultas personalizadas de aux. contables");
 
         jmCfg.add(jmiCfgAbp);
         jmCfg.add(jmCfgAbpLink);
+        jmCfg.add(jmiCfgAbpRep);
 
         jmCat = new JMenu("Catálogos");
 
@@ -531,6 +537,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBookkeepingMoves = new JMenuItem("Movimientos de cuentas contables");
         jmiRecDpsBizPartnerCus = new JMenuItem("Consulta pólizas contables de docs. de clientes");
         jmiRecDpsBizPartnerSup = new JMenuItem("Consulta pólizas contables de docs. de proveedores");
+        jmiRecAccCus = new JMenuItem("Consulta personalizada de aux. contables...");
 
         jmRec.add(jmiRecRec);
         jmRec.add(jmiRecRecCash);
@@ -562,6 +569,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec.add(jmiRecBookkeepingMoves);
         jmRec.add(jmiRecDpsBizPartnerCus);
         jmRec.add(jmiRecDpsBizPartnerSup);
+        jmRec.addSeparator();
+        jmRec.add(jmiRecAccCus);
 
         jmFin = new JMenu("Finanzas");
 
@@ -586,7 +595,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinCfdiMassiveValidation = new JMenu("Validación masiva de estatus de CFDI");
         jmiFinCfdiMassiveValidationPur = new JMenuItem("Validación masiva de estatus de CFDI recibidos...");
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
-        jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
+        jmiFinUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinBankNbDay);
@@ -620,7 +629,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationPur);
         jmFinCfdiMassiveValidation.add(jmiFinCfdiMassiveValidationSal);
         jmFin.addSeparator();
-        jmFin.add(jmiUuidSearch);
+        jmFin.add(jmiFinUuidSearch);
         
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
@@ -903,6 +912,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBookkeepingMoves.addActionListener(this);
         jmiRecDpsBizPartnerCus.addActionListener(this);
         jmiRecDpsBizPartnerSup.addActionListener(this);
+        jmiRecAccCus.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
         jmiFinBankNbDay.addActionListener(this);
@@ -923,7 +933,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinImportPayments.addActionListener(this);
         jmiFinCfdiMassiveValidationPur.addActionListener(this);
         jmiFinCfdiMassiveValidationSal.addActionListener(this);
-        jmiUuidSearch.addActionListener(this);
+        jmiFinUuidSearch.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
         jmiCfgAbpEntityWarehouse.addActionListener(this);
@@ -938,6 +948,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAbpLinkItem.addActionListener(this);
         jmiCfgAccItemLink.addActionListener(this);
         jmiCfgTaxItemLink.addActionListener(this);
+        jmiCfgAbpRep.addActionListener(this);
 
         jmiRepTrialBalStandard.addActionListener(this);
         jmiRepTrialBalCostCenter.addActionListener(this);
@@ -1037,10 +1048,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         boolean hasRightGblCatAccTax = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_TAX).HasRight;
         boolean hasRightGblCatAccMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_MISC).HasRight;
         boolean hasRightCfdPayment = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CFD_PAYMENT).HasRight;
+        
+        boolean hasRightAuxCustom = miClient.getSessionXXX().getUser().hasRight(miClient, erp.data.SDataConstantsSys.PRV_FIN_REP_AUX_CUSTOM).HasRight;
 
         jmCfg.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
 
         jmCfgAbpLink.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem);
+        jmiCfgAbpRep.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkCashAccount.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkWarehouse.setEnabled(hasRightGblCatAccCfg);
         jmiCfgAbpLinkPlant.setEnabled(hasRightGblCatAccCfg);
@@ -1092,7 +1106,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBkkFiscalYearOpening.setEnabled(hasRightYear);
         jmiBkkFiscalYearOpeningDel.setEnabled(hasRightYear);
 
-        jmRec.setEnabled(hasRightBookkeeping || hasRightRep || hasRightMoveAccCash || hasRightMoveBpCdr || hasRightMoveBpDbr);
+        jmRec.setEnabled(hasRightBookkeeping || hasRightRep || hasRightMoveAccCash || hasRightMoveBpCdr || hasRightMoveBpDbr || hasRightAuxCustom);
         jmiRecRec.setEnabled(hasRightBookkeeping);
         jmiRecRecCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash);
         jmiRecRecEtyXmlIncome.setEnabled(hasRightBookkeeping);
@@ -1115,6 +1129,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBookkeepingMoves.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecDpsBizPartnerCus.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecDpsBizPartnerSup.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecAccCus.setEnabled(hasRightAuxCustom);
 
         jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt || hasRightCfdPayment);
         jmiFinExchangeRate.setEnabled(hasRightExcRate);
@@ -1135,7 +1150,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinCfdiMassiveValidation.setEnabled(hasRightMoveAccCash);
         jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
         jmiFinCfdiMassiveValidationSal.setEnabled(hasRightMoveAccCash);
-        jmiUuidSearch.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
+        jmiFinUuidSearch.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
         jmRepTrialBal.setEnabled(hasRightRep);
@@ -2093,6 +2108,16 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRecDpsBizPartnerSup) {
                 showView(SDataConstants.FINX_REC_DPS, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
+            else if (item == jmiRecAccCus) {
+                SDialogChoseAccountingCustomReport dialog = new SDialogChoseAccountingCustomReport((SGuiClient) miClient);
+                dialog.setVisible(true);
+                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    int subType = (int) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_ID);
+                    SGuiParams params = new SGuiParams();
+                    params.getParamsMap().put(subType, ((String) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
+                    miClient.getSession().showView(SModConsts.FINX_REP_CUS_ACC, subType, params);
+                }
+            }
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
             }
@@ -2150,7 +2175,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinCfdiMassiveValidationSal) {
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_FIN, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
-            else if (item == jmiUuidSearch) {
+            else if (item == jmiFinUuidSearch) {
                 new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SLibConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiRepTrialBalStandard) {
@@ -2407,6 +2432,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgAccItemLink) {
                 miClient.getSession().showView(SModConsts.FIN_ACC_ITEM_LINK, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCfgAbpRep) {
+                miClient.getSession().showView(SModConsts.FIN_REP_CUS_ACC, SLibConstants.UNDEFINED, null);
             }
         }
     }

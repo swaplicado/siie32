@@ -3912,7 +3912,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moPanelFkCostCenterId_n.enableFields(true);
 
             try {
-                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient, moItem.getPkItemId()));
+                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId()));
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -4623,7 +4623,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private void actionPriceHistory() {
         moDialogItemPriceHistory.refreshForm();
-        moDialogItemPriceHistory.showPriceHistory(moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR ? true : false,
+        moDialogItemPriceHistory.showPriceHistory(moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR,
             moFieldFkItemId.getKeyAsIntArray()[0], moParamBizPartner.getPkBizPartnerId(), new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId()});
     }
 

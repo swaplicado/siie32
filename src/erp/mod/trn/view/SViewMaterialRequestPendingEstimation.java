@@ -15,6 +15,7 @@ import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestEstimation;
 import erp.mod.trn.form.SDialogMaterialRequestEstimationCardex;
+import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,6 +57,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     private JButton jbDocsCardex;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
+    private JButton jbLogCardex;
     private JButton mjbToNew;
     //private JButton mjbClose;
     //private JButton mjbOpen;
@@ -63,6 +65,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
     private SDialogMaterialRequestEstimation moDialogEstimate;
     private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
+    private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
     private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
@@ -87,6 +90,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
+        jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
         mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         
@@ -100,6 +104,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToEstimate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
@@ -112,6 +117,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         mjbToEstimate.setEnabled(true);
         mjbEstimationKardex.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED);
         jbDocsCardex.setEnabled(true);
+        jbLogCardex.setEnabled(true);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
@@ -123,6 +129,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos de la requisición");
+        moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         
         msSeekQueryText = "";
     }
@@ -241,6 +248,34 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void actionLog() {
+        int[] key;
+        
+        if (jbLogCardex.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        key = (int[]) gridRow.getRowPrimaryKey();
+                    
+                        moDialogLogsCardex.setFormParams(key[0]);
+                        moDialogLogsCardex.setVisible(true);
+                    }
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -435,6 +470,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "IF(ISNULL(entc.name), trn_get_cons_info(v.id_mat_req, 1), entc.name) AS ent_cons, "
                 + "IF(ISNULL(sentc.name), trn_get_cons_info(v.id_mat_req, 2), sentc.name) AS s_ent_cons, "
                 + "IF(ISNULL(fcc.id_cc), trn_get_cons_info(v.id_mat_req, 3), fcc.id_cc) AS f_cc, "
+                + "IF((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " AS mrl "
+                + " WHERE mrl.id_mat_req = v.id_mat_req AND mrl.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") > 1, " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_NULL + ") "
+                + " AS count_pur, "
                 + "(SELECT  " +
                     "COUNT(*) > 0 " +
                     "FROM " +
@@ -512,12 +550,13 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "is_estimated", "Cotizada"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "count_pur", "Veces en compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "comp_doc", "Doc compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "i.item_key", "Clave"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Ítem"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "i.part_num", "# parte"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "org_qty", "Cant. requerida"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "unit", "unidad"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "unit", "Unidad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ent_cons", "Centro consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "s_ent_cons", "Subcentro consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cc", "Centro de costo"));
@@ -564,6 +603,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             }
             else if (button == jbDocsCardex) {
                 actionDocsKardex();
+            }
+            else if (button == jbLogCardex) {
+                actionLog();
             }
             else if (button == mjbToSearch) {
                 actionSearch();

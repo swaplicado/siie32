@@ -325,11 +325,17 @@ public abstract class SModConsts {
     public static final int FIN_LAY_BANK = 2013461;
     public static final int FIN_LAY_BANK_DEP = 2013462;
     public static final int FIN_LAY_BANK_DEP_ANA = 2013463;
+    public static final int FIN_REP_CUS_ACC = 2013491;
+    public static final int FIN_REP_CUS_ACC_ACC = 2013492;
+    public static final int FIN_REP_CUS_ACC_CC = 2013493;
+    public static final int FIN_REP_CUS_ACC_USR = 2013494;
+
 
     public static final int FIN_BKC = 2013501;
 
     public static final int FINX_REC_CASH = 2014001;
     public static final int FINX_ACC_CASH_BANK = 2014002;
+    public static final int FINX_REP_CUS_ACC = 2014003;
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
     public static final int FINR_MAS_PRI = 2015002;
@@ -405,6 +411,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_ETY_HIST = 2023066;
     public static final int TRN_DPS_ETY_ITEM_COMP = 2023072;
     public static final int TRN_DPS_ETY_QTY_CHG = 2023073;
+    public static final int TRN_DPS_ETY_IOG_ETY_XFR = 2023074;
     public static final int TRN_DPS_ETY_ANALYSIS = 2023065;
     public static final int TRN_DPS_RISS = 2023022;
     public static final int TRN_DPS_REPL = 2023023;
@@ -507,6 +514,7 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_CON_SEND = 2024002;    // document send
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_COST = 2024049;        // stock cost
+    public static final int TRNX_STK_VAL_DET = 2024091;
     public static final int TRNX_INV_VAL_COST_UPD = 2024061;    // inventory valuation vs. cost
     public static final int TRNX_INV_VAL_COST_QRY = 2024066;    // inventory valuation vs. cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;     // operations control
@@ -552,6 +560,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_CONS_CC_R = 1;
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
+    public static final int TRNX_TP_VAL_MVT = 2024092;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1147,6 +1156,10 @@ public abstract class SModConsts {
         TablesMap.put(FIN_LAY_BANK, "fin_lay_bank");
         TablesMap.put(FIN_LAY_BANK_DEP, "fin_lay_bank_dep");
         TablesMap.put(FIN_LAY_BANK_DEP_ANA, "fin_lay_bank_dep_ana");
+        TablesMap.put(FIN_REP_CUS_ACC, "fin_rep_cus_acc");
+        TablesMap.put(FIN_REP_CUS_ACC_ACC, "fin_rep_cus_acc_acc");
+        TablesMap.put(FIN_REP_CUS_ACC_CC, "fin_rep_cus_acc_cc");
+        TablesMap.put(FIN_REP_CUS_ACC_USR, "fin_rep_cus_acc_usr");
 
         TablesMap.put(FIN_BKC, "fin_bkc");
 
@@ -1214,6 +1227,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ETY_HIST, "trn_dps_ety_hist");
         TablesMap.put(TRN_DPS_ETY_ITEM_COMP, "trn_dps_ety_item_comp");
         TablesMap.put(TRN_DPS_ETY_QTY_CHG, "trn_dps_ety_qty_chg");
+        TablesMap.put(TRN_DPS_ETY_IOG_ETY_XFR, "trn_dps_ety_iog_ety_xfr");
         TablesMap.put(TRN_DPS_ETY_ANALYSIS, "trn_dps_ety_analysis");
         TablesMap.put(TRN_DPS_RISS, "trn_dps_riss");
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");

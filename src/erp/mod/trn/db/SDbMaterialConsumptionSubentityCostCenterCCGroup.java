@@ -171,4 +171,10 @@ public class SDbMaterialConsumptionSubentityCostCenterCCGroup extends SDbRegistr
         
         return registry;
     }
+    
+    @Override
+    public void delete(SGuiSession session) throws Exception {
+        msSql = "DELETE " + getSqlFromWhere();
+        session.getStatement().execute(msSql);
+    }
 }

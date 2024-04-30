@@ -305,6 +305,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
     
+    protected boolean mbXtaTestLinks;
+    
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
@@ -1042,15 +1044,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
                     */
                     case 205:
-                        sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
-                        sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
+                        if (mbXtaTestLinks) {
+                            sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
+                            sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
+                        }
                         break;
                     case 206:
-                        sSql = "SELECT COUNT(*) AS f_count " +
-                                "FROM trn_diog AS d " +
-                                "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                                "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND de.b_del = 0 AND d.b_del = 0 ";
-                        sMsgAux = "¡El documento está asociado con un surtido de almacén!";
+                        if (mbXtaTestLinks) {
+                            sSql = "SELECT COUNT(*) AS f_count " +
+                                    "FROM trn_diog AS d " +
+                                    "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                                    "WHERE de.fid_dps_year_n = " + mnPkYearId + " AND de.fid_dps_doc_n = " + mnPkDocId + " AND de.fid_dps_adj_year_n IS NULL AND de.fid_dps_adj_doc_n IS NULL AND de.b_del = 0 AND d.b_del = 0 ";
+                            sMsgAux = "¡El documento está asociado con un surtido de almacén!";
+                        }
                         break;
                     case 207:
                         sSql = "SELECT COUNT(*) AS f_count " +
@@ -2135,6 +2141,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getOldDate() { return mtOldDate; }
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
+    
+    public void setTestLinks(boolean b) { mbXtaTestLinks = b; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entry = null;
@@ -2404,6 +2412,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtOldDate = null;
         msXtaTotalCyAsText = "";
         createXtaDpsType();
+        
+        mbXtaTestLinks = true;
     }
                         
     @Override
@@ -3711,6 +3721,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                             }
                             
+                            String accountFormat = SFinAccountUtilities.getConfigAccountFormat(connection.createStatement());   // current account format is an empty account
                             for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                                 if (dpsEntry.isAccountable()) {
                                     switch (dpsEntry.getOperationsType()) {
@@ -3833,6 +3844,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     oRecordEntry.setFkItemId_n(dpsEntry.getFkItemRefId_n());
                                                     oRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
                                                     oRecordEntry.setFkItemAuxId_n(dpsEntry.getFkItemId());
+                                                }
+                                                
+                                                // Si la cuenta contable es de tipo inventario: 
+                                                // Validar si el ítem de la partida tiene configurado un almacén
+                                                if (SLibUtils.belongsTo(SFinAccountUtilities.getSystemAccountType(connection, SFinAccountUtilities.obtainAccountLedger(oAccountConfigItem.getAccountConfigEntries().get(i).getAccountId(), accountFormat)), 
+                                                        new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_INV })) {
+                                                    // Consultar almacén correspondiente al ítem
+                                                    int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, dpsEntry.getFkItemId());
+                                                    if (aWh == null) {
+                                                        // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
+                                                        aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                                        if (aWh == null) {
+                                                            throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
+                                                                    dpsEntry.getConcept());
+                                                        }
+                                                    }
+                                                    
+                                                    oRecordEntry.setFkCompanyBranchId_n(aWh[0]);
+                                                    oRecordEntry.setFkEntityId_n(aWh[1]);
                                                 }
 
                                                 oRecord.getDbmsRecordEntries().add(oRecordEntry);
@@ -4423,6 +4453,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) {
                                         msDbmsError = MSG_ERR_ITM_CFG_ + "ítem:\n'" + name + "' (configuración anticipo).";
                                         throw new Exception(msDbmsError);
+                                    }
+                                    
+                                    // Si la cuenta contable es de tipo inventario: 
+                                    // Validar si el ítem de la partida tiene configurado un almacén
+                                    if (SLibUtils.belongsTo(SFinAccountUtilities.getSystemAccountType(connection, SFinAccountUtilities.obtainAccountLedger(config.getAccountId(), accountFormat)), 
+                                            new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_INV })) {
+                                        // Consultar almacén correspondiente al ítem
+                                        int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, entry.getFkItemId());
+                                        if (aWh == null) {
+                                            // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
+                                            aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                            if (aWh == null) {
+                                                throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
+                                                        entry.getConcept());
+                                            }
+                                        }
                                     }
                                 }
                                 

@@ -15,6 +15,10 @@ import erp.mod.fin.db.SDbAbpItemLink;
 import erp.mod.fin.db.SDbAbpTax;
 import erp.mod.fin.db.SDbAccount;
 import erp.mod.fin.db.SDbAccountItemLink;
+import erp.mod.fin.db.SDbAccountingCustomizableReport;
+import erp.mod.fin.db.SDbAccountingCustomizableReportAccount;
+import erp.mod.fin.db.SDbAccountingCustomizableReportCostCenter;
+import erp.mod.fin.db.SDbAccountingCustomizableReportUser;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
@@ -29,6 +33,9 @@ import erp.mod.fin.form.SFormAbpItem;
 import erp.mod.fin.form.SFormAbpItemLink;
 import erp.mod.fin.form.SFormAbpTax;
 import erp.mod.fin.form.SFormAccountItemLink;
+import erp.mod.fin.form.SFormAccountingCustomizableReport;
+import erp.mod.fin.form.SFormAccountingCustomizableReportAccount;
+import erp.mod.fin.form.SFormAccountingCustomizableReportCostCenter;
 import erp.mod.fin.form.SFormBankLayout;
 import erp.mod.fin.form.SFormImportPayments;
 import erp.mod.fin.form.SFormTaxItemLink;
@@ -40,9 +47,11 @@ import erp.mod.fin.view.SViewAbpItem;
 import erp.mod.fin.view.SViewAbpItemLink;
 import erp.mod.fin.view.SViewAbpTax;
 import erp.mod.fin.view.SViewAccountItemLink;
+import erp.mod.fin.view.SViewAccoutingCustomizableReport;
 import erp.mod.fin.view.SViewBankLayout;
 import erp.mod.fin.view.SViewBankLayoutPayments;
 import erp.mod.fin.view.SViewImportFile;
+import erp.mod.fin.view.SViewReportAccountingCustomizableReport;
 import erp.mod.fin.view.SViewTaxItemLink;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -91,6 +100,9 @@ public class SModuleFin extends SGuiModule {
     private SFormBankLayout moFormBankLayoutPayments;
     private SFormBankLayout moFormBankLayoutPrepayments;
     private SFormImportPayments moFormImportPayments;
+    private SFormAccountingCustomizableReport moFormAccountingCustomizableReport;
+    private SFormAccountingCustomizableReportAccount moFormAccountingCustomizableReportAccount;
+    private SFormAccountingCustomizableReportCostCenter moFormAccountingCustomizableReportCostCenter;
 
     private SBeanOptionPicker moPickerExchangeRateMxn;
     private SBeanOptionPicker moPickerExchangeRateUsd;
@@ -258,6 +270,18 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_CHECK_WAL:
                 registry = new SDbCheckWallet();
                 break;
+            case SModConsts.FIN_REP_CUS_ACC:
+                registry = new SDbAccountingCustomizableReport();
+                break;
+            case SModConsts.FIN_REP_CUS_ACC_ACC:
+                registry = new SDbAccountingCustomizableReportAccount();
+                break;
+            case SModConsts.FIN_REP_CUS_ACC_CC:
+                registry = new SDbAccountingCustomizableReportCostCenter();
+                break;
+            case SModConsts.FIN_REP_CUS_ACC_USR:
+                registry = new SDbAccountingCustomizableReportUser();
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -375,7 +399,7 @@ public class SModuleFin extends SGuiModule {
                                 + "INNER JOIN trn_mat_cons_subent_cc AS cscc ON " 
                                 + "cc.pk_cc = cscc.id_cc "
                                 + "INNER JOIN trn_mat_cons_subent_cc_cc_grp AS csccg ON "
-                                + "cscc.id_cc = csccg.id_cc " 
+                                + "cscc.id_mat_cons_ent = csccg.id_mat_cons_ent AND cscc.id_mat_cons_subent = csccg.id_mat_cons_subent AND cscc.id_cc = csccg.id_cc " 
                                 + "INNER JOIN trn_mat_cc_grp_usr AS ccgu ON " 
                                 + "csccg.id_mat_cc_grp = ccgu.id_mat_cc_grp " 
                                 + "WHERE cscc.id_mat_cons_ent = " + pkConsSub[0] + " AND cscc.id_mat_cons_subent = " + pkConsSub[1] + " "
@@ -417,6 +441,16 @@ public class SModuleFin extends SGuiModule {
                 }
                 sql += "ORDER BY ce.ent, ce.code, ac.id_cob, ac.id_acc_cash ";
                 
+                break;
+            case SModConsts.FIN_REP_CUS_ACC:
+                settings = new SGuiCatalogueSettings("Consulta personalizada aux. contables", 1);
+                settings.setCodeApplying(false);
+                sql = "SELECT a.id_rep_cus_acc " + SDbConsts.FIELD_ID + "1, a.name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " AS a "
+                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REP_CUS_ACC_USR) + " AS u ON "
+                        + "a.id_rep_cus_acc = u.id_rep_cus_acc " 
+                        + "WHERE NOT a.b_del AND (u.id_usr = " + params.getType() + " OR u.id_usr IS NULL)"
+                        + "ORDER BY a.name ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -523,6 +557,12 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FIN_LAY_BANK_DEP:
                 view = new SViewImportFile(miClient, subtype, "Importación de archivos");
+                break;
+            case SModConsts.FIN_REP_CUS_ACC:
+                view = new SViewAccoutingCustomizableReport(miClient, "Config. consultas personalizadas aux. contables");
+                break;
+            case SModConsts.FINX_REP_CUS_ACC:
+                view = new SViewReportAccountingCustomizableReport(miClient, subtype, "Aux. contables: " + (String) params.getParamsMap().get(subtype));
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -689,6 +729,18 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_LAY_BANK_DEP:
                 moFormImportPayments = new SFormImportPayments(miClient, subtype, "Importación de pagos por analista");
                 form = moFormImportPayments;
+                break;
+            case SModConsts.FIN_REP_CUS_ACC:
+                if (moFormAccountingCustomizableReport == null) moFormAccountingCustomizableReport = new SFormAccountingCustomizableReport(miClient, "Configuración de consulta personalizada de aux. contables");
+                form = moFormAccountingCustomizableReport;
+                break;
+            case SModConsts.FIN_REP_CUS_ACC_ACC:
+                if (moFormAccountingCustomizableReportAccount == null) moFormAccountingCustomizableReportAccount = new SFormAccountingCustomizableReportAccount(miClient, "Selecciona cuenta contable inicial y final");
+                form = moFormAccountingCustomizableReportAccount;
+                break;
+            case SModConsts.FIN_REP_CUS_ACC_CC:
+                if (moFormAccountingCustomizableReportCostCenter == null) moFormAccountingCustomizableReportCostCenter = new SFormAccountingCustomizableReportCostCenter(miClient, "Selecciona centro de costo inicial y final");
+                form = moFormAccountingCustomizableReportCostCenter;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
