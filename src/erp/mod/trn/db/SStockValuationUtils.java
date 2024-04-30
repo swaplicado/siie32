@@ -199,7 +199,9 @@ public class SStockValuationUtils {
                 + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
                 + "WHERE "
                 + "NOT ve.b_del AND ve.fk_diog_year_in = " + idYear + " "
-                + "GROUP BY ve.fk_cob , ve.fk_wh , ve.fk_item , ve.fk_unit , ve.fk_lot , ve.cost_u , ve.fk_diog_year_in , ve.fk_diog_doc_in , ve.fk_diog_ety_in, ve.fk_stk_val "
+                + "GROUP BY ve.fk_cob , ve.fk_wh , ve.fk_item , ve.fk_unit , ve.fk_lot , ve.cost_u , "
+                + "ve.fk_mat_req_n , ve.fk_mat_req_ety_n , "
+                + "ve.fk_diog_year_in , ve.fk_diog_doc_in , ve.fk_diog_ety_in, ve.fk_stk_val "
                 + "HAVING qty > 0 "
                 + "ORDER BY ve.dt_mov ASC , ve.fk_stk_val ASC";
       
