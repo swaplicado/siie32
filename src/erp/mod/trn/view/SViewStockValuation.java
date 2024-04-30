@@ -4,12 +4,15 @@
  */
 package erp.mod.trn.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -29,6 +32,8 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewStockValuation extends SGridPaneView implements ActionListener {
 
+    private int levelRightValMatCons;
+    
     private SGridFilterDatePeriod moFilterDatePeriod;
     
     /**
@@ -41,8 +46,11 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     }
     
     private void initComponents() {
-        jbRowNew.setEnabled(true);
-        jbRowDelete.setEnabled(true);
+        levelRightValMatCons = ((SClientInterface) miClient).getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
+        
+        jbRowNew.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_CAPTURE);
+        jbRowEdit.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_EDITOR);
+        jbRowDelete.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_MANAGER);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
         

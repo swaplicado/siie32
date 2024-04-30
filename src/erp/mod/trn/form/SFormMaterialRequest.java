@@ -1704,7 +1704,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 
                 moDialogPickerItem.resetPicker();
                 moDialogPickerItem.initComponentsCustom();
-                moDialogPickerItem.setItemPickerInvDefault(true);
+                //moDialogPickerItem.setItemPickerInvDefault(true);
+                moDialogPickerItem.setDefaultEnableRadio(SDialogItemPicker.INV_ITEMS);
                 moDialogPickerItem.setPickerVisible(true);
 
                 if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1738,6 +1739,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
         moTextUnitUsr.setValue(moUnitEty.getSymbol());
         moTextUnit.setValue(moUnitEty.getSymbol());
+        moKeyItemRefEty.setValue(new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
         obtainItemPrice();
     }
     
@@ -1758,7 +1760,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
-        moDialogPickerItemRef.setItemPickerInvDefault(false);
+        //moDialogPickerItemRef.setItemPickerInvDefault(false);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1779,7 +1782,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
-        moDialogPickerItemRef.setItemPickerInvDefault(false);
+        //moDialogPickerItemRef.setItemPickerInvDefault(false);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {

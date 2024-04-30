@@ -280,6 +280,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqProv = false;
         boolean hasRightMatReqPur = false;
         boolean hasRightMatReqAdm = false;
+        boolean hasRightValMatCons = false;
+        int levelRightValMatCons = 0;
         boolean hasRightMatReqReclass = false;
 
         jmMenuCat = new JMenu("Catálogos");
@@ -753,8 +755,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
-        jmiStkStockValuation = new JMenuItem("Valuación de inventarios");
-        jmiStkStockValuationDetail = new JMenuItem("Valuación de inventarios detalle");
+        jmiStkStockValuation = new JMenuItem("Valuación de conumos de materiales");
+        jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiItemHistoric = new JMenuItem("Historial ítems");
         
@@ -879,6 +881,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMatReqProv = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
+        hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
+        levelRightValMatCons = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
@@ -988,11 +992,20 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
-        jmMenuStk.setEnabled(hasRightStock);
-        jmiStkStockValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiStkStockValuationDetail.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons);
+        jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiStkStockLot.setEnabled(hasRightStock);
+        jmiStkStockCommPrice.setEnabled(hasRightStock);
+        jmiStkStockWarehouse.setEnabled(hasRightStock);
+        jmiStkStockWarehouseLot.setEnabled(hasRightStock);
+        jmiStkStockMovements.setEnabled(hasRightStock);
+        jmiStkStockMovementsEntry.setEnabled(hasRightStock);
+        jmiStkStockRotation.setEnabled(hasRightStock);
+        jmiStkStockRotationLot.setEnabled(hasRightStock);
+        jmiStkStockValuation.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
+        jmiStkStockValuationDetail.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
+        jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
