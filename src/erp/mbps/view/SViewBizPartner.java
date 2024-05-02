@@ -55,7 +55,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbBizPartnerExport;
     private javax.swing.JButton jbStatusEmployeeChange;
     private javax.swing.JButton jbStatusEmployeeModify;
-    private javax.swing.JButton jbStatusEmployeeDelete;
+    private javax.swing.JButton jbStatusEmployeeRevert;
     private javax.swing.JToggleButton jtbViewEmployeeActive;
     private javax.swing.JToggleButton jtbViewEmployeeInactive;
     private javax.swing.JToggleButton jtbViewEmployeeAll;
@@ -116,18 +116,19 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             jcbFilterDepartament.setPreferredSize(new java.awt.Dimension(250, 23));
             jcbFilterDepartament.setMaximumRowCount(16);
             
-            jbClearFilterDepartament = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro departamento", this);
+            jbClearFilterDepartament = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro departamento", this);
             
             jbStatusEmployeeChange = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_switch.gif")), "Cambiar estatus alta-baja", this);
-            jbStatusEmployeeModify = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif")), "Modificar última alta o baja", this);
-            jbStatusEmployeeDelete = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Revertir última alta o baja", this);
+            jbStatusEmployeeModify = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif")), "Modificar última alta o baja", this);
+            jbStatusEmployeeRevert = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Revertir última alta o baja", this);
             
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jcbFilterDepartament);
             addTaskBarUpperComponent(jbClearFilterDepartament);
+            addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbStatusEmployeeChange);
             addTaskBarUpperComponent(jbStatusEmployeeModify);
-            addTaskBarUpperComponent(jbStatusEmployeeDelete);
+            addTaskBarUpperComponent(jbStatusEmployeeRevert);
             
             if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP_CON_EXP) {
                 // render cutoff date:
@@ -545,7 +546,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (mbIsViewEmployees) {
             jbStatusEmployeeChange.setEnabled(jbEdit.isEnabled());
             jbStatusEmployeeModify.setEnabled(jbEdit.isEnabled());
-            jbStatusEmployeeDelete.setEnabled(jbEdit.isEnabled());
+            jbStatusEmployeeRevert.setEnabled(jbEdit.isEnabled());
         }
 
         mvSuscriptors.add(mnTabTypeAux01);
@@ -779,8 +780,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
     }
     
-    public void actionStatusEmployeeDelete() {
-        if (jbStatusEmployeeDelete.isEnabled()) {
+    public void actionStatusEmployeeRevert() {
+        if (jbStatusEmployeeRevert.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 try {
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última alta o baja del empleado?\nEsta acción no se puede deshacer.") == JOptionPane.YES_OPTION) {
@@ -923,8 +924,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             else if (button == jbStatusEmployeeModify) {
                 actionStatusEmployeeModify();
             }
-            else if (button == jbStatusEmployeeDelete) {
-                actionStatusEmployeeDelete();
+            else if (button == jbStatusEmployeeRevert) {
+                actionStatusEmployeeRevert();
             }
             else if (button == jbClearFilterPaymentType) {
                 actionClearFilterPaymentType();
