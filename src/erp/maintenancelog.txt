@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 251.1/ 2024-05-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio en la contabilización de facturas para que tome en cuenta el ítem de referencia cuando lo haya y no haya un vínculo con RM.
+2) Cambio en vista de RM para no filtrar status de terminado, ya que no se actualiza automáticamente
+
+================================================================================
 SIIE 3.2 251.0/ 2024-04-30
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
