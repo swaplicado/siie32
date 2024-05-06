@@ -3756,7 +3756,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     try {
                                                         oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
                                                         // Petición S. Flores: Contabilizar siempre por el ítem 2024-04-04
-                                                        dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        // dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
+                                                        // Se revierte el cambio: 2024-05-03
+                                                        dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId(), oRecord.getPkBookkeepingCenterId(),
                                                         tAccDpsDate, accItemTypeId, isDebitForOperations(), oStatement));
                                                     }
                                                     catch (Exception e) {
@@ -3772,8 +3774,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 }
                                                 else {
                                                     // Petición S. Flores: Contabilizar siempre por el ítem 2024-04-04
-//                                                    idItemAcc = dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId();
-                                                    idItemAcc = dpsEntry.getFkItemId();
+//                                                    idItemAcc = dpsEntry.getFkItemId();
+                                                    // Se revierte el cambio: 2024-05-03
+                                                    idItemAcc = dpsEntry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? dpsEntry.getFkItemRefId_n() : dpsEntry.getFkItemId();
                                                 }
                                                 
                                                 oAccountConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
@@ -4416,7 +4419,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         try {
                                             accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(
                                                 // Petición S. Flores: Contabilizar siempre por el ítem 2024-04-04
-                                                entry.getFkItemId(), (Integer) keyRecord[2],
+//                                                entry.getFkItemId(), (Integer) keyRecord[2],
+                                                // Se revierte el cambio: 2024-05-03
+                                                entry.getFkItemRefId_n() != 0 ? entry.getFkItemRefId_n() : entry.getFkItemId(), (Integer) keyRecord[2],
                                                 tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
                                         }
                                         catch (Exception e) {
@@ -4432,7 +4437,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                     else {
                                         // Petición S. Flores: Contabilizar siempre por el ítem 2024-04-04
-                                        idItemAcc = entry.getFkItemId();
+//                                        idItemAcc = entry.getFkItemId();
+                                        // Se revierte el cambio: 2024-05-03
+                                        idItemAcc = entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId();
                                     }
                                     
                                     accountConfigs = SFinAccountUtilities.obtainItemAccountConfigs(

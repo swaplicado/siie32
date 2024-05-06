@@ -826,13 +826,15 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 having += "HAVING (org_qty - sumi_qty) > COALESCE(SUM(req_pur.pur_qty), 0) ";
             }
             else if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
-                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + ") ";
+                // Se comenta el filtro del estatus ya que actualmente no se actualiza por sí solo cuando una RM está completamente "comprada"
+//                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + ") ";
                 filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
                 if (filter != null) {
                     where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
                 }
                 
-                having += "HAVING COALESCE(SUM(req_pur.pur_qty), 0) >= (org_qty - sumi_qty) OR (v.b_clo_pur AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") ";
+                having += "HAVING (COALESCE(SUM(req_pur.pur_qty), 0) >= (org_qty - sumi_qty) AND COALESCE(SUM(req_pur.pur_qty), 0) > 0) "
+                        + "OR (v.b_clo_pur AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") ";
             }
         }
         
