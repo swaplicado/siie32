@@ -246,6 +246,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
+    private int mnFirstTaxRegion;
     
     private boolean mbPostEmissionEdition;
     private boolean mbPostEmissionEditionDone;
@@ -410,6 +411,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlFkTaxRegionId = new javax.swing.JLabel();
         jcbFkTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxRegionId = new javax.swing.JButton();
+        jbEditTaxRegion = new javax.swing.JButton();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
         jPanel34 = new javax.swing.JPanel();
         jlFkThirdTaxCausingId_n = new javax.swing.JLabel();
@@ -1333,9 +1335,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkTaxRegionId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jbFkTaxRegionId);
 
+        jbEditTaxRegion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditTaxRegion.setToolTipText("Habilitar región impuestos");
+        jbEditTaxRegion.setFocusable(false);
+        jbEditTaxRegion.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel13.add(jbEditTaxRegion);
+
         jckIsTaxesAutomaticApplying.setText("Cálculo automático de impuestos");
         jckIsTaxesAutomaticApplying.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jckIsTaxesAutomaticApplying.setPreferredSize(new java.awt.Dimension(225, 23));
+        jckIsTaxesAutomaticApplying.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel13.add(jckIsTaxesAutomaticApplying);
 
         jPanel33.add(jPanel13);
@@ -2879,6 +2887,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbPriceHistory.addActionListener(this);
         jbFkItemReferenceId_n.addActionListener(this);
         jbFkTaxRegionId.addActionListener(this);
+        jbEditTaxRegion.addActionListener(this);
         jbFkThirdTaxCausingId_n.addActionListener(this);
         jbEditFkThirdTaxCausingId_n.addActionListener(this);
         jbEditLogistics.addActionListener(this);
@@ -4217,6 +4226,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jcbFkTaxRegionId.setEnabled(false);
             jbFkTaxRegionId.setEnabled(false);
+            jbEditTaxRegion.setEnabled(false);
             jckIsTaxesAutomaticApplying.setEnabled(false);
             jcbFkThirdTaxCausingId_n.setEnabled(false);
             jbFkThirdTaxCausingId_n.setEnabled(false);
@@ -4307,8 +4317,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             jcbOperationsType.setEnabled(true);
 
-            jcbFkTaxRegionId.setEnabled(true);
-            jbFkTaxRegionId.setEnabled(true);
+            jcbFkTaxRegionId.setEnabled(false);
+            jbFkTaxRegionId.setEnabled(false);
+            jbEditTaxRegion.setEnabled(true);
             jckIsTaxesAutomaticApplying.setEnabled(true);
             jcbFkThirdTaxCausingId_n.setEnabled(false);
             jbFkThirdTaxCausingId_n.setEnabled(false);
@@ -4634,6 +4645,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void actionFkTaxRegionId() {
         if (miClient.pickOption(SDataConstants.FINU_TAX_REG, moFieldFkTaxRegionId, null) == SLibConstants.FORM_RESULT_OK) {
             itemChangedFkTaxRegionId();
+        }
+    }
+    
+    private void actionEditTaxRegion() {
+        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea cambiar la región de impuestos?") == JOptionPane.OK_OPTION) {
+            jcbFkTaxRegionId.setEnabled(true);
+            jbFkTaxRegionId.setEnabled(true);
+            jbEditTaxRegion.setEnabled(false);
+            jcbFkTaxRegionId.requestFocus();
         }
     }
     
@@ -5269,6 +5289,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbEditFkThirdTaxCausingId_n;
     private javax.swing.JButton jbEditLogistics;
     private javax.swing.JButton jbEditNotes;
+    private javax.swing.JButton jbEditTaxRegion;
     private javax.swing.JButton jbFkItemId;
     private javax.swing.JButton jbFkItemReferenceId_n;
     private javax.swing.JButton jbFkOriginalUnitId;
@@ -6296,6 +6317,22 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     }
                 }
             }
+            if (!validation.getIsError()) {
+                if (moPaneTaxes.getTableGuiRowCount() == 0) {
+                    validation.setMessage("La partida debe tener al menos un impuesto, sugerimos cambiar la región de impuestos.");
+                    validation.setComponent(jcbFkTaxRegionId);
+                    validation.setTabbedPaneIndex(TAB_TAX);
+                }
+            }
+            if (!validation.getIsError()) {
+                if (moDpsEntry.hasDpsLinksAsDestiny() && mnFirstTaxRegion != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
+                    if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                        validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
+                        validation.setComponent(jcbFkTaxRegionId);
+                        validation.setTabbedPaneIndex(TAB_TAX);
+                    }
+                }
+            }
         }
         
         return validation;
@@ -6331,6 +6368,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkItemId.setFieldValue(new int[] { moDpsEntry.getFkItemId() });
         itemChangedFkItemId(false);
    
+        mnFirstTaxRegion = moDpsEntry.getFkTaxRegionId();
+        
         moFieldConceptKey.setFieldValue(moDpsEntry.getConceptKey());
         moFieldConcept.setFieldValue(moDpsEntry.getConcept());
         moFieldFkOriginalUnitId.setFieldValue(new int[] { moDpsEntry.getFkOriginalUnitId() });
@@ -6825,6 +6864,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else if (button == jbFkTaxRegionId) {
                 actionFkTaxRegionId();
+            }
+            else if (button == jbEditTaxRegion) {
+                actionEditTaxRegion();
             }
             else if (button == jbFkThirdTaxCausingId_n) {
                 actionFkThirdTaxCausingId_n();

@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 251.2/ 2024-05-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección a la validación de folios en la forma de captura de DPS.
+2) Adición de opciones en el picker para gastos en las RM así como hacer que corresponda con el contenido del combobox.
+3) Adición del botón para cambiar la región de impuestos en la forma de captura de DPS y en los entry.
+4) Adición de validaciones de impuestos al momento de guardar DPS.
+
+================================================================================
 SIIE 3.2 251.1/ 2024-05-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -192,14 +192,17 @@ public class SModuleItm extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Ítems", 1, 1);
                 settings.setCodeSettings(true, false);
                 String where = "";
-                switch (subtype) {
-                    case SModSysConsts.ITMU_ITEM_INV: where += "AND i.b_inv "; break;
-                    case SModSysConsts.ITMU_ITEM_NOT_INV: where += "AND NOT i.b_inv "; break;
-                    default:
-                }
                 
                 if (params != null) {
-                    where += "AND i.fid_st_item = " + params.getParamsMap().get(SModConsts.ITMS_ST_ITEM) + " ";
+                    if (params.getParamsMap().get(SModConsts.ITMS_ST_ITEM) != null) {
+                        where += "AND i.fid_st_item = " + params.getParamsMap().get(SModConsts.ITMS_ST_ITEM) + " ";
+                    }
+                    if (params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV) != null) {
+                        where += ((boolean) params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV)) ? "AND i.b_inv " : "AND NOT i.b_inv ";
+                    }
+                    if (params.getParamsMap().get(SModConsts.ITMS_CT_ITEM) != null) {
+                        where += "AND ig.fid_ct_item = " + params.getParamsMap().get(SModConsts.ITMS_CT_ITEM) + " ";
+                    }
                 }
                 
                 sql = "SELECT i.id_item AS " + SDbConsts.FIELD_ID + "1, " +

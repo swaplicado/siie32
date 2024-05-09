@@ -50,7 +50,10 @@ import sa.lib.gui.SGuiSession;
 public abstract class SMaterialRequestUtils {
 
     public static String ITEM_INV = "is_inv";
-    public static String ITEM_REF = "is_ref";
+    public static String ITEM_SAL = "is_sal";
+    public static String ITEM_ASS = "is_ass";
+    public static String ITEM_PUR = "is_pur";
+    public static String ITEM_EXP = "is_exp";
     public static final int EQUIVALENCES = 1;
     
     public static SDataStockSegregation getSegregationOfMaterialRequest(SGuiSession session, final int idMaterialRequest) {
@@ -438,7 +441,10 @@ public abstract class SMaterialRequestUtils {
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
                                 + "a.b_inv AS " + ITEM_INV + ", "
-                                + "0 AS " + ITEM_REF + " "
+                                + "0 AS " + ITEM_SAL + ", "
+                                + "0 AS " + ITEM_ASS + ", "
+                                + "0 AS " + ITEM_PUR + ", "
+                                + "0 AS " + ITEM_EXP + " "
                                 + "FROM ("
                                 + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
@@ -462,7 +468,10 @@ public abstract class SMaterialRequestUtils {
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
                                 + "a.b_inv AS " + ITEM_INV + ", "
-                                + "IF(b.fid_ct_item IN (1, 2, 4), 1, 0) AS " + ITEM_REF + " "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_SAL + ", 1, 0) AS " + ITEM_SAL + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_ASS + ", 1, 0) AS " + ITEM_ASS + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_PUR + ", 1, 0) AS " + ITEM_PUR + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_EXP + ", 1, 0) AS " + ITEM_EXP + " "
                                 + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS b ON "
                                 + "a.fid_igen = b.id_igen "

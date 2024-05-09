@@ -1761,13 +1761,35 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
         //moDialogPickerItemRef.setItemPickerInvDefault(false);
-        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.EXP_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
             itemId = (int[]) moDialogPickerItemRef.getOption();
 
             if (itemId != null) {
+                SGuiParams params = new SGuiParams();
+                switch (moDialogPickerItemRef.getSetectedMode()) {
+                    case SDialogItemPicker.INV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, true);
+                        break;
+                    case SDialogItemPicker.NOINV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, false);
+                        break;
+                    case SDialogItemPicker.SAL_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_SAL);
+                        break;
+                    case SDialogItemPicker.ASS_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_ASS);
+                        break;
+                    case SDialogItemPicker.PUR_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_PUR);
+                        break;
+                    case SDialogItemPicker.EXP_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
+                        break;
+                }
+                miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
                 moKeyItemRef.setValue(itemId);
             }
         }
@@ -1783,13 +1805,35 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moDialogPickerItemRef.resetPicker();
         moDialogPickerItemRef.initComponentsCustom();
         //moDialogPickerItemRef.setItemPickerInvDefault(false);
-        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
+        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.EXP_ITEMS);
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
             itemId = (int[]) moDialogPickerItemRef.getOption();
 
             if (itemId != null) {
+                SGuiParams params = new SGuiParams();
+                switch (moDialogPickerItemRef.getSetectedMode()) {
+                    case SDialogItemPicker.INV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, true);
+                        break;
+                    case SDialogItemPicker.NOINV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, false);
+                        break;
+                    case SDialogItemPicker.SAL_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_SAL);
+                        break;
+                    case SDialogItemPicker.ASS_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_ASS);
+                        break;
+                    case SDialogItemPicker.PUR_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_PUR);
+                        break;
+                    case SDialogItemPicker.EXP_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
+                        break;
+                }
+                miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
                 moKeyItemRefEty.setValue(itemId);
             }
         }
@@ -2086,6 +2130,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     public void reloadCatalogues() {
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
+        SGuiParams paramsItemRef = new SGuiParams();
+        paramsItemRef.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
 
         moFieldKeyConsEntityEty.initGroup();
         moFieldKeyConsEntityEty.addFieldKey(moKeyConsEntEty, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
@@ -2098,8 +2144,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         miClient.getSession().populateCatalogue(moKeyDocNature, SModConsts.TRNU_DPS_NAT, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriReq, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriEty, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, paramsItemRef);
+        miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, paramsItemRef);
         
         isReqInv = false;
     }

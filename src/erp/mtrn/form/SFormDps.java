@@ -583,6 +583,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlTaxRegionId = new javax.swing.JLabel();
         jcbTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbTaxRegionId = new javax.swing.JButton();
+        jbEditTaxRegion = new javax.swing.JButton();
         jpMarketing = new javax.swing.JPanel();
         jpOtherSupply = new javax.swing.JPanel();
         jPanel39 = new javax.swing.JPanel();
@@ -1827,6 +1828,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbTaxRegionId.setFocusable(false);
         jbTaxRegionId.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsEast.add(jbTaxRegionId);
+
+        jbEditTaxRegion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditTaxRegion.setToolTipText("Habilitar región impuestos");
+        jbEditTaxRegion.setFocusable(false);
+        jbEditTaxRegion.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsEast.add(jbEditTaxRegion);
 
         jpEntriesControls.add(jpEntriesControlsEast, java.awt.BorderLayout.CENTER);
 
@@ -3842,6 +3849,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewMatReqLinks.addActionListener(this);
         jbExportCsv.addActionListener(this);
         jbTaxRegionId.addActionListener(this);
+        jbEditTaxRegion.addActionListener(this);
         jbNotesNew.addActionListener(this);
         jbNotesEdit.addActionListener(this);
         jbNotesDelete.addActionListener(this);
@@ -5521,7 +5529,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfFiscalId.setToolTipText(jtfFiscalId.getText());
             jtfFiscalId.setCaretPosition(0);
 
-            SFormUtilities.locateComboBoxItem(jcbTaxRegionId, new int[] { moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n() });
+            if (moDps.getIsRegistryNew() || moDps.getDbmsDpsEntries().isEmpty()) {
+                SFormUtilities.locateComboBoxItem(jcbTaxRegionId, new int[] { moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n() });
+
+                if (jcbTaxRegionId.getSelectedIndex() == 0) {
+                    jcbTaxRegionId.setEnabled(true);
+                    jbTaxRegionId.setEnabled(true);
+                    jbEditTaxRegion.setEnabled(false);
+                }
+            }
+            else {
+                SFormUtilities.locateComboBoxItem(jcbTaxRegionId, new int[] { moDps.getDbmsDpsEntries().get(0).getFkTaxRegionId() });
+            }
         }
 
         if (moBizPartnerBranch != null) {
@@ -5854,6 +5873,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jcbAdjustmentSubtypeId.setEnabled(false);
             jcbTaxRegionId.setEnabled(false);
             jbTaxRegionId.setEnabled(false);
+            jbEditTaxRegion.setEnabled(false);
 
             jftDateDocDelivery_n.setEditable(false);
             jftDateDocDelivery_n.setFocusable(false);
@@ -5963,8 +5983,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbEditNotes.setEnabled(false);
 
             //jcbAdjustTypeId.setEnabled(true); // status already set by previous call to method updateDpsControlsStatus()
-            jcbTaxRegionId.setEnabled(true);
-            jbTaxRegionId.setEnabled(true);
+            jcbTaxRegionId.setEnabled(false);
+            jbTaxRegionId.setEnabled(false);
+            jbEditTaxRegion.setEnabled(true);
 
             jftDateDocDelivery_n.setEditable(!mbIsDpsAdjustment);
             jftDateDocDelivery_n.setFocusable(!mbIsDpsAdjustment);
@@ -7220,27 +7241,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jbEntryNew.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
             SDataDpsEntry entry = null;
 
-            updateDpsWithCurrentFormData();
-
-            moFormEntry.formReset();
-            moFormEntry.setValue(SDataConstants.TRN_DPS, moDps);
-            moFormEntry.setValue(SDataConstants.BPSU_BP, moBizPartner);
-            moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
-            moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
             if (jcbTaxRegionId.getSelectedIndex() > 0) {
+                updateDpsWithCurrentFormData();
+
+                moFormEntry.formReset();
+                moFormEntry.setValue(SDataConstants.TRN_DPS, moDps);
+                moFormEntry.setValue(SDataConstants.BPSU_BP, moBizPartner);
+                moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
+                moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
                 moFormEntry.setValue(SDataConstants.FINU_TAX_REG, ((SFormComponentItem) jcbTaxRegionId.getSelectedItem()).getPrimaryKey());
+
+                moFormEntry.setFormVisible(true);
+
+                if (moFormEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    entry = (SDataDpsEntry) moFormEntry.getRegistry();
+
+                    moPaneGridEntries.addTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                    renderEntries();
+                    calculateTotal();
+                    updateDpsEntryCfdiSettings();
+                    moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+                }
             }
-
-            moFormEntry.setFormVisible(true);
-
-            if (moFormEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                entry = (SDataDpsEntry) moFormEntry.getRegistry();
-
-                moPaneGridEntries.addTableRow(new SDataDpsEntryRow(entry, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
-                renderEntries();
-                calculateTotal();
-                updateDpsEntryCfdiSettings();
-                moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+            else {
+                miClient.showMsgBoxWarning("No se ha seleccionado región de impuestos, favor de seleccionar una.");
+                jcbTaxRegionId.requestFocus();
             }
         }
     }
@@ -8404,6 +8429,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SFormUtilities.locateComboBoxItem(jcbTaxRegionId, picker.getSelectedPrimaryKey());
+            jcbTaxRegionId.requestFocus();
+        }
+    }
+    
+    private void actionEditTaxRegion() {
+        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea cambiar la región de impuestos?\nLa configuración se aplicará para las partidas que se agreguen en adelante.") == JOptionPane.OK_OPTION) {
+            jcbTaxRegionId.setEnabled(true);
+            jbTaxRegionId.setEnabled(true);
+            jbEditTaxRegion.setEnabled(false);
             jcbTaxRegionId.requestFocus();
         }
     }
@@ -10455,6 +10489,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEditHelp;
     private javax.swing.JButton jbEditLogistics;
     private javax.swing.JButton jbEditNotes;
+    private javax.swing.JButton jbEditTaxRegion;
     private javax.swing.JButton jbEntryCopy;
     private javax.swing.JButton jbEntryDelete;
     private javax.swing.JButton jbEntryDiscountRetailChain;
@@ -11129,11 +11164,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     validation.setMessage("¡No se han especificado la clave de esta empresa como proveedor del cliente " + moBizPartner.getBizPartner() + ".\n" +
                             "Actualizar este dato en el Módulo Configuración, vista 'Clientes', forma de captura 'Cliente', pestaña 'Información adicional', campo 'Clave de la empresa'.");
                 }
-                else if (!moDps.isEstimate() && !moDps.isOrder()) {
-                    if (!SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                        validation.setComponent(jftDate);
-                    }
+                else if (!moDps.isEstimate() && !moDps.isOrder() && !SDataUtilities.isPeriodOpen(miClient, moFieldDate.getDate())) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
+                    validation.setComponent(jftDate);
                 }
                 else if (moDps.getPkYearId() != SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
@@ -11787,6 +11820,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                             + "Usar la utilería '" + jbExeWizardAccSubtotal.getToolTipText() + "' disponible al modificar la partida que requiera el ajuste.");
                                     validation.setTabbedPaneIndex(TAB_ACC);
                                 }
+                            }
+                        }
+                    }
+                    
+                    if (!validation.getIsError()) {
+                        int taxReg = 0;
+                        for (STableRow row : moPaneGridEntries.getGridRows()) {
+                            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
+                            if (taxReg == 0) {
+                                taxReg = entry.getFkTaxRegionId();
+                            }
+                            if (taxReg != entry.getFkTaxRegionId()) {
+                                if (miClient.showMsgBoxConfirm("El documento tiene partidas en mas de una distinta región de impuestos.\n¿Desea guardar de todas formas?") != JOptionPane.OK_OPTION) {
+                                    validation.setMessage("Cambiar la región de impuestos de las partidas para que todas coincidan.");
+                                }
+                                break;
                             }
                         }
                     }
@@ -12659,6 +12708,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbTaxRegionId) {
                     actionTaxRegionId();
+                }
+                else if (button == jbEditTaxRegion) {
+                    actionEditTaxRegion();
                 }
                 else if (button == jbNotesNew) {
                     actionNotesNew();
