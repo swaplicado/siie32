@@ -5,7 +5,6 @@
  */
 package erp.mod.trn.form;
 
-import erp.mod.SModConsts;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SRowItemPicker;
 import java.awt.BorderLayout;
@@ -48,9 +47,11 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpInvControl;
     private javax.swing.JPanel jpRefControl;
-    private sa.lib.gui.bean.SBeanFieldText moTextItem;
-    protected Vector<SGridRow> moAllRows;
-    protected Vector<SGridRow> moAllRowsAux;
+    private javax.swing.JLabel jlSearchItems;
+    protected sa.lib.gui.bean.SBeanFieldText moSearchItem;
+    private Vector<SGridRow> moAllRows;
+    private Vector<SGridRow> moAllRowsAux;
+    private javax.swing.JLabel jlFilterItems;
     private javax.swing.JRadioButton jrbAllItems;
     private javax.swing.JRadioButton jrbInvItem;
     private javax.swing.JRadioButton jrbNoInvItem;
@@ -59,6 +60,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.JRadioButton jrbPurItem;
     private javax.swing.JRadioButton jrbExpItem;
     private javax.swing.ButtonGroup jbgItems;
+    private javax.swing.JLabel jlShowedItems;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -85,69 +87,75 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         
         jbgItems = new javax.swing.ButtonGroup();
         
+        jlSearchItems = new javax.swing.JLabel("Buscar ítems:");
+        jlSearchItems.setPreferredSize(new java.awt.Dimension(75, 23));
+        
+        jlFilterItems = new javax.swing.JLabel("Filtrar ítems:");
+        jlFilterItems.setPreferredSize(new java.awt.Dimension(75, 23));
+        
         jrbAllItems = new javax.swing.JRadioButton();
-        jrbAllItems.setText("Todos los ítems");
-        jrbAllItems.setPreferredSize(new java.awt.Dimension(125, 23));
+        jrbAllItems.setText("Todos");
+        jrbAllItems.setPreferredSize(new java.awt.Dimension(70, 23));
         jrbAllItems.addItemListener(this);
         jbgItems.add(jrbAllItems);
         
         jrbInvItem = new javax.swing.JRadioButton();
-        jrbInvItem.setText("Ítems inventariables");
-        jrbInvItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbInvItem.setText("Inventariables");
+        jrbInvItem.setPreferredSize(new java.awt.Dimension(110, 23));
         jrbInvItem.addItemListener(this);
         jbgItems.add(jrbInvItem);
         
         jrbNoInvItem = new javax.swing.JRadioButton();
-        jrbNoInvItem.setText("Ítems no inventariables");
-        jrbNoInvItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbNoInvItem.setText("No inventariables");
+        jrbNoInvItem.setPreferredSize(new java.awt.Dimension(110, 23));
         jrbNoInvItem.addItemListener(this);
         jbgItems.add(jrbNoInvItem);
         
         jrbSalItem = new javax.swing.JRadioButton();
         jrbSalItem.setText("Ventas");
-        jrbSalItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbSalItem.setPreferredSize(new java.awt.Dimension(75, 23));
         jrbSalItem.addItemListener(this);
         jbgItems.add(jrbSalItem);
         
         jrbAssItem = new javax.swing.JRadioButton();
         jrbAssItem.setText("Activos");
-        jrbAssItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbAssItem.setPreferredSize(new java.awt.Dimension(75, 23));
         jrbAssItem.addItemListener(this);
         jbgItems.add(jrbAssItem);
         
         jrbPurItem = new javax.swing.JRadioButton();
         jrbPurItem.setText("Compras");
-        jrbPurItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbPurItem.setPreferredSize(new java.awt.Dimension(75, 23));
         jrbPurItem.addItemListener(this);
         jbgItems.add(jrbPurItem);
         
         jrbExpItem = new javax.swing.JRadioButton();
         jrbExpItem.setText("Gastos");
-        jrbExpItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbExpItem.setPreferredSize(new java.awt.Dimension(75, 23));
         jrbExpItem.addItemListener(this);
         jbgItems.add(jrbExpItem);
         
         moAllRows = new Vector<>(moGridPicker.getModel().getGridRows());
         moAllRowsAux = new Vector<>(moGridPicker.getModel().getGridRows());
         
-        moTextItem = new sa.lib.gui.bean.SBeanFieldText();
-        moTextItem.setPreferredSize(new java.awt.Dimension(200, 23));
-        moTextItem.addKeyListener(this);
+        moSearchItem = new sa.lib.gui.bean.SBeanFieldText();
+        moSearchItem.setPreferredSize(new java.awt.Dimension(300, 23));
+        moSearchItem.addKeyListener(this);
         
         jpGrid.add(jpControls, BorderLayout.NORTH);
         jpControls.add(jpInvControl);
-        jpInvControl.add(moTextItem);
-        jpInvControl.add(jrbAllItems);
-        jpInvControl.add(jrbInvItem);
-        jpInvControl.add(jrbNoInvItem);
+        jpControls.add(jpRefControl);
+        jpInvControl.add(jlSearchItems);
+        jpInvControl.add(moSearchItem);
+        jpRefControl.add(jlFilterItems);
+        jpRefControl.add(jrbAllItems);
+        jpRefControl.add(jrbInvItem);
+        jpRefControl.add(jrbNoInvItem);
         jpRefControl.add(jrbSalItem);            
         jpRefControl.add(jrbAssItem);            
         jpRefControl.add(jrbPurItem);            
-        jpRefControl.add(jrbExpItem);            
+        jpRefControl.add(jrbExpItem);
         
-        if (mnPickerSubtype != SModConsts.TRN_MAT_REQ) {
-            jpControls.add(jpRefControl);
-        }
     }
     
     private void stateChangeAllItems() {
@@ -257,6 +265,15 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
                 stateChangeExpItem();
                 break;
         }
+    }
+    
+    public void setShowedItems(String text) {
+        jlShowedItems = new javax.swing.JLabel(text);
+        super.jpCommand.remove(jbOk);
+        super.jpCommand.remove(jbCancel);
+        super.jpCommand.add(jlShowedItems);
+        super.jpCommand.add(jbOk);
+        super.jpCommand.add(jbCancel);
     }
     
     @Override
@@ -372,7 +389,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     @Override
     public void keyReleased(KeyEvent e) {
         Vector<SGridRow> items = new Vector<>();
-        String textToSearch = moTextItem.getValue();
+        String textToSearch = moSearchItem.getValue();
         if (textToSearch.isEmpty()) {
             items.addAll(moAllRowsAux);
         }

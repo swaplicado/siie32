@@ -1,3 +1,12 @@
+SIIE 3.2 251.3/ 2024-05-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de la validación para no importar partidas con ítems eliminados a los DPS.
+2) Adición de la validación para no guardar DPS con partidas con ítems eliminados.
+3) Cambio en el acomodo de los filtros del picker de los ítems de RM, así como adición de la nota de los ítems que se muestran.
+4) Optimización al cargar los ítems de referencia en las RM.
+5) Cambio en la generación en los CFDI de pagos debido a un cambio en la validación del campo EquivalenciaDR. 
+
 ================================================================================
 SIIE 3.2 251.2/ 2024-05-09
 Isabel Danae GARCÍA SERVÍN

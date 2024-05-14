@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.data.SDataConstantsSys;
+import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -88,6 +89,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected boolean mbAuxChangeStatus;
     protected boolean mbAuxLastProvClosedSta;
     protected boolean mbAuxLastPurClosedSta;
+    
+    protected SDataItem moDbmsItemRef;
 
     public SDbMaterialRequest() {
         super(SModConsts.TRN_MAT_REQ);
@@ -144,6 +147,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setAuxChangeStatus(boolean b) { mbAuxChangeStatus = b; }
     public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
     public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
+    
+    public void setDbmsItemRef(SDataItem o) { moDbmsItemRef = o; }
     
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public String getTypeRequest() { return msTypeRequest; }
@@ -202,6 +207,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public boolean getAuxChangeStatus() { return mbAuxChangeStatus; }
     public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
     public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
+    
+    public SDataItem getDbmsItemRef() { return moDbmsItemRef; }
     
     public String getConsumptionInfo() {
         String description = "";
@@ -294,6 +301,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mbAuxLastProvClosedSta = false;
         mbAuxLastPurClosedSta = false;
         msAuxNotes = "";
+        
+        moDbmsItemRef = null;
     }
 
     @Override
@@ -477,6 +486,11 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                        
             msAuxAuthStatus = SAuthorizationUtils.AUTH_STATUS_DESC.get(SAuthorizationUtils.getAuthStatus(session, 
                     SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[] { mnPkMatRequestId } )).toUpperCase();
+            
+            if (mnFkItemReferenceId_n != 0) {
+                moDbmsItemRef = new SDataItem();
+                moDbmsItemRef.read(new int[] { mnFkItemReferenceId_n }, statement);
+            }
             
             mbRegistryNew = false;
         }
@@ -800,6 +814,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         registry.setAuxLastProvClosedSta(this.getAuxLastProvClosedSta());
         registry.setAuxLastPurClosedSta(this.getAuxLastPurClosedSta());
+        
+        registry.setDbmsItemRef(this.getDbmsItemRef());
         
         registry.setRegistryNew(this.isRegistryNew());
         

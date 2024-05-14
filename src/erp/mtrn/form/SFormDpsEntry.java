@@ -4649,7 +4649,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void actionEditTaxRegion() {
-        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea cambiar la región de impuestos?") == JOptionPane.OK_OPTION) {
+        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea habilitar la región de impuestos?") == JOptionPane.OK_OPTION) {
             jcbFkTaxRegionId.setEnabled(true);
             jbFkTaxRegionId.setEnabled(true);
             jbEditTaxRegion.setEnabled(false);
@@ -6151,6 +6151,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setComponent(jcbFkCashAccountId_n);
                     jTabbedPane.setSelectedIndex(TAB_MKT);
                 }
+                else if (moItem.getIsDeleted()) {
+                    validation.setMessage("No es posible guardar la partida debido a que el ítem está eliminado.");
+                    validation.setComponent(jcbFkItemId);
+                }
                 else if (moParamDps.isOrder() && moDpsEntry.getContractPriceYear() != SLibConstants.UNDEFINED && moDpsEntry.getContractPriceMonth() != SLibConstants.UNDEFINED && moFieldOriginalQuantity.getDouble() > mdQuantityPrc) {
                     validation.setMessage("De acuerdo con la entrega mensual actual" + (mbIsLastPrc ? ", considerando el excedente permitido en la partida del documento origen" : "") + ":\n" +
                             "el valor máximo permitido para el campo '" + jlOriginalQuantity.getText() + "' es " + SLibUtils.getDecimalFormatQuantity().format(mdQuantityPrc) + " " + jtfOriginalUnitSymbolRo.getText() + ".");
@@ -6319,19 +6323,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             if (!validation.getIsError()) {
                 if (moPaneTaxes.getTableGuiRowCount() == 0) {
-                    validation.setMessage("La partida debe tener al menos un impuesto, sugerimos cambiar la región de impuestos.");
+                    validation.setMessage("La partida debe tener al menos un impuesto.\nSe sugiere cambiar la región de impuestos o revisar la configuración de impuestos del ítem.");
                     validation.setComponent(jcbFkTaxRegionId);
                     validation.setTabbedPaneIndex(TAB_TAX);
                 }
             }
             if (!validation.getIsError()) {
-                if (moDpsEntry.hasDpsLinksAsDestiny() && mnFirstTaxRegion != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
-                    if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
-                        validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
-                        validation.setComponent(jcbFkTaxRegionId);
-                        validation.setTabbedPaneIndex(TAB_TAX);
+                try {
+                    if (moDpsEntry.hasDpsLinksAsDestiny()) {
+                        if (STrnUtilities.getTaxRegionDpsEty(miClient, moDpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsDestinyDpsEntryKey()) != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
+                            if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                                validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
+                                validation.setComponent(jcbFkTaxRegionId);
+                                validation.setTabbedPaneIndex(TAB_TAX);
+                            }
+                        }
                     }
                 }
+                catch (Exception e) {}
             }
         }
         

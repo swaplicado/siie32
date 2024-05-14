@@ -1922,7 +1922,7 @@
                         <Component class="javax.swing.JLabel" name="jlTaxRegionId">
                           <Properties>
                             <Property name="horizontalAlignment" type="int" value="11"/>
-                            <Property name="text" type="java.lang.String" value="Regi&#xf3;n impuestos: "/>
+                            <Property name="text" type="java.lang.String" value="Regi&#xf3;n de impuestos: "/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[110, 23]"/>
                             </Property>

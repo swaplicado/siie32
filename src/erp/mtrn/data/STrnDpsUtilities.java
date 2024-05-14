@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Uriel Castañeda, Adrián Avilés
+ * @author Uriel Castañeda, Adrián Avilés, Isabel Servín
  */
 public abstract class STrnDpsUtilities {
  
@@ -28,8 +28,8 @@ public abstract class STrnDpsUtilities {
      * @throws Exception
      */
     public static double obtainEntryTotalQuantitySupplied(final SClientInterface client, final int[] entryKey) throws Exception {
-        String sql = "";
-        ResultSet resulSet = null;
+        String sql;
+        ResultSet resulSet;
         double totalSupplied = 0;
 
         sql = "SELECT SUM(de.orig_qty) as tot_qty_sup "
@@ -44,6 +44,30 @@ public abstract class STrnDpsUtilities {
         }
 
         return totalSupplied;
+    }
+    
+    /**
+     * Obtiene si el ítem de la partida de un dps está eliminado.
+     * @param client GUI client.
+     * @param entryKey Entry key.
+     * @return true or false
+     * @throws Exception
+     */
+    public static boolean isDpsEntryItemDeleted(final SClientInterface client, final int[] entryKey) throws Exception {
+        boolean deleted = false;
+        String sql;
+        ResultSet resultSet;
+        
+        sql = "SELECT i.b_del FROM trn_dps_ety AS de " 
+                + "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " 
+                + "WHERE de.id_year = " + entryKey[0] + " AND de.id_doc = " + entryKey[1] + " AND de.id_ety = " + entryKey[2];
+        
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            deleted = resultSet.getBoolean(1);
+        }
+        
+        return deleted;
     }
     
     public static SDataDps getDpsSourceFromCreditNote(final Statement statement, final int[] entryKey) {

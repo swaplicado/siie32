@@ -135,6 +135,7 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.xml.SXmlUtils;
@@ -1816,7 +1817,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpEntriesControlsEast.add(jcbAdjustmentSubtypeId);
 
         jlTaxRegionId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jlTaxRegionId.setText("Región impuestos: ");
+        jlTaxRegionId.setText("Región de impuestos: ");
         jlTaxRegionId.setPreferredSize(new java.awt.Dimension(110, 23));
         jpEntriesControlsEast.add(jlTaxRegionId);
 
@@ -7264,7 +7265,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             else {
-                miClient.showMsgBoxWarning("No se ha seleccionado región de impuestos, favor de seleccionar una.");
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + " '" + SGuiUtils.getLabelName(jlTaxRegionId.getText()) + "'.");
                 jcbTaxRegionId.requestFocus();
             }
         }
@@ -8434,7 +8435,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionEditTaxRegion() {
-        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea cambiar la región de impuestos?\nLa configuración se aplicará para las partidas que se agreguen en adelante.") == JOptionPane.OK_OPTION) {
+        if (miClient.showMsgBoxConfirm("¿Está seguro(a) que desea habilitar la región de impuestos?\nLa configuración se aplicará para las partidas que se agreguen en adelante.") == JOptionPane.OK_OPTION) {
             jcbTaxRegionId.setEnabled(true);
             jbTaxRegionId.setEnabled(true);
             jbEditTaxRegion.setEnabled(false);
@@ -11470,6 +11471,52 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
+                    
+                    if (!validation.getIsError()) {
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                            try {
+                                if (STrnUtils.getIsItemDeleted(miClient.getSession(), entry.getFkItemId())) {
+                                    validation.setMessage("La partida # " + (i + 1) + " no se puede guardar debido a que el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' está eliminado.");
+                                    validation.setComponent(moPaneGridEntries);
+                                    validation.setTabbedPaneIndex(TAB_ETY);
+                                    break;
+                                }
+                            }
+                            catch (Exception e) { }
+                        }
+                    }
+                    
+                    if (!validation.getIsError()) {
+                        ArrayList<Integer> taxReg = new ArrayList<>();
+                        for (STableRow row : moPaneGridEntries.getGridRows()) {
+                            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
+                            if (!taxReg.contains(entry.getFkTaxRegionId())){
+                                taxReg.add(entry.getFkTaxRegionId());
+                            }
+                        }
+                        if (taxReg.size() > 1) {
+                            if (miClient.showMsgBoxConfirm("El documento tiene partidas con " + taxReg.size() + " distintas regiones de impuestos.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                                validation.setMessage("Cambiar la región de impuestos de las partidas para que coincidan.");
+                            }
+                        }
+                    }
+                    
+                    if (!validation.getIsError() && mbHasDpsLinksAsDes) {
+                        for (STableRow row : moPaneGridEntries.getGridRows()) {
+                            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
+                            try {
+                                if(entry.hasDpsLinksAsDestiny()){
+                                    if (STrnUtilities.getTaxRegionDpsEty(miClient, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsDestinyDpsEntryKey()) != entry.getFkTaxRegionId()) {
+                                        if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                                            validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e) {}
+                        }
+                    }
 
                     double prepaymentsCy = mdPrepaymentsCy;
                     double applicationsCy = 0;
@@ -11824,22 +11871,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                     
-                    if (!validation.getIsError()) {
-                        int taxReg = 0;
-                        for (STableRow row : moPaneGridEntries.getGridRows()) {
-                            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
-                            if (taxReg == 0) {
-                                taxReg = entry.getFkTaxRegionId();
-                            }
-                            if (taxReg != entry.getFkTaxRegionId()) {
-                                if (miClient.showMsgBoxConfirm("El documento tiene partidas en mas de una distinta región de impuestos.\n¿Desea guardar de todas formas?") != JOptionPane.OK_OPTION) {
-                                    validation.setMessage("Cambiar la región de impuestos de las partidas para que todas coincidan.");
-                                }
-                                break;
-                            }
-                        }
-                    }
-
                     /*
                      * IMPORTANT!: THIS IS THE VERY LAST BLOCK OF VALIDATIONS IN THIS SECTION!!!
                      */
