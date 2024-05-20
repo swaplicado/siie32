@@ -6331,7 +6331,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             if (!validation.getIsError()) {
                 try {
                     if (moDpsEntry.hasDpsLinksAsDestiny()) {
-                        if (STrnUtilities.getTaxRegionDpsEty(miClient, moDpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsDestinyDpsEntryKey()) != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
+                        if (STrnUtilities.getTaxRegionDpsEty(miClient, moDpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()) != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
                             if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
                                 validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
                                 validation.setComponent(jcbFkTaxRegionId);

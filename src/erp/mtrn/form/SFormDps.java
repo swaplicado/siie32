@@ -11503,12 +11503,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                     
                     if (!validation.getIsError() && mbHasDpsLinksAsDes) {
-                        for (STableRow row : moPaneGridEntries.getGridRows()) {
-                            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
                             try {
                                 if(entry.hasDpsLinksAsDestiny()){
-                                    if (STrnUtilities.getTaxRegionDpsEty(miClient, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsDestinyDpsEntryKey()) != entry.getFkTaxRegionId()) {
-                                        if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                                    if (STrnUtilities.getTaxRegionDpsEty(miClient, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()) != entry.getFkTaxRegionId()) {
+                                        if (miClient.showMsgBoxConfirm("La región de impuestos de la partida #" + (i + 1) + " es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
                                             validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
                                         }
                                     }
