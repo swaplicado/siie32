@@ -507,6 +507,7 @@
                     <Component class="javax.swing.JComboBox" name="jcbVouTaxRegime">
                       <Properties>
                         <Property name="maximumRowCount" type="int" value="16"/>
+                        <Property name="toolTipText" type="java.lang.String" value="R&#xe9;gimen fiscal emisor"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[363, 23]"/>
                         </Property>

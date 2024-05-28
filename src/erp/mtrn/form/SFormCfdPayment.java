@@ -640,6 +640,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel9.add(jlVouTaxRegime);
 
         jcbVouTaxRegime.setMaximumRowCount(16);
+        jcbVouTaxRegime.setToolTipText("Régimen fiscal emisor");
         jcbVouTaxRegime.setPreferredSize(new java.awt.Dimension(363, 23));
         jPanel9.add(jcbVouTaxRegime);
 
