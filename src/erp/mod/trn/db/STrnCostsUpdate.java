@@ -333,6 +333,7 @@ public class STrnCostsUpdate {
                         diogEntry.setFkMfgOrderId_n(0);
                         diogEntry.setFkMfgChargeId_n(0);
                         diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                        diogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                         diogEntry.setFkUserNewId(moSession.getUser().getPkUserId());
                         diogEntry.setFkUserEditId(SUtilConsts.USR_NA_ID);
                         diogEntry.setFkUserDeleteId(SUtilConsts.USR_NA_ID);

@@ -312,6 +312,7 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                         diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                         diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                         diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                        diogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                         diogEntry.setFkUserNewId(mnFkUserNewId);
                         diogEntry.setFkUserEditId(1);
                         diogEntry.setFkUserDeleteId(1);

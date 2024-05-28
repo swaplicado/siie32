@@ -230,10 +230,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfItemDestiny = new javax.swing.JTextField();
         jtfQuantityDestiny = new javax.swing.JTextField();
         jtfUnitSymbolDestiny = new javax.swing.JTextField();
-        jPanel27 = new javax.swing.JPanel();
+        jPanel28 = new javax.swing.JPanel();
         jlRef = new javax.swing.JLabel();
         jtfReference = new javax.swing.JTextField();
-        jPanel28 = new javax.swing.JPanel();
+        jPanel29 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         jtfNotes = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
@@ -590,29 +590,29 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel22.add(jpProductionOrderDestinyItem);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRef.setText("Referencia:");
         jlRef.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jlRef);
+        jPanel28.add(jlRef);
 
         jtfReference.setText("TEXT");
         jtfReference.setPreferredSize(new java.awt.Dimension(135, 23));
-        jPanel27.add(jtfReference);
+        jPanel28.add(jtfReference);
 
-        jPanel22.add(jPanel27);
+        jPanel22.add(jPanel28);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setText("Notas:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jlNotes);
+        jPanel29.add(jlNotes);
 
         jtfNotes.setText("TEXT");
         jtfNotes.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel28.add(jtfNotes);
+        jPanel29.add(jtfNotes);
 
-        jPanel22.add(jPanel28);
+        jPanel22.add(jPanel29);
 
         jPanel21.add(jPanel22, java.awt.BorderLayout.CENTER);
 
@@ -1732,6 +1732,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -1861,6 +1862,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -2241,6 +2243,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 iogEntry.setClonedFkMfgChargeId_n(SLibConstants.UNDEFINED);
 
                                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                                 
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
@@ -2375,6 +2378,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
 
                                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                                 
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
@@ -2465,6 +2469,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                             
                 iogEntry.setFkUserNewId(1);
                 iogEntry.setFkUserEditId(1);
@@ -2749,6 +2754,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -3338,8 +3344,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -3990,6 +3996,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 entryNew.setClonedFkMfgChargeId_n(entryOriginal.getClonedFkMfgChargeId_n());
                                 
                                 entryNew.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                                entryNew.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
                                 break;
                             }
                         }
