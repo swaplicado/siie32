@@ -357,6 +357,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
             int cfdProcessed = 0;
             int cfdProcessedOk = 0;
             int cfdProcessedWrong = 0;
+            String subjectHint = "";
             String detailMessage = "";
 
             moIntCfdToProcess.setValue(maPayrollReceipts.size());
@@ -368,6 +369,8 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                 if (!maPayrollReceipts.isEmpty()) {
                     SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { maPayrollReceipts.get(0).getPkPayrollId() });
                     SCfdUtils.DataSet.put(SModConsts.HRS_PAY, payroll); // payroll registry will be used in method SHrsUtils.createPayrollReceiptMap()
+                    
+                    subjectHint = payroll.getHint();
                 }
 
                 for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
@@ -379,7 +382,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                     cfdProcessed++;
 
                     if (pdf != null) {
-                        String subject = "Envío de recibo de nómina";
+                        String subject = "Envío de recibo de nómina" + (subjectHint.isEmpty() ? "" : " (" + subjectHint + ")") ;
                         String body = "Se adjunta recibo de nómina en formato PDF.";
                         boolean sent = STrnUtilities.sendMailPdf((SClientInterface) miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
 

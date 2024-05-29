@@ -7,56 +7,51 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Sergio Flores
  */
-public class SDbPaysheetCustomType extends SDbRegistryUser {
-    
-    protected int mnPkPaysheetCustomTypeId;
-    protected String msCode;
-    protected String msName;
-    protected String msHint;
-    protected boolean mbOneOff;
-    
+public class SDbEmploymentSubsidy extends SDbRegistryUser {
+
+    protected int mnPkEmploymentSubsidyId;
+    protected Date mtDateStart;
+    protected double mdIncomeMonthlyCap;
+    protected double mdSubsidyMonthlyCap;
     /*
     protected boolean mbDeleted;
-    protected boolean mbSystem;
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
 
-    public SDbPaysheetCustomType() {
-        super(SModConsts.HRSU_TP_PAY_SHT_CUS);
+    public SDbEmploymentSubsidy() {
+        super(SModConsts.HRS_EMPL_SUB);
     }
 
-    public void setPkPaysheetCustomTypeId(int n) { mnPkPaysheetCustomTypeId = n; }
-    public void setCode(String s) { msCode = s; }
-    public void setName(String s) { msName = s; }
-    public void setHint(String s) { msHint = s; }
-    public void setOneOff(boolean b) { mbOneOff = b; }
+    public void setPkEmploymentSubsidyId(int n) { mnPkEmploymentSubsidyId = n; }
+    public void setDateStart(Date t) { mtDateStart = t; }
+    public void setIncomeMonthlyCap(double d) { mdIncomeMonthlyCap = d; }
+    public void setSubsidyMonthlyCap(double d) { mdSubsidyMonthlyCap = d; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setSystem(boolean b) { mbSystem = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public int getPkPaysheetCustomTypeId() { return mnPkPaysheetCustomTypeId; }
-    public String getCode() { return msCode; }
-    public String getName() { return msName; }
-    public String getHint() { return msHint; }
-    public boolean isOneOff() { return mbOneOff; }
+    public int getPkEmploymentSubsidyId() { return mnPkEmploymentSubsidyId; }
+    public Date getDateStart() { return mtDateStart; }
+    public double getIncomeMonthlyCap() { return mdIncomeMonthlyCap; }
+    public double getSubsidyMonthlyCap() { return mdSubsidyMonthlyCap; }
     public boolean isDeleted() { return mbDeleted; }
-    public boolean isSystem() { return mbSystem; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -64,25 +59,23 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkPaysheetCustomTypeId = pk[0];
+        mnPkEmploymentSubsidyId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkPaysheetCustomTypeId };
+        return new int[] { mnPkEmploymentSubsidyId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
 
-        mnPkPaysheetCustomTypeId = 0;
-        msCode = "";
-        msName = "";
-        msHint = "";
-        mbOneOff = false;
+        mnPkEmploymentSubsidyId = 0;
+        mtDateStart = null;
+        mdIncomeMonthlyCap = 0;
+        mdSubsidyMonthlyCap = 0;
         mbDeleted = false;
-        mbSystem = false;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -96,29 +89,30 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_tp_pay_sht_cus = " + mnPkPaysheetCustomTypeId + "";
+        return "WHERE id_empl_sub = " + mnPkEmploymentSubsidyId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_tp_pay_sht_cus = " + pk[0] + "";
+        return "WHERE id_empl_sub = " + pk[0] + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkPaysheetCustomTypeId = 0;
+        mnPkEmploymentSubsidyId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_tp_pay_sht_cus), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_empl_sub), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkPaysheetCustomTypeId = resultSet.getInt(1);
+            mnPkEmploymentSubsidyId = resultSet.getInt(1);
         }
     }
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        Statement statement = null;
         ResultSet resultSet = null;
 
         initRegistry();
@@ -131,13 +125,11 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkPaysheetCustomTypeId = resultSet.getInt("id_tp_pay_sht_cus");
-            msCode = resultSet.getString("code");
-            msName = resultSet.getString("name");
-            msHint = resultSet.getString("hint");
-            mbOneOff = resultSet.getBoolean("b_one_off");
+            mnPkEmploymentSubsidyId = resultSet.getInt("id_empl_sub");
+            mtDateStart = resultSet.getDate("dt_sta");
+            mdIncomeMonthlyCap = resultSet.getDouble("inc_mon_cap");
+            mdSubsidyMonthlyCap = resultSet.getDouble("sub_mon_cap");
             mbDeleted = resultSet.getBoolean("b_del");
-            mbSystem = resultSet.getBoolean("b_sys");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -161,32 +153,26 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkPaysheetCustomTypeId + ", " +
-                    "'" + msCode + "', " +
-                    "'" + msName + "', " +
-                    "'" + msHint + "', " +
-                    (mbOneOff ? 1 : 0) + ", " +
-                    (mbDeleted ? 1 : 0) + ", " +
-                    (mbSystem ? 1 : 0) + ", " +
-                    mnFkUserInsertId + ", " +
-                    mnFkUserUpdateId + ", " +
-                    "NOW()" + ", " +
-                    "NOW()" + " " +
+                    mnPkEmploymentSubsidyId + ", " + 
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
+                    mdIncomeMonthlyCap + ", " + 
+                    mdSubsidyMonthlyCap + ", " + 
+                    (mbDeleted ? 1 : 0) + ", " + 
+                    mnFkUserInsertId + ", " + 
+                    mnFkUserUpdateId + ", " + 
+                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
                     ")";
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    /*
-                    "id_tp_pay_sht_cus = " + mnPkPaysheetCustomTypeId + ", " +
-                    */
-                    "code = '" + msCode + "', " +
-                    "name = '" + msName + "', " +
-                    "hint = '" + msHint + "', " +
-                    "b_one_off = " + (mbOneOff ? 1 : 0) + ", " +
+                    //"id_empl_sub = " + mnPkEmploymentSubsidyId + ", " +
+                    "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
+                    "inc_mon_cap = " + mdIncomeMonthlyCap + ", " +
+                    "sub_mon_cap = " + mdSubsidyMonthlyCap + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "b_del = " + (mbSystem ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -195,21 +181,20 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override
-    public SDbPaysheetCustomType clone() throws CloneNotSupportedException {
-        SDbPaysheetCustomType registry = new SDbPaysheetCustomType();
+    public SDbEmploymentSubsidy clone() throws CloneNotSupportedException {
+        SDbEmploymentSubsidy registry = new SDbEmploymentSubsidy();
 
-        registry.setPkPaysheetCustomTypeId(this.getPkPaysheetCustomTypeId());
-        registry.setCode(this.getCode());
-        registry.setName(this.getName());
-        registry.setHint(this.getHint());
-        registry.setOneOff(this.isOneOff());
+        registry.setPkEmploymentSubsidyId(this.getPkEmploymentSubsidyId());
+        registry.setDateStart(this.getDateStart());
+        registry.setIncomeMonthlyCap(this.getIncomeMonthlyCap());
+        registry.setSubsidyMonthlyCap(this.getSubsidyMonthlyCap());
         registry.setDeleted(this.isDeleted());
-        registry.setSystem(this.isSystem());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

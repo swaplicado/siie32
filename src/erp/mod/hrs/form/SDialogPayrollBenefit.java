@@ -16,7 +16,6 @@ import erp.mod.hrs.db.SHrsBenefit;
 import erp.mod.hrs.db.SHrsBenefitUtils;
 import erp.mod.hrs.db.SHrsBenefitsManager;
 import erp.mod.hrs.db.SHrsConsts;
-import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceipt;
 import erp.mod.hrs.utils.SAnniversary;
 import java.awt.event.ActionEvent;
@@ -57,7 +56,6 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     protected SDbPayrollReceipt moPayrollReceipt;
     protected SDbPayroll moPayroll;
     
-    protected SHrsEmployeeDays moHrsEmployeeDays;
     protected SDbEmployee moEmployee;
     protected SDbEarning moEarning;
     protected boolean mbIsBenefitCompByCalendarYear;
@@ -759,14 +757,14 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
                 moDecVacationBonusPct.setValue(annumBenefit.getBenefitBonusPct());
                 
                 moDecBenefitGainedDays.setValue((double) annumBenefitVac.getBenefitDays());
-                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, annumBenefitVac.getBenefitDays(), annumBenefit.getBenefitBonusPct()));
+                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, annumBenefitVac.getBenefitDays(), annumBenefit.getBenefitBonusPct()));
             }
             else {
                 annumBenefitVac = null;
                 moDecVacationBonusPct.setValue(1d);
                 
                 moDecBenefitGainedDays.setValue((double) annumBenefit.getBenefitDays());
-                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, annumBenefit.getBenefitDays(), 1d));
+                moCurBenefitGainedAmount.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, annumBenefit.getBenefitDays(), 1d));
             }
             
             if (hrsBenefitPaid == null) {
@@ -815,7 +813,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     
     private double calculateBenefitToBePayedAmount() {
         double bonusPct = mbIsBenefitVacationBonus ? moDecVacationBonusPct.getValue() : 1d;
-        return moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moDecBenefitToPayDays.getValue(), bonusPct);
+        return moHrsReceipt.calculateBenefit(moEarning, moDecBenefitToPayDays.getValue(), bonusPct);
     }
     
     private void computeBenefitToBePayedAmount() {
@@ -972,7 +970,6 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
                 moPayrollReceipt = moHrsReceipt.getPayrollReceipt();
                 moPayroll = moHrsReceipt.getHrsPayroll().getPayroll();
                 
-                moHrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
                 moEmployee = params.HrsReceipt.getHrsEmployee().getEmployee();
                 moEarning = params.Earning;
                 mbIsBenefitCompByCalendarYear = SHrsBenefitUtils.getBenefitCompFromBenefitType(moEarning.getFkBenefitTypeId()) == SHrsConsts.BEN_COMP_CALENDAR_YEAR;

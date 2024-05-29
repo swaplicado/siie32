@@ -6,7 +6,6 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbPaysheetCustomType;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -27,7 +26,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
      * Creates new form SFormMwzType
      */
     public SFormPaysheetCustomType(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_TP_PAY_SHT_CUS, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -50,14 +49,19 @@ public class SFormPaysheetCustomType extends SBeanForm {
         jPanel5 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel7 = new javax.swing.JPanel();
+        jlHint = new javax.swing.JLabel();
+        moTextHint = new sa.lib.gui.bean.SBeanFieldText();
+        jlHintHint = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         moBoolOneOff = new sa.lib.gui.bean.SBeanFieldBoolean();
         jlOneOffHint = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -82,17 +86,37 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         jPanel2.add(jPanel5);
 
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlHint.setForeground(new java.awt.Color(0, 102, 102));
+        jlHint.setText("Texto aclaratorio:");
+        jlHint.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlHint);
+
+        moTextHint.setText("TEXT");
+        jPanel7.add(moTextHint);
+
+        jlHintHint.setForeground(java.awt.Color.gray);
+        jlHintHint.setText("(Para el asunto del correo-e de recibos.)");
+        jlHintHint.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel7.add(jlHintHint);
+
+        jPanel2.add(jPanel7);
+
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolOneOff.setText("Irrepetible");
+        moBoolOneOff.setText("No repetible");
         jPanel6.add(moBoolOneOff);
 
-        jlOneOffHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlOneOffHint.setText("No se permitirá repetir el número de nóminas para este mismo tipo");
-        jlOneOffHint.setPreferredSize(new java.awt.Dimension(350, 23));
+        jlOneOffHint.setForeground(java.awt.Color.gray);
+        jlOneOffHint.setText("(El número de nómina no es repetible en el mismo año.)");
+        jlOneOffHint.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel6.add(jlOneOffHint);
 
         jPanel2.add(jPanel6);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel2.add(jPanel8);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -105,11 +129,16 @@ public class SFormPaysheetCustomType extends SBeanForm {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlHint;
+    private javax.swing.JLabel jlHintHint;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlOneOffHint;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolOneOff;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
+    private sa.lib.gui.bean.SBeanFieldText moTextHint;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
@@ -118,10 +147,13 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
+        moTextHint.setTextSettings(SGuiUtils.getLabelName(jlHint), 10, 0);
+        moTextHint.setTextCaseType(0); // preserve case of text in user input
         moBoolOneOff.setBooleanSettings(SGuiUtils.getLabelName(moBoolOneOff.getText()), false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
+        moFields.addField(moTextHint);
         moFields.addField(moBoolOneOff);
 
         moFields.setFormButton(jbSave);
@@ -146,7 +178,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
     public void setRegistry(SDbRegistry registry) throws Exception {
         moRegistry = (SDbPaysheetCustomType) registry;
 
-        mnFormResult = SLibConsts.UNDEFINED;
+        mnFormResult = 0;
         mbFirstActivation = true;
 
         removeAllListeners();
@@ -161,8 +193,9 @@ public class SFormPaysheetCustomType extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
-        moTextName.setValue(moRegistry.getName());
         moTextCode.setValue(moRegistry.getCode());
+        moTextName.setValue(moRegistry.getName());
+        moTextHint.setValue(moRegistry.getHint());
         moBoolOneOff.setValue(moRegistry.isOneOff());
 
         setFormEditable(true);
@@ -176,8 +209,9 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         if (registry.isRegistryNew()) { }
 
-        registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
+        registry.setName(moTextName.getValue());
+        registry.setHint(moTextHint.getValue());
         registry.setOneOff(moBoolOneOff.getValue());
 
         return registry;

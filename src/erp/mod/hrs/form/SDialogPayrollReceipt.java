@@ -987,11 +987,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 if (jbRowEdit.isEnabled()) {
                     try {
                         SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
+                        SDialogPayrollReceiptEarningEdition dialog = new SDialogPayrollReceiptEarningEdition(miClient, hrsReceiptEarning.clone(), "Percepción");
+                        dialog.setVisible(true);
 
-                        SDialogPayrollEarning dlgPayrollEarning = new SDialogPayrollEarning(miClient, hrsReceiptEarning.clone(), "Percepción");
-                        dlgPayrollEarning.setVisible(true);
-
-                        if (dlgPayrollEarning.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                             refreshReceiptMovements();
                         }
                     }
@@ -1233,7 +1232,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { employee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
     }
 
-    private SDbPayrollReceiptEarning createPayrollReceipEarning(SHrsReceipt hrsReceipt, SHrsEmployeeDays hrsEmployeeDays) {
+    private SDbPayrollReceiptEarning createPayrollReceipEarning(SHrsReceipt hrsReceipt) {
         double unitsAlleged;
         double amountUnitAlleged;
         int[] loanKey = moKeyEarningLoan_n.getSelectedIndex() <= 0 ? new int[] { 0, 0 } : moKeyEarningLoan_n.getValue();
@@ -1259,7 +1258,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
         }
         
-        SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(hrsReceipt, moEarning, hrsEmployeeDays, moHrsCurrentBenefit, 
+        SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
+                hrsReceipt, moEarning, moHrsCurrentBenefit, 
                 unitsAlleged, amountUnitAlleged, false, 
                 loanKey[0], loanKey[1], moGridReceiptEarnings.getTable().getRowCount() + 1);
         
@@ -1465,12 +1465,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
     private void addHrsReceiptEarning() {
         if (moEarning != null) {
-            SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
-            
             SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
             hrsReceiptEarning.setHrsReceipt(moHrsReceipt);
             hrsReceiptEarning.setEarning(moEarning);
-            hrsReceiptEarning.setPayrollReceiptEarning(createPayrollReceipEarning(moHrsReceipt, hrsEmployeeDays));
+            hrsReceiptEarning.setPayrollReceiptEarning(createPayrollReceipEarning(moHrsReceipt));
 
             try {
                 if (moKeyEarningLoan_n.isEnabled() && moKeyEarningLoan_n.getSelectedIndex() > 0) {
@@ -2178,7 +2176,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
             
             SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
-            double maxWorkingDays = hrsEmployeeDays.getWorkingDays();
+            double maxWorkingDays = hrsEmployeeDays.getReceiptWorkingDays();
             double daysCovered = daysWorked + daysAbsence;
             double daysDiff = maxWorkingDays - daysCovered;
             

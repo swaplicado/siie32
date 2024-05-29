@@ -253,7 +253,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                     
                     if (payroll.isClosed()) {
                         if (payroll.isAccounting()) {
-                            int receipts = payroll.getPayrollReceiptsCount();
+                            int receipts = payroll.getPayrollReceiptsActiveCount();
                             String message = "Nómina: " + payroll.getName() + ".\n"
                                     + "Número de recibos: " + SLibUtils.DecimalFormatInteger.format(receipts) + ".\n"
                                     + "Modalidad de contabilización: " + (payroll.isAccountingGradual() ? "gradual": "un solo paso") + ".\n"
@@ -464,6 +464,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "v.num, "
                 + "v.dt_sta, "
                 + "v.dt_end, "
+                + "v.hint, "
                 + "v.nts, "
                 + "tpsc.code, "
                 + "tps.name, "
@@ -575,6 +576,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(column);
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "trs.name", "Tipo régimen nómina", 100));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.hint", "Texto aclaratorio (asunto correo-e recibos)", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas nómina", 200));
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_clo", "Cerrada"));

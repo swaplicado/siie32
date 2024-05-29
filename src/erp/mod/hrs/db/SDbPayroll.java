@@ -43,6 +43,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected double mdUmiAmount;
     protected double mdMwzWage;
     protected double mdMwzReferenceWage;
+    protected String msHint;
     protected String msNotes;
     protected boolean mbTaxSubsidy;
     protected boolean mbSsContribution;
@@ -60,6 +61,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected int mnFkTaxComputationTypeId;
     protected int mnFkTaxId;
     protected int mnFkTaxSubsidyId;
+    protected int mnFkEmploymentSubsidyId_n;
     protected int mnFkSsContributionId;
     protected int mnFkUserClosedId;
     /*
@@ -147,6 +149,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setUmiAmount(double d) { mdUmiAmount = d; }
     public void setMwzWage(double d) { mdMwzWage = d; }
     public void setMwzReferenceWage(double d) { mdMwzReferenceWage = d; }
+    public void setHint(String s) { msHint = s; }
     public void setNotes(String s) { msNotes = s; }
     public void setTaxSubsidy(boolean b) { mbTaxSubsidy = b; }
     public void setSsContribution(boolean b) { mbSsContribution = b; }
@@ -164,6 +167,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setFkTaxComputationTypeId(int n) { mnFkTaxComputationTypeId = n; }
     public void setFkTaxId(int n) { mnFkTaxId = n; }
     public void setFkTaxSubsidyId(int n) { mnFkTaxSubsidyId = n; }
+    public void setFkEmploymentSubsidyId_n(int n) { mnFkEmploymentSubsidyId_n = n; }
     public void setFkSsContributionId(int n) { mnFkSsContributionId = n; }
     public void setFkUserClosedId(int n) { mnFkUserClosedId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -186,6 +190,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getUmiAmount() { return mdUmiAmount; }
     public double getMwzWage() { return mdMwzWage; }
     public double getMwzReferenceWage() { return mdMwzReferenceWage; }
+    public String getHint() { return msHint; }
     public String getNotes() { return msNotes; }
     public boolean isTaxSubsidy() { return mbTaxSubsidy; }
     public boolean isSsContribution() { return mbSsContribution; }
@@ -203,6 +208,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public int getFkTaxComputationTypeId() { return mnFkTaxComputationTypeId; }
     public int getFkTaxId() { return mnFkTaxId; }
     public int getFkTaxSubsidyId() { return mnFkTaxSubsidyId; }
+    public int getFkEmploymentSubsidyId_n() { return mnFkEmploymentSubsidyId_n; }
     public int getFkSsContributionId() { return mnFkSsContributionId; }
     public int getFkUserClosedId() { return mnFkUserClosedId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -224,6 +230,31 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
     public String getAuxPaymentType() { return msAuxPaymentType; }
     
+    public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
+    public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
+    
+    public void clearPayrollForeingKeys() {
+        mnFkPaymentTypeId = 0;
+        mnFkPaysheetTypeId = 0;
+        mnFkPaysheetCustomTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
+        mnFkMwzTypeId = 0;
+        mnFkMwzReferenceTypeId = 0;
+        mnFkTaxComputationTypeId = 0;
+        mnFkTaxId = 0;
+        mnFkTaxSubsidyId = 0;
+        mnFkEmploymentSubsidyId_n = 0;
+        mnFkSsContributionId = 0;
+    }
+    
+    public boolean isPayrollNormal() {
+        return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR;
+    }
+    
+    public boolean isPayrollFortnightStandard() {
+        return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard;
+    }
+
     /**
      * Compose name of payroll as payroll year and number number in format: 'yyyy' + " " + 'abbreviation of type of payment' + ". " + 'payroll number' + [", " + 'payroll notes'].
      */
@@ -232,17 +263,19 @@ public class SDbPayroll extends SDbRegistryUser {
         return composePayrollYearAndNumber() + (msNotes.isEmpty() ? "" : ", " + msNotes);
     }
     
-    public boolean isPayrollNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
-    public boolean isPayrollFortnightStandard() { return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard; }
-
-    public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
-    public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
+    public double getFactorCalendar() {
+        return mnCalendarDays_r == 0 ? 0.0 : mnReceiptDays / (double) mnCalendarDays_r;
+    }
+    
+    public double getFactorDaysPaid() {
+        return mnWorkingDays == 0 ? 0.0 : mnReceiptDays / (double) mnWorkingDays;
+    }
     
     /**
      * Get count of active (not deleted) payroll receipts.
      * @return Count of active (not deleted) payroll receipts.
      */
-    public int getPayrollReceiptsCount() {
+    public int getPayrollReceiptsActiveCount() {
         int count = 0;
         
         for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
@@ -385,6 +418,20 @@ public class SDbPayroll extends SDbRegistryUser {
         
         return payrollNumber;
     }
+
+    public static String retrievePayrollHint(final SGuiSession session, final int payrollId) throws Exception {
+        String payrollHint = "";
+        
+        String sql = "SELECT hint "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                + "WHERE id_pay = " + payrollId + ";";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            payrollHint = resultSet.getString("hint");
+        }
+        
+        return payrollHint;
+    }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -416,6 +463,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mdUmiAmount = 0;
         mdMwzWage = 0;
         mdMwzReferenceWage = 0;
+        msHint = "";
         msNotes = "";
         mbTaxSubsidy = false;
         mbSsContribution = false;
@@ -433,6 +481,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mnFkTaxComputationTypeId = 0;
         mnFkTaxId = 0;
         mnFkTaxSubsidyId = 0;
+        mnFkEmploymentSubsidyId_n = 0;
         mnFkSsContributionId = 0;
         mnFkUserClosedId = 0;
         mnFkUserInsertId = 0;
@@ -512,6 +561,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mdUmiAmount = resultSet.getDouble("p.umi_amt");
             mdMwzWage = resultSet.getDouble("p.mwz_wage");
             mdMwzReferenceWage = resultSet.getDouble("p.mwz_ref_wage");
+            msHint = resultSet.getString("hint");
             msNotes = resultSet.getString("p.nts");
             mbTaxSubsidy = resultSet.getBoolean("p.b_tax_sub");
             mbSsContribution = resultSet.getBoolean("p.b_ssc");
@@ -529,6 +579,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mnFkTaxComputationTypeId = resultSet.getInt("p.fk_tp_tax_comp");
             mnFkTaxId = resultSet.getInt("p.fk_tax");
             mnFkTaxSubsidyId = resultSet.getInt("p.fk_tax_sub");
+            mnFkEmploymentSubsidyId_n = resultSet.getInt("fk_empl_sub_n");
             mnFkSsContributionId = resultSet.getInt("p.fk_ssc");
             mnFkUserClosedId = resultSet.getInt("p.fk_usr_clo");
             mnFkUserInsertId = resultSet.getInt("p.fk_usr_ins");
@@ -596,6 +647,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     mdUmiAmount + ", " +
                     mdMwzWage + ", " +
                     mdMwzReferenceWage + ", " +
+                    "'" + msHint + "', " + 
                     "'" + msNotes + "', " +
                     (mbTaxSubsidy ? 1 : 0) + ", " + 
                     (mbSsContribution ? 1 : 0) + ", " +
@@ -613,6 +665,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     mnFkTaxComputationTypeId + ", " +
                     mnFkTaxId + ", " +
                     mnFkTaxSubsidyId + ", " +
+                    (mnFkEmploymentSubsidyId_n == 0 ? "NULL" : "" + mnFkEmploymentSubsidyId_n) + ", " + 
                     mnFkSsContributionId + ", " +
                     mnFkUserClosedId + ", " +
                     mnFkUserInsertId + ", " +
@@ -640,6 +693,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "umi_amt = " + mdUmiAmount + ", " +
                     "mwz_wage = " + mdMwzWage + ", " +
                     "mwz_ref_wage = " + mdMwzReferenceWage + ", " +
+                    "hint = '" + msHint + "', " +
                     "nts = '" + msNotes + "', " +
                     "b_tax_sub = " + (mbTaxSubsidy ? 1 : 0) + ", " +
                     "b_ssc = " + (mbSsContribution ? 1 : 0) + ", " +
@@ -657,6 +711,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "fk_tp_tax_comp = " + mnFkTaxComputationTypeId + ", " +
                     "fk_tax = " + mnFkTaxId + ", " +
                     "fk_tax_sub = " + mnFkTaxSubsidyId + ", " +
+                    "fk_empl_sub_n = " + (mnFkEmploymentSubsidyId_n == 0 ? "NULL" : "" + mnFkEmploymentSubsidyId_n) + ", " +
                     "fk_ssc = " + mnFkSsContributionId + ", " +
                     "fk_usr_clo = " + mnFkUserClosedId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -707,6 +762,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setUmiAmount(this.getUmiAmount());
         registry.setMwzWage(this.getMwzWage());
         registry.setMwzReferenceWage(this.getMwzReferenceWage());
+        registry.setHint(this.getHint());
         registry.setNotes(this.getNotes());
         registry.setTaxSubsidy(this.isTaxSubsidy());
         registry.setSsContribution(this.isSsContribution());
@@ -724,6 +780,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setFkTaxComputationTypeId(this.getFkTaxComputationTypeId());
         registry.setFkTaxId(this.getFkTaxId());
         registry.setFkTaxSubsidyId(this.getFkTaxSubsidyId());
+        registry.setFkEmploymentSubsidyId_n(this.getFkEmploymentSubsidyId_n());
         registry.setFkSsContributionId(this.getFkSsContributionId());
         registry.setFkUserClosedId(this.getFkUserClosedId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -856,6 +913,7 @@ public class SDbPayroll extends SDbRegistryUser {
             dummyPayroll.setFkTaxComputationTypeId(SModSysConsts.HRSS_TP_TAX_COMP_WOT);
             dummyPayroll.setFkTaxId(1);
             dummyPayroll.setFkTaxSubsidyId(1);
+            dummyPayroll.setFkEmploymentSubsidyId_n(0);
             dummyPayroll.setFkSsContributionId(1);
 
             dummyPayroll.save(session);

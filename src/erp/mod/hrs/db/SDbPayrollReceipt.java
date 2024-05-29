@@ -61,6 +61,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected double mdPayrollTaxCompensated;
     protected double mdPayrollTaxPending_r;
     protected double mdPayrollTaxPayed;
+    protected double mdPayrollTaxSubsidyAssessedOld_i;
     protected double mdPayrollTaxSubsidyAssessedGross;
     protected double mdPayrollTaxSubsidyAssessed;
     protected double mdPayrollTaxSubsidyCompensated;
@@ -216,6 +217,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setPayrollTaxCompensated(double d) { mdPayrollTaxCompensated = d; }
     public void setPayrollTaxPending_r(double d) { mdPayrollTaxPending_r = d; }
     public void setPayrollTaxPayed(double d) { mdPayrollTaxPayed = d; }
+    public void setPayrollTaxSubsidyAssessedOld_i(double d) { mdPayrollTaxSubsidyAssessedOld_i = d; }
     public void setPayrollTaxSubsidyAssessedGross(double d) { mdPayrollTaxSubsidyAssessedGross = d; }
     public void setPayrollTaxSubsidyAssessed(double d) { mdPayrollTaxSubsidyAssessed = d; }
     public void setPayrollTaxSubsidyCompensated(double d) { mdPayrollTaxSubsidyCompensated = d; }
@@ -291,6 +293,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public double getPayrollTaxCompensated() { return mdPayrollTaxCompensated; }
     public double getPayrollTaxPending_r() { return mdPayrollTaxPending_r; }
     public double getPayrollTaxPayed() { return mdPayrollTaxPayed; }
+    public double getPayrollTaxSubsidyAssessedOld_i() { return mdPayrollTaxSubsidyAssessedOld_i; }
     public double getPayrollTaxSubsidyAssessedGross() { return mdPayrollTaxSubsidyAssessedGross; }
     public double getPayrollTaxSubsidyAssessed() { return mdPayrollTaxSubsidyAssessed; }
     public double getPayrollTaxSubsidyCompensated() { return mdPayrollTaxSubsidyCompensated; }
@@ -329,7 +332,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
 
     public ArrayList<SDbPayrollReceiptEarning> getChildPayrollReceiptEarnings() { return maChildPayrollReceiptEarnings; }
     public ArrayList<SDbPayrollReceiptDeduction> getChildPayrollReceiptDeductions() { return maChildPayrollReceiptDeductions; }
-    public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumption() { return maChildAbsenceConsumptions; }
+    public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumptions() { return maChildAbsenceConsumptions; }
     public SDbPayrollReceiptIssue getChildPayrollReceiptIssue() { return moChildPayrollReceiptIssue; }
     
     public void setAuxIssueDateOfPayment(Date t) { mtAuxIssueDateOfPayment = t; }
@@ -551,6 +554,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mdPayrollTaxCompensated = 0;
         mdPayrollTaxPending_r = 0;
         mdPayrollTaxPayed = 0;
+        mdPayrollTaxSubsidyAssessedOld_i = 0;
         mdPayrollTaxSubsidyAssessedGross = 0;
         mdPayrollTaxSubsidyAssessed = 0;
         mdPayrollTaxSubsidyCompensated = 0;
@@ -665,6 +669,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mdPayrollTaxCompensated = resultSet.getDouble("pay_tax_comp");
             mdPayrollTaxPending_r = resultSet.getDouble("pay_tax_pend_r");
             mdPayrollTaxPayed = resultSet.getDouble("pay_tax_payd");
+            mdPayrollTaxSubsidyAssessedOld_i = resultSet.getDouble("pay_tax_sub_assd_old_i");
             mdPayrollTaxSubsidyAssessedGross = resultSet.getDouble("pay_tax_sub_assd_gross");
             mdPayrollTaxSubsidyAssessed = resultSet.getDouble("pay_tax_sub_assd");
             mdPayrollTaxSubsidyCompensated = resultSet.getDouble("pay_tax_sub_comp");
@@ -814,6 +819,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mdPayrollTaxCompensated + ", " + 
                     mdPayrollTaxPending_r + ", " + 
                     mdPayrollTaxPayed + ", " + 
+                    mdPayrollTaxSubsidyAssessedOld_i + ", " + 
                     mdPayrollTaxSubsidyAssessedGross + ", " + 
                     mdPayrollTaxSubsidyAssessed + ", " + 
                     mdPayrollTaxSubsidyCompensated + ", " + 
@@ -893,6 +899,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "pay_tax_comp = " + mdPayrollTaxCompensated + ", " +
                     "pay_tax_pend_r = " + mdPayrollTaxPending_r + ", " +
                     "pay_tax_payd = " + mdPayrollTaxPayed + ", " +
+                    "pay_tax_sub_assd_old_i = " + mdPayrollTaxSubsidyAssessedOld_i + ", " +
                     "pay_tax_sub_assd_gross = " + mdPayrollTaxSubsidyAssessedGross + ", " +
                     "pay_tax_sub_assd = " + mdPayrollTaxSubsidyAssessed + ", " +
                     "pay_tax_sub_comp = " + mdPayrollTaxSubsidyCompensated + ", " +
@@ -1005,6 +1012,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setPayrollTaxCompensated(this.getPayrollTaxCompensated());
         registry.setPayrollTaxPending_r(this.getPayrollTaxPending_r());
         registry.setPayrollTaxPayed(this.getPayrollTaxPayed());
+        registry.setPayrollTaxSubsidyAssessedOld_i(this.getPayrollTaxSubsidyAssessedOld_i());
         registry.setPayrollTaxSubsidyAssessedGross(this.getPayrollTaxSubsidyAssessedGross());
         registry.setPayrollTaxSubsidyAssessed(this.getPayrollTaxSubsidyAssessed());
         registry.setPayrollTaxSubsidyCompensated(this.getPayrollTaxSubsidyCompensated());
@@ -1047,8 +1055,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             registry.getChildPayrollReceiptDeductions().add(child.clone());
         }
         
-        for (SDbAbsenceConsumption child : this.getChildAbsenceConsumption()) {
-            registry.getChildAbsenceConsumption().add(child.clone());
+        for (SDbAbsenceConsumption child : this.getChildAbsenceConsumptions()) {
+            registry.getChildAbsenceConsumptions().add(child.clone());
         }
         
         registry.setChildPayrollReceiptIssue(this.getChildPayrollReceiptIssue() == null ? null : this.getChildPayrollReceiptIssue().clone());

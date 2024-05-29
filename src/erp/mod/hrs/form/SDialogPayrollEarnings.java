@@ -8,7 +8,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
-import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsPayroll;
 import erp.mod.hrs.db.SHrsReceipt;
 import erp.mod.hrs.db.SHrsReceiptEarning;
@@ -301,7 +300,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jbSetAll.setEnabled(enable);
     }
     
-    private SDbPayrollReceiptEarning createPayrollReceipEarning(final SHrsReceipt hrsReceipt, final SHrsReceiptEarning hrsReceiptEarning, final SHrsEmployeeDays hrsEmployeeDays) {
+    private SDbPayrollReceiptEarning createPayrollReceipEarning(final SHrsReceipt hrsReceipt, final SHrsReceiptEarning hrsReceiptEarning) {
         double unitsAlleged;
         double amountUnitAlleged;
         int moveId;
@@ -324,7 +323,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         }
 
         SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
-                hrsReceipt, hrsReceiptEarning.getEarning(), hrsEmployeeDays, null, 
+                hrsReceipt, hrsReceiptEarning.getEarning(), null, 
                 unitsAlleged, amountUnitAlleged, false, 
                 0, 0, moveId);
         
@@ -375,19 +374,18 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
             for (SGridRow gridRow : moGridEmployeeRow.getModel().getGridRows()) { // process grid
                 SHrsReceiptEarning hrsReceiptEarningCopy = (SHrsReceiptEarning) gridRow;
                 SHrsReceipt hrsReceipt = hrsReceiptEarningCopy.getHrsReceipt();
-                SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays();
                 
-                double units = hrsEmployeeDays.computeEarningUnits(unitsAlleged, moEarning);
+                double units = moEarning.computeEarningUnits(unitsAlleged, moHrsPayroll.getPayroll());
                 hrsReceiptEarningCopy.getPayrollReceiptEarning().setUnitsAlleged(unitsAlleged);
                 hrsReceiptEarningCopy.getPayrollReceiptEarning().setUnits(units);
 
                 double amount;
                 if (moEarning.isBasedOnUnits()) {
-                    amount = SHrsEmployeeDays.computeEarningAmount(units, hrsReceiptEarningCopy.getPayrollReceiptEarning().getAmountUnitary(), moEarning);
+                    amount = moEarning.computeEarningAmount(units, hrsReceiptEarningCopy.getPayrollReceiptEarning().getAmountUnitary());
                 }
                 else {
                     hrsReceiptEarningCopy.getPayrollReceiptEarning().setAmountUnitary(amountUnitAlleged);
-                    amount = SHrsEmployeeDays.computeEarningAmount(units, amountUnitAlleged, moEarning);
+                    amount = moEarning.computeEarningAmount(units, amountUnitAlleged);
                 }
                 
                 hrsReceiptEarningCopy.getPayrollReceiptEarning().setAmountSystem_r(amount);
@@ -496,8 +494,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                     hrsReceiptEarningCopy.setPayrollReceiptEarning(payrollReceiptEarning);
                 }
                 else {
-                    SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays();
-                    hrsReceiptEarningCopy.setPayrollReceiptEarning(createPayrollReceipEarning(hrsReceipt, hrsReceiptEarningCopy, hrsEmployeeDays));
+                    hrsReceiptEarningCopy.setPayrollReceiptEarning(createPayrollReceipEarning(hrsReceipt, hrsReceiptEarningCopy));
                 }
 
                 rows.add(hrsReceiptEarningCopy);

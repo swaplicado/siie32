@@ -68,7 +68,8 @@ import sa.lib.prt.SPrtConsts;
 import sa.lib.prt.SPrtUtils;
 
 /**
- *
+ * Utilerías varias para el procesamiento y emisión de nóminas.
+ * 
  * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
@@ -1032,7 +1033,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeRegisterAseg(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1059,7 +1059,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
@@ -1150,7 +1149,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeAffiliateData(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1178,7 +1176,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
@@ -1261,7 +1258,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeImportMovLow(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1285,7 +1281,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
 
                 ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
@@ -1362,7 +1357,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeImportMovEntry(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1386,7 +1380,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
 
                 ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryReEntry(client, dateLayoutStart, dateLayoutEnd);
@@ -1433,7 +1426,7 @@ public abstract class SHrsUtils {
                         else {
                             buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                         }
-    //                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
+                        //buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
                         buffer += "\r\n";
                         
                     }
@@ -1464,7 +1457,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeImportMovInc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1495,7 +1487,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
 
                 ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryInability(client, typeMov, dateLayoutStart, dateLayoutEnd);
@@ -1579,7 +1570,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeImportInc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1606,7 +1596,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryInability(client, typeMov, dateLayoutStart, dateLayoutEnd);
 
@@ -1691,7 +1680,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeImportMovSsc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1715,7 +1703,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
@@ -1789,7 +1776,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeCred(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1813,7 +1799,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
@@ -1882,7 +1867,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) { // xx123
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -1909,7 +1893,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8")); // utf-8
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
@@ -2002,7 +1985,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeModification(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -2029,7 +2011,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
@@ -2119,7 +2100,6 @@ public abstract class SHrsUtils {
     public static void createLayoutEmployeeDeletion(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateSta = formatter.format(dateLayoutStart);
@@ -2144,7 +2124,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
     
@@ -2345,7 +2324,6 @@ public abstract class SHrsUtils {
     public static void createLayoutAnnexed02(SGuiClient client, int typeLayout, int year, int period) throws SQLException, Exception {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
-        Statement statement = null;
         Date periodEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(year, period));
         java.lang.String buffer = "";
         java.lang.String bufferLine = "";
@@ -2373,7 +2351,6 @@ public abstract class SHrsUtils {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
-                statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<SDbEmployee> employees = getEmployeesPaidInPeriodAF02(client.getSession(), year , period);
                 bufferLine += createFirstLineAnnexed02(client, year, period, typeLayout);
@@ -2672,7 +2649,6 @@ public abstract class SHrsUtils {
      * @throws Exception 
      */
     public static boolean validatePayrollDate(final SDbConfig config, final Date dateStart, final Date dateEnd) throws Exception {
-        
         if (config == null) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Configuración del módulo)");
         }
@@ -3297,9 +3273,9 @@ public abstract class SHrsUtils {
     }
 
     /**
-     * Get recent tax table
+     * Get the most recent tax table.
      * @param session SGuiSession
-     * @param start Date start date
+     * @param start Start date
      * @return id_tax int
      * @throws Exception
      */
@@ -3322,50 +3298,75 @@ public abstract class SHrsUtils {
     }
 
     /**
-     * Get recent tax subsidy table
+     * Get the most recent tax subsidy table.
      * @param session SGuiSession
-     * @param start Date start date
+     * @param start Start date
      * @return id_tax_sub int
      * @throws Exception
      */
     public static int getRecentTaxSubsidyTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int tableId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_tax_sub "
+        String sql = "SELECT id_tax_sub "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TAX_SUB) + " "
             + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_tax_sub "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            tableId = resultSet.getInt(1);
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                tableId = resultSet.getInt(1);
+            }
         }
 
         return tableId;
     }
 
     /**
-     * Get recent SS contribution table
+     * Get the most recent configuration of employment subsidy.
      * @param session SGuiSession
-     * @param start Date start date
+     * @param start Start date
+     * @return id_empl_sub int
+     * @throws Exception
+     */
+    public static int getRecentEmploymentSubsidy(final SGuiSession session, final Date start) throws SQLException, Exception {
+        int configId = 0;
+
+        String sql = "SELECT id_empl_sub "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMPL_SUB) + " "
+            + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "ORDER BY dt_sta DESC, id_empl_sub "
+            + "LIMIT 1;";
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                configId = resultSet.getInt(1);
+            }
+        }
+
+        return configId;
+    }
+
+    /**
+     * Get the most recent SS contribution table.
+     * @param session SGuiSession
+     * @param start Start date
      * @return id_ss int
      * @throws Exception
      */
     public static int getRecentSsContributionTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int tableId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ssc "
+        String sql = "SELECT id_ssc "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_SSC) + " "
             + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_ssc "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            tableId = resultSet.getInt(1);
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                tableId = resultSet.getInt(1);
+            }
         }
 
         return tableId;
@@ -3373,18 +3374,18 @@ public abstract class SHrsUtils {
     
     public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCutoff) throws Exception {
         int tableId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ben "
+        String sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
             + "WHERE NOT b_del AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
             + (paymentType == 0 ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            tableId = resultSet.getInt(1);
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                tableId = resultSet.getInt(1);
+            }
         }
 
         return tableId;
@@ -3405,9 +3406,11 @@ public abstract class SHrsUtils {
             + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_uma "
             + "LIMIT 1;";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            uma = resultSet.getDouble(1);
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                uma = resultSet.getDouble(1);
+            }
         }
 
         return uma;
@@ -3428,9 +3431,11 @@ public abstract class SHrsUtils {
             + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_umi "
             + "LIMIT 1;";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            umi = resultSet.getDouble(1);
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                umi = resultSet.getDouble(1);
+            }
         }
 
         return umi;
@@ -3452,9 +3457,11 @@ public abstract class SHrsUtils {
             + "WHERE NOT b_del AND id_tp_mwz = " + idMwzType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_wage "
             + "LIMIT 1;";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            wage = resultSet.getDouble(1);
+
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                wage = resultSet.getDouble(1);
+            }
         }
 
         return wage;
@@ -4221,7 +4228,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes loan amount.
+     * Compute loan amount.
      * For plain loans, loan amount is already limited to current loan balance.
      * @param loan
      * @param hrsReceipt Current payroll receipt.
@@ -4326,7 +4333,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes tax.
+     * Compute tax.
      * @param taxTable Table of tax for computation.
      * @param taxableEarnings Taxable earnings.
      * @param tableFactor Adjustment factor to apply to tax table.
@@ -4349,7 +4356,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes tax subsidy.
+     * Compute tax subsidy.
      * @param taxSubsidyTable Table of tax subsidy for computation.
      * @param taxableEarnings Taxable earnings.
      * @param tableFactor Adjustment factor to apply to tax subsidy table.
@@ -4372,7 +4379,25 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes tax based in Articule 174 RLISR.
+     * Compute employment subsidy.
+     * @param employmentSubsidy Employment subsidy configuration.
+     * @param taxableEarnings Taxable earnings.
+     * @param tableFactor Adjustment factor to apply to tax subsidy table.
+     * @return Computed tax subsidy.
+     * @throws Exception 
+     */
+    public static double computeEmploymentSubsidy(final SDbEmploymentSubsidy employmentSubsidy, final double taxableEarnings, final double tableFactor) throws Exception {
+        double employmentSubsidyAssessed = 0;
+        
+        if (taxableEarnings <= employmentSubsidy.getIncomeMonthlyCap() * tableFactor) {
+            employmentSubsidyAssessed = SLibUtils.roundAmount(employmentSubsidy.getSubsidyMonthlyCap() * tableFactor);
+        }
+        
+        return employmentSubsidyAssessed;
+    }
+    
+    /**
+     * Compute tax based in Articule 174 RLISR.
      * @param taxTable Table of tax for computation.
      * @param taxableEarnings Taxable earnings.
      * @param monthlyIncome Ordinary monthly income.
@@ -4396,7 +4421,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes tax subsidy based in Articule 174 RLISR.
+     * Compute tax subsidy based in Articule 174 RLISR.
      * @param taxSubsidyTable Table of tax subsidy for computation.
      * @param taxableEarnings Taxable earnings.
      * @param monthlyIncome Ordinary monthly income.
@@ -4420,7 +4445,31 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Computes Social Security Contribution.
+     * Compute employment subsidy based in Articule 174 RLISR.
+     * @param employmentSubsidy Table of tax subsidy for computation.
+     * @param taxableEarnings Taxable earnings.
+     * @param monthlyIncome Ordinary monthly income.
+     * @param tableFactor Adjustment factor to apply to tax subsidy table.
+     * @return Computed tax subsidy.
+     * @throws Exception 
+     */
+    public static double computeEmploymentSubsidyAlt(final SDbEmploymentSubsidy employmentSubsidy, final double taxableEarnings, final double monthlyIncome, final double tableFactor) throws Exception {
+        double amountFractionI = taxableEarnings / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
+        
+        double amountFractionII = computeEmploymentSubsidy(employmentSubsidy, (monthlyIncome + amountFractionI), tableFactor);
+        
+        double amountFractionIIIAux = computeEmploymentSubsidy(employmentSubsidy, monthlyIncome, tableFactor);
+        double amountFractionIII = amountFractionIIIAux > 0 ? (amountFractionII - amountFractionIIIAux) : 0;
+        
+        double amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
+        
+        double amountFractionIV = amountFractionIIIAux > 0 ? (taxableEarnings * amountFractionV) : 0;
+        
+        return amountFractionIV;
+    }
+    
+    /**
+     * Compute Social Security Contribution.
      * @param sscTable Table of Social Security Contribution for computation.
      * @param salarySsc Employee's base salary for Social Security Contribution.
      * @param mwzReferenceWage Minimum wage of reference zone.
@@ -4620,11 +4669,8 @@ public abstract class SHrsUtils {
      */
     public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutoff, final int earningTypeId) throws Exception {
         SHrsAmountEarning amountEarning = null;
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = session.getDatabase().getConnection().createStatement();
 
-        sql = "SELECT SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_taxa " +
+        String sql = "SELECT SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_taxa " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
             "p.id_pay = pr.id_pay " +
@@ -4634,7 +4680,8 @@ public abstract class SHrsUtils {
             (earningTypeId == 0 ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
             "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "'";
         
-        resultSet = statement.executeQuery(sql);
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             amountEarning = new SHrsAmountEarning(earningTypeId);
             
@@ -4658,11 +4705,8 @@ public abstract class SHrsUtils {
      */
     public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutoff, final int deductionTypeId) throws Exception {
         double amountDeduction = 0;
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = session.getDatabase().getConnection().createStatement();
 
-        sql = "SELECT SUM(prd.amt_r) AS f_amount " +
+        String sql = "SELECT SUM(prd.amt_r) AS f_amount " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
             "p.id_pay = pr.id_pay " +
@@ -4672,7 +4716,8 @@ public abstract class SHrsUtils {
             (deductionTypeId == 0 ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
             "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "'";
         
-        resultSet = statement.executeQuery(sql);
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             amountDeduction = resultSet.getDouble("f_amount");
         }
@@ -5087,17 +5132,16 @@ public abstract class SHrsUtils {
     }
 
     public static ArrayList<String> companyWithRh(final Statement statement) throws SQLException {
-        String sql;
         ArrayList<String> companyName = new ArrayList<>();
         
-        sql = "SELECT bd FROM erp.cfgu_co WHERE b_mod_hrs = 1;";
+        String sql = "SELECT bd FROM erp.cfgu_co WHERE b_mod_hrs = 1;";
         ResultSet resultSet = statement.executeQuery(sql);
         
         while (resultSet.next()) {
             String cn = resultSet.getString("bd");
             companyName.add(cn);
         }
+        
         return companyName;
-
     }    
 }

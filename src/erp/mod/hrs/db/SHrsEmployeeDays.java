@@ -4,137 +4,119 @@
  */
 package erp.mod.hrs.db;
 
-import erp.mod.SModSysConsts;
-import java.util.Date;
-import sa.lib.SLibTimeUtils;
-import sa.lib.SLibUtils;
-
 /**
+ * Las instancias de esta clase son una estructura de datos
+ * que contiene los valores de días tanto en la nómina como en el año actuales
+ * para el procesamiento de impuestos y demás cálculos y emisión de nóminas.
  *
  * @author Sergio Flores
  */
 public class SHrsEmployeeDays {
 
-    protected int mnYear;       // for accumulated earnings & deductions
-    protected int mnPeriod;     // for accumulated earnings & deductions
-    protected Date mtPeriodStart;   // analyzed period start
-    protected Date mtPeriodEnd;     // analyzed period end
-    protected int mnPeriodDays;     // analyzed period days
+    protected int mnPayrollYear;    // for accumulated earnings & deductions
+    protected int mnPayrollPeriod;  // for accumulated earnings & deductions
     
-    protected double mdFactorCalendar;
-    protected double mdFactorDaysPaid;
     protected double mdReceiptDays;
-    protected double mdWorkingDays;
-    protected double mdDaysWorked;
-    protected double mdDaysHiredPayroll;
-    protected double mdDaysHiredAnnual;
-    protected double mdDaysDisabilityNotPaidPayroll;
-    protected double mdDaysDisabilityNotPaidAnnual;
-    protected double mdDaysNotWorkedButPaid;
-    protected double mdDaysNotWorkedNotPaid;
+    protected double mdReceiptWorkingDays;
+    protected double mdReceiptDaysWorked;
+    protected double mdReceiptBusinessDays;
     
-    protected double mdBusinessDays;
+    /** HRS days group for tax and attendance standard processing of payroll-specific period. */
+    protected SHrsEmployeeDaysGroup moHrsDaysGroupStdPayroll;
+    /** HRS days group for tax and attendance standard processing of annual period. */
+    protected SHrsEmployeeDaysGroup moHrsDaysGroupStdAnnual;
+    /** HRS days group for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    protected SHrsEmployeeDaysGroup moHrsDaysGroupTransAnnualOldStyle;
+    /** HRS days group for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    protected SHrsEmployeeDaysGroup moHrsDaysGroupTransAnnualNewStyle;
     
-    public SHrsEmployeeDays(int year, int period, Date periodStart, Date periodEnd) {
-        mnYear = year;
-        mnPeriod = period;
-        mtPeriodStart = periodStart;
-        mtPeriodEnd = periodEnd;
-        mnPeriodDays = SLibTimeUtils.countPeriodDays(mtPeriodStart, mtPeriodEnd);
+    /**
+     * Create new HRS employee days.
+     * Instances only created in SHrsEmployee.createEmployeeDays().
+     * @param payrollYear
+     * @param payrollPeriod 
+     */
+    public SHrsEmployeeDays(int payrollYear, int payrollPeriod) {
+        mnPayrollYear = payrollYear;
+        mnPayrollPeriod = payrollPeriod;
         
-        mdFactorCalendar = 0;
-        mdFactorDaysPaid = 0;
         mdReceiptDays = 0;
-        mdWorkingDays = 0;
-        mdDaysWorked = 0;
-        mdDaysHiredPayroll = 0;
-        mdDaysHiredAnnual = 0;
-        mdDaysDisabilityNotPaidPayroll = 0;
-        mdDaysDisabilityNotPaidAnnual = 0;
-        mdDaysNotWorkedButPaid = 0;
-        mdDaysNotWorkedNotPaid = 0;
+        mdReceiptWorkingDays = 0;
+        mdReceiptDaysWorked = 0;
+        mdReceiptBusinessDays = 0;
         
-        mdBusinessDays = 0;
+        moHrsDaysGroupStdPayroll = new SHrsEmployeeDaysGroup();
+        moHrsDaysGroupStdAnnual = new SHrsEmployeeDaysGroup();
+        moHrsDaysGroupTransAnnualOldStyle = null;
+        moHrsDaysGroupTransAnnualNewStyle = null;
     }
     
-    public void setFactorCalendar(double d) { mdFactorCalendar = d; }
-    public void setFactorDaysPaid(double d) { mdFactorDaysPaid = d; }
     public void setReceiptDays(double d) { mdReceiptDays = d; }
-    public void setWorkingDays(double d) { mdWorkingDays = d; }
-    public void setDaysWorked(double d) { mdDaysWorked = d; }
-    public void setDaysHiredPayroll(double d) { mdDaysHiredPayroll = d; }
-    public void setDaysHiredAnnual(double d) { mdDaysHiredAnnual = d; }
-    public void setDaysDisabilityNotPaidPayroll(double d) { mdDaysDisabilityNotPaidPayroll = d; }
-    public void setDaysDisabilityNotPaidAnnual(double d) { mdDaysDisabilityNotPaidAnnual = d; }
-    public void setDaysNotWorkedButPaid(double d) { mdDaysNotWorkedButPaid = d; }
-    public void setDaysNotWorkedNotPaid(double d) { mdDaysNotWorkedNotPaid = d; }
+    public void setReceiptWorkingDays(double d) { mdReceiptWorkingDays = d; }
+    public void setReceiptDaysWorked(double d) { mdReceiptDaysWorked = d; }
+    public void setReceiptBusinessDays(double d) { mdReceiptBusinessDays = d; }
     
-    public void setBusinessDays(double d) { mdBusinessDays = d; }
-
-    public int getYear() { return mnYear; }
-    public int getPeriod() { return mnPeriod; }
-    public Date getPeriodStart() { return mtPeriodStart; }
-    public Date getPeriodEnd() { return mtPeriodEnd; }
-    public int getPeriodDays() { return mnPeriodDays; }
+    /** HRS days group for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    public void setHrsDaysGroupTransAnnualOldStyle(SHrsEmployeeDaysGroup o) { moHrsDaysGroupTransAnnualOldStyle = o; }
+    /** HRS days group for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    public void setHrsDaysGroupTransAnnualNewStyle(SHrsEmployeeDaysGroup o) { moHrsDaysGroupTransAnnualNewStyle = o; }
     
-    public double getFactorCalendar() { return mdFactorCalendar; }
-    public double getFactorDaysPaid() { return mdFactorDaysPaid; }
+    public void setDaysHiredAnnual(double d) { moHrsDaysGroupStdAnnual.setDaysHired(d); }
+    public void setDaysHiredPayroll(double d) { moHrsDaysGroupStdPayroll.setDaysHired(d); }
+    
+    public void setDaysIncapacityNotPaidAnnual(double d) { moHrsDaysGroupStdAnnual.setDaysIncapacityNotPaid(d); }
+    public void setDaysIncapacityNotPaidPayroll(double d) { moHrsDaysGroupStdPayroll.setDaysIncapacityNotPaid(d); }
+    public void setDaysNotWorkedButPaidPayroll(double d) { moHrsDaysGroupStdPayroll.setDaysNotWorkedButPaid(d); }
+    public void setDaysNotWorkedNotPaidPayroll(double d) { moHrsDaysGroupStdPayroll.setDaysNotWorkedNotPaid(d); }
+    
+    public int getPayrollYear() { return mnPayrollYear; }
+    public int getPayrollPeriod() { return mnPayrollPeriod; }
+    
     public double getReceiptDays() { return mdReceiptDays; }
-    public double getWorkingDays() { return mdWorkingDays; }
-    public double getDaysWorked() { return mdDaysWorked; }
-    public double getDaysHiredPayroll() { return mdDaysHiredPayroll; }
-    public double getDaysHiredAnnual() { return mdDaysHiredAnnual; }
-    public double getDaysIncapacityNotPaidPayroll() { return mdDaysDisabilityNotPaidPayroll; }
-    public double getDaysIncapacityNotPaidAnnual() { return mdDaysDisabilityNotPaidAnnual; }
-    public double getDaysNotWorkedButPaid() { return mdDaysNotWorkedButPaid; }
-    public double getDaysNotWorkedNotPaid() { return mdDaysNotWorkedNotPaid; }
+    public double getReceiptWorkingDays() { return mdReceiptWorkingDays; }
+    public double getReceiptDaysWorked() { return mdReceiptDaysWorked; }
+    public double getReceiptBusinessDays() { return mdReceiptBusinessDays; }
     
-    public double getBusinessDays() { return mdBusinessDays; }
-
-    public double getDaysNotWorked_r() { return mdDaysNotWorkedButPaid + mdDaysNotWorkedNotPaid; }
-    public double getDaysToBePaid_r() { return (mdDaysWorked + mdDaysNotWorkedButPaid) * mdFactorCalendar; }
-    public double getDaysPaid() { return getDaysToBePaid_r() * mdFactorDaysPaid; }
+    /** HRS days group for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    public SHrsEmployeeDaysGroup getHrsDaysGroupTransAnnualOldStyle() { return moHrsDaysGroupTransAnnualOldStyle; }
+    /** HRS days group for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    public SHrsEmployeeDaysGroup getHrsDaysGroupTransAnnualNewStyle() { return moHrsDaysGroupTransAnnualNewStyle; }
     
-    /**
-     * Gets employee's taxable days in current payroll.
-     * @return Days hired - days of disability.
-     */
-    public double getTaxableDaysPayroll() { return mdDaysHiredPayroll - mdDaysDisabilityNotPaidPayroll; }
+    public double getDaysHiredAnnual() { return moHrsDaysGroupStdAnnual.getDaysHired(); }
+    public double getDaysHiredPayroll() { return moHrsDaysGroupStdPayroll.getDaysHired(); }
+    
+    public double getDaysIncapacityNotPaidAnnual() { return moHrsDaysGroupStdAnnual.getDaysIncapacityNotPaid(); }
+    public double getDaysIncapacityNotPaidPayroll() { return moHrsDaysGroupStdPayroll.getDaysIncapacityNotPaid(); }
+    public double getDaysNotWorkedButPaidPayroll() { return moHrsDaysGroupStdPayroll.getDaysNotWorkedButPaid(); }
+    public double getDaysNotWorkedNotPaidPayroll() { return moHrsDaysGroupStdPayroll.getDaysNotWorkedNotPaid(); }
     
     /**
-     * Gets employee's taxable days in current year.
-     * @return Days hired - days of disability.
+     * Get employee's not-worked days in current payrooll.
+     * @return Employee's not-worked days in current payrooll.
      */
-    public double getTaxableDaysAnnual() { return mdDaysHiredAnnual - mdDaysDisabilityNotPaidAnnual; }
-
-    /**
-     * Computes earning units.
-     * @param unitsAlleged
-     * @param earning
-     * @return 
-     */
-    public double computeEarningUnits(final double unitsAlleged, final SDbEarning earning) {
-        double units;
-        
-        switch (earning.getFkEarningComputationTypeId()) {
-            case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
-                units = unitsAlleged * mdFactorCalendar * (earning.isDaysAdjustment() ? mdFactorDaysPaid : 1d);
-                break;
-            default:
-                units = unitsAlleged;
-        }
-        
-        return SLibUtils.round(units, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
-    }
+    public double getNotWorkedDaysPayroll() { return moHrsDaysGroupStdPayroll.getNotWorkedDays(); }
     
     /**
-     * Computes earning amount.
-     * @param units
-     * @param amountUnit
-     * @param earning
-     * @return 
+     * Get employee's workable-calendar days in current payroll.
+     * @return Receipt days (in current payroll) - not-worked days in current payrooll.
      */
-    public static double computeEarningAmount(final double units, final double amountUnit, final SDbEarning earning) {
-        return SLibUtils.roundAmount(units * amountUnit * earning.getUnitsFactor());
-    }
+    public double getWorkableCalendarDaysPayroll() { return getReceiptDays() - getNotWorkedDaysPayroll(); }
+    
+    /**
+     * Get employee's workable-business days in current payroll.
+     * @return Business days in current payroll - not-worked days in current payrooll.
+     */
+    public double getWorkableBusinessDaysPayroll() { return getReceiptBusinessDays() - getNotWorkedDaysPayroll(); }
+    
+    /**
+     * Get employee's taxable days in current year.
+     * @return Employee's taxable days in current year.
+     */
+    public double getTaxableDaysAnnual() { return moHrsDaysGroupStdAnnual.getTaxableDays(); }
+    
+    /**
+     * Get employee's taxable days in current payroll.
+     * @return Employee's taxable days in current payroll.
+     */
+    public double getTaxableDaysPayroll() { return moHrsDaysGroupStdPayroll.getTaxableDays(); }
 }

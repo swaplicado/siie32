@@ -20,15 +20,19 @@ import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiSession;
 
 /**
+ * Las instancias de esta clase permiten la concentración de la información necesaria para emitir nóminas en general.
  *
  * @author Néstor Ávalos, Juan Barajas, Sergio Flores
  */
 public class SHrsPayrollDataProvider {
     
-    private static final int TAX_STD = 1;     // standard tax
-    private static final int TAX_ART_174 = 2; // tax by Articule 174 RLISR
-    private static final int COMP_TAX = 1;
-    private static final int COMP_TAX_SUB = 2;
+    private static final int TAX_TYPE_STD = 1;      // standard tax
+    private static final int TAX_TYPE_ART_174 = 2;  // tax by Articule 174 RLISR
+    private static final int COMP_TAX_COMP = 1;             // computations of tax compensated
+    private static final int COMP_TAX_SUB_COMP = 2;         // computations of tax subsidy compensated
+    private static final int COMP_TAX_SUB_ASSD_OLD_I = 3;   // computations of assessed old-syle tax subsidy (informative)
+    private static final int ACCUM_MODE_BY_ID = 1;
+    private static final int ACCUM_MODE_BY_TYPE = 2;
 
     private final SGuiSession moSession;
     private final Statement miStatement;
@@ -47,7 +51,7 @@ public class SHrsPayrollDataProvider {
      */
 
     /*
-     * Specific methods for a payroll
+     * Methods for instantiating a HRS payroll
      */
 
     private ArrayList<SDbLoanTypeAdjustment> readLoanTypeAdjustment() throws Exception {
@@ -175,6 +179,25 @@ public class SHrsPayrollDataProvider {
         return registries;
     }
 
+    private ArrayList<SDbEmploymentSubsidy> readEmploymentSubsidies() throws Exception {
+        ArrayList<SDbEmploymentSubsidy> registries = new ArrayList<>();
+
+        String sql = "SELECT id_empl_sub "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMPL_SUB) + " "
+                + "WHERE NOT b_del "
+                + "ORDER BY dt_sta, id_empl_sub;";
+
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbEmploymentSubsidy registry = new SDbEmploymentSubsidy();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
+        }
+
+        return registries;
+    }
+
     private ArrayList<SDbSsContributionTable> readSsContributionTables() throws Exception {
         ArrayList<SDbSsContributionTable> registries = new ArrayList<>();
 
@@ -194,6 +217,7 @@ public class SHrsPayrollDataProvider {
         return registries;
     }
     
+    @Deprecated
     private ArrayList<SDbBenefitTable> readBenefitTables() throws Exception {
         ArrayList<SDbBenefitTable> registries = new ArrayList<>();
 
@@ -373,6 +397,49 @@ public class SHrsPayrollDataProvider {
 
         return registries;
     }
+    
+    private SDbPayrollReceipt readPayrollReceiptAndPrepareHrsReceipt(final int[] payrollReceiptPk, final SHrsReceipt hrsReceipt) throws Exception {
+        SHrsPayroll hrsPayroll = hrsReceipt.getHrsPayroll();
+        
+        SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
+        payrollReceipt.read(moSession, payrollReceiptPk);
+
+        // Obtain payroll receipt earnings:
+
+        for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
+            if (!payrollReceiptEarning.isDeleted()) {
+                SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
+                hrsReceiptEarning.setHrsReceipt(hrsReceipt);
+                hrsReceiptEarning.setEarning(hrsPayroll.getEarning(payrollReceiptEarning.getFkEarningId()));
+                hrsReceiptEarning.setPayrollReceiptEarning(payrollReceiptEarning);
+
+                hrsReceipt.getHrsReceiptEarnings().add(hrsReceiptEarning);
+            }
+        }
+
+        // Obtain payroll receipt deductions:
+
+        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
+            if (!payrollReceiptDeduction.isDeleted()) {
+                SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
+                hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
+                hrsReceiptDeduction.setDeduction(hrsPayroll.getDeduction(payrollReceiptDeduction.getFkDeductionId()));
+                hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
+
+                hrsReceipt.getHrsReceiptDeductions().add(hrsReceiptDeduction);
+            }
+        }
+
+        // Obtain absence consumptions:
+
+        for (SDbAbsenceConsumption absenceConsumption : payrollReceipt.getChildAbsenceConsumptions()) {
+            if (!absenceConsumption.isDeleted()) {
+                hrsReceipt.getAbsenceConsumptions().add(absenceConsumption);
+            }
+        }
+        
+        return payrollReceipt;
+    }
 
     private ArrayList<SHrsReceipt> readHrsReceipts(final SHrsPayroll hrsPayroll) throws Exception {
         SDbPayroll payroll = hrsPayroll.getPayroll();
@@ -386,54 +453,22 @@ public class SHrsPayrollDataProvider {
 
             try (ResultSet resultSet = moSession.getStatement().getConnection().createStatement().executeQuery(sql)) {
                 while (resultSet.next()) {
-                    SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
-                    payrollReceipt.read(moSession, new int[] { payroll.getPkPayrollId(), resultSet.getInt("id_emp") });
+                    int employeeId = resultSet.getInt("id_emp");
                     
+                    // create HRS receipt:
                     SHrsReceipt hrsReceipt = new SHrsReceipt(hrsPayroll);
                     
-                    // Obtain payroll receipt earnings:
-                    
-                    for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
-                        if (!payrollReceiptEarning.isDeleted()) {
-                            SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
-                            hrsReceiptEarning.setHrsReceipt(hrsReceipt);
-                            hrsReceiptEarning.setEarning(hrsPayroll.getEarning(payrollReceiptEarning.getFkEarningId()));
-                            hrsReceiptEarning.setPayrollReceiptEarning(payrollReceiptEarning);
-                            
-                            hrsReceipt.getHrsReceiptEarnings().add(hrsReceiptEarning);
-                        }
-                    }
-                    
-                    // Obtain payroll receipt deductions:
-                    
-                    for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
-                        if (!payrollReceiptDeduction.isDeleted()) {
-                            SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
-                            hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
-                            hrsReceiptDeduction.setDeduction(hrsPayroll.getDeduction(payrollReceiptDeduction.getFkDeductionId()));
-                            hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
-                            
-                            hrsReceipt.getHrsReceiptDeductions().add(hrsReceiptDeduction);
-                        }
-                    }
-                    
-                    // Obtain absence consumptions:
-                    
-                    for (SDbAbsenceConsumption absenceConsumption : payrollReceipt.getChildAbsenceConsumption()) {
-                        if (!absenceConsumption.isDeleted()) {
-                            hrsReceipt.getAbsenceConsumptions().add(absenceConsumption);
-                        }
-                    }
-                    
                     // create HRS employee:
-                    SHrsEmployee hrsEmployee = createHrsEmployee(hrsPayroll, hrsReceipt, payrollReceipt.getPkEmployeeId());
+                    SHrsEmployee hrsEmployee = createHrsEmployee(hrsReceipt, employeeId);
                     
-                    // asign HRS employee to HRS receipt:
+                    // assign HRS employee to HRS receipt:
                     hrsReceipt.setHrsEmployee(hrsEmployee);
                     
-                    // asign payroll receipt to HRS receipt:
+                    // assign payroll receipt to HRS receipt:
+                    SDbPayrollReceipt payrollReceipt = readPayrollReceiptAndPrepareHrsReceipt(new int[] { payroll.getPkPayrollId(), employeeId }, hrsReceipt);
                     hrsReceipt.setPayrollReceipt(payrollReceipt);
                     
+                    // add new HRS receipt:
                     hrsReceipts.add(hrsReceipt);
                 }
             }
@@ -489,7 +524,7 @@ public class SHrsPayrollDataProvider {
     }
     
     /*
-     * Specific methods for an individual employee
+     * Methods for instantiating an individual HRS employee
      */
 
     private ArrayList<SDbLoan> readEmployeeLoans(final int employeeId) throws Exception {
@@ -511,7 +546,7 @@ public class SHrsPayrollDataProvider {
         return loans;
     }
     
-    private ArrayList<SHrsLoan> createEmployeeHrsLoans(final ArrayList<SDbLoan> loans, final int excludePayrollId) throws Exception {
+    private ArrayList<SHrsLoan> createEmployeeHrsLoans(final ArrayList<SDbLoan> loans, final int payrollIdToExclude) throws Exception {
         String sql;
         ArrayList<SHrsLoan> hrsLoans = new ArrayList<>();
         
@@ -525,7 +560,7 @@ public class SHrsPayrollDataProvider {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                 + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT pre.b_del AND "
-                + (excludePayrollId == 0 ? "" : "p.id_pay <> " + excludePayrollId + " AND ") // do not exclude loan adjustments!
+                + (payrollIdToExclude == 0 ? "" : "p.id_pay <> " + payrollIdToExclude + " AND ") // do not exclude loan adjustments!
                 + "pre.fk_loan_emp_n = ? AND pre.fk_loan_loan_n = ?;";
         PreparedStatement psEarnings = miStatement.getConnection().prepareStatement(sql);
         
@@ -539,7 +574,7 @@ public class SHrsPayrollDataProvider {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                 + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT prd.b_del AND "
-                + (excludePayrollId == 0 ? "" : "p.id_pay <> " + excludePayrollId + " AND ") // do not exclude loan adjustments!
+                + (payrollIdToExclude == 0 ? "" : "p.id_pay <> " + payrollIdToExclude + " AND ") // do not exclude loan adjustments!
                 + "prd.fk_loan_emp_n = ? AND prd.fk_loan_loan_n = ?;";
         PreparedStatement psDeductions = miStatement.getConnection().prepareStatement(sql);
         
@@ -596,14 +631,14 @@ public class SHrsPayrollDataProvider {
         return absences;
     }
     
-    private ArrayList<SDbAbsenceConsumption> readEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int excludePayrollId) throws Exception {
+    private ArrayList<SDbAbsenceConsumption> readEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int payrollIdToExclude) throws Exception {
         ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
 
         String sql = "SELECT ac.id_cns "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
-                + "WHERE p.id_pay <> " + excludePayrollId + " AND NOT p.b_del AND NOT pr.b_del AND "
+                + "WHERE p.id_pay <> " + payrollIdToExclude + " AND NOT p.b_del AND NOT pr.b_del AND "
                 + "ac.id_emp = ? AND ac.id_abs = ? AND NOT ac.b_del "
                 + "ORDER BY ac.id_cns;";
         
@@ -641,71 +676,6 @@ public class SHrsPayrollDataProvider {
         return hiredDays;
     }
     
-    private double getEmployeeAnnualTaxableEarnings(final int employeeId, final int recruitmentSchemaCat, final int fiscalYear, final Date payrollDateEnd, int taxType, final int excludePayrollId) throws Exception {
-        double earnings = 0;
-        String sqlAltTaxArt174;
-        
-        switch (taxType) {
-            case TAX_STD:
-                sqlAltTaxArt174 = "0";
-                break;
-            case TAX_ART_174:
-                sqlAltTaxArt174 = "1";
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-        }
-
-        String sql = "SELECT COALESCE(SUM(pre.amt_taxa), 0.0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
-                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
-                + "p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " AND "
-                + "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' AND "
-                + "pre.b_alt_tax = " + sqlAltTaxArt174 + ";"; // Articule 174 RLISR
-        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
-            if (resultSet.next()) {
-                earnings = resultSet.getDouble(1);
-            }
-        }
-
-        return earnings;
-    }
-    
-    private double getEmployeeAnnualCompensation(final int employeeId, final int recruitmentSchemaCat, final int fiscalYear, final Date payrollDateEnd, int compensationType, final int excludePayrollId) throws Exception {
-        double compensation = 0;
-        String sqlColumn;
-        
-        switch (compensationType) {
-            case COMP_TAX:
-                sqlColumn = "pr.pay_tax_comp";
-                break;
-            case COMP_TAX_SUB:
-                sqlColumn = "pr.pay_tax_sub_comp";
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-        }
-
-        String sql = "SELECT COALESCE(SUM(" + sqlColumn + "), 0.0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
-                + "WHERE NOT p.b_del AND NOT pr.b_del AND "
-                + "p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " AND "
-                + "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "';";
-        
-        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
-            if (resultSet.next()) {
-                compensation = resultSet.getDouble(1);
-            }
-        }
-
-        return compensation;
-    }
-    
     private int getEmployeeBusinessDays(final ArrayList<SDbEmployeeHireLog> employeeHireLogs, final int paymentType, final Date dateStart, final Date dateEnd) throws Exception {
         int businessDays = 0;
         
@@ -718,6 +688,102 @@ public class SHrsPayrollDataProvider {
         }
         
         return businessDays;
+    }
+    
+    /**
+     * Get employee's annual taxable earnings.
+     * @param employeeId ID of employee.
+     * @param recruitmentSchemaCat Catetory of recruitment schema.
+     * @param fiscalYear Fiscal year.
+     * @param fiscalStart_n Fiscal start (optional, can be <code>null</code>.)
+     * @param fiscalEnd Fiscal end.
+     * @param taxType Tax type: standard (TAX_TYPE_STD) or Article 174 of LISR (TAX_TYPE_ART_174).
+     * @param payrollIdToExclude ID of payroll to exclude
+     * @return
+     * @throws Exception 
+     */
+    private double getEmployeeAnnualTaxableEarnings(final int employeeId, final int recruitmentSchemaCat, 
+            final int fiscalYear, final Date fiscalStart_n, final Date fiscalEnd, int taxType, final int payrollIdToExclude) throws Exception {
+        double earnings = 0;
+        String sqlAltTaxArt174;
+        
+        switch (taxType) {
+            case TAX_TYPE_STD:
+                sqlAltTaxArt174 = "0";
+                break;
+            case TAX_TYPE_ART_174:
+                sqlAltTaxArt174 = "1";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        String sql = "SELECT COALESCE(SUM(pre.amt_taxa), 0.0) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
+                + "p.id_pay <> " + payrollIdToExclude + " AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " AND "
+                + "p.fis_year = " + fiscalYear + " AND " + (fiscalStart_n == null ? "" : "p.dt_end >= '" + SLibUtils.DbmsDateFormatDate.format(fiscalStart_n) + "' AND ")
+                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(fiscalEnd) + "' AND "
+                + "pre.b_alt_tax = " + sqlAltTaxArt174 + ";"; // Articule 174 RLISR
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                earnings = resultSet.getDouble(1);
+            }
+        }
+
+        return earnings;
+    }
+    
+    /**
+     * Get employee's annual computations.
+     * @param employeeId ID of employee.
+     * @param recruitmentSchemaCat Catetory of recruitment schema.
+     * @param fiscalYear Fiscal year.
+     * @param fiscalStart_n Fiscal start (optional, can be <code>null</code>.)
+     * @param fiscalEnd Fiscal end.
+     * @param compensationType Compensation type: tax (COMP_TAX) or tax subsidy (COMP_TAX_SUB).
+     * @param payrollIdToExclude ID of payroll to exclude
+     * @return
+     * @throws Exception 
+     */
+    private double getEmployeeAnnualComputations(final int employeeId, final int recruitmentSchemaCat, 
+            final int fiscalYear, final Date fiscalStart_n, final Date fiscalEnd, int compensationType, final int payrollIdToExclude) throws Exception {
+        double compensation = 0;
+        String sqlColumn;
+        
+        switch (compensationType) {
+            case COMP_TAX_COMP:
+                sqlColumn = "pr.pay_tax_comp";
+                break;
+            case COMP_TAX_SUB_COMP:
+                sqlColumn = "pr.pay_tax_sub_comp";
+                break;
+            case COMP_TAX_SUB_ASSD_OLD_I:
+                sqlColumn = "pr.pay_tax_sub_assd_old_i";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        String sql = "SELECT COALESCE(SUM(" + sqlColumn + "), 0.0) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND "
+                + "p.id_pay <> " + payrollIdToExclude + " AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " AND "
+                + "p.fis_year = " + fiscalYear + " AND " + (fiscalStart_n == null ? "" : "p.dt_end >= '" + SLibUtils.DbmsDateFormatDate.format(fiscalStart_n) + "' AND ")
+                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(fiscalEnd) + "';";
+        
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                compensation = resultSet.getDouble(1);
+            }
+        }
+
+        return compensation;
     }
     
     /**
@@ -784,27 +850,27 @@ public class SHrsPayrollDataProvider {
      * Retrieve accumulated earnings for arguments provided ONLY that accountable for compatible category of recruitment schema in payroll receipts.
      * @param employeeId ID of employee.
      * @param periodYear Period year.
-     * @param dateStart Start date.
-     * @param dateEnd End date.
-     * @param taxComputationType Tax computation type (SModSysConsts.HRSS_TP_TAX_COMP_...) or zero value to accumulate earnings up to end date.
-     * @param byEarningType Is accumulation requested by earning type instead of by earning.
-     * @param excludePayrollId ID of payroll to be excluded.
+     * @param periodStart_n Period start (optional, can be <code>null</code>.)
+     * @param periodEnd Period end.
+     * @param accumulationMode Accumulation mode requested: by earning type (ACCUM_MODE_BY_TYPE) or by earning (ACCUM_MODE_BY_ID).
+     * @param payrollIdToExclude ID of payroll to exclude.
      * @return
      * @throws Exception 
      */
     private ArrayList<SHrsAccumulatedEarning> createEmployeeAccumulatedEarnings(final int employeeId, 
-            final int periodYear, final Date dateEnd, final boolean byEarningType, final int excludePayrollId) throws Exception {
-        int recrutimentSchemaCat = getRecruitmentSchemaCat(excludePayrollId, employeeId);
+            final int periodYear, final Date periodStart_n, final Date periodEnd, final int accumulationMode, final int payrollIdToExclude) throws Exception {
+        int recrutimentSchemaCat = getRecruitmentSchemaCat(payrollIdToExclude, employeeId);
         ArrayList<SHrsAccumulatedEarning> hrsAccumulatedEarnings = new ArrayList<>();
 
-        String field = (!byEarningType ? "pre.fk_ear" : "pre.fk_tp_ear");
+        String field = accumulationMode == ACCUM_MODE_BY_ID ? "pre.fk_ear" : "pre.fk_tp_ear";
         String sql = "SELECT " + field + " AS _ear, SUM(pre.amt_r) AS _amount, SUM(pre.amt_taxa) AS _taxa "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
-                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
-                + "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND "
+                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollIdToExclude + " AND pr.id_emp = " + employeeId + " AND "
+                + "p.per_year = " + periodYear + " AND " + (periodStart_n == null ? "" : "p.dt_end >= '" + SLibUtils.DbmsDateFormatDate.format(periodStart_n) + "' AND ")
+                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(periodEnd) + "' AND "
                 + "trs.rec_sche_cat = " + recrutimentSchemaCat + " "
                 + "GROUP BY " + field + " "
                 + "ORDER BY " + field + ";";
@@ -823,27 +889,27 @@ public class SHrsPayrollDataProvider {
      * Retrieve accumulated deductions for arguments provided ONLY that accountable for compatible category of recruitment schema in payroll receipts.
      * @param employeeId ID of employee.
      * @param periodYear Period year.
-     * @param dateStart Start date.
-     * @param dateEnd End date.
-     * @param taxComputationType Tax computation type (SModSysConsts.HRSS_TP_TAX_COMP_...) or zero value to accumulate deductions up to end date.
-     * @param byDeductionType Is accumulation requested by deduction type instead of by deduction.
-     * @param excludePayrollId ID of payroll to be excluded.
+     * @param periodStart_n Period start (optional, can be <code>null</code>.)
+     * @param periodEnd Period end.
+     * @param accumulationMode Accumulation mode requested: by deduction type (ACCUM_MODE_BY_TYPE) or by deduction ((ACCUM_MODE_BY_ID).
+     * @param payrollIdToExclude ID of payroll to exclude.
      * @return
      * @throws Exception 
      */
     private ArrayList<SHrsAccumulatedDeduction> createEmployeeAccumulatedDeductions(final int employeeId, 
-            final int periodYear, final Date dateEnd, final boolean byDeductionType, final int excludePayrollId) throws Exception {
-        int recrutimentSchemaCat = getRecruitmentSchemaCat(excludePayrollId, employeeId);
+            final int periodYear, final Date periodStart_n, final Date periodEnd, final int accumulationMode, final int payrollIdToExclude) throws Exception {
+        int recrutimentSchemaCat = getRecruitmentSchemaCat(payrollIdToExclude, employeeId);
         ArrayList<SHrsAccumulatedDeduction> hrsAccumulatedDeductions = new ArrayList<>();
 
-        String field = (!byDeductionType ? "prd.fk_ded" : "prd.fk_tp_ded");
+        String field = accumulationMode == ACCUM_MODE_BY_ID ? "prd.fk_ded" : "prd.fk_tp_ded";
         String sql = "SELECT " + field + " AS _ded, SUM(prd.amt_r) AS _amount "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
-                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
-                + "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND "
+                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.id_pay <> " + payrollIdToExclude + " AND pr.id_emp = " + employeeId + " AND "
+                + "p.per_year = " + periodYear + " AND " + (periodStart_n == null ? "" : "p.dt_end >= '" + SLibUtils.DbmsDateFormatDate.format(periodStart_n) + "' AND ")
+                + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(periodEnd) + "' AND "
                 + "trs.rec_sche_cat = " + recrutimentSchemaCat + " "
                 + "GROUP BY " + field + " "
                 + "ORDER BY " + field + ";";
@@ -887,6 +953,9 @@ public class SHrsPayrollDataProvider {
         // Tax subsidy tables:
         hrsPayroll.getTaxSubsidyTables().addAll(readTaxSubsidyTables());
 
+        // Employment subsidy configurations:
+        hrsPayroll.getEmploymentSubsidies().addAll(readEmploymentSubsidies());
+
         // SS Contribution tables:
         hrsPayroll.getSsContributionTables().addAll(readSsContributionTables());
         
@@ -916,43 +985,125 @@ public class SHrsPayrollDataProvider {
         
         // Deduction computation types:
         populateDescriptionsMap(SModConsts.HRSS_TP_DED_COMP, SDbRegistry.FIELD_CODE, hrsPayroll.getDeductionComputationTypesMap());
+        
+        // Assess applicability of employment subsidy:
+        hrsPayroll.assessEmploymentSubsidyApplicability();
 
         return hrsPayroll;
     }
 
-    public SHrsEmployee createHrsEmployee(final SHrsPayroll hrsPayroll, final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
-        SDbPayroll payroll = hrsPayroll.getPayroll(); // convenience variable
+    public SHrsEmployee createHrsEmployee(final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
+        SDbPayroll payroll = hrsReceipt.getHrsPayroll().getPayroll(); // convenience variable
+        
         int payrollId = payroll.getPkPayrollId();
         int fiscalYear = payroll.getFiscalYear();
         int periodYear = payroll.getPeriodYear();
-        Date dateStart = payroll.getDateStart();
-        Date dateEnd = payroll.getDateEnd();
+        Date payrollStart = payroll.getDateStart();
+        Date payrollEnd = payroll.getDateEnd();
+        Date endOfFiscalYear = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear));
+        Date fiscalStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
+        Date fiscalEnd = payrollEnd.before(endOfFiscalYear) ? payrollEnd : endOfFiscalYear;
+        ArrayList<SDbEmployeeHireLog> hireLogsPayroll = readEmployeeHireLogs(employeeId, payrollStart, payrollEnd);
+        ArrayList<SDbEmployeeHireLog> hireLogsAnnual = readEmployeeHireLogs(employeeId, fiscalStart, fiscalEnd);
         
-        SHrsEmployee hrsEmployee = new SHrsEmployee(hrsPayroll, hrsReceipt, employeeId);
+        SHrsEmployee hrsEmployee = new SHrsEmployee(hrsReceipt, employeeId);
+        
+        int paymentType = hrsEmployee.getEmployee().getFkPaymentTypeId(); // convenience variable
+        int recruitmentSchemaCat = hrsEmployee.getEmployee().getXtaEffectiveRecruitmentSchemaCat(); // convenience variable
+        
         hrsEmployee.getLoans().addAll(readEmployeeLoans(employeeId));
         hrsEmployee.getHrsLoans().addAll(createEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));
         hrsEmployee.getAbsences().addAll(readEmployeeAbsences(employeeId));
         hrsEmployee.getAbsenceConsumptions().addAll(readEmployeeAbsencesConsumptions(hrsEmployee.getAbsences(), payrollId));
-        hrsEmployee.getEmployeeHireLogs().addAll(readEmployeeHireLogs(employeeId, dateStart, dateEnd));
+        
+        hrsEmployee.getEmployeeHireLogsPayroll().addAll(hireLogsPayroll);
+        
+        hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(hireLogsAnnual, fiscalStart, fiscalEnd));
+        hrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(hrsEmployee.getEmployeeHireLogsPayroll(), payrollStart, payrollEnd));
+        hrsEmployee.setReceiptBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogsPayroll(), paymentType, payrollStart, payrollEnd));
+        
+        hrsEmployee.setAnnualTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, null, fiscalEnd, TAX_TYPE_STD, payrollId));
+        hrsEmployee.setAnnualTaxableEarningsArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, null, fiscalEnd, TAX_TYPE_ART_174, payrollId));
+        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, fiscalEnd, COMP_TAX_COMP, payrollId));
+        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, fiscalEnd, COMP_TAX_SUB_COMP, payrollId));
+        
+        hrsEmployee.setAnnualTaxSubsidyAssessedOldInformative(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, fiscalEnd, COMP_TAX_SUB_ASSD_OLD_I, payrollId));
+        
+        hrsEmployee.getHrsAccumulatedEarnigs().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, null, payrollEnd, ACCUM_MODE_BY_ID, payrollId));
+        hrsEmployee.getHrsAccumulatedEarnigsByType().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, null, payrollEnd, ACCUM_MODE_BY_TYPE, payrollId));
+        hrsEmployee.getHrsAccumulatedDeductions().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, null, payrollEnd, ACCUM_MODE_BY_ID, payrollId));
+        hrsEmployee.getHrsAccumulatedDeductionsByType().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, null, payrollEnd, ACCUM_MODE_BY_TYPE, payrollId));
+        
+        // tax and attendance for tax subsidy year of transition of style (i.e., 2024), if applies:
 
-        Date annualStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
-        Date annualEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
-        SDbEmployee employee = hrsEmployee.getEmployee();
-        int recruitmentSchemaCat = employee.getXtaEffectiveRecruitmentSchemaCat();
+        if (payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN) {
+            SHrsPayroll hrsPayroll = hrsReceipt.getHrsPayroll();
 
-        hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(readEmployeeHireLogs(employeeId, annualStart, annualEnd), annualStart, annualEnd));
-        hrsEmployee.setAnnualTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_STD, payrollId));
-        hrsEmployee.setAnnualTaxableEarningArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, TAX_ART_174, payrollId));
-        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX, payrollId));
-        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(employeeId, recruitmentSchemaCat, fiscalYear, annualEnd, COMP_TAX_SUB, payrollId));
+            if (hrsPayroll.isTransitionYearForTaxSubsidy()) { // please note that this block will be executed only along 2024!
+                // payroll belongs to the year of transtition of style of subsidy (i.e., 2024):
 
-        hrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
-        hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), employee.getFkPaymentTypeId(), dateStart, dateEnd));
-        hrsEmployee.addAllYearHrsAccumulatedEarnigs(createEmployeeAccumulatedEarnings(employeeId, periodYear, dateEnd, false, payrollId)); // by earning ID
-        hrsEmployee.addAllYearHrsAccumulatedEarnigsByType(createEmployeeAccumulatedEarnings(employeeId, periodYear, dateEnd, true, payrollId)); // by earning type
-        hrsEmployee.addAllYearHrsAccumulatedDeductions(createEmployeeAccumulatedDeductions(employeeId, periodYear, dateEnd, false, payrollId)); // by deduction ID
-        hrsEmployee.addAllYearHrsAccumulatedDeductionsByType(createEmployeeAccumulatedDeductions(employeeId, periodYear, dateEnd, true, payrollId)); // by deduction type
+                SDbEmploymentSubsidy employmentSubsidyAkaNewStyle = hrsPayroll.getEmploymentSubsidy(payroll.getFkEmploymentSubsidyId_n()); // the shiny "new-style"
+                
+                if (employmentSubsidyAkaNewStyle == null) {
+                    throw new Exception("No se pudo recuperar la configuración del subsidio para el empleo vigente a partir de mayo 2024 aplicable al '" + SLibUtils.DateFormatDate.format(fiscalEnd) + "'.");
+                }
 
+                // check if employee was hired before the transition:
+
+                Date officialStart = SLibTimeUtils.createDate(2024, 5, 1);
+                Date newStyleStart = employmentSubsidyAkaNewStyle.getDateStart(); // should be May 1st, 2024
+                Date oldStyleEnd = SLibTimeUtils.addDate(newStyleStart, 0, 0, -1); // should be April 31th, 2024
+                
+                if (!SLibTimeUtils.isSameDate(officialStart, newStyleStart)) {
+                    throw new Exception("El inicio de vigencia de la configuración del subsidio para el empleo en el año de transición debería ser el '" + SLibUtils.DateFormatDate.format(newStyleStart) + "', pero no el '" + SLibUtils.DateFormatDate.format(officialStart) + "'.");
+                }
+                
+                // HRS employee movements for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.)
+                
+                SHrsEmployeeMvts hrsEmployeelMvtsOldStyle = new SHrsEmployeeMvts();
+                
+                hrsEmployeelMvtsOldStyle.setDaysHired(getEmployeeHiredDays(hireLogsAnnual, fiscalStart, oldStyleEnd));
+
+                hrsEmployeelMvtsOldStyle.setTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, null, oldStyleEnd, TAX_TYPE_STD, payrollId));
+                hrsEmployeelMvtsOldStyle.setTaxableEarningsArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, null, oldStyleEnd, TAX_TYPE_ART_174, payrollId));
+                hrsEmployeelMvtsOldStyle.setTaxCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, oldStyleEnd, COMP_TAX_COMP, payrollId));
+                hrsEmployeelMvtsOldStyle.setTaxSubsidyCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, oldStyleEnd, COMP_TAX_SUB_COMP, payrollId));
+                
+                /* Old-style assessed tax subsidy is useful only in annual-global context, so, next line is preserved commented only to remark this (2024-05-27, Sergio Flores)
+                hrsEmployeelMvtsOldStyle.setTaxSubsidyAssessedOldInformative(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, null, oldStyleEnd, COMP_TAX_SUB_ASSD_OLD_I, payrollId));
+                */
+
+                hrsEmployeelMvtsOldStyle.getHrsAccumulatedEarnings().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, null, oldStyleEnd, ACCUM_MODE_BY_ID, payrollId));
+                hrsEmployeelMvtsOldStyle.getHrsAccumulatedEarningsByType().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, null, oldStyleEnd, ACCUM_MODE_BY_TYPE, payrollId));
+                hrsEmployeelMvtsOldStyle.getHrsAccumulatedDeductions().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, null, oldStyleEnd, ACCUM_MODE_BY_ID, payrollId));
+                hrsEmployeelMvtsOldStyle.getHrsAccumulatedDeductionsByType().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, null, oldStyleEnd, ACCUM_MODE_BY_TYPE, payrollId));
+                
+                hrsEmployee.setHrsEmployeelMvtsAnnualTransOldStyle(hrsEmployeelMvtsOldStyle);
+                
+                // HRS employee movements for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.)
+                
+                SHrsEmployeeMvts hrsEmployeelMvtsNewStyle = new SHrsEmployeeMvts();
+                
+                hrsEmployeelMvtsNewStyle.setDaysHired(getEmployeeHiredDays(hireLogsAnnual, newStyleStart, fiscalEnd));
+
+                hrsEmployeelMvtsNewStyle.setTaxableEarnings(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, newStyleStart, fiscalEnd, TAX_TYPE_STD, payrollId));
+                hrsEmployeelMvtsNewStyle.setTaxableEarningsArt174(getEmployeeAnnualTaxableEarnings(employeeId, recruitmentSchemaCat, fiscalYear, newStyleStart, fiscalEnd, TAX_TYPE_ART_174, payrollId));
+                hrsEmployeelMvtsNewStyle.setTaxCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, newStyleStart, fiscalEnd, COMP_TAX_COMP, payrollId));
+                hrsEmployeelMvtsNewStyle.setTaxSubsidyCompensated(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, newStyleStart, fiscalEnd, COMP_TAX_SUB_COMP, payrollId));
+
+                /* Old-style assessed tax subsidy is useful only in annual-global context, so, next line is preserved commented only to remark this (2024-05-27, Sergio Flores)
+                hrsEmployeelMvtsNewStyle.setTaxSubsidyAssessedOldInformative(getEmployeeAnnualComputations(employeeId, recruitmentSchemaCat, fiscalYear, newStyleStart, fiscalEnd, COMP_TAX_SUB_ASSD_OLD_I, payrollId));
+                */
+
+                hrsEmployeelMvtsNewStyle.getHrsAccumulatedEarnings().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, newStyleStart, payrollEnd, ACCUM_MODE_BY_ID, payrollId));
+                hrsEmployeelMvtsNewStyle.getHrsAccumulatedEarningsByType().addAll(createEmployeeAccumulatedEarnings(employeeId, periodYear, newStyleStart, payrollEnd, ACCUM_MODE_BY_TYPE, payrollId));
+                hrsEmployeelMvtsNewStyle.getHrsAccumulatedDeductions().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, newStyleStart, payrollEnd, ACCUM_MODE_BY_ID, payrollId));
+                hrsEmployeelMvtsNewStyle.getHrsAccumulatedDeductionsByType().addAll(createEmployeeAccumulatedDeductions(employeeId, periodYear, newStyleStart, payrollEnd, ACCUM_MODE_BY_TYPE, payrollId));
+                
+                hrsEmployee.setHrsEmployeelMvtsAnnualTransNewStyle(hrsEmployeelMvtsNewStyle);
+            }
+        }
+        
         return hrsEmployee;
     }
 }

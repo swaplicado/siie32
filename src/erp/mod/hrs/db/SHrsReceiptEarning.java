@@ -56,7 +56,7 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
     }
     
     private void computeAmount() {
-        double amount = SHrsEmployeeDays.computeEarningAmount(moPayrollReceiptEarning.getUnits(), moPayrollReceiptEarning.getAmountUnitary(), moEarning);
+        double amount = moEarning.computeEarningAmount(moPayrollReceiptEarning.getUnits(), moPayrollReceiptEarning.getAmountUnitary());
         moPayrollReceiptEarning.setAmountSystem_r(amount);
         moPayrollReceiptEarning.setAmount_r(amount);
         
@@ -88,9 +88,8 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
                 moPayrollReceiptEarning.setUserEdited(true);
             }
 
-            SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
             moPayrollReceiptEarning.setUnitsAlleged(valueAlleged);
-            moPayrollReceiptEarning.setUnits(hrsEmployeeDays.computeEarningUnits(valueAlleged, moEarning));
+            moPayrollReceiptEarning.setUnits(moEarning.computeEarningUnits(valueAlleged, moHrsReceipt.getHrsPayroll().getPayroll()));
             
             computeAmount();
         }

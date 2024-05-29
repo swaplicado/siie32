@@ -81,6 +81,11 @@ import sa.lib.srv.SSrvConsts;
  * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public abstract class STrnUtilities {
+    
+    /** Map of payroll composed texts of year and number. Content: key = payroll ID; value = composed text of year and number. */
+    private static final HashMap<Integer, String> PayrollYearAndNumbersMap = new HashMap<>();
+    /** Map of payroll subject hints for mailing. Content: key = payroll ID; value = subject hint for mailing. */
+    private static final HashMap<Integer, String> PayrollSubjectHintsMap = new HashMap<>();
 
     /**
      * @return Production order status set as comma separated values where stock moves are allowed.
@@ -2069,6 +2074,7 @@ public abstract class STrnUtilities {
                     throw new SMailException("El receptor no cuenta con correo-e para la recepción de documentos o comprobantes.");
                 }
                 else {
+                    String subjectHint = "";
                     String docNumber = "";
                     String docType = "";
                     boolean isCancelled = false;
@@ -2100,8 +2106,10 @@ public abstract class STrnUtilities {
                                 case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                     SDataFormerPayroll payrollFormer = (SDataFormerPayroll) SDataUtilities.readRegistry(client, SDataConstants.HRS_SIE_PAY, new int[] { cfd.getFkPayrollPayrollId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                     SDataFormerPayrollEmp payrollFormerEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(client, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                                    
                                     docNumber = payrollFormer.getYear() + " " + (payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_FOR) == 0 ? SHrsFormerConsts.PAY_FOR_ABB : payrollFormer.getType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
                                         SLibUtils.DecimalFormatCalendarDay.format(payrollFormer.getNumber()) + " " + (payrollFormerEmp.getNumberSeries().length() > 0 ? payrollFormerEmp.getNumberSeries() + "-" : "") + payrollFormerEmp.getNumber();
+                                    
                                     isCancelled = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     cancelledDate = payrollFormerEmp.getLastDbUpdate();
                                     docType = "Recibo de nomina";
@@ -2109,8 +2117,20 @@ public abstract class STrnUtilities {
 
                                 case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                                     SDbPayrollReceiptIssue payrollReceiptIssue = (SDbPayrollReceiptIssue) client.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() });
-                                    docNumber = SDbPayroll.composePayrollYearAndNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
+                                    
+                                    subjectHint = PayrollSubjectHintsMap.get(cfd.getFkPayrollReceiptPayrollId_n());
+                                    if (subjectHint == null) {
+                                        subjectHint = SDbPayroll.retrievePayrollHint(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // retrive payroll hint only once!
+                                        PayrollSubjectHintsMap.put(cfd.getFkPayrollReceiptPayrollId_n(), subjectHint);
+                                    }
+                                    
+                                    docNumber = PayrollYearAndNumbersMap.get(cfd.getFkPayrollReceiptPayrollId_n());
+                                    if (docNumber == null) {
+                                        docNumber = SDbPayroll.composePayrollYearAndNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n()); // compose payroll year and number only once!
+                                        PayrollYearAndNumbersMap.put(cfd.getFkPayrollReceiptPayrollId_n(), docNumber);
+                                    }
                                     docNumber += " " + payrollReceiptIssue.getIssueNumber();
+                                    
                                     isCancelled = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     cancelledDate = payrollReceiptIssue.getTsUserUpdate();
                                     docType = "Recibo de nomina";
@@ -2127,7 +2147,7 @@ public abstract class STrnUtilities {
 
                     // send mail:
                     
-                    String mailSubject = mms.getTextSubject() + " " + docNumber;
+                    String mailSubject = mms.getTextSubject() + " " + docNumber + (subjectHint.isEmpty() ? "" : " (" + subjectHint + ")");
                     if (isCancelled) {
                         mailSubject += " (cancelacion)";
                     }

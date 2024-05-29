@@ -6,7 +6,7 @@ package erp.mod.hrs.db;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsDaysByPeriod {
 
@@ -18,7 +18,7 @@ public class SHrsDaysByPeriod {
     protected int mnDaysIncapacityNotPaid;  // days of incapacity not paid in current period
 
     /**
-     * 
+     * Create new Days by Period.
      * @param year
      * @param period
      * @param periodDays

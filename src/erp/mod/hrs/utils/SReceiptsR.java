@@ -50,7 +50,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  * Esta clase es para usarse una sola vez.
- * Objetivo: corregir la información relacionada con Subsidio para el empleo indebidamente registrado en CFDI previos.
+ * Objetivo: corregir la información relacionada con subsidio para el empleo indebidamente registrado en CFDI previos.
  * @author Edwin Carmona, Sergio Flores
  */
 public class SReceiptsR {

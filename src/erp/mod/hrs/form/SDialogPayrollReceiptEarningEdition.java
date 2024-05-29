@@ -8,7 +8,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
-import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceiptEarning;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,10 +33,9 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogPayrollEarning extends SBeanFormDialog implements ActionListener, ItemListener, FocusListener {
+public class SDialogPayrollReceiptEarningEdition extends SBeanFormDialog implements ActionListener, ItemListener, FocusListener {
     
     private final SHrsReceiptEarning moHrsReceiptEarning;
-    private final SHrsEmployeeDays moHrsEmployeeDays;
     private double mdOriginalUnitsAlleged;
     private double mdOriginalAmount_r;
     private double mdOriginalAuxiliarValue;
@@ -46,16 +44,15 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     private int mnOriginalOtherPaymentTypeId;
 
     /**
-     * Creates new form SDialogPayrollEarning
+     * Creates new form SDialogPayrollReceiptEarningEdition.
+     * Note that every time an earning is about to be edited, a dialog of this class is instantiated!
      * @param client
      * @param hrsReceiptEarning
      * @param title
      */
-
-    public SDialogPayrollEarning(SGuiClient client, SHrsReceiptEarning hrsReceiptEarning, String title) {
+    public SDialogPayrollReceiptEarningEdition(SGuiClient client, SHrsReceiptEarning hrsReceiptEarning, String title) {
         setFormSettings(client, SModConsts.HRS_PAY_RCP_EAR, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
         moHrsReceiptEarning = hrsReceiptEarning;
-        moHrsEmployeeDays = moHrsReceiptEarning.getHrsReceipt().getHrsEmployee().createEmployeeDays();
         initComponents();
         initComponentsCustom();
     }
@@ -451,14 +448,14 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     }
     
     private void calculateUnits() {
-        double units = moHrsEmployeeDays.computeEarningUnits(moCompUnitsAlleged.getField().getValue(), moHrsReceiptEarning.getEarning());
+        double units = moHrsReceiptEarning.getEarning().computeEarningUnits(moCompUnitsAlleged.getField().getValue(), moHrsReceiptEarning.getHrsReceipt().getHrsPayroll().getPayroll());
         moCompUnits.getField().setValue(units);
         
         calculateAmount();
     }
     
     private void calculateAmount() {
-        double amount = SHrsEmployeeDays.computeEarningAmount(moCompUnits.getField().getValue(), moCurAmountUnit.getField().getValue(), moHrsReceiptEarning.getEarning());
+        double amount = moHrsReceiptEarning.getEarning().computeEarningAmount(moCompUnits.getField().getValue(), moCurAmountUnit.getField().getValue());
         moCurAmount.getField().setValue(amount);
     }
     

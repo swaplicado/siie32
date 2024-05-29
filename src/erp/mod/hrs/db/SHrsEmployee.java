@@ -11,104 +11,133 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 
 /**
- *
+ * Las instancias de esta clase permiten el enfoque en un empleado específico para la emisión de recibos de nómina.
+ * 
  * @author Néstor Ávalos, Sergio Flores
  */
 public class SHrsEmployee {
-
-    protected SDbEmployee moEmployee;
-    protected final int mnPeriodYear;   // for accumulated earnings & deductions
-    protected final int mnPeriod; // for accumulated earnings & deductions
-    protected final Date mtPeriodStart; // analyzed period start date
-    protected final Date mtPeriodEnd;   // analyzed period end date
     
-    protected SHrsReceipt moHrsReceipt; // current receipt
+    protected SHrsReceipt moHrsReceipt;     // current HRS receipt
+    protected SDbEmployee moEmployee;       // current employment of receipt
     
-    protected ArrayList<SDbLoan> maLoans;       // all employee loans
-    protected ArrayList<SHrsLoan> maHrsLoans;   // all employee loans
-    protected ArrayList<SDbAbsence> maAbsences; // all employee absences
-    protected ArrayList<SDbAbsenceConsumption> maAbsenceConsumptions; // all employee absences consumptions
-    protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogs;       // all hire log entries
-    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigs;       // accumulated earnings in year, current payroll receipt not included (applies only for earnings exempt computation)
-    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigsByType; // accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation)
-    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductions;       // accumulated deductions in year, current payroll receipt not included (applies only for deductions)
-    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByType; // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
+    /** All employee loans. */
+    protected ArrayList<SDbLoan> maLoans;
+    /** All employee loans excluding current payroll. */
+    protected ArrayList<SHrsLoan> maHrsLoans;
+    /** All employee absences. */
+    protected ArrayList<SDbAbsence> maAbsences;
+    /** All employee absences consumptions excluding current payroll. */
+    protected ArrayList<SDbAbsenceConsumption> maAbsenceConsumptions;
     
-    protected int mnDaysHiredAnnual;    // hired days in fiscal year
-    protected int mnDaysHiredPayroll;   // hired days in the period payroll
-    protected int mnBusinessDays;       // business days in the period payroll
-    protected double mdAnnualTaxableEarnings;       // taxable amount accumulated of earnigs 
-    protected double mdAnnualTaxableEarningsArt174; // taxable amount accumulated of earnigs configured for articule 174 the RLISR
-    protected double mdAnnualTaxCompensated;
-    protected double mdAnnualTaxSubsidyCompensated;
+    /** Hire log entries concerning current payroll. */
+    protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogsPayroll;
+    
+    protected int mnDaysHiredPayroll;       // hired days in the period payroll
+    protected int mnReceiptBusinessDays;    // business days in the period payroll
+    /** HRS employee movements for tax and attendance standard processing of annual period. */
+    protected SHrsEmployeeMvts moHrsEmployeeMvtsAnnualStd;
+    /** HRS employee movements for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    protected SHrsEmployeeMvts moHrsEmployeelMvtsAnnualTransOldStyle;
+    /** HRS employee movements for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    protected SHrsEmployeeMvts moHrsEmployeelMvtsAnnualTransNewStyle;
+    
     protected SHrsDaysByPeriod moHrsDaysPrev;
     protected SHrsDaysByPeriod moHrsDaysCurr;
     protected SHrsDaysByPeriod moHrsDaysNext;
 
-    public SHrsEmployee(final SHrsPayroll hrsPayroll, final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
-        SDbPayroll payroll = hrsPayroll.getPayroll(); // convenience variable
-        
-        moEmployee = hrsPayroll.getEmployee(employeeId);
-        mnPeriodYear = payroll.getPeriodYear();
-        mnPeriod = payroll.getPeriod();
-        mtPeriodStart = payroll.getDateStart();
-        mtPeriodEnd = payroll.getDateEnd();
-        
+    public SHrsEmployee(final SHrsReceipt hrsReceipt, final int employeeId) throws Exception {
         moHrsReceipt = hrsReceipt;
+        moEmployee = moHrsReceipt.getHrsPayroll().getEmployee(employeeId);
         
         maLoans = new ArrayList<>();
         maHrsLoans = new ArrayList<>();
         maAbsences = new ArrayList<>();
         maAbsenceConsumptions = new ArrayList<>();
-        maEmployeeHireLogs = new ArrayList<>();
-        maYearHrsAccumulatedEarnigs = new ArrayList<>();
-        maYearHrsAccumulatedEarnigsByType = new ArrayList<>();
-        maYearHrsAccumulatedDeductions = new ArrayList<>();
-        maYearHrsAccumulatedDeductionsByType = new ArrayList<>();
         
-        mnDaysHiredAnnual = 0;
+        maEmployeeHireLogsPayroll = new ArrayList<>();
+        
         mnDaysHiredPayroll = 0;
-        mnBusinessDays = 0;
-        mdAnnualTaxableEarnings = 0;
-        mdAnnualTaxableEarningsArt174 = 0;
-        mdAnnualTaxCompensated = 0;
-        mdAnnualTaxSubsidyCompensated = 0;
+        mnReceiptBusinessDays = 0;
+        moHrsEmployeeMvtsAnnualStd = new SHrsEmployeeMvts();
+        moHrsEmployeelMvtsAnnualTransOldStyle = null;
+        moHrsEmployeelMvtsAnnualTransNewStyle = null;
+        
         moHrsDaysPrev = null;
         moHrsDaysCurr = null;
         moHrsDaysNext = null;
     }
 
-    public void setDaysHiredAnnual(int n) { mnDaysHiredAnnual = n; }
+    public void setDaysHiredAnnual(int n) { moHrsEmployeeMvtsAnnualStd.setDaysHired(n); }
     public void setDaysHiredPayroll(int n) { mnDaysHiredPayroll = n; }
-    public void setBusinessDays(int n) { mnBusinessDays = n; }
-    public void setAnnualTaxableEarnings(double d) { mdAnnualTaxableEarnings = d; }
-    public void setAnnualTaxableEarningArt174(double d) { mdAnnualTaxableEarningsArt174 = d; }
-    public void setAnnualTaxCompensated(double d) { mdAnnualTaxCompensated = d; }
-    public void setAnnualTaxSubsidyCompensated(double d) { mdAnnualTaxSubsidyCompensated = d; }
+    public void setReceiptBusinessDays(int n) { mnReceiptBusinessDays = n; }
+    /** HRS employee movements for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    public void setHrsEmployeelMvtsAnnualTransOldStyle(SHrsEmployeeMvts o) { moHrsEmployeelMvtsAnnualTransOldStyle = o; }
+    /** HRS employee movements for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    public void setHrsEmployeelMvtsAnnualTransNewStyle(SHrsEmployeeMvts o) { moHrsEmployeelMvtsAnnualTransNewStyle = o; }
+    
     public void setHrsDaysPrev(SHrsDaysByPeriod o) { moHrsDaysPrev = o; }
     public void setHrsDaysCurr(SHrsDaysByPeriod o) { moHrsDaysCurr = o; }
     public void setHrsDaysNext(SHrsDaysByPeriod o) { moHrsDaysNext = o; }
 
-    public SDbEmployee getEmployee() { return moEmployee; }
-    public int getPeriodYear() { return mnPeriodYear; }
-    public int getPeriod() { return mnPeriod; }
-    public Date getPeriodStart() { return mtPeriodStart; }
-    public Date getPeriodEnd() { return mtPeriodEnd; }
-    
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
+    public SDbEmployee getEmployee() { return moEmployee; }
     
+    /** All employee loans. */
     public ArrayList<SDbLoan> getLoans() { return maLoans; }
+    /** All employee loans excluding current payroll. */
     public ArrayList<SHrsLoan> getHrsLoans() { return maHrsLoans; }
+    /** All employee absences. */
     public ArrayList<SDbAbsence> getAbsences() { return maAbsences; }
+    /** All employee absences consumptions excluding current payroll. */
     public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptions() { return maAbsenceConsumptions; }
-    public ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs() { return maEmployeeHireLogs; }
-    public double getAnnualTaxableEarnings() { return mdAnnualTaxableEarnings; }
-    public double getAnnualTaxableEarningsArt174() { return mdAnnualTaxableEarningsArt174; }
-    public double getAnnualTaxCompensated() { return mdAnnualTaxCompensated; }
-    public double getAnnualTaxSubsidyCompensated() { return mdAnnualTaxSubsidyCompensated; }
+    
+    /** All hire log entries concerning current payroll. */
+    public ArrayList<SDbEmployeeHireLog> getEmployeeHireLogsPayroll() { return maEmployeeHireLogsPayroll; }
+    
+    public int getDaysHiredAnnual() { return moHrsEmployeeMvtsAnnualStd.getDaysHired(); }
+    public int getDaysHiredPayroll() { return mnDaysHiredPayroll; }
+    public int getReceiptBusinessDays() { return mnReceiptBusinessDays; }
+    /** HRS employee movements for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.) */
+    public SHrsEmployeeMvts getHrsEmployeelMvtsAnnualTransOldStyle() { return moHrsEmployeelMvtsAnnualTransOldStyle; }
+    /** HRS employee movements for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.) */
+    public SHrsEmployeeMvts getHrsEmployeelMvtsAnnualTransNewStyle() { return moHrsEmployeelMvtsAnnualTransNewStyle; }
+    
     public SHrsDaysByPeriod getHrsDaysPrev() { return moHrsDaysPrev; }
     public SHrsDaysByPeriod getHrsDaysCurr() { return moHrsDaysCurr; }
     public SHrsDaysByPeriod getHrsDaysNext() { return moHrsDaysNext; }
+    
+    /** Ordinary taxable earnings. */
+    public void setAnnualTaxableEarnings(double d) { moHrsEmployeeMvtsAnnualStd.setTaxableEarnings(d); }
+    /** Taxable earnings by articule 174 of the RLISR. */
+    public void setAnnualTaxableEarningsArt174(double d) { moHrsEmployeeMvtsAnnualStd.setTaxableEarningsArt174(d); }
+    /** Annual tax compensated actually equals tax subsidy compensated! */
+    public void setAnnualTaxCompensated(double d) { moHrsEmployeeMvtsAnnualStd.setTaxCompensated(d); }
+    /** Annual tax subsidy compensated actually equals tax compensated! */
+    public void setAnnualTaxSubsidyCompensated(double d) { moHrsEmployeeMvtsAnnualStd.setTaxSubsidyCompensated(d); }
+    
+    /** Old-style assessed tax subsidy preserved for informative purposes! It will exist only in 2024, the transition year.*/
+    public void setAnnualTaxSubsidyAssessedOldInformative(double d) { moHrsEmployeeMvtsAnnualStd.setTaxSubsidyAssessedOldInformative(d); }
+    
+    /** Ordinary taxable earnings. */
+    public double getAnnualTaxableEarnings() { return moHrsEmployeeMvtsAnnualStd.getTaxableEarnings(); }
+    /** Taxable earnings by articule 174 of the RLISR. */
+    public double getAnnualTaxableEarningsArt174() { return moHrsEmployeeMvtsAnnualStd.getTaxableEarningsArt174(); }
+    /** Annual tax compensated actually equals tax subsidy compensated! */
+    public double getAnnualTaxCompensated() { return moHrsEmployeeMvtsAnnualStd.getTaxCompensated(); }
+    /** Annual tax subsidy compensated actually equals tax compensated! */
+    public double getAnnualTaxSubsidyCompensated() { return moHrsEmployeeMvtsAnnualStd.getTaxSubsidyCompensated(); }
+    
+    /** Old-style assessed tax subsidy preserved for informative purposes! It will exist only in 2024, the transition year.*/
+    public double getAnnualTaxSubsidyAssessedOldInformative() { return moHrsEmployeeMvtsAnnualStd.getTaxSubsidyAssessedOldInformative(); }
+    
+    /** Accumulated earnings in year, current payroll receipt not included (applies only for earnings exempt computation.) */
+    public ArrayList<SHrsAccumulatedEarning> getHrsAccumulatedEarnigs() { return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedEarnings(); }
+    /** Accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation.) */
+    public ArrayList<SHrsAccumulatedEarning> getHrsAccumulatedEarnigsByType() { return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedEarningsByType(); }
+    /** Accumulated deductions in year, current payroll receipt not included (applies only for deductions.) */
+    public ArrayList<SHrsAccumulatedDeduction> getHrsAccumulatedDeductions() { return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedDeductions(); }
+    /** Accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation.) */
+    public ArrayList<SHrsAccumulatedDeduction> getHrsAccumulatedDeductionsByType() { return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedDeductionsByType(); }
     
     public SDbLoan getLoan(final int loanId) {
         SDbLoan loan = null;
@@ -151,57 +180,12 @@ public class SHrsEmployee {
     }
 
     /**
-     * Clear first existing elements, and after that add all provided elements in array.
-     * @param array 
-     */
-    public void addAllYearHrsAccumulatedEarnigs(ArrayList<SHrsAccumulatedEarning> array) {
-        maYearHrsAccumulatedEarnigs.clear();
-        maYearHrsAccumulatedEarnigs.addAll(array);
-    }
-    
-    /**
-     * Clear first existing elements, and after that add all provided elements in array.
-     * @param array 
-     */
-    public void addAllYearHrsAccumulatedEarnigsByType(ArrayList<SHrsAccumulatedEarning> array) {
-        maYearHrsAccumulatedEarnigsByType.clear();
-        maYearHrsAccumulatedEarnigsByType.addAll(array);
-    }
-    
-    /**
-     * Clear first existing elements, and after that add all provided elements in array.
-     * @param array 
-     */
-    public void addAllYearHrsAccumulatedDeductions(ArrayList<SHrsAccumulatedDeduction> array) {
-        maYearHrsAccumulatedDeductions.clear();
-        maYearHrsAccumulatedDeductions.addAll(array);
-    }
-    
-    /**
-     * Clear first existing elements, and after that add all provided elements in array.
-     * @param array 
-     */
-    public void addAllYearHrsAccumulatedDeductionsByType(ArrayList<SHrsAccumulatedDeduction> array) {
-        maYearHrsAccumulatedDeductionsByType.clear();
-        maYearHrsAccumulatedDeductionsByType.addAll(array);
-    }
-    
-    /**
      * Get accumulated earning by its ID.
      * @param earningId ID of desired earning.
      * @return 
      */
     public SHrsAccumulatedEarning getHrsAccumulatedEarning(final int earningId) {
-        SHrsAccumulatedEarning hrsAccumulatedEarning = null;
-
-        for (SHrsAccumulatedEarning earning : maYearHrsAccumulatedEarnigs) {
-            if (earning.getEarningId() == earningId) {
-                hrsAccumulatedEarning = earning;
-                break;
-            }
-        }
-
-        return hrsAccumulatedEarning;
+        return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedEarning(earningId);
     }
 
     /**
@@ -210,16 +194,7 @@ public class SHrsEmployee {
      * @return 
      */
     public SHrsAccumulatedEarning getHrsAccumulatedEarningByType(final int earningType) {
-        SHrsAccumulatedEarning hrsAccumulatedEarning = null;
-
-        for (SHrsAccumulatedEarning earning : maYearHrsAccumulatedEarnigsByType) {
-            if (earning.getEarningId() == earningType) {
-                hrsAccumulatedEarning = earning;
-                break;
-            }
-        }
-
-        return hrsAccumulatedEarning;
+        return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedEarningByType(earningType);
     }
 
     /**
@@ -228,16 +203,7 @@ public class SHrsEmployee {
      * @return 
      */
     public SHrsAccumulatedDeduction getHrsAccumulatedDeduction(final int deductionId) {
-        SHrsAccumulatedDeduction hrsAccumulatedDeduction = null;
-
-        for (SHrsAccumulatedDeduction deduction : maYearHrsAccumulatedDeductions) {
-            if (deduction.getDeductionId() == deductionId) {
-                hrsAccumulatedDeduction = deduction;
-                break;
-            }
-        }
-
-        return hrsAccumulatedDeduction;
+        return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedDeduction(deductionId);
     }
 
     /**
@@ -246,78 +212,117 @@ public class SHrsEmployee {
      * @return 
      */
     public SHrsAccumulatedDeduction getHrsAccumulatedDeductionByType(final int deductionType) {
-        SHrsAccumulatedDeduction hrsAccumulatedDeduction = null;
-
-        for (SHrsAccumulatedDeduction deduction : maYearHrsAccumulatedDeductionsByType) {
-            if (deduction.getDeductionId() == deductionType) {
-                hrsAccumulatedDeduction = deduction;
-                break;
-            }
-        }
-
-        return hrsAccumulatedDeduction;
+        return moHrsEmployeeMvtsAnnualStd.getHrsAccumulatedDeductionByType(deductionType);
     }
 
     public SHrsEmployeeDays createEmployeeDays() {
-        SDbPayroll payroll = moHrsReceipt.getHrsPayroll().getPayroll(); // convenience variable
-        double daysPayrollCalendar = payroll.getCalendarDays_r(); // casted to double to compute a correct factor!
-        double factorCalendar = daysPayrollCalendar == 0 ? 0 : payroll.getReceiptDays() / daysPayrollCalendar;
-
-        int daysReceipt = mnDaysHiredPayroll;
-        int daysWorking;
-
+        SHrsPayroll hrsPayroll = moHrsReceipt.getHrsPayroll(); // convenience variable
+        SDbPayroll payroll = hrsPayroll.getPayroll(); // convenience variable
+        int daysWorking = 0;
+        
         if (payroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE) {
-            int daysInactive = payroll.getReceiptDays() - daysReceipt;
+            int daysInactive = payroll.getReceiptDays() - mnDaysHiredPayroll;
             daysWorking = payroll.getWorkingDays() - daysInactive;
         }
         else {
             daysWorking = mnDaysHiredPayroll;
         }
-
+        
+        int daysIncapacityNotPaidPayroll = 0;
         int daysNotWorkedButPaid = 0;
         int daysNotWorkedNotPaid = 0;
-        int daysDisabilityNotPaidPayroll = 0;
-        int daysDisabilityNotPaidAnnual = 0;
-
+        
         for (SDbAbsenceConsumption absenceConsumption : moHrsReceipt.getAbsenceConsumptions()) { // consumptions in receipt
             if (absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable()) {
                 daysNotWorkedButPaid += absenceConsumption.getEffectiveDays();
             }
             else {
                 daysNotWorkedNotPaid += absenceConsumption.getEffectiveDays();
-
+                
                 if (absenceConsumption.getParentAbsence().isDisability()) {
-                    daysDisabilityNotPaidPayroll += absenceConsumption.getEffectiveDays();
+                    daysIncapacityNotPaidPayroll += absenceConsumption.getEffectiveDays();
                 }
             }
         }
-
-        Date yearStart = SLibTimeUtils.getBeginOfYear(mtPeriodStart);
-        Date yearEnd = SLibTimeUtils.getEndOfYear(mtPeriodEnd).compareTo(mtPeriodEnd) <= 0 ? SLibTimeUtils.getEndOfYear(mtPeriodEnd) : mtPeriodEnd;
-
+        
+        int daysIncapacityNotPaidAnnual = 0;
+        Date payrollStart = payroll.getDateStart();
+        Date payrollEnd = payroll.getDateEnd();
+        Date endOfYear = SLibTimeUtils.getEndOfYear(payrollEnd);
+        Date yearStart = SLibTimeUtils.getBeginOfYear(payrollStart);
+        Date yearEnd = payrollEnd.before(endOfYear) ? payrollEnd : endOfYear;
+        
         for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptions) { // consumptions in year
-            if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability() && 
-                    SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), yearStart, yearEnd)) {
-                daysDisabilityNotPaidAnnual += absenceConsumption.getEffectiveDays();
+            if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), yearStart, yearEnd)) {
+                if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability()) {
+                    daysIncapacityNotPaidAnnual += absenceConsumption.getEffectiveDays();
+                }
             }
         }
-
-        SHrsEmployeeDays hrsEmployeeDays = new SHrsEmployeeDays(mnPeriodYear, mnPeriod, mtPeriodStart, mtPeriodEnd);
         
-        hrsEmployeeDays.setFactorCalendar(factorCalendar);
-        hrsEmployeeDays.setFactorDaysPaid(moHrsReceipt.getHrsPayroll().getFactorDaysPaid());
-        hrsEmployeeDays.setReceiptDays(daysReceipt);
-        hrsEmployeeDays.setWorkingDays(daysWorking);
-        hrsEmployeeDays.setDaysWorked(daysWorking - (daysNotWorkedButPaid + daysNotWorkedNotPaid));
+        SHrsEmployeeDays hrsEmployeeDays = new SHrsEmployeeDays(payroll.getPeriodYear(), payroll.getPeriod());
+        
+        hrsEmployeeDays.setReceiptDays(mnDaysHiredPayroll);
+        hrsEmployeeDays.setReceiptWorkingDays(daysWorking);
+        hrsEmployeeDays.setReceiptDaysWorked(daysWorking - (daysNotWorkedButPaid + daysNotWorkedNotPaid));
+        hrsEmployeeDays.setReceiptBusinessDays(mnReceiptBusinessDays);
+        
+        hrsEmployeeDays.setDaysHiredAnnual(moHrsEmployeeMvtsAnnualStd.getDaysHired());
         hrsEmployeeDays.setDaysHiredPayroll(mnDaysHiredPayroll);
-        hrsEmployeeDays.setDaysHiredAnnual(mnDaysHiredAnnual);
-        hrsEmployeeDays.setDaysDisabilityNotPaidPayroll(daysDisabilityNotPaidPayroll);
-        hrsEmployeeDays.setDaysDisabilityNotPaidAnnual(daysDisabilityNotPaidAnnual);
-        hrsEmployeeDays.setDaysNotWorkedButPaid(daysNotWorkedButPaid);
-        hrsEmployeeDays.setDaysNotWorkedNotPaid(daysNotWorkedNotPaid);
         
-        hrsEmployeeDays.setBusinessDays(mnBusinessDays);
+        hrsEmployeeDays.setDaysIncapacityNotPaidAnnual(daysIncapacityNotPaidAnnual);
+        hrsEmployeeDays.setDaysIncapacityNotPaidPayroll(daysIncapacityNotPaidPayroll);
+        hrsEmployeeDays.setDaysNotWorkedButPaidPayroll(daysNotWorkedButPaid);
+        hrsEmployeeDays.setDaysNotWorkedNotPaidPayroll(daysNotWorkedNotPaid);
+        
+        // attendance for tax subsidy year of transition of style (i.e., 2024), if applies:
 
+        if (payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN) {
+            if (hrsPayroll.isTransitionYearForTaxSubsidy()) { // please note that this block will be executed only along 2024!
+                // payroll belongs to the year of transtition of style of subsidy (i.e., 2024):
+
+                SDbEmploymentSubsidy employmentSubsidyAkaNewStyle = hrsPayroll.getEmploymentSubsidy(payroll.getFkEmploymentSubsidyId_n()); // the shiny "new-style"
+                Date newStyleStart = employmentSubsidyAkaNewStyle.getDateStart(); // should be May 1st, 2024
+                Date oldStyleEnd = SLibTimeUtils.addDate(newStyleStart, 0, 0, -1); // should be April 31th, 2024
+                
+                // HRS days group for tax and attendance transition processing of annual old-style period. (E.g., calculation of tax subsidy until April 2024.)
+                
+                int daysIncapacityNotPaidOldStyle = 0;
+                SHrsEmployeeDaysGroup hrsDaysGroupOldStyle = new SHrsEmployeeDaysGroup();
+                
+                for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptions) { // consumptions in year
+                    if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), yearStart, oldStyleEnd)) {
+                        if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability()) {
+                            daysIncapacityNotPaidOldStyle += absenceConsumption.getEffectiveDays();
+                        }
+                    }
+                }
+                
+                hrsDaysGroupOldStyle.setDaysHired(moHrsEmployeelMvtsAnnualTransOldStyle.getDaysHired());
+                hrsDaysGroupOldStyle.setDaysIncapacityNotPaid(daysIncapacityNotPaidOldStyle);
+                
+                hrsEmployeeDays.setHrsDaysGroupTransAnnualOldStyle(hrsDaysGroupOldStyle);
+                
+                // HRS days group for tax and attendance transition processing of annual new-style period. (E.g., calculation of tax subsidy since May 2024.)
+                
+                int daysIncapacityNotPaidNewStyle = 0;
+                SHrsEmployeeDaysGroup hrsDaysGroupNewStyle = new SHrsEmployeeDaysGroup();
+                
+                for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptions) { // consumptions in year
+                    if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), newStyleStart, yearEnd)) {
+                        if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability()) {
+                            daysIncapacityNotPaidNewStyle += absenceConsumption.getEffectiveDays();
+                        }
+                    }
+                }
+                
+                hrsDaysGroupNewStyle.setDaysHired(moHrsEmployeelMvtsAnnualTransNewStyle.getDaysHired());
+                hrsDaysGroupNewStyle.setDaysIncapacityNotPaid(daysIncapacityNotPaidNewStyle);
+                
+                hrsEmployeeDays.setHrsDaysGroupTransAnnualNewStyle(hrsDaysGroupNewStyle);
+            }
+        }
+        
         return hrsEmployeeDays;
     }
 }

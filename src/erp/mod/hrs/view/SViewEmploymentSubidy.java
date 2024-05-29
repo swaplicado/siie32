@@ -6,7 +6,6 @@ package erp.mod.hrs.view;
 
 import erp.mod.SModConsts;
 import java.util.ArrayList;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -16,13 +15,13 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SViewTaxSubsidyTableRow extends SGridPaneView {
+public class SViewEmploymentSubidy extends SGridPaneView {
 
-    public SViewTaxSubsidyTableRow(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_TAX_SUB_ROW, SLibConsts.UNDEFINED, title);
-        setRowButtonsEnabled(false);
+    public SViewEmploymentSubidy(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMPL_SUB, 0, title);
+        setRowButtonsEnabled(true, true, true, false, true);
     }
 
     @Override
@@ -30,50 +29,45 @@ public class SViewTaxSubsidyTableRow extends SGridPaneView {
         String sql = "";
         Object filter = null;
 
-        moPaneSettings = new SGridPaneSettings(2);
+        moPaneSettings = new SGridPaneSettings(1);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "t.b_del = 0 ";
+            sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
 
         msSql = "SELECT "
-                + "tr.id_tax_sub AS " + SDbConsts.FIELD_ID + "1, "
-                + "tr.id_row AS " + SDbConsts.FIELD_ID + "2, "
-                + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "'' AS " + SDbConsts.FIELD_NAME + ", "
-                + "t.dt_sta, "
-                + "tr.id_row, "
-                + "tr.low_lim, "
-                + "tr.tax_sub, "
-                + "t.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "t.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-                + "t.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-                + "t.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-                + "t.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
+                + "v.id_empl_sub AS " + SDbConsts.FIELD_ID + "1, "
+                + "v.dt_sta AS " + SDbConsts.FIELD_CODE + ", "
+                + "v.dt_sta AS " + SDbConsts.FIELD_NAME + ", "
+                + "v.dt_sta, "
+                + "v.inc_mon_cap, "
+                + "v.sub_mon_cap, "
+                + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
+                + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TAX_SUB) + " AS t "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_TAX_SUB_ROW) + " AS tr ON "
-                + "t.id_tax_sub = tr.id_tax_sub "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMPL_SUB) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "t.fk_usr_ins = ui.id_usr "
+                + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
-                + "t.fk_usr_upd = uu.id_usr "
+                + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY t.dt_sta, tr.id_tax_sub, tr.id_row ";
+                + "ORDER BY v.dt_sta, v.id_empl_sub ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "t.dt_sta", "Inicio vigencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "tr.id_row", "#"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "tr.low_lim", "Límite inferior"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "tr.tax_sub", "Subsidio empleo (obsoleto)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "Inicio vigencia"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.inc_mon_cap", "Tope ingresos $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.sub_mon_cap", "Tope subsidio $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -86,7 +80,6 @@ public class SViewTaxSubsidyTableRow extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(SModConsts.HRS_TAX_SUB);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 }

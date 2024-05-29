@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SModConsts {
 
@@ -786,6 +786,7 @@ public abstract class SModConsts {
     public static final int HRS_TAX_ROW = 2063022;
     public static final int HRS_TAX_SUB = 2063031;
     public static final int HRS_TAX_SUB_ROW = 2063032;
+    public static final int HRS_EMPL_SUB = 2063036;
     public static final int HRS_SSC = 2063041;
     public static final int HRS_SSC_ROW = 2063042;
     public static final int HRS_BEN = 2063051;
@@ -1496,6 +1497,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_TAX_ROW, "hrs_tax_row");
         TablesMap.put(HRS_TAX_SUB, "hrs_tax_sub");
         TablesMap.put(HRS_TAX_SUB_ROW, "hrs_tax_sub_row");
+        TablesMap.put(HRS_EMPL_SUB, "hrs_empl_sub");
         TablesMap.put(HRS_SSC, "hrs_ssc");
         TablesMap.put(HRS_SSC_ROW, "hrs_ssc_row");
         TablesMap.put(HRS_BEN, "hrs_ben");

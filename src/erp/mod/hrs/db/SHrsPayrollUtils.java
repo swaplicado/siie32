@@ -22,7 +22,7 @@ public abstract class SHrsPayrollUtils {
     
     /**
      * Obtain row-payroll-employees that are available at the time.
-     * Used only in <code>erp.mod.hrs.form.SFormPayroll</code>.
+     * Used only in <code>erp.mod.hrs.form.SFormPayroll</code>!
      * @param session
      * @param paymentType
      * @param payrollStart
@@ -89,7 +89,7 @@ public abstract class SHrsPayrollUtils {
 
     /**
      * Obtain row-payroll-employees that belongs to given payroll.
-     * Used only in <code>erp.mod.hrs.form.SDialogLayoutPayroll</code>.
+     * Used only in <code>erp.mod.hrs.form.SDialogLayoutPayroll</code>!
      * @param session
      * @param idPayroll
      * @return List of row-payroll-employees from given payroll.
@@ -158,7 +158,7 @@ public abstract class SHrsPayrollUtils {
     
     /**
      * Obtain row-payroll-employees contained in given list of receipts.
-     * Used only in <code>erp.mod.hrs.form.SFormPayroll</code>.
+     * Used only in <code>erp.mod.hrs.form.SFormPayroll</code>!
      * @param session
      * @param hrsReceipts
      * @return List of row-payroll-employees from given list of receipts.
@@ -181,10 +181,17 @@ public abstract class SHrsPayrollUtils {
             // type of recruitment schema of employee:
             
             recruitmentSchemaTypeId = hrsReceipt.getHrsEmployee().getEmployee().getXtaMembershipRecruitmentSchemaTypeId();
+            
+            if (recruitmentSchemaTypeId == 0) {
+                recruitmentSchemaTypeId = hrsReceipt.getHrsEmployee().getEmployee().getFkRecruitmentSchemaTypeId();
+            }
+            
             recruitmentSchemaType = recruitmentSchemaTypesMap.get(recruitmentSchemaTypeId);
             
             if (recruitmentSchemaType == null) {
-                recruitmentSchemaType = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_NAME);
+                String code = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_CODE);
+                String name = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_NAME);
+                recruitmentSchemaType = code + " - " + name;
                 recruitmentSchemaTypesMap.put(recruitmentSchemaTypeId, recruitmentSchemaType);
             }
             
@@ -197,7 +204,9 @@ public abstract class SHrsPayrollUtils {
             recruitmentSchemaType = recruitmentSchemaTypesMap.get(recruitmentSchemaTypeId);
             
             if (recruitmentSchemaType == null) {
-                recruitmentSchemaType = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_NAME);
+                String code = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_CODE);
+                String name = (String) session.readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { recruitmentSchemaTypeId }, SDbRegistry.FIELD_NAME);
+                recruitmentSchemaType = code + " - " + name;
                 recruitmentSchemaTypesMap.put(recruitmentSchemaTypeId, recruitmentSchemaType);
             }
             

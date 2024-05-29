@@ -188,15 +188,49 @@ public class SDbEarning extends SDbRegistryUser {
         return isBasedOnUnits() && !isAbsence();
     }
     
-    public int[] getAbsenceClassKey() { return new int[] { mnFkAbsenceClassId_n }; }
-    public int[] getAbsenceTypeKey() { return new int[] { mnFkAbsenceClassId_n, mnFkAbsenceTypeId_n }; }
+    public boolean isLoan() {
+        return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NA;
+    }
     
-    public boolean isLoan() { return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NA; }
-    public boolean isBenefit() { return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NA; }
-    public boolean isAbsence() { return mnFkAbsenceClassId_n != 0 && mnFkAbsenceTypeId_n != 0; }
+    public boolean isBenefit() {
+        return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NA;
+    }
     
-    public boolean isMassAsignable() { return !isLoan() && !isBenefit() && !isAbsence(); }
+    public boolean isAbsence() {
+        return mnFkAbsenceClassId_n != 0 && mnFkAbsenceTypeId_n != 0;
+    }
+    
+    public boolean isMassAsignable() {
+        return !isLoan() && !isBenefit() && !isAbsence();
+    }
+    
+    public int[] getAbsenceClassKey() {
+        return new int[] { mnFkAbsenceClassId_n };
+    }
+    
+    public int[] getAbsenceTypeKey() {
+        return new int[] { mnFkAbsenceClassId_n, mnFkAbsenceTypeId_n };
+    }
+    
+    public double computeEarningUnits(final double unitsAlleged, final SDbPayroll payroll) {
+        double units;
+        
+        switch (mnFkEarningComputationTypeId) {
+            case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
+                units = unitsAlleged * payroll.getFactorCalendar() * (mbDaysAdjustment ? payroll.getFactorDaysPaid() : 1.0);
+                break;
+                
+            default:
+                units = unitsAlleged;
+        }
+        
+        return SLibUtils.round(units, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
+    }
 
+    public double computeEarningAmount(final double units, final double amountUnit) {
+        return SLibUtils.roundAmount(units * amountUnit * mdUnitsFactor);
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEarningId = pk[0];

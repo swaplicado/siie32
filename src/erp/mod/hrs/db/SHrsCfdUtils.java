@@ -626,7 +626,7 @@ public abstract class SHrsCfdUtils {
 
                     if (!bTaxSubFound && dTaxSubEffective > 0) {
                         if (!bHasEarningTaxSubComp) {
-                            throw new Exception("El recibo no tiene el nodo otro pago para informar del Subsidio para el empleo totalmente compensado.");
+                            throw new Exception("El recibo no tiene el nodo otro pago para informar del subsidio para el empleo totalmente compensado.");
                         }
 
                         hrsFormerReceiptConcept = new SHrsFormerReceiptConcept();

@@ -58,6 +58,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgTaxTableRow;
     private javax.swing.JMenuItem jmiCfgTaxSubsidyTable;
     private javax.swing.JMenuItem jmiCfgTaxSubsidyTableRow;
+    private javax.swing.JMenuItem jmiCfgEmploymentSubsidy;
     private javax.swing.JMenuItem jmiCfgSsContributionTable;
     private javax.swing.JMenuItem jmiCfgSsContributionTableRow;
     private javax.swing.JMenuItem jmiCfgBenefitTable;
@@ -215,8 +216,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg = new JMenu("Configuración");
         jmiCfgTaxTable = new JMenuItem("Tablas de impuesto");
         jmiCfgTaxTableRow = new JMenuItem("Tablas de impuesto a detalle");
-        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de Subsidio para el empleo");
-        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de Subsidio para el empleo a detalle");
+        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de subsidio para el empleo (obsoleto)");
+        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de subsidio para el empleo (obsoleto) a detalle");
+        jmiCfgEmploymentSubsidy = new JMenuItem("Configuraciones de subsidio para el empleo");
         jmiCfgSsContributionTable = new JMenuItem("Tablas de retención de SS");
         jmiCfgSsContributionTableRow = new JMenuItem("Tablas de retención de SS a detalle");
         jmiCfgBenefitTable = new JMenuItem("Tablas de prestaciones");
@@ -256,6 +258,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgTaxTableRow);
         jmCfg.add(jmiCfgTaxSubsidyTable);
         jmCfg.add(jmiCfgTaxSubsidyTableRow);
+        jmCfg.add(jmiCfgEmploymentSubsidy);
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgSsContributionTable);
         jmCfg.add(jmiCfgSsContributionTableRow);
@@ -537,6 +540,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgTaxTableRow.addActionListener(this);
         jmiCfgTaxSubsidyTable.addActionListener(this);
         jmiCfgTaxSubsidyTableRow.addActionListener(this);
+        jmiCfgEmploymentSubsidy.addActionListener(this);
         jmiCfgSsContributionTable.addActionListener(this);
         jmiCfgSsContributionTableRow.addActionListener(this);
         jmiCfgBenefitTable.addActionListener(this);
@@ -671,6 +675,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgTaxTableRow.setEnabled(true);
         jmiCfgTaxSubsidyTable.setEnabled(true);
         jmiCfgTaxSubsidyTableRow.setEnabled(true);
+        jmiCfgEmploymentSubsidy.setEnabled(true);
         jmiCfgSsContributionTable.setEnabled(true);
         jmiCfgSsContributionTableRow.setEnabled(true);
         jmiCfgBenefitTable.setEnabled(true);
@@ -864,7 +869,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         for (index = 0; index < count; index++) {
             if (miClient.getTabbedPane().getComponentAt(index) instanceof STableTabInterface) {
                 tableTab = (STableTabInterface) miClient.getTabbedPane().getComponentAt(index);
-                if (tableTab.getTabType() == panelType && tableTab.getTabTypeAux01() == SLibConstants.UNDEFINED && tableTab.getTabTypeAux02() == SLibConstants.UNDEFINED) {
+                if (tableTab.getTabType() == panelType && tableTab.getTabTypeAux01() == 0 && tableTab.getTabTypeAux02() == 0) {
                     exists = true;
                     break;
                 }
@@ -1039,49 +1044,52 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
             if (item == jmiCfgTaxTable) {
-                miClient.getSession().showView(SModConsts.HRS_TAX, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_TAX, 0, null);
             }
             else if (item == jmiCfgTaxTableRow) {
-                miClient.getSession().showView(SModConsts.HRS_TAX_ROW, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_TAX_ROW, 0, null);
             }
             else if (item == jmiCfgTaxSubsidyTable) {
-                miClient.getSession().showView(SModConsts.HRS_TAX_SUB, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_TAX_SUB, 0, null);
             }
             else if (item == jmiCfgTaxSubsidyTableRow) {
-                miClient.getSession().showView(SModConsts.HRS_TAX_SUB_ROW, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_TAX_SUB_ROW, 0, null);
+            }
+            else if (item == jmiCfgEmploymentSubsidy) {
+                miClient.getSession().showView(SModConsts.HRS_EMPL_SUB, 0, null);
             }
             else if (item == jmiCfgSsContributionTable) {
-                miClient.getSession().showView(SModConsts.HRS_SSC, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_SSC, 0, null);
             }
             else if (item == jmiCfgSsContributionTableRow) {
-                miClient.getSession().showView(SModConsts.HRS_SSC_ROW, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_SSC_ROW, 0, null);
             }
             else if (item == jmiCfgBenefitTable) {
-                miClient.getSession().showView(SModConsts.HRS_BEN, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_BEN, 0, null);
             }
             else if (item == jmiCfgBenefitTableRow) {
-                miClient.getSession().showView(SModConsts.HRS_BEN_ROW, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_BEN_ROW, 0, null);
             }
             else if (item == jmiCfgFirstDayYear) {
-                miClient.getSession().showView(SModConsts.HRS_FDY, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_FDY, 0, null);
             }
             else if (item == jmiCfgHoliday) {
-                miClient.getSession().showView(SModConsts.HRS_HOL, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_HOL, 0, null);
             }
             else if (item == jmiCfgCutoffCalendar) {
-                miClient.getSession().showView(SModConsts.HRS_PRE_PAY_CUT_CAL, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_PRE_PAY_CUT_CAL, 0, null);
             }
             else if (item == jmiCfgWorkingDaySettings) {
-                miClient.getSession().showView(SModConsts.HRS_WDS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_WDS, 0, null);
             }
             else if (item == jmiCfgPaysheetCustomType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_PAY_SHT_CUS, 0, null);
             }
             else if (item == jmiCfgEarnings) {
-                miClient.getSession().showView(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_EAR, 0, null);
             }
             else if (item == jmiCfgDeductions) {
-                miClient.getSession().showView(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_DED, 0, null);
             }
             else if (item == jmiCfgAccDepartmentPackCostCenters) {
                 miClient.getSession().showView(SModConsts.HRS_CFG_ACC_DEP_PACK_CC, 0, null);
@@ -1141,7 +1149,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 restoreAccountingSettings();
             }
             else if (item == jmiCfgConfig) {
-                miClient.getSession().showView(SModConsts.HRS_CFG, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_CFG, 0, null);
             }
             else if (item == jmiCatEmployee) {
                 miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP);
@@ -1156,76 +1164,76 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showPanelQueryIntegralEmployee(SModConsts.HRSX_EMP_INT);
             }
             else if (item == jmiCatEmployeeHireLog) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_HIRE, 0, null);
             }
             else if (item == jmiCatEmployeeWageLog) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_WAGE, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_WAGE, 0, null);
             }
             else if (item == jmiCatEmployeeSscBaseLog) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, 0, null);
             }
             else if (item == jmiCatEmployeeSua) {
-                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_SUA, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_SUA, 0, null);
             }
             else if (item == jmiCatEmployeeIdse) {
-                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_IDSE, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_IDSE, 0, null);
             }
             else if (item == jmiCatPosition) {
-                miClient.getSession().showView(SModConsts.HRSU_POS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_POS, 0, null);
             }
             else if (item == jmiCatDeparment) {
-                miClient.getSession().showView(SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_DEP, 0, null);
             }
             else if (item == jmiCatDepartmentCc) {
-                miClient.getSession().showView(SModConsts.HRS_DEP_CC, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_DEP_CC, 0, null);
             }
             else if (item == jmiCatEmployeeCc) {
-                miClient.getSession().showView(SModConsts.HRSX_EMP_CC, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_EMP_CC, 0, null);
             }
             else if (item == jmiCatShift) {
-                miClient.getSession().showView(SModConsts.HRSU_SHT, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_SHT, 0, null);
             }
             else if (item == jmiCatEmployeeType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_EMP, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_EMP, 0, null);
             }
             else if (item == jmiCatWorkerType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_WRK, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_WRK, 0, null);
             }
             else if (item == jmiCatEmployeeDismissType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_EMP_DIS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_EMP_DIS, 0, null);
             }
             else if (item == jmiCatMwzType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_MWZ, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_MWZ, 0, null);
             }
             else if (item == jmiCatMwzTypeWage) {
-                miClient.getSession().showView(SModConsts.HRS_MWZ_WAGE, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_MWZ_WAGE, 0, null);
             }
             else if (item == jmiCatUma) {
-                miClient.getSession().showView(SModConsts.HRS_UMA, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_UMA, 0, null);
             }
             else if (item == jmiCatUmi) {
-                miClient.getSession().showView(SModConsts.HRS_UMI, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_UMI, 0, null);
             }
             else if (item == jmiCatWorkerTypeSalary) {
-                miClient.getSession().showView(SModConsts.HRS_WRK_SAL, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_WRK_SAL, 0, null);
             }
             else if (item == jmiCatLoanTypeAdjustment) {
-                miClient.getSession().showView(SModConsts.HRS_TP_LOAN_ADJ, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_TP_LOAN_ADJ, 0, null);
             }
             else if (item == jmiCatAbsenceType) {
-                miClient.getSession().showView(SModConsts.HRSU_TP_ABS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_TP_ABS, 0, null);
             }
             else if (item == jmiCatAbsenceClass) {
-                miClient.getSession().showView(SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSU_CL_ABS, 0, null);
             }
             else if (item == jmiBenAbsence) {
-                miClient.getSession().showView(SModConsts.HRS_ABS, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_ABS, 0, null);
             }
             else if (item == jmiBenBenefitTables) {
-                miClient.getSession().showView(SModConsts.HRS_EMP_BEN, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_EMP_BEN, 0, null);
             }
             else if (item == jmiBenBenefitVacStat) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_STAT, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_STAT, 0, null);
             }
             else if (item == jmiBenBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
@@ -1240,7 +1248,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_EAR, SModConsts.HRS_BEN, null);
             }
             else if (item == jmiBenLoan) {
-                miClient.getSession().showView(SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_LOAN, 0, null);
             }
             else if (item == jmiBenLoanAdjustmentEar) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_EAR, SModConsts.HRS_LOAN, null);
@@ -1249,7 +1257,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_DED, SModConsts.HRS_LOAN, null);
             }
             else if (item == jmiBenAdvanceSettlement) {
-                miClient.getSession().showView(SModConsts.HRS_ADV_SET, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_ADV_SET, 0, null);
             }
             else if (item == jmiPayPayrollWeek) {
                 miClient.getSession().showView(SModConsts.HRS_PAY, SModSysConsts.HRSS_TP_PAY_WEE, null);
@@ -1279,7 +1287,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_HRS, SDataConstants.UNDEFINED).setVisible(true);
             }
             else if (item == jmiUuidSearch) {
-                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SLibConstants.UNDEFINED).setVisible(true);
+                new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, 0).setVisible(true);
             }
             else if (item == jmiPayCfdiStampSign) {
                 showView(SDataConstants.TRN_CFD, SDataConstants.TRNX_STAMP_SIGN, SCfdConsts.CFDI_PAYROLL_VER_CUR);
@@ -1291,10 +1299,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFDI_PAYROLL_VER_CUR);
             }
             else if (item == jmiPayPayrollBkkRecord) {
-                miClient.getSession().showView(SModConsts.HRSX_PAY_REC, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_PAY_REC, 0, null);
             }
             else if (item == jmiPayConditionalEarnings) {
-                miClient.getSession().showView(SModConsts.HRS_COND_EAR, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRS_COND_EAR, 0, null);
             }
             else if (item == jmiPayAutoEarningsGlobal) {
                 miClient.getSession().showView(SModConsts.HRSX_AUT_EAR, SModSysConsts.HRS_AUT_GBL, null);
@@ -1394,13 +1402,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRSX_EMP_LOG_HIRE_BY_PER, SViewEmployeeHireLogByPeriod.GRID_SUBTYPE_DISMISS, null);
             }
             else if (item == jmiRepPtu) {
-                miClient.getSession().showView(SModConsts.HRSX_PTU, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_PTU, 0, null);
             }
             else if (item == jmiRepBenAnnBon) {
-                miClient.getSession().showView(SModConsts.HRSX_BEN_ANN_BON, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_BEN_ANN_BON, 0, null);
             }
             else if (item == jmiRepBankPayrollDisp) {
-                miClient.getSession().showView(SModConsts.HRSX_BANK_PAY_DISP, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.HRSX_BANK_PAY_DISP, 0, null);
             }
             else if (item == jmiRepAnnexAF02) {
                 new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02").setFormVisible(true);

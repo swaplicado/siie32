@@ -1699,7 +1699,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 179.2*/ 2021-02-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Refactorización de la captura y modificación del Subsidio para el empleo pagado y compensado.
+1) Refactorización de la captura y modificación del subsidio para el empleo pagado y compensado.
 
 ================================================================================
 SIIE 3.2 179.1*/ 2021-02-23
@@ -2122,7 +2122,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 159.0/ 2020-02-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de captura en recibos de nóminas de monto Subsidio para el empleo efectivamente entregado al trabajador.
+1) Implementación de captura en recibos de nóminas de monto subsidio para el empleo efectivamente entregado al trabajador.
 2) Implementación de selección en recibos de nóminas de Tipo otro pago en captura de percepciones Otros pagos.
 3) Para CFDI de nóminas cancelados corrección a:
     creación de registro de emisión de CFDI de nóminas;
@@ -2152,14 +2152,14 @@ SIIE 3.2 156.0/ 2020-01-31
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de nuevas disposiciones fiscales para la emisión de CFDI de nóminas:
-    Validación de tope máximo permitido para Subsidio para el empleo causado en periodos menores a 31 días.
+    Validación de tope máximo permitido para subsidio para el empleo causado en periodos menores a 31 días.
 
 ================================================================================
 SIIE 3.2 155.0/ 2020-01-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de nuevas disposiciones fiscales para la emisión de CFDI de nóminas:
-    Incorporación del nodo Otros Pagos con el dato del Subsidio para el empleo, no importando que sea 0,
+    Incorporación del nodo Otros Pagos con el dato del subsidio para el empleo, no importando que sea 0,
     para empleados cuyo régimen de contratación sea Sueldos (02).
 
 ================================================================================
@@ -2307,7 +2307,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 2019-11-13, 3.2 146.0
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Implementación de reexpedición de CFDI de nóminas para incorporar el Subsidio para el empleo efectivamente entregado al trabajador.
+1) Implementación de reexpedición de CFDI de nóminas para incorporar el subsidio para el empleo efectivamente entregado al trabajador.
 
 ================================================================================
 2019-10-29, 3.2 146.0
@@ -2405,8 +2405,8 @@ Sergio Abraham FLORES GUTIÉRREZ
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a la adición del nodo otros pagos en el CFDI de nóminas para el 
-    Subsidio para el empleo efectivamente pagado al trabajador cuando el impuesto y el subsidio son iguales.
-2) Corrección a la determinación del factor de ajuste para tablas de ISR y Subsidio para el empleo 
+    subsidio para el empleo efectivamente pagado al trabajador cuando el impuesto y el subsidio son iguales.
+2) Corrección a la determinación del factor de ajuste para tablas de ISR y subsidio para el empleo 
     para nóminas quincenales de días fijos (i.e., 15 días).
 3) Corrección a la validación de días a pagar en el diálogo de captura de recibos de nómina.
 
@@ -2465,14 +2465,14 @@ Sergio Abraham FLORES GUTIÉRREZ
 2) Mejora a la captura de ajustes de prestaciones, para permitir valores negativos en el número de días (p. ej., para disminuir vacaciones pagadas indebidamente).
 3) Mejora a los mensajes de usuario de la validación de consumos de incidencias, para una mejor identificación de las incidencias en conflicto.
 4) Corrección para la inclusión de ajustes a préstamos (Payroll ID = 0) al crear nóminas, y refactorización del cálculo de saldos de préstamos.
-5) Corrección a la generación de CFDI con saldo negativo del Subsidio para el empleo pagado en exceso.
+5) Corrección a la generación de CFDI con saldo negativo del subsidio para el empleo pagado en exceso.
 
 ================================================================================
 2019-06-14, 3.2 136.6
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Mejoramiento de vistas de empleados para mostrar cuáles tienen foto y/o firma.
-2) Revisión a la compensación de Subsidio para el empleo pagado en exceso contra ISR.
+2) Revisión a la compensación de subsidio para el empleo pagado en exceso contra ISR.
 3) Estandarización de columnas en vistas de nóminas y recibos de nóminas.
 4) Corrección a modificación de créditos/préstamos, que la información de capital y cantidad total a pagar se borraban al abrir le forma de captura.
 5) Mejoramiento a la creación automática de registros para la configuración de contabilización de percepciones y deducciones, y corrección al crearlas mediante copia.
@@ -2549,7 +2549,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 2019-03-26, 3.2 134.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Revisión y corrección a emisión CFDI nóminas cuando Subsidio para el empleo es cero, y por tanto no debe ser considerado.
+1) Revisión y corrección a emisión CFDI nóminas cuando subsidio para el empleo es cero, y por tanto no debe ser considerado.
 
 ================================================================================
 2019-03-20, 3.2 134.0
@@ -2595,7 +2595,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 2019-02-28, 3.2 131.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Implementación de impresión de Subsidio para el empleo causado en el PDF del CFDI de nóminas.
+1) Implementación de impresión de subsidio para el empleo causado en el PDF del CFDI de nóminas.
 2) Refactorización de formato de impresión JasperReports del CFDI de nóminas (i.e., reorganización de controles etiqueta y texto, entre otros).
 
 ================================================================================
@@ -2603,7 +2603,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de pago de 0.01 para dar cumplimiento a las nuevas disposiciones
-    fiscales respecto a la información del Subsidio para el empleo efectivamente entregado al trabajador
+    fiscales respecto a la información del subsidio para el empleo efectivamente entregado al trabajador
     consignada en el CFDI de nóminas.
 
 ================================================================================
@@ -2613,8 +2613,8 @@ Sergio Abraham FLORES GUTIÉRREZ
 1) Corrección a cálculo de parte excenta en percepciones, basándolo ahora en las UMA.
 2) Implementación de nueva disposicion obligatorioa del "Apéndice 5" de la 
     "Guía de llenado del comprobante del recibo de pago de nómina y su complemento", 
-    respecto al Subsidio para el empleo efectivamente pagado al trabajador.
-    Así como la preservación del Subsidio compensado contra ISR.
+    respecto al subsidio para el empleo efectivamente pagado al trabajador.
+    Así como la preservación del subsidio para el empleo compensado contra ISR.
 
 ================================================================================
 2019-01-10, 3.2 128.0
