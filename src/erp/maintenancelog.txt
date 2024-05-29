@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 253.0/ 2024-05-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación del nuevo subsidio para el empleo que entró en vigor el 1.° de mayo de 2024, y su cálculo mixto durante 2024.
+2) Implementación del texto aclaratorio para el asunto del correo-e de recibos para las nóminas que lo requieran.
+
+================================================================================
 SIIE 3.2 253.0*/ 2024-05-28
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
