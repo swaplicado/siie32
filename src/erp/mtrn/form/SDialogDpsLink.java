@@ -566,6 +566,18 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
                 // The source is order and has supplied quantities:
                 
+                if (!validation.getIsError()) {
+                    try {
+                        if (STrnDpsUtilities.isDpsEntryItemDeleted(miClient, (int[]) entry.getDpsEntryKey())){
+                            validation.setMessage("No se puede vincular la partida # " + entry.getSortingPosition() + ".\nDebido a que el ítem '" + entry.getConcept() + 
+                                    " (" + entry.getConceptKey() + ")' está eliminado.");
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+                
                 if (!validation.getIsError() && moParamDpsSource.isOrder()){
                     try {
                         double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());

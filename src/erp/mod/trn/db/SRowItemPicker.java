@@ -17,7 +17,10 @@ public class SRowItemPicker extends SGridRowCustom {
     private Object moMainOption;
     private final ArrayList<Object> maValues;
     private boolean mbInv;
-    private boolean mbRef;
+    private boolean mbSal;
+    private boolean mbAss;
+    private boolean mbPur;
+    private boolean mbExp;
 
     public SRowItemPicker(int[] pk) {
         super(pk, "", "");
@@ -27,11 +30,17 @@ public class SRowItemPicker extends SGridRowCustom {
 
     public void setMainOption(Object o) { moMainOption = o; }
     public void setInv(boolean b) { mbInv = b; }
-    public void setRef(boolean b) { mbRef = b; }
+    public void setSal(boolean b) { mbSal = b; }
+    public void setAss(boolean b) { mbAss = b; }
+    public void setPur(boolean b) { mbPur = b; }
+    public void setExp(boolean b) { mbExp = b; }
 
     public Object getMainOption() { return moMainOption; }
     public boolean getInv() { return mbInv; }
-    public boolean getRef() { return mbRef; }
+    public boolean getSal() { return mbSal; }
+    public boolean getAss() { return mbAss; }
+    public boolean getPur() { return mbPur; }
+    public boolean getExp() { return mbExp; }
 
     public ArrayList<Object> getValues() { return maValues; }
 

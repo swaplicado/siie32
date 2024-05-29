@@ -1,4 +1,35 @@
 ================================================================================
+SIIE 3.2 253.0*/ 2024-05-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición del ID del centro de costo en las partidas de los movimientos de almacén (por el momento predeterminado 1).
+
+================================================================================
+SIIE 3.2 251.4/ 2024-05-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la obtención del ID del documento origen al para comparar la región de impuestos.
+
+================================================================================
+SIIE 3.2 251.3/ 2024-05-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de la validación para no importar partidas con ítems eliminados a los DPS.
+2) Adición de la validación para no guardar DPS con partidas con ítems eliminados.
+3) Cambio en el acomodo de los filtros del picker de los ítems de RM, así como adición de la nota de los ítems que se muestran.
+4) Optimización al cargar los ítems de referencia en las RM.
+5) Cambio en la generación en los CFDI de pagos debido a un cambio en la validación del campo EquivalenciaDR. 
+
+================================================================================
+SIIE 3.2 251.2/ 2024-05-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección a la validación de folios en la forma de captura de DPS.
+2) Adición de opciones en el picker para gastos en las RM así como hacer que corresponda con el contenido del combobox.
+3) Adición del botón para cambiar la región de impuestos en la forma de captura de DPS y en los entry.
+4) Adición de validaciones de impuestos al momento de guardar DPS.
+
+================================================================================
 SIIE 3.2 251.1/ 2024-05-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

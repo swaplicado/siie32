@@ -1220,7 +1220,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 }
                 else {
                     doctoRelacionado.getAttEquivalenciaDR().setDouble(1);
-                    doctoRelacionado.getAttEquivalenciaDR().setDecimals(10);
+                    doctoRelacionado.getAttEquivalenciaDR().setDecimals(0);
                 }
                 doctoRelacionado.getAttNumParcialidad().setInteger(paymentEntryDoc.Installment);
                 doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.DocBalancePrev);

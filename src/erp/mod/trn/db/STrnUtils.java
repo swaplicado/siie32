@@ -500,6 +500,18 @@ public abstract class STrnUtils {
         return true;
     }
     
+    public static boolean getIsItemDeleted(final SGuiSession session, final int idItem) throws Exception {
+        boolean deleted = false;
+        
+        String sql = "SELECT b_del FROM erp.itmu_item WHERE id_item = " + idItem;
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            deleted = resultSet.getBoolean(1);
+        }
+        
+        return deleted;
+    }
+    
     public static void printDelivery(final SGuiClient client, final int idDelivery) throws Exception {
         HashMap<String, Object> params = null;
         

@@ -22,7 +22,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Edwin Carmona
+ * @author Sergio Flores, Claudio Peña, Edwin Carmona, Isabel Servín
  */
 public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -52,6 +52,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMatRequestId_n;
     protected int mnFkMatRequestEtyId_n;
     protected int mnFkMaintAreaId;
+    protected int mnFkCostCenterId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -113,6 +114,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMatRequestId_n(int n) { mnFkMatRequestId_n = n; }
     public void setFkMatRequestEtyId_n(int n) { mnFkMatRequestEtyId_n = n; }
     public void setFkMaintAreaId(int n) { mnFkMaintAreaId = n; }
+    public void setFkCostCenterId(int n) { mnFkCostCenterId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -146,6 +148,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMatRequestId_n() { return mnFkMatRequestId_n; }
     public int getFkMatRequestEtyId_n() { return mnFkMatRequestEtyId_n; }
     public int getFkMaintAreaId() { return mnFkMaintAreaId; }
+    public int getFkCostCenterId() { return mnFkCostCenterId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -289,6 +292,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         mnFkMatRequestId_n = 0;
         mnFkMatRequestEtyId_n = 0;
         mnFkMaintAreaId = SModSysConsts.TRN_MAINT_AREA_NA;              // default value set only for preventing bugs
+        mnFkCostCenterId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -373,6 +377,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMatRequestId_n = resultSet.getInt("de.fid_mat_req_n");
                 mnFkMatRequestEtyId_n = resultSet.getInt("de.fid_mat_req_ety_n");
                 mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
+                mnFkCostCenterId = resultSet.getInt("fid_cc");
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("de.fid_usr_del");
@@ -492,6 +497,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMatRequestEtyId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
+            callableStatement.setInt(nParam++, mnFkCostCenterId);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, Types.SMALLINT);
@@ -698,6 +704,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setFkMatRequestId_n(this.getFkMatRequestId_n());
         registry.setFkMatRequestEtyId_n(this.getFkMatRequestEtyId_n());
         registry.setFkMaintAreaId(this.getFkMaintAreaId());
+        registry.setFkCostCenterId(this.getFkCostCenterId());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
         registry.setFkUserDeleteId(this.getFkUserDeleteId());

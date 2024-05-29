@@ -1339,7 +1339,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMaintAreaId(jcbEntryMaintArea.getSelectedIndex() <= 0 ? SModSysConsts.TRN_MAINT_AREA_NA : ((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getPrimaryKey()[0]);
-
+                    iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                    
                     iogEntry.setFkUserNewId(SUtilConsts.USR_NA_ID);
                     iogEntry.setFkUserEditId(SUtilConsts.USR_NA_ID);
                     iogEntry.setFkUserDeleteId(SUtilConsts.USR_NA_ID);

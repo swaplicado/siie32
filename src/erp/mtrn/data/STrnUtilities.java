@@ -604,6 +604,15 @@ public abstract class STrnUtilities {
         return qty;
     }
 
+    public static int getTaxRegionDpsEty(final SClientInterface client, final int[] dpsEntryKey) throws Exception {
+        String sql = "SELECT fid_tax_reg FROM trn_dps_ety WHERE id_year = " + dpsEntryKey[0] + " AND id_doc = " + dpsEntryKey[1] + " AND id_ety = " + dpsEntryKey[2];
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return 0;
+    }
+    
     /**
      * @param iogTypeKey IOG type key. Constants defined in SDataConstantsSys.
      */

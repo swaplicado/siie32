@@ -12,6 +12,7 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.SModuleItm;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialCostCenterGroup;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -33,6 +34,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -57,6 +59,8 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
 import sa.lib.gui.SGuiFields;
+import sa.lib.gui.SGuiItem;
+import sa.lib.gui.SGuiModule;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
@@ -71,6 +75,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
     private SDbMaterialRequest moRegistry;
     
+    private SGuiModule moModule;
+    private HashMap<Integer, Vector<SGuiItem>> moMapItems;
+    
     private ArrayList<SDbMaterialRequestCostCenter> maMatReqCC;
     private ArrayList<SDbMaterialRequestEntry> maMatReqEntries;
     private ArrayList<SDbMaterialRequestNote> maMatReqNotes;
@@ -84,6 +91,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     
     private SDialogItemPicker moDialogPickerItem;
     private SDialogItemPicker moDialogPickerItemRef;
+    private SDialogItemPicker moDialogPickerItemRefEty;
     private SDialogUnitPicker moDialogPickerUnit;
     
     private JLabel jlKeyWhs;
@@ -101,6 +109,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private boolean hasUserProvPurRight;
     private boolean hasUserReclassRight;
     private boolean hasLinkMatReq;
+    private boolean mbCcChanged;
     
     private int mnStatusReqId;
     
@@ -110,10 +119,15 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private SGuiFields moFieldsEty;
     private SDataItem moItemEty;
     private SDataUnit moUnitEty;
+    private SDataItem moItemRefEty;
     
     private double mdPriceUnitaryEty;
     
     private JButton jbSaveAndSend;
+    
+    private int mnItemRefCt;
+    private int mnItemRefPickerSeccSelected;
+    private int mnItemRefPickerSeccSelectedEty;
     
     /**
      * Creates new form SFormItemCost
@@ -199,6 +213,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jlItemRefEty = new javax.swing.JLabel();
         moKeyItemRefEty = new sa.lib.gui.bean.SBeanFieldKey();
         jbPickItemRefEty = new javax.swing.JButton();
+        moTextItemRefEty = new sa.lib.gui.bean.SBeanFieldText();
         jPanel44 = new javax.swing.JPanel();
         jlQtyUsr = new javax.swing.JLabel();
         moDecQtyUsr = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -522,6 +537,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         jbPickItemRefEty.setFocusable(false);
         jbPickItemRefEty.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel30.add(jbPickItemRefEty);
+
+        moTextItemRefEty.setPreferredSize(new java.awt.Dimension(215, 23));
+        jPanel30.add(moTextItemRefEty);
 
         jpItem.add(jPanel30);
 
@@ -983,6 +1001,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
     private sa.lib.gui.bean.SBeanFieldText moTextItemDescription;
     private sa.lib.gui.bean.SBeanFieldText moTextItemKey;
     private sa.lib.gui.bean.SBeanFieldText moTextItemName;
+    private sa.lib.gui.bean.SBeanFieldText moTextItemRefEty;
     private sa.lib.gui.bean.SBeanFieldText moTextProvStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextPurStatus;
     private sa.lib.gui.bean.SBeanFieldText moTextReferecnce;
@@ -996,6 +1015,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 700);
+        
+        moModule = new SModuleItm(miClient);
         
         moFieldsEty = new SGuiFields();
         
@@ -1177,6 +1198,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         
         moDialogPickerItem = null;
         moDialogPickerItemRef = null;
+        moDialogPickerItemRefEty = null;
         moDialogPickerUnit = null;
         
         jlKeyWhs = new JLabel("Almacén: ");
@@ -1347,6 +1369,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moKeyPriEty.setSelectedIndex(0);
         moTextEtyNotes.setValue("");
         moKeyItemRefEty.setSelectedIndex(0);
+        moItemRefEty = null;
     }
     
     private void enableEntryControls(boolean enable) {
@@ -1376,6 +1399,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             jbRegisterEty.setEnabled(enable);
             jbCancelEty.setEnabled(enable);
             jbNewEty.setEnabled(false);
+            moTextItemRefEty.setEnabled(false);
         }
         else {
             moDecUnitPriceSis.setEnabled(false);
@@ -1403,13 +1427,63 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             jbRegisterEty.setEnabled(enable);
             jbCancelEty.setEnabled(enable);
             jbNewEty.setEnabled(isRegistryEditable && !enable && getFormSubtype() != SModConsts.TRNX_MAT_REQ_RECLASS);
+            moTextItemRefEty.setEnabled(false);
+        }
+        
+        if (moKeyItemRefEty.isEnabled()) {
+            reloadCatalogueItemRef();
+            moKeyItemRefEty.setVisible(true);
+            jbPickItemRefEty.setVisible(true);
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private void reloadCatalogueItemRef() {
+        if (moItemRefEty != null) {
+            SGuiParams params = new SGuiParams();
+            params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, moItemRefEty.getDbmsDataItemGeneric().getFkItemCategoryId());
+            //moKeyItemRefEty.removeAllItems();
+            //miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
+//            Vector<SGuiItem> items = moModule.readItems(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
+//            for (SGuiItem item : items) {
+//                moKeyItemRefEty.addItem(item);
+//            }
+            switch (moItemRefEty.getDbmsDataItemGeneric().getFkItemCategoryId()) {
+                case SModSysConsts.ITMS_CT_ITEM_SAL: mnItemRefPickerSeccSelectedEty = SDialogItemPicker.SAL_ITEMS; break;
+                case SModSysConsts.ITMS_CT_ITEM_ASS: mnItemRefPickerSeccSelectedEty = SDialogItemPicker.ASS_ITEMS; break;
+                case SModSysConsts.ITMS_CT_ITEM_PUR: mnItemRefPickerSeccSelectedEty = SDialogItemPicker.PUR_ITEMS; break;
+                case SModSysConsts.ITMS_CT_ITEM_EXP: mnItemRefPickerSeccSelectedEty = SDialogItemPicker.EXP_ITEMS; break;
+            }
+            if (!moMapItems.containsKey(mnItemRefPickerSeccSelectedEty)) {
+                moMapItems.put(mnItemRefPickerSeccSelectedEty, moModule.readItems(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params)); 
+            }
+            moKeyItemRefEty.removeAllItems();
+            for (SGuiItem item : moMapItems.get(mnItemRefPickerSeccSelectedEty)) {
+                moKeyItemRefEty.addItem(item);
+            }
+            moKeyItemRefEty.setValue(moItemRefEty.getPrimaryKey());
+        }
+        else {
+            moKeyItemRefEty.removeAllItems();
+            if (moMapItems.containsKey(mnItemRefPickerSeccSelectedEty)) {
+                for (SGuiItem item : moMapItems.get(mnItemRefPickerSeccSelectedEty)) {
+                    moKeyItemRefEty.addItem(item);
+                }
+            }
+            else {
+                for (SGuiItem item : moMapItems.get(SDialogItemPicker.EXP_ITEMS)) {
+                    moKeyItemRefEty.addItem(item);
+                }
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
     private void setComponetsEntryData(SDbMaterialRequestEntry ety) {
         if (ety != null) {
             moItemEty = ety.getDataItem();
             moUnitEty = ety.getDataUnitUsr();
+            moItemRefEty = ety.getDataItemRef();
             
             moTextItemKey.setValue(moItemEty.getCode());
             moTextItemName.setValue(moItemEty.getName());
@@ -1433,7 +1507,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             moKeyPriEty.setValue(new int[] { ety.getFkMatRequestPriorityId_n() });
             moTextItemDescription.setValue("");
             moTextEtyNotes.setValue("");
-            moKeyItemRefEty.setValue(new int[] { ety.getFkItemReferenceId_n() });
+            //moKeyItemRefEty.setValue(new int[] { ety.getFkItemReferenceId_n() });
+            
+            moKeyItemRefEty.removeAllItems();
+            moKeyItemRefEty.addItem(ety.getDataItemRef()!= null ? ety.getDataItemRef().getKey() + " - " + ety.getDataItemRef().getItem() : "");
+            moKeyItemRefEty.setSelectedIndex(0);
+            moKeyItemRefEty.setVisible(false);
+            jbPickItemRefEty.setVisible(false);
+            moTextItemRefEty.setText(ety.getDataItemRef()!= null ? ety.getDataItemRef().getKey() + " - " + ety.getDataItemRef().getItem() : "");
+            moTextItemRefEty.setVisible(true);
+            moTextItemRefEty.setCaretPosition(0);
             
             for (SDbMaterialRequestEntryNote note : ety.getChildNotes()) {
                 if (note.getIsDescription()) {
@@ -1446,6 +1529,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         }
         else {
             moItemEty = null;
+            moItemRefEty = null;
             moTextItemKey.setValue("");
             moTextItemName.setValue("");
             moBoolNewItem.setValue(false);
@@ -1466,6 +1550,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
             moTextItemDescription.setValue("");
             moTextEtyNotes.setValue("");
             moKeyItemRefEty.setSelectedIndex(0);
+            moTextItemRefEty.setText("");
         }
         isCapturingData = false;
         enableEntryControls(false);
@@ -1698,14 +1783,17 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                     params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, isReqInv);
                 }
 
-                if (moDialogPickerItem == null) {
+                if (moDialogPickerItem == null || mbCcChanged) {
+                    moDialogPickerItem = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
+                    moDialogPickerItem.resetPicker();
+                    moDialogPickerItem.initComponentsCustom();
+                    moDialogPickerItem.setShowedItems("Ítems del (los) centro(s) de consumo: " + getShowedItems());
+                    mbCcChanged = false;
+                    //moDialogPickerItem.setItemPickerInvDefault(true);
                 }
-                moDialogPickerItem = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SModConsts.TRN_MAT_REQ, params);
                 
-                moDialogPickerItem.resetPicker();
-                moDialogPickerItem.initComponentsCustom();
-                //moDialogPickerItem.setItemPickerInvDefault(true);
                 moDialogPickerItem.setDefaultEnableRadio(SDialogItemPicker.INV_ITEMS);
+                moDialogPickerItem.moSearchItem.setText("");
                 moDialogPickerItem.setPickerVisible(true);
 
                 if (moDialogPickerItem.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -1723,6 +1811,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         catch (Exception e) {
             miClient.showMsgBoxError(e.getMessage());
         }
+    }
+    
+    private String getShowedItems() {
+        String text = "";
+        for (SGridRow row : moGridMatReqCC.getModel().getGridRows()) {
+            SDbMaterialRequestCostCenter cc = (SDbMaterialRequestCostCenter) row;
+            text += text.isEmpty() ? "" : ", ";
+            text += cc.getDbmsConsSubent().getXtaConsumptionEntityName();
+        }
+        return text;
     }
     
     private void readItemEty(int[] itemId) {
@@ -1755,41 +1853,120 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         int[] itemId; 
         
         if (moDialogPickerItemRef == null) {
+            moDialogPickerItemRef = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+            moDialogPickerItemRef.resetPicker();
+            moDialogPickerItemRef.initComponentsCustom();
         }
-        moDialogPickerItemRef = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        if (mnItemRefPickerSeccSelected == 0) {
+            mnItemRefPickerSeccSelected = SDialogItemPicker.EXP_ITEMS;
+        }
         
-        moDialogPickerItemRef.resetPicker();
-        moDialogPickerItemRef.initComponentsCustom();
         //moDialogPickerItemRef.setItemPickerInvDefault(false);
-        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
+        moDialogPickerItemRef.setDefaultEnableRadio(mnItemRefPickerSeccSelected);
+        moDialogPickerItemRef.setOption(moKeyItemRef.getValue());
+        moDialogPickerItemRef.moSearchItem.setText("");
         moDialogPickerItemRef.setPickerVisible(true);
 
         if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
             itemId = (int[]) moDialogPickerItemRef.getOption();
 
             if (itemId != null) {
+                SGuiParams params = new SGuiParams();
+                switch (moDialogPickerItemRef.getSetectedMode()) {
+                    case SDialogItemPicker.INV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, true);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.INV_ITEMS;
+                        break;
+                    case SDialogItemPicker.NOINV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, false);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.NOINV_ITEMS;
+                        break;
+                    case SDialogItemPicker.SAL_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_SAL);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.SAL_ITEMS;
+                        break;
+                    case SDialogItemPicker.ASS_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_ASS);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.ASS_ITEMS;
+                        break;
+                    case SDialogItemPicker.PUR_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_PUR);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.PUR_ITEMS;
+                        break;
+                    case SDialogItemPicker.EXP_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
+                        mnItemRefPickerSeccSelected = SDialogItemPicker.EXP_ITEMS;
+                        break;
+                }
+                miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
                 moKeyItemRef.setValue(itemId);
             }
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionPickItemRefEty() {
         int[] itemId; 
         
-        if (moDialogPickerItemRef == null) {
+        if (moDialogPickerItemRefEty == null) {
+            moDialogPickerItemRefEty = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+            moDialogPickerItemRefEty.resetPicker();
+            moDialogPickerItemRefEty.initComponentsCustom();
         }
-        moDialogPickerItemRef = SMaterialRequestUtils.getOptionItemPicker(miClient, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
         
-        moDialogPickerItemRef.resetPicker();
-        moDialogPickerItemRef.initComponentsCustom();
+        if (mnItemRefPickerSeccSelectedEty == 0) {
+            mnItemRefPickerSeccSelectedEty = SDialogItemPicker.EXP_ITEMS;
+        }
         //moDialogPickerItemRef.setItemPickerInvDefault(false);
-        moDialogPickerItemRef.setDefaultEnableRadio(SDialogItemPicker.REF_ITEMS);
-        moDialogPickerItemRef.setPickerVisible(true);
+        moDialogPickerItemRefEty.setDefaultEnableRadio(mnItemRefPickerSeccSelectedEty);
+        moDialogPickerItemRefEty.setOption(moKeyItemRefEty.getValue());
+        moDialogPickerItemRefEty.moSearchItem.setText("");
+        moDialogPickerItemRefEty.setPickerVisible(true);
 
-        if (moDialogPickerItemRef.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            itemId = (int[]) moDialogPickerItemRef.getOption();
+        if (moDialogPickerItemRefEty.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            itemId = (int[]) moDialogPickerItemRefEty.getOption();
 
             if (itemId != null) {
+                SGuiParams params = new SGuiParams();
+                switch (moDialogPickerItemRefEty.getSetectedMode()) {
+                    case SDialogItemPicker.INV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, true);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.INV_ITEMS;
+                        break;
+                    case SDialogItemPicker.NOINV_ITEMS:
+                        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, false);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.NOINV_ITEMS;
+                        break;
+                    case SDialogItemPicker.SAL_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_SAL);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.SAL_ITEMS;
+                        break;
+                    case SDialogItemPicker.ASS_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_ASS);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.ASS_ITEMS;
+                        break;
+                    case SDialogItemPicker.PUR_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_PUR);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.PUR_ITEMS;
+                        break;
+                    case SDialogItemPicker.EXP_ITEMS:
+                        params.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
+                        mnItemRefPickerSeccSelectedEty = SDialogItemPicker.EXP_ITEMS;
+                        break;
+                }
+                //miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
+//                Vector<SGuiItem> items = moModule.readItems(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
+//                for (SGuiItem item : items) {
+//                    moKeyItemRefEty.addItem(item);
+//                }
+                if (!moMapItems.containsKey(mnItemRefPickerSeccSelectedEty)) {
+                    moMapItems.put(mnItemRefPickerSeccSelectedEty, moModule.readItems(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params)); 
+                }
+                moKeyItemRefEty.removeAllItems();
+                for (SGuiItem item : moMapItems.get(mnItemRefPickerSeccSelectedEty)) {
+                    moKeyItemRefEty.addItem(item);
+                }
+                
                 moKeyItemRefEty.setValue(itemId);
             }
         }
@@ -2082,15 +2259,21 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moTextItemDescription.removeFocusListener(this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void reloadCatalogues() {
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
+        SGuiParams paramsItemRef = new SGuiParams();
+        paramsItemRef.getParamsMap().put(SModConsts.ITMS_CT_ITEM, mnItemRefCt);
+        SGuiParams paramsItemRefEty = new SGuiParams();
+        paramsItemRefEty.getParamsMap().put(SModConsts.ITMS_CT_ITEM, SModSysConsts.ITMS_CT_ITEM_EXP);
 
         moFieldKeyConsEntityEty.initGroup();
         moFieldKeyConsEntityEty.addFieldKey(moKeyConsEntEty, SModConsts.TRN_MAT_CONS_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
         moFieldKeyConsEntityEty.addFieldKey(moKeyConsSubentEty, SModConsts.TRN_MAT_CONS_SUBENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
         moFieldKeyConsEntityEty.populateCatalogues();
+        moTextItemRefEty.setText("");
         
         miClient.getSession().populateCatalogue(moKeyProvEnt, SModConsts.TRN_MAT_PROV_ENT, hasUserProvRight || hasUserRevRight ? SLibConsts.UNDEFINED : SModConsts.USRU_USR, params);
         miClient.getSession().populateCatalogue(moKeyUsrReq, SModConsts.USRU_USR, SLibConsts.UNDEFINED, null);
@@ -2098,10 +2281,19 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         miClient.getSession().populateCatalogue(moKeyDocNature, SModConsts.TRNU_DPS_NAT, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriReq, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPriEty, SModConsts.TRNU_MAT_REQ_PTY, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyItemRef, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, paramsItemRef);
+        //miClient.getSession().populateCatalogue(moKeyItemRefEty, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, paramsItemRefEty);
         
+        moMapItems = new HashMap<>();
+        moMapItems.put(SDialogItemPicker.EXP_ITEMS, moModule.readItems(SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, paramsItemRefEty));
+        for (SGuiItem item : moMapItems.get(SDialogItemPicker.EXP_ITEMS)) {
+            moKeyItemRefEty.addItem(item);
+        }
+        
+        mnItemRefPickerSeccSelected = 0;
+        mnItemRefPickerSeccSelectedEty = 0;
         isReqInv = false;
+        mbCcChanged = false;
     }
 
     @Override
@@ -2111,6 +2303,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
 
+        if (moRegistry.isRegistryNew()) {
+            mnItemRefCt = SModSysConsts.ITMS_CT_ITEM_EXP;
+        }
+        else {
+            mnItemRefCt = moRegistry.getDbmsItemRef().getDbmsDataItemGeneric().getFkItemCategoryId();
+        }
+        
         removeAllListeners();
         reloadCatalogues();
         clearEntryControls();
@@ -2396,6 +2595,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
                 canAddRows();
                 updateReqAsignBudgetRows();
                 populateWhs();
+                mbCcChanged = true;
                 break;
         }
     }

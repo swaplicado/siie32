@@ -185,8 +185,9 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
     public void reloadCatalogues() {
         SGuiParams params = new SGuiParams();
         params.getParamsMap().put(SModConsts.ITMS_ST_ITEM, SModSysConsts.ITMS_ST_ITEM_ACT); 
+        params.getParamsMap().put(SModSysConsts.ITMU_ITEM_INV, true);
         
-        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SModSysConsts.ITMU_ITEM_INV, params);
+        miClient.getSession().populateCatalogue(moKeyItem, SModConsts.ITMU_ITEM, SLibConsts.UNDEFINED, params);
         miClient.getSession().populateCatalogue(moKeyUnit, SModConsts.ITMU_UNIT, SLibConsts.UNDEFINED, null);
     }
 
