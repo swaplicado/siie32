@@ -599,6 +599,8 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
+    public static final int TRNX_DIOG_AUTH_PEND = 207654;
+    public static final int TRNX_DIOG_AUTHORIZED = 207655;
     public static final int TRNX_CFD_PAY_REC = 207611;
     public static final int TRNX_CFD_PAY_REC_EXT = 207612;
     public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;

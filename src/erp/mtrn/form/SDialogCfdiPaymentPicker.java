@@ -108,8 +108,6 @@ public class SDialogCfdiPaymentPicker extends javax.swing.JDialog implements jav
         jbCancel.addActionListener(this);
     }
     
-    
-    
     private void actionOk() {
         try {
         jlCfdList.getSelectedValue();

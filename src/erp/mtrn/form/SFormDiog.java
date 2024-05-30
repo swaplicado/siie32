@@ -32,10 +32,12 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.form.SDialogPickerCompanyBranchEntity;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mfin.data.SDataCostCenter;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mod.SModSysConsts;
+import erp.mod.fin.db.SFinUtils;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mtrn.data.SDataDiog;
@@ -82,7 +84,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -127,6 +129,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private int[] manLastWarehouseDestinyKey;
     private erp.mtrn.form.SDialogStockLots moDialogStockLots;
     private erp.mtrn.form.SDialogStockLots moDialogStockLotsProdOrder;
+    private erp.mtrn.form.SDialogCostCenter moDialogCostCenter;
     private erp.mtrn.form.SDialogPickerStockLots moPickerStockLots;
     private erp.mbps.form.SDialogPickerCompanyBranchEntity moPickerWarehouseSource;
     private erp.mbps.form.SDialogPickerCompanyBranchEntity moPickerWarehouseDestiny;
@@ -142,6 +145,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mitm.data.SDataItem moItemProdOrderDestiny;
     private erp.mitm.data.SDataUnit moUnitProdOrderSource;
     private erp.mitm.data.SDataUnit moUnitProdOrderDestiny;
+    private erp.mfin.data.SDataCostCenter moCostCenter;
     private erp.mtrn.data.STrnStockMove moStockMoveEntry;
     private erp.mtrn.form.SDialogDpsStockSupply moDialogDpsStockSupply;
     private erp.mtrn.form.SDialogDpsStockReturn moDialogDpsStockReturn;
@@ -150,7 +154,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.form.SDialogProdOrderStockAssign moDialogProdOrderStockAssignForReturn;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForReturn;
-    
+     
     private boolean mbImportExternalDoc;
 
     /** Creates new form SFormDiog
@@ -208,6 +212,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfWarehouseDestiny = new javax.swing.JTextField();
         jtfWarehouseDestinyCode = new javax.swing.JTextField();
         jbWarehouseDestiny = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jlCostCenter = new javax.swing.JLabel();
+        jtfCostCenter = new javax.swing.JTextField();
+        jbCostCenter = new javax.swing.JButton();
         jPanel22 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlProdOrderSource = new javax.swing.JLabel();
@@ -293,7 +301,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel21.setLayout(new java.awt.BorderLayout(5, 0));
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del documento:"));
-        jPanel8.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel8.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jpDocType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -442,8 +450,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfCompanyBranchDestinyCode.setPreferredSize(new java.awt.Dimension(50, 23));
         jpWarehouseDestiny.add(jtfCompanyBranchDestinyCode);
 
-        jtfWarehouseDestiny.setBackground(java.awt.Color.lightGray);
         jtfWarehouseDestiny.setEditable(false);
+        jtfWarehouseDestiny.setBackground(java.awt.Color.lightGray);
         jtfWarehouseDestiny.setText("WAREHOUSE");
         jtfWarehouseDestiny.setFocusable(false);
         jtfWarehouseDestiny.setPreferredSize(new java.awt.Dimension(135, 23));
@@ -463,6 +471,26 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jpWarehouseDestiny.add(jbWarehouseDestiny);
 
         jPanel8.add(jpWarehouseDestiny);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCostCenter.setText("Centro costo:");
+        jlCostCenter.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlCostCenter);
+
+        jtfCostCenter.setEditable(false);
+        jtfCostCenter.setBackground(java.awt.Color.lightGray);
+        jtfCostCenter.setFocusable(false);
+        jtfCostCenter.setPreferredSize(new java.awt.Dimension(325, 23));
+        jPanel6.add(jtfCostCenter);
+
+        jbCostCenter.setText("...");
+        jbCostCenter.setToolTipText("Seleccionar almacén destino");
+        jbCostCenter.setFocusable(false);
+        jbCostCenter.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel6.add(jbCostCenter);
+
+        jPanel8.add(jPanel6);
 
         jPanel21.add(jPanel8, java.awt.BorderLayout.WEST);
 
@@ -861,6 +889,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         mbWarehouseDestinyNeeded = false;
         manLastWarehouseSourceKey = null;
         manLastWarehouseDestinyKey = null;
+        
+        moDialogCostCenter = null;
+        moCostCenter = null;
 
         mvDeletedDiogEntries = new Vector<SDataDiogEntry>();
         moPaneDiogEntries = new STablePane(miClient);
@@ -936,9 +967,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfEntryQuantity.addFocusListener(this);
         jtfEntryValueUnitary.addFocusListener(this);
         jtfEntryValue.addFocusListener(this);
+        jbCostCenter.addActionListener(this);
 
         i = 0;
-        tableColumnsEntry = new STableColumnForm[14];
+        tableColumnsEntry = new STableColumnForm[15];
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
         mnColQty = i;
@@ -957,6 +989,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Modificación", STableConstants.WIDTH_DATE_TIME);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. eliminación", STableConstants.WIDTH_USER);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro de costo", STableConstants.WIDTH_ACCOUNT_ID);
 
         for (i = 0; i < tableColumnsEntry.length; i++) {
             moPaneDiogEntries.addTableColumn(tableColumnsEntry[i]);
@@ -1428,10 +1461,34 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             moFieldProdOrderDestiny.setFieldValue(manParamProdOrderDestinyKey);
             itemStateChangedProdOrderDestiny();
         }
+        
+        jlCostCenter.setEnabled(mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT);
+        jtfCostCenter.setEnabled(mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT);
+        jbCostCenter.setEnabled(mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT);
+        
+        if (jbCostCenter.isEnabled()) {
+            try {
+                String param = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_DEF_CC);
+                moDialogCostCenter = new SDialogCostCenter(miClient);
+                moDialogCostCenter.getPanel().getFieldAccount().setFieldValue(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), SLibUtils.parseInt(param)));
+                moDialogCostCenter.getPanel().refreshPanel();
+                moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
+                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
+                jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
+                jtfCostCenter.setCaretPosition(0);
+            }
+            catch (Exception e) {}
+        }
+        else {
+            jtfCostCenter.setText("");
+            moCostCenter = null;
+            moDialogCostCenter = null;                    
+        }
 
         setUpControls();
 
         mbResetingForm = false;
+        
     }
 
     private void computeEntryValue() {
@@ -1732,7 +1789,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                            iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                            iogEntry.setDbmsCostCenter(moCostCenter);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -1862,7 +1920,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                            iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                            iogEntry.setDbmsCostCenter(moCostCenter);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -2243,7 +2302,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 iogEntry.setClonedFkMfgChargeId_n(SLibConstants.UNDEFINED);
 
                                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                                iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                                iogEntry.setDbmsCostCenter(moCostCenter);
                                 
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
@@ -2378,7 +2438,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
 
                                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                                iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                                iogEntry.setDbmsCostCenter(moCostCenter);
                                 
                                 iogEntry.setFkUserNewId(1);
                                 iogEntry.setFkUserEditId(1);
@@ -2469,7 +2530,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                iogEntry.setDbmsCostCenter(moCostCenter);
                             
                 iogEntry.setFkUserNewId(1);
                 iogEntry.setFkUserEditId(1);
@@ -2706,6 +2768,14 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 //                }
 //            }
             else {
+                if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV)) {
+                    try {
+                        if (SModSysConsts.FIN_CC_NA != SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_DEF_CC))
+                                && (moCostCenter == null || moCostCenter.getPkCostCenterId() == SModSysConsts.FIN_CC_NA)){
+                            miClient.showMsgBoxWarning("Existe un centro de costo predeterminado en la configuración de la empresa pero no hay ninguno seleccionado.");
+                        }
+                    } catch (Exception e) {}
+                }
                 msg = validateAppropriateWarehouses();
 
                 if (msg.length() > 0) {
@@ -2754,7 +2824,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
                             iogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                            iogEntry.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                            iogEntry.setFkCostCenterId(moCostCenter != null ? moCostCenter.getPkCostCenterId() : SModSysConsts.FIN_CC_NA);
+                            iogEntry.setDbmsCostCenter(moCostCenter);
 
                             iogEntry.setFkUserNewId(1);
                             iogEntry.setFkUserEditId(1);
@@ -3165,6 +3236,19 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
         }
     }
+    
+    private void actionCostCenter() {
+        if (moDialogCostCenter == null) {
+            moDialogCostCenter = new SDialogCostCenter(miClient);
+        }
+        moDialogCostCenter.setVisible(true);
+        if (moDialogCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
+            String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
+            jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
+            jtfCostCenter.setCaretPosition(0);
+        }
+    }
 
     private void  actionSwitchProdOrderDestiny() {
         mbResetingForm = true;
@@ -3349,9 +3433,11 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCostCenter;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbEdit;
     private javax.swing.JButton jbEditHelp;
@@ -3378,6 +3464,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsShipmentRequired;
     private javax.swing.JCheckBox jckIsSystem;
     private javax.swing.JFormattedTextField jftDate;
+    private javax.swing.JLabel jlCostCenter;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDiogType;
     private javax.swing.JLabel jlDummy01;
@@ -3412,6 +3499,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfCompanyBranchDestinyCode;
     private javax.swing.JTextField jtfCompanyBranchSource;
     private javax.swing.JTextField jtfCompanyBranchSourceCode;
+    private javax.swing.JTextField jtfCostCenter;
     private javax.swing.JTextField jtfDiogType;
     private javax.swing.JTextField jtfDpsSourceBizPartner;
     private javax.swing.JTextField jtfDpsSourceNumber;
@@ -3996,7 +4084,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 entryNew.setClonedFkMfgChargeId_n(entryOriginal.getClonedFkMfgChargeId_n());
                                 
                                 entryNew.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-                                entryNew.setFkCostCenterId(SModSysConsts.FIN_CC_NA);
+                                entryNew.setFkCostCenterId(entryOriginal.getFkCostCenterId());
                                 break;
                             }
                         }
@@ -4095,6 +4183,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             else if (button == jbEntryViewLots) {
                 actionEntryViewLots();
+            }
+            else if (button == jbCostCenter) {
+                actionCostCenter();
             }
         }
         else if (e.getSource() instanceof JTextField) {
