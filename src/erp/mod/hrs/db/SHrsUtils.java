@@ -70,7 +70,7 @@ import sa.lib.prt.SPrtUtils;
 /**
  * Utilerías varias para el procesamiento y emisión de nóminas.
  * 
- * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
  */
 public abstract class SHrsUtils {
     
@@ -728,7 +728,7 @@ public abstract class SHrsUtils {
                     bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
                     bodyLayout.append(balance).append(',');
                     bodyLayout.append("PAGO NOMINA").append(',');
-                    bodyLayout.append(sNameEmploy.substring(1,sNameEmploy.length() <= 35 ? sNameEmploy.length() : 35)).append(",,,,");
+                    bodyLayout.append(sNameEmploy.substring(0,sNameEmploy.length() <= 35 ? sNameEmploy.length() : 35)).append(",,,,");
                     bodyLayout.append("\r\n");
                 }
                 
