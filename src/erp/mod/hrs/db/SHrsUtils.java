@@ -724,7 +724,7 @@ public abstract class SHrsUtils {
                     sNameEmploy = parts[1] + " " + parts[0];
                     balance = resulSet.getDouble("_pay_net");
                     total = SLibUtils.roundAmount(total + balance);
-                    sNameEmploy = removeSpecialChars(sNameEmploy);
+                    sNameEmploy = SLibUtils.textToAscii(sNameEmploy);
                     bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
                     bodyLayout.append(balance).append(',');
                     bodyLayout.append("PAGO NOMINA").append(',');
