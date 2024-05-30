@@ -111,6 +111,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogMfgConsumeOut;
     private javax.swing.JMenuItem jmiIogAuditPending;
     private javax.swing.JMenuItem jmiIogAudited;
+    private javax.swing.JMenuItem jmiIogAuthPending;
+    private javax.swing.JMenuItem jmiIogAuthorized;
     private javax.swing.JMenuItem jmiIogInventoryValuationPrcCalc;
     private javax.swing.JMenuItem jmiIogInventoryValuationUpdCost;
     private javax.swing.JMenuItem jmiIogInventoryMfgCost;
@@ -516,6 +518,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut = new JMenuItem("Docs. salida por consumo de insumos y productos");
         jmiIogAuditPending = new JMenuItem("Docs. inventarios por auditar");
         jmiIogAudited = new JMenuItem("Docs. inventarios auditados");
+        jmiIogAuthPending = new JMenuItem("Docs. inventarios por autorizar");
+        jmiIogAuthorized = new JMenuItem("Docs. inventarios autorizados");
         jmiIogInventoryValuationPrcCalc = new JMenuItem("Valuación de inventarios");
         jmiIogInventoryValuationUpdCost = new JMenuItem("Actualización de costos de inventarios");
         jmiIogInventoryMfgCost = new JMenuItem("Costos de producción por producto");
@@ -541,6 +545,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogAuditPending);
         jmMenuIog.add(jmiIogAudited);
         jmMenuIog.addSeparator();
+        //jmMenuIog.add(jmiIogAuthPending);
+        //jmMenuIog.add(jmiIogAuthorized);
+        //jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogInventoryValuationPrcCalc);
         jmMenuIog.add(jmiIogInventoryValuationUpdCost);
         jmMenuIog.addSeparator();
@@ -563,6 +570,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut.addActionListener(this);
         jmiIogAuditPending.addActionListener(this);
         jmiIogAudited.addActionListener(this);
+        jmiIogAuthPending.addActionListener(this);
+        jmiIogAuthorized.addActionListener(this);
         jmiIogInventoryValuationPrcCalc.addActionListener(this);
         jmiIogInventoryValuationUpdCost.addActionListener(this);
         jmiIogInventoryMfgCost.addActionListener(this);
@@ -936,6 +945,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut.setEnabled(hasRightMfgCon);
         jmiIogAuditPending.setEnabled(hasRightAudit);
         jmiIogAudited.setEnabled(hasRightAudit);
+        jmiIogAuthPending.setEnabled(hasRightAudit);
+        jmiIogAuthorized.setEnabled(hasRightAudit);
         jmiIogInventoryValuationPrcCalc.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogInventoryValuationUpdCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1810,6 +1821,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiIogAudited) {
                 showView(SDataConstants.TRN_DIOG, SDataConstants.TRNX_DIOG_AUDITED);
+            }
+            else if (item == jmiIogAuthPending) {
+                showView(SDataConstants.TRN_DIOG, SDataConstants.TRNX_DIOG_AUTH_PEND);
+            }
+            else if (item == jmiIogAuthorized) {
+                showView(SDataConstants.TRN_DIOG, SDataConstants.TRNX_DIOG_AUTHORIZED);
             }
             else if (item == jmiIogInventoryValuationPrcCalc) {
                 miClient.getSession().showView(SModConsts.TRN_INV_VAL, SLibConstants.UNDEFINED, null);

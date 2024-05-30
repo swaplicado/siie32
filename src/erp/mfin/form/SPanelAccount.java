@@ -259,6 +259,7 @@ public class SPanelAccount extends javax.swing.JPanel implements java.awt.event.
     public erp.mfin.data.SDataAccount getDataAccountMajor() { return moAccountMajor; }
     public erp.mfin.data.SDataCostCenter getDataCostCenterMajor() { return moCostCenterMajor; }
     public java.lang.String getEmptyAccountId() { return msEmptyAccountId; }
+    public java.lang.String getAccountDescription() { return jtfAccount.getText(); }
     public javax.swing.JLabel getFieldAccountLabel() { return jlAccountId; }
 
     public boolean isEmptyAccountId() {

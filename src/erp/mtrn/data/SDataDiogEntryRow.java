@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SDataDiogEntryRow extends erp.lib.table.STableRow {
 
@@ -36,5 +36,6 @@ public class SDataDiogEntryRow extends erp.lib.table.STableRow {
         mvValues.add(diogEntry.getUserEditTs());
         mvValues.add(diogEntry.getDbmsUserDelete());
         mvValues.add(diogEntry.getUserDeleteTs());
+        mvValues.add(diogEntry.getDbmsCostCenter() != null ? diogEntry.getDbmsCostCenter().getPkCostCenterIdXXX() : "");
     }
 }

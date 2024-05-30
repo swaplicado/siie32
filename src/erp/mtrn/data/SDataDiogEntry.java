@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mfin.data.SDataCostCenter;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SMatConsumeSubEntCcConfig;
 import erp.mod.trn.db.SMaterialRequestUtils;
@@ -72,6 +73,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
+    
+    protected SDataCostCenter moDbmsCostCenter;
 
     protected java.util.Vector<erp.mtrn.data.STrnStockMove> mvAuxStockMoves;
     protected ArrayList<SDataDiogEtyMatConsEntCostCenter> mlAuxDiogEtyMatEntCcsConfigs;
@@ -168,6 +171,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
+    
+    public void setDbmsCostCenter(SDataCostCenter o) { moDbmsCostCenter = o; }
 
     public int getDbmsBookkeepingYearId() { return mnDbmsBookkeepingYearId; }
     public int getDbmsBookkeepingNumberId() { return mnDbmsBookkeepingNumberId; }
@@ -181,6 +186,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
+    
+    public SDataCostCenter getDbmsCostCenter() { return moDbmsCostCenter; }
 
     public java.util.Vector<erp.mtrn.data.STrnStockMove> getAuxStockMoves() { return mvAuxStockMoves; }
     public ArrayList<SDataDiogEtyMatConsEntCostCenter> getAuxDiogEtyMatEntCcsConfigs() { return mlAuxDiogEtyMatEntCcsConfigs; }
@@ -312,6 +319,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
         msDbmsUserDelete = "";
+        
+        moDbmsCostCenter = null;
 
         mvAuxStockMoves.clear();
         mlAuxDiogEtyMatEntCcsConfigs = new ArrayList<>();
@@ -442,6 +451,13 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     mlAuxDiogEtyMatEntCcsConfigs.add(oConfig);
                 }
                 
+                sql = "SELECT id_cc FROM fin_cc WHERE pk_cc = " + mnFkCostCenterId;
+                res = statement.getConnection().createStatement().executeQuery(sql);
+                if (res.next()) {
+                    moDbmsCostCenter = new SDataCostCenter();
+                    moDbmsCostCenter.read(new String[] {res.getString(1)}, statement.getConnection().createStatement());
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -470,7 +486,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                     "{ CALL trn_diog_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -722,6 +738,8 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setDbmsUserNew(this.getDbmsUserNew());
         registry.setDbmsUserEdit(this.getDbmsUserEdit());
         registry.setDbmsUserDelete(this.getDbmsUserDelete());
+        
+        registry.setDbmsCostCenter(this.getDbmsCostCenter());
 
         for (STrnStockMove move : mvAuxStockMoves) {
             registry.getAuxStockMoves().add(move.clone());
