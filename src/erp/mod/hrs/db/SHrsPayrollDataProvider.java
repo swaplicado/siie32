@@ -955,6 +955,7 @@ public class SHrsPayrollDataProvider {
 
         // Employment subsidy configurations:
         hrsPayroll.getEmploymentSubsidies().addAll(readEmploymentSubsidies());
+        hrsPayroll.assessEmploymentSubsidyApplicability(); // assess applicability of employment subsidy JUST AFTER retrieving its configurations!
 
         // SS Contribution tables:
         hrsPayroll.getSsContributionTables().addAll(readSsContributionTables());
@@ -973,6 +974,8 @@ public class SHrsPayrollDataProvider {
 
         // Automatic deductions:
         hrsPayroll.getAutomaticDeductions().addAll(readAutomaticDeductions(payroll.getFkPaymentTypeId()));
+        
+        // AT THE END compute employees, then receipts, and finnaly payroll-related descriptions:
 
         // Employees:
         hrsPayroll.getEmployees().addAll(readEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
@@ -985,9 +988,6 @@ public class SHrsPayrollDataProvider {
         
         // Deduction computation types:
         populateDescriptionsMap(SModConsts.HRSS_TP_DED_COMP, SDbRegistry.FIELD_CODE, hrsPayroll.getDeductionComputationTypesMap());
-        
-        // Assess applicability of employment subsidy:
-        hrsPayroll.assessEmploymentSubsidyApplicability();
 
         return hrsPayroll;
     }

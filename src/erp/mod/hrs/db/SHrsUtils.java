@@ -2663,7 +2663,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Validate information necesary basic for capture payroll.
+     * Validate basic information required for payroll capture.
      * @param session User GUI session.
      * @param config Object with information of configuration the module resource human.
      * @param workingDaySettings Configuration of days working.

@@ -207,6 +207,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel5 = new javax.swing.JPanel();
         jlHint = new javax.swing.JLabel();
         moTextHint = new sa.lib.gui.bean.SBeanFieldText();
+        jbEditHint = new javax.swing.JButton();
         jlHintHint = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
@@ -514,6 +515,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlHint.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlHint);
         jPanel5.add(moTextHint);
+
+        jbEditHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditHint.setToolTipText("Modificar");
+        jbEditHint.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbEditHint);
 
         jlHintHint.setForeground(java.awt.Color.gray);
         jlHintHint.setText("(Para el asunto del correo-e de recibos.)");
@@ -977,6 +983,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbClearPrepayroll;
     private javax.swing.JButton jbEditDates;
     private javax.swing.JButton jbEditFiscalYear;
+    private javax.swing.JButton jbEditHint;
     private javax.swing.JButton jbEditNumber;
     private javax.swing.JButton jbEditPeriod;
     private javax.swing.JButton jbEditPeriodYear;
@@ -1260,7 +1267,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                             int index = moGridPanePayrollReceipts.getTable().getSelectedRow();
                             populateRowPayrollEmployeesReceipts();
                             moGridPanePayrollReceipts.setSelectedGridRow(index);
-                            computePayrollValue();
+                            computeTotals();
                         }
                     }
                 }
@@ -1295,12 +1302,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mnCurrentPeriod = 0;
     }
     
-    private void enableFieldsCfdiStatus() {
+    private void enableFieldsStatusRelatedToPayroll() {
         boolean enable = true;
         
         try {
-            mbIsReadOnly = moRegistry.isClosed() || moRegistry.isDeleted();
-            
             if (mbIsReadOnly) {
                 enable = false;
             }
@@ -1315,8 +1320,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
-            moTextHint.setEnabled(enable);
-            moTextNotes.setEnabled(enable);
+            moTextHint.setEnabled(false);
+            jbEditHint.setEnabled(!mbIsReadOnly);
+            moTextNotes.setEnabled(!mbIsReadOnly);
+            
             moKeyTaxComputationType.setEnabled(enable);
             moKeyTax.setEnabled(enable);
             moKeyTaxSubsidy.setEnabled(enable);
@@ -1325,29 +1332,33 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moBoolSsContribution.setEnabled(enable);
             moKeyMwzType.setEnabled(enable);
             moKeyMwzReferenceType.setEnabled(enable);
+            
             jbTaxSubsidyOptionChange.setEnabled(enable);
+            
             jbReceiptCaptureEarnings.setEnabled(enable);
             jbReceiptCaptureDeductions.setEnabled(enable);
             jbLoadPrepayroll.setEnabled(enable);
             jbClearPrepayroll.setEnabled(enable);
             jbAddPayrollBonus.setEnabled(enable);
+            
+            jbReceiptAdd.setEnabled(!mbIsReadOnly);
+            jbReceiptAddAll.setEnabled(!mbIsReadOnly);
+            jbReceiptRemove.setEnabled(!mbIsReadOnly);
+            jbReceiptRemoveAll.setEnabled(!mbIsReadOnly);
+            
             moRadViewEmployeesActive.setEnabled(!mbIsReadOnly);
             moRadViewEmployeesAll.setEnabled(!mbIsReadOnly);
             moBoolFilterWages.setEnabled(!mbIsReadOnly);
             moBoolFilterAssimilated.setEnabled(!mbIsReadOnly);
             moBoolFilterRetirees.setEnabled(!mbIsReadOnly);
             moBoolFilterOthers.setEnabled(!mbIsReadOnly);
-            jbReceiptAdd.setEnabled(!mbIsReadOnly);
-            jbReceiptAddAll.setEnabled(!mbIsReadOnly);
-            jbReceiptRemove.setEnabled(!mbIsReadOnly);
-            jbReceiptRemoveAll.setEnabled(!mbIsReadOnly);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
     }
 
-    private void updateFieldsStatus() {
+    private void enableFieldsStatusRelatedToReceipts() {
         moIntPeriodYear.setEditable(false);
         moIntFiscalYear.setEditable(false);
         moIntNumber.setEditable(false);
@@ -1499,10 +1510,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         //payroll.setFkUserClosedId(...); // value set outside this form in another user case
         
-        moHrsPayroll.setPayroll(payroll);
-        
-        if (populateReceipts) {
-            populateRowPayrollEmployeesReceipts();
+        if (moHrsPayroll != null) {
+            moHrsPayroll.setPayroll(payroll);
+            
+            if (populateReceipts) {
+                populateRowPayrollEmployeesReceipts();
+            }
         }
     }
     
@@ -1510,20 +1523,20 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         try {
             updatePayroll(moRegistry, true); // update registry with current UI data
             moHrsPayroll.computeReceipts();
-            computePayrollValue();
+            computeTotals();
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
     }
     
-    private void computePayrollValue() {
+    private void computeTotals() {
         moDecTotalEarnings.getField().setValue(moHrsPayroll.getTotalEarnings());
         moDecTotalDeductions.getField().setValue(moHrsPayroll.getTotalDeductions());
         moDecTotalNet.getField().setValue(moDecTotalEarnings.getField().getValue() - moDecTotalDeductions.getField().getValue());
     }
 
-    private void resetDays() {
+    private void resetPayrollDays() {
         int workingDays = 0;
 
         if (moDateDateStart.getValue() != null && moDateDateEnd.getValue() != null) {
@@ -1543,7 +1556,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
-    private void resetSalaries() throws Exception {
+    private void resetSalariesAmounts() throws Exception {
         moDecMwzWage.getField().setValue(moKeyMwzType.getSelectedIndex() <= 0 ? 0d : SHrsUtils.getRecentMinimumWage(miClient.getSession(), moKeyMwzType.getValue()[0], moDateDateEnd.getValue()));
         moDecMwzReferenceWage.getField().setValue(moKeyMwzReferenceType.getSelectedIndex() <= 0 ? 0d : SHrsUtils.getRecentMinimumWage(miClient.getSession(), moKeyMwzReferenceType.getValue()[0], moDateDateEnd.getValue()));
     }
@@ -1601,8 +1614,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void triggerResets(boolean populateEmployeesAvailabe) throws Exception {
-        resetDays();
-        resetSalaries();
+        resetPayrollDays();
+        resetSalariesAmounts();
         resetUmaUmiAmounts();
         resetWithholdingTables();
         
@@ -1629,10 +1642,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 SHrsPayrollUtils.createRowPayrollEmployees(miClient.getSession(), moHrsPayroll.getHrsReceipts())));
         
         maBonusPayed = new ArrayList<>();
+        
         for (SHrsReceipt hrsReceipt : moHrsPayroll.getHrsReceipts()) {
             for (SHrsReceiptEarning hrsReceiptEarning : hrsReceipt.getHrsReceiptEarnings()) {
                 int bonus = hrsReceiptEarning.getPayrollReceiptEarning().getFkBonusId();
-                if (! maBonusPayed.contains(bonus) && bonus != 1) {
+                if (!maBonusPayed.contains(bonus) && bonus != SModSysConsts.HRSS_BONUS_NA) {
                     maBonusPayed.add(bonus);
                 }
             }
@@ -1688,7 +1702,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyRecruitmentSchemaType.setEnabled(true);
         moKeyRecruitmentSchemaType.requestFocusInWindow();
     }
+    
+    private void actionEditHint() {
+        jbEditHint.setEnabled(false);
+        moTextHint.setEditable(true);
+        moTextHint.requestFocusInWindow();
+    }
 
+    private void updateTaxSubsidyOptionText() {
+        jtfTaxSubsidyOption.setText(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
+        jtfTaxSubsidyOption.setCaretPosition(0);
+    }
+    
     private void actionTaxSubsidyChange() {
         boolean changed = false;
         
@@ -1706,8 +1731,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
 
         if (changed) {
-            jtfTaxSubsidyOption.setText(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
-            jtfTaxSubsidyOption.setCaretPosition(0);
+            updateTaxSubsidyOptionText();
             computeReceipts();
         }
     }
@@ -1868,8 +1892,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moGridPanePayrollReceipts.renderGridRows();
                 moGridPanePayrollReceipts.setSelectedGridRow(moGridPanePayrollReceipts.getTable().convertRowIndexToView(moGridPanePayrollReceipts.getModel().getRowCount() - 1));
 
-                updateFieldsStatus();
-                computePayrollValue();
+                enableFieldsStatusRelatedToReceipts();
+                computeTotals();
                 showCounts();
             }
             catch (Exception e) {
@@ -1936,7 +1960,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     private boolean actionReceiptRemove() {
         boolean removed = true;
-        int idEmployee = 0;
+        int employeeId = 0;
+        
         if (mbIsReadOnly) {
             miClient.showMsgBoxWarning("No se puede remover el recibo, la nómina es de solo lectura.");
         }
@@ -1955,7 +1980,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     maPayrollReceiptsDeleted.add(rowReceiptBeingRemoved.getHrsReceipt().getPayrollReceipt());
                 }
                 moHrsPayroll.removeHrsReceipt(rowReceiptBeingRemoved.getPkEmployeeId());
-                idEmployee = rowReceiptBeingRemoved.getPkEmployeeId();
+                employeeId = rowReceiptBeingRemoved.getPkEmployeeId();
 
                 moGridPanePayrollReceipts.removeGridRow(moGridPanePayrollReceipts.getTable().getSelectedRow());
                 moGridPanePayrollReceipts.renderGridRows();
@@ -1973,8 +1998,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getTable().convertRowIndexToView(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1));
                 }
                 
-                updateFieldsStatus();
-                computePayrollValue();
+                enableFieldsStatusRelatedToReceipts();
+                computeTotals();
                 showCounts();
             }
             catch (Exception e) {
@@ -1985,8 +2010,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         if (removed) {
             int rows = moGridPanePayrollReceipts.getTable().getRowCount();
-            if (maBonusPayed.contains(SPayrollBonusUtils.BONUS) && idEmployee > 0 && maEmployeesWithCurrentBonus.contains(idEmployee)) {
-                maEmployeesWithCurrentBonus.remove(idEmployee);
+            if (maBonusPayed.contains(SPayrollBonusUtils.BONUS) && employeeId > 0 && maEmployeesWithCurrentBonus.contains(employeeId)) {
+                maEmployeesWithCurrentBonus.remove(employeeId);
             }
             if (rows == 0) {
                 maBonusPayed.clear();
@@ -2058,7 +2083,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     moHrsPayroll.replaceHrsReceipt(hrsReceipt, true);
                 }
                 populateRowPayrollEmployeesReceipts();
-                computePayrollValue();
+                computeTotals();
             }
         }
         catch (Exception e) {
@@ -2086,7 +2111,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     moHrsPayroll.replaceHrsReceipt(hrsReceipt, true);
                 }
                 populateRowPayrollEmployeesReceipts();
-                computePayrollValue();
+                computeTotals();
             }
         }
         catch (Exception e) {
@@ -2198,7 +2223,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             for (SPrepayrollRow row : ppayroll.getRows()) {
                 for (SPrepayrollRow rowVar : ppayrollVar.getRows()) {
-                    if (! SPrepayrollUtils.isNumber(rowVar.getDouble_overtime()) || ! SPrepayrollUtils.isNumber(rowVar.getTriple_overtime())) {
+                    if (!SPrepayrollUtils.isNumber(rowVar.getDouble_overtime()) || !SPrepayrollUtils.isNumber(rowVar.getTriple_overtime())) {
                         miClient.showMsgBoxError("El valor de la etiqueta de tiempo extra no es correcto (" + rowVar.getDouble_overtime() + ", " + rowVar.getTriple_overtime() + "), "
                                 + "por favor contacte a soporte técnico.");
                         return;
@@ -2524,12 +2549,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                                                         SLibConstants.EXEC_MODE_SILENT);
                 String sCompanyKey = company.getKey();
                 
-                if (dialog.getCurrentBonus() == SPayrollBonusUtils.PANTRY && dialog.getWithPreviousPayments() && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
+                if (dialog.getCurrentBonus() == SPayrollBonusUtils.PANTRY && dialog.getWithPreviousPayments() && !maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
                     miClient.showMsgBoxError("Debe agregar el pago de vales de despensa antes que la despensa en especie.");
                     return;
                 }
                 
-                if (dialog.getCurrentBonus() == SPayrollBonusUtils.SUPER_BONUS && dialog.getWithPreviousPayments() && ! maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
+                if (dialog.getCurrentBonus() == SPayrollBonusUtils.SUPER_BONUS && dialog.getWithPreviousPayments() && !maBonusPayed.contains(SPayrollBonusUtils.BONUS)) {
                     miClient.showMsgBoxError("Debe agregar el pago de vales de despensa antes que el superbono.");
                     return;
                 }
@@ -2594,7 +2619,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                             }
                         }
 
-                        if (! gainedEarnings.isEmpty()) {
+                        if (!gainedEarnings.isEmpty()) {
                             this.addReceiptAndPerception(entry.getKey(), gainedEarnings);
                         }
                     }
@@ -2749,6 +2774,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditDates.addActionListener(this);
         jbEditPeriod.addActionListener(this);
         jbEditRecruitmentSchemaType.addActionListener(this);
+        jbEditHint.addActionListener(this);
         jbGoTabReceipts.addActionListener(this);
         jbReceiptAdd.addActionListener(this);
         jbReceiptAddAll.addActionListener(this);
@@ -2795,6 +2821,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditDates.removeActionListener(this);
         jbEditPeriod.removeActionListener(this);
         jbEditRecruitmentSchemaType.removeActionListener(this);
+        jbEditHint.removeActionListener(this);
         jbGoTabReceipts.removeActionListener(this);
         jbReceiptAdd.removeActionListener(this);
         jbReceiptAddAll.removeActionListener(this);
@@ -2864,6 +2891,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moWorkingDaySettings = SHrsUtils.getPayrollWorkingDaySettings(miClient.getSession(), mnFormSubtype);
                 
         if (SHrsUtils.validatePayroll(miClient.getSession(), moModuleConfig, moWorkingDaySettings)) {
+            // all basic information required for payroll capture is already validated
+            
+            // Set payroll:
+            
             mbIsCopyingPayroll = moRegistry.isRegistryNew() && moRegistry.getPkPayrollId() != 0;
 
             if (moRegistry.isRegistryNew()) {
@@ -2953,12 +2984,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moBoolClosed.setValue(moRegistry.isClosed());
             moBoolSsContribution.setValue(moRegistry.isSsContribution());
             mbIsWithTaxSubsidy = moRegistry.isTaxSubsidy();
-            jtfTaxSubsidyOption.setText(mbIsWithTaxSubsidy ? TXT_WITH_TAX_SUB_PAY : TXT_WITHOUT_TAX_SUB_PAY);
-            jtfTaxSubsidyOption.setCaretPosition(0);
+            updateTaxSubsidyOptionText();
 
             moDecTotalEarnings.getField().setValue(moRegistry.getAuxTotalEarnings());
             moDecTotalDeductions.getField().setValue(moRegistry.getAuxTotalDeductions());
             moDecTotalNet.getField().setValue(moRegistry.getAuxTotalNet());
+            
+            mbIsReadOnly = moRegistry.isClosed() || moRegistry.isDeleted();
+            
+            if (!mbIsReadOnly) {
+                updatePayroll(moRegistry, true); // update registry with current UI data, JUST BEFORE instantiating HRS payroll
+            }
 
             moHrsPayroll = (new SHrsPayrollDataProvider(miClient.getSession())).createHrsPayroll(moModuleConfig, moWorkingDaySettings, moRegistry);
 
@@ -2966,13 +3002,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             setFormEditable(true);
             
-            populateRowPayrollEmployeesReceipts();      // XXX This method MUST be invoked just before populateRowPayrollEmployeesAvailable()! Improve this!
-            populateRowPayrollEmployeesAvailable(true); // XXX This method MUST be invoked just after populateRowPayrollEmployeesReceipts()! Improve this!
+            populateRowPayrollEmployeesReceipts();      // This method MUST be invoked JUST BEFORE populateRowPayrollEmployeesAvailable()! Improve this!
+            populateRowPayrollEmployeesAvailable(true); // This method MUST be invoked JUST AFTER populateRowPayrollEmployeesReceipts()! Improve this!
 
             clearCurrentValues();
-            updateFieldsStatus();
-            enableFieldsCfdiStatus();
+            enableFieldsStatusRelatedToPayroll();
+            enableFieldsStatusRelatedToReceipts();
             
+            // reset filters in receipts tab:
             moRadViewEmployeesActive.setSelected(true);
             moBoolFilterWages.setSelected(true);
             moBoolFilterAssimilated.setSelected(false);
@@ -3180,6 +3217,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 else if (button == jbEditRecruitmentSchemaType) {
                     actionEditRecruitmentSchemaType();
                 }
+                else if (button == jbEditHint) {
+                    actionEditHint();
+                }
                 else if (button == jbTaxSubsidyOptionChange) {
                     actionTaxSubsidyChange();
                 }
@@ -3233,7 +3273,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     computeReceipts();
                 }
                 else if (comboBox == moKeyMwzType || comboBox == moKeyMwzReferenceType) {
-                    resetSalaries();
+                    resetSalariesAmounts();
                     computeReceipts();
                 }
             }
