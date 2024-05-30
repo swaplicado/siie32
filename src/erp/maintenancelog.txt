@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 253.3/ 2024-05-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la secuencia de procesamientos para determinar si aplica y para calcular el nuevo subsidio para el empleo en nóminas preexistentes.
+2) Cambio a la captura del texto aclaratorio para el asunto de correo-e de recibos de nóminas a petición explícita del usuario.
+
+================================================================================
 SIIE 3.2 253.2*/ 2024-05-30
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Selección del centro de costo en las partidas de los movimientos de salida de almacén.
+1) Selección del centro de costo en las partidas de los movimientos de salida de almacén (en proceso.)
 
 ================================================================================
 SIIE 3.2 253.1/ 2024-05-29
