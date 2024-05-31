@@ -81,8 +81,8 @@ public class SViewDiogAuth extends erp.lib.table.STableTab implements java.awt.e
         mjbViewDps.addActionListener(this);
         mjbViewNotes.addActionListener(this);
 
-        mjbAuthYes.setToolTipText("Marcar como auditado");
-        mjbAuthNo.setToolTipText("Desmarcar como auditado");
+        mjbAuthYes.setToolTipText("Marcar como autorizado");
+        mjbAuthNo.setToolTipText("Desmarcar como autorizado");
         mjbViewDps.setToolTipText("Ver documento");
         mjbViewNotes.setToolTipText("Ver notas");
 
@@ -193,12 +193,12 @@ public class SViewDiogAuth extends erp.lib.table.STableTab implements java.awt.e
     private void actionAuthYes() {
         if (mjbAuthYes.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_AUDIT_YES) == JOptionPane.YES_OPTION) {
+                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_AUTH_YES) == JOptionPane.YES_OPTION) {
                     Vector<Object> params = new Vector<>();
 
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                    params.add(SDataConstantsSys.UPD_DIOG_FL_AUDIT);
+                    params.add(SDataConstantsSys.UPD_DIOG_FL_AUTHORN);
                     params.add(1);
                     params.add(miClient.getSession().getUser().getPkUserId());
                     params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DIOG_UPD, params, SLibConstants.EXEC_MODE_SILENT);
@@ -222,12 +222,12 @@ public class SViewDiogAuth extends erp.lib.table.STableTab implements java.awt.e
     private void actionAuthNo() {
         if (mjbAuthNo.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_AUDIT_NO) == JOptionPane.YES_OPTION) {
+                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_AUTH_NO) == JOptionPane.YES_OPTION) {
                     Vector<Object> params = new Vector<>();
 
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                     params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                    params.add(SDataConstantsSys.UPD_DIOG_FL_AUDIT);
+                    params.add(SDataConstantsSys.UPD_DIOG_FL_AUTHORN);
                     params.add(0);
                     params.add(miClient.getSession().getUser().getPkUserId());
                     params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DIOG_UPD, params, SLibConstants.EXEC_MODE_SILENT);
@@ -270,10 +270,18 @@ public class SViewDiogAuth extends erp.lib.table.STableTab implements java.awt.e
                 return where;
             }
             else {
+                where = "AND (";
                 String aux[] = param.split(";");
+                int i = 0;
                 for (String a : aux) {
-                    
+                    if (i != 0) {
+                        where += "OR " ;
+                    }
+                    String b[] = a.split("-");
+                    where += "(iog.fid_ct_iog = " + b[0] + " AND iog.fid_cl_iog = " + b[1] + ") ";
+                    i++;
                 }
+                where += ") ";
             }
         } catch (Exception e) { }
         return where;

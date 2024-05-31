@@ -317,6 +317,8 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_CNF_DOC_REJECT = "¿Está seguro que desea rechazar el documento?";
     public static final java.lang.String MSG_CNF_DOC_AUDIT_YES = "¿Está seguro que desea marcar el documento como auditado?";
     public static final java.lang.String MSG_CNF_DOC_AUDIT_NO = "¿Está seguro que desea desmarcar el documento como auditado?";
+    public static final java.lang.String MSG_CNF_DOC_AUTH_YES = "¿Está seguro que desea marcar el documento como autorizado?";
+    public static final java.lang.String MSG_CNF_DOC_AUTH_NO = "¿Está seguro que desea desmarcar el documento como autorizado?";
     public static final java.lang.String MSG_CNF_FORM_CLOSE = "¿Está seguro que desea cerrar la forma de captura?";
     public static final java.lang.String MSG_CNF_FILE_OPEN = "¿Desea abrir el archivo?";
     public static final java.lang.String MSG_CNF_MSG_CONT = "¿Está seguro que desea continuar?";
