@@ -545,9 +545,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogAuditPending);
         jmMenuIog.add(jmiIogAudited);
         jmMenuIog.addSeparator();
-        //jmMenuIog.add(jmiIogAuthPending);
-        //jmMenuIog.add(jmiIogAuthorized);
-        //jmMenuIog.addSeparator();
+        jmMenuIog.add(jmiIogAuthPending);
+        jmMenuIog.add(jmiIogAuthorized);
+        jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogInventoryValuationPrcCalc);
         jmMenuIog.add(jmiIogInventoryValuationUpdCost);
         jmMenuIog.addSeparator();
@@ -1399,6 +1399,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstants.TRNX_DIOG_AUDITED:
                             viewClass = erp.mtrn.view.SViewDiogAudit.class;
                             title = "Docs. inventarios auditad@s";
+                            break;
+                        case SDataConstants.TRNX_DIOG_AUTH_PEND:
+                            viewClass = erp.mtrn.view.SViewDiogAuth.class;
+                            title = "Docs. inventarios x autorizar";
+                            break;
+                        case SDataConstants.TRNX_DIOG_AUTHORIZED:
+                            viewClass = erp.mtrn.view.SViewDiogAuth.class;
+                            title = "Docs. inventarios autorizados";
                             break;
                     }
                     break;
