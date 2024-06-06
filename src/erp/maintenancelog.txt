@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 253.6/ 2024-06/06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización general de la forma de captura de nóminas, reorganización de miembros, métodos y mecanismos y flujo de 
+ inicialización y puesta a punto de datos de registros preexistentes a modificar; así como reforzamiento al caso cuando las nóminas son de sólo lectura.
+2) Mejoramiento al procesamiento de nóminas posteriores al inicio del nuevo subsidio para el empleo, 1.° de mayo de 2024, 
+ que aún no cuentan con la referencia foránea al registro de configuración de dicho subsidio.
+
+================================================================================
 SIIE 3.2 253.5/ 2024-05-31
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
