@@ -110,21 +110,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private int mnDefaultPeriodYear;
     private int mnDefaultNumber;
     private int mnDefaultPeriod;
-    private int mnCurrentPeriodYear;
-    private int mnCurrentNumber;
-    private int mnCurrentPeriod;
     private Date mtDefaultDateStart;
     private Date mtDefaultDateEnd;
-    private Date mtCurrentDateStart;
-    private Date mtCurrentDateEnd;
     
-    private int mnDaysCalendarPayroll;
+    private int mnAuxCurrentPeriodYear;
+    private int mnAuxCurrentNumber;
+    private int mnAuxCurrentPeriod;
+    private Date mtAuxCurrentDateStart;
+    private Date mtAuxCurrentDateEnd;
     
+    private int mnCalendarDays;
     private boolean mbIsReadOnly;
-    private boolean mbIsCopyingPayroll;
+    private boolean mbIsBeingCopied;
     private boolean mbIsWithTaxSubsidy;
     private boolean mbIsGoingToReceipts;
-    private boolean mbAuxOpenRegAgain;
+    private boolean mbAuxReopen;
     
     /**
      * Creates new form SFormPayroll
@@ -1289,17 +1289,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         maEmployeesWithCurrentBonus = new ArrayList<>();
     }
 
-    private void showCounts() {
+    private void showEmployeesAndReceiptsNumbers() {
         jlTotalAvailables.setText("Empleados disponibles: " + moGridPaneEmployeesAvailable.getTable().getRowCount());
         jlTotalSelected.setText("Recibos de nómina: " + moGridPanePayrollReceipts.getTable().getRowCount());
     }
 
-    private void clearCurrentValues() {
-        mnCurrentPeriodYear = 0;
-        mnCurrentNumber = 0;
-        mtCurrentDateStart = null;
-        mtCurrentDateEnd = null;
-        mnCurrentPeriod = 0;
+    private void clearAuxCurrentValues() {
+        mnAuxCurrentPeriodYear = 0;
+        mnAuxCurrentNumber = 0;
+        mnAuxCurrentPeriod = 0;
+        mtAuxCurrentDateStart = null;
+        mtAuxCurrentDateEnd = null;
     }
     
     private void enableFieldsStatusRelatedToPayroll() {
@@ -1381,17 +1381,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moKeyPaysheetCustomType.setEnabled(true);
         }
         else {
-            jbEditPeriodYear.setEnabled(mbIsCopyingPayroll);
-            jbEditFiscalYear.setEnabled(mbIsCopyingPayroll);
-            jbEditNumber.setEnabled(mbIsCopyingPayroll);
-            jbGetNextNumber.setEnabled(mbIsCopyingPayroll);
-            jbEditDates.setEnabled(mbIsCopyingPayroll);
-            jbEditPeriod.setEnabled(mbIsCopyingPayroll);
-            jbEditRecruitmentSchemaType.setEnabled(mbIsCopyingPayroll);
-            moRadNormal.setEnabled(mbIsCopyingPayroll);
-            moRadSpecial.setEnabled(mbIsCopyingPayroll);
-            moRadExtraordinary.setEnabled(mbIsCopyingPayroll);
-            moKeyPaysheetCustomType.setEnabled(mbIsCopyingPayroll);
+            jbEditPeriodYear.setEnabled(mbIsBeingCopied);
+            jbEditFiscalYear.setEnabled(mbIsBeingCopied);
+            jbEditNumber.setEnabled(mbIsBeingCopied);
+            jbGetNextNumber.setEnabled(mbIsBeingCopied);
+            jbEditDates.setEnabled(mbIsBeingCopied);
+            jbEditPeriod.setEnabled(mbIsBeingCopied);
+            jbEditRecruitmentSchemaType.setEnabled(mbIsBeingCopied);
+            moRadNormal.setEnabled(mbIsBeingCopied);
+            moRadSpecial.setEnabled(mbIsBeingCopied);
+            moRadExtraordinary.setEnabled(mbIsBeingCopied);
+            moKeyPaysheetCustomType.setEnabled(mbIsBeingCopied);
         }
         
         // permanent read-only fields:
@@ -1402,22 +1402,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecUmaAmount.setEditable(false);
         moDecUmiAmount.setEditable(false);
         moBoolClosed.setEnabled(false);
-    }
-    
-    private int getPaysheetTypeId() {
-        int type = SLibConsts.UNDEFINED;
-        
-        if (moRadNormal.isSelected()) {
-            type = SModSysConsts.HRSS_TP_PAY_SHT_NOR;
-        }
-        else if (moRadSpecial.isSelected()) {
-            type = SModSysConsts.HRSS_TP_PAY_SHT_SPE;
-        }
-        else if (moRadExtraordinary.isSelected()) {
-            type = SModSysConsts.HRSS_TP_PAY_SHT_EXT;
-        }
-        
-        return type;
+        moDecTotalEarnings.setEditable(false);
+        moDecTotalDeductions.setEditable(false);
+        moDecTotalNet.setEditable(false);
     }
     
     private void setPaysheetTypeId(int type) {
@@ -1436,6 +1423,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
+    private int getPaysheetTypeId() {
+        int type = SLibConsts.UNDEFINED;
+        
+        if (moRadNormal.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_NOR;
+        }
+        else if (moRadSpecial.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_SPE;
+        }
+        else if (moRadExtraordinary.isSelected()) {
+            type = SModSysConsts.HRSS_TP_PAY_SHT_EXT;
+        }
+        
+        return type;
+    }
+    
     private void validateRowReceiptRemoval(SRowPayrollEmployee rowReceipt) throws Exception {
         SDbPayrollReceiptIssue payrollReceiptIssue = rowReceipt.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
         
@@ -1451,7 +1454,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         payroll.setNumber(moIntNumber.getValue());
         payroll.setDateStart(moDateDateStart.getValue());
         payroll.setDateEnd(moDateDateEnd.getValue());
-        payroll.setCalendarDays_r(mnDaysCalendarPayroll);
+        payroll.setCalendarDays_r(mnCalendarDays);
         payroll.setReceiptDays(moIntReceiptDays.getValue());
         payroll.setWorkingDays(moIntWorkingDays.getValue());
         payroll.setUmaAmount(moDecUmaAmount.getField().getValue());
@@ -1533,39 +1536,54 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private void computeTotals() {
         moDecTotalEarnings.getField().setValue(moHrsPayroll.getTotalEarnings());
         moDecTotalDeductions.getField().setValue(moHrsPayroll.getTotalDeductions());
-        moDecTotalNet.getField().setValue(moDecTotalEarnings.getField().getValue() - moDecTotalDeductions.getField().getValue());
+        moDecTotalNet.getField().setValue(SLibUtils.roundAmount(moDecTotalEarnings.getField().getValue() - moDecTotalDeductions.getField().getValue()));
     }
 
+    /**
+     * Reset days.
+     */
     private void resetPayrollDays() {
         int workingDays = 0;
 
         if (moDateDateStart.getValue() != null && moDateDateEnd.getValue() != null) {
             if (moDateDateStart.getValue().compareTo(moDateDateEnd.getValue()) > 0) {
-                mnDaysCalendarPayroll = 0;
+                mnCalendarDays = 0;
             }
             else {
-                mnDaysCalendarPayroll = SLibTimeUtils.countPeriodDays(moDateDateStart.getValue(), moDateDateEnd.getValue());
+                mnCalendarDays = SLibTimeUtils.countPeriodDays(moDateDateStart.getValue(), moDateDateEnd.getValue());
             }
         }
 
-        if (mnDaysCalendarPayroll > 0) {
-            workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
+        if (mnCalendarDays > 0) {
+            workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnCalendarDays);
             
-            moIntReceiptDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
+            moIntReceiptDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnCalendarDays);
             moIntWorkingDays.setValue(workingDays <= 0 ? 0 : workingDays);
         }
     }
     
+    /**
+     * Reset salaries amounts.
+     * @throws Exception 
+     */
     private void resetSalariesAmounts() throws Exception {
         moDecMwzWage.getField().setValue(moKeyMwzType.getSelectedIndex() <= 0 ? 0d : SHrsUtils.getRecentMinimumWage(miClient.getSession(), moKeyMwzType.getValue()[0], moDateDateEnd.getValue()));
         moDecMwzReferenceWage.getField().setValue(moKeyMwzReferenceType.getSelectedIndex() <= 0 ? 0d : SHrsUtils.getRecentMinimumWage(miClient.getSession(), moKeyMwzReferenceType.getValue()[0], moDateDateEnd.getValue()));
     }
-
+    
+    /**
+     * Reset UMA & UMI amounts.
+     * @throws Exception 
+     */
     private void resetUmaUmiAmounts() throws Exception {
         moDecUmaAmount.getField().setValue(SHrsUtils.getRecentUma(miClient.getSession(), moDateDateEnd.getValue()));
         moDecUmiAmount.getField().setValue(SHrsUtils.getRecentUmi(miClient.getSession(), moDateDateEnd.getValue()));
     }
 
+    /**
+     * Ret withholding tables.
+     * @throws Exception 
+     */
     private void resetWithholdingTables() throws Exception {
         moKeyTax.setValue(new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), moDateDateEnd.getValue()) });
         moKeyTaxSubsidy.setValue(new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), moDateDateEnd.getValue()) });
@@ -1573,28 +1591,29 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeySsContribution.setValue(new int[] { SHrsUtils.getRecentSsContributionTable(miClient.getSession(), moDateDateEnd.getValue()) });
     }
 
-    private void setDefaultPeriodYear(final int year, final boolean populateEmployeesAvailabe) throws Exception {
+    private void setDefaultPeriodYear(final int year, final boolean setPeriodAndTriggerResets, final boolean populateEmployeesAvailabe) throws Exception {
         mnDefaultPeriodYear = year;
+        
         moIntPeriodYear.setValue(mnDefaultPeriodYear);
         moIntFiscalYear.setValue(mnDefaultPeriodYear);
 
         mnDefaultNumber = SHrsUtils.getPayrollNextNumber(miClient.getSession(), mnDefaultPeriodYear, mnFormSubtype, getPaysheetTypeId());
+        
         moIntNumber.setValue(mnDefaultNumber);
 
-        setDefaultPeriod(mnDefaultPeriodYear, mnDefaultNumber, populateEmployeesAvailabe);
+        setDefaultPeriod(mnDefaultPeriodYear, mnDefaultNumber, setPeriodAndTriggerResets, populateEmployeesAvailabe);
     }
 
-    private void setDefaultPeriod(final int year, final int number, final boolean populateEmployeesAvailabe) throws Exception {
+    private void setDefaultPeriod(final int year, final int number, final boolean setPeriodAndTriggerResets, final boolean populateEmployeesAvailabe) throws Exception {
         Date[] period = SHrsUtils.getPayrollPeriod(miClient.getSession(), year, number, mnFormSubtype);
         int[] periodEnd = SLibTimeUtils.digestMonth(period[1]);
-        int[] periodStart = null;
 
         if (periodEnd[0] == year) {
             mnDefaultPeriod = periodEnd[1];
         }
         else if (periodEnd[0] == year + 1) {
-            periodStart = SLibTimeUtils.digestMonth(period[0]);
-            mnDefaultPeriod = periodStart[1]; // on last week period, period end date can belong to next year
+            int[] periodStart = SLibTimeUtils.digestMonth(period[0]);
+            mnDefaultPeriod = periodStart[1]; // on last week period, period end date may belong to next year
         }
         else {
             throw new Exception(SHrsConsts.ERR_PERIOD_DATE_INVALID);
@@ -1605,14 +1624,24 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jtfDefaultDateStart.setText(SLibUtils.DateFormatDate.format(mtDefaultDateStart));
         jtfDefaultDateEnd.setText(SLibUtils.DateFormatDate.format(mtDefaultDateEnd));
-
-        moDateDateStart.setValue(mtDefaultDateStart);
-        moDateDateEnd.setValue(mtDefaultDateEnd);
-        moIntPeriod.setValue(mnDefaultPeriod);
         
-        triggerResets(populateEmployeesAvailabe);
+        if (setPeriodAndTriggerResets) {
+            moDateDateStart.setValue(mtDefaultDateStart);
+            moDateDateEnd.setValue(mtDefaultDateEnd);
+            moIntPeriod.setValue(mnDefaultPeriod);
+
+            triggerResets(populateEmployeesAvailabe);
+        }
     }
     
+    private void applyCurrentPeriodYear() throws Exception {
+        setDefaultPeriodYear(moIntPeriodYear.getValue(), true, true);
+    }
+
+    private void applyCurrentNumber() throws Exception {
+        setDefaultPeriod(moIntPeriodYear.getValue(), moIntNumber.getValue(), true, true);
+    }
+
     private void triggerResets(boolean populateEmployeesAvailabe) throws Exception {
         resetPayrollDays();
         resetSalariesAmounts();
@@ -1634,7 +1663,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moGridPaneEmployeesAvailable.populateGrid(new Vector<>(
                 SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnFormSubtype, moDateDateStart.getValue(), moDateDateEnd.getValue(), activesOnly, selectedEmployeesIds)));
         
-        showCounts();
+        showEmployeesAndReceiptsNumbers();
     }
 
     private void populateRowPayrollEmployeesReceipts() {
@@ -1671,16 +1700,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntNumber.requestFocusInWindow();
     }
 
-    private void actionApplyPeriodYear() throws Exception {
-        setDefaultPeriodYear(moIntPeriodYear.getValue(), true);
-    }
-
-    private void actionApplyNumber() throws Exception {
-        setDefaultPeriod(moIntPeriodYear.getValue(), moIntNumber.getValue(), true);
-    }
-
     private void actionGetNextNumber() throws Exception {
-        setDefaultPeriodYear(moIntPeriodYear.getValue(), true);
+        applyCurrentPeriodYear();
         moIntNumber.requestFocusInWindow();
     }
 
@@ -1759,7 +1780,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         if (jbEditNumber.isEnabled()) {
             try {
-                setDefaultPeriodYear(moIntPeriodYear.getValue(), true);
+                applyCurrentPeriodYear();
             }
             catch (Exception ex) {
                 SLibUtils.printException(this, ex);
@@ -1894,7 +1915,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 enableFieldsStatusRelatedToReceipts();
                 computeTotals();
-                showCounts();
+                showEmployeesAndReceiptsNumbers();
             }
             catch (Exception e) {
                 added = false;
@@ -2000,7 +2021,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 
                 enableFieldsStatusRelatedToReceipts();
                 computeTotals();
-                showCounts();
+                showEmployeesAndReceiptsNumbers();
             }
             catch (Exception e) {
                 removed = false;
@@ -2138,7 +2159,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         if (moRegistry.getPkPayrollId() == 0) {
             if (miClient.showMsgBoxConfirm("Debe guardar la nómina para continuar.\n"
                     + "¿Desea guardarla y abrirla de nuevo?") == JOptionPane.YES_OPTION) {
-                mbAuxOpenRegAgain = true;
+                mbAuxReopen = true;
                 this.actionSave();
             }
             
@@ -2687,10 +2708,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moIntPeriodYear.setValue(SLibTimeConsts.YEAR_MAX);
         }
 
-        if (mnCurrentPeriodYear != moIntPeriodYear.getValue()) {
-            actionApplyPeriodYear();
+        if (mnAuxCurrentPeriodYear != moIntPeriodYear.getValue()) {
+            applyCurrentPeriodYear();
         }
-        mnCurrentPeriodYear = 0;
+        
+        mnAuxCurrentPeriodYear = 0;
     }
 
     private void focusLostNumber() throws Exception {
@@ -2704,11 +2726,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moIntNumber.setValue(SHrsConsts.YEAR_FORTNIGHTS);
         }
 
-        if (mnCurrentNumber != moIntNumber.getValue()) {
-            actionApplyNumber();
+        if (mnAuxCurrentNumber != moIntNumber.getValue()) {
+            applyCurrentNumber();
         }
         
-        mnCurrentNumber = 0;
+        mnAuxCurrentNumber = 0;
     }
 
     private void focusLostDateStart() throws Exception {
@@ -2716,11 +2738,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moDateDateStart.setValue(mtDefaultDateStart);
         }
 
-        if (mtCurrentDateStart != moDateDateStart.getValue()) {
+        if (mtAuxCurrentDateStart != moDateDateStart.getValue()) {
             triggerResets(true);
         }
         
-        mtCurrentDateStart = null;
+        mtAuxCurrentDateStart = null;
     }
 
     private void focusLostDateEnd() throws Exception {
@@ -2728,18 +2750,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moDateDateEnd.setValue(mtDefaultDateEnd);
         }
 
-        if (mtCurrentDateEnd != moDateDateEnd.getValue()) {
+        if (mtAuxCurrentDateEnd != moDateDateEnd.getValue()) {
             triggerResets(true);
         }
 
-        mtCurrentDateEnd = null;
+        mtAuxCurrentDateEnd = null;
     }
 
     private void focusLostPeriod() throws Exception {
         int[] dateStart = null;
         int[] dateEnd = null;
 
-        if (mnCurrentPeriod != moIntPeriod.getValue()) {
+        if (mnAuxCurrentPeriod != moIntPeriod.getValue()) {
             dateStart = SLibTimeUtils.digestMonth(moDateDateStart.getValue());
             dateEnd = SLibTimeUtils.digestMonth(moDateDateEnd.getValue());
 
@@ -2754,7 +2776,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
         }
 
-        mnCurrentPeriod = 0;
+        mnAuxCurrentPeriod = 0;
     }
 
     /*
@@ -2878,10 +2900,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
+        
+        mnCalendarDays = 0;
         mbIsReadOnly = false;
+        mbIsBeingCopied = false;
         mbIsWithTaxSubsidy = true;
         mbIsGoingToReceipts = false;
-        mbAuxOpenRegAgain = false;
+        mbAuxReopen = false;
+        
         maPayrollReceiptsDeleted.clear();
         
         removeAllListeners();
@@ -2895,7 +2921,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             
             // Set payroll:
             
-            mbIsCopyingPayroll = moRegistry.isRegistryNew() && moRegistry.getPkPayrollId() != 0;
+            mbIsReadOnly = moRegistry.isReadOnly();
+            mbIsBeingCopied = moRegistry.isRegistryNew() && moRegistry.getPkPayrollId() != 0;
 
             if (moRegistry.isRegistryNew()) {
                 jtfRegistryKey.setText("");
@@ -2903,17 +2930,20 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 // Set default values:
 
                 moRegistry.setFkPaymentTypeId(mnFormSubtype);
+                
                 moRegistry.setFkPaysheetTypeId(SModSysConsts.HRSS_TP_PAY_SHT_NOR);
                 moRegistry.setFkPaysheetCustomTypeId(0);
                 moRegistry.setFkRecruitmentSchemaTypeId(SModSysConsts.HRSS_TP_REC_SCHE_NA);
+                
                 moRegistry.setClosed(false);
                 moRegistry.setSsContribution(true);
                 moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
 
                 // Set default payroll settings:
 
-                if (!mbIsCopyingPayroll) {
-                    moRegistry.setPkPayrollId(0);
+                if (!mbIsBeingCopied) {
+                    moRegistry.setPkPayrollId(0); // registry is new and is not being copied
+                    
                     moRegistry.setFkTaxComputationTypeId(moModuleConfig.getFkTaxComputationTypeId());
                     moRegistry.setFkMwzTypeId(moModuleConfig.getFkMwzTypeId());
                     moRegistry.setFkMwzReferenceTypeId(moModuleConfig.getFkMwzReferenceTypeId());
@@ -2925,20 +2955,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             // Set payroll settings:
 
+            setPaysheetTypeId(moRegistry.getFkPaysheetTypeId());
             moKeyPaysheetCustomType.setValue(new int[] { moRegistry.getFkPaysheetCustomTypeId() });
             moKeyRecruitmentSchemaType.setValue(new int[] { moRegistry.getFkRecruitmentSchemaTypeId()});
+            
             moKeyTaxComputationType.setValue(new int[] { moRegistry.getFkTaxComputationTypeId() });
             moKeyMwzType.setValue(new int[] { moRegistry.getFkMwzTypeId() });
             moKeyMwzReferenceType.setValue(new int[] { moRegistry.getFkMwzReferenceTypeId() });
 
-            // Set payroll values:
-
-            setPaysheetTypeId(moRegistry.getFkPaysheetTypeId());
-            
             if (moRegistry.getPkPayrollId() == 0) {
-                // Set new period (registry is new and is not being copied):
+                // registry is new and is not being copied
                 
-                setDefaultPeriodYear(miClient.getSession().getCurrentYear(), false);
+                // Set a new period:
+                
+                setDefaultPeriodYear(miClient.getSession().getCurrentYear(), true, false);
+                
                 moRegistry.setPeriodYear(mnDefaultPeriodYear);
                 moRegistry.setNumber(mnDefaultNumber);
                 moRegistry.setDateStart(mtDefaultDateStart);
@@ -2946,14 +2977,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moRegistry.setPeriod(mnDefaultPeriod);
             }
             else {
-                // Set registrie's current period:
+                // Set registry's period:
+                
+                mnDefaultPeriodYear = moRegistry.getPeriodYear();
 
-                moIntPeriodYear.setValue(mnDefaultPeriodYear = moRegistry.getPeriodYear());
+                moIntPeriodYear.setValue(moRegistry.getPeriodYear());
                 moIntFiscalYear.setValue(moRegistry.getFiscalYear());
 
-                moIntNumber.setValue(mnDefaultNumber = moRegistry.getNumber());
+                mnDefaultNumber = moRegistry.getNumber();
+                
+                moIntNumber.setValue(moRegistry.getNumber());
 
-                setDefaultPeriod(moRegistry.getPeriodYear(), moRegistry.getNumber(), false);
+                setDefaultPeriod(mnDefaultPeriodYear, mnDefaultNumber, false, false);
+                
                 moDateDateStart.setValue(moRegistry.getDateStart());
                 moDateDateEnd.setValue(moRegistry.getDateEnd());
                 moIntPeriod.setValue(moRegistry.getPeriod());
@@ -2962,14 +2998,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moIntReceiptDays.setValue(moRegistry.getReceiptDays());
                 moIntWorkingDays.setValue(moRegistry.getWorkingDays());
                 
-                // Set salaries:
+                // Set salaries amounts:
                 moDecMwzWage.getField().setValue(moRegistry.getMwzWage());
                 moDecMwzReferenceWage.getField().setValue(moRegistry.getMwzReferenceWage());
                 
-                // Set UMA:
+                // Set UMA & UMI amounts:
                 moDecUmaAmount.getField().setValue(moRegistry.getUmaAmount());
-
-                // Set UMI:
                 moDecUmiAmount.getField().setValue(moRegistry.getUmiAmount());
 
                 // Set withholding tables:
@@ -2990,8 +3024,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moDecTotalDeductions.getField().setValue(moRegistry.getAuxTotalDeductions());
             moDecTotalNet.getField().setValue(moRegistry.getAuxTotalNet());
             
-            mbIsReadOnly = moRegistry.isClosed() || moRegistry.isDeleted();
-            
             if (!mbIsReadOnly) {
                 updatePayroll(moRegistry, true); // update registry with current UI data, JUST BEFORE instantiating HRS payroll
             }
@@ -3005,7 +3037,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             populateRowPayrollEmployeesReceipts();      // This method MUST be invoked JUST BEFORE populateRowPayrollEmployeesAvailable()! Improve this!
             populateRowPayrollEmployeesAvailable(true); // This method MUST be invoked JUST AFTER populateRowPayrollEmployeesReceipts()! Improve this!
 
-            clearCurrentValues();
+            clearAuxCurrentValues();
             enableFieldsStatusRelatedToPayroll();
             enableFieldsStatusRelatedToReceipts();
             
@@ -3066,7 +3098,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         registry.getChildPayrollReceiptsToDelete().clear();
         registry.getChildPayrollReceiptsToDelete().addAll(maPayrollReceiptsDeleted);
         
-        if (mbAuxOpenRegAgain) {
+        if (mbAuxReopen) {
             SGuiParams params = new SGuiParams();
             registry.computePrimaryKey(miClient.getSession());
             params.setKey(registry.getPrimaryKey());
@@ -3309,23 +3341,23 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SBeanFieldInteger field = (SBeanFieldInteger) evt.getSource();
 
             if (field == moIntPeriodYear){
-                mnCurrentPeriodYear = moIntPeriodYear.getValue();
+                mnAuxCurrentPeriodYear = moIntPeriodYear.getValue();
             }
             else if (field == moIntNumber) {
-                mnCurrentNumber = moIntNumber.getValue();
+                mnAuxCurrentNumber = moIntNumber.getValue();
             }
             else if (field == moIntPeriod) {
-                mnCurrentPeriod = moIntPeriod.getValue();
+                mnAuxCurrentPeriod = moIntPeriod.getValue();
             }
         }
         else if (evt.getSource() instanceof JFormattedTextField) {
             JFormattedTextField formattedTextField = (JFormattedTextField) evt.getSource();
 
             if (formattedTextField == moDateDateStart.getComponent()) {
-                mtCurrentDateStart = moDateDateStart.getValue();
+                mtAuxCurrentDateStart = moDateDateStart.getValue();
             }
             else if (formattedTextField == moDateDateEnd.getComponent()) {
-                mtCurrentDateEnd = moDateDateEnd.getValue();
+                mtAuxCurrentDateEnd = moDateDateEnd.getValue();
             }
         }
     }
@@ -3361,7 +3393,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SLibUtils.showException(this, e);
         }
         finally {
-            clearCurrentValues();
+            clearAuxCurrentValues();
         }
     }
 

@@ -278,7 +278,7 @@ public class SHrsEmployee {
         // attendance for tax subsidy year of transition of style (i.e., 2024), if applies:
 
         if (payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN) {
-            if (hrsPayroll.isTransitionYearForTaxSubsidy()) { // please note that this block will be executed only along 2024!
+            if (hrsPayroll.isTransitionYearForTaxSubsidy() && !payroll.isReadOnly()) { // please note that this block will be executed only along 2024!
                 // payroll belongs to the year of transtition of style of subsidy (i.e., 2024):
 
                 SDbEmploymentSubsidy employmentSubsidyAkaNewStyle = hrsPayroll.getEmploymentSubsidy(payroll.getFkEmploymentSubsidyId_n()); // the shiny "new-style"

@@ -254,6 +254,8 @@ public class SDbPayroll extends SDbRegistryUser {
     public boolean isPayrollFortnightStandard() {
         return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard;
     }
+    
+    public boolean isReadOnly() { return mbClosed || mbDeleted; }
 
     /**
      * Compose name of payroll as payroll year and number number in format: 'yyyy' + " " + 'abbreviation of type of payment' + ". " + 'payroll number' + [", " + 'payroll notes'].

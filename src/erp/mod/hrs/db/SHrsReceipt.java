@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.db;
 
+import cfd.ver3.nom12.DNom12Consts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.utils.SAnniversary;
 import java.util.ArrayList;
@@ -808,7 +809,7 @@ public class SHrsReceipt {
                 double payrollSubsidyAssessedOldStyle = 0;
                 
                 if (appliesOldStyle) {
-                    double maxSubsidyAssessed = subsidyTable.getChildRows().get(0).getTaxSubsidy(); // set maximum subsidy in one single receipt according to new regulations as of January 2020
+                    double maxSubsidyAssessed = DNom12Consts.MAX_TAX_SUB; // set maximum subsidy in one single receipt according to new regulations as of January 2020
                     
                     payrollSubsidyAssessedGrossOldStyle = SLibUtils.roundAmount(subsidyAssessedOldStyle - (subsidyCompensatedForSubsidyOldStyle + subsidyPayedForSubsidyOldStyle + annualTaxSubsidyAssessedOldInformative));
                     payrollSubsidyAssessedOldStyle = payrollSubsidyAssessedGrossOldStyle <= maxSubsidyAssessed ? payrollSubsidyAssessedGrossOldStyle : maxSubsidyAssessed; // applay maximum value for subsidy when needed
@@ -834,6 +835,11 @@ public class SHrsReceipt {
                 
                 payrollSubsidyAssessedGross = SLibUtils.roundAmount(payrollSubsidyAssessedGrossOldStyle + payrollSubsidyAssessedGrossNewStyle);
                 payrollSubsidyAssessed = SLibUtils.roundAmount(payrollSubsidyAssessedOldStyle + payrollSubsidyAssessedNewStyle);
+                
+                // finally, due to payroll CFDI rules still valid (by 2024-06-03), subsidy is capped:
+                if (payrollSubsidyAssessed > DNom12Consts.MAX_TAX_SUB) {
+                    payrollSubsidyAssessed = DNom12Consts.MAX_TAX_SUB;
+                }
                 
                 // Create earning for subsidy:
                 
