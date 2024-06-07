@@ -1,11 +1,18 @@
 ================================================================================
+SIIE 3.2 253.8/ 2024-06-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación del cálculo del subsidio para el empleo en el año de transición para cálculo de impuestos por nómina.
+
+================================================================================
 SIIE 3.2 253.7/ 2024-06-07
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Adición de centros de costo en movimientos de almacén cuando vienen de documentos de ajuste.
 2) Habilitación de validación de movimientos de almacén cuando hay una valuación existente
+
 ================================================================================
-SIIE 3.2 253.6/ 2024-06/06
+SIIE 3.2 253.6/ 2024-06-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización general de la forma de captura de nóminas, reorganización de miembros, métodos y mecanismos y flujo de 
