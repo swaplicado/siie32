@@ -65,7 +65,9 @@ public class SStockValuationRecordUtils {
         HashMap<String, SDataAccount> lAccounts = new HashMap<>();
         SDataAccount oAccount;
         HashMap<String, Integer> lCC = new HashMap<>();
+        int nIdDiogEtyCc;
         int nIdCC;
+        String sCc;
         ArrayList<SDataRecordEntry> lRecordEntries = new ArrayList<>();
         int n = lConsumptions.size();
         int i = 1;
@@ -164,7 +166,7 @@ public class SStockValuationRecordUtils {
 
                 lPurAccConfigs.addAll(vPurAccConfigs);
             }
-
+            
             if (lPurAccConfigs.size() > 0) {
                 double dTotalAmount = 0d;
                 SFinAccountConfigEntry oConfigMaj = null;
@@ -181,6 +183,9 @@ public class SStockValuationRecordUtils {
                         oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + (oConsumption.getCost_r() - dTotalAmount)));
                     }
                 }
+                
+                // Se asigna el centro de costo del movimiento de almacén de salida:
+                nIdDiogEtyCc = oConsumption.getAuxFkCostCenter();
 
                 for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
@@ -191,25 +196,30 @@ public class SStockValuationRecordUtils {
                         oAccount.read(new String[]{oConfig.getAccountId()}, session.getStatement());
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
-
-                    if (lCC.containsKey(oConfig.getCostCenterId())) {
-                        nIdCC = lCC.get(oConfig.getCostCenterId());
-                    }
-                    else {
-                        nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
-                        lCC.put(oConfig.getCostCenterId(), nIdCC);
-                    }
                     
-                    String sCc;
-                    if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
-                        sCc = SDataUtilities.obtainCostCenterItem(session, oConsumption.getFkItemId());
-                        if (sCc.isEmpty()) {
-                            throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
-                        }
-                        nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                    if (nIdDiogEtyCc > 1) {
+                        nIdCC = nIdDiogEtyCc;
+                        sCc = SFinUtils.getCostCenterFormerIdXXX(session, nIdCC);
                     }
                     else {
-                        sCc = oConfig.getCostCenterId();
+                        if (lCC.containsKey(oConfig.getCostCenterId())) {
+                            nIdCC = lCC.get(oConfig.getCostCenterId());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
+                            lCC.put(oConfig.getCostCenterId(), nIdCC);
+                        }
+                        
+                        if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
+                            sCc = SDataUtilities.obtainCostCenterItem(session, oConsumption.getFkItemId());
+                            if (sCc.isEmpty()) {
+                                throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                            }
+                            nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                        }
+                        else {
+                            sCc = oConfig.getCostCenterId();
+                        }
                     }
 
                     /**

@@ -53,6 +53,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     protected double mdAuxConsumption;
     protected int[] maAuxWarehousePk;
     protected int[] maAuxMaterialRequestEntryPk;
+    protected int mnAuxFkCostCenterId;
 
     public SDbStockValuationMvt() {
         super(SModConsts.TRN_STK_VAL_MVT);
@@ -87,6 +88,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
 
     public void setAuxConsumed(boolean b) { mbAuxConsumed = b; }
     public void setAuxConsumption(double d) { mdAuxConsumption = d; }
+    public void setAuxFkCostCenterId(int n) { mnAuxFkCostCenterId = n; }
     
     public int getPkStockValuationMvtId() { return mnPkStockValuationMvtId; }
     public Date getDateMove() { return mtDate; }
@@ -117,6 +119,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
 
     public boolean isAuxConsumed() { return mbAuxConsumed; }
     public double getAuxConsumption() { return mdAuxConsumption; }
+    public int getAuxFkCostCenter() { return mnAuxFkCostCenterId; }
     public int[] getAuxWarehousePk() {
         if (mnFkWarehouseId > 0) {
             return new int [] { mnFkCompanyBranchId, mnFkWarehouseId }; 

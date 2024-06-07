@@ -75,7 +75,8 @@ public class SStockValuationUtils {
                 + "    mre.fk_item_ref_n AS ref_ety, "
                 + "    mr.fk_item_ref_n ref_rm, "
                 + "    de.fid_mat_req_n, "
-                + "    de.fid_mat_req_ety_n "
+                + "    de.fid_mat_req_ety_n,"
+                + "    de.fid_cc "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
                 + "        INNER JOIN "
@@ -298,6 +299,7 @@ public class SStockValuationUtils {
                         oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
                         oConsumption.setFkStockValuationId(idValuation);
                         oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
+                        oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
 
                         oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
                         oConsumption.setFkWarehouseId(res.getInt("id_wh"));

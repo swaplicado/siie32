@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 253.7/ 2024-06-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Adición de centros de costo en movimientos de almacén cuando vienen de documentos de ajuste.
+2) Habilitación de validación de movimientos de almacén cuando hay una valuación existente
+================================================================================
 SIIE 3.2 253.6/ 2024-06/06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
