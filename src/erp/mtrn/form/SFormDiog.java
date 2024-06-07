@@ -40,6 +40,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;
@@ -3703,10 +3704,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                 validation.setComponent(jftDate);
             }
-//            else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
-//                validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
-//                validation.setComponent(jftDate);
-//            }
+           else if (! SStockValuationUtils.canCreateDiogByValuation(miClient.getSession(), moFieldDate.getDate())) {
+               validation.setMessage("No se puede crear el movimiento porque hay una valuación de inventarios para la fecha " + "'" + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + "'");
+               validation.setComponent(jftDate);
+           }
             else if (moDiog != null && moDiog.getPkYearId() != year) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_YEAR);
                 validation.setComponent(jftDate);
