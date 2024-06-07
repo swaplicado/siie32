@@ -415,25 +415,25 @@ public class SHrsReceipt {
     
     /**
      * Create standard taxable earnings array for transition year ONLY.
-     * @param payrollBelongsToNewStyle Current payroll belongs to new style, otherwise to old style.
+     * @param payrollIsNewStyle Current payroll is new style, otherwise old style.
      * @return Array of values: index 0 = old-style value; index 1 = new-style value.
      */
-    private double[] createEarningsTaxableStdTrans(boolean payrollBelongsToNewStyle) {
+    private double[] createEarningsTaxableStdTrans(boolean payrollIsNewStyle) {
         return new double[] {
-            SLibUtils.roundAmount((payrollBelongsToNewStyle ? 0d : getTaxedEarningsStd()) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransOldStyle().getTaxableEarnings()),
-            SLibUtils.roundAmount((payrollBelongsToNewStyle ? getTaxedEarningsStd() : 0d) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransNewStyle().getTaxableEarnings())
+            SLibUtils.roundAmount((payrollIsNewStyle ? 0d : getTaxedEarningsStd()) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransOldStyle().getTaxableEarnings()),
+            SLibUtils.roundAmount((payrollIsNewStyle ? getTaxedEarningsStd() : 0d) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransNewStyle().getTaxableEarnings())
         };
     }
     
     /**
      * Create Article 174 of LISR taxable earnings array for transition year ONLY.
-     * @param payrollBelongsToNewStyle Current payroll belongs to new style, otherwise to old style.
+     * @param payrollIsNewStyle Current payroll is new style, otherwise old style.
      * @return Array of values: index 0 = old-style value; index 1 = new-style value.
      */
-    private double[] createEarningsTaxableArt174Trans(boolean payrollBelongsToNewStyle) {
+    private double[] createEarningsTaxableArt174Trans(boolean payrollIsNewStyle) {
         return new double[] {
-            SLibUtils.roundAmount((payrollBelongsToNewStyle ? 0d : getTaxedEarningsArt174()) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransOldStyle().getTaxableEarningsArt174()),
-            SLibUtils.roundAmount((payrollBelongsToNewStyle ? getTaxedEarningsArt174() : 0d) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransNewStyle().getTaxableEarningsArt174())
+            SLibUtils.roundAmount((payrollIsNewStyle ? 0d : getTaxedEarningsArt174()) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransOldStyle().getTaxableEarningsArt174()),
+            SLibUtils.roundAmount((payrollIsNewStyle ? getTaxedEarningsArt174() : 0d) + moHrsEmployee.getHrsEmployeelMvtsAnnualTransNewStyle().getTaxableEarningsArt174())
         };
     }
     
@@ -520,7 +520,9 @@ public class SHrsReceipt {
         SDbEarning earningSubsidy = null;
         SDbEarning earningSubsidyOtherPayment = null;
         SDbPayroll payroll = moHrsPayroll.getPayroll(); // convenience variable
-        boolean computeTax = SLibUtils.belongsTo(payroll.getFkTaxComputationTypeId(), new int[] { SModSysConsts.HRSS_TP_TAX_COMP_PAY, SModSysConsts.HRSS_TP_TAX_COMP_ANN });
+        boolean isTaxCalcPayroll = payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_PAY;
+        boolean isTaxCalcAnnual = payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN;
+        boolean computeTax = isTaxCalcPayroll || isTaxCalcAnnual;
         boolean computeSubsidy = computeTax && payroll.isTaxSubsidy() && !moPayrollReceipt.isAssimilated(); // assimilables are not elegible for subsidy
         
         if (computeTax) {
@@ -605,25 +607,23 @@ public class SHrsReceipt {
             
             double earningsTaxableStd = 0;
             double earningsTaxableArt174 = 0;
+            
+            if (isTaxCalcPayroll) {
+                // tax computation type is payroll
+                
+                earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd());
+                earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174());
+            }
+            else {
+                // tax computation type is annual
+                
+                earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAnnualTaxableEarnings());
+                earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAnnualTaxableEarningsArt174());
 
-            switch (payroll.getFkTaxComputationTypeId()) {
-                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // tax computation type is payroll
-                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd());
-                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174());
-                    break;
-
-                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // tax computation type is annual
-                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAnnualTaxableEarnings());
-                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAnnualTaxableEarningsArt174());
-                    
-                    annualTaxCompensated = moHrsEmployee.getAnnualTaxCompensated(); // should be equal to compensated annual subsidy
-                    annualTaxPayed = getAnnualTaxPayed();
-                    annualSubsidyCompensated = moHrsEmployee.getAnnualTaxSubsidyCompensated(); // should be equal to compensated annual tax
-                    annualSubsidyPayed = getAnnualSubsidyPayed();
-                    break;
-
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                annualTaxCompensated = moHrsEmployee.getAnnualTaxCompensated(); // should be equal to compensated annual subsidy
+                annualTaxPayed = getAnnualTaxPayed();
+                annualSubsidyCompensated = moHrsEmployee.getAnnualTaxSubsidyCompensated(); // should be equal to compensated annual tax
+                annualSubsidyPayed = getAnnualSubsidyPayed();
             }
 
             // Define payroll and annual factors for adjusting tables of tax and subsidy:
@@ -636,10 +636,12 @@ public class SHrsReceipt {
             
             double tableFactor;
             
-            if (payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_PAY) {
+            if (isTaxCalcPayroll) {
+                // tax computation type is payroll
                 tableFactor = tableFactors[COMP_PAY];
             }
             else {
+                // tax computation type is annual
                 tableFactor = tableFactors[COMP_ANN];
             }
 
@@ -686,7 +688,9 @@ public class SHrsReceipt {
             if (computeSubsidy) {
                 // Prepare subsidy computation for both old and new styles:
                 
-                boolean payrollBelongsToNewStyle = moHrsPayroll.isEmploymentSubsidyApplying() && employmentSubsidyAkaNewStyle != null && !payroll.getDateStart().before(employmentSubsidyAkaNewStyle.getDateStart());
+                // it will be true only if payroll belongs to the year of transtition of style of subsidy (i.e., 2024), and also its tax calculation is annual:
+                boolean isTransitionYearForTaxSubsidyAndTaxCalcAnnual = moHrsPayroll.isTransitionYearForTaxSubsidy() && isTaxCalcAnnual;
+                
                 double annualTaxSubsidyAssessedOldInformative = 0;
                 
                 double[] earningsTaxableStdTrans = null;    // index 0 = old syle; index 1 = new style
@@ -695,13 +699,13 @@ public class SHrsReceipt {
                 double[] subsidyCompensatedTrans = null;    // index 0 = old syle; index 1 = new style
                 double[] subsidyPayedTrans = null;          // index 0 = old syle; index 1 = new style
                 
-                if (moHrsPayroll.isTransitionYearForTaxSubsidy()) { // please note that this block will be executed only along 2024!
-                    // payroll belongs to the year of transtition of style of subsidy (i.e., 2024):
+                if (isTransitionYearForTaxSubsidyAndTaxCalcAnnual) {
+                    boolean payrollIsNewStyle = moHrsPayroll.isEmploymentSubsidyApplying() && employmentSubsidyAkaNewStyle != null && !payroll.getDateStart().before(employmentSubsidyAkaNewStyle.getDateStart());
 
                     annualTaxSubsidyAssessedOldInformative = moHrsEmployee.getAnnualTaxSubsidyAssessedOldInformative();
                     
-                    earningsTaxableStdTrans = createEarningsTaxableStdTrans(payrollBelongsToNewStyle);
-                    earningsTaxableArt174Trans = createEarningsTaxableArt174Trans(payrollBelongsToNewStyle);
+                    earningsTaxableStdTrans = createEarningsTaxableStdTrans(payrollIsNewStyle);
+                    earningsTaxableArt174Trans = createEarningsTaxableArt174Trans(payrollIsNewStyle);
                     tableFactorTrans = createTableFactorTrans(employmentSubsidyAkaNewStyle, hrsEmployeeDays);
                     subsidyCompensatedTrans = createSubsidyCompensatedTrans();
                     subsidyPayedTrans = createSubsidyPayedTrans();
@@ -709,8 +713,10 @@ public class SHrsReceipt {
                 
                 // Compute assessed and payable subsidy (payroll or annual, the one required):
                 
-                boolean appliesOldStyle = !moHrsPayroll.isEmploymentSubsidyApplying() || moHrsPayroll.isTransitionYearForTaxSubsidy(); // payroll is before May 1st, 2024 or belongs to transition period
-                boolean appliesNewStyle = moHrsPayroll.isEmploymentSubsidyApplying(); // payroll is after May 1st, 2024, inclusive
+                // payroll is before May 1st, 2024, or it belongs to the year of transtition of style of subsidy (i.e., 2024), and also its tax calculation is annual:
+                boolean appliesOldStyle = !moHrsPayroll.isEmploymentSubsidyApplying() || isTransitionYearForTaxSubsidyAndTaxCalcAnnual;
+                // payroll is after May 1st, 2024, inclusive:
+                boolean appliesNewStyle = moHrsPayroll.isEmploymentSubsidyApplying();
                 
                 // old-syle:
                 
@@ -723,23 +729,19 @@ public class SHrsReceipt {
                     double earningsTaxableArt174ForSubsidyOldStyle = 0;
                     double tableFactorForSubsidyOldStyle = 0;
 
-                    if (!moHrsPayroll.isEmploymentSubsidyApplying()) {
-                        // all payrolls before start of new-style (2024-05-01)
-                        
-                        earningsTaxableStdForSubsidyOldStyle = earningsTaxableStd;
-                        earningsTaxableArt174ForSubsidyOldStyle = earningsTaxableArt174;
-                        tableFactorForSubsidyOldStyle = tableFactor;
-                        subsidyCompensatedForSubsidyOldStyle = annualSubsidyCompensated;
-                        subsidyPayedForSubsidyOldStyle = annualSubsidyPayed;
-                    }
-                    else {
-                        // all payrolls after start of new-style (2024-05-01), but only along 2024, the transition year
-                        
+                    if (isTransitionYearForTaxSubsidyAndTaxCalcAnnual) { // payroll belongs to the year of transtition of style of subsidy (i.e., 2024), and its tax calculation is annual?
                         earningsTaxableStdForSubsidyOldStyle = earningsTaxableStdTrans[STYLE_OLD];
                         earningsTaxableArt174ForSubsidyOldStyle = earningsTaxableArt174Trans[STYLE_OLD];
                         tableFactorForSubsidyOldStyle = tableFactorTrans[STYLE_OLD];
                         subsidyCompensatedForSubsidyOldStyle = subsidyCompensatedTrans[STYLE_OLD];
                         subsidyPayedForSubsidyOldStyle = subsidyPayedTrans[STYLE_OLD];
+                    }
+                    else {
+                        earningsTaxableStdForSubsidyOldStyle = earningsTaxableStd;
+                        earningsTaxableArt174ForSubsidyOldStyle = earningsTaxableArt174;
+                        tableFactorForSubsidyOldStyle = tableFactor;
+                        subsidyCompensatedForSubsidyOldStyle = annualSubsidyCompensated;
+                        subsidyPayedForSubsidyOldStyle = annualSubsidyPayed;
                     }
 
                     if (earningsTaxableStdForSubsidyOldStyle > 0) {
@@ -770,23 +772,19 @@ public class SHrsReceipt {
                     double earningsTaxableArt174ForSubsidyNewStyle = 0;
                     double tableFactorForSubsidyNewStyle = 0;
                     
-                    if (!moHrsPayroll.isTransitionYearForTaxSubsidy()) {
-                        // all payrolls after 2024, the transition year
-                        
-                        earningsTaxableStdForSubsidyNewStyle = earningsTaxableStd;
-                        earningsTaxableArt174ForSubsidyNewStyle = earningsTaxableArt174;
-                        tableFactorForSubsidyNewStyle = tableFactor;
-                        subsidyCompensatedForSubsidyNewStyle = annualSubsidyCompensated;
-                        subsidyPayedForSubsidyNewStyle = annualSubsidyPayed;
-                    }
-                    else {
-                        // all payrolls after start of new-style (2024-05-01), but only along 2024, the transition year
-                        
+                    if (isTransitionYearForTaxSubsidyAndTaxCalcAnnual) { // payroll belongs to the year of transtition of style of subsidy (i.e., 2024), and its tax calculation is annual?
                         earningsTaxableStdForSubsidyNewStyle = earningsTaxableStdTrans[STYLE_NEW];
                         earningsTaxableArt174ForSubsidyNewStyle = earningsTaxableArt174Trans[STYLE_NEW];
                         tableFactorForSubsidyNewStyle = tableFactorTrans[STYLE_NEW];
                         subsidyCompensatedForSubsidyNewStyle = subsidyCompensatedTrans[STYLE_NEW];
                         subsidyPayedForSubsidyNewStyle = subsidyPayedTrans[STYLE_NEW];
+                    }
+                    else {
+                        earningsTaxableStdForSubsidyNewStyle = earningsTaxableStd;
+                        earningsTaxableArt174ForSubsidyNewStyle = earningsTaxableArt174;
+                        tableFactorForSubsidyNewStyle = tableFactor;
+                        subsidyCompensatedForSubsidyNewStyle = annualSubsidyCompensated;
+                        subsidyPayedForSubsidyNewStyle = annualSubsidyPayed;
                     }
                     
                     if (earningsTaxableStdForSubsidyNewStyle > 0) {
@@ -814,7 +812,7 @@ public class SHrsReceipt {
                     payrollSubsidyAssessedGrossOldStyle = SLibUtils.roundAmount(subsidyAssessedOldStyle - (subsidyCompensatedForSubsidyOldStyle + subsidyPayedForSubsidyOldStyle + annualTaxSubsidyAssessedOldInformative));
                     payrollSubsidyAssessedOldStyle = payrollSubsidyAssessedGrossOldStyle <= maxSubsidyAssessed ? payrollSubsidyAssessedGrossOldStyle : maxSubsidyAssessed; // applay maximum value for subsidy when needed
                     
-                    if (moHrsPayroll.isTransitionYearForTaxSubsidy()) {
+                    if (isTransitionYearForTaxSubsidyAndTaxCalcAnnual) { // payroll belongs to the year of transtition of style of subsidy (i.e., 2024), and its tax calculation is annual?
                         payrollSubsidyAssessedOldStyleInformative = payrollSubsidyAssessedOldStyle;
                     }
                 }
@@ -1088,27 +1086,23 @@ public class SHrsReceipt {
             moPayrollReceipt.setPayrollTaxSubsidyPending_r(payrollSubsidy);
             moPayrollReceipt.setPayrollTaxSubsidyPayed(isUserSubsidy ? userSubsidy : payrollSubsidy);
             
-            switch (payroll.getFkTaxComputationTypeId()) {
-                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // Payroll
-                    moPayrollReceipt.setAnnualTaxAssessed(0);
-                    moPayrollReceipt.setAnnualTaxCompensated(0);
-                    moPayrollReceipt.setAnnualTaxPayed(0);
-                    moPayrollReceipt.setAnnualTaxSubsidyAssessed(0);
-                    moPayrollReceipt.setAnnualTaxSubsidyCompensated(0);
-                    moPayrollReceipt.setAnnualTaxSubsidyPayed(0);
-                    break;
-
-                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // Annual
-                    moPayrollReceipt.setAnnualTaxAssessed(taxAssessed);
-                    moPayrollReceipt.setAnnualTaxCompensated(annualTaxCompensated);
-                    moPayrollReceipt.setAnnualTaxPayed(annualTaxPayed);
-                    moPayrollReceipt.setAnnualTaxSubsidyAssessed(subsidyAssessed);
-                    moPayrollReceipt.setAnnualTaxSubsidyCompensated(annualSubsidyCompensated);
-                    moPayrollReceipt.setAnnualTaxSubsidyPayed(annualSubsidyPayed);
-                    break;
-
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN); // unnecessary, just for consistence!
+            if (isTaxCalcPayroll) {
+                // tax computation type is payroll
+                moPayrollReceipt.setAnnualTaxAssessed(0);
+                moPayrollReceipt.setAnnualTaxCompensated(0);
+                moPayrollReceipt.setAnnualTaxPayed(0);
+                moPayrollReceipt.setAnnualTaxSubsidyAssessed(0);
+                moPayrollReceipt.setAnnualTaxSubsidyCompensated(0);
+                moPayrollReceipt.setAnnualTaxSubsidyPayed(0);
+            }
+            else {
+                // tax computation type is annual
+                moPayrollReceipt.setAnnualTaxAssessed(taxAssessed);
+                moPayrollReceipt.setAnnualTaxCompensated(annualTaxCompensated);
+                moPayrollReceipt.setAnnualTaxPayed(annualTaxPayed);
+                moPayrollReceipt.setAnnualTaxSubsidyAssessed(subsidyAssessed);
+                moPayrollReceipt.setAnnualTaxSubsidyCompensated(annualSubsidyCompensated);
+                moPayrollReceipt.setAnnualTaxSubsidyPayed(annualSubsidyPayed);
             }
         }
     }
