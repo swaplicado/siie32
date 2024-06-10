@@ -36,7 +36,8 @@ public class SDiotLayout {
     protected HashMap<String, SDataTax> moVatsMap; // key: 'basic tax ID' + "-" + 'tax ID'
     protected HashMap<Integer, SDataBizPartner> moBizPartnersMap; // key: ID of business partner
     protected HashSet<String> moRepeatedFiscalId;
-    protected String[] masDiotAccountCodes;
+    protected String[] masDiotAccountsCodes;
+    protected int[] manVatDefaultKey;
     
     public SDiotLayout(erp.client.SClientInterface client, Date start, Date end) throws Exception {
         miClient = client;
@@ -46,7 +47,8 @@ public class SDiotLayout {
         moMajorAccountsMap = new HashMap<>();
         moVatsMap = new HashMap<>();
         moBizPartnersMap = new HashMap<>();
-        masDiotAccountCodes = SDiotUtils.getDiotAccounts(miClient.getSession().getStatement());
+        masDiotAccountsCodes = SDiotUtils.getDiotAccounts(miClient.getSession().getStatement());
+        manVatDefaultKey = SDiotUtils.getDiotVatDefaultPk(miClient.getSession().getStatement());
     }
     
     private SDataAccount getAccount(final String accountCodeUser) {
@@ -131,6 +133,47 @@ public class SDiotLayout {
                 "(" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")");
     }
     
+    private void obtainRepeatedFiscalId() throws Exception {
+        moRepeatedFiscalId = new HashSet<>();
+        HashSet<String> occFiscalIds = new HashSet<>();
+        HashSet<String> taxFiscalIds = new HashSet<>();
+        ResultSet resultSet;
+        
+        String sql = "SELECT DISTINCT re.occ_fiscal_id " +
+            "FROM " +
+            "fin_rec AS r " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
+            "WHERE " +
+            "NOT r.b_del AND NOT re.b_del AND " +
+            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
+            "re.occ_fiscal_id <> '' " +
+            "ORDER BY re.occ_fiscal_id;";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            occFiscalIds.add(resultSet.getString(1));
+        }
+        
+        sql = "SELECT DISTINCT b.fiscal_id " +
+            "FROM " +
+            "fin_rec AS r " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
+            "INNER JOIN trn_dps AS d ON d.id_year=re.fid_dps_year_n AND d.id_doc=re.fid_dps_doc_n " +
+            "INNER JOIN erp.bpsu_bp AS b ON b.id_bp=d.fid_bp_r " +
+            "WHERE " +
+            "NOT r.b_del AND NOT re.b_del AND " +
+            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
+            "d.fid_ct_dps=1 AND re.fid_acc = '1160-0002-0000' " +
+            "ORDER BY b.fiscal_id;";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            taxFiscalIds.add(resultSet.getString(1));
+        }
+        
+        occFiscalIds.stream().filter((occFiscalId) -> (taxFiscalIds.contains(occFiscalId))).forEach((occFiscalId) -> {
+            moRepeatedFiscalId.add(occFiscalId);
+        });
+    }
+    
     /**
      * Get DIOT layout in requested format.
      * @param format Requested format: PIPE separated values or CSV.
@@ -145,7 +188,6 @@ public class SDiotLayout {
         int entriesForCompany = 0;
         int entriesVatZeroUndefined = 0;
         int entriesVatNonZeroUndefined = 0;
-        int[] vatDefaultPk = SDiotUtils.getDiotVatDefaultPk(miClient.getSession().getStatement());
         double debit = 0;
         double credit = 0;
         double debitTotal = 0;
@@ -164,19 +206,19 @@ public class SDiotLayout {
         moVatsMap.clear();
         moBizPartnersMap.clear();
         
-        // Obtener los RFC que aparecen en los ocasionales agregados a las pólizas y los que tienen movimientos de IVA acreditable
+        // Obtener los RFC ocasionales capturados directamente en los renglones de pólizas contables, y que tienen movimientos de IVA acreditable:
         
         obtainRepeatedFiscalId();
         
         // add default VAT to map of taxes:
         
-        addVat((SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, vatDefaultPk, SLibConstants.EXEC_MODE_VERBOSE));
+        addVat((SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, manVatDefaultKey, SLibConstants.EXEC_MODE_VERBOSE));
         
         // iterate through all DIOT accounts set up in company's configuration:
         
         ArrayList<SDiotAccount> diotAccounts = new ArrayList<>();
         
-        for (String diotAccountCode : masDiotAccountCodes) {
+        for (String diotAccountCode : masDiotAccountsCodes) {
             diotAccounts.add(new SDiotAccount(diotAccountCode, true));
         }
         
@@ -220,7 +262,7 @@ public class SDiotLayout {
                         + "WHERE NOT r.b_del AND NOT re.b_del AND "
                         + "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND "
                         + "al.fid_tp_acc_sys IN (" + SDataConstantsSys.FINS_TP_ACC_SYS_PUR + ", " + SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ + ") AND "
-                        + "re.fid_tax_bas_n IS NOT NULL "
+                        + "(re.fid_tax_bas_n IS NOT NULL AND re.fid_tax_bas_n = " + manVatDefaultKey[0] + ") " // exclude taxes that are not VAT
                         + "ORDER BY r.dt, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety;";
                 
                 System.out.println();
@@ -280,7 +322,7 @@ public class SDiotLayout {
                 }
                 else {
                     entriesWithoutTax++;
-                    vatPk = vatDefaultPk;
+                    vatPk = manVatDefaultKey;
                 }
                 
                 SDataTax vat = getVat(vatPk);
@@ -813,7 +855,7 @@ public class SDiotLayout {
                     creditTotal + "," + 
                     (debitTotal - creditTotal) + "\n";
             
-            SDataTax vatDefault = getVat(vatDefaultPk);
+            SDataTax vatDefault = getVat(manVatDefaultKey);
             
             layout += "\n";
             layout += "\"Resumen:\"\n";
@@ -852,47 +894,6 @@ public class SDiotLayout {
         }
         
         return SLibUtils.textToAscii(layout);
-    }
-
-    private void obtainRepeatedFiscalId() throws Exception {
-        moRepeatedFiscalId = new HashSet<>();
-        HashSet<String> occFiscalIds = new HashSet<>();
-        HashSet<String> taxFiscalIds = new HashSet<>();
-        ResultSet resultSet;
-        
-        String sql = "SELECT DISTINCT re.occ_fiscal_id " +
-            "FROM " +
-            "fin_rec AS r " +
-            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
-            "WHERE " +
-            "NOT r.b_del AND NOT re.b_del AND " +
-            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
-            "re.occ_fiscal_id <> '' " +
-            "ORDER BY re.occ_fiscal_id;";
-        resultSet = miClient.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            occFiscalIds.add(resultSet.getString(1));
-        }
-        
-        sql = "SELECT DISTINCT b.fiscal_id " +
-            "FROM " +
-            "fin_rec AS r " +
-            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
-            "INNER JOIN trn_dps AS d ON d.id_year=re.fid_dps_year_n AND d.id_doc=re.fid_dps_doc_n " +
-            "INNER JOIN erp.bpsu_bp AS b ON b.id_bp=d.fid_bp_r " +
-            "WHERE " +
-            "NOT r.b_del AND NOT re.b_del AND " +
-            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
-            "d.fid_ct_dps=1 AND re.fid_acc = '1160-0002-0000' " +
-            "ORDER BY b.fiscal_id;";
-        resultSet = miClient.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            taxFiscalIds.add(resultSet.getString(1));
-        }
-        
-        occFiscalIds.stream().filter((occFiscalId) -> (taxFiscalIds.contains(occFiscalId))).forEach((occFiscalId) -> {
-            moRepeatedFiscalId.add(occFiscalId);
-        });
     }
     
     public class JournalEntry {
