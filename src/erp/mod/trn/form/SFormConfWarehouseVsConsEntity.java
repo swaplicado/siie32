@@ -237,7 +237,7 @@ public class SFormConfWarehouseVsConsEntity extends SBeanForm implements ActionL
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de suministro"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Centro de consumo"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Predeterminado");
                 col.setEditable(true);
                 columns.add(col);

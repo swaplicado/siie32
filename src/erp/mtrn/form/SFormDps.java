@@ -11504,12 +11504,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                     if (!validation.getIsError() && mbHasDpsLinksAsDes) {
                         for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-                            SDataDpsEntry entry = (SDataDpsEntry) (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
                             try {
                                 if(entry.hasDpsLinksAsDestiny()){
                                     if (STrnUtilities.getTaxRegionDpsEty(miClient, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()) != entry.getFkTaxRegionId()) {
                                         if (miClient.showMsgBoxConfirm("La región de impuestos de la partida #" + (i + 1) + " es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
-                                            validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
+                                            validation.setMessage("Seleccionar la región de impuestos de la partida #" + (i + 1) + " del documento de origen.");
                                         }
                                     }
                                 }
@@ -11517,7 +11517,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             catch (Exception e) {}
                         }
                     }
-
+                    
+                    if (!validation.getIsError() && mbIsDpsAdjustment) {
+                        for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                            SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                            if (!entry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
+                                if (entry.getIsRegistryNew() && !entry.getFlagDpsEtyOpened() && entry.getIsPrepayment()) {
+                                    validation.setMessage("La partida #" + (i + 1) + " fue importada de una partida de anticipos y no le fue especificado si se debe de contabilizar en una cuenta de dinero o en anticipos facturados por aplicar.\n"
+                                            + "Favor de modificar la partida y especificar.");
+                                }
+                            }
+                        }   
+                    }
+                    
                     double prepaymentsCy = mdPrepaymentsCy;
                     double applicationsCy = 0;
 
