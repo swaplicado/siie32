@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 254.0/ 2024-06-14
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de control de tipo de régimen de contratación en altas y en el procesamiento de períodos de contratación de empleados.
+
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de impresión de agente de ventas y supervisor en contratos de ventas.
+
+================================================================================
 SIIE 3.2 253.10/ 2024-06-11
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
