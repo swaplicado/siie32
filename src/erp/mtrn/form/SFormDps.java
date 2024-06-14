@@ -12409,6 +12409,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (!entry.getIsRegistryEdited()) {
                     entry.setIsRegistryEdited(recalculateEntries);  // force entry recalculation when saved
                 }
+                entry.setConcept(entry.getConcept().length() > 130 ? entry.getConcept().substring(0, 130) : entry.getConcept());
                 moDps.getDbmsDpsEntries().add(entry);
             }
 
