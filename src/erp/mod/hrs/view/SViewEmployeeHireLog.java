@@ -142,6 +142,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
                 + "v.b_hire, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "vt.name, "
+                + "vtrs.name, "
                 + "bp.bp, "
                 + "emp.num, "
                 + "emp.b_act, "
@@ -155,6 +156,8 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP_DIS) + " AS vt ON "
                 + "v.fk_tp_emp_dis = vt.id_tp_emp_dis "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS vtrs ON "
+                + "v.fk_tp_rec_sche = vtrs.id_tp_rec_sche "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
                 + "v.id_emp = emp.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
@@ -180,6 +183,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_dis_n", "Fecha baja"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts_dis", "Notas baja", 200));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "vt.name", "Motivo baja"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vtrs.name", "Tipo régimen"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_hire", "Alta"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

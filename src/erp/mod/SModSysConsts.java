@@ -1109,7 +1109,11 @@ public abstract class SModSysConsts {
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;
     
-    public static final int HRS_CFG_TIME_CLOCK_POL_ALL = 1; // all movements: official and non-official
-    public static final int HRS_CFG_TIME_CLOCK_POL_OFF = 2; // only official movements
+    public static final int HRS_CFG_TIME_CLOCK_POL_ALL = 1;     // all movements: official and non-official
+    public static final int HRS_CFG_TIME_CLOCK_POL_OFF = 2;     // only official movements
     public static final int HRS_CFG_TIME_CLOCK_POL_NON_OFF = 3; // only non-official movements
+    
+    public static final int HRSX_REC_SCHE_CAT_NA = 0;           // Not applicable
+    public static final int HRSX_REC_SCHE_CAT_WAGES = 1;        // Wages & salaries, retirees and others
+    public static final int HRSX_REC_SCHE_CAT_ASSIMILATED = 2;  // All assimilated types
 }

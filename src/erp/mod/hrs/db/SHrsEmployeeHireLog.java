@@ -21,9 +21,12 @@ import sa.lib.gui.SGuiSession;
  */
 public class SHrsEmployeeHireLog {
     
+    public static final int MODE_MODIFY = 1;
+    public static final int MODE_REVERT = 2;
+    
     protected Connection moConnection;
     protected SGuiSession moSession;
-    protected int mnPkEmployeeHireLogId;
+    
     protected int mnPkEmployeeId;
     protected Date mtLastHireDate;
     protected String msLastHireNotes;
@@ -31,21 +34,19 @@ public class SHrsEmployeeHireLog {
     protected String msLastDismissalNotes;
     protected boolean mbIsHire;
     protected boolean mbDeleted;
-    protected int mnFkDismissalType;
+    protected int mnFkEmployeeDismissalTypeId;
+    protected int mnFkRecruitmentSchemaTypeId;
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     
-    protected boolean mbIsAuxFirstHiring;
-    protected boolean mbIsAuxForceFirstHiring;
-    protected boolean mbIsAuxModification;
-    protected boolean mbIsAuxCorrection;
-    protected Connection moAuxFormerEmployerConnection;
+    protected boolean mbRequestFirstHiring;
+    protected int mnRequestMode;
+    protected Connection moRequestFormerEmployerConnection;
     
     private SHrsEmployeeHireLog(final Connection connection, final SGuiSession session) {
         moConnection = connection;
         moSession = session;
         
-        mnPkEmployeeHireLogId = 0;
         mnPkEmployeeId = 0;
         mtLastHireDate = null;
         msLastHireNotes = "";
@@ -53,15 +54,14 @@ public class SHrsEmployeeHireLog {
         msLastDismissalNotes = "";
         mbIsHire = false;
         mbDeleted = false;
-        mnFkDismissalType = 0;
+        mnFkEmployeeDismissalTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         
-        mbIsAuxFirstHiring = false;
-        mbIsAuxForceFirstHiring = false;
-        mbIsAuxModification = false;
-        mbIsAuxCorrection = false;
-        moAuxFormerEmployerConnection = null;
+        mbRequestFirstHiring = false;
+        mnRequestMode = 0;
+        moRequestFormerEmployerConnection = null;
     }
 
     /**
@@ -84,7 +84,6 @@ public class SHrsEmployeeHireLog {
         this(session.getDatabase().getConnection(), session);
     }
 
-    public void setPkEmployeeHireLogId(int n) { mnPkEmployeeHireLogId = n; }
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setLastHireDate(Date t) { mtLastHireDate = t; }
     public void setLastHireNotes(String s) { msLastHireNotes = s; }
@@ -92,46 +91,11 @@ public class SHrsEmployeeHireLog {
     public void setLastDismissalNotes(String s) { msLastDismissalNotes = s; }
     public void setIsHire(boolean b) { mbIsHire = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkDismissalType(int n) { mnFkDismissalType = n; }
+    public void setFkEmployeeDismissalTypeId(int n) { mnFkEmployeeDismissalTypeId = n; }
+    public void setFkRecruitmentSchemaTypeId(int n) { mnFkRecruitmentSchemaTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     
-    /**
-     * Set auxiliar flag for first hiring. Used when employee registered for the very first time in ERP.
-     * Requires that a connection has been provided in constructor of this instance.
-     * @param flagStatus Enabling-disabling flag.
-     */
-    public void setIsAuxFirstHiring(boolean flagStatus) { mbIsAuxFirstHiring = flagStatus; } 
-
-    /**
-     * Set auxiliar flag for force (emulate) a first hiring. Used when employee is exported to a new set of friend companies within ERP.
-     * Requires that a connection has been provided in constructor of this instance.
-     * @param flagStatus Enabling-disabling flag.
-     */
-    public void setIsAuxForceFirstHiring(boolean flagStatus) { mbIsAuxForceFirstHiring = flagStatus; } 
-
-    /**
-     * Set auxiliar flag for modification.
-     * Requires that a GUI session has been provided in constructor of this instance.
-     * @param flagStatus Enabling-disabling flag.
-     */
-    public void setIsAuxModification(boolean flagStatus) { mbIsAuxModification = flagStatus; } 
-
-    /**
-     * Set auxiliar flag for correction.
-     * Requires that a GUI session has been provided in constructor of this instance.
-     * @param flagStatus Enabling-disabling flag.
-     */
-    public void setIsAuxCorrection(boolean flagStatus) { mbIsAuxCorrection = flagStatus; } 
-
-    /**
-     * Set former employer connection to execute employee new hire-log entries and memberships and to delete employee obsolete memberships within a set of sibling companies when an employeer substitution is being processed.
-     * Requires as well that a connection has been provided in constructor of this instance.
-     * @param formerEmployerConnection Former employer connection.
-     */
-    public void setAuxFormerEmployerConnection(Connection formerEmployerConnection) { moAuxFormerEmployerConnection = formerEmployerConnection; }
-    
-    public int getPkEmployeeHireLogId() { return mnPkEmployeeHireLogId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public Date getLastHireDate() { return mtLastHireDate; }
     public String getLastHireNotes() { return msLastHireNotes; }
@@ -139,11 +103,30 @@ public class SHrsEmployeeHireLog {
     public String getLastDismissalNotes() { return msLastDismissalNotes; }
     public boolean isHire() { return mbIsHire; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkDismissalType() { return mnFkDismissalType; }
+    public int getFkEmployeeDismissalTypeId() { return mnFkEmployeeDismissalTypeId; }
+    public int getFkRecruitmentSchemaTypeId() { return mnFkRecruitmentSchemaTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     
-    public void save() throws Exception {
+    private void setRequestSettings(final boolean firstHiring, final int mode, final Connection formerEmployerConnection) throws Exception {
+        mbRequestFirstHiring = firstHiring;
+        mnRequestMode = mode;
+        moRequestFormerEmployerConnection = formerEmployerConnection;
+    }
+    
+    public void setRequestSettings(final boolean firstHiring) throws Exception {
+        setRequestSettings(firstHiring, 0, null);
+    }
+    
+    public void setRequestSettings(final boolean firstHiring, final Connection formerEmployerConnection) throws Exception {
+        setRequestSettings(firstHiring, 0, formerEmployerConnection);
+    }
+    
+    public void setRequestSettings(final int mode) throws Exception {
+        setRequestSettings(false, mode, null);
+    }
+    
+    public void processRequest() throws Exception {
         String currentSchema = "";
         ArrayList<String> schemas = null;
 
@@ -164,11 +147,11 @@ public class SHrsEmployeeHireLog {
             schemas.add(0, currentSchema);
         }
         
-        // when moAuxFormerEmployerConnection has been set, use it for database updates to keep them into the global transaction:
-        Connection connection = moAuxFormerEmployerConnection != null ? moAuxFormerEmployerConnection : moConnection;
+        // when moRequestFormerEmployerConnection has been set, use it for database updates to keep them into the global transaction:
+        Connection connection = moRequestFormerEmployerConnection != null ? moRequestFormerEmployerConnection : moConnection;
         
         for (String schema : schemas) {
-            if (mbIsAuxFirstHiring || mbIsAuxForceFirstHiring) {
+            if (mbRequestFirstHiring) {
                 // bizarre, but member moConnection should have been previously set:
 
                 try (Statement statement = connection.createStatement()) {
@@ -191,7 +174,8 @@ public class SHrsEmployeeHireLog {
                             "'" + msLastDismissalNotes + "', " +
                             (mbIsHire ? 1 : 0) + ", " +
                             (mbDeleted ? 1 : 0) + ", " +
-                            mnFkDismissalType + ", " +
+                            mnFkEmployeeDismissalTypeId + ", " +
+                            mnFkRecruitmentSchemaTypeId + ", " + 
                             mnFkUserInsertId + ", " +
                             mnFkUserUpdateId + ", " +
                             "NOW()" + ", " +
@@ -211,7 +195,7 @@ public class SHrsEmployeeHireLog {
                 SDbEmployeeHireLog oldEmployeeHireLog = null;
                 SDbEmployeeHireLog newEmployeeHireLog = null;
 
-                if (mbIsAuxModification) {
+                if (mnRequestMode == MODE_MODIFY) {
                     oldEmployeeHireLog = null;
 
                     if (mbIsHire) {
@@ -231,15 +215,18 @@ public class SHrsEmployeeHireLog {
                     if (mbIsHire) {
                         newEmployeeHireLog.setDateHire(mtLastHireDate);
                         newEmployeeHireLog.setNotesHire(msLastHireNotes);
+                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
                     }
                     else {
                         newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
                         newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
+                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
+                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(oldEmployeeHireLog.getFkRecruitmentSchemaTypeId()); // preserve
                     }
 
                     newEmployeeHireLog.setHired(mbIsHire);
                     newEmployeeHireLog.setDeleted(mbDeleted);
-                    newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkDismissalType);
                     newEmployeeHireLog.setAuxSchema(schema);
 
                     newEmployeeHireLog.save(moSession);
@@ -257,9 +244,10 @@ public class SHrsEmployeeHireLog {
                     oldEmployeeHireLog = null;
 
                     if (!mbIsHire) {
+                        // dismiss...
                         oldEmployeeHireLog = SHrsUtils.getEmployeeLastHire(moSession, mnPkEmployeeId, 0, schema);
                     }
-                    else if (mbIsAuxCorrection) {
+                    else if (mnRequestMode == MODE_REVERT) {
                         oldEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
                     }
 
@@ -272,8 +260,17 @@ public class SHrsEmployeeHireLog {
 
                     newEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
                     
-                    if (mbIsHire) {
-                        if (mbIsAuxCorrection) {
+                    if (!mbIsHire) {
+                        // dismiss...
+                        
+                        newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
+                        newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
+                        
+                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
+                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(oldEmployeeHireLog.getFkRecruitmentSchemaTypeId()); // preserve
+                    }
+                    else {
+                        if (mnRequestMode == MODE_REVERT) {
                             newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
                             newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
                         }
@@ -281,20 +278,18 @@ public class SHrsEmployeeHireLog {
                             newEmployeeHireLog.setDateHire(mtLastHireDate);
                             newEmployeeHireLog.setNotesHire(msLastHireNotes);
                         }
-                    }
-                    else {
-                        newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
-                        newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
+                        
+                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
                     }
 
                     newEmployeeHireLog.setHired(mbIsHire);
                     newEmployeeHireLog.setDeleted(mbDeleted);
-                    newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkDismissalType);
                     newEmployeeHireLog.setAuxSchema(schema);
 
                     newEmployeeHireLog.save(moSession);
 
-                    if (mbIsAuxCorrection) {
+                    if (mnRequestMode == MODE_REVERT) {
                         SDbEmployeeHireLog employeeHireLogAux = null;
 
                         employee = new SDbEmployee();
@@ -317,7 +312,7 @@ public class SHrsEmployeeHireLog {
             }
         }
 
-        if (mbIsAuxFirstHiring || mbIsAuxForceFirstHiring) {
+        if (mbRequestFirstHiring) {
             // bizarre, but member moConnection should be instantiated:
 
             SHrsAccounting accounting = new SHrsAccounting(moConnection); // spreads accounting configurations to all sibling companies
@@ -337,10 +332,10 @@ public class SHrsEmployeeHireLog {
             accounting.save();
         }
         
-        if (moAuxFormerEmployerConnection != null) {
+        if (moRequestFormerEmployerConnection != null) {
             // process an employer sustitution deleting employee memberships from former set of sibling companies:
             
-            try (Statement statement = moAuxFormerEmployerConnection.createStatement()) {
+            try (Statement statement = moRequestFormerEmployerConnection.createStatement()) {
                 // define list of schemas:
                 
                 String formerCurrentSchema = SHrsEmployeeUtils.getCurrentCompanySchema(statement);

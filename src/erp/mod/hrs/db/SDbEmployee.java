@@ -105,7 +105,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
     
-    protected boolean mbOldActive; // immutable member
+    protected boolean mbActiveOld; // immutable member
     
     protected String msXtaEmployeeName;
     protected String msXtaEmployeeProperName;
@@ -437,7 +437,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mbOldActive = false;
+        mbActiveOld = false;
         
         msXtaEmployeeName = "";
         msXtaEmployeeProperName = "";
@@ -551,7 +551,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            mbOldActive = mbActive;
+            mbActiveOld = mbActive;
             
             // employee's names, fiscal and legal ID:
             msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id "
@@ -750,7 +750,7 @@ public class SDbEmployee extends SDbRegistryUser {
         
         // process hiring or dismissing:
 
-        if (mbRegistryNew || mbActive != mbOldActive) {
+        if (mbRegistryNew || mbActive != mbActiveOld) {
             SHrsEmployeeHireLog hrsEmployeeHireLog = moAuxHrsEmployeeHireLog != null ? moAuxHrsEmployeeHireLog : new SHrsEmployeeHireLog(session); // spreads log entries to all sibling companies
                 
             hrsEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
@@ -759,13 +759,15 @@ public class SDbEmployee extends SDbRegistryUser {
                 hrsEmployeeHireLog.setIsHire(true);
                 hrsEmployeeHireLog.setLastHireDate(mtAuxHireLogDate);
                 hrsEmployeeHireLog.setLastHireNotes(msAuxHireLogNotes);
-                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId); // recruitment schema type set only when hiring
             }
             else {
                 hrsEmployeeHireLog.setIsHire(false);
                 hrsEmployeeHireLog.setLastDismissalDate_n(mtAuxHireLogDate);
                 hrsEmployeeHireLog.setLastDismissalNotes(msAuxHireLogNotes);
-                hrsEmployeeHireLog.setFkDismissalType(mnAuxEmployeeDismissalTypeId);
+                hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(mnAuxEmployeeDismissalTypeId);
+                //hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(...); // recruitment schema type set only when hiring
             }
             
             hrsEmployeeHireLog.setDeleted(mbDeleted);
@@ -781,13 +783,8 @@ public class SDbEmployee extends SDbRegistryUser {
                 hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
             }
             
-            hrsEmployeeHireLog.setIsAuxFirstHiring(mbRegistryNew);
-            //employeeHireLog.setIsAuxForceFirstHiring(...);
-            //employeeHireLog.setIsAuxModification(...);
-            //employeeHireLog.setIsAuxCorrection(...);
-            //employeeHireLog.setAuxFormerEmployerConnection(...);
-            
-            hrsEmployeeHireLog.save();
+            hrsEmployeeHireLog.setRequestSettings(mbRegistryNew);
+            hrsEmployeeHireLog.processRequest();
         }
         
         mbRegistryNew = false;
@@ -857,7 +854,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
-        registry.mbOldActive = this.mbOldActive;
+        registry.mbActiveOld = this.mbActiveOld;
         
         registry.setXtaEmployeeName(this.getXtaEmployeeName());
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());

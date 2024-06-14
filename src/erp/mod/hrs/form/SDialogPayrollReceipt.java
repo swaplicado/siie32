@@ -232,7 +232,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlName.setText("Nombre:");
+        jlName.setText("Empleado:");
         jlName.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel16.add(jlName);
 

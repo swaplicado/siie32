@@ -359,6 +359,7 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
     
     private void populateEmployees() {
         int employeeId = 0;
+        int recruitmentSchemaCat = 0;
         int periodYear = 0;
         double dDaysHired = 0;
         double dDaysIncapacityNotPay = 0;
@@ -387,10 +388,12 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
             dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), mtDateEnd) });
             dbSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), mtDateEnd) });
             
-            sql = "SELECT b.bp, e.id_emp, e.num, e.b_act, e.dt_hire, e.dt_dis_n, UPPER(LEFT(tp.name, 3)) AS _tp_name "
+            sql = "SELECT b.bp, e.id_emp, e.num, e.b_act, e.dt_hire, e.dt_dis_n, trs.rec_sche_cat, UPPER(LEFT(tp.name, 3)) AS _tp_name "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON tp.id_tp_pay = e.fk_tp_pay "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = COALESCE(em.fk_tp_rec_sche_n, e.fk_tp_rec_sche) "
                     + "WHERE e.id_emp IN ("
                     + "SELECT DISTINCT id_emp "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
@@ -404,8 +407,9 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
             while (resultSet.next()) {
                 SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
                 employeeId = resultSet.getInt("e.id_emp");
+                recruitmentSchemaCat = resultSet.getInt("trs.rec_sche_cat");
                 
-                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.readEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
+                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.readEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, recruitmentSchemaCat, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
                 dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumptions(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), 0), mtDateStart, mtDateEnd);
                 dDaysTaxable = dDaysHired - dDaysIncapacityNotPay;
                 

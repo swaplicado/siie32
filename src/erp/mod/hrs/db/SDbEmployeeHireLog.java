@@ -36,6 +36,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     protected boolean mbHired;
     //protected boolean mbDeleted;
     protected int mnFkEmployeeDismissalTypeId;
+    protected int mnFkRecruitmentSchemaTypeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -58,6 +59,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     public void setHired(boolean b) { mbHired = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkEmployeeDismissalTypeId(int n) { mnFkEmployeeDismissalTypeId = n; }
+    public void setFkRecruitmentSchemaTypeId(int n) { mnFkRecruitmentSchemaTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -74,6 +76,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     public boolean isHired() { return mbHired; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkEmployeeDismissalTypeId() { return mnFkEmployeeDismissalTypeId; }
+    public int getFkRecruitmentSchemaTypeId() { return mnFkRecruitmentSchemaTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -105,6 +108,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
         mbHired = false;
         mbDeleted = false;
         mnFkEmployeeDismissalTypeId = 0;
+        mnFkRecruitmentSchemaTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -164,6 +168,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
             mbHired = resultSet.getBoolean("b_hire");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkEmployeeDismissalTypeId = resultSet.getInt("fk_tp_emp_dis");
+            mnFkRecruitmentSchemaTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -196,6 +201,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
                     (mbHired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkEmployeeDismissalTypeId + ", " + 
+                    mnFkRecruitmentSchemaTypeId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " +
@@ -217,6 +223,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
                     "b_hire = " + (mbHired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_emp_dis = " + mnFkEmployeeDismissalTypeId + ", " +
+                    "fk_tp_rec_sche = " + mnFkRecruitmentSchemaTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -242,6 +249,7 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
         registry.setHired(this.isHired());
         registry.setDeleted(this.isDeleted());
         registry.setFkEmployeeDismissalTypeId(this.getFkEmployeeDismissalTypeId());
+        registry.setFkRecruitmentSchemaTypeId(this.getFkRecruitmentSchemaTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

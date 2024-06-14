@@ -48,15 +48,12 @@ public class SDialogUpdateExchangeBal extends SBeanFormDialog implements ActionL
     private erp.mfin.data.SDataRecord moCurrentRecord;
     private Date mtDate;
     private HashMap<Integer, Object> moParamsMap;
-    
-    
-
 
     /**
-     * Creates new form SDialogAbpEntry
+     * Creates new form SDialogUpdateExchangeBal
      */
     public SDialogUpdateExchangeBal(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -396,25 +393,22 @@ public class SDialogUpdateExchangeBal extends SBeanFormDialog implements ActionL
             }
         }
     }
-    
-    
-    
 
     @Override
     public SGuiValidation validateForm() {
-       
         SGuiValidation validation = moFields.validateFields();
+        
         if (validation.isValid()) {
             if (moCurrentRecord == null) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRecord.getText()) + "'.");
                 validation.setComponent(jbPickRecord);
             }
             else if (moCurrentRecord.getPkYearId() != moCalYear.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlYear.getText()) + "' debe pertenecer al mismo periodo que el campo '" + SGuiUtils.getLabelName(jlRecord.getText() + "'."));
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlYear.getText()) + "' debe pertenecer al mismo período que el campo '" + SGuiUtils.getLabelName(jlRecord.getText() + "'."));
                 validation.setComponent(jbPickRecord);
             }
             else if (moCurrentRecord.getPkPeriodId()!= moCalPeriod.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlPeriod.getText()) + "' debe pertenecer al mismo periodo que el campo '" + SGuiUtils.getLabelName(jlRecord.getText() + "'."));
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlPeriod.getText()) + "' debe pertenecer al mismo período que el campo '" + SGuiUtils.getLabelName(jlRecord.getText() + "'."));
                 validation.setComponent(jbPickRecord);
             }
             else  if(moKeyCurrency.getValue()[0] == 1) {

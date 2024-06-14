@@ -136,7 +136,7 @@ public abstract class SHrsUtils {
     }
     
     public static int getRecruitmentSchemaIcon(final int recruitmentSchemaType) {
-        int icon = 0;
+        int icon;
         
         if (isWages(recruitmentSchemaType)) {
             icon = SGridConsts.ICON_CIRC_BLUE;
@@ -3841,18 +3841,21 @@ public abstract class SHrsUtils {
         return sql;
     }
     
-    public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement statement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
+    public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement statement, final int employeeId, final int recruitmentSchemaCat, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
-        String sql = "SELECT id_emp, id_log " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-                "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
-                "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "');";
+        String sql = "SELECT elh.id_emp, elh.id_log " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " AS elh " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = elh.fk_tp_rec_sche " +
+                "WHERE NOT elh.b_del AND elh.id_emp = " + employeeId + " AND elh.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
+                "(elh.dt_dis_n IS NULL OR elh.dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "') AND " +
+                "trs.rec_sche_cat = " + recruitmentSchemaCat + ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
                 employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
+//                employeeHireLog.read(session, new int[] { resultSet.getInt("elh.id_emp"), resultSet.getInt("elh.id_log") });
                 employeeHireLogs.add(employeeHireLog);
             }
         }
@@ -3994,76 +3997,72 @@ public abstract class SHrsUtils {
         return isFirtsHire;
     }
     
-    public static boolean deleteHireLog(final SGuiSession session, final int employeeId) throws Exception {
-        if (isFirstHire(session, employeeId)) {
-            throw new Exception("El empleado no tiene registros adicionales a su única alta en la bitácora altas y bajas.");
-        }
-        else {
-            SDbEmployeeHireLog employeeHireLog;
-            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
-            
-            if (employee.isActive()) {
-                employeeHireLog = getEmployeeLastHire(session, employeeId, 0, "");
-            }
-            else {
-                employeeHireLog = getEmployeeLastDismiss(session, employeeId, 0, "");
-            }
+    public static boolean modifyHireLog(final SGuiSession session, final SDbEmployeeHireLog currentEmployeeHireLog) throws Exception {
+        SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
 
-            SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
-            
-            hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
-            hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
-            hrsEmployeeHireLog.setIsHire(!employee.isActive());
-            hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
-            hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
-            hrsEmployeeHireLog.setLastHireNotes(employeeHireLog.getNotesHire());
-            hrsEmployeeHireLog.setLastDismissalDate_n(employeeHireLog.getDateDismissal_n());
-            hrsEmployeeHireLog.setLastDismissalNotes(employeeHireLog.getNotesDismissal());
-            hrsEmployeeHireLog.setFkDismissalType(employeeHireLog.getFkEmployeeDismissalTypeId());
-            hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
-            hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
+        hrsEmployeeHireLog.setPkEmployeeId(currentEmployeeHireLog.getPkEmployeeId());
+        hrsEmployeeHireLog.setLastHireDate(currentEmployeeHireLog.getDateHire());
+        hrsEmployeeHireLog.setLastHireNotes(currentEmployeeHireLog.getNotesHire());
+        hrsEmployeeHireLog.setLastDismissalDate_n(currentEmployeeHireLog.getDateDismissal_n());
+        hrsEmployeeHireLog.setLastDismissalNotes(currentEmployeeHireLog.getNotesDismissal());
+        hrsEmployeeHireLog.setIsHire(currentEmployeeHireLog.isHired());
+        hrsEmployeeHireLog.setDeleted(currentEmployeeHireLog.isDeleted());
+        hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(currentEmployeeHireLog.getFkEmployeeDismissalTypeId());
+        hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(currentEmployeeHireLog.getFkRecruitmentSchemaTypeId());
+        hrsEmployeeHireLog.setFkUserInsertId(currentEmployeeHireLog.getFkUserInsertId());
+        hrsEmployeeHireLog.setFkUserUpdateId(currentEmployeeHireLog.getFkUserUpdateId());
 
-            hrsEmployeeHireLog.setIsAuxFirstHiring(false);
-            hrsEmployeeHireLog.setIsAuxForceFirstHiring(false);
-            hrsEmployeeHireLog.setIsAuxModification(false);
-            hrsEmployeeHireLog.setIsAuxCorrection(true);
-
-            if (employee.isActive()) {
-                hrsEmployeeHireLog.setDeleted(true);
-            }
-            else {
-                hrsEmployeeHireLog.setLastDismissalDate_n(null);
-                hrsEmployeeHireLog.setLastDismissalNotes("");
-                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NA); 
-            }
-            
-            hrsEmployeeHireLog.save();
-        }
+        hrsEmployeeHireLog.setRequestSettings(SHrsEmployeeHireLog.MODE_MODIFY);
+        hrsEmployeeHireLog.processRequest();
         
         return true;
     }
     
-    public static boolean editHireLog(final SGuiSession session, final SDbEmployeeHireLog employeeHireLog) throws Exception {
-        SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
+    public static boolean revertLastHireLogEntry(final SGuiSession session, final int employeeId) throws Exception {
+        if (isFirstHire(session, employeeId)) {
+            throw new Exception("El empleado no tiene registros adicionales a su única alta en la bitácora altas y bajas.");
+        }
+        else {
+            SDbEmployeeHireLog lastEmployeeHireLog;
+            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
+            
+            if (employee.isActive()) {
+                lastEmployeeHireLog = getEmployeeLastHire(session, employeeId, 0, "");
+            }
+            else {
+                lastEmployeeHireLog = getEmployeeLastDismiss(session, employeeId, 0, "");
+            }
 
-        hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
-        hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
-        hrsEmployeeHireLog.setIsHire(employeeHireLog.isHired());
-        hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
-        hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
-        hrsEmployeeHireLog.setLastHireNotes(employeeHireLog.getNotesHire());
-        hrsEmployeeHireLog.setLastDismissalDate_n(employeeHireLog.getDateDismissal_n());
-        hrsEmployeeHireLog.setLastDismissalNotes(employeeHireLog.getNotesDismissal());
-        hrsEmployeeHireLog.setFkDismissalType(employeeHireLog.getFkEmployeeDismissalTypeId());
-        hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
-        hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
+            SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
+            
+            hrsEmployeeHireLog.setPkEmployeeId(lastEmployeeHireLog.getPkEmployeeId());
+            hrsEmployeeHireLog.setLastHireDate(lastEmployeeHireLog.getDateHire());
+            hrsEmployeeHireLog.setLastHireNotes(lastEmployeeHireLog.getNotesHire());
+            hrsEmployeeHireLog.setLastDismissalDate_n(lastEmployeeHireLog.getDateDismissal_n());
+            hrsEmployeeHireLog.setLastDismissalNotes(lastEmployeeHireLog.getNotesDismissal());
+            hrsEmployeeHireLog.setIsHire(!employee.isActive()); // revert current active status of employee
+            hrsEmployeeHireLog.setDeleted(lastEmployeeHireLog.isDeleted());
+            hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(lastEmployeeHireLog.getFkEmployeeDismissalTypeId());
+            hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(lastEmployeeHireLog.getFkRecruitmentSchemaTypeId());
+            hrsEmployeeHireLog.setFkUserInsertId(lastEmployeeHireLog.getFkUserInsertId());
+            hrsEmployeeHireLog.setFkUserUpdateId(lastEmployeeHireLog.getFkUserUpdateId());
 
-        hrsEmployeeHireLog.setIsAuxFirstHiring(false);
-        hrsEmployeeHireLog.setIsAuxForceFirstHiring(false);
-        hrsEmployeeHireLog.setIsAuxModification(true);
-        hrsEmployeeHireLog.setIsAuxCorrection(false);
-        
-        hrsEmployeeHireLog.save();
+            if (employee.isActive()) {
+                // delete last log entry for hiring:
+                
+                hrsEmployeeHireLog.setDeleted(true);
+            }
+            else {
+                // clear last log entry when dismissed:
+                
+                hrsEmployeeHireLog.setLastDismissalDate_n(null);
+                hrsEmployeeHireLog.setLastDismissalNotes("");
+                hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA); 
+            }
+            
+            hrsEmployeeHireLog.setRequestSettings(SHrsEmployeeHireLog.MODE_REVERT);
+            hrsEmployeeHireLog.processRequest();
+        }
         
         return true;
     }

@@ -660,8 +660,8 @@ public class SHrsPayrollDataProvider {
         return absencesConsumptions;
     }
 
-    private ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final int employeeId, final Date dateStart, final Date dateEnd)  throws Exception {
-        return SHrsUtils.readEmployeeHireLogs(moSession, miStatement, employeeId, dateStart, dateEnd);
+    private ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final int employeeId, final int recruitmentSchemaCat, final Date dateStart, final Date dateEnd)  throws Exception {
+        return SHrsUtils.readEmployeeHireLogs(moSession, miStatement, employeeId, recruitmentSchemaCat, dateStart, dateEnd);
     }
     
     private int getEmployeeHiredDays(final ArrayList<SDbEmployeeHireLog> employeeHireLogs, final Date dateStart, final Date dateEnd) throws Exception {
@@ -1003,13 +1003,13 @@ public class SHrsPayrollDataProvider {
         Date endOfFiscalYear = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear));
         Date fiscalStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
         Date fiscalEnd = payrollEnd.before(endOfFiscalYear) ? payrollEnd : endOfFiscalYear;
-        ArrayList<SDbEmployeeHireLog> hireLogsPayroll = readEmployeeHireLogs(employeeId, payrollStart, payrollEnd);
-        ArrayList<SDbEmployeeHireLog> hireLogsAnnual = readEmployeeHireLogs(employeeId, fiscalStart, fiscalEnd);
         
         SHrsEmployee hrsEmployee = new SHrsEmployee(hrsReceipt, employeeId);
         
         int paymentType = hrsEmployee.getEmployee().getFkPaymentTypeId(); // convenience variable
         int recruitmentSchemaCat = hrsEmployee.getEmployee().getXtaEffectiveRecruitmentSchemaCat(); // convenience variable
+        ArrayList<SDbEmployeeHireLog> hireLogsPayroll = readEmployeeHireLogs(employeeId, recruitmentSchemaCat, payrollStart, payrollEnd);
+        ArrayList<SDbEmployeeHireLog> hireLogsAnnual = readEmployeeHireLogs(employeeId, recruitmentSchemaCat, fiscalStart, fiscalEnd);
         
         hrsEmployee.getLoans().addAll(readEmployeeLoans(employeeId));
         hrsEmployee.getHrsLoans().addAll(createEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));

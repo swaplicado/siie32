@@ -1543,8 +1543,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * Reset days.
      */
     private void resetPayrollDays() {
-        int workingDays = 0;
-
         if (moDateDateStart.getValue() != null && moDateDateEnd.getValue() != null) {
             if (moDateDateStart.getValue().compareTo(moDateDateEnd.getValue()) > 0) {
                 mnCalendarDays = 0;
@@ -1555,7 +1553,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
 
         if (mnCalendarDays > 0) {
-            workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnCalendarDays);
+            int workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnCalendarDays);
             
             moIntReceiptDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moModuleConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnCalendarDays);
             moIntWorkingDays.setValue(workingDays <= 0 ? 0 : workingDays);
@@ -2160,7 +2158,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             if (miClient.showMsgBoxConfirm("Debe guardar la nómina para continuar.\n"
                     + "¿Desea guardarla y abrirla de nuevo?") == JOptionPane.YES_OPTION) {
                 mbAuxReopen = true;
-                this.actionSave();
+                actionSave();
             }
             
             return;
@@ -2189,7 +2187,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
         }
         
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        try {
+            SGuiUtils.setCursorWait(miClient);
+            
+            
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            SGuiUtils.setCursorDefault(miClient);
+        }
+        
         SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
                                                     SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
                                                     SLibConstants.EXEC_MODE_SILENT);
@@ -2272,15 +2281,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         dialog.setVisible(true);
         
         if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            this.removeByImportation(false);
+            removeByImportation(false);
             ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
-            this.addPerceptAndDeductByImportation(rows, ppayroll.getRows());
+            addPerceptAndDeductByImportation(rows, ppayroll.getRows());
             
             computeReceipts();
             populateRowPayrollEmployeesReceipts();
         }
-        
-        this.setCursor(Cursor.getDefaultCursor());
     }
     
     /**
@@ -2334,19 +2341,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     perceptionId = moModuleConfig.getFkEarningOvertime3Id_n();
                 }
 
-                this.addPerception(receipt, perceptionId, factor, true, 0);
+                addPerception(receipt, perceptionId, factor, true, 0);
             }
             
             if (timeClockRow.getHolidays() > 0) {
-                this.addPerception(receipt, moModuleConfig.getFkEarningHolidayId_n(), timeClockRow.getHolidays(), true, 0);
+                addPerception(receipt, moModuleConfig.getFkEarningHolidayId_n(), timeClockRow.getHolidays(), true, 0);
             }
             
             if (timeClockRow.getSundays() > 0) {
-                this.addPerception(receipt, moModuleConfig.getFkEarningSunBonusId_n(), timeClockRow.getSundays(), true, 0);
+                addPerception(receipt, moModuleConfig.getFkEarningSunBonusId_n(), timeClockRow.getSundays(), true, 0);
             }
             
             if (timeClockRow.getDaysOff() > 0) {
-                this.addPerception(receipt, moModuleConfig.getFkEarningDayOffId_n(), timeClockRow.getDaysOff(), true, 0);
+                addPerception(receipt, moModuleConfig.getFkEarningDayOffId_n(), timeClockRow.getDaysOff(), true, 0);
             }
             
             if (timeClockRow.getAbsences() > 0) {
@@ -2359,7 +2366,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     }
                 }
                 
-                this.adjustNormalPerception(receipt, row);
+                adjustNormalPerception(receipt, row);
             }
         }
     }
@@ -2490,8 +2497,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         if (rowIndex > -1) {
             moGridPanePayrollReceipts.setSelectedGridRow(rowIndex);
-            this.actionReceiptRemove();
-            this.removeByImportation(false);
+            actionReceiptRemove();
+            removeByImportation(false);
         }
         
         if (showMessage) {
@@ -2501,7 +2508,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     
     private void actionClearPrepayroll() {
         boolean showMessage = true;
-        this.removeByImportation(showMessage);
+        removeByImportation(showMessage);
         computeReceipts();
     }
     
@@ -2641,7 +2648,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         }
 
                         if (!gainedEarnings.isEmpty()) {
-                            this.addReceiptAndPerception(entry.getKey(), gainedEarnings);
+                            addReceiptAndPerception(entry.getKey(), gainedEarnings);
                         }
                     }
 
@@ -2661,7 +2668,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             if (row.getPkEmployeeId() == employeeId) {
                 moGridPaneEmployeesAvailable.setSelectedGridRow(i);
                 exists = true;
-                this.addToRigth(employeeId, configs);
+                addToRigth(employeeId, configs);
                 break;
             }
         }
@@ -2670,7 +2677,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             return;
         }
         
-        this.addEarning(employeeId, configs);
+        addEarning(employeeId, configs);
     }
     
     private void addToRigth(int employeeId, ArrayList<SEarnConfiguration> configs) {
@@ -2692,7 +2699,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         if (row != null) {
             for (SEarnConfiguration config : configs) {
-                this.addPerception(row.getHrsReceipt(), config.getIdEarning(), config.getAmount(), isSourcedByClock, config.getIdBonus());
+                addPerception(row.getHrsReceipt(), config.getIdEarning(), config.getAmount(), isSourcedByClock, config.getIdBonus());
             }
         }
         else {
@@ -2995,6 +3002,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moIntPeriod.setValue(moRegistry.getPeriod());
 
                 // Set days:
+                resetPayrollDays(); // REQUIRED for proper payroll calendar days computation!
                 moIntReceiptDays.setValue(moRegistry.getReceiptDays());
                 moIntWorkingDays.setValue(moRegistry.getWorkingDays());
                 
@@ -3205,7 +3213,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                             if (validation.isValid()) {
                                 if (!SHrsUtils.isPayrollUniquenessFullfilled(miClient.getSession(), 
                                         moRegistry.getPkPayrollId(), moIntPeriodYear.getValue(), moIntNumber.getValue(), 
-                                        mnFormSubtype, this.getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
+                                        mnFormSubtype, getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
                                     validation.setMessage("Ya existe una nómina del mismo año, número, periodicidad y tipo.");
                                     validation.setComponent(moKeyPaysheetCustomType);
                                 }

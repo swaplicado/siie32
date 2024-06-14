@@ -69,7 +69,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private java.lang.String msOrderKey;
 
     private erp.mbps.form.SDialogBizPartnerExport moDialogBizPartnerExport;
-    private erp.mod.hrs.form.SDialogEmployeeHireLog moDialogEmployeeHireLog;
     private boolean mbIsViewEmployees;
     private boolean mbIsViewBizPartnersSimple;
     private boolean mbHasRightEmpWage;
@@ -738,13 +737,13 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     public void actionStatusEmployeeChange() {
         if (jbStatusEmployeeChange.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambiar estatus alta-baja del empleado");
-                moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_BPR, moTablePane.getSelectedTableRow().getPrimaryKey());
-                moDialogEmployeeHireLog.setFormVisible(true);
+                SDialogEmployeeHireLog dialog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambiar estatus activo del empleado", SDialogEmployeeHireLog.MODE_SWITCH);
+                dialog.setValue(SModConsts.HRSU_EMP, moTablePane.getSelectedTableRow().getPrimaryKey());
+                dialog.setFormVisible(true);
 
-                if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                        SDbEmployee employee = (SDbEmployee) moDialogEmployeeHireLog.getValue(SModConsts.HRSU_EMP);
+                        SDbEmployee employee = (SDbEmployee) dialog.getValue(SModConsts.HRSU_EMP);
                         employee.save(miClient.getSession());
                     }
                     catch (Exception e) {
@@ -760,15 +759,15 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     public void actionStatusEmployeeModify() {
         if (jbStatusEmployeeChange.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Modificar última alta o baja del empleado");
-                moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_KEY, moTablePane.getSelectedTableRow().getPrimaryKey());
-                moDialogEmployeeHireLog.setFormVisible(true);
+                SDialogEmployeeHireLog dialog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Modificar última alta o baja del empleado", SDialogEmployeeHireLog.MODE_MODIFY);
+                dialog.setValue(SModConsts.HRSU_EMP, moTablePane.getSelectedTableRow().getPrimaryKey());
+                dialog.setFormVisible(true);
 
-                if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SModConsts.HRS_EMP_LOG_HIRE);
+                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  dialog.getValue(SModConsts.HRS_EMP_LOG_HIRE);
                         
-                        if (SHrsUtils.editHireLog(miClient.getSession(), employeeHireLog)) {
+                        if (SHrsUtils.modifyHireLog(miClient.getSession(), employeeHireLog)) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
                         }
                     }
@@ -784,8 +783,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbStatusEmployeeRevert.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 try {
-                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última alta o baja del empleado?\nEsta acción no se puede deshacer.") == JOptionPane.YES_OPTION) {
-                        if (SHrsUtils.deleteHireLog(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
+                    SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    
+                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última " + (employee.isActive() ? "ALTA" : "BAJA") + " del empleado '" + employee.getXtaEmployeeName() + "'?\n"
+                            + "IMPORTANTE: ¡Esta acción no se puede deshacer!") == JOptionPane.YES_OPTION) {
+                        if (SHrsUtils.revertLastHireLogEntry(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
                         }
                     }

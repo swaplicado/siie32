@@ -106,7 +106,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     protected SDataEmployeeRelatives moChildRelatives;
     
-    protected boolean mbOldActive; // immutable member
+    protected boolean mbActiveOld; // immutable member
     
     protected double mdAuxNewSalary;
     protected double mdAuxNewWage;
@@ -504,6 +504,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtTsUserUpdate = null;
         
         moChildRelatives = null;
+        
+        mbActiveOld = false;
 
         mdAuxNewSalary = 0;
         mdAuxNewWage = 0;
@@ -597,7 +599,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
                 mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
                 
-                mbOldActive = mbActive;
+                mbActiveOld = mbActive;
 
                 if (oPhoto_n != null) {
                     moXtaImageIconPhoto_n = SLibUtilities.convertBlobToImageIcon(oPhoto_n);
@@ -911,7 +913,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 statement.execute(sql);
             }
             
-            if (mbIsRegistryNew || mbActive != mbOldActive) {
+            if (mbIsRegistryNew || mbActive != mbActiveOld) {
                 SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(connection); // spreads log entries to all sibling companies
                 
                 hrsEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
@@ -921,17 +923,17 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 hrsEmployeeHireLog.setLastDismissalNotes("");
                 hrsEmployeeHireLog.setIsHire(mbActive);
                 hrsEmployeeHireLog.setDeleted(mbDeleted);
-                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                
+                if (mbActive) {
+                    hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId); // recruitment schema type set only when hiring
+                }
+                
                 hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId != 0 ? mnFkUserInsertId : SUtilConsts.USR_NA_ID);
                 hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId != 0 ? mnFkUserUpdateId : SUtilConsts.USR_NA_ID);
                 
-                hrsEmployeeHireLog.setIsAuxFirstHiring(mbIsRegistryNew);
-                //employeeHireLog.setIsAuxForceFirstHiring(...);
-                //employeeHireLog.setIsAuxModification(...);
-                //employeeHireLog.setIsAuxCorrection(...);
-                //employeeHireLog.setAuxFormerEmployerConnection(...);
-                
-                hrsEmployeeHireLog.save();
+                hrsEmployeeHireLog.setRequestSettings(mbIsRegistryNew);
+                hrsEmployeeHireLog.processRequest();
             }
 
             if (mdAuxNewSalary != 0) {

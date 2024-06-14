@@ -665,9 +665,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel26.add(jftNumber);
 
         jtfBizPartner_Ro.setEditable(false);
+        jtfBizPartner_Ro.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfBizPartner_Ro.setText("TEXT");
         jtfBizPartner_Ro.setToolTipText("Nombre empleado");
         jtfBizPartner_Ro.setFocusable(false);
-        jtfBizPartner_Ro.setPreferredSize(new java.awt.Dimension(300, 23));
+        jtfBizPartner_Ro.setPreferredSize(new java.awt.Dimension(405, 23));
         jPanel26.add(jtfBizPartner_Ro);
 
         jPanel19.add(jPanel26);

@@ -9,8 +9,9 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsUtils;
+import java.awt.Color;
 import java.util.ArrayList;
-import sa.lib.SLibConsts;
+import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -24,17 +25,26 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDialogEmployeeHireLog extends SBeanFormDialog {
-
+    
+    /** Dialog mode to switch active status of employee. */
+    public static final int MODE_SWITCH = 1;
+    
+    /** Dialog mode to modify last hire log entry.  */
+    public static final int MODE_MODIFY = 2;
+    
     protected SDbEmployee moEmployee;
     protected SDbEmployeeHireLog moEmployeeHireLog;
     protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogs;
-    protected boolean mbIsEdit;
+    protected boolean mbCaseOfDismiss;
 
     /**
-     * Creates new form SDialogEmployeeHireLog
+     * Creates new form SDialogEmployeeHireLog.
+     * @param client GUI client.
+     * @param title Dialog title.
+     * @param mode Dialog mode: MODE_SWITCH or MODE_MODIFY.
      */
-    public SDialogEmployeeHireLog(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, title);
+    public SDialogEmployeeHireLog(SGuiClient client, String title, int mode) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_EMP_LOG_HIRE, mode, title);
         initComponents();
         initComponentsCustom();
     }
@@ -48,164 +58,345 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jpDialog = new javax.swing.JPanel();
+        jpEmployeeN = new javax.swing.JPanel();
+        jpRegistry1 = new javax.swing.JPanel();
+        jlEmpEmployee = new javax.swing.JLabel();
+        jtfEmpName = new javax.swing.JTextField();
+        jtfEmpNumber = new javax.swing.JTextField();
+        jpEmployeeN1 = new javax.swing.JPanel();
+        jlEmpContractType = new javax.swing.JLabel();
+        jtfEmpContractType = new javax.swing.JTextField();
+        jpEmployeeN2 = new javax.swing.JPanel();
+        jlEmpRecruitmentSchemeType = new javax.swing.JLabel();
+        jtfEmpRecruitmentSchemeType = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jpRegistry = new javax.swing.JPanel();
+        jpRegistry2 = new javax.swing.JPanel();
         jlAction = new javax.swing.JLabel();
         jtfAction = new javax.swing.JTextField();
-        jPanel11 = new javax.swing.JPanel();
+        jpRegistry3 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel12 = new javax.swing.JPanel();
+        jpRegistry4 = new javax.swing.JPanel();
         jlEmployeeDismissalType = new javax.swing.JLabel();
         moKeyEmployeeDismissalType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel13 = new javax.swing.JPanel();
+        jpRegistry5 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jpRegistry6 = new javax.swing.JPanel();
+        jlRecruitmentSchemeType = new javax.swing.JLabel();
+        moKeyRecruitmentSchemeType = new sa.lib.gui.bean.SBeanFieldKey();
+        jpEmployeeN4 = new javax.swing.JPanel();
+        jlEmpHireWarning = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpDialog.setLayout(new java.awt.BorderLayout());
+
+        jpEmployeeN.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos actuales del empleado:"));
+        jpEmployeeN.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jpRegistry1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmpEmployee.setText("Empleado:");
+        jlEmpEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpRegistry1.add(jlEmpEmployee);
+
+        jtfEmpName.setEditable(false);
+        jtfEmpName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfEmpName.setText("TEXT");
+        jtfEmpName.setFocusable(false);
+        jtfEmpName.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpRegistry1.add(jtfEmpName);
+
+        jtfEmpNumber.setEditable(false);
+        jtfEmpNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfEmpNumber.setText("TEXT");
+        jtfEmpNumber.setFocusable(false);
+        jtfEmpNumber.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpRegistry1.add(jtfEmpNumber);
+
+        jpEmployeeN.add(jpRegistry1);
+
+        jpEmployeeN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmpContractType.setText("Tipo contrato:");
+        jlEmpContractType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpEmployeeN1.add(jlEmpContractType);
+
+        jtfEmpContractType.setEditable(false);
+        jtfEmpContractType.setText("TEXT");
+        jtfEmpContractType.setFocusable(false);
+        jtfEmpContractType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpEmployeeN1.add(jtfEmpContractType);
+
+        jpEmployeeN.add(jpEmployeeN1);
+
+        jpEmployeeN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmpRecruitmentSchemeType.setText("Tipo régimen:");
+        jlEmpRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpEmployeeN2.add(jlEmpRecruitmentSchemeType);
+
+        jtfEmpRecruitmentSchemeType.setEditable(false);
+        jtfEmpRecruitmentSchemeType.setText("TEXT");
+        jtfEmpRecruitmentSchemeType.setFocusable(false);
+        jtfEmpRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpEmployeeN2.add(jtfEmpRecruitmentSchemeType);
+
+        jpEmployeeN.add(jpEmployeeN2);
+
+        jpDialog.add(jpEmployeeN, java.awt.BorderLayout.PAGE_START);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del movimiento:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jpRegistry.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpRegistry2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAction.setText("Acción:");
+        jlAction.setText("Movimiento:");
         jlAction.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlAction);
+        jpRegistry2.add(jlAction);
 
         jtfAction.setEditable(false);
+        jtfAction.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfAction.setText("TEXT");
         jtfAction.setFocusable(false);
-        jtfAction.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel3.add(jtfAction);
+        jtfAction.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpRegistry2.add(jtfAction);
 
-        jPanel2.add(jPanel3);
+        jpRegistry.add(jpRegistry2);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpRegistry3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha:*");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel11.add(jlDate);
-        jPanel11.add(moDateDate);
+        jpRegistry3.add(jlDate);
+        jpRegistry3.add(moDateDate);
 
-        jPanel2.add(jPanel11);
+        jpRegistry.add(jpRegistry3);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpRegistry4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployeeDismissalType.setText("Motivo baja:*");
         jlEmployeeDismissalType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlEmployeeDismissalType);
+        jpRegistry4.add(jlEmployeeDismissalType);
 
-        moKeyEmployeeDismissalType.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel12.add(moKeyEmployeeDismissalType);
+        moKeyEmployeeDismissalType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpRegistry4.add(moKeyEmployeeDismissalType);
 
-        jPanel2.add(jPanel12);
+        jpRegistry.add(jpRegistry4);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpRegistry5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setText("Notas:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jlNotes);
+        jpRegistry5.add(jlNotes);
 
-        moTextNotes.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel13.add(moTextNotes);
+        moTextNotes.setText("TEXT");
+        moTextNotes.setPreferredSize(new java.awt.Dimension(500, 23));
+        jpRegistry5.add(moTextNotes);
 
-        jPanel2.add(jPanel13);
+        jpRegistry.add(jpRegistry5);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jpRegistry6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jlRecruitmentSchemeType.setText("Tipo régimen:");
+        jlRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpRegistry6.add(jlRecruitmentSchemeType);
+
+        moKeyRecruitmentSchemeType.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpRegistry6.add(moKeyRecruitmentSchemeType);
+
+        jpRegistry.add(jpRegistry6);
+
+        jpEmployeeN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEmpHireWarning.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlEmpHireWarning.setText("WARNING TEXT...");
+        jlEmpHireWarning.setPreferredSize(new java.awt.Dimension(510, 23));
+        jpEmployeeN4.add(jlEmpHireWarning);
+
+        jpRegistry.add(jpEmployeeN4);
+
+        jPanel1.add(jpRegistry, java.awt.BorderLayout.NORTH);
+
+        jpDialog.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpDialog, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel jlAction;
     private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlEmpContractType;
+    private javax.swing.JLabel jlEmpEmployee;
+    private javax.swing.JLabel jlEmpHireWarning;
+    private javax.swing.JLabel jlEmpRecruitmentSchemeType;
     private javax.swing.JLabel jlEmployeeDismissalType;
     private javax.swing.JLabel jlNotes;
+    private javax.swing.JLabel jlRecruitmentSchemeType;
+    private javax.swing.JPanel jpDialog;
+    private javax.swing.JPanel jpEmployeeN;
+    private javax.swing.JPanel jpEmployeeN1;
+    private javax.swing.JPanel jpEmployeeN2;
+    private javax.swing.JPanel jpEmployeeN4;
+    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JPanel jpRegistry1;
+    private javax.swing.JPanel jpRegistry2;
+    private javax.swing.JPanel jpRegistry3;
+    private javax.swing.JPanel jpRegistry4;
+    private javax.swing.JPanel jpRegistry5;
+    private javax.swing.JPanel jpRegistry6;
     private javax.swing.JTextField jtfAction;
+    private javax.swing.JTextField jtfEmpContractType;
+    private javax.swing.JTextField jtfEmpName;
+    private javax.swing.JTextField jtfEmpNumber;
+    private javax.swing.JTextField jtfEmpRecruitmentSchemeType;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployeeDismissalType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyRecruitmentSchemeType;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
-        moEmployeeHireLog = null;
-        mbIsEdit = false;
-
+        SGuiUtils.setWindowBounds(this, 640, 400);
         jbSave.setText("Aceptar");
 
         moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
         moKeyEmployeeDismissalType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployeeDismissalType.getText()), true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
+        moKeyRecruitmentSchemeType.setKeySettings(miClient, SGuiUtils.getLabelName(jlRecruitmentSchemeType), true);
 
         moFields.addField(moDateDate);
         moFields.addField(moKeyEmployeeDismissalType);
         moFields.addField(moTextNotes);
+        moFields.addField(moKeyRecruitmentSchemeType);
 
         moFields.setFormButton(jbSave);
-
-        moTextNotes.setValue("");
-        moDateDate.setValue(miClient.getSession().getCurrentDate());
 
         reloadCatalogues();
         addAllListeners();
     }
     
-    private void renderHireLog(final int[] employeePk) {
-        moEmployeeHireLog = new SDbEmployeeHireLog();
+    private boolean isSwitching() {
+        return mnFormSubtype == MODE_SWITCH;
+    }
+    
+    private void renderHireLog(final int[] employeeKey) {
+        // render employee:
+        
+        moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, employeeKey);
+        
+        jtfEmpName.setText(moEmployee.getXtaEmployeeName());
+        jtfEmpNumber.setText(moEmployee.getNumber());
+        jtfEmpContractType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { moEmployee.getFkContractTypeId() }, SDbRegistry.FIELD_NAME));
+        jtfEmpRecruitmentSchemeType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moEmployee.getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME));
+        
+        jtfEmpName.setCaretPosition(0);
+        jtfEmpNumber.setCaretPosition(0);
+        jtfEmpContractType.setCaretPosition(0);
+        jtfEmpRecruitmentSchemeType.setCaretPosition(0);
+        
+        // render action:
+        
+        /*
+        a) mode switch:
+            from active to inactive:    case of dismiss
+            from inactive to active:    case of hire
+        b) mode modify (= not switch):
+            keept as active:            case of hire
+            keept as inactive:          case of dismiss
+        */
+        
+        mbCaseOfDismiss = (isSwitching() && moEmployee.isActive()) || (!isSwitching() && !moEmployee.isActive());
+        
+        String action = mbCaseOfDismiss ? "baja" : "alta";
+        
+        jtfAction.setText((isSwitching() ? "" : "MODIFICACIÓN DE LA ÚLTIMA ") + action.toUpperCase());
+        jtfAction.setCaretPosition(0);
+
+        jlDate.setText("Fecha " + action + ":*");
+        jlNotes.setText("Notas " + action + ":");
+        
+        // render hire log entry:
+        
+        moFields.resetFields();
+        moDateDate.setValue(miClient.getSession().getCurrentDate());
+        
+        jlEmployeeDismissalType.setEnabled(mbCaseOfDismiss);
+        moKeyEmployeeDismissalType.setEnabled(mbCaseOfDismiss);
         
         try {
-            readEmployee(employeePk);
+            moEmployeeHireLog = null;
             
-            if (mbIsEdit) {
-                if (moEmployee.isActive()) {
-                    jtfAction.setText("Modificación última alta");
-                }
-                else {
-                    jtfAction.setText("Modificación última baja");
-                }
-            }
-            else {
-                if (moEmployee.isActive()) {
-                    jtfAction.setText("Baja");
-                }
-                else {
-                    jtfAction.setText("Alta");
-                }
-            }
-
             if (moEmployee.isActive()) {
+                // both switching or modifying active employee requires last hire
                 moEmployeeHireLog = SHrsUtils.getEmployeeLastHire(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
             }
-            else if (mbIsEdit) {
+            else {
+                // both switching or modifying inactive employee requires last dismiss
                 moEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
             }
             
-            moKeyEmployeeDismissalType.setEnabled((moEmployee.isActive() && !mbIsEdit) || (!moEmployee.isActive() && mbIsEdit));
-            
-            if (mbIsEdit) {
-                moDateDate.setValue(moEmployee.isActive() ? moEmployeeHireLog.getDateHire() : moEmployeeHireLog.getDateDismissal_n());
-                moKeyEmployeeDismissalType.setValue(new int[] { moEmployeeHireLog.getFkEmployeeDismissalTypeId() });
-                moTextNotes.setValue(moEmployee.isActive() ? moEmployeeHireLog.getNotesHire() : moEmployeeHireLog.getNotesDismissal());
+            if (isSwitching()) {
+                // switchiing...
+                
+                // recruitment type:
+                
+                if (moEmployee.isActive()) {
+                    moKeyRecruitmentSchemeType.setValue(new int[] { moEmployeeHireLog.getFkRecruitmentSchemaTypeId() });
+                }
+                else {
+                    moKeyRecruitmentSchemeType.setValue(new int[] { moEmployee.getFkRecruitmentSchemaTypeId() });
+                }
+                
+                moKeyRecruitmentSchemeType.setEnabled(false);
             }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
-        }
-    }
-
-    private void readEmployee(final int[] employeePk) {
-        moEmployee = new SDbEmployee();
-
-        try {
-            moEmployee.read(miClient.getSession(), employeePk);
+            else {
+                // modifying...
+                
+                // date, notes, dismissal type:
+                
+                if (moEmployee.isActive()) {
+                    moDateDate.setValue(moEmployeeHireLog.getDateHire());
+                    moTextNotes.setValue(moEmployeeHireLog.getNotesHire());
+                    
+                    moKeyEmployeeDismissalType.resetField();
+                }
+                else {
+                    moDateDate.setValue(moEmployeeHireLog.getDateDismissal_n());
+                    moTextNotes.setValue(moEmployeeHireLog.getNotesDismissal());
+                    
+                    moKeyEmployeeDismissalType.setValue(new int[] { moEmployeeHireLog.getFkEmployeeDismissalTypeId() });
+                }
+                
+                // recruitment type:
+                
+                moKeyRecruitmentSchemeType.setValue(new int[] { moEmployeeHireLog.getFkRecruitmentSchemaTypeId() });
+                
+                moKeyRecruitmentSchemeType.setEnabled(moEmployee.isActive() && moEmployeeHireLog.getFkRecruitmentSchemaTypeId() != moEmployee.getFkRecruitmentSchemaTypeId());
+            }
+            
+            if (mbCaseOfDismiss) {
+                // case of dismiss...
+                
+                jlEmpHireWarning.setText("");
+            }
+            else {
+                // case of hire...
+                
+                jtfEmpRecruitmentSchemeType.setForeground(Color.red);
+                jlEmpHireWarning.setForeground(Color.red);
+                
+                if (isSwitching()) {
+                    jlEmpHireWarning.setText("IMPORTANTE: ¡La nueva alta QUEDARÁ con el TIPO DE RÉGIMEN ACTUAL del empleado!");
+                }
+                else {
+                    jlEmpHireWarning.setText("IMPORTANTE: ¡Validar que el TIPO DE RÉGIMEN de la alta sea el correcto!");
+                }
+            }
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -231,7 +422,8 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyEmployeeDismissalType, SModConsts.HRSU_TP_EMP_DIS, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyEmployeeDismissalType, SModConsts.HRSU_TP_EMP_DIS, 0, null);
+        miClient.getSession().populateCatalogue(moKeyRecruitmentSchemeType, SModConsts.HRSS_TP_REC_SCHE, 0, null);
     }
 
     @Override
@@ -243,15 +435,29 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEmployeeDismissalType) + "'.");
                 validation.setComponent(moKeyEmployeeDismissalType);
             }
-            else if (!mbIsEdit) {
-                try {
-                    validateDate();
-                    SHrsUtils.validateEmployeeHireLog(miClient.getSession(), moEmployee.getPkEmployeeId(), !moEmployee.isActive());
+            else if (moKeyRecruitmentSchemeType.isEnabled() && moKeyRecruitmentSchemeType.getValue()[0] != moEmployee.getFkRecruitmentSchemaTypeId()) {
+                String[] recruitmentSchemeTypes = new String[] {
+                    (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moKeyRecruitmentSchemeType.getValue()[0] }, SDbRegistry.FIELD_NAME),
+                    (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moEmployee.getFkRecruitmentSchemaTypeId() }, SDbRegistry.FIELD_NAME),
+                };
+                
+                if (miClient.showMsgBoxConfirm("Confirmar si el tipo de régimen del movimiento '" + recruitmentSchemeTypes[0] + "' es correcto que sea distinto al del empleado '" + recruitmentSchemeTypes[1] + "'.") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlRecruitmentSchemeType) + "' ('" + recruitmentSchemeTypes[1] + "').");
+                    validation.setComponent(moKeyRecruitmentSchemeType);
                 }
-                catch (Exception e) {
-                    SLibUtils.printException(this, e);
-                    validation.setMessage(e.getMessage());
-                    validation.setComponent(moDateDate);
+            }
+            
+            if (validation.isValid()) {
+                if (isSwitching()) {
+                    try {
+                        validateDate();
+                        SHrsUtils.validateEmployeeHireLog(miClient.getSession(), moEmployee.getPkEmployeeId(), !moEmployee.isActive());
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                        validation.setMessage(e.getMessage());
+                        validation.setComponent(moDateDate);
+                    }
                 }
             }
         }
@@ -282,13 +488,11 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
     @Override
     public void setValue(final int type, final Object value) {
         switch (type) {
-            case SGuiConsts.PARAM_BPR:
+            case SModConsts.HRSU_EMP:
                 renderHireLog((int[]) value);
                 break;
-            case SGuiConsts.PARAM_KEY:
-                mbIsEdit = true;
-                renderHireLog((int[]) value);
             default:
+                // nothing
         }
     }
 
@@ -304,12 +508,12 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         switch (type) {
             case SModConsts.HRSU_EMP:
                 if (!moKeyEmployeeDismissalType.isEnabled()) {
-                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                     moEmployee.setDateLastHire(moDateDate.getValue());
+                    moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
                 }
                 else {
-                    moEmployee.setAuxEmployeeDismissalTypeId(moKeyEmployeeDismissalType.getValue()[0]);
                     moEmployee.setDateLastDismissal_n(moDateDate.getValue());
+                    moEmployee.setAuxEmployeeDismissalTypeId(moKeyEmployeeDismissalType.getValue()[0]);
                 }
                 
                 moEmployee.setAuxHireLogDate(moDateDate.getValue());
@@ -320,15 +524,21 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 break;
                 
             case SModConsts.HRS_EMP_LOG_HIRE:
-                if (!moKeyEmployeeDismissalType.isEnabled()) {
-                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
-                    moEmployeeHireLog.setDateHire(moDateDate.getValue());
-                    moEmployeeHireLog.setNotesHire(moTextNotes.getValue());                    
-                }
-                else {
-                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(moKeyEmployeeDismissalType.getValue()[0]);
+                if (mbCaseOfDismiss) {
+                    // case of dismiss...
+                    
                     moEmployeeHireLog.setDateDismissal_n(moDateDate.getValue());
                     moEmployeeHireLog.setNotesDismissal(moTextNotes.getValue());                    
+                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(moKeyEmployeeDismissalType.getValue()[0]);
+                    //moEmployeeHireLog.setFkRecruitmentSchemaTypeId(...); // preserve current recruitment schema type
+                }
+                else {
+                    // case of hire...
+                    
+                    moEmployeeHireLog.setDateHire(moDateDate.getValue());
+                    moEmployeeHireLog.setNotesHire(moTextNotes.getValue());                    
+                    moEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                    moEmployeeHireLog.setFkRecruitmentSchemaTypeId(moKeyRecruitmentSchemeType.getValue()[0]);
                 }
                 
                 value = moEmployeeHireLog;

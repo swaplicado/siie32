@@ -607,11 +607,8 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
                     //hrsEmployeeHireLog.setFkUserInsertId(...);
                     //hrsEmployeeHireLog.setFkUserUpdateId(...);
                     
-                    hrsEmployeeHireLog.setIsAuxFirstHiring(false); // employee has been hired at least once!
-                    hrsEmployeeHireLog.setIsAuxForceFirstHiring(true); // emulate a first-higing movement
-                    hrsEmployeeHireLog.setIsAuxModification(false);
-                    hrsEmployeeHireLog.setIsAuxCorrection(false);
-                    hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer DB connection (current DB connection in user session)
+                    // emulate a first-higing movement, employee has been hired at least once:
+                    hrsEmployeeHireLog.setRequestSettings(true, miClient.getSession().getStatement().getConnection()); // former employer DB connection (current DB connection in user session)
                     
                     moEmployee.setActive(true); // re-active this inactive employee
                     moEmployee.setDateBenefits(moDateBenefits.getValue());
