@@ -195,6 +195,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected boolean mbFlagReadLinksAswell; // Read aswell links and adjustments
     protected boolean mbFlagMinorChangesEdited;
     protected boolean mbFlagOpenedByMatRequestImport;
+    protected boolean mbFlagDpsEtyOpened;
     
     protected int mnXtaPkDpsYearConId; // DPS for adjustment DPS in contract
     protected int mnXtaPkDpsDocConId; // DPS for adjustment DPS in contract
@@ -539,10 +540,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setFlagReadLinksAswell(boolean b) { mbFlagReadLinksAswell = b; }
     public void setFlagMinorChangesEdited(boolean b) { mbFlagMinorChangesEdited = b; }
     public void setFlagOpenedByMatRequestImport(boolean b) { mbFlagOpenedByMatRequestImport = b; }
+    public void setFlagDpsEtyOpened(boolean b) { mbFlagDpsEtyOpened = b; }
     
     public boolean getFlagReadLinksAswell() { return mbFlagReadLinksAswell; }
     public boolean getFlagMinorChangesEdited() { return mbFlagMinorChangesEdited; }
     public boolean getFlagOpenedByMatRequestImport() { return mbFlagOpenedByMatRequestImport; }
+    public boolean getFlagDpsEtyOpened() { return mbFlagDpsEtyOpened; }
 
     public int[] getKeyDps() { return new int[] { mnPkYearId, mnPkDocId }; }
     public int[] getKeyDpsAdjustmentType() { return new int[] { mnFkDpsAdjustmentTypeId }; }
@@ -744,6 +747,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         //mbFlagReadLinksAswell = false; // must be independent of a reset!
         mbFlagMinorChangesEdited = false;
         mbFlagOpenedByMatRequestImport = false;
+        mbFlagDpsEtyOpened = false;
     
         mnXtaPkDpsYearConId = 0;
         mnXtaPkDpsDocConId = 0;
@@ -2110,6 +2114,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setFlagReadLinksAswell(mbFlagReadLinksAswell);
         clone.setFlagMinorChangesEdited(mbFlagMinorChangesEdited);
         clone.setFlagOpenedByMatRequestImport(mbFlagOpenedByMatRequestImport);
+        clone.setFlagDpsEtyOpened(mbFlagDpsEtyOpened);
 
         clone.setXtaIsPurInvoiceInventoriable(mbXtaIsPurInvoiceInventoriable);
         clone.setXtaPriceCommUnitary(mnXtaPriceCommUnitary);

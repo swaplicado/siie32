@@ -1982,8 +1982,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel61.add(jradAccCashAccount);
 
         bgAccOptions.add(jradAccAdvanceBilled);
-        jradAccAdvanceBilled.setText("Anticipos fact.");
-        jradAccAdvanceBilled.setPreferredSize(new java.awt.Dimension(100, 23));
+        jradAccAdvanceBilled.setText("Anticipos fact. x aplic.");
+        jradAccAdvanceBilled.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel61.add(jradAccAdvanceBilled);
 
         jPanel60.add(jPanel61);
@@ -2947,7 +2947,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jradAccAdvanceBilled.addItemListener(this);
         
         jckAuxPreserveQuantity.addItemListener(this);
-
+        
         SFormUtilities.createActionMap(rootPane, this, "publicPriceUnitaryCyWizard", "priceUnitaryCyWizard", KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionNotesNew", "notesNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionNotesEdit", "notesEdit", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
@@ -4558,6 +4558,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         itemStateIsTaxesAutomaticApplying(true);
 
         mbUpdatingForm = false;
+    }
+    
+    private void itemChangeOperationsType() {
+        if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && moParamDps.isAdjustment() && moFieldOperationsType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) {
+            jradAccCashAccount.setEnabled(true);
+            jradAccAdvanceBilled.setEnabled(true);
+            jradAccAdvanceBilled.setSelected(true);
+        }
+        else {
+            bgAccOptions.clearSelection();
+            jradAccCashAccount.setEnabled(false);
+            jradAccAdvanceBilled.setEnabled(false);
+        }
+        
+        renderAccountOptions();
     }
 
     private void actionKey() {
@@ -6530,6 +6545,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (moParamDps.isDocumentSal()) {
             itemComposition();
         }
+        
+        if (moParamDps.isAdjustment()){
+            jcbOperationsType.addItemListener(this);
+            itemChangeOperationsType();
+        }
 
         mbResetingForm = false;
     }
@@ -6696,6 +6716,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.getDbmsDpsEntryQuantityChange().add(chg);
         }
         
+        moDpsEntry.setFlagDpsEtyOpened(true);
         return moDpsEntry;
     }
 
@@ -7049,6 +7070,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
                 else if (comboBox == jcbFkTaxRegionId) {
                     itemChangedFkTaxRegionId();
+                }
+                else if (comboBox == jcbOperationsType) {
+                    itemChangeOperationsType();
                 }
             }
             else if (e.getSource() instanceof javax.swing.JRadioButton && e.getStateChange() == ItemEvent.SELECTED) {
