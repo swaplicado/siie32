@@ -751,6 +751,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     }
 
                     miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                    miClient.getSession().notifySuscriptors(mnTabTypeAux01);
                 }
             }
         }
@@ -765,10 +766,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
                 if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  dialog.getValue(SModConsts.HRS_EMP_LOG_HIRE);
+                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog) dialog.getValue(SModConsts.HRS_EMP_LOG_HIRE);
                         
                         if (SHrsUtils.modifyHireLog(miClient.getSession(), employeeHireLog)) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                            miClient.getSession().notifySuscriptors(mnTabTypeAux01);
                         }
                     }
                     catch (Exception e) {
@@ -787,8 +789,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última " + (employee.isActive() ? "ALTA" : "BAJA") + " del empleado '" + employee.getXtaEmployeeName() + "'?\n"
                             + "IMPORTANTE: ¡Esta acción no se puede deshacer!") == JOptionPane.YES_OPTION) {
-                        if (SHrsUtils.revertLastHireLogEntry(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
+                        if (SHrsUtils.revertLastHireLogEntry(miClient.getSession(), employee)) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                            miClient.getSession().notifySuscriptors(mnTabTypeAux01);
                         }
                     }
                 }

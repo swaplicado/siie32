@@ -35,7 +35,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
     protected SDbEmployee moEmployee;
     protected SDbEmployeeHireLog moEmployeeHireLog;
     protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogs;
-    protected boolean mbCaseOfDismiss;
+    protected boolean mbCaseOfDismissal;
 
     /**
      * Creates new form SDialogEmployeeHireLog.
@@ -303,16 +303,16 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         
         /*
         a) mode switch:
-            from active to inactive:    case of dismiss
+            from active to inactive:    case of dismissal
             from inactive to active:    case of hire
         b) mode modify (= not switch):
             keept as active:            case of hire
-            keept as inactive:          case of dismiss
+            keept as inactive:          case of dismissal
         */
         
-        mbCaseOfDismiss = (isSwitching() && moEmployee.isActive()) || (!isSwitching() && !moEmployee.isActive());
+        mbCaseOfDismissal = (isSwitching() && moEmployee.isActive()) || (!isSwitching() && !moEmployee.isActive());
         
-        String action = mbCaseOfDismiss ? "baja" : "alta";
+        String action = mbCaseOfDismissal ? "baja" : "alta";
         
         jtfAction.setText((isSwitching() ? "" : "MODIFICACIÓN DE LA ÚLTIMA ") + action.toUpperCase());
         jtfAction.setCaretPosition(0);
@@ -325,20 +325,11 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         moFields.resetFields();
         moDateDate.setValue(miClient.getSession().getCurrentDate());
         
-        jlEmployeeDismissalType.setEnabled(mbCaseOfDismiss);
-        moKeyEmployeeDismissalType.setEnabled(mbCaseOfDismiss);
+        jlEmployeeDismissalType.setEnabled(mbCaseOfDismissal);
+        moKeyEmployeeDismissalType.setEnabled(mbCaseOfDismissal);
         
         try {
-            moEmployeeHireLog = null;
-            
-            if (moEmployee.isActive()) {
-                // both switching or modifying active employee requires last hire
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastHire(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
-            }
-            else {
-                // both switching or modifying inactive employee requires last dismiss
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
-            }
+            moEmployeeHireLog = SHrsUtils.getEmployeeLastHireLog(miClient.getSession(), "", moEmployee.getPkEmployeeId(), 0);
             
             if (isSwitching()) {
                 // switchiing...
@@ -379,13 +370,13 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 moKeyRecruitmentSchemeType.setEnabled(moEmployee.isActive() && moEmployeeHireLog.getFkRecruitmentSchemaTypeId() != moEmployee.getFkRecruitmentSchemaTypeId());
             }
             
-            if (mbCaseOfDismiss) {
-                // case of dismiss...
+            if (mbCaseOfDismissal) {
+                // dismissal...
                 
                 jlEmpHireWarning.setText("");
             }
             else {
-                // case of hire...
+                // hire...
                 
                 jtfEmpRecruitmentSchemeType.setForeground(Color.red);
                 jlEmpHireWarning.setForeground(Color.red);
@@ -524,8 +515,8 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 break;
                 
             case SModConsts.HRS_EMP_LOG_HIRE:
-                if (mbCaseOfDismiss) {
-                    // case of dismiss...
+                if (mbCaseOfDismissal) {
+                    // dismissal...
                     
                     moEmployeeHireLog.setDateDismissal_n(moDateDate.getValue());
                     moEmployeeHireLog.setNotesDismissal(moTextNotes.getValue());                    
@@ -533,7 +524,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                     //moEmployeeHireLog.setFkRecruitmentSchemaTypeId(...); // preserve current recruitment schema type
                 }
                 else {
-                    // case of hire...
+                    // hire...
                     
                     moEmployeeHireLog.setDateHire(moDateDate.getValue());
                     moEmployeeHireLog.setNotesHire(moTextNotes.getValue());                    

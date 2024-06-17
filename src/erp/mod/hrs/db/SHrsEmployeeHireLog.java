@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -21,6 +22,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SHrsEmployeeHireLog {
     
+    private static final int MODE_SWITCH = 0;
     public static final int MODE_MODIFY = 1;
     public static final int MODE_REVERT = 2;
     
@@ -115,11 +117,11 @@ public class SHrsEmployeeHireLog {
     }
     
     public void setRequestSettings(final boolean firstHiring) throws Exception {
-        setRequestSettings(firstHiring, 0, null);
+        setRequestSettings(firstHiring, MODE_SWITCH, null);
     }
     
     public void setRequestSettings(final boolean firstHiring, final Connection formerEmployerConnection) throws Exception {
-        setRequestSettings(firstHiring, 0, formerEmployerConnection);
+        setRequestSettings(firstHiring, MODE_SWITCH, formerEmployerConnection);
     }
     
     public void setRequestSettings(final int mode) throws Exception {
@@ -152,7 +154,7 @@ public class SHrsEmployeeHireLog {
         
         for (String schema : schemas) {
             if (mbRequestFirstHiring) {
-                // bizarre, but member moConnection should have been previously set:
+                // bizarre, but member moConnection should have been previously set
 
                 try (Statement statement = connection.createStatement()) {
                     int logId = 0;
@@ -189,125 +191,131 @@ public class SHrsEmployeeHireLog {
                 }
             }
             else {
-                // bizarre, but member moSession should have been previously set:
+                // bizarre, but member moSession should have been previously set
 
-                SDbEmployee employee = null;
-                SDbEmployeeHireLog oldEmployeeHireLog = null;
-                SDbEmployeeHireLog newEmployeeHireLog = null;
-
-                if (mnRequestMode == MODE_MODIFY) {
-                    oldEmployeeHireLog = null;
-
-                    if (mbIsHire) {
-                        oldEmployeeHireLog = SHrsUtils.getEmployeeLastHire(moSession, mnPkEmployeeId, 0, schema);
-                    }
-                    else {
-                        oldEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
-                    }
-
-                    if (oldEmployeeHireLog == null) {
-                        newEmployeeHireLog = new SDbEmployeeHireLog();
-                    }
-                    else {
-                        newEmployeeHireLog = oldEmployeeHireLog;
-                    }
-
-                    if (mbIsHire) {
-                        newEmployeeHireLog.setDateHire(mtLastHireDate);
-                        newEmployeeHireLog.setNotesHire(msLastHireNotes);
-                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
-                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
-                    }
-                    else {
-                        newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
-                        newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
-                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
-                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(oldEmployeeHireLog.getFkRecruitmentSchemaTypeId()); // preserve
-                    }
-
-                    newEmployeeHireLog.setHired(mbIsHire);
-                    newEmployeeHireLog.setDeleted(mbDeleted);
-                    newEmployeeHireLog.setAuxSchema(schema);
-
-                    newEmployeeHireLog.save(moSession);
-
-                    employee = new SDbEmployee();
-
-                    if (mbIsHire) {
-                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, mtLastHireDate);
-                    }
-                    else {
-                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, mtLastDismissalDate_n);
-                    }
-                }
-                else {
-                    oldEmployeeHireLog = null;
-
-                    if (!mbIsHire) {
-                        // dismiss...
-                        oldEmployeeHireLog = SHrsUtils.getEmployeeLastHire(moSession, mnPkEmployeeId, 0, schema);
-                    }
-                    else if (mnRequestMode == MODE_REVERT) {
-                        oldEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
-                    }
-
-                    if (oldEmployeeHireLog == null) {
-                        newEmployeeHireLog = new SDbEmployeeHireLog();
-                    }
-                    else {
-                        newEmployeeHireLog = oldEmployeeHireLog;
-                    }
-
-                    newEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
-                    
-                    if (!mbIsHire) {
-                        // dismiss...
-                        
-                        newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
-                        newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
-                        
-                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
-                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(oldEmployeeHireLog.getFkRecruitmentSchemaTypeId()); // preserve
-                    }
-                    else {
-                        if (mnRequestMode == MODE_REVERT) {
-                            newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
-                            newEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
-                        }
-                        else {
-                            newEmployeeHireLog.setDateHire(mtLastHireDate);
-                            newEmployeeHireLog.setNotesHire(msLastHireNotes);
-                        }
-                        
-                        newEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
-                        newEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
-                    }
-
-                    newEmployeeHireLog.setHired(mbIsHire);
-                    newEmployeeHireLog.setDeleted(mbDeleted);
-                    newEmployeeHireLog.setAuxSchema(schema);
-
-                    newEmployeeHireLog.save(moSession);
-
-                    if (mnRequestMode == MODE_REVERT) {
-                        SDbEmployeeHireLog employeeHireLogAux = null;
-
-                        employee = new SDbEmployee();
-
-                        employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_ACTIVE, mbIsHire);
-
-                        if (!mbIsHire) {
-                            employeeHireLogAux = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, newEmployeeHireLog.getPkLogId(), schema);
-                        }
+                SDbEmployeeHireLog employeeHireLog;
+                SDbEmployeeHireLog oldEmployeeHireLog;
+                SDbEmployeeHireLog lastEmployeeHireLog;
+                
+                switch (mnRequestMode) {
+                    case MODE_SWITCH:
+                        // active status of employee already changed in SDbEmployee.save()!
 
                         if (mbIsHire) {
-                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, null);
+                            // new hire...
+                            
+                            // create new log entry:
+                            
+                            employeeHireLog = new SDbEmployeeHireLog();
+                            employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+                            
+                            employeeHireLog.setHired(true);
+                            employeeHireLog.setDateHire(mtLastHireDate);
+                            employeeHireLog.setNotesHire(msLastHireNotes);
+
+                            employeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                            employeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
                         }
                         else {
-                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISS, employeeHireLogAux.getDateDismissal_n());
-                            employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, employeeHireLogAux.getDateHire());
+                            // new dismissal...
+                            
+                            // update last log entry:
+                            
+                            employeeHireLog = SHrsUtils.getEmployeeLastHireLog(moSession, schema, mnPkEmployeeId, 0);
+
+                            employeeHireLog.setHired(false);
+                            employeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
+                            employeeHireLog.setNotesDismissal(msLastDismissalNotes);
+                            
+                            employeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
+                            //employeeHireLog.setFkRecruitmentSchemaTypeId(...); // preserve
                         }
-                    }
+
+                        employeeHireLog.setAuxSchema(schema);
+                        employeeHireLog.save(moSession);
+                        break;
+                        
+                    case MODE_MODIFY:
+                        // registry of employee is not yet updated!
+
+                        lastEmployeeHireLog = SHrsUtils.getEmployeeLastHireLog(moSession, schema, mnPkEmployeeId, 0);
+                        
+                        if (mbIsHire) {
+                            // modify last hire:
+                            
+                            lastEmployeeHireLog.setDateHire(mtLastHireDate);
+                            lastEmployeeHireLog.setNotesHire(msLastHireNotes);
+                            
+                            lastEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                            lastEmployeeHireLog.setFkRecruitmentSchemaTypeId(mnFkRecruitmentSchemaTypeId);
+                        }
+                        else {
+                            // modify last dismissal:
+                            
+                            lastEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
+                            lastEmployeeHireLog.setNotesDismissal(msLastDismissalNotes);
+                            
+                            lastEmployeeHireLog.setFkEmployeeDismissalTypeId(mnFkEmployeeDismissalTypeId);
+                            //lastEmployeeHireLog.setFkRecruitmentSchemaTypeId(...); // preserve
+                        }
+
+                        lastEmployeeHireLog.setAuxSchema(schema);
+                        lastEmployeeHireLog.save(moSession);
+                        
+                        // update employee:
+
+                        if (mbIsHire) {
+                            moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, mtLastHireDate);
+                        }
+                        else {
+                            moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISSAL, mtLastDismissalDate_n);
+                        }
+                        break;
+                        
+                    case MODE_REVERT:
+                        // registry of employee is not yet updated!
+
+                        oldEmployeeHireLog = SHrsUtils.getEmployeeLastHireLog(moSession, schema, mnPkEmployeeId, 0);
+                        
+                        if (mbIsHire) {
+                            // revert last dismissal...
+                            
+                            oldEmployeeHireLog.setHired(true);
+                            oldEmployeeHireLog.setDateDismissal_n(null);
+                            oldEmployeeHireLog.setNotesDismissal("");
+                            oldEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA);
+                            //oldEmployeeHireLog.setFkRecruitmentSchemaTypeId(...); // preserve
+                        }
+                        else {
+                            // revert last hire...
+                            
+                            oldEmployeeHireLog.setDeleted(true);
+                        }
+
+                        oldEmployeeHireLog.setAuxSchema(schema);
+                        oldEmployeeHireLog.save(moSession);
+
+                        // update employee:
+                        
+                        lastEmployeeHireLog = SHrsUtils.getEmployeeLastHireLog(moSession, schema, mnPkEmployeeId, oldEmployeeHireLog.getPkLogId());
+                        
+                        moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_ACTIVE, mbIsHire);
+                        
+                        if (mbIsHire) {
+                            // revert info of last dismissal...
+
+                            moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISSAL, lastEmployeeHireLog == null ? null : lastEmployeeHireLog.getDateDismissal_n());
+                        }
+                        else {
+                            // revert info of last hire...
+
+                            moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, lastEmployeeHireLog.getDateHire());
+                            moSession.saveField(SModConsts.HRSU_EMP, new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_DISMISSAL, lastEmployeeHireLog.getDateDismissal_n());
+                        }
+                        break;
+                        
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
             }
         }

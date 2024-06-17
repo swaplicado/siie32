@@ -3854,8 +3854,7 @@ public abstract class SHrsUtils {
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
-                employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
-//                employeeHireLog.read(session, new int[] { resultSet.getInt("elh.id_emp"), resultSet.getInt("elh.id_log") });
+                employeeHireLog.read(session, new int[] { resultSet.getInt("elh.id_emp"), resultSet.getInt("elh.id_log") });
                 employeeHireLogs.add(employeeHireLog);
             }
         }
@@ -3863,32 +3862,13 @@ public abstract class SHrsUtils {
         return employeeHireLogs;
     }
     
-    public static SDbEmployeeHireLog getEmployeeLastHire(final SGuiSession session, final int employeeId, final int logId, final String schema) throws Exception {
+    public static SDbEmployeeHireLog getEmployeeLastHireLog(final SGuiSession session, final String schema, final int employeeId, final int excludeLogId) throws Exception {
         SDbEmployeeHireLog employeeHireLog = null;
         
-        String sql = "SELECT id_log, dt_hire " +
+        String sql = "SELECT id_log " +
             "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NULL AND id_log <> " + logId + " " +
-            "ORDER BY dt_hire DESC, id_log " +
-            "LIMIT 1;";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                employeeHireLog = new SDbEmployeeHireLog();
-                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
-            }
-        }
-        
-        return employeeHireLog;
-    }
-    
-    public static SDbEmployeeHireLog getEmployeeLastDismiss(final SGuiSession session, final int employeeId, final int logId, final String schema) throws Exception {
-        SDbEmployeeHireLog employeeHireLog = null;
-        
-        String sql = "SELECT id_log, dt_dis_n " +
-            "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NOT NULL AND id_log <> " + logId + " " +
-            "ORDER BY dt_dis_n DESC, id_log " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + " " + (excludeLogId == 0 ? "" : "AND id_log <> " + excludeLogId + " ") +
+            "ORDER BY id_log DESC " +
             "LIMIT 1;";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
@@ -4018,47 +3998,15 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static boolean revertLastHireLogEntry(final SGuiSession session, final int employeeId) throws Exception {
-        if (isFirstHire(session, employeeId)) {
-            throw new Exception("El empleado no tiene registros adicionales a su única alta en la bitácora altas y bajas.");
+    public static boolean revertLastHireLogEntry(final SGuiSession session, final SDbEmployee employee) throws Exception {
+        if (isFirstHire(session, employee.getPkEmployeeId())) {
+            throw new Exception("El empleado '" + employee.getXtaEmployeeName() + "' no tiene más movimientos aparte de su única alta.");
         }
         else {
-            SDbEmployeeHireLog lastEmployeeHireLog;
-            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
-            
-            if (employee.isActive()) {
-                lastEmployeeHireLog = getEmployeeLastHire(session, employeeId, 0, "");
-            }
-            else {
-                lastEmployeeHireLog = getEmployeeLastDismiss(session, employeeId, 0, "");
-            }
-
             SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
             
-            hrsEmployeeHireLog.setPkEmployeeId(lastEmployeeHireLog.getPkEmployeeId());
-            hrsEmployeeHireLog.setLastHireDate(lastEmployeeHireLog.getDateHire());
-            hrsEmployeeHireLog.setLastHireNotes(lastEmployeeHireLog.getNotesHire());
-            hrsEmployeeHireLog.setLastDismissalDate_n(lastEmployeeHireLog.getDateDismissal_n());
-            hrsEmployeeHireLog.setLastDismissalNotes(lastEmployeeHireLog.getNotesDismissal());
+            hrsEmployeeHireLog.setPkEmployeeId(employee.getPkEmployeeId());
             hrsEmployeeHireLog.setIsHire(!employee.isActive()); // revert current active status of employee
-            hrsEmployeeHireLog.setDeleted(lastEmployeeHireLog.isDeleted());
-            hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(lastEmployeeHireLog.getFkEmployeeDismissalTypeId());
-            hrsEmployeeHireLog.setFkRecruitmentSchemaTypeId(lastEmployeeHireLog.getFkRecruitmentSchemaTypeId());
-            hrsEmployeeHireLog.setFkUserInsertId(lastEmployeeHireLog.getFkUserInsertId());
-            hrsEmployeeHireLog.setFkUserUpdateId(lastEmployeeHireLog.getFkUserUpdateId());
-
-            if (employee.isActive()) {
-                // delete last log entry for hiring:
-                
-                hrsEmployeeHireLog.setDeleted(true);
-            }
-            else {
-                // clear last log entry when dismissed:
-                
-                hrsEmployeeHireLog.setLastDismissalDate_n(null);
-                hrsEmployeeHireLog.setLastDismissalNotes("");
-                hrsEmployeeHireLog.setFkEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NA); 
-            }
             
             hrsEmployeeHireLog.setRequestSettings(SHrsEmployeeHireLog.MODE_REVERT);
             hrsEmployeeHireLog.processRequest();

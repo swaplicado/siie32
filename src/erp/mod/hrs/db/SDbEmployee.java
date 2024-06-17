@@ -38,7 +38,7 @@ public class SDbEmployee extends SDbRegistryUser {
     
     public static final int FIELD_ACTIVE = FIELD_BASE + 1;
     public static final int FIELD_DATE_LAST_HIRE = FIELD_BASE + 2;
-    public static final int FIELD_DATE_LAST_DISMISS = FIELD_BASE + 3;
+    public static final int FIELD_DATE_LAST_DISMISSAL = FIELD_BASE + 3;
     public static final int FIELD_ZIP_CODE = FIELD_BASE + 11;
     public static final int FIELD_BRANCH_HQ = FIELD_BASE + 12;
 
@@ -935,7 +935,7 @@ public class SDbEmployee extends SDbRegistryUser {
             case FIELD_DATE_LAST_HIRE:
                 msSql += "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format((Date) value) + "' ";
                 break;
-            case FIELD_DATE_LAST_DISMISS:
+            case FIELD_DATE_LAST_DISMISSAL:
                 msSql += "dt_dis_n = " + (value == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format((Date) value) + "'") + " ";
                 break;
             default:
