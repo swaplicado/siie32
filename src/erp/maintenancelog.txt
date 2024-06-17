@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 254.1/ 2024-06-17
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de las funcionalidades de bajas, altas subsecuentes, modificaciones a altas y bajas, y reversiones del último movimiento, alta o baja.
+
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección a importación de conceptos excesivamente largos de requisiones de materiales en cotizaciones, mediante truncado de textos a la longitud máxima permitida.
+
+================================================================================
 SIIE 3.2 254.0/ 2024-06-14
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
