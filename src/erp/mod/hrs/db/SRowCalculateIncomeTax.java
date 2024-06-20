@@ -4,96 +4,81 @@
  */
 package erp.mod.hrs.db;
 
+import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Sergio Flores
  */
 public class SRowCalculateIncomeTax implements SGridRow {
 
     protected int mnEmployeeId;
-    protected String msNameEmployee;
-    protected String msCodeEmployee;
-    protected String msCodePaymentType;
-    protected double mdAmountIncome;
-    protected double mdAmountTaxable;
-    protected double mdDaysHire;
-    protected double mdDaysIncapacity;
-    protected double mdDaysTaxable;
-    protected double mdFactor;
-    protected double mdCalculatedTax;
-    protected double mdRetainedTax;
-    protected double mdCalculatedSubsidy;
-    protected double mdGivenSubsidy;
-    protected boolean mbStatus;
+    protected String msEmployeeName;
+    protected String msEmployeeCode;
+    protected String msPaymentType;
+    protected String msRecruitmentSchema;
+    protected boolean mbActive;
     protected Date mtDateHire;
-    protected Date mtDateDismisss_n;
+    protected Date mtDateDismissal_n;
+    
+    protected SRowCalculateIncomeTaxValues moValues;
+    
+    protected ArrayList<SRowCalculateIncomeTaxValues> maSubsidyValueses;
 
-    public SRowCalculateIncomeTax() throws Exception {
+    public SRowCalculateIncomeTax() {
         mnEmployeeId = 0;
-        msNameEmployee = "";
-        msCodeEmployee = "";
-        msCodePaymentType = "";
-        mdAmountIncome = 0;
-        mdAmountTaxable = 0;
-        mdDaysHire = 0;
-        mdDaysIncapacity = 0;
-        mdDaysTaxable = 0;
-        mdFactor = 0;
-        mdCalculatedTax = 0;
-        mdRetainedTax = 0;
-        mdCalculatedSubsidy = 0;
-        mdGivenSubsidy = 0;
-        mbStatus = false;
+        msEmployeeName = "";
+        msEmployeeCode = "";
+        msPaymentType = "";
+        msRecruitmentSchema = "";
+        mbActive = false;
         mtDateHire = null;
-        mtDateDismisss_n = null;
+        mtDateDismissal_n = null;
+        
+        moValues = new SRowCalculateIncomeTaxValues();
+        maSubsidyValueses = new ArrayList<>();
     }
 
     public void setEmployeeId(int n) { mnEmployeeId = n; }
-    public void setNameEmployee(String s) { msNameEmployee = s; }
-    public void setCodeEmployee(String s) { msCodeEmployee = s; }
-    public void setCodePaymentType(String s) { msCodePaymentType = s; }
-    public void setAmountIncome(double d) { mdAmountIncome = d; }
-    public void setAmountTaxable(double d) { mdAmountTaxable = d; }
-    public void setDaysHire(double n) { mdDaysHire = n; }
-    public void setDaysIncapacity(double n) { mdDaysIncapacity = n; }
-    public void setDaysTaxable(double n) { mdDaysTaxable = n; }
-    public void setFactor(double d) { mdFactor = d; }
-    public void setCalculatedTax(double d) { mdCalculatedTax = d; }
-    public void setRetainedTax(double d) { mdRetainedTax = d; }
-    public void setCalculatedSubsidy(double d) { mdCalculatedSubsidy = d; }
-    public void setGivenSubsidy(double d) { mdGivenSubsidy = d; }
-    public void setIsStatus(boolean b) { mbStatus = b; }
+    public void seEmployeetName(String s) { msEmployeeName = s; }
+    public void setEmployeeCode(String s) { msEmployeeCode = s; }
+    public void setPaymentType(String s) { msPaymentType = s; }
+    public void setRecruitmentSchema(String s) { msRecruitmentSchema = s; }
+    public void setActive(boolean b) { mbActive = b; }
     public void setDateHire(Date t) { mtDateHire = t; }
-    public void setDateDismisss_n(Date t) { mtDateDismisss_n = t; }
+    public void setDateDismissal_n(Date t) { mtDateDismissal_n = t; }
+    
+    public void setValues(SRowCalculateIncomeTaxValues o) { moValues = o; }
     
     public int getEmployeeId() { return mnEmployeeId; }
-    public String getNameEmployee() { return msNameEmployee; }
-    public String getCodeEmployee() { return msCodeEmployee; }
-    public String getCodePaymentType() { return msCodePaymentType; }
-    public double getAmountIncome() { return mdAmountIncome; }
-    public double getAmountTaxable() { return mdAmountTaxable; }
-    public double getDaysHire() { return mdDaysHire; }
-    public double getDaysIncapacity() { return mdDaysIncapacity; }
-    public double getDaysTaxable() { return mdDaysTaxable; }
-    public double getFactor() { return mdFactor; }
-    public double getCalculatedTax() { return mdCalculatedTax; }
-    public double getRetainedTax() { return mdRetainedTax; }
-    public double getCalculatedSubsidy() { return mdCalculatedSubsidy; }
-    public double getGivenSubsidy() { return mdGivenSubsidy; }
-    public boolean isStatus() { return mbStatus; }
+    public String getEmployeeName() { return msEmployeeName; }
+    public String getEmployeeCode() { return msEmployeeCode; }
+    public String getPaymentType() { return msPaymentType; }
+    public String getRecruitmentSchema() { return msRecruitmentSchema; }
+    public boolean isActive() { return mbActive; }
     public Date getDateHire() { return mtDateHire; }
-    public Date getDateDismisss_n() { return mtDateDismisss_n; }
+    public Date getDateDismissal_n() { return mtDateDismissal_n; }
     
-    public double getDiferenceTax() { return SLibUtils.roundAmount(mdCalculatedTax - mdRetainedTax); }
+    public SRowCalculateIncomeTaxValues getValues() { return moValues; }
     
-    public double getDiferenceSubsidy() { return SLibUtils.roundAmount(mdCalculatedSubsidy - mdGivenSubsidy); }
+    public ArrayList<SRowCalculateIncomeTaxValues> getSubsidyValueses() { return maSubsidyValueses; }
     
-    public double getDiferenceNet() { return SLibUtils.roundAmount(getDiferenceTax() - getDiferenceSubsidy()); }
-
+    public void totalizeSubsidyFromSubsidyValueses() {
+        double subsidyAssessed = 0;
+        double subsidyPayed = 0;
+        
+        for (SRowCalculateIncomeTaxValues values : maSubsidyValueses) {
+            subsidyAssessed = SLibUtils.roundAmount(subsidyAssessed + values.getSubsidyAssessed());
+            subsidyPayed = SLibUtils.roundAmount(subsidyPayed + values.getSubsidyPayed());
+        }
+        
+        moValues.setSubsidyAssessed(subsidyAssessed);
+        moValues.setSubsidyPayed(subsidyPayed);
+    }
+    
     @Override
     public int[] getRowPrimaryKey() {
         return new int[] { mnEmployeeId };
@@ -101,12 +86,12 @@ public class SRowCalculateIncomeTax implements SGridRow {
 
     @Override
     public String getRowCode() {
-        return getCodeEmployee();
+        return getEmployeeCode();
     }
 
     @Override
     public String getRowName() {
-        return getNameEmployee();
+        return getEmployeeName();
     }
 
     @Override
@@ -135,61 +120,64 @@ public class SRowCalculateIncomeTax implements SGridRow {
 
         switch (col) {
             case 0:
-                value = msNameEmployee;
+                value = msEmployeeName;
                 break;
             case 1:
-                value = msCodeEmployee;
+                value = msEmployeeCode;
                 break;
             case 2:
-                value = msCodePaymentType;
+                value = msPaymentType;
                 break;
             case 3:
-                value = mdAmountIncome;
+                value = moValues.getIncomeGross();
                 break;
             case 4:
-                value = mdAmountTaxable;
+                value = moValues.getIncomeTaxable();
                 break;
             case 5:
-                value = mdDaysHire;
+                value = moValues.getDaysHired();
                 break;
             case 6:
-                value = mdDaysIncapacity;
+                value = moValues.getDaysIncapacity();
                 break;
             case 7:
-                value = mdDaysTaxable;
+                value = moValues.getDaysTaxable();
                 break;
             case 8:
-                value = mdFactor;
+                value = moValues.getTableFactor();
                 break;
             case 9:
-                value = mdCalculatedTax;
+                value = moValues.getTaxAssessed();
                 break;
             case 10:
-                value = mdRetainedTax;
+                value = moValues.getTaxWithheld();
                 break;
             case 11:
-                value = getDiferenceTax();
+                value = moValues.getDiferenceTax();
                 break;
             case 12:
-                value = mdCalculatedSubsidy;
+                value = moValues.getSubsidyAssessed();
                 break;
             case 13:
-                value = mdGivenSubsidy;
+                value = moValues.getSubsidyPayed();
                 break;
             case 14:
-                value = getDiferenceSubsidy();
+                value = moValues.getDiferenceSubsidy();
                 break;
             case 15:
-                value = getDiferenceNet();
+                value = moValues.getDiferenceNet();
                 break;
             case 16:
-               value = mbStatus;
+               value = mbActive;
                 break;
             case 17:
                value = mtDateHire;
                 break;
             case 18:
-               value = mtDateDismisss_n;
+               value = mtDateDismissal_n;
+                break;
+            case 19:
+               value = msRecruitmentSchema;
                 break;
             default:
         }

@@ -6,26 +6,40 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbAbsence;
+import erp.mod.hrs.db.SDbAbsenceConsumption;
+import erp.mod.hrs.db.SDbEmploymentSubsidy;
 import erp.mod.hrs.db.SDbTaxSubsidyTable;
 import erp.mod.hrs.db.SDbTaxTable;
 import erp.mod.hrs.db.SHrsAmountEarning;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsPayroll;
+import erp.mod.hrs.db.SHrsPayrollDataProvider;
+import erp.mod.hrs.db.SHrsTaxUtils;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.SRowCalculateIncomeTax;
+import erp.mod.hrs.db.SRowCalculateIncomeTaxValues;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import sa.lib.SLibConsts;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -43,12 +57,14 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Sergio Flores
  */
-public class SDialogCalculateIncomeTax extends SBeanFormDialog implements ActionListener, ChangeListener  {
+public class SDialogCalculateIncomeTax extends SBeanFormDialog implements ActionListener, FocusListener, ItemListener, ChangeListener, ListSelectionListener {
 
-    protected SGridPaneForm moGridEmployeesRow;
+    protected SGridPaneForm moEmployeesGrid;
+    protected SGridPaneForm moSubsidyGrid;
     protected int mnDaysPeriod;
+    protected Date mtTempCutoff;
     
     /**
      * Creates new form SDialogCalculateEstimateIncomeTax
@@ -56,7 +72,7 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
      * @param title
      */
     public SDialogCalculateIncomeTax(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_SSC_UPD, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -70,206 +86,266 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
     private void initComponents() {
 
         moGrpTypeDate = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
-        jPanel29 = new javax.swing.JPanel();
+        jpDialog = new javax.swing.JPanel();
+        jpSettings = new javax.swing.JPanel();
+        jpSettingsW = new javax.swing.JPanel();
+        jpSettingsW1 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel25 = new javax.swing.JPanel();
+        jpSettingsW2 = new javax.swing.JPanel();
+        moRadComputeYear = new sa.lib.gui.bean.SBeanFieldRadio();
+        moCalYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
+        jpSettingsW3 = new javax.swing.JPanel();
+        moRadComputeCutoff = new sa.lib.gui.bean.SBeanFieldRadio();
+        moDateCutoff = new sa.lib.gui.bean.SBeanFieldDate();
+        jbSetCurrentDate = new javax.swing.JButton();
+        jpSettingsC = new javax.swing.JPanel();
+        jpSettingsC1 = new javax.swing.JPanel();
         jlTax = new javax.swing.JLabel();
         moKeyTax = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel9 = new javax.swing.JPanel();
-        moRadFilterTypeYear = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadFilterTypeDateCut = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel26 = new javax.swing.JPanel();
+        jpSettingsC2 = new javax.swing.JPanel();
         jlTaxSubsidy = new javax.swing.JLabel();
         moKeyTaxSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel27 = new javax.swing.JPanel();
-        jlYear = new javax.swing.JLabel();
-        moCalYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
-        jlDateCutoff = new javax.swing.JLabel();
-        moDateDateCutoff = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel28 = new javax.swing.JPanel();
-        jbCalculate = new javax.swing.JButton();
-        jbClean = new javax.swing.JButton();
-        jpEmployee = new javax.swing.JPanel();
+        jlTaxSubsidyHint = new javax.swing.JLabel();
+        jpSettingsC3 = new javax.swing.JPanel();
+        jlEmploymentSubsidy = new javax.swing.JLabel();
+        moKeyEmploymentSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
+        jlEmploymentSubsidyHint = new javax.swing.JLabel();
+        jpSettingsE = new javax.swing.JPanel();
+        jpSettingsE1 = new javax.swing.JPanel();
+        jbCompute = new javax.swing.JButton();
+        jpSettingsE2 = new javax.swing.JPanel();
+        jbClear = new javax.swing.JButton();
+        jpSettingsE3 = new javax.swing.JPanel();
+        jpEmployees = new javax.swing.JPanel();
+        jSplitPane = new javax.swing.JSplitPane();
+        jpEmployeesGrid = new javax.swing.JPanel();
+        jpSubsidyGrid = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpDialog.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.BorderLayout());
+        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del cálculo:"));
+        jpSettings.setLayout(new java.awt.BorderLayout(25, 0));
 
-        jPanel13.setLayout(new java.awt.GridLayout(3, 2, 0, 5));
+        jpSettingsW.setLayout(new java.awt.GridLayout(3, 1, 0, 3));
 
-        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsW1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago nómina:");
+        jlPaymentType.setText("Período de pago a procesar:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel29.add(jlPaymentType);
+        jpSettingsW1.add(jlPaymentType);
 
-        moKeyPaymentType.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel29.add(moKeyPaymentType);
+        moKeyPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpSettingsW1.add(moKeyPaymentType);
 
-        jPanel13.add(jPanel29);
+        jpSettingsW.add(jpSettingsW1);
 
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsW2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moGrpTypeDate.add(moRadComputeYear);
+        moRadComputeYear.setSelected(true);
+        moRadComputeYear.setText("Cálculo ejercicio");
+        moRadComputeYear.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpSettingsW2.add(moRadComputeYear);
+        jpSettingsW2.add(moCalYear);
+
+        jpSettingsW.add(jpSettingsW2);
+
+        jpSettingsW3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moGrpTypeDate.add(moRadComputeCutoff);
+        moRadComputeCutoff.setText("Cálculo fecha de corte");
+        moRadComputeCutoff.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpSettingsW3.add(moRadComputeCutoff);
+        jpSettingsW3.add(moDateCutoff);
+
+        jbSetCurrentDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbSetCurrentDate.setToolTipText("Día actual");
+        jbSetCurrentDate.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpSettingsW3.add(jbSetCurrentDate);
+
+        jpSettingsW.add(jpSettingsW3);
+
+        jpSettings.add(jpSettingsW, java.awt.BorderLayout.WEST);
+
+        jpSettingsC.setLayout(new java.awt.GridLayout(3, 1, 0, 3));
+
+        jpSettingsC1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTax.setText("Tabla impuesto:*");
-        jlTax.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel25.add(jlTax);
+        jlTax.setPreferredSize(new java.awt.Dimension(225, 23));
+        jpSettingsC1.add(jlTax);
 
-        moKeyTax.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel25.add(moKeyTax);
+        moKeyTax.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpSettingsC1.add(moKeyTax);
 
-        jPanel13.add(jPanel25);
+        jpSettingsC.add(jpSettingsC1);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsC2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moGrpTypeDate.add(moRadFilterTypeYear);
-        moRadFilterTypeYear.setSelected(true);
-        moRadFilterTypeYear.setText("Por ejercicio");
-        moRadFilterTypeYear.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel9.add(moRadFilterTypeYear);
+        jlTaxSubsidy.setText("Tabla subsidio para el empleo (obsoleto):*");
+        jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(225, 23));
+        jpSettingsC2.add(jlTaxSubsidy);
 
-        moGrpTypeDate.add(moRadFilterTypeDateCut);
-        moRadFilterTypeDateCut.setText("Por fecha de corte");
-        moRadFilterTypeDateCut.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel9.add(moRadFilterTypeDateCut);
+        moKeyTaxSubsidy.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpSettingsC2.add(moKeyTaxSubsidy);
 
-        jPanel13.add(jPanel9);
+        jlTaxSubsidyHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlTaxSubsidyHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlTaxSubsidyHint.setToolTipText("Vigente hasta 31/04/2024");
+        jlTaxSubsidyHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpSettingsC2.add(jlTaxSubsidyHint);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsC.add(jpSettingsC2);
 
-        jlTaxSubsidy.setText("Tabla subsidio empleo:*");
-        jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel26.add(jlTaxSubsidy);
+        jpSettingsC3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moKeyTaxSubsidy.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel26.add(moKeyTaxSubsidy);
+        jlEmploymentSubsidy.setText("Configuración subsidio para el empleo:*");
+        jlEmploymentSubsidy.setPreferredSize(new java.awt.Dimension(225, 23));
+        jpSettingsC3.add(jlEmploymentSubsidy);
 
-        jPanel13.add(jPanel26);
+        moKeyEmploymentSubsidy.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpSettingsC3.add(moKeyEmploymentSubsidy);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jlEmploymentSubsidyHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlEmploymentSubsidyHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlEmploymentSubsidyHint.setToolTipText("Vigente desde 01/05/2024");
+        jlEmploymentSubsidyHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpSettingsC3.add(jlEmploymentSubsidyHint);
 
-        jlYear.setText("Ejercicio:");
-        jlYear.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel27.add(jlYear);
-        jPanel27.add(moCalYear);
+        jpSettingsC.add(jpSettingsC3);
 
-        jlDateCutoff.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlDateCutoff.setText("Fecha corte:");
-        jlDateCutoff.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jlDateCutoff);
-        jPanel27.add(moDateDateCutoff);
+        jpSettings.add(jpSettingsC, java.awt.BorderLayout.CENTER);
 
-        jPanel13.add(jPanel27);
+        jpSettingsE.setLayout(new java.awt.GridLayout(3, 1, 0, 3));
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbCalculate.setText("Calcular");
-        jbCalculate.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbCalculate.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel28.add(jbCalculate);
+        jbCompute.setText("Calcular");
+        jbCompute.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbCompute.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpSettingsE1.add(jbCompute);
 
-        jbClean.setText("Limpiar");
-        jbClean.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbClean.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel28.add(jbClean);
+        jpSettingsE.add(jpSettingsE1);
 
-        jPanel13.add(jPanel28);
+        jpSettingsE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel7.add(jPanel13, java.awt.BorderLayout.PAGE_START);
+        jbClear.setText("Limpiar");
+        jbClear.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbClear.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpSettingsE2.add(jbClear);
 
-        jPanel1.add(jPanel7, java.awt.BorderLayout.NORTH);
+        jpSettingsE.add(jpSettingsE2);
 
-        jpEmployee.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados:"));
-        jpEmployee.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jpEmployee, java.awt.BorderLayout.CENTER);
+        jpSettingsE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpSettingsE.add(jpSettingsE3);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jpSettings.add(jpSettingsE, java.awt.BorderLayout.EAST);
+
+        jpDialog.add(jpSettings, java.awt.BorderLayout.NORTH);
+
+        jpEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados:"));
+        jpEmployees.setLayout(new java.awt.BorderLayout());
+
+        jSplitPane.setDividerLocation(325);
+        jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        jpEmployeesGrid.setLayout(new java.awt.BorderLayout());
+        jSplitPane.setLeftComponent(jpEmployeesGrid);
+
+        jpSubsidyGrid.setLayout(new java.awt.BorderLayout());
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_view_info.png"))); // NOI18N
+        jLabel1.setText("Detalle del cálculo de subsidio para el empleo:");
+        jLabel1.setToolTipText("Disponible para el año de transición 2024");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jLabel1.setPreferredSize(new java.awt.Dimension(300, 16));
+        jpSubsidyGrid.add(jLabel1, java.awt.BorderLayout.NORTH);
+
+        jSplitPane.setRightComponent(jpSubsidyGrid);
+
+        jpEmployees.add(jSplitPane, java.awt.BorderLayout.CENTER);
+
+        jpDialog.add(jpEmployees, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpDialog, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbCalculate;
-    private javax.swing.JButton jbClean;
-    private javax.swing.JLabel jlDateCutoff;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JButton jbClear;
+    private javax.swing.JButton jbCompute;
+    private javax.swing.JButton jbSetCurrentDate;
+    private javax.swing.JLabel jlEmploymentSubsidy;
+    private javax.swing.JLabel jlEmploymentSubsidyHint;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxSubsidy;
-    private javax.swing.JLabel jlYear;
-    private javax.swing.JPanel jpEmployee;
+    private javax.swing.JLabel jlTaxSubsidyHint;
+    private javax.swing.JPanel jpDialog;
+    private javax.swing.JPanel jpEmployees;
+    private javax.swing.JPanel jpEmployeesGrid;
+    private javax.swing.JPanel jpSettings;
+    private javax.swing.JPanel jpSettingsC;
+    private javax.swing.JPanel jpSettingsC1;
+    private javax.swing.JPanel jpSettingsC2;
+    private javax.swing.JPanel jpSettingsC3;
+    private javax.swing.JPanel jpSettingsE;
+    private javax.swing.JPanel jpSettingsE1;
+    private javax.swing.JPanel jpSettingsE2;
+    private javax.swing.JPanel jpSettingsE3;
+    private javax.swing.JPanel jpSettingsW;
+    private javax.swing.JPanel jpSettingsW1;
+    private javax.swing.JPanel jpSettingsW2;
+    private javax.swing.JPanel jpSettingsW3;
+    private javax.swing.JPanel jpSubsidyGrid;
     private sa.lib.gui.bean.SBeanFieldCalendarYear moCalYear;
-    private sa.lib.gui.bean.SBeanFieldDate moDateDateCutoff;
+    private sa.lib.gui.bean.SBeanFieldDate moDateCutoff;
     private javax.swing.ButtonGroup moGrpTypeDate;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyEmploymentSubsidy;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxSubsidy;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeDateCut;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadFilterTypeYear;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadComputeCutoff;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadComputeYear;
     // End of variables declaration//GEN-END:variables
 
-    private void enableFields(boolean enable) {
-        moKeyPaymentType.setEnabled(enable);
-        moRadFilterTypeDateCut.setEnabled(enable);
-        moRadFilterTypeYear.setEnabled(enable);
-        moDateDateCutoff.setEditable(enable);
-        moDateDateCutoff.setFocusable(enable);
-        moCalYear.setEditable(enable);
-        moCalYear.setFocusable(enable);
-        jbCalculate.setEnabled(enable);
-        jbClean.setEnabled(!enable);
-    }
-    
-    private void actionEnableFieldsTypeCal() {
-        if (moRadFilterTypeDateCut.isSelected()) {
-            moDateDateCutoff.setEditable(true);
-            moDateDateCutoff.setFocusable(true);
-            moCalYear.setEditable(true);
-            moCalYear.setFocusable(true);
-        }
-        else if (moRadFilterTypeYear.isSelected()) {
-            moDateDateCutoff.setEditable(false);
-            moDateDateCutoff.setFocusable(false);
-            moCalYear.setEditable(true);
-            moCalYear.setFocusable(true);
-            actionStateChangeYear();
-        }
-    }
-    
-    private void actionStateChangeYear() {
-        moDateDateCutoff.setValue(SLibTimeUtils.createDate(moCalYear.getValue(), 12, 31));
-    }
+    /*
+     * UI handling
+     */
     
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 960, 600);
+        SGuiUtils.setWindowBounds(this, 1024, 640);
+        
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+        moRadComputeYear.setBooleanSettings(moRadComputeYear.getText(), true);
+        moRadComputeCutoff.setBooleanSettings(moRadComputeCutoff.getText(), false);
+        moCalYear.setCalendarSettings(moRadComputeYear.getText());
+        moDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(moRadComputeCutoff.getText()), true);
+        
+        moFields.addField(moKeyPaymentType);
+        moFields.addField(moRadComputeYear);
+        moFields.addField(moRadComputeCutoff);
+        moFields.addField(moCalYear);
+        moFields.addField(moDateCutoff);
+        
+        moFields.setFormButton(jbCompute);
+        
+        moKeyTax.setEnabled(false);
+        moKeyTaxSubsidy.setEnabled(false);
+        moKeyEmploymentSubsidy.setEnabled(false);
         
         jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
         jbSave.setText(SGuiConsts.TXT_BTN_OK);
-        jbSave.setEnabled(false);   // button not needed
+        jbSave.setEnabled(false);
         
-        moDateDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
-        
-        moFields.addField(moDateDateCutoff);
-        moFields.addField(moKeyPaymentType);
-        
-        moFields.setFormButton(jbSave);
-        
-        moGridEmployeesRow = new SGridPaneForm(miClient, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, "Empleados") {
+        moEmployeesGrid = new SGridPaneForm(miClient, 0, 0, "Empleados") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -298,217 +374,510 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Última alta"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Última baja"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen"));
                 
                 return gridColumnsForm;
             }
         };
 
-        jpEmployee.add(moGridEmployeesRow, BorderLayout.CENTER);
-        //mvFormGrids.add(moGridEmployeesRow);
+        jpEmployeesGrid.add(moEmployeesGrid, BorderLayout.CENTER);
+        //mvFormGrids.add(moEmployeesGrid);
         
+        moSubsidyGrid = new SGridPaneForm(miClient, 0, 0, "Subsidio para el empleo") {
+            @Override
+            public void initGrid() {
+                setRowButtonsEnabled(false);
+            }
+
+            @Override
+            public ArrayList<SGridColumnForm> createGridColumns() {
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
+
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estilo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte gravada $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días activo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días incapacidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días gravados"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR causado $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR retenido $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR diferencia $: (+) a cargo, (-) a favor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio causado $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio pagado $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio diferencia $: (+) a cargo, (-) a favor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia neta $: (+) a cargo, (-) a favor"));
+                
+                return gridColumnsForm;
+            }
+        };
+
+        jpSubsidyGrid.add(moSubsidyGrid, BorderLayout.CENTER);
+        //mvFormGrids.add(moSubsidyGrid);
+        
+        // initialize fields:
+        
+        removeAllListeners();
         reloadCatalogues();
+        
+        moEmployeesGrid.populateGrid(new Vector<>(), this);
+        moSubsidyGrid.populateGrid(new Vector<>());
+        
+        moRadComputeYear.setSelected(true);
+        moCalYear.setValue(miClient.getSession().getCurrentYear());
+        stateChangedYear();
+        
+        actionPerformedClear(false);
+        
         addAllListeners();
-        
-        moGridEmployeesRow.populateGrid(new Vector<SGridRow>());
-        moGridEmployeesRow.resetSortKeys();
-        moGridEmployeesRow.setSelectedGridRow(0);
-        
-        moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
-        moDateDateCutoff.setValue(miClient.getSession().getCurrentDate());
-        moRadFilterTypeYear.setSelected(true);
-        
-        moKeyTax.setEnabled(false);
-        moKeyTaxSubsidy.setEnabled(false);
-        
-        enableFields(true);
-        actionEnableFieldsTypeCal();
     }
     
-    private void setTablesTax() throws Exception {
-        moKeyTax.setValue(new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), moDateDateCutoff.getValue()) });
-        moKeyTaxSubsidy.setValue(new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), moDateDateCutoff.getValue()) });
+    private void enableFields(boolean enable) {
+        moKeyPaymentType.setEnabled(enable);
+        moRadComputeYear.setEnabled(enable);
+        moRadComputeCutoff.setEnabled(enable);
+        
+        jbCompute.setEnabled(enable);
+        jbClear.setEnabled(!enable);
+        
+        enableFieldsCompute();
     }
     
-    private void actionCalculate() {
-        SGuiValidation validation = validateForm();
-        
-        if (validation.isValid()) {
-            enableFields(false);
-            try {
-                setTablesTax();
-                populateEmployees();
-            }
-            catch (Exception e) {
-                SLibUtils.showException(this, e);
-            }
+    private void enableFieldsCompute() {
+        if (moRadComputeYear.isSelected()) {
+            moCalYear.setEnabled(jbCompute.isEnabled());
+            
+            moDateCutoff.setEnabled(false);
+            jbSetCurrentDate.setEnabled(false);
+        }
+        else if (moRadComputeCutoff.isSelected()) {
+            moCalYear.setEnabled(false);
+            
+            moDateCutoff.setEnabled(jbCompute.isEnabled());
+            jbSetCurrentDate.setEnabled(jbCompute.isEnabled());
         }
         else {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
-            }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-            }
+            moCalYear.setEnabled(false);
+            
+            moDateCutoff.setEnabled(false);
+            jbSetCurrentDate.setEnabled(false);
         }
     }
     
-    private void actionClean() {
-        enableFields(true);
-        actionEnableFieldsTypeCal();
+    private void setRecentTablesTax() {
+        moKeyTax.resetField();
+        moKeyTaxSubsidy.resetField();
+        moKeyEmploymentSubsidy.resetField();
+
+        try {
+            moKeyTax.setValue(new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), moDateCutoff.getValue()) });
+            moKeyTaxSubsidy.setValue(new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), moDateCutoff.getValue()) });
+            moKeyEmploymentSubsidy.setValue(new int[] { SHrsUtils.getRecentEmploymentSubsidy(miClient.getSession(), moDateCutoff.getValue()) });
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    /*
+     * Tax computation
+     */
+    
+    private int getEmployeeDaysIncapacityNotPaid(final ArrayList<SDbAbsenceConsumption> absenceConsumptions, final Date dateStart, final Date dateEnd) {
+        int daysIncapacityNotPaid = 0;
+        
+        for (SDbAbsenceConsumption absenceConsumption : absenceConsumptions) {
+            if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), dateStart, dateEnd)) {
+                if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability()) {
+                    daysIncapacityNotPaid += absenceConsumption.getEffectiveDays();
+                }
+            }
+        }
+        
+        return daysIncapacityNotPaid;
+    }
+
+    private ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final Statement statement, final ArrayList<SDbAbsence> absences, final int recruitmentSchemaCat) throws Exception {
+        ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
+
+        String sql = "SELECT ac.id_cns "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = pr.fk_tp_rec_sche "
+                + "WHERE NOT pr.b_del AND NOT p.b_del AND trs.rec_sche_cat = " + recruitmentSchemaCat + " "
+                + "AND ac.id_emp = ? AND ac.id_abs = ? AND NOT ac.b_del "
+                + "ORDER BY ac.id_cns;";
+
+        try (PreparedStatement preparedStatement = statement.getConnection().prepareStatement(sql)) {
+            for (SDbAbsence absence : absences) {
+                preparedStatement.setInt(1, absence.getPkEmployeeId());
+                preparedStatement.setInt(2, absence.getPkAbsenceId());
+                
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
+                        absenceConsumption.read(miClient.getSession(), new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt("ac.id_cns") });
+                        absencesConsumptions.add(absenceConsumption);
+                    }
+                }
+            }
+        }
+        
+        return absencesConsumptions;
+    }
+    
+    private SHrsAmountEarning getHrsAmountEarning(final Statement statement, final int employeeId, final int fiscalYear, final Date start_n, final Date cutoff, final int earningTypeId, final int recruitmentSchemaCat) throws Exception {
+        SHrsAmountEarning amount = null;
+        
+        String sql = "SELECT SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exempt, SUM(pre.amt_taxa) AS f_taxable "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = pr.fk_tp_rec_sche "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " "
+                + "AND p.fis_year = " + fiscalYear + " "
+                + (start_n == null ? "" : "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(start_n) + "' ")
+                + "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                + (earningTypeId == 0 ? "" : "AND pre.fk_tp_ear = " + earningTypeId + " ") + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                amount = new SHrsAmountEarning(earningTypeId);
+                amount.setAmount(resultSet.getDouble("f_amount"));
+                amount.setAmountExempt(resultSet.getDouble("f_exempt"));
+                amount.setAmountTaxable(resultSet.getDouble("f_taxable"));
+            }
+        }
+        
+        return amount;
+    }
+
+    private double getAmountDeduction(final Statement statement, final int employeeId, final int fiscalYear, final Date start_n, final Date cutoff, final int deductionTypeId, final int recruitmentSchemaCat) throws Exception {
+        double amount = 0;
+        
+        String sql = "SELECT SUM(prd.amt_r) AS f_amount "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = pr.fk_tp_rec_sche "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " "
+                + "AND p.fis_year = " + fiscalYear + " "
+                + (start_n == null ? "" : "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(start_n) + "' ")
+                + "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
+                + (deductionTypeId == 0 ? "" : "AND prd.fk_tp_ded = " + deductionTypeId + " ") + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                amount = resultSet.getDouble("f_amount");
+            }
+        }
+        
+        return amount;
+    }
+    
+    private double computeTableFactor(final int year, final double taxableDays) {
+        return ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(year) ? 1d : 0d))) * taxableDays;
+    }
+
+    private SRowCalculateIncomeTaxValues createValues(final Statement statement, final ArrayList<SDbAbsenceConsumption> absenceConsumptions, 
+            final SDbTaxTable dbTaxTable, final SDbTaxSubsidyTable dbTaxSubsidyTable, final SDbEmploymentSubsidy employmentSubsidy, final boolean taxSubsidyOldStyle, final boolean taxSubsidyNewStyle, 
+            final int style, final int employeeId, final int recruitmentSchemaCat, final int periodYear, final Date periodStartForAttendance, final Date periodStart, final Date periodEnd) throws Exception {
+        SRowCalculateIncomeTaxValues values = new SRowCalculateIncomeTaxValues(style);
+        
+        double daysHired = SHrsUtils.getEmployeeDaysHired(SHrsUtils.readEmployeeHireLogs(miClient.getSession(), statement, employeeId, recruitmentSchemaCat, periodStartForAttendance, periodEnd), periodStartForAttendance, periodEnd);
+        double daysIncapacityNotPaid = getEmployeeDaysIncapacityNotPaid(absenceConsumptions, periodStartForAttendance, periodEnd);
+        double daysTaxable = daysHired - daysIncapacityNotPaid;
+        double tableFactor = computeTableFactor(periodYear, daysTaxable);
+
+        SHrsAmountEarning amountEarnings = getHrsAmountEarning(statement, employeeId, periodYear, periodStart, periodEnd, 0, recruitmentSchemaCat);
+        double taxAssessed = SHrsTaxUtils.computeTax(dbTaxTable, amountEarnings.getAmountTaxable(), tableFactor);
+        double taxWithheld = getAmountDeduction(statement, employeeId, periodYear, periodStart, periodEnd, SModSysConsts.HRSS_TP_DED_TAX, recruitmentSchemaCat);
+
+        values.setDaysHired(daysHired);
+        values.setDaysIncapacity(daysIncapacityNotPaid);
+        values.setDaysTaxable(daysTaxable);
+        values.setTableFactor(tableFactor);
+
+        values.setIncomeGross(amountEarnings.getAmount());
+        values.setIncomeTaxable(amountEarnings.getAmountTaxable());
+        values.setTaxAssessed(taxAssessed);
+        values.setTaxWithheld(taxWithheld);
+
+        // compute employment subsidy depending of new-style (since 2024-05-01) applicability:
+
+        double subsidyAssessed = 0;
+        double subsidyPayed = 0;
+        
+        if (taxSubsidyOldStyle || taxSubsidyNewStyle) {
+            if (taxSubsidyOldStyle) {
+                // pure old-style...
+                subsidyAssessed = SHrsTaxUtils.computeTaxSubsidy(dbTaxSubsidyTable, amountEarnings.getAmountTaxable(), tableFactor);
+            }
+            else if (taxSubsidyNewStyle) {
+                // pure new-style...
+                subsidyAssessed = SHrsTaxUtils.computeEmploymentSubsidy(employmentSubsidy, amountEarnings.getAmountTaxable(), tableFactor);
+            }
+            
+            SHrsAmountEarning amountEarningSubsidy = getHrsAmountEarning(statement, employeeId, periodYear, periodStart, periodEnd, SModSysConsts.HRSS_TP_EAR_TAX_SUB, recruitmentSchemaCat);
+            subsidyPayed = amountEarningSubsidy.getAmount();
+        }
+        
+        values.setSubsidyAssessed(subsidyAssessed);
+        values.setSubsidyPayed(subsidyPayed);
+    
+        return values;
     }
     
     private void populateEmployees() {
-        int employeeId = 0;
-        int recruitmentSchemaCat = 0;
-        int periodYear = 0;
-        double dDaysHired = 0;
-        double dDaysIncapacityNotPay = 0;
-        double dDaysTaxable = 0;
-        double dTableFactor = 0;
-        SDbTaxTable dbTaxTable = null;
-        SDbTaxSubsidyTable dbSubsidyTable = null;
-        Date mtDateStart = null;
-        Date mtDateEnd = null;
-        String sql = "";
-        Vector<SGridRow> rows = new Vector<SGridRow>();
-        SHrsAmountEarning amountEarningSubsidy = null;
-        SHrsAmountEarning amountEarnings = null;
-        ResultSet resultSet = null;
-        Statement statement = null;
-        Statement statementAux = null;
+        Vector<SGridRow> rows = new Vector<>();
         
         try {
-            statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
+            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            Statement statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
             
-            mtDateStart = SLibTimeUtils.createDate(moCalYear.getValue(), 1, 1);
-            mtDateEnd = moDateDateCutoff.getValue();
-            periodYear = moCalYear.getValue();
+            int periodYear = moCalYear.getValue();
+            Date periodStart = SLibTimeUtils.createDate(moCalYear.getValue(), 1, 1);
+            Date periodEnd = moDateCutoff.getValue();
             
-            dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), mtDateEnd) });
-            dbSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), mtDateEnd) });
+            SDbTaxTable dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, moKeyTax.getValue());
+            SDbTaxSubsidyTable dbTaxSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, moKeyTaxSubsidy.getValue());
+            SDbEmploymentSubsidy dbEmploymentSubsidy = moKeyEmploymentSubsidy.getSelectedIndex() <= 0 ? null : (SDbEmploymentSubsidy) miClient.getSession().readRegistry(SModConsts.HRS_EMPL_SUB, moKeyEmploymentSubsidy.getValue());
+            Date newStyleStart = null;
+            Date oldStyleEnd = null;
             
-            sql = "SELECT b.bp, e.id_emp, e.num, e.b_act, e.dt_hire, e.dt_dis_n, trs.rec_sche_cat, UPPER(LEFT(tp.name, 3)) AS _tp_name "
+            ArrayList<SDbEmploymentSubsidy> employmentSubsidies = SHrsPayrollDataProvider.readEmploymentSubsidies(miClient.getSession(), statement);
+            boolean[] employmentSubsidyApplicability = SHrsPayroll.assessEmploymentSubsidyApplicability(periodStart, periodEnd, employmentSubsidies);
+            boolean employmentSubsidyApplicable = employmentSubsidyApplicability[0];
+            boolean employmentSubsidyAffectingWholeYear = employmentSubsidyApplicability[1];
+            boolean isTransitionYearForTaxSubsidy = SHrsPayroll.isTransitionYearForTaxSubsidy(employmentSubsidyApplicable, employmentSubsidyAffectingWholeYear);
+            
+            if (isTransitionYearForTaxSubsidy) {
+                newStyleStart = dbEmploymentSubsidy.getDateStart();
+                oldStyleEnd = SLibTimeUtils.addDate(newStyleStart, 0, 0, -1);
+            }
+            
+            String sql = "SELECT b.bp, b.id_bp, e.num, e.b_act, e.dt_hire, e.dt_dis_n, e.fk_tp_pay, trs.name, trs.rec_sche_cat "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON tp.id_tp_pay = e.fk_tp_pay "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = COALESCE(em.fk_tp_rec_sche_n, e.fk_tp_rec_sche) "
-                    + "WHERE e.id_emp IN ("
-                    + "SELECT DISTINCT id_emp "
+                    + "WHERE " + (moKeyPaymentType.getSelectedIndex() > 0 ? "e.fk_tp_pay = " + moKeyPaymentType.getValue()[0] + " AND " : "") + "e.id_emp IN ("
+                    + "SELECT DISTINCT pr.id_emp "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                    + "WHERE p.fis_year = " + moCalYear.getValue() + " " + (!moRadFilterTypeDateCut.isSelected() ? "" : "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateCutoff.getValue()) + "'") + " "
-                    + (moKeyPaymentType.getSelectedIndex() <= 0 ? "" : "AND p.fk_tp_pay = " +  moKeyPaymentType.getValue()[0]) + " "
-                    + "ORDER BY id_emp)"
-                    + "ORDER BY b.bp, b.id_bp ";
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND p.fis_year = " + moCalYear.getValue() + " " + (moRadComputeCutoff.isSelected() ? "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateCutoff.getValue()) + "' " : "")
+                    + "ORDER BY pr.id_emp) "
+                    + "ORDER BY b.bp, b.id_bp;";
 
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
-                employeeId = resultSet.getInt("e.id_emp");
-                recruitmentSchemaCat = resultSet.getInt("trs.rec_sche_cat");
-                
-                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.readEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, recruitmentSchemaCat, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
-                dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumptions(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), 0), mtDateStart, mtDateEnd);
-                dDaysTaxable = dDaysHired - dDaysIncapacityNotPay;
-                
-                amountEarnings = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, 0);
-                amountEarningSubsidy = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, SModSysConsts.HRSS_TP_EAR_TAX_SUB);
-                dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(periodYear) ? 1d : 0d))) * dDaysTaxable;
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    int employeeId = resultSet.getInt("b.id_bp");
+                    int recruitmentSchemaCat = resultSet.getInt("trs.rec_sche_cat");
 
-                row.setEmployeeId(employeeId);
-                row.setNameEmployee(resultSet.getString("b.bp"));
-                row.setCodeEmployee(resultSet.getString("e.num"));
-                row.setCodePaymentType(resultSet.getString("_tp_name"));
-                row.setAmountTaxable(amountEarnings.getAmountTaxable());
-                row.setAmountIncome(amountEarnings.getAmount());
-                row.setDaysHire(dDaysHired);
-                row.setDaysIncapacity(dDaysIncapacityNotPay);
-                row.setDaysTaxable(dDaysTaxable);
-                row.setFactor(dTableFactor);
-                row.setCalculatedTax(SHrsUtils.computeTax(dbTaxTable, amountEarnings.getAmountTaxable(), dTableFactor));
-                row.setRetainedTax(SHrsUtils.getAmountDeductionByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, SModSysConsts.HRSS_TP_DED_TAX));
-                row.setCalculatedSubsidy(SHrsUtils.computeTaxSubsidy(dbSubsidyTable, amountEarnings.getAmountTaxable(), dTableFactor));
-                row.setGivenSubsidy(amountEarningSubsidy.getAmount());
-                row.setIsStatus(resultSet.getBoolean("e.b_act"));
-                row.setDateHire(resultSet.getDate("e.dt_hire"));
-                row.setDateDismisss_n(resultSet.getDate("e.dt_dis_n"));
-                
-                rows.add(row);
+                    ArrayList<SDbAbsenceConsumption> absenceConsumptions = getEmployeeAbsencesConsumptions(statementAux, SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId, false), recruitmentSchemaCat);
+                    
+                    SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
+                    
+                    row.setEmployeeId(employeeId);
+                    row.seEmployeetName(resultSet.getString("b.bp"));
+                    row.setEmployeeCode(resultSet.getString("e.num"));
+                    row.setPaymentType(SHrsConsts.PaymentTypeCodes.get(resultSet.getInt("e.fk_tp_pay")));
+                    row.setRecruitmentSchema(resultSet.getString("trs.name"));
+                    row.setActive(resultSet.getBoolean("e.b_act"));
+                    row.setDateHire(resultSet.getDate("e.dt_hire"));
+                    row.setDateDismissal_n(resultSet.getDate("e.dt_dis_n"));
+                    
+                    /*
+                    Computing tax subsidy in a non-transition year (that is either pure old style or new style):
+                    - start date for processing attendance: periodStart
+                    - start date for computing tax and subsidy: null
+                    - end date for processing attendance and computing tax and subsidy: periodEnd
+                    */
+                    
+                    SRowCalculateIncomeTaxValues values = createValues(statementAux, absenceConsumptions, 
+                            dbTaxTable, dbTaxSubsidyTable, dbEmploymentSubsidy, !employmentSubsidyApplicable, employmentSubsidyAffectingWholeYear, 
+                            SRowCalculateIncomeTaxValues.STYLE_NA, employeeId, recruitmentSchemaCat, periodYear, periodStart, null, periodEnd);
+
+                    row.setValues(values);
+                    
+                    if (isTransitionYearForTaxSubsidy) {
+                        // Computing tax subsidy in a transition year (that is both old style and new style)...
+                        
+                        /*
+                        Old style computation:
+                        - start date for processing attendance: periodStart
+                        - start date for computing tax and subsidy: null
+                        - end date for processing attendance and computing tax and subsidy: oldStyleEnd
+                        */
+
+                        SRowCalculateIncomeTaxValues valuesOldStyle = createValues(statementAux, absenceConsumptions, 
+                                dbTaxTable, dbTaxSubsidyTable, dbEmploymentSubsidy, true, false, 
+                                SRowCalculateIncomeTaxValues.STYLE_OLD, employeeId, recruitmentSchemaCat, periodYear, periodStart, null, oldStyleEnd);
+
+                        row.getSubsidyValueses().add(valuesOldStyle);
+                        
+                        /*
+                        New style computation:
+                        - start date for processing attendance: newStyleStart
+                        - start date for computing tax and subsidy: newStyleStart
+                        - end date for processing attendance and computing tax and subsidy: periodEnd
+                        */
+
+                        SRowCalculateIncomeTaxValues valuesNewStyle = createValues(statementAux, absenceConsumptions, 
+                                dbTaxTable, dbTaxSubsidyTable, dbEmploymentSubsidy, false, true, 
+                                SRowCalculateIncomeTaxValues.STYLE_NEW, employeeId, recruitmentSchemaCat, periodYear, newStyleStart, newStyleStart, periodEnd);
+
+                        row.getSubsidyValueses().add(valuesNewStyle);
+                        
+                        // totalize subsidy:
+                        row.totalizeSubsidyFromSubsidyValueses();
+                    }
+
+                    rows.add(row);
+                }
             }
         }
         catch (Exception e) {
            SLibUtils.showException(this, e);
         }
         
-        moGridEmployeesRow.populateGrid(rows);
-        moGridEmployeesRow.resetSortKeys();
-        moGridEmployeesRow.setSelectedGridRow(0);
+        moEmployeesGrid.populateGrid(rows, this);
+        moEmployeesGrid.resetSortKeys();
+        moEmployeesGrid.setSelectedGridRow(0);
+    }
+    
+    /*
+     * Listener methods
+     */
+    
+    private void actionPerformedSetCurrentDate() {
+        removeAllListeners();
+        
+        moCalYear.setValue(miClient.getSession().getCurrentYear());
+        moDateCutoff.setValue(miClient.getSession().getCurrentDate());
+        moDateCutoff.requestFocusInWindow();
+        setRecentTablesTax();
+        
+        addAllListeners();
+    }
+    
+    private void actionPerformedCompute(final boolean requestFocus) {
+        SGuiValidation validation = validateForm();
+        
+        if (SGuiUtils.computeValidation(miClient, validation)) {
+            String confirm = "Cálculo de impuesto acumulado solicitado:\n"
+                    + "- período de pago: " + (moKeyPaymentType.getSelectedIndex() <= 0 ? "indistinto (todos los empleados)" : "sólo empleados de tipo '" + moKeyPaymentType.getSelectedItem().getItem() + "'") + "\n"
+                    + "- " + (moRadComputeYear.isSelected() ? "ejercicio: " + moCalYear.getValue() : "fecha de corte: " + SLibUtils.DateFormatDateLong.format(moDateCutoff.getValue())) + "\n"
+                    + "El proceso puede demorar varios segundos, ¿está seguro que desea continuar?";
+            
+            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                enableFields(false);
+                setRecentTablesTax();
+                populateEmployees();
+
+                if (requestFocus && moEmployeesGrid.getTable() != null) {
+                    moEmployeesGrid.getTable().requestFocusInWindow();
+                }
+            }
+        }
+    }
+    
+    private void actionPerformedClear(final boolean requestFocus) {
+        moEmployeesGrid.clearGridRows();
+        enableFields(true);
+        
+        if (requestFocus) {
+            moKeyPaymentType.requestFocusInWindow();
+        }
+    }
+    
+    private void focusGainedCutoff() {
+        mtTempCutoff = moDateCutoff.getValue();
+    }
+    
+    private void focusLostCutoff() {
+        if (!SLibTimeUtils.isSameDatetime(moDateCutoff.getValue(), mtTempCutoff)) {
+            setRecentTablesTax();
+        }
+        
+        mtTempCutoff = null;
+    }
+    
+    private void itemStateChangedCompute() {
+        enableFieldsCompute();
+    }
+    
+    private void stateChangedYear() {
+        moDateCutoff.setValue(SLibTimeUtils.createDate(moCalYear.getValue(), 12, 31));
+        setRecentTablesTax();
+    }
+    
+    private void valueChangedEmployeesGrid() {
+        moSubsidyGrid.clearGridRows();
+        
+        SRowCalculateIncomeTax row = (SRowCalculateIncomeTax) moEmployeesGrid.getSelectedGridRow();
+        if (row != null) {
+            moSubsidyGrid.populateGrid(new Vector<>(row.getSubsidyValueses()));
+            moSubsidyGrid.resetSortKeys();
+            moSubsidyGrid.setSelectedGridRow(0);
+        }
     }
     
     @Override
     public void addAllListeners() {
-        moRadFilterTypeDateCut.addChangeListener(this);
-        moRadFilterTypeYear.addChangeListener(this);
+        jbSetCurrentDate.addActionListener(this);
+        jbCompute.addActionListener(this);
+        jbClear.addActionListener(this);
+        
+        moDateCutoff.getComponent().addFocusListener(this);
+        
+        moRadComputeCutoff.addItemListener(this);
+        moRadComputeYear.addItemListener(this);
+        
         moCalYear.addChangeListener(this);
-        jbCalculate.addActionListener(this);
-        jbClean.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moRadFilterTypeDateCut.removeChangeListener(this);
-        moRadFilterTypeYear.removeChangeListener(this);
+        jbSetCurrentDate.removeActionListener(this);
+        jbCompute.removeActionListener(this);
+        jbClear.removeActionListener(this);
+        
+        moDateCutoff.getComponent().removeFocusListener(this);
+        
+        moRadComputeCutoff.removeItemListener(this);
+        moRadComputeYear.removeItemListener(this);
+        
         moCalYear.removeChangeListener(this);
-        jbCalculate.removeActionListener(this);
-        jbClean.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyTax, SModConsts.HRS_TAX, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyTaxSubsidy, SModConsts.HRS_TAX_SUB, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, 0, null);
+        miClient.getSession().populateCatalogue(moKeyTax, SModConsts.HRS_TAX, 0, null);
+        miClient.getSession().populateCatalogue(moKeyTaxSubsidy, SModConsts.HRS_TAX_SUB, 0, null);
+        miClient.getSession().populateCatalogue(moKeyEmploymentSubsidy, SModConsts.HRS_EMPL_SUB, 0, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
+    
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (SLibTimeUtils.digestYear(moDateDateCutoff.getValue())[0] < moCalYear.getValue()) {
-                validation.setMessage("El año del campo '" + SGuiUtils.getLabelName(jlDateCutoff) + "' debe ser mayor o igual al campo '" + SGuiUtils.getLabelName(jlYear) + "'.");
-                validation.setComponent(moDateDateCutoff);
-            }
-            else if (SLibTimeUtils.digestYear(moDateDateCutoff.getValue())[0] - moCalYear.getValue() > 1) {
-                validation.setMessage("La diferencia entre el año del campo '" + SGuiUtils.getLabelName(jlDateCutoff) + "' y el campo '" + SGuiUtils.getLabelName(jlYear) + "' no puede ser mayor a 1.");
-                validation.setComponent(moDateDateCutoff);
-            }
-            
-            if (validation.isValid() && moRadFilterTypeDateCut.isSelected()) {
-                int diffDays = (int) SLibTimeUtils.getDaysDiff(moDateDateCutoff.getValue(), SLibTimeUtils.createDate(moCalYear.getValue(), 12, 31));
-                
-                if (diffDays > 6) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'.");
-                    validation.setComponent(moDateDateCutoff);
-                }
-                
-                if (validation.isValid() && SLibTimeUtils.digestYear(moDateDateCutoff.getValue())[0] != moCalYear.getValue()) {
-                    if (miClient.showMsgBoxConfirm("Los días gravables de acuerdo a la fecha de corte son mayores a " + (SLibTimeUtils.isLeapYear(moCalYear.getValue()) ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS) + " que tiene el ejercicio especificado, el calculo se verá afectado.\n " + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'.");
-                        validation.setComponent(moDateDateCutoff);
-                    }
-                }
+            if (moDateCutoff.isEnabled() && SLibTimeUtils.digestYear(moDateCutoff.getValue())[0] != moCalYear.getValue()) {
+                validation.setMessage("El año del campo '" + moDateCutoff.getFieldName() + "' debe igual al del campo '" + moCalYear.getFieldName() + "'.");
+                validation.setComponent(moDateCutoff);
             }
         }
         
@@ -516,42 +885,74 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
     }
 
     @Override
-    public void setValue(final int type, final Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Object getValue(final int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbCalculate) {
-                actionCalculate();
+            if (button == jbSetCurrentDate) {
+                actionPerformedSetCurrentDate();
             }
-            else if (button == jbClean) {
-                actionClean();
+            else if (button == jbCompute) {
+                actionPerformedCompute(true);
+            }
+            else if (button == jbClear) {
+                actionPerformedClear(true);
+            }
+        }
+    }
+    
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (e.getSource() instanceof JFormattedTextField) {
+            JFormattedTextField field = (JFormattedTextField) e.getSource();
+            
+            if (field == moDateCutoff.getComponent()) {
+                focusGainedCutoff();
+            }
+        }
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof JFormattedTextField) {
+            JFormattedTextField field = (JFormattedTextField) e.getSource();
+            
+            if (field == moDateCutoff.getComponent()) {
+                focusLostCutoff();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
+            
+            if (field == moRadComputeYear) {
+                itemStateChangedCompute();
+                stateChangedYear();
+            }
+            else if (field == moRadComputeCutoff) {
+                itemStateChangedCompute();
             }
         }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if (e.getSource() instanceof SBeanFieldRadio) {
-            if ((SBeanFieldRadio) e.getSource() == moRadFilterTypeDateCut || (SBeanFieldRadio) e.getSource() == moRadFilterTypeYear) {
-                actionEnableFieldsTypeCal();
-            }
-        }
-        else if (e.getSource() instanceof JSpinner) {
+        if (e.getSource() instanceof JSpinner) {
             SBeanFieldCalendarYear spinner = (SBeanFieldCalendarYear) e.getSource();
 
             if (spinner == moCalYear) {
-                actionStateChangeYear();
+                stateChangedYear();
             }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getSource() == moEmployeesGrid.getTable().getSelectionModel() && !e.getValueIsAdjusting()) {
+            valueChangedEmployeesGrid();
         }
     }
 }

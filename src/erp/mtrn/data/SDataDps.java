@@ -5706,6 +5706,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             case SModSysConsts.CFGU_CUR_EUR:
                 moneda = DAttributeOptionMoneda.CFD_EUR;
                 break;
+            case SModSysConsts.CFGU_CUR_GBP:
+                moneda = DAttributeOptionMoneda.CFD_GBP;
+                break;
             default:
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }

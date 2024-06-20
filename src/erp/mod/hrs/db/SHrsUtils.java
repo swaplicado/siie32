@@ -18,7 +18,6 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.utils.SAnniversary;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
@@ -32,7 +31,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -56,7 +54,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
-import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -70,7 +67,7 @@ import sa.lib.prt.SPrtUtils;
 /**
  * Utilerías varias para el procesamiento y emisión de nóminas.
  * 
- * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -2572,6 +2569,13 @@ public abstract class SHrsUtils {
         return number;
     }
 
+    /**
+     * Get payroll receipt issues.
+     * @param session GUI session.
+     * @param payrollKey Payroll key.
+     * @return
+     * @throws Exception 
+     */
     public static ArrayList<SDataPayrollReceiptIssue> getPayrollReceiptIssues(final SGuiSession session, final int[] payrollKey) throws Exception {
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = new ArrayList<>();
 
@@ -2714,17 +2718,25 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static boolean validateEmployeeHireLog(final SGuiSession session, final int employeeId, final boolean isHire) throws Exception {
+    /**
+     * Validate employee hire log.
+     * @param session GUI session.
+     * @param employeeId ID of employee.
+     * @param isHiring Is hiring.
+     * @return
+     * @throws Exception 
+     */
+    public static boolean validateEmployeeHireLog(final SGuiSession session, final int employeeId, final boolean isHiring) throws Exception {
         String sql = "SELECT COUNT(id_log) AS f_count " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
             "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NULL;";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             if (resultSet.next()) {
-                if (isHire && resultSet.getInt("f_count") > 0) {
+                if (isHiring && resultSet.getInt("f_count") > 0) {
                     throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe al menos un movimiento de alta sin su baja correspondiente.");
                 }
-                else if (!isHire) {
+                else if (!isHiring) {
                     if (resultSet.getInt("f_count") > 1) {
                         throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe más de un movimiento de alta sin su baja correspondiente.");
                     }
@@ -3242,35 +3254,6 @@ public abstract class SHrsUtils {
 
         return disabilityName;
     }
-    
-    /**
-     * Create anniversary entries from 1 to 99 for each given table of benefits.
-     * @param benefitTables
-     * @return Array of anniversaries (from 1 to 100) for each given table of benefits.
-     */
-    public static ArrayList<SHrsBenefitTableAnniversary> createBenefitTablesAnniversaries(ArrayList<SDbBenefitTable> benefitTables) {
-        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
-        
-        benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
-            int currIndex = -1; // current index of row for current benefit table
-            double benefit = 0; // current benefit, expressed as days or bonus percentage
-            SDbBenefitTableRow tableRow = null; // current benefit-table row
-            
-            for (int year = 1; year <= 100; year++) {
-                if (tableRow == null || (year * SLibTimeConsts.MONTHS) > tableRow.getMonths()) {
-                    if (currIndex + 1 < table.getChildRows().size()) {
-                        ++currIndex;
-                        tableRow = table.getChildRows().get(currIndex);
-                        benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
-                    }
-                }
-                
-                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), year, benefit));
-            }
-        });
-
-        return benefitTableAnniversarys;
-    }
 
     /**
      * Get the most recent tax table.
@@ -3371,25 +3354,6 @@ public abstract class SHrsUtils {
 
         return tableId;
     }
-    
-    public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCutoff) throws Exception {
-        int tableId = 0;
-
-        String sql = "SELECT id_ben "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE NOT b_del AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
-            + (paymentType == 0 ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
-            + "ORDER BY dt_sta DESC, id_ben "
-            + "LIMIT 1;";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                tableId = resultSet.getInt(1);
-            }
-        }
-
-        return tableId;
-    }
 
     /**
      * Gets recent UMA.
@@ -3467,6 +3431,14 @@ public abstract class SHrsUtils {
         return wage;
     }
 
+    /**
+     * Create payroll receipt map for printing.
+     * @param client
+     * @param payrollReceiptKey
+     * @param printMode
+     * @return
+     * @throws Exception 
+     */
     public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollReceiptKey, final int printMode) throws Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
@@ -3841,6 +3813,25 @@ public abstract class SHrsUtils {
         return sql;
     }
     
+    public static SDbEmployeeHireLog getEmployeeLastHireLog(final SGuiSession session, final String schema, final int employeeId, final int excludeLogId) throws Exception {
+        SDbEmployeeHireLog employeeHireLog = null;
+        
+        String sql = "SELECT id_log " +
+            "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + " " + (excludeLogId == 0 ? "" : "AND id_log <> " + excludeLogId + " ") +
+            "ORDER BY id_log DESC " +
+            "LIMIT 1;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                employeeHireLog = new SDbEmployeeHireLog();
+                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+            }
+        }
+        
+        return employeeHireLog;
+    }
+    
     public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement statement, final int employeeId, final int recruitmentSchemaCat, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
@@ -3861,64 +3852,33 @@ public abstract class SHrsUtils {
 
         return employeeHireLogs;
     }
-    
-    public static SDbEmployeeHireLog getEmployeeLastHireLog(final SGuiSession session, final String schema, final int employeeId, final int excludeLogId) throws Exception {
-        SDbEmployeeHireLog employeeHireLog = null;
-        
-        String sql = "SELECT id_log " +
-            "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE NOT b_del AND id_emp = " + employeeId + " " + (excludeLogId == 0 ? "" : "AND id_log <> " + excludeLogId + " ") +
-            "ORDER BY id_log DESC " +
-            "LIMIT 1;";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                employeeHireLog = new SDbEmployeeHireLog();
-                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
-            }
-        }
-        
-        return employeeHireLog;
-    }
-    
-    public static int getEmployeeHireDays(final ArrayList<SDbEmployeeHireLog> aEmployeeHireLogs, final Date dateStart, final Date dateEnd) throws Exception {
+
+    public static int getEmployeeDaysHired(final ArrayList<SDbEmployeeHireLog> employeeHireLogs, final Date dateStart, final Date dateEnd) {
         int daysHired = 0;
         
-        for (SDbEmployeeHireLog hireLog : aEmployeeHireLogs) {
-            if (hireLog.getDateHire().compareTo(dateStart) <= 0) {
-                daysHired += SLibTimeUtils.countPeriodDays(
-                        dateStart, 
-                        hireLog.getDateDismissal_n() == null ? dateEnd : hireLog.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissal_n());
-            }
-            else if (hireLog.getDateHire().compareTo(dateStart) >= 0) {
-                daysHired += SLibTimeUtils.countPeriodDays(
-                        hireLog.getDateHire(),
-                        hireLog.getDateDismissal_n() == null ? dateEnd : hireLog.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissal_n());
-            }
+        for (SDbEmployeeHireLog entry : employeeHireLogs) {
+            daysHired += SLibTimeUtils.countPeriodDays(
+                    entry.getDateHire().compareTo(dateStart) <= 0 ? dateStart : entry.getDateHire(), 
+                    entry.getDateDismissal_n() == null || entry.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissal_n());
         }
         
         return daysHired;
     }
     
-    public static int getEmployeeIncapacityNotPayed(final ArrayList<SDbAbsenceConsumption> aAbsenceConsumptions, final Date dateStart, final Date dateEnd) {
-        int daysIncapacityNotPaidAnnual = 0;
-        
-        for (SDbAbsenceConsumption absenceConsumption : aAbsenceConsumptions) {
-            if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability() && 
-                    SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), dateStart, dateEnd)) {
-                daysIncapacityNotPaidAnnual += absenceConsumption.getEffectiveDays();
-            }
-        }
-        
-        return daysIncapacityNotPaidAnnual;
-    }
-    
-    public static ArrayList<SDbAbsence> getEmployeeAbsences(final SGuiSession session, final int employeeId) throws Exception {
+    /**
+     * Get absences of employee.
+     * @param session GUI session.
+     * @param employeeId ID of employee.
+     * @param excludeClosedAbsences Include closed absences.
+     * @return
+     * @throws Exception 
+     */
+    public static ArrayList<SDbAbsence> getEmployeeAbsences(final SGuiSession session, final int employeeId, final boolean excludeClosedAbsences) throws Exception {
         ArrayList<SDbAbsence> aAbsences = new ArrayList<>();
 
         String sql = "SELECT id_emp, id_abs " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " " +
-            "WHERE id_emp = " + employeeId + " AND NOT b_del AND NOT b_clo " +
+            "WHERE id_emp = " + employeeId + " AND NOT b_del " + (excludeClosedAbsences ? "AND NOT b_clo " : "") +
             "ORDER BY dt_sta, id_emp, id_abs;";
 
         try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql)) {
@@ -3930,51 +3890,6 @@ public abstract class SHrsUtils {
         }
         
         return aAbsences;
-    }
-    
-    public static ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final SGuiSession session, final ArrayList<SDbAbsence> absences, final int payrollId) throws Exception {
-        ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
-
-        String sql = "SELECT ac.id_cns "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p ON pr.id_pay = p.id_pay "
-                + "WHERE ac.id_emp = ? AND ac.id_abs = ? AND ac.fk_rcp_pay <> " + payrollId + " AND NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del "
-                + "ORDER BY ac.id_emp, ac.id_abs, ac.id_cns;";
-
-        try (PreparedStatement preparedStatement = session.getDatabase().getConnection().prepareStatement(sql)) {
-            for (SDbAbsence absence : absences) {
-                preparedStatement.setInt(1, absence.getPkEmployeeId());
-                preparedStatement.setInt(2, absence.getPkAbsenceId());
-                
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
-                        absenceConsumption.read(session, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt(1) });
-                        absencesConsumptions.add(absenceConsumption);
-                    }
-                }
-            }
-        }
-        
-        return absencesConsumptions;
-    }
-    
-    private static boolean isFirstHire(final SGuiSession session, final int employeeId) throws Exception {
-        boolean isFirtsHire = false;
-        
-        String sql = "SELECT COUNT(*) AS _count, MAX(id_log) AS _max_id_log " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE NOT b_del AND id_emp = " + employeeId + ";";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next() && resultSet.getInt("_count") == 1) {
-                SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog) session.readRegistry(SModConsts.HRS_EMP_LOG_HIRE, new int[] { employeeId, resultSet.getInt("_max_id_log") }, SDbConsts.MODE_STEALTH);
-                isFirtsHire = employeeHireLog.getDateDismissal_n() == null;
-            }
-        }
-        
-        return isFirtsHire;
     }
     
     public static boolean modifyHireLog(final SGuiSession session, final SDbEmployeeHireLog currentEmployeeHireLog) throws Exception {
@@ -3996,6 +3911,23 @@ public abstract class SHrsUtils {
         hrsEmployeeHireLog.processRequest();
         
         return true;
+    }
+    
+    private static boolean isFirstHire(final SGuiSession session, final int employeeId) throws Exception {
+        boolean isFirtsHire = false;
+        
+        String sql = "SELECT COUNT(*) AS _count, MAX(id_log) AS _max_id_log " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + ";";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next() && resultSet.getInt("_count") == 1) {
+                SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog) session.readRegistry(SModConsts.HRS_EMP_LOG_HIRE, new int[] { employeeId, resultSet.getInt("_max_id_log") }, SDbConsts.MODE_STEALTH);
+                isFirtsHire = employeeHireLog.getDateDismissal_n() == null;
+            }
+        }
+        
+        return isFirtsHire;
     }
     
     public static boolean revertLastHireLogEntry(final SGuiSession session, final SDbEmployee employee) throws Exception {
@@ -4070,60 +4002,6 @@ public abstract class SHrsUtils {
         }
 
         return days;
-    }
-    // xxx123 refactorizar
-    public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
-        int seniority = 0;
-        int daysTableAnnualBonus = 0;
-        int daysTableVacation = 0;
-        double percentageTableVacationBonus = 0;
-        double salaryUnit = 1;
-        double integrationFactorSbc = 0;
-        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
-        ArrayList<SDbBenefitTable> benefitTableAnnualBonus = new ArrayList<>();
-        ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
-        ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
-        
-        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, 0, dateCutoff) }));
-        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, 0, dateCutoff) }));
-        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, 0, dateCutoff) }));
-        
-        if (dateBenefits != null) {
-            SAnniversary anniversary = new SAnniversary(dateBenefits, dateCutoff);
-            seniority = anniversary.getElapsedYears();
-        }
-        else {
-            seniority = 1;
-        }
-        
-        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnnualBonusAnniversaries = createBenefitTablesAnniversaries(benefitTableAnnualBonus);
-        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationAnniversaries = createBenefitTablesAnniversaries(benefitTableVacation);
-        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationBonusAnniversaries = createBenefitTablesAnniversaries(benefitTableVacationBonus);
-        
-        for (SHrsBenefitTableAnniversary anniversary : benefitTableAnnualBonusAnniversaries) {
-            if (anniversary.getAnniversary() <= seniority) {
-                benefitTableAnniversary = anniversary;
-            }
-        }
-        daysTableAnnualBonus = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
-        
-        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversaries) {
-            if (anniversary.getAnniversary() <= seniority) {
-                benefitTableAnniversary = anniversary;
-            }
-        }
-        daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
-        
-        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationBonusAnniversaries) {
-            if (anniversary.getAnniversary() <= seniority) {
-                benefitTableAnniversary = anniversary;
-            }
-        }
-        percentageTableVacationBonus = benefitTableAnniversary == null ? 0 : (double) benefitTableAnniversary.getValue();
-        
-        integrationFactorSbc = salaryUnit + ((double) daysTableAnnualBonus / SHrsConsts.YEAR_DAYS) + (double) (daysTableVacation * percentageTableVacationBonus / SHrsConsts.YEAR_DAYS);
-        
-        return integrationFactorSbc;
     }
     
     /**
@@ -4277,399 +4155,6 @@ public abstract class SHrsUtils {
         }
         
         return SLibUtils.roundAmount(loanAmount);
-    }
-    
-    /**
-     * Compute tax.
-     * @param taxTable Table of tax for computation.
-     * @param taxableEarnings Taxable earnings.
-     * @param tableFactor Adjustment factor to apply to tax table.
-     * @return Computed tax.
-     * @throws Exception 
-     */
-    public static double computeTax(final SDbTaxTable taxTable, final double taxableEarnings, final double tableFactor) throws Exception {
-        double taxAssessed = 0;
-        
-        for (int row = 0; row < taxTable.getChildRows().size(); row++) {
-            SDbTaxTableRow taxTableRow = taxTable.getChildRows().get(row);
-            if (taxableEarnings >= SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor) &&
-                    (row + 1 == taxTable.getChildRows().size() || taxableEarnings < SLibUtils.roundAmount(taxTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor))) {
-                taxAssessed = SLibUtils.roundAmount((taxableEarnings - SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor)) * taxTableRow.getTaxRate() + taxTableRow.getFixedFee() * tableFactor);
-                break;
-            }
-        }
-        
-        return taxAssessed;
-    }
-    
-    /**
-     * Compute tax subsidy.
-     * @param taxSubsidyTable Table of tax subsidy for computation.
-     * @param taxableEarnings Taxable earnings.
-     * @param tableFactor Adjustment factor to apply to tax subsidy table.
-     * @return Computed tax subsidy.
-     * @throws Exception 
-     */
-    public static double computeTaxSubsidy(final SDbTaxSubsidyTable taxSubsidyTable, final double taxableEarnings, final double tableFactor) throws Exception {
-        double taxSubsidyAssessed = 0;
-        
-        for (int row = 0; row < taxSubsidyTable.getChildRows().size(); row++) {
-            SDbTaxSubsidyTableRow taxSubsidyTableRow = taxSubsidyTable.getChildRows().get(row);
-            if (taxableEarnings >= taxSubsidyTableRow.getLowerLimit() * tableFactor &&
-                    (row + 1 == taxSubsidyTable.getChildRows().size() || taxableEarnings < taxSubsidyTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor)) {
-                taxSubsidyAssessed = SLibUtils.roundAmount(taxSubsidyTableRow.getTaxSubsidy() * tableFactor);
-                break;
-            }
-        }
-        
-        return taxSubsidyAssessed;
-    }
-    
-    /**
-     * Compute employment subsidy.
-     * @param employmentSubsidy Employment subsidy configuration.
-     * @param taxableEarnings Taxable earnings.
-     * @param tableFactor Adjustment factor to apply to tax subsidy table.
-     * @return Computed tax subsidy.
-     * @throws Exception 
-     */
-    public static double computeEmploymentSubsidy(final SDbEmploymentSubsidy employmentSubsidy, final double taxableEarnings, final double tableFactor) throws Exception {
-        double employmentSubsidyAssessed = 0;
-        
-        if (taxableEarnings <= employmentSubsidy.getIncomeMonthlyCap() * tableFactor) {
-            employmentSubsidyAssessed = SLibUtils.roundAmount(employmentSubsidy.getSubsidyMonthlyCap() * tableFactor);
-        }
-        
-        return employmentSubsidyAssessed;
-    }
-    
-    /**
-     * Compute tax based in Articule 174 RLISR.
-     * @param taxTable Table of tax for computation.
-     * @param taxableEarnings Taxable earnings.
-     * @param monthlyIncome Ordinary monthly income.
-     * @param tableFactor Adjustment factor to apply to tax table.
-     * @return Computed tax.
-     * @throws Exception 
-     */
-    public static double computeTaxAlt(final SDbTaxTable taxTable, final double taxableEarnings, final double monthlyIncome, final double tableFactor) throws Exception {
-        double amountFractionI = taxableEarnings / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
-        
-        double amountFractionII = computeTax(taxTable, (monthlyIncome + amountFractionI), tableFactor);
-        
-        double amountFractionIIIAux = computeTax(taxTable, monthlyIncome, tableFactor);
-        double amountFractionIII = amountFractionIIIAux > 0 ? (amountFractionII - amountFractionIIIAux) : 0;
-        
-        double amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
-        
-        double amountFractionIV = amountFractionIIIAux > 0 ? (taxableEarnings * amountFractionV) : 0;
-        
-        return amountFractionIV;
-    }
-    
-    /**
-     * Compute tax subsidy based in Articule 174 RLISR.
-     * @param taxSubsidyTable Table of tax subsidy for computation.
-     * @param taxableEarnings Taxable earnings.
-     * @param monthlyIncome Ordinary monthly income.
-     * @param tableFactor Adjustment factor to apply to tax subsidy table.
-     * @return Computed tax subsidy.
-     * @throws Exception 
-     */
-    public static double computeTaxSubsidyAlt(final SDbTaxSubsidyTable taxSubsidyTable, final double taxableEarnings, final double monthlyIncome, final double tableFactor) throws Exception {
-        double amountFractionI = taxableEarnings / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
-        
-        double amountFractionII = computeTaxSubsidy(taxSubsidyTable, (monthlyIncome + amountFractionI), tableFactor);
-        
-        double amountFractionIIIAux = computeTaxSubsidy(taxSubsidyTable, monthlyIncome, tableFactor);
-        double amountFractionIII = amountFractionIIIAux > 0 ? (amountFractionII - amountFractionIIIAux) : 0;
-        
-        double amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
-        
-        double amountFractionIV = amountFractionIIIAux > 0 ? (taxableEarnings * amountFractionV) : 0;
-        
-        return amountFractionIV;
-    }
-    
-    /**
-     * Compute employment subsidy based in Articule 174 RLISR.
-     * @param employmentSubsidy Table of tax subsidy for computation.
-     * @param taxableEarnings Taxable earnings.
-     * @param monthlyIncome Ordinary monthly income.
-     * @param tableFactor Adjustment factor to apply to tax subsidy table.
-     * @return Computed tax subsidy.
-     * @throws Exception 
-     */
-    public static double computeEmploymentSubsidyAlt(final SDbEmploymentSubsidy employmentSubsidy, final double taxableEarnings, final double monthlyIncome, final double tableFactor) throws Exception {
-        double amountFractionI = taxableEarnings / SHrsConsts.YEAR_DAYS * SHrsConsts.MONTH_DAYS_FIXED;
-        
-        double amountFractionII = computeEmploymentSubsidy(employmentSubsidy, (monthlyIncome + amountFractionI), tableFactor);
-        
-        double amountFractionIIIAux = computeEmploymentSubsidy(employmentSubsidy, monthlyIncome, tableFactor);
-        double amountFractionIII = amountFractionIIIAux > 0 ? (amountFractionII - amountFractionIIIAux) : 0;
-        
-        double amountFractionV = amountFractionI == 0 ? 0 : (amountFractionIII / amountFractionI);
-        
-        double amountFractionIV = amountFractionIIIAux > 0 ? (taxableEarnings * amountFractionV) : 0;
-        
-        return amountFractionIV;
-    }
-    
-    /**
-     * Compute Social Security Contribution.
-     * @param sscTable Table of Social Security Contribution for computation.
-     * @param salarySsc Employee's base salary for Social Security Contribution.
-     * @param mwzReferenceWage Minimum wage of reference zone.
-     * @param hrsDaysPrev Number of employee's days hired in previous period the payroll.
-     * @param hrsDaysCurr Number of employee's days hired in current period the payroll.
-     * @param hrsDaysNext Number of employee's days hired in next period the payroll.
-     * @return double amount calculated of security social contribution.
-     * @throws Exception 
-     */
-    public static double computeSsContribution(final SDbSsContributionTable sscTable, final double salarySsc, final double mwzReferenceWage, 
-            final SHrsDaysByPeriod hrsDaysPrev, final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
-        double sscAssessed = 0;
-        
-        for (int row = 0; row < sscTable.getChildRows().size(); row++) {
-            SDbSsContributionTableRow sscTableRow = sscTable.getChildRows().get(row);
-            double sscEarning = 0;
-            
-            switch(sscTableRow.getPkRowId()) {
-                case SHrsConsts.SS_INC_MON:
-                case SHrsConsts.SS_INC_PEN:
-                    sscEarning = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * salarySsc);
-                    break;
-                    
-                case SHrsConsts.SS_INC_KND_SSC_LET:
-                    sscEarning = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * mwzReferenceWage);
-                    break;
-                    
-                case SHrsConsts.SS_INC_KND_SSC_GT:
-                    sscEarning = SLibUtils.roundAmount(salarySsc <= (sscTableRow.getLowerLimitMwzReference() * mwzReferenceWage) ? 0 :
-                           ((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * (salarySsc - (sscTableRow.getLowerLimitMwzReference() * mwzReferenceWage))));
-                    break;
-                    
-                case SHrsConsts.SS_DIS_LIF:
-                case SHrsConsts.SS_CRE:
-                case SHrsConsts.SS_RSK:
-                case SHrsConsts.SS_RET:
-                case SHrsConsts.SS_SEV:
-                case SHrsConsts.SS_HOM:
-                    sscEarning = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid() - hrsDaysCurr.getDaysNotWorkedNotPaid() - hrsDaysNext.getDaysNotWorkedNotPaid()) * salarySsc);
-                    break;
-                    
-                default:
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-            }
-            
-            sscAssessed += SLibUtils.roundAmount(sscEarning * sscTableRow.getWorkerPercentage());
-        }
-        
-        return sscAssessed;
-    }
-    
-    /**
-     * Estimates net monthly payment from a suggested gross payment.
-     * @param session GUI session.
-     * @param grossAmount Suggested gross monthly payment.
-     * @param dateCutoff Cutoff date.
-     * @param dateBenefits Benefits date.
-     * @return Estimation.
-     * @throws Exception 
-     */
-    public static SHrsCalculatedNetGrossAmount estimateMonthlyPaymentNet(final SGuiSession session, final double grossAmount, final Date dateCutoff, final Date dateBenefits) throws Exception {
-        SHrsCalculatedNetGrossAmount hrsCalculatedNetGrossAmount = null;
-        SDbTaxTable taxTable = null;
-        SDbTaxSubsidyTable taxSubsidyTable = null;
-        SDbSsContributionTable sscTable = null;
-        SDbConfig config = null;
-        double salaryDaily = 0;
-        double salarySsc = 0;
-        double mwzReferenceWage = 0;
-        double netAmount = 0;
-        double taxAmount = 0;
-        double taxSubsidyAmount = 0;
-        double sscAmount = 0;
-        double tableFactor = 0;
-        int year = SLibTimeUtils.digestYear(dateCutoff)[0];
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutoff);
-        SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0);
-        SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days);
-        SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0);
-        
-        salaryDaily = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-        salarySsc = salaryDaily * getSbcIntegrationFactor(session, dateBenefits, dateCutoff);
-        
-        config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-        taxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutoff) });
-        taxSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCutoff) });
-        sscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCutoff) });
-        mwzReferenceWage = getRecentMinimumWage(session, config.getFkMwzReferenceTypeId(), dateCutoff);
-        
-        tableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
-        
-        taxAmount = computeTax(taxTable, grossAmount, tableFactor);
-        taxSubsidyAmount = computeTaxSubsidy(taxSubsidyTable, grossAmount, tableFactor);
-        sscAmount = computeSsContribution(sscTable, salarySsc, mwzReferenceWage, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
-        
-        netAmount = grossAmount - taxAmount - sscAmount;
-        
-        hrsCalculatedNetGrossAmount = new SHrsCalculatedNetGrossAmount(netAmount, grossAmount, taxAmount, taxSubsidyAmount, sscAmount);
-        hrsCalculatedNetGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_NET_AMT_TYPE);
-        hrsCalculatedNetGrossAmount.setSalary(salaryDaily);
-        hrsCalculatedNetGrossAmount.setSalarySs(salarySsc);
-        
-        return hrsCalculatedNetGrossAmount;
-    }
-    
-    /**
-     * Estimates gross monthly payment from a suggested net payment.
-     * @param session GUI session.
-     * @param netAmount Suggested net monthly payment.
-     * @param dateCutoff Cutoff date.
-     * @param dateBenefits Benefits date.
-     * @param tolerance Estimation tolerance as an amount of money.
-     * @return
-     * @throws Exception 
-     */
-    public static SHrsCalculatedNetGrossAmount estimateMonthlyPaymentGross(final SGuiSession session, final double netAmount, final Date dateCutoff, final Date dateBenefits, final double tolerance) throws Exception {
-        SHrsCalculatedNetGrossAmount hrsCalculatedNetGrossAmount = null;
-        SDbTaxTable taxTable = null;
-        SDbTaxTableRow taxTableRow = null;
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutoff);
-        double salaryDaily = 0;
-        double salarySsc = 0;
-        double tableFactor = 0;
-        double average = 0;
-        double grossAmount = 0;
-        double limitInf = 0;
-        double limitSup = 0;
-        double toleranceAux = 0;
-        boolean calculate = true;
-        
-        taxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutoff) });
-        
-        tableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
-        
-        if (taxTable != null) {
-            for (int i = 0; i < taxTable.getChildRows().size(); i++) {
-                taxTableRow = taxTable.getChildRows().get(i);
-                if (i == 0) {
-                    limitInf = SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor);
-                }
-                if (netAmount <= SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor)) {
-                    limitSup = SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor);
-                }
-                
-                average = (limitInf + limitSup) / 2;
-                
-                salaryDaily = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-                salarySsc = salaryDaily * getSbcIntegrationFactor(session, dateBenefits, dateCutoff);
-
-                hrsCalculatedNetGrossAmount = estimateMonthlyPaymentNet(session, average, dateCutoff, dateBenefits);
-                
-                if (hrsCalculatedNetGrossAmount.getNetAmount() > netAmount) {
-                    break;
-                }
-            }
-        }
-        
-        average = 0;
-
-        while (calculate) {
-            average = (limitInf + limitSup) / 2;
-            
-            salaryDaily = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-            salarySsc = salaryDaily * getSbcIntegrationFactor(session, dateBenefits, dateCutoff);
-
-            hrsCalculatedNetGrossAmount = estimateMonthlyPaymentNet(session, average, dateCutoff, dateBenefits);
-
-            if (hrsCalculatedNetGrossAmount.getNetAmount() > netAmount) {
-                limitSup = average;
-            }
-            else {
-                limitInf = average;
-            }
-            toleranceAux = SLibUtils.roundAmount(netAmount - hrsCalculatedNetGrossAmount.getNetAmount());
-            
-            calculate = SLibUtils.roundAmount(limitInf) != SLibUtils.roundAmount(limitSup) && Math.abs(toleranceAux) > tolerance;
-        }
-        grossAmount = average;
-        
-        hrsCalculatedNetGrossAmount.setSalary(salaryDaily);
-        hrsCalculatedNetGrossAmount.setSalarySs(salarySsc);
-        hrsCalculatedNetGrossAmount.setGrossAmount(grossAmount);
-        hrsCalculatedNetGrossAmount.setCalculatedAmountType(SHrsConsts.CAL_GROSS_AMT_TYPE);
-        
-        return hrsCalculatedNetGrossAmount;
-    }
-    
-    /**
-     * Gets amounts (total, exempt and taxable) of earnings of employee.
-     * @param session
-     * @param employeeId
-     * @param periodYear
-     * @param dateCutoff
-     * @param earningTypeId Can be omitted with 0.
-     * @return
-     * @throws Exception 
-     */
-    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutoff, final int earningTypeId) throws Exception {
-        SHrsAmountEarning amountEarning = null;
-
-        String sql = "SELECT SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_taxa " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-            "p.id_pay = pr.id_pay " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
-            "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + 
-            (earningTypeId == 0 ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "'";
-        
-        Statement statement = session.getDatabase().getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            amountEarning = new SHrsAmountEarning(earningTypeId);
-            
-            amountEarning.setAmount(resultSet.getDouble("f_amount"));
-            amountEarning.setAmountExempt(resultSet.getDouble("f_exem"));
-            amountEarning.setAmountTaxable(resultSet.getDouble("f_taxa"));
-        }
-        
-        return amountEarning;
-    }
-
-    /**
-     * Gets amount of deductions of employee.
-     * @param session
-     * @param employeeId
-     * @param periodYear
-     * @param dateCutoff
-     * @param deductionTypeId Can be omitted with 0.
-     * @return
-     * @throws Exception 
-     */
-    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutoff, final int deductionTypeId) throws Exception {
-        double amountDeduction = 0;
-
-        String sql = "SELECT SUM(prd.amt_r) AS f_amount " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-            "p.id_pay = pr.id_pay " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
-            "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + employeeId + 
-            (deductionTypeId == 0 ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "'";
-        
-        Statement statement = session.getDatabase().getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            amountDeduction = resultSet.getDouble("f_amount");
-        }
-        
-        return amountDeduction;
     }
     
     /**

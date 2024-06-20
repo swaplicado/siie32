@@ -61,7 +61,7 @@ public class SDialogBenefitTablesMassiveAssignation extends SBeanFormDialog impl
     protected int mnEmployeesSet;
 
     /**
-     * Creates new form SDialogBenefitTablesMassiveUpdate.
+     * Creates new form SDialogBenefitTablesMassiveAssignation.
      */
     public SDialogBenefitTablesMassiveAssignation(SGuiClient client) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Actualización masiva de prestaciones");

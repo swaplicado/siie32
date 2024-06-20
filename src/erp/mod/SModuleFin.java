@@ -107,9 +107,8 @@ public class SModuleFin extends SGuiModule {
     private SBeanOptionPicker moPickerExchangeRateMxn;
     private SBeanOptionPicker moPickerExchangeRateUsd;
     private SBeanOptionPicker moPickerExchangeRateEur;
+    private SBeanOptionPicker moPickerExchangeRateGbp;
     private SBeanOptionPicker moPickerTaxes;
-
-    
     
     public SModuleFin(SGuiClient client) {
         super(client, SModConsts.MOD_FIN_N, SLibConsts.UNDEFINED);
@@ -610,6 +609,13 @@ public class SModuleFin extends SGuiModule {
                             moPickerExchangeRateEur.setPickerSettings(miClient, type, subtype, settings);
                         }
                         picker = moPickerExchangeRateEur;
+                        break;
+                    case SModSysConsts.CFGU_CUR_GBP:
+                        if (moPickerExchangeRateGbp == null) {
+                            moPickerExchangeRateGbp = new SBeanOptionPicker();
+                            moPickerExchangeRateGbp.setPickerSettings(miClient, type, subtype, settings);
+                        }
+                        picker = moPickerExchangeRateGbp;
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

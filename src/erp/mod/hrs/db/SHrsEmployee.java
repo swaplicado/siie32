@@ -229,15 +229,15 @@ public class SHrsEmployee {
         }
         
         int daysIncapacityNotPaidPayroll = 0;
-        int daysNotWorkedButPaid = 0;
-        int daysNotWorkedNotPaid = 0;
+        int daysNotWorkedButPaidPayroll = 0;
+        int daysNotWorkedNotPaidPayroll = 0;
         
         for (SDbAbsenceConsumption absenceConsumption : moHrsReceipt.getAbsenceConsumptions()) { // consumptions in receipt
             if (absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable()) {
-                daysNotWorkedButPaid += absenceConsumption.getEffectiveDays();
+                daysNotWorkedButPaidPayroll += absenceConsumption.getEffectiveDays();
             }
             else {
-                daysNotWorkedNotPaid += absenceConsumption.getEffectiveDays();
+                daysNotWorkedNotPaidPayroll += absenceConsumption.getEffectiveDays();
                 
                 if (absenceConsumption.getParentAbsence().isDisability()) {
                     daysIncapacityNotPaidPayroll += absenceConsumption.getEffectiveDays();
@@ -264,7 +264,7 @@ public class SHrsEmployee {
         
         hrsEmployeeDays.setReceiptDays(mnDaysHiredPayroll);
         hrsEmployeeDays.setReceiptWorkingDays(daysWorking);
-        hrsEmployeeDays.setReceiptDaysWorked(daysWorking - (daysNotWorkedButPaid + daysNotWorkedNotPaid));
+        hrsEmployeeDays.setReceiptDaysWorked(daysWorking - (daysNotWorkedButPaidPayroll + daysNotWorkedNotPaidPayroll));
         hrsEmployeeDays.setReceiptBusinessDays(mnReceiptBusinessDays);
         
         hrsEmployeeDays.setDaysHiredAnnual(moHrsEmployeeMvtsAnnualStd.getDaysHired());
@@ -272,8 +272,8 @@ public class SHrsEmployee {
         
         hrsEmployeeDays.setDaysIncapacityNotPaidAnnual(daysIncapacityNotPaidAnnual);
         hrsEmployeeDays.setDaysIncapacityNotPaidPayroll(daysIncapacityNotPaidPayroll);
-        hrsEmployeeDays.setDaysNotWorkedButPaidPayroll(daysNotWorkedButPaid);
-        hrsEmployeeDays.setDaysNotWorkedNotPaidPayroll(daysNotWorkedNotPaid);
+        hrsEmployeeDays.setDaysNotWorkedButPaidPayroll(daysNotWorkedButPaidPayroll);
+        hrsEmployeeDays.setDaysNotWorkedNotPaidPayroll(daysNotWorkedNotPaidPayroll);
         
         // attendance for tax subsidy year of transition of style (i.e., 2024), if applies:
 

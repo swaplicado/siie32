@@ -91,11 +91,7 @@ public class SDbPayroll extends SDbRegistryUser {
      * Private methods
      */
     
-    /*
-     * Public methods
-     */
-
-    public double getTotalEarnings(final SGuiSession session) throws Exception {
+    private double readTotalEarnings(final SGuiSession session) throws Exception {
         double total = 0;
         ResultSet resultSet = null;
 
@@ -115,7 +111,7 @@ public class SDbPayroll extends SDbRegistryUser {
         return total;
     }
 
-    public double getTotalDeductions(final SGuiSession session) throws Exception {
+    private double readTotalDeductions(final SGuiSession session) throws Exception {
         double total = 0;
         ResultSet resultSet = null;
 
@@ -134,6 +130,10 @@ public class SDbPayroll extends SDbRegistryUser {
 
         return total;
     }
+
+    /*
+     * Public methods
+     */
 
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }
     public void setFiscalYear(int n) { mnFiscalYear = n; }
@@ -592,8 +592,8 @@ public class SDbPayroll extends SDbRegistryUser {
 
             msAuxPaymentType = resultSet.getString("t.name");
 
-            mdAuxTotalEarnings = getTotalEarnings(session);
-            mdAuxTotalDeductions = getTotalDeductions(session);
+            mdAuxTotalEarnings = readTotalEarnings(session);
+            mdAuxTotalDeductions = readTotalDeductions(session);
 
             statement = session.getStatement().getConnection().createStatement();
 

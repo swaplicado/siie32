@@ -105,10 +105,14 @@ public class SHrsConsts {
     public static final String CODE_UNION_YES = "1";
     public static final String CODE_UNION_NO = "0";
     
+    public static final HashMap<Integer, String> PaymentTypeCodes = new HashMap<>();
     public static final HashMap<Integer, Integer> BanksHrsToFin = new HashMap<>();
     public static final HashMap<Integer, Integer> BanksFinToHrs = new HashMap<>();
     
     static {
+        PaymentTypeCodes.put(SModSysConsts.HRSS_TP_PAY_WEE, "SEM");
+        PaymentTypeCodes.put(SModSysConsts.HRSS_TP_PAY_FOR, "QNA");
+        
         BanksHrsToFin.put(SModSysConsts.HRSS_BANK_HSBC, SFinConsts.LAY_BANK_HSBC);
         BanksHrsToFin.put(SModSysConsts.HRSS_BANK_SANT, SFinConsts.LAY_BANK_SANT);
         BanksHrsToFin.put(SModSysConsts.HRSS_BANK_BBAJ, SFinConsts.LAY_BANK_BBAJ);

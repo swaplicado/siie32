@@ -52,6 +52,7 @@ public abstract class SModSysConsts {
     public static final int CFGU_CUR_MXN = 1;
     public static final int CFGU_CUR_USD = 2;
     public static final int CFGU_CUR_EUR = 3;
+    public static final int CFGU_CUR_GBP = 4;
 
     public static final int CFGU_FUNC_NA = 1;
     

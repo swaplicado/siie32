@@ -9,6 +9,7 @@ import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsCalculatedNetGrossAmount;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsTaxUtils;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
@@ -579,14 +580,14 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         
         try {
             if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.estimateMonthlyPaymentNet(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
+                netGrossAmount = SHrsTaxUtils.estimateMonthlyPaymentNet(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
 
                 moCompNetAmountCalculated.getField().setValue(netGrossAmount.getNetAmount());
                 moCompGrossAmountCalculated.getField().setValue(0d);
                 moCompNetAmountWithSubsidy.getField().setValue(netGrossAmount.getNetAmountWithSubsidy());
             }
             else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.estimateMonthlyPaymentGross(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moCompTolerance.getField().getValue());
+                netGrossAmount = SHrsTaxUtils.estimateMonthlyPaymentGross(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moCompTolerance.getField().getValue());
 
                 moCompNetAmountCalculated.getField().setValue(0d);
                 moCompGrossAmountCalculated.getField().setValue(netGrossAmount.getGrossAmount());

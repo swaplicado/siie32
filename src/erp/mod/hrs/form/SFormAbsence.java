@@ -992,8 +992,9 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
 
                     if (validation.isValid()) {
                         // validate that period of this absence does not overlap with other employee's absences:
+                        
                         try {
-                            ArrayList<SDbAbsence> absences = SHrsUtils.getEmployeeAbsences(miClient.getSession(), moKeyEmployee.getValue()[0]);
+                            ArrayList<SDbAbsence> absences = SHrsUtils.getEmployeeAbsences(miClient.getSession(), moKeyEmployee.getValue()[0], true);
                             for (SDbAbsence absence : absences) {
                                 if (!SLibUtils.compareKeys(absence.getPrimaryKey(), moRegistry.getPrimaryKey())) { // skip this absence
                                     if (SLibTimeUtils.isBelongingToPeriod(moDateDateStart.getValue(), moDateDateEnd.getValue(), absence.getDateStart(), absence.getDateEnd())) {

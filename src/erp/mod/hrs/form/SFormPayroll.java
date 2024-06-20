@@ -152,10 +152,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         bgViewEmployees = new javax.swing.ButtonGroup();
         jpMain = new javax.swing.JPanel();
         jtpPayroll = new javax.swing.JTabbedPane();
-        jpPayrollSettings = new javax.swing.JPanel();
-        jPanel41 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        jpSettings = new javax.swing.JPanel();
+        jpSettingsC = new javax.swing.JPanel();
+        jpSettingsCN = new javax.swing.JPanel();
+        jpSettingsCNW = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         jtfPaymentType = new javax.swing.JTextField();
@@ -212,7 +212,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel16 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel21 = new javax.swing.JPanel();
+        jpSettingsCNE = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlTaxComputationType = new javax.swing.JLabel();
         moKeyTaxComputationType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -222,9 +222,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel26 = new javax.swing.JPanel();
         jlTaxSubsidy = new javax.swing.JLabel();
         moKeyTaxSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
+        jlTaxSubsidyHint = new javax.swing.JLabel();
         jPanel43 = new javax.swing.JPanel();
         jlEmploymentSubsidy = new javax.swing.JLabel();
         moKeyEmploymentSubsidy = new sa.lib.gui.bean.SBeanFieldKey();
+        jlEmploymentSubsidyHint = new javax.swing.JLabel();
         jPanel27 = new javax.swing.JPanel();
         jlSsContribution = new javax.swing.JLabel();
         moKeySsContribution = new sa.lib.gui.bean.SBeanFieldKey();
@@ -254,8 +256,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecUmiAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel44 = new javax.swing.JPanel();
         moBoolClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
-        jPanel20 = new javax.swing.JPanel();
-        jPanel38 = new javax.swing.JPanel();
+        jpSettingsS = new javax.swing.JPanel();
         jPanel28 = new javax.swing.JPanel();
         jlTotalEarnings = new javax.swing.JLabel();
         moDecTotalEarnings = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -267,8 +268,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalNet = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel37 = new javax.swing.JPanel();
         jbGoTabReceipts = new javax.swing.JButton();
-        jpPayrollReceipts = new javax.swing.JPanel();
         jpReceipts = new javax.swing.JPanel();
+        jpReceiptsC = new javax.swing.JPanel();
         jpReceiptsControls = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel39 = new javax.swing.JPanel();
@@ -309,14 +310,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jtpPayroll.setAutoscrolls(true);
         jtpPayroll.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        jpPayrollSettings.setLayout(new java.awt.BorderLayout());
+        jpSettings.setLayout(new java.awt.BorderLayout());
 
-        jPanel41.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel41.setLayout(new java.awt.BorderLayout());
+        jpSettingsC.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpSettingsC.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
+        jpSettingsCN.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
+        jpSettingsCNW.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -327,12 +328,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jtfPaymentType.setEditable(false);
         jtfPaymentType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jtfPaymentType.setText("jTextField1");
+        jtfPaymentType.setText("TEXT");
         jtfPaymentType.setFocusable(false);
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jtfPaymentType);
 
-        jPanel6.add(jPanel8);
+        jpSettingsCNW.add(jPanel8);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -346,7 +347,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditPeriodYear.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel35.add(jbEditPeriodYear);
 
-        jPanel6.add(jPanel35);
+        jpSettingsCNW.add(jPanel35);
 
         jPanel42.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -360,7 +361,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditFiscalYear.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel42.add(jbEditFiscalYear);
 
-        jPanel6.add(jPanel42);
+        jpSettingsCNW.add(jPanel42);
 
         jPanel9.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -380,7 +381,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbGetNextNumber.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jbGetNextNumber);
 
-        jPanel6.add(jPanel9);
+        jpSettingsCNW.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -401,7 +402,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jtfDefaultDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jtfDefaultDateStart);
 
-        jPanel6.add(jPanel10);
+        jpSettingsCNW.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -420,7 +421,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jtfDefaultDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jtfDefaultDateEnd);
 
-        jPanel6.add(jPanel11);
+        jpSettingsCNW.add(jPanel11);
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -434,7 +435,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditPeriod.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel36.add(jbEditPeriod);
 
-        jPanel6.add(jPanel36);
+        jpSettingsCNW.add(jPanel36);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -445,7 +446,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntReceiptDays.setEditable(false);
         jPanel12.add(moIntReceiptDays);
 
-        jPanel6.add(jPanel12);
+        jpSettingsCNW.add(jPanel12);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -456,7 +457,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntWorkingDays.setEditable(false);
         jPanel13.add(moIntWorkingDays);
 
-        jPanel6.add(jPanel13);
+        jpSettingsCNW.add(jPanel13);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -479,7 +480,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadExtraordinary.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel17.add(moRadExtraordinary);
 
-        jPanel6.add(jPanel17);
+        jpSettingsCNW.add(jPanel17);
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -490,7 +491,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel31.add(moKeyPaysheetCustomType);
 
-        jPanel6.add(jPanel31);
+        jpSettingsCNW.add(jPanel31);
 
         jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -506,7 +507,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbEditRecruitmentSchemaType.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel47.add(jbEditRecruitmentSchemaType);
 
-        jPanel6.add(jPanel47);
+        jpSettingsCNW.add(jPanel47);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -526,7 +527,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlHintHint.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel5.add(jlHintHint);
 
-        jPanel6.add(jPanel5);
+        jpSettingsCNW.add(jPanel5);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -537,11 +538,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moTextNotes.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(moTextNotes);
 
-        jPanel6.add(jPanel16);
+        jpSettingsCNW.add(jPanel16);
 
-        jPanel7.add(jPanel6);
+        jpSettingsCN.add(jpSettingsCNW, java.awt.BorderLayout.WEST);
 
-        jPanel21.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
+        jpSettingsCNE.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -552,7 +553,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyTaxComputationType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel24.add(moKeyTaxComputationType);
 
-        jPanel21.add(jPanel24);
+        jpSettingsCNE.add(jPanel24);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -563,7 +564,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyTax.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel25.add(moKeyTax);
 
-        jPanel21.add(jPanel25);
+        jpSettingsCNE.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -574,7 +575,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyTaxSubsidy.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel26.add(moKeyTaxSubsidy);
 
-        jPanel21.add(jPanel26);
+        jlTaxSubsidyHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlTaxSubsidyHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlTaxSubsidyHint.setToolTipText("Vigente hasta 31/04/2024");
+        jlTaxSubsidyHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel26.add(jlTaxSubsidyHint);
+
+        jpSettingsCNE.add(jPanel26);
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -585,7 +592,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyEmploymentSubsidy.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel43.add(moKeyEmploymentSubsidy);
 
-        jPanel21.add(jPanel43);
+        jlEmploymentSubsidyHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlEmploymentSubsidyHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlEmploymentSubsidyHint.setToolTipText("Vigente desde 01/05/2024");
+        jlEmploymentSubsidyHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel43.add(jlEmploymentSubsidyHint);
+
+        jpSettingsCNE.add(jPanel43);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -596,7 +609,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeySsContribution.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel27.add(moKeySsContribution);
 
-        jPanel21.add(jPanel27);
+        jpSettingsCNE.add(jPanel27);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -604,7 +617,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moBoolSsContribution.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel19.add(moBoolSsContribution);
 
-        jPanel21.add(jPanel19);
+        jpSettingsCNE.add(jPanel19);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -622,7 +635,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbTaxSubsidyOptionChange.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel18.add(jbTaxSubsidyOptionChange);
 
-        jPanel21.add(jPanel18);
+        jpSettingsCNE.add(jPanel18);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -633,7 +646,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyMwzType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel22.add(moKeyMwzType);
 
-        jPanel21.add(jPanel22);
+        jpSettingsCNE.add(jPanel22);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -644,7 +657,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecMwzWage.setEditable(false);
         jPanel14.add(moDecMwzWage);
 
-        jPanel21.add(jPanel14);
+        jpSettingsCNE.add(jPanel14);
 
         jPanel23.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -656,7 +669,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moKeyMwzReferenceType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel23.add(moKeyMwzReferenceType);
 
-        jPanel21.add(jPanel23);
+        jpSettingsCNE.add(jPanel23);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -667,7 +680,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecMwzReferenceWage.setEditable(false);
         jPanel15.add(moDecMwzReferenceWage);
 
-        jPanel21.add(jPanel15);
+        jpSettingsCNE.add(jPanel15);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -678,7 +691,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecUmaAmount.setEditable(false);
         jPanel34.add(moDecUmaAmount);
 
-        jPanel21.add(jPanel34);
+        jpSettingsCNE.add(jPanel34);
 
         jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -689,7 +702,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecUmiAmount.setEditable(false);
         jPanel46.add(moDecUmiAmount);
 
-        jPanel21.add(jPanel46);
+        jpSettingsCNE.add(jPanel46);
 
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -698,18 +711,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moBoolClosed.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel44.add(moBoolClosed);
 
-        jPanel21.add(jPanel44);
+        jpSettingsCNE.add(jPanel44);
 
-        jPanel7.add(jPanel21);
+        jpSettingsCN.add(jpSettingsCNE, java.awt.BorderLayout.EAST);
 
-        jPanel41.add(jPanel7, java.awt.BorderLayout.NORTH);
+        jpSettingsC.add(jpSettingsCN, java.awt.BorderLayout.NORTH);
 
-        jpPayrollSettings.add(jPanel41, java.awt.BorderLayout.CENTER);
+        jpSettings.add(jpSettingsC, java.awt.BorderLayout.CENTER);
 
-        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales de la nómina:"));
-        jPanel20.setLayout(new java.awt.BorderLayout(0, 5));
-
-        jPanel38.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
+        jpSettingsS.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales de la nómina:"));
+        jpSettingsS.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -720,7 +731,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalEarnings.setEditable(false);
         jPanel28.add(moDecTotalEarnings);
 
-        jPanel38.add(jPanel28);
+        jpSettingsS.add(jPanel28);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -731,7 +742,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalDeductions.setEditable(false);
         jPanel29.add(moDecTotalDeductions);
 
-        jPanel38.add(jPanel29);
+        jpSettingsS.add(jPanel29);
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -742,7 +753,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalNet.setEditable(false);
         jPanel30.add(moDecTotalNet);
 
-        jPanel38.add(jPanel30);
+        jpSettingsS.add(jPanel30);
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -750,18 +761,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbGoTabReceipts.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jbGoTabReceipts);
 
-        jPanel38.add(jPanel37);
+        jpSettingsS.add(jPanel37);
 
-        jPanel20.add(jPanel38, java.awt.BorderLayout.NORTH);
+        jpSettings.add(jpSettingsS, java.awt.BorderLayout.SOUTH);
 
-        jpPayrollSettings.add(jPanel20, java.awt.BorderLayout.SOUTH);
+        jtpPayroll.addTab("Nómina", jpSettings);
 
-        jtpPayroll.addTab("Nómina", jpPayrollSettings);
+        jpReceipts.setLayout(new java.awt.BorderLayout());
 
-        jpPayrollReceipts.setLayout(new java.awt.BorderLayout());
-
-        jpReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de la nómina:"));
-        jpReceipts.setLayout(new java.awt.BorderLayout(5, 5));
+        jpReceiptsC.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de la nómina:"));
+        jpReceiptsC.setLayout(new java.awt.BorderLayout(5, 5));
 
         jpReceiptsControls.setLayout(new java.awt.BorderLayout());
 
@@ -863,7 +872,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jpReceiptsControls.add(jPanel40, java.awt.BorderLayout.EAST);
 
-        jpReceipts.add(jpReceiptsControls, java.awt.BorderLayout.NORTH);
+        jpReceiptsC.add(jpReceiptsControls, java.awt.BorderLayout.NORTH);
 
         jpReceiptsAvailableEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
         jpReceiptsAvailableEmployees.setPreferredSize(new java.awt.Dimension(375, 100));
@@ -872,7 +881,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlTotalAvailables.setText("[number of available employees]");
         jpReceiptsAvailableEmployees.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
-        jpReceipts.add(jpReceiptsAvailableEmployees, java.awt.BorderLayout.LINE_START);
+        jpReceiptsC.add(jpReceiptsAvailableEmployees, java.awt.BorderLayout.LINE_START);
 
         jpReceiptsControlsReceipts.setLayout(new java.awt.BorderLayout());
 
@@ -905,7 +914,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jpReceiptsControlsReceipts.add(jPanel32, java.awt.BorderLayout.PAGE_START);
 
-        jpReceipts.add(jpReceiptsControlsReceipts, java.awt.BorderLayout.CENTER);
+        jpReceiptsC.add(jpReceiptsControlsReceipts, java.awt.BorderLayout.CENTER);
 
         jpReceiptsPayrollReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
         jpReceiptsPayrollReceipts.setPreferredSize(new java.awt.Dimension(545, 100));
@@ -914,11 +923,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlTotalSelected.setText("[number of selected employees]");
         jpReceiptsPayrollReceipts.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
 
-        jpReceipts.add(jpReceiptsPayrollReceipts, java.awt.BorderLayout.LINE_END);
+        jpReceiptsC.add(jpReceiptsPayrollReceipts, java.awt.BorderLayout.LINE_END);
 
-        jpPayrollReceipts.add(jpReceipts, java.awt.BorderLayout.CENTER);
+        jpReceipts.add(jpReceiptsC, java.awt.BorderLayout.CENTER);
 
-        jtpPayroll.addTab("Recibos", jpPayrollReceipts);
+        jtpPayroll.addTab("Recibos", jpReceipts);
 
         jpMain.add(jtpPayroll, java.awt.BorderLayout.CENTER);
         jtpPayroll.getAccessibleContext().setAccessibleName("Configuración");
@@ -945,8 +954,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
@@ -964,19 +971,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
-    private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
-    private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel43;
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAddPayrollBonus;
@@ -1002,6 +1005,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDummy01;
     private javax.swing.JLabel jlEmploymentSubsidy;
+    private javax.swing.JLabel jlEmploymentSubsidyHint;
     private javax.swing.JLabel jlFilter;
     private javax.swing.JLabel jlFiscalYear;
     private javax.swing.JLabel jlHint;
@@ -1022,6 +1026,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxComputationType;
     private javax.swing.JLabel jlTaxSubsidy;
+    private javax.swing.JLabel jlTaxSubsidyHint;
     private javax.swing.JLabel jlTaxSubsidyOption;
     private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlTotalDeductions;
@@ -1034,13 +1039,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlWorkingDays;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpMain;
-    private javax.swing.JPanel jpPayrollReceipts;
-    private javax.swing.JPanel jpPayrollSettings;
     private javax.swing.JPanel jpReceipts;
     private javax.swing.JPanel jpReceiptsAvailableEmployees;
+    private javax.swing.JPanel jpReceiptsC;
     private javax.swing.JPanel jpReceiptsControls;
     private javax.swing.JPanel jpReceiptsControlsReceipts;
     private javax.swing.JPanel jpReceiptsPayrollReceipts;
+    private javax.swing.JPanel jpSettings;
+    private javax.swing.JPanel jpSettingsC;
+    private javax.swing.JPanel jpSettingsCN;
+    private javax.swing.JPanel jpSettingsCNE;
+    private javax.swing.JPanel jpSettingsCNW;
+    private javax.swing.JPanel jpSettingsS;
     private javax.swing.JTextField jtfDefaultDateEnd;
     private javax.swing.JTextField jtfDefaultDateStart;
     private javax.swing.JTextField jtfPaymentType;

@@ -30,8 +30,8 @@ public class SHrsPayroll {
     protected SDbPayroll moPayroll;
     protected SHrsPayrollDataProvider moHrsPayrollDataProvider;
     
-    /** Employment subsidy is applying for current payroll. */
-    protected boolean mbEmploymentSubsidyApplying;
+    /** Employment subsidy is applicable for current payroll. */
+    protected boolean mbEmploymentSubsidyApplicable;
     /** Employment subsidy is affecting the whole year, from January, 1st. */
     protected boolean mbEmploymentSubsidyAffectingWholeYear;
     
@@ -121,7 +121,7 @@ public class SHrsPayroll {
     public SDbPayroll getPayroll() { return moPayroll; }
     public SHrsPayrollDataProvider getHrsPayrollDataProvider() { return moHrsPayrollDataProvider; }
 
-    public boolean isEmploymentSubsidyApplying() { return mbEmploymentSubsidyApplying; }
+    public boolean isEmploymentSubsidyApplicable() { return mbEmploymentSubsidyApplicable; }
     public boolean isEmploymentSubsidyAffectingWholeYear() { return mbEmploymentSubsidyAffectingWholeYear; }
     
     public ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustments() { return maLoanTypeAdjustments; }
@@ -142,8 +142,14 @@ public class SHrsPayroll {
     public HashMap<Integer, String> getEarningComputationTypesMap() { return moEarningComputationTypesMap; }
     public HashMap<Integer, String> getDeductionComputationTypesMap() { return moDeductionComputationTypesMap; }
     
+    /** Check if payroll belongs to the year of transtition of style of subsidy (i.e., 2024)
+     * @param applicable Is employment subsidy applicable.
+     * @param affectingWholeYear Is employment subsidy affecting the whole year.
+     */
+    public static boolean isTransitionYearForTaxSubsidy(final boolean applicable, final boolean affectingWholeYear) { return applicable && !affectingWholeYear; }
+    
     /** Check if payroll belongs to the year of transtition of style of subsidy (i.e., 2024) */
-    public boolean isTransitionYearForTaxSubsidy() { return mbEmploymentSubsidyApplying && !mbEmploymentSubsidyAffectingWholeYear; }
+    public boolean isTransitionYearForTaxSubsidy() { return isTransitionYearForTaxSubsidy(mbEmploymentSubsidyApplicable, mbEmploymentSubsidyAffectingWholeYear); }
     
     public double getLoanTypeMonthlyAdjustment(final Date date, final int loanType) {
         double monthlyAdjustment = 0;
@@ -255,19 +261,6 @@ public class SHrsPayroll {
         return taxTable;
     }
 
-    public SDbTaxTable getTaxTableByDate(final Date date) {
-        SDbTaxTable taxTable = null;
-
-        for (SDbTaxTable table : maTaxTables) {
-            if (!date.before(table.getDateStart())) {
-                taxTable = table;
-                break;
-            }
-        }
-
-        return taxTable;
-    }
-
     public SDbTaxSubsidyTable getTaxSubsidyTable(final int tableId) {
         SDbTaxSubsidyTable taxSubsidyTable = null;
 
@@ -281,37 +274,11 @@ public class SHrsPayroll {
         return taxSubsidyTable;
     }
 
-    public SDbTaxSubsidyTable getTaxSubsidyTableByDate(final Date date) {
-        SDbTaxSubsidyTable taxSubsidyTable = null;
-
-        for (SDbTaxSubsidyTable table : maTaxSubsidyTables) {
-            if (!date.before(table.getDateStart())) {
-                taxSubsidyTable = table;
-                break;
-            }
-        }
-
-        return taxSubsidyTable;
-    }
-
     public SDbEmploymentSubsidy getEmploymentSubsidy(final int configId) {
         SDbEmploymentSubsidy employmentSubsidy = null;
 
         for (SDbEmploymentSubsidy config : maEmploymentSubsidies) {
             if (config.getPkEmploymentSubsidyId() == configId) {
-                employmentSubsidy = config;
-                break;
-            }
-        }
-
-        return employmentSubsidy;
-    }
-
-    public SDbEmploymentSubsidy getEmploymentSubsidy(final Date date) {
-        SDbEmploymentSubsidy employmentSubsidy = null;
-
-        for (SDbEmploymentSubsidy config : maEmploymentSubsidies) {
-            if (!date.before(config.getDateStart())) {
                 employmentSubsidy = config;
                 break;
             }
@@ -458,25 +425,52 @@ public class SHrsPayroll {
     }
     
     private void clearEmploymentSubsidyApplicability() {
-        mbEmploymentSubsidyApplying = false;
+        mbEmploymentSubsidyApplicable = false;
         mbEmploymentSubsidyAffectingWholeYear = false;
+    }
+    
+    /**
+     * Assess employment subsidy applicability to given period.
+     * @param dateStart Start of period.
+     * @param dateEnd End of period.
+     * @param employmentSubsidies Array list of all employment subsidies.
+     * @return Array of booleans: index 0 = Is subsidy <strong>applying</strong> for given period; index 1 = Is subsidy <strong>affecting the whole year</strong> of given period.
+     */
+    public static boolean[] assessEmploymentSubsidyApplicability(final Date dateStart, final Date dateEnd, final ArrayList<SDbEmploymentSubsidy> employmentSubsidies) {
+        boolean applicable = false;
+        boolean affectingWholeYear = false;
+        
+        if (employmentSubsidies != null && !employmentSubsidies.isEmpty()) {
+            SDbEmploymentSubsidy employmentSubsidy = null;
+            Date payrollEndOfYear = SLibTimeUtils.getEndOfYear(dateStart);
+            Date lookupDate = dateEnd.before(payrollEndOfYear) ? dateEnd : payrollEndOfYear;
+
+            for (SDbEmploymentSubsidy config : employmentSubsidies) {
+                if (!lookupDate.before(config.getDateStart())) {
+                    employmentSubsidy = config;
+                    break;
+                }
+            }
+
+            if (employmentSubsidy != null) { // is there an applicable registry?
+                applicable = true;
+                
+                Date payrollStartOfYear = SLibTimeUtils.getBeginOfYear(dateStart);
+                affectingWholeYear = !payrollStartOfYear.before(employmentSubsidies.get(0).getDateStart()); // check against fisrt registry
+            }
+        }
+        
+        return new boolean[] { applicable, affectingWholeYear };
     }
 
     public void assessEmploymentSubsidyApplicability() {
         clearEmploymentSubsidyApplicability();
         
-        if (moPayroll != null && maEmploymentSubsidies != null && !maEmploymentSubsidies.isEmpty()) {
-            Date payrollEndOfYear = SLibTimeUtils.getEndOfYear(moPayroll.getDateStart());
-            Date lookupDate = moPayroll.getDateEnd().before(payrollEndOfYear) ? moPayroll.getDateEnd() : payrollEndOfYear;
-            
-            SDbEmploymentSubsidy employmentSubsidy = getEmploymentSubsidy(lookupDate);
-            
-            if (employmentSubsidy != null) {
-                mbEmploymentSubsidyApplying = true;
-                
-                Date payrollStartOfYear = SLibTimeUtils.getBeginOfYear(moPayroll.getDateStart());
-                mbEmploymentSubsidyAffectingWholeYear = !payrollStartOfYear.before(employmentSubsidy.getDateStart());
-            }
+        if (moPayroll != null) {
+            boolean[] assessment = assessEmploymentSubsidyApplicability(moPayroll.getDateStart(), moPayroll.getDateEnd(), maEmploymentSubsidies);
+
+            mbEmploymentSubsidyApplicable = assessment[0];
+            mbEmploymentSubsidyAffectingWholeYear = assessment[1];
         }
     }
 

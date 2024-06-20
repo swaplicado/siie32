@@ -159,8 +159,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayAutoDeductionsGlobal;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployee;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployeeDet;
-    private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
-    private javax.swing.JMenuItem jmiPayCalculatedEstimateIncomeTax;
+    private javax.swing.JMenuItem jmiPayCalculatedNetGrossAmount;
+    private javax.swing.JMenuItem jmiPayCalculateIncomeTax;
     private javax.swing.JMenuItem jmiPayReissueCfdis;
     private javax.swing.JMenuItem jmiPayVerifyCfdis;
     
@@ -417,8 +417,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal = new JMenuItem("Globales");
         jmiPayAutoDeductionsByEmployee = new JMenuItem("Por empleado");
         jmiPayAutoDeductionsByEmployeeDet = new JMenuItem("Por empleado a detalle");
-        jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
-        jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
+        jmiPayCalculatedNetGrossAmount = new JMenuItem("Calcular ingreso mensual");
+        jmiPayCalculateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
         jmiPayReissueCfdis = new JMenuItem("Reexpedición de recibos");
         jmiPayVerifyCfdis = new JMenuItem("Verificar CFDIs");
 
@@ -454,8 +454,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPayAutoDeductions.add(jmiPayAutoDeductionsByEmployeeDet);
         jmPay.add(jmPayAutoDeductions);
         jmPay.addSeparator();
-        jmPay.add(jmiPayCalculatedAmountMonth);
-        jmPay.add(jmiPayCalculatedEstimateIncomeTax);
+        jmPay.add(jmiPayCalculatedNetGrossAmount);
+        jmPay.add(jmiPayCalculateIncomeTax);
         /* Funcionalidades temporales que por lo pronto no son requeridas:
         jmPay.addSeparator();
         jmPay.add(jmiPayReissueCfdis);
@@ -632,8 +632,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal.addActionListener(this);
         jmiPayAutoDeductionsByEmployee.addActionListener(this);
         jmiPayAutoDeductionsByEmployeeDet.addActionListener(this);
-        jmiPayCalculatedAmountMonth.addActionListener(this);
-        jmiPayCalculatedEstimateIncomeTax.addActionListener(this);
+        jmiPayCalculatedNetGrossAmount.addActionListener(this);
+        jmiPayCalculateIncomeTax.addActionListener(this);
         jmiPayReissueCfdis.addActionListener(this);
         jmiPayVerifyCfdis.addActionListener(this);
         
@@ -788,8 +788,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsGlobal.setEnabled(hasRightPay);
         jmiPayAutoDeductionsByEmployee.setEnabled(hasRightPay);
         jmiPayAutoDeductionsByEmployeeDet.setEnabled(hasRightPay);
-        jmiPayCalculatedAmountMonth.setEnabled(hasRightPay);
-        jmiPayCalculatedEstimateIncomeTax.setEnabled(hasRightPay);
+        jmiPayCalculatedNetGrossAmount.setEnabled(hasRightPay);
+        jmiPayCalculateIncomeTax.setEnabled(hasRightPay);
         jmiPayReissueCfdis.setEnabled(hasRightPay);
         jmiPayVerifyCfdis.setEnabled(hasRightPay);
         
@@ -1322,10 +1322,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiPayAutoDeductionsByEmployeeDet) {
                 miClient.getSession().showView(SModConsts.HRSX_AUT_DED, SModSysConsts.HRS_AUT_EMP, new SGuiParams(SUtilConsts.QRY_DET));
             }
-            else if (item == jmiPayCalculatedAmountMonth) {
+            else if (item == jmiPayCalculatedNetGrossAmount) {
                 new SFormCalculateNetGrossAmount((SGuiClient) miClient, SHrsConsts.CAL_NET_AMT_TYPE, "Calcular ingreso mensual").setFormVisible(true);
             }
-            else if (item == jmiPayCalculatedEstimateIncomeTax) {
+            else if (item == jmiPayCalculateIncomeTax) {
                 new SDialogCalculateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
             }
             else if (item == jmiPayReissueCfdis) {

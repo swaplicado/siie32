@@ -20,7 +20,7 @@ import sa.lib.db.SDbConsts;
 /**
  * Las instancias de esta clase permiten la emisión de un recibo de nómina en específico.
  *
- * @author Néstor Ávalos, Juan Barajas, Sergio Flores
+ * @author Néstor Ávalos, Juan Barajas, Sergio Flores, Sergio Flores
  * 2020-05-10 Sergio Flores: Implementación del subsidio para el empleo vigente por decreto a partir del 1° de mayo de 2024.
  * 2020-08-14 Sergio Flores: Implementación del cálculo de ISR retenido por salarios de forma independiente: sueldos y asimilados.
  * 2019-06-07 Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
@@ -663,7 +663,7 @@ public class SHrsReceipt {
             }
 
             if (earningsTaxableArt174ForTax > 0) {
-                double taxAssessedArt74 = SHrsUtils.computeTaxAlt(taxTable, earningsTaxableArt174ForTax, moPayrollReceipt.getMonthlyPayment(), tableFactorForTax);
+                double taxAssessedArt74 = SHrsTaxUtils.computeTaxAlt(taxTable, earningsTaxableArt174ForTax, moPayrollReceipt.getMonthlyPayment(), tableFactorForTax);
                 taxAssessed = SLibUtils.roundAmount(taxAssessed + taxAssessedArt74); // update assessed tax
             }
             
@@ -700,7 +700,7 @@ public class SHrsReceipt {
                 double[] subsidyPayedTrans = null;          // index 0 = old syle; index 1 = new style
                 
                 if (isTransitionYearForTaxSubsidyAndTaxCalcAnnual) {
-                    boolean payrollIsNewStyle = moHrsPayroll.isEmploymentSubsidyApplying() && employmentSubsidyAkaNewStyle != null && !payroll.getDateStart().before(employmentSubsidyAkaNewStyle.getDateStart());
+                    boolean payrollIsNewStyle = moHrsPayroll.isEmploymentSubsidyApplicable() && employmentSubsidyAkaNewStyle != null && !payroll.getDateStart().before(employmentSubsidyAkaNewStyle.getDateStart());
 
                     annualTaxSubsidyAssessedOldInformative = moHrsEmployee.getAnnualTaxSubsidyAssessedOldInformative();
                     
@@ -714,9 +714,9 @@ public class SHrsReceipt {
                 // Compute assessed and payable subsidy (payroll or annual, the one required):
                 
                 // payroll is before May 1st, 2024, or it belongs to the year of transtition of style of subsidy (i.e., 2024), and also its tax calculation is annual:
-                boolean appliesOldStyle = !moHrsPayroll.isEmploymentSubsidyApplying() || isTransitionYearForTaxSubsidyAndTaxCalcAnnual;
+                boolean appliesOldStyle = !moHrsPayroll.isEmploymentSubsidyApplicable() || isTransitionYearForTaxSubsidyAndTaxCalcAnnual;
                 // payroll is after May 1st, 2024, inclusive:
-                boolean appliesNewStyle = moHrsPayroll.isEmploymentSubsidyApplying();
+                boolean appliesNewStyle = moHrsPayroll.isEmploymentSubsidyApplicable();
                 
                 // old-syle:
                 
@@ -756,7 +756,7 @@ public class SHrsReceipt {
                     }
 
                     if (earningsTaxableArt174ForSubsidyOldStyle > 0) {
-                        double subsidyComputedArt74 = SHrsUtils.computeTaxSubsidyAlt(subsidyTable, earningsTaxableArt174ForSubsidyOldStyle, moPayrollReceipt.getMonthlyPayment(), tableFactorForSubsidyOldStyle);
+                        double subsidyComputedArt74 = SHrsTaxUtils.computeTaxSubsidyAlt(subsidyTable, earningsTaxableArt174ForSubsidyOldStyle, moPayrollReceipt.getMonthlyPayment(), tableFactorForSubsidyOldStyle);
                         subsidyAssessedOldStyle = SLibUtils.roundAmount(subsidyAssessedOldStyle + subsidyComputedArt74); // update assessed subsidy
                     }
                 }
@@ -794,7 +794,7 @@ public class SHrsReceipt {
                     }
                     
                     if (earningsTaxableArt174ForSubsidyNewStyle > 0) {
-                        double subsidyComputedArt74 = SHrsUtils.computeEmploymentSubsidyAlt(employmentSubsidyAkaNewStyle, earningsTaxableArt174ForSubsidyNewStyle, moPayrollReceipt.getMonthlyPayment(), tableFactorForSubsidyNewStyle);
+                        double subsidyComputedArt74 = SHrsTaxUtils.computeEmploymentSubsidyAlt(employmentSubsidyAkaNewStyle, earningsTaxableArt174ForSubsidyNewStyle, moPayrollReceipt.getMonthlyPayment(), tableFactorForSubsidyNewStyle);
                         subsidyAssessedNewStyle = SLibUtils.roundAmount(subsidyAssessedNewStyle + subsidyComputedArt74); // update employment subsidy
                     }
                 }
