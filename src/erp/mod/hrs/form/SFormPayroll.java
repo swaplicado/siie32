@@ -2307,30 +2307,32 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * @param ppRows 
      */
     private void addPerceptAndDeductByImportation(ArrayList<SRowTimeClock> timeClockRows, List<SPrepayrollRow> ppRows) {
+        boolean configured = true;
         
-        boolean isConfigured = true;
         if (moModuleConfig.getFkEarningHolidayId_n() == 0) {
-            miClient.showMsgBoxError("No Existe configuración para la percepción de días festivos");
-            isConfigured = false;
+            miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de días festivos.");
+            configured = false;
         }
         if (moModuleConfig.getFkEarningOvertime2Id_n() == 0) {
-            miClient.showMsgBoxError("No Existe configuración para la percepción de horas extras");
-            isConfigured = false;
+            miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de horas extras.");
+            configured = false;
         }
         if (moModuleConfig.getFkEarningOvertime3Id_n() == 0) {
-            miClient.showMsgBoxError("No Existe configuración para la percepción de horas extras triples");
-            isConfigured = false;
+            miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de horas extras triples.");
+            configured = false;
         }
         if (moModuleConfig.getFkEarningDayOffId_n() == 0) {
-            miClient.showMsgBoxError("No Existe configuración para la percepción de días de descanso trabajados");
-            isConfigured = false;
+            miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de días de descanso trabajados.");
+            configured = false;
         }
-        if (!isConfigured) {
+        
+        if (!configured) {
             return;
         }
         
         for (SRowTimeClock timeClockRow : timeClockRows) {
             SHrsReceipt receipt = null;
+            
             for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
                 SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
                 if (timeClockRow.getEmployeeId() == row.getPkEmployeeId()) {
@@ -2340,6 +2342,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
             
             double doubleOvertimeValue = ((Number) timeClockRow.getOvertime()).doubleValue();
+            
             if (doubleOvertimeValue > 0d) {
                 int perceptionId = 0;
                 double factor = doubleOvertimeValue;
