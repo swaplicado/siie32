@@ -2200,103 +2200,103 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         try {
             SGuiUtils.setCursorWait(miClient);
             
+            SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
+                                                        SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
+                                                        SLibConstants.EXEC_MODE_SILENT);
+            String sCompanyKey = company.getKey();
+
+            String urls = "";
+            String url = "";
+            try {
+                //localhost:8080/CAP/public/api/prepayroll
+
+                urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_CAP);
+                String arrayUrls[] = urls.split(";");
+                url = arrayUrls[0];
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            if (miClient.showMsgBoxConfirm("Se cargará la prenómina correspondiente al periodo: " + 
+                    SLibUtils.DateFormatDate.format(dates[0]) + " - " + SLibUtils.DateFormatDate.format(dates[1]) + 
+                    ".\n¿Desea continuar?\nEste proceso puede demorar algunos minutos.") != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            SShareData sd = new SShareData();
+            SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
+
+            if (ppayroll == null) {
+                miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
+                return;
+            }
+
+            // Acomodar la lista para los periodos distintos de faltas y percepciones
+            if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moModuleConfig.getPrePayrollWeeklyCutoffDayWeek() != moModuleConfig.PrePayrollWeeklyVarCutoffDayWeek()) {
+                int cutDay = moModuleConfig.PrePayrollWeeklyVarCutoffDayWeek();
+                int weekLag = moModuleConfig.PrePayrollWeeklyVarWeeksLag();
+                Date datesVar[] = null;
+
+                if (cutDay == 0) {
+                    miClient.showMsgBoxError("No existe configuración para día de corte alterno");
+                    return;
+                }
+
+                // obtener faltas
+                datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
+
+                if (ppayrollVar == null) {
+                    miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
+                    return;
+                }
+
+                for (SPrepayrollRow row : ppayroll.getRows()) {
+                    for (SPrepayrollRow rowVar : ppayrollVar.getRows()) {
+                        if (!SPrepayrollUtils.isNumber(rowVar.getDouble_overtime()) || !SPrepayrollUtils.isNumber(rowVar.getTriple_overtime())) {
+                            miClient.showMsgBoxError("El valor de la etiqueta de tiempo extra no es correcto (" + rowVar.getDouble_overtime() + ", " + rowVar.getTriple_overtime() + "), "
+                                    + "por favor contacte a soporte técnico.");
+                            return;
+                        }
+                        if (row.getEmployee_id() == rowVar.getEmployee_id()) {
+                            row.getDays().clear();
+                            row.getDays().addAll(rowVar.getDays());
+                            break;
+                        }
+                    }
+                }
+            }
             
+            SGuiUtils.setCursorDefault(miClient);
+
+            // Vista previa de la importación
+            SDialogTimeClockImport dialog = new SDialogTimeClockImport(miClient, "Importación de prenómina desde reloj checador");
+
+            dialog.setlPpRows(ppayroll.getRows());
+            dialog.setlReceiptRows(selectedEmployeesIds);
+            dialog.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
+            dialog.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
+            dialog.setPrepayrollMode(moModuleConfig.getTimeClockPolicy());
+            dialog.setCutOffDay(moModuleConfig.getPrePayrollWeeklyCutoffDayWeek());
+            dialog.setCompanyKey(sCompanyKey);
+            dialog.initView();
+            dialog.setVisible(true);
+
+            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                removeByImportation(false);
+                ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
+                addPerceptAndDeductByImportation(rows, ppayroll.getRows());
+
+                computeReceipts();
+                populateRowPayrollEmployeesReceipts();
+            }
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
         finally {
             SGuiUtils.setCursorDefault(miClient);
-        }
-        
-        SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
-                                                    SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
-                                                    SLibConstants.EXEC_MODE_SILENT);
-        String sCompanyKey = company.getKey();
-        
-        String urls = "";
-        String url = "";
-        try {
-            //localhost:8080/CAP/public/api/prepayroll
-
-            urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_CAP);
-            String arrayUrls[] = urls.split(";");
-            url = arrayUrls[0];
-        }
-        catch (Exception ex) {
-            Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        if (miClient.showMsgBoxConfirm("Se cargará la prenómina correspondiente al periodo: " + 
-                SLibUtils.DateFormatDate.format(dates[0]) + " - " + SLibUtils.DateFormatDate.format(dates[1]) + 
-                ".\n¿Desea continuar?\nEste proceso puede demorar algunos minutos.") != JOptionPane.YES_OPTION) {
-            return;
-        }
-        
-        SShareData sd = new SShareData();
-        SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
-        
-        if (ppayroll == null) {
-            miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
-            return;
-        }
-        
-        // Acomodar la lista para los periodos distintos de faltas y percepciones
-        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moModuleConfig.getPrePayrollWeeklyCutoffDayWeek() != moModuleConfig.PrePayrollWeeklyVarCutoffDayWeek()) {
-            int cutDay = moModuleConfig.PrePayrollWeeklyVarCutoffDayWeek();
-            int weekLag = moModuleConfig.PrePayrollWeeklyVarWeeksLag();
-            Date datesVar[] = null;
-
-            if (cutDay == 0) {
-                miClient.showMsgBoxError("No existe configuración para día de corte alterno");
-                return;
-            }
-
-            // obtener faltas
-            datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
-            SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
-
-            if (ppayrollVar == null) {
-                miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
-                return;
-            }
-
-            for (SPrepayrollRow row : ppayroll.getRows()) {
-                for (SPrepayrollRow rowVar : ppayrollVar.getRows()) {
-                    if (!SPrepayrollUtils.isNumber(rowVar.getDouble_overtime()) || !SPrepayrollUtils.isNumber(rowVar.getTriple_overtime())) {
-                        miClient.showMsgBoxError("El valor de la etiqueta de tiempo extra no es correcto (" + rowVar.getDouble_overtime() + ", " + rowVar.getTriple_overtime() + "), "
-                                + "por favor contacte a soporte técnico.");
-                        return;
-                    }
-                    if (row.getEmployee_id() == rowVar.getEmployee_id()) {
-                        row.getDays().clear();
-                        row.getDays().addAll(rowVar.getDays());
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // Vista previa de la importación
-        SDialogTimeClockImport dialog = new SDialogTimeClockImport(miClient, "Importación de prenómina desde reloj checador");
-        
-        dialog.setlPpRows(ppayroll.getRows());
-        dialog.setlReceiptRows(selectedEmployeesIds);
-        dialog.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
-        dialog.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
-        dialog.setPrepayrollMode(moModuleConfig.getTimeClockPolicy());
-        dialog.setCutOffDay(moModuleConfig.getPrePayrollWeeklyCutoffDayWeek());
-        dialog.setCompanyKey(sCompanyKey);
-        dialog.initView();
-        dialog.setVisible(true);
-        
-        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            removeByImportation(false);
-            ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
-            addPerceptAndDeductByImportation(rows, ppayroll.getRows());
-            
-            computeReceipts();
-            populateRowPayrollEmployeesReceipts();
         }
     }
     
