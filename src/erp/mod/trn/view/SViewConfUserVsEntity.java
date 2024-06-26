@@ -162,4 +162,9 @@ public class SViewConfUserVsEntity extends SGridPaneView implements ActionListen
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }

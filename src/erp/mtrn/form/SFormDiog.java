@@ -1470,6 +1470,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         if (jbCostCenter.isEnabled()) {
             try {
                 String param = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_DEF_CC);
+                if (param.equals("0") || param.equals("1") || param.isEmpty()) {
+                    System.out.println("Configuración de centro de costo predefinida inexistente o incorrecta.");
+                }
                 moDialogCostCenter = new SDialogCostCenter(miClient);
                 moDialogCostCenter.getPanel().getFieldAccount().setFieldValue(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), SLibUtils.parseInt(param)));
                 moDialogCostCenter.getPanel().refreshPanel();
@@ -2769,7 +2772,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 //                }
 //            }
             else {
-                if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV)) {
+                if (jbCostCenter.isEnabled() && moCostCenter == null) {
+                    msg = "Debe seleccionar un centro de costo valido.";
+                }
+                else if (moCostCenter != null && moCostCenter.getIsDeleted()) {
+                    msg = "No se puede puede guardar debido a que el centro de costo esta eliminado.";
+                }
+                if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_ADJ)) {
                     try {
                         if (SModSysConsts.FIN_CC_NA != SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_DEF_CC))
                                 && (moCostCenter == null || moCostCenter.getPkCostCenterId() == SModSysConsts.FIN_CC_NA)){
@@ -2777,7 +2786,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         }
                     } catch (Exception e) {}
                 }
-                msg = validateAppropriateWarehouses();
+                msg += validateAppropriateWarehouses();
 
                 if (msg.length() > 0) {
                     miClient.showMsgBoxWarning(msg);
@@ -3739,7 +3748,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             else if (STrnUtilities.needsIogTypeProdOrderDestiny(manParamIogTypeKey) && SLibUtilities.compareKeys(moFieldProdOrderSource.getKeyAsIntArray(), moFieldProdOrderDestiny.getKeyAsIntArray())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlProdOrderDestiny.getText() + "'.\nLa orden de producción origen y la orden de producción destino deben ser distintas.");
                 validation.setComponent(jcbProdOrderDestiny);
-            }
+            }         
             else {
                 msg = validateAppropriateWarehouses();
 

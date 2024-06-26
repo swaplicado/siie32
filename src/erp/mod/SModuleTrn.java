@@ -932,7 +932,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormUserVsEntity;
                 break;
             case SModConsts.TRNX_CONF_EMP_VS_ENT:
-                if (moFormEmployeeVsEntity == null) moFormEmployeeVsEntity = new SFormConfEmployeeVsEntity(miClient, "Configuración de empleado vs. centros");
+                if (moFormEmployeeVsEntity == null) moFormEmployeeVsEntity = new SFormConfEmployeeVsEntity(miClient, "Configuración de empleado vs. centros de consumo");
                 form = moFormEmployeeVsEntity;
                 break;
             case SModConsts.TRNX_CONF_WHS_VS_PRV_ENT:

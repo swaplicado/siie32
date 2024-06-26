@@ -154,4 +154,9 @@ public class SViewConfWarehouseVsConsEntity extends SGridPaneView implements Act
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }

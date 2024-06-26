@@ -295,6 +295,7 @@ public class SFormConfMatCostCenterGroupVsUser extends SBeanForm implements Acti
         maRows = new ArrayList<>();
         
         miClient.getSession().populateCatalogue(moKeyLink, SModConsts.USRS_LINK, SLibConsts.UNDEFINED, null);
+        moKeyReference.removeAllItems();
     }
 
     @Override

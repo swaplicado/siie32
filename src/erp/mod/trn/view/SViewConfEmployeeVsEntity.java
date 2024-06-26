@@ -151,4 +151,9 @@ public class SViewConfEmployeeVsEntity extends SGridPaneView implements ActionLi
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }

@@ -200,7 +200,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpSubAvailableLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlSubAvailable.setText("Centros de consumo disponibles:");
+        jlSubAvailable.setText("Subcentros de consumo disponibles:");
         jpSubAvailableLabel.add(jlSubAvailable);
 
         jpSubAvailable.add(jpSubAvailableLabel, java.awt.BorderLayout.NORTH);
@@ -244,7 +244,7 @@ public class SFormConfEmployeeVsEntity extends SBeanForm implements ActionListen
 
         jpSubSelectedLabel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlSubSelected.setText("Centros de consumo seleccionadas:");
+        jlSubSelected.setText("Subcentros de consumo seleccionadas:");
         jlSubSelected.setPreferredSize(new java.awt.Dimension(370, 16));
         jpSubSelectedLabel.add(jlSubSelected);
 

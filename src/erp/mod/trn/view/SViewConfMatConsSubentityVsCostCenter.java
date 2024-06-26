@@ -147,4 +147,9 @@ public class SViewConfMatConsSubentityVsCostCenter extends SGridPaneView impleme
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }

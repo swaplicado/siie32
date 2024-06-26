@@ -139,4 +139,9 @@ public class SViewConfMatCostCenterGroupItem extends SGridPaneView implements Ac
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }

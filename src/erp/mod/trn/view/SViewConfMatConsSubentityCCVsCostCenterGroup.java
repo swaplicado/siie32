@@ -158,4 +158,9 @@ public class SViewConfMatConsSubentityCCVsCostCenterGroup extends SGridPaneView 
             }
         }
     }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionConfig();
+    }
 }
