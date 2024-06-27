@@ -823,7 +823,7 @@ public class SHrsReceipt {
                 double payrollSubsidyAssessedNewStyle = 0;
                 
                 if (appliesNewStyle) {
-                    double maxSubsidyAssessed = payrollTaxAssessed;
+                    double maxSubsidyAssessed = payrollTaxAssessed > 0 ? payrollTaxAssessed : 0; // prevent from having negative subsidy
                     
                     payrollSubsidyAssessedGrossNewStyle = SLibUtils.roundAmount(subsidyAssessedNewStyle - (subsidyCompensatedForSubsidyNewStyle + subsidyPayedForSubsidyNewStyle - annualTaxSubsidyAssessedOldInformative));
                     payrollSubsidyAssessedNewStyle = payrollSubsidyAssessedGrossNewStyle <= maxSubsidyAssessed ? payrollSubsidyAssessedGrossNewStyle : maxSubsidyAssessed; // applay maximum value for subsidy when needed
