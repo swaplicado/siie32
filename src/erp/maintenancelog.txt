@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 254.4/ 2024-06-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Incorporación de restricción de compensación de ISR retenido en exceso contra subsidio para el empleo en nóminas con cálculo de impuestos anual.
+
+================================================================================
 SIIE 3.2 254.3/ 2024-06-26
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
