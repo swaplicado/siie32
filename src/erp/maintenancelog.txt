@@ -1,3 +1,8 @@
+SIIE 3.2 254.6/ 2024-06-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Mostrar error en la importación de nóminas cuando no se encuentra un usuario
+
 ================================================================================
 SIIE 3.2 254.5/ 2024-06-27
 Jhonatan Claudio PEÑA HERNÁNDEZ

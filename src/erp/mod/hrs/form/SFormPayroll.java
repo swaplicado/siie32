@@ -2306,9 +2306,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * @param lImportedprepayrollRows@param selectedEmployeesIds
      * @param ppRows 
      */
-    private void addPerceptAndDeductByImportation(ArrayList<SRowTimeClock> timeClockRows, List<SPrepayrollRow> ppRows) {
+    private void addPerceptAndDeductByImportation(ArrayList<SRowTimeClock> timeClockRows, List<SPrepayrollRow> ppRows) throws Exception {
         boolean configured = true;
-        
+
         if (moModuleConfig.getFkEarningHolidayId_n() == 0) {
             miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de días festivos.");
             configured = false;
@@ -2325,24 +2325,32 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             miClient.showMsgBoxError("No se ha configurado en este módulo la percepción de días de descanso trabajados.");
             configured = false;
         }
-        
+
         if (!configured) {
             return;
         }
-        
+
         for (SRowTimeClock timeClockRow : timeClockRows) {
+            if (timeClockRow.getEmployeeId() == 6658) {
+                int i = 0;
+            }
             SHrsReceipt receipt = null;
-            
+            boolean receiptFound = false;
+
             for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
                 SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
                 if (timeClockRow.getEmployeeId() == row.getPkEmployeeId()) {
                     receipt = row.getHrsReceipt();
+                    receiptFound = true;
                     break;
                 }
             }
-            
+            if (! receiptFound) {
+                throw new Exception("El empleado " + timeClockRow.getEmployee() + " no se pudo procesar, intente de nuevo la carga de prenómina.");
+            }
+
             double doubleOvertimeValue = ((Number) timeClockRow.getOvertime()).doubleValue();
-            
+
             if (doubleOvertimeValue > 0d) {
                 int perceptionId = 0;
                 double factor = doubleOvertimeValue;
@@ -2356,29 +2364,29 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 addPerception(receipt, perceptionId, factor, true, 0);
             }
-            
+
             if (timeClockRow.getHolidays() > 0) {
                 addPerception(receipt, moModuleConfig.getFkEarningHolidayId_n(), timeClockRow.getHolidays(), true, 0);
             }
-            
+
             if (timeClockRow.getSundays() > 0) {
                 addPerception(receipt, moModuleConfig.getFkEarningSunBonusId_n(), timeClockRow.getSundays(), true, 0);
             }
-            
+
             if (timeClockRow.getDaysOff() > 0) {
                 addPerception(receipt, moModuleConfig.getFkEarningDayOffId_n(), timeClockRow.getDaysOff(), true, 0);
             }
-            
+
             if (timeClockRow.getAbsences() > 0) {
                 SPrepayrollRow row = null;
-                
+
                 for (SPrepayrollRow ppRow : ppRows) {
                     if (ppRow.getEmployee_id() == timeClockRow.getEmployeeId()) {
                         row = ppRow;
                         break;
                     }
                 }
-                
+
                 adjustNormalPerception(receipt, row);
             }
         }
@@ -2394,11 +2402,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         for (SHrsReceiptEarning hrsReceiptEarning : receipt.getHrsReceiptEarnings()) {
             if (hrsReceiptEarning.getEarning().getPkEarningId() == moModuleConfig.getFkEarningEarningId_n()) {
                 double units = hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged();
-                
+
                 if (units >= ppRow.getAbsences()) {
                     hrsReceiptEarning.getPayrollReceiptEarning().setTimeClockSourced(true);
                     hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(units - ppRow.getAbsences());
-                    
+
                     double unitsPayed = hrsReceiptEarning.getEarning().computeEarningUnits(units - ppRow.getAbsences(), moRegistry);
                     hrsReceiptEarning.getPayrollReceiptEarning().setUnits(unitsPayed);
                 }
@@ -2415,10 +2423,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      */
     private void addPerception(SHrsReceipt receipt, int earningId, double dFactor, boolean sourcedByClock, int bonusId) {
         SDbEarning earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, new int[] { earningId });
-        
+
         double unitsAlleged = 0d;
         double amountUnitAlleged = 0d;
-        
+
         if (earning.isBasedOnUnits()) {
             unitsAlleged = dFactor;
             amountUnitAlleged = 0d;
@@ -2427,12 +2435,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             unitsAlleged = 1;
             amountUnitAlleged = dFactor;
         }
-        
+
         SDbPayrollReceiptEarning prearning = receipt.getHrsPayroll().createPayrollReceiptEarning(
                 receipt, earning, null, 
                 unitsAlleged, amountUnitAlleged, false, 
                 0, 0, receipt.getHrsReceiptEarnings().size() + 1);
-        
+
         // consider specialized inputs:
         prearning.setTimeClockSourced(sourcedByClock);
         prearning.setFkOtherPaymentTypeId(0);
@@ -2440,7 +2448,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         prearning.setAuxiliarAmount1(0d);
         prearning.setAuxiliarAmount2(0d);
         prearning.setFkBonusId(bonusId > 1 ? bonusId : 1);
-            
+
         SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
         hrsReceiptEarning.setHrsReceipt(receipt);
         hrsReceiptEarning.setEarning(earning);
