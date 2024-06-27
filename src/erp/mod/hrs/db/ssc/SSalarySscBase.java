@@ -5,6 +5,8 @@
  */
 package erp.mod.hrs.db.ssc;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -23,8 +25,11 @@ public class SSalarySscBase {
     }
     
     public SSalarySscBase(final int employeeId, final double salarySscBase, final Date dateSalarySscBase, final int userId) {
+        BigDecimal bd = new BigDecimal(Double.toString(salarySscBase));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        double salarySscBaseDecimal = bd.doubleValue();
         EmployeeId = employeeId;
-        SalarySscBase = salarySscBase;
+        SalarySscBase = salarySscBaseDecimal;
         DateSalarySscBase = dateSalarySscBase;
         UserId = userId;
     }
