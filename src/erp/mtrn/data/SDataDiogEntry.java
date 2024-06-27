@@ -513,7 +513,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
             if (mnFkMatRequestId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             if (mnFkMatRequestEtyId_n != SLibConstants.UNDEFINED) callableStatement.setInt(nParam++, mnFkMatRequestEtyId_n); else callableStatement.setNull(nParam++, Types.SMALLINT);
             callableStatement.setInt(nParam++, mnFkMaintAreaId);
-            callableStatement.setInt(nParam++, mnFkCostCenterId == 0 ? 1 : mnFkCostCenterId );
+            callableStatement.setInt(nParam++, mnFkCostCenterId == 0 ? SModSysConsts.FIN_CC_NA : mnFkCostCenterId );
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, Types.SMALLINT);
