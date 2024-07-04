@@ -528,6 +528,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_CLO_PUR = 2024080;        // material requisitions closed purchase
     public static final int TRNX_MAT_REQ_EST = 2024078;        // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_RECLASS = 2024079;        // material requisitions pending purchase
+    public static final int TRNX_MAT_REQ_FOLL_PUR = 2024081;        // material requisitions following
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;   // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;   // diálogo de cotizaciones
     public static final int TRNX_MAT_REQ_EST_PROVID_ROW = 2024077;   // renglones de cotizaciones

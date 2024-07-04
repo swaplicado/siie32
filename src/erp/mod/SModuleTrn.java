@@ -88,6 +88,7 @@ import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
+import erp.mod.trn.view.SViewFollowingPurchaseMaterialRequest;
 import erp.mod.trn.view.SViewFunctionalAreaBudgets;
 import erp.mod.trn.view.SViewFunctionalAreaExpenses;
 import erp.mod.trn.view.SViewIdentifiedCostCalculation;
@@ -685,6 +686,15 @@ public class SModuleTrn extends SGuiModule {
                         break;
                 }
                 view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
+                switch (subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE: title = "Seguimiento RM de compras x fecha";
+                        break;
+                    case SLibConsts.UNDEFINED: title = "Seguimiento RM de compras";
+                        break;
+                }
+                view = new SViewFollowingPurchaseMaterialRequest(miClient, subtype, title);
                 break;
             case SModConsts.TRN_MAT_CONS_ENT:
                 view = new SViewMaterialConsumptionEntity(miClient, "C. consumo");

@@ -149,6 +149,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPetTbAuth;
     private javax.swing.JMenuItem jmiReqPetTbProccProv;
     private javax.swing.JMenuItem jmiReqPetTbProccPur;
+    private javax.swing.JMenu jmMenuReqPetAll;
     private javax.swing.JMenuItem jmiReqPetAll;
     private javax.swing.JMenuItem jmiReqAdmAuth;
     private javax.swing.JMenuItem jmiReqRevTbAuth;
@@ -167,7 +168,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPurClosed;
     private javax.swing.JMenuItem jmiReqPurClosedDet;
     private javax.swing.JMenuItem jmiReqEstDet;
+    private javax.swing.JMenuItem jmiReqFollPur;
+    private javax.swing.JMenuItem jmiReqFollPurDate;
     private javax.swing.JMenuItem jmiReqPendEstDet;
+    private javax.swing.JMenu jmMenuReqAll;
     private javax.swing.JMenuItem jmiReqAll;
     private javax.swing.JMenuItem jmiReqAllReclass;
     private javax.swing.JMenuItem jmiCatMatCostCenterGrp;
@@ -647,14 +651,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserToolMaintProv.addActionListener(this);
         jmiMaintArea.addActionListener(this);
         
-        jmMenuReq = new JMenu("Requisiciones materiales");
+        jmMenuReq = new JMenu("Requisiciones");
         
         jmiReqPetNew = new JMenuItem("Mis RM nuevas");
         jmiReqPetTbAuth = new JMenuItem("Mis RM en autorización");
         jmiReqPetTbProccProv = new JMenuItem("Mis RM en suministro");
         jmiReqPetTbProccPur = new JMenuItem("Mis RM en compras");
-        jmiReqPetAll = new JMenuItem("Todas mis RM");
         
+        jmMenuReqPetAll = new JMenu("Todas mis RM");
+        jmiReqPetAll = new JMenuItem("Todas mis RM");
         jmiReqAllConsEnt = new JMenuItem("RM de mis centros de consumo");
         jmiReqAllSupEnt = new JMenuItem("RM de mis centros de suministro");
         
@@ -680,19 +685,23 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPendEstDet = new JMenuItem("RM por solicitar para cotización");
         jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
         
+        jmiReqFollPur = new JMenuItem("Seguimiento RM de compras");
+        jmiReqFollPurDate = new JMenuItem("Seguimiento RM de compras por fecha");
+        
+        jmMenuReqAll = new JMenu("Todas las RM");
         jmiReqAll = new JMenuItem("Todas las RM");
         jmiReqAllReclass = new JMenuItem("Todas las RM (Reclasificación contable)");
-        
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
         
         jmMenuReq.add(jmiReqPetNew);
         jmMenuReq.add(jmiReqPetTbAuth);
         jmMenuReq.add(jmiReqPetTbProccProv);
         jmMenuReq.add(jmiReqPetTbProccPur);
-        jmMenuReq.add(jmiReqPetAll);
-        jmMenuReq.addSeparator();
-        jmMenuReq.add(jmiReqAllConsEnt);
-        jmMenuReq.add(jmiReqAllSupEnt);
+        jmMenuReq.add(jmMenuReqPetAll);
+        jmMenuReqPetAll.add(jmiReqPetAll);
+        jmMenuReqPetAll.addSeparator();
+        jmMenuReqPetAll.add(jmiReqAllConsEnt);
+        jmMenuReqPetAll.add(jmiReqAllSupEnt);
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmiReqAdmAuth);
         jmMenuReq.add(jmiReqRevTbAuth);
@@ -717,11 +726,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmiReqPendEstDet);
         jmMenuReq.add(jmiReqEstDet);
         jmMenuReq.addSeparator();
-        jmMenuReq.add(jmiReqAll);
+        jmMenuReq.add(jmiReqFollPur);
+        jmMenuReq.add(jmiReqFollPurDate);
         jmMenuReq.addSeparator();
-        jmMenuReq.add(jmiReqAllReclass);
-        jmMenuReq.addSeparator();
-        jmMenuReq.add(jmiReqMatConsumptionEntBudget);
+        jmMenuReq.add(jmMenuReqAll);
+        jmMenuReqAll.add(jmiReqAll);
+        jmMenuReqAll.addSeparator();
+        jmMenuReqAll.add(jmiReqAllReclass);
+        jmMenuReqAll.addSeparator();
+        jmMenuReqAll.add(jmiReqMatConsumptionEntBudget);
         
         jmiReqAllConsEnt.addActionListener(this);
         jmiReqAllSupEnt.addActionListener(this);
@@ -748,6 +761,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurClosed.addActionListener(this);
         jmiReqPurClosedDet.addActionListener(this);
         jmiReqEstDet.addActionListener(this);
+        jmiReqFollPur.addActionListener(this);
+        jmiReqFollPurDate.addActionListener(this);
         jmiReqPendEstDet.addActionListener(this);
         jmiReqAll.addActionListener(this);
         jmiReqAllReclass.addActionListener(this);
@@ -999,6 +1014,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurClosed.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurClosedDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqFollPur.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqFollPurDate.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
@@ -2008,6 +2025,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqPendEstDet) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
+            }
+            else if (item == jmiReqFollPur) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqFollPurDate) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE, null);
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SLibConstants.UNDEFINED, null);
