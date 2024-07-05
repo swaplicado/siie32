@@ -168,8 +168,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPurClosed;
     private javax.swing.JMenuItem jmiReqPurClosedDet;
     private javax.swing.JMenuItem jmiReqEstDet;
-    private javax.swing.JMenuItem jmiReqFollPur;
-    private javax.swing.JMenuItem jmiReqFollPurDate;
+    private javax.swing.JMenuItem jmiReqFollowingPurOpen;
+    private javax.swing.JMenuItem jmiReqFollowingPurClosed;
     private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenu jmMenuReqAll;
     private javax.swing.JMenuItem jmiReqAll;
@@ -392,7 +392,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatMatConsumptionSubentCCGrp.addActionListener(this);
         jmiCatAccMatConsumptionSubentCCGrp.addActionListener(this);
 
-        jmMenuDpsPurSup = new JMenu("Surtidos compras");
+        jmMenuDpsPurSup = new JMenu("Surts. compras");
         jmiDpsPurSupplyPend = new JMenuItem("Compras por surtir");
         jmiDpsPurSupplyPendEty = new JMenuItem("Compras por surtir a detalle");
         jmiDpsPurSupplied = new JMenuItem("Compras surtidas");
@@ -429,7 +429,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPurReturned.addActionListener(this);
         jmiDpsPurReturnedEty.addActionListener(this);
 
-        jmMenuDpsSalSup = new JMenu("Surtidos ventas");
+        jmMenuDpsSalSup = new JMenu("Surts. ventas");
         jmiDpsSalSupplyPend = new JMenuItem("Ventas por surtir");
         jmiDpsSalSupplyPendEntry = new JMenuItem("Ventas por surtir a detalle");
         jmiDpsSalSupplied = new JMenuItem("Ventas surtidas");
@@ -463,7 +463,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsSalReturned.addActionListener(this);
         jmiDpsSalReturnedEntry.addActionListener(this);
 
-        jmMenuMfg = new JMenu("Movs. producción");
+        jmMenuMfg = new JMenu("Producción");
         jmiMfgPanelProdOrder = new JMenuItem("Panel movs. producción");
         jmiMfgAssignPend = new JMenuItem("Órdenes prod. por asignar");
         jmiMfgAssignPendEntry = new JMenuItem("Órdenes prod. por asignar a detalle");
@@ -663,7 +663,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAllConsEnt = new JMenuItem("RM de mis centros de consumo");
         jmiReqAllSupEnt = new JMenuItem("RM de mis centros de suministro");
         
-        jmiReqAdmAuth = new JMenuItem("Todas las RM por autorizar (admin)");
+        jmiReqAdmAuth = new JMenuItem("Todas las RM por autorizar (administrador)");
         jmiReqRevTbAuth = new JMenuItem("RM por autorizar");
         jmiReqRevAuth = new JMenuItem("RM autorizadas");
         jmiReqRevNoAuth = new JMenuItem("RM rechazadas");
@@ -685,12 +685,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPendEstDet = new JMenuItem("RM por solicitar para cotización");
         jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
         
-        jmiReqFollPur = new JMenuItem("Seguimiento RM de compras");
-        jmiReqFollPurDate = new JMenuItem("Seguimiento RM de compras por fecha");
+        jmiReqFollowingPurOpen = new JMenuItem("Seguimiento de compras de RM abiertas a detalle");
+        jmiReqFollowingPurClosed = new JMenuItem("Seguimiento de compras de RM cerradas a detalle");
         
         jmMenuReqAll = new JMenu("Todas las RM");
         jmiReqAll = new JMenuItem("Todas las RM");
-        jmiReqAllReclass = new JMenuItem("Todas las RM (Reclasificación contable)");
+        jmiReqAllReclass = new JMenuItem("Todas las RM (reclasificación contable)");
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
         
         jmMenuReq.add(jmiReqPetNew);
@@ -726,8 +726,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmiReqPendEstDet);
         jmMenuReq.add(jmiReqEstDet);
         jmMenuReq.addSeparator();
-        jmMenuReq.add(jmiReqFollPur);
-        jmMenuReq.add(jmiReqFollPurDate);
+        jmMenuReq.add(jmiReqFollowingPurOpen);
+        jmMenuReq.add(jmiReqFollowingPurClosed);
         jmMenuReq.addSeparator();
         jmMenuReq.add(jmMenuReqAll);
         jmMenuReqAll.add(jmiReqAll);
@@ -761,8 +761,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurClosed.addActionListener(this);
         jmiReqPurClosedDet.addActionListener(this);
         jmiReqEstDet.addActionListener(this);
-        jmiReqFollPur.addActionListener(this);
-        jmiReqFollPurDate.addActionListener(this);
+        jmiReqFollowingPurOpen.addActionListener(this);
+        jmiReqFollowingPurClosed.addActionListener(this);
         jmiReqPendEstDet.addActionListener(this);
         jmiReqAll.addActionListener(this);
         jmiReqAllReclass.addActionListener(this);
@@ -1014,8 +1014,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurClosed.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurClosedDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
-        jmiReqFollPur.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
-        jmiReqFollPurDate.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqFollowingPurOpen.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqFollowingPurClosed.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
@@ -2026,10 +2026,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiReqPendEstDet) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
             }
-            else if (item == jmiReqFollPur) {
+            else if (item == jmiReqFollowingPurOpen) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiReqFollPurDate) {
+            else if (item == jmiReqFollowingPurClosed) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE, null);
             }
             else if (item == jmiReqAll) {

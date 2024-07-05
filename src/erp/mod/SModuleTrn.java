@@ -519,6 +519,7 @@ public class SModuleTrn extends SGuiModule {
                         view = new SViewDpsEntryContractPrice(miClient, subtype, "CPA - Entregas mensuales contratos" + (params != null && params.getType() == SModConsts.VIEW_ST_PEND ? " x procesar" : " procesados"), params);
                         break;
                     default:
+                        // nothing
                 }
                 break;
             case SModConsts.TRN_CFD:
@@ -533,6 +534,7 @@ public class SModuleTrn extends SGuiModule {
                         view = new SViewDpsSendWebService(miClient, subtype, "VTA - " + SDataConstantsSys.getDpsTypeNamePlr(params.getType()) + " aceptadas x WS", params);
                         break;
                     default:
+                        // nothing
                 }
                 break;
             case SModConsts.TRN_INV_VAL:
@@ -581,6 +583,7 @@ public class SModuleTrn extends SGuiModule {
                         view = new SViewMaintUser(miClient, subtype, "Mantto. - Proveedores mantto. herramientas");
                         break;
                     default:
+                        // nothing
                 }
                 break;
             case SModConsts.TRN_MAINT_USER_SUPV:
@@ -614,14 +617,15 @@ public class SModuleTrn extends SGuiModule {
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_ADM:
-                        title = "Todas las RM por autorizar (Admin.)";
+                        title = "Todas las RM x autorizar (admor.)";
                         break;
-                    default: title = "Todas las RM"; break;
+                    default:
+                        title = "Todas las RM"; break;
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_RECLASS:
-                title = "Todas las RM (Reclasificación contable)";
+                title = "Todas las RM (reclasificación ctb.)";
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_STK_VAL:
@@ -629,50 +633,56 @@ public class SModuleTrn extends SGuiModule {
                 view = new SViewStockValuation(miClient, title);
                 break;
             case SModConsts.TRNX_STK_VAL_DET:
-                title = "Valuación consumos materiales detalle";
+                title = "Valuación consumos materiales (detalle)";
                 view = new SViewStockValuationDetail(miClient, title);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar (detalle)";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM consumo suministradas detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM consumo suministradas (detalle)";
                         break;
                     case SLibConsts.UNDEFINED: title = "RM consumo x suministrar";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_SUP, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a (detalle)";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM resurtido suministradas detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM resurtido suministradas (detalle)";
                         break;
                     case SLibConsts.UNDEFINED: title = "RM resurtido x suministrar";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewMaterialRequesPendingSupply(miClient, SModConsts.TRNX_MAT_REQ_STK_SUP, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM x pedir detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM x pedir (detalle)";
                         break;
                     case SLibConsts.UNDEFINED: title = "RM x pedir";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_PEND_PUR, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_CLO_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM pedidas detalle";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM pedidas (detalle)";
                        break;
-                    default: title = "RM pedidas";
-                        break;
+                    default:
+                        title = "RM pedidas";
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, title, params);
                 break;
@@ -684,15 +694,19 @@ public class SModuleTrn extends SGuiModule {
                         break;
                     case SLibConsts.UNDEFINED: title = "RM x solicitar cotización";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
                 switch (subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE: title = "Seguimiento RM de compras x fecha";
+                    case SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE: title = "Seguimiento compras RM cerradas (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Seguimiento RM de compras";
+                    case SLibConsts.UNDEFINED: title = "Seguimiento compras RM abiertas (detalle)";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewFollowingPurchaseMaterialRequest(miClient, subtype, title);
                 break;
@@ -741,6 +755,8 @@ public class SModuleTrn extends SGuiModule {
                     case SModConsts.TRN_MAT_PROV_ENT_USR:
                         title = "Usuarios vs. c. suministro (detalle)";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewConfUserVsEntityDetail(miClient, subtype, title);
                 break;
@@ -791,8 +807,11 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_CONS_CC:
                 switch (subtype) {
-                    case SModConsts.TRNX_MAT_CONS_CC_R: title = "CC consumo materiales resumen"; break;
-                    default: title = "CC consumo materiales"; break;
+                    case SModConsts.TRNX_MAT_CONS_CC_R:
+                        title = "CC consumo materiales resumen";
+                        break;
+                    default:
+                        title = "CC consumo materiales"; break;
                 }
                 view = new SViewReportMaterialConsuptionCC(miClient, subtype, title);
                 break;

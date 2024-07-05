@@ -27,6 +27,12 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
     
     private SGridFilterDatePeriod moFilterDatePeriod;
 
+    /**
+     * Create new SViewFollowingPurchaseMaterialRequest view.
+     * @param client GUI client.
+     * @param gridSubtype SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE (closed MR) or SLibConstants.UNDEFINED (open MR).
+     * @param title View tab label.
+     */
     public SViewFollowingPurchaseMaterialRequest(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_MAT_REQ_FOLL_PUR, gridSubtype, title);
         setRowButtonsEnabled(false);
@@ -43,7 +49,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
 
     @Override
     public void prepareSqlQuery() {
-        String sql = "WHERE ";
+        String where = "";
         Object filter;
         
         moPaneSettings = new SGridPaneSettings(2);
@@ -55,10 +61,10 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_DATE) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
-            sql += (sql.isEmpty() ? " " : " ") + SGridUtils.getSqlFilterDate("r.dt", (SGuiDate) filter);
+            where += "r.b_clo_pur AND " + SGridUtils.getSqlFilterDate("r.dt", (SGuiDate) filter);
         }
         else {
-            sql += "r.b_clo_pur ";
+            where += "NOT r.b_clo_pur ";
         }
         
         msSql = "SELECT " 
@@ -158,7 +164,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
                 + "fac.fid_dps_year = dfe.id_year AND fac.fid_dps_doc = dfe.id_doc AND fac.fid_dps_ety = dfe.id_ety "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON "
                 + "df.fid_cur = c.id_cur "
-                + sql;       
+                + "WHERE " + where;       
     }
 
     @Override
