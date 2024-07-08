@@ -128,7 +128,7 @@ public class SViewReportAccountingCustomizableReport extends SGridPaneView imple
         filter = (Date[]) moFiltersMap.get(SGridConsts.FILTER_DATE_RANGE).getValue();
         where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDateRange("r.dt", (Date[]) filter);
         
-        msSql = "SELECT " 
+        msSql = "SELECT DISTINCT " 
                 + "r.id_year AS " + SDbConsts.FIELD_ID + "1, "
                 + "CONCAT(r.id_year, '-', LPAD(r.id_per, 2, 0)) per, "
                 + "CONCAT(r.id_tp_rec, '-', LPAD(r.id_num, 6, 0)) AS " + SDbConsts.FIELD_NAME + ", " 
@@ -155,6 +155,7 @@ public class SViewReportAccountingCustomizableReport extends SGridPaneView imple
                 + (where.length() == 0 ? "" : "WHERE " + where) + " " 
                 + (sqlAcc.length() == 0 ? "" : "AND " + sqlAcc) + " " 
                 + (sqlCc.length() == 0 ? "" : "AND " + sqlCc) + " " 
+                + "AND NOT r.b_del AND NOT re.b_del "
                 + "ORDER BY fid_cc_n, item_key, dt, r.id_num ";
     }
 

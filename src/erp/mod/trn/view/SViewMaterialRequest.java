@@ -185,6 +185,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbRowEdit.setEnabled(hasMatReqReclassRight);
         }
         
+        if (mnGridSubtype == SModConsts.TRNX_MAT_REQ_ALL) {
+            jbRowEdit.setEnabled(false);
+            jbAuthorize.setEnabled(false);
+            jbReject.setEnabled(false);
+            jbReject.setEnabled(false);
+            mjbToNew.setEnabled(false);
+        }
+        
         jbRowDisable.setToolTipText("Cancelar");
     }
     

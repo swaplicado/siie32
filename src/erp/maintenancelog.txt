@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 254.8/ 2024-07-04
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste al reporte de auxiliares contables.
+2) Eliminación de solicitudes de cotización al hacer un cambio de ítem, unidad o cantidad a una partida de una RM.
+
+================================================================================
 SIIE 3.2 254.7/ 2024-07-04
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

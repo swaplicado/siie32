@@ -7,6 +7,7 @@ package erp.mod.trn.form;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormUtilities;
@@ -29,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -590,7 +592,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
     @SuppressWarnings("unchecked")
     private void showMaterialRequestEntries() {
         Vector<SGridRow> rows = new Vector<>();
-
+        boolean shWarning = false;
         try {
             moGridMatReqEty.clearGridRows();
             
@@ -633,7 +635,19 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                     }
                     oRow.setNotes(notes);
                     rows.add(oRow);
+                    
+                    try {
+                        Date dateEst = SMaterialRequestUtils.getMatReqEtyEstimationDate(miClient.getSession(), oMaterialRequestEntry.getPrimaryKey());
+                        if (SLibTimeUtilities.getDaysDiff(dateEst, moMaterialRequest.getTsUserUpdate()) < 0) {
+                            shWarning = true;
+                        }
+                    } catch (Exception e) {}
+                    
                 }
+            }
+            
+            if (shWarning) {
+                miClient.showMsgBoxInformation("Puede ser que haya cambios en la solicitud de cotización o incluso que se haya eliminado por cambios del solicitante.");
             }
 
             moGridMatReqEty.populateGrid(rows, this);

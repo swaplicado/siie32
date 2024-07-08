@@ -903,6 +903,19 @@ public abstract class SMaterialRequestUtils {
         }
     }
     
+    public static boolean hasMatReqEstimation(SGuiSession session, int[] pkMatReq) throws SQLException {
+        boolean est = false;
+        
+        String sql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " WHERE fk_mat_req_n = " + pkMatReq[0] + " AND NOT b_del";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            est = true;
+        }
+        
+        return est;
+    }
+    
     public static String hasLinksMaterialRequest(SGuiSession session, int[] pkMatReq) throws SQLException {
         String sql = "SELECT ety.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS ety "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di ON ety.id_year = di.id_year "
@@ -1026,6 +1039,26 @@ public abstract class SMaterialRequestUtils {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             return ex.getMessage();
         }
+    }
+    
+    public static Date getMatReqEtyEstimationDate (SGuiSession session, int[] pkMatReqEty) {
+        String sql = "SELECT MAX(e.ts_usr) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " AS ee " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ) + " AS e ON ee.id_est_req = e.id_est_req " 
+                + "WHERE ee.fk_mat_req_n = " + pkMatReqEty[0] + " "
+                + "AND ee.fk_mat_req_ety_n = " + pkMatReqEty[1] + " " 
+                + " ";
+        
+        try {
+            ResultSet resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return resultSet.getDate(1);
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
     
     public static boolean hasMatReqEtyEstimation(SGuiSession session, int[] pkMatReqEty) {

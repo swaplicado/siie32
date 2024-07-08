@@ -53,8 +53,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     protected ArrayList<SDbMaterialRequestEntryNote> maChildNotes;
     protected ArrayList<SDbMaterialRequestEntryItemChange> maChildItemChange;
+    protected ArrayList<SDbEstimationRequestEntry> maEstReqEty;
     
     protected int mnAuxRowId;
+    protected double mdAuxQuantityOld;
     
     protected SDataItem moDataItem;
     protected SDataItem moDataItemRef;
@@ -96,6 +98,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setDataUnitUsr(SDataUnit o) { moDataUnitUsr = o; }
     
     public void setAuxRowId(int n) { mnAuxRowId = n; }
+    public void setAuxQuantityOld(double d) { mdAuxQuantityOld = d; }
 
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
@@ -123,8 +126,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     public ArrayList<SDbMaterialRequestEntryNote> getChildNotes() { return maChildNotes; }
     public ArrayList<SDbMaterialRequestEntryItemChange> getChildItemChange() { return maChildItemChange; }
+    public ArrayList<SDbEstimationRequestEntry> getEstReqEty() { return maEstReqEty; }
     
     public int getAuxRowId() { return mnAuxRowId; }
+    public double getAuxQuantityOld() { return mdAuxQuantityOld; }
     public SDataItem getDataItem() { return moDataItem; }
     public SDataItem getDataItemRef() { return moDataItemRef; }
     public SDataUnit getDataUnitUsr() { return moDataUnitUsr; }
@@ -249,8 +254,10 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         
         maChildNotes = new ArrayList<>();
         maChildItemChange = new ArrayList<>();
+        maEstReqEty = new ArrayList<>();
         
         mnAuxRowId = 0;
+        mdAuxQuantityOld = 0;
         moDataItem = null;
         moDataItemRef = null;
         moDataUnitUsr = null;
@@ -293,6 +300,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         Statement statement;
         SDbMaterialRequestEntryNote note;
         SDbMaterialRequestEntryItemChange change;
+        SDbEstimationRequestEntry est;
                 
         initRegistry();
         initQueryMembers();
@@ -328,6 +336,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             mnFkCostCenterId_n = resultSet.getInt("fk_cc_n");
             mnFkItemReferenceId_n = resultSet.getInt("fk_item_ref_n");
             
+            mdAuxQuantityOld = mdQuantity;
+            
             // Read aswell document notes:
             
             statement = session.getStatement().getConnection().createStatement();
@@ -354,6 +364,17 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
                 change = new SDbMaterialRequestEntryItemChange();
                 change.read(session, new int[] { mnPkMatRequestId, mnPkEntryId, resultSet.getInt(1) });
                 maChildItemChange.add(change);
+            }
+            
+            msSql = "SELECT id_est_req, id_ety " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " " +
+                    "WHERE fk_mat_req_n = " + mnPkMatRequestId + " AND fk_mat_req_ety_n = " + mnPkEntryId + " AND NOT b_del";
+            
+            resultSet = statement.executeQuery(msSql);
+            while (resultSet.next()) {
+                est = new SDbEstimationRequestEntry();
+                est.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                maEstReqEty.add(est);
             }
             
             // Read ítem:
@@ -472,6 +493,16 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             change.save(session);
         }
         
+        for (SDbEstimationRequestEntry est : maEstReqEty) {
+            if (est.getFkMatRequestId_n() == mnPkMatRequestId && est.getFkMatRequestEntryId_n() == mnPkEntryId) {
+                if (mdQuantity != mdAuxQuantityOld || est.getFkItemId() != mnFkItemId || est.getFkUnitId() != mnFkUnitId) {
+                    est.setDeleted(true);
+                    est.setRegistryEdited(true);
+                    est.save(session);
+                }
+            }
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -512,9 +543,14 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             registry.getChildItemChange().add(change);
         }
         
+        for (SDbEstimationRequestEntry est : this.getEstReqEty()) {
+            registry.getEstReqEty().add(est);
+        }
+        
         registry.setDataItem(this.getDataItem());
         registry.setDataItemRef(this.getDataItemRef());
         registry.setAuxRowId(this.getAuxRowId());
+        registry.setAuxQuantityOld(this.getAuxQuantityOld());
 
         registry.setRegistryNew(this.isRegistryNew());
         

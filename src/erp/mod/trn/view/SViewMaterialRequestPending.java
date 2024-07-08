@@ -367,8 +367,10 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else {
                 try {
-                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de devolver la requisición a estatus de nuevo?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
-                        int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    boolean est = SMaterialRequestUtils.hasMatReqEstimation(null, key);
+                    if (miClient.showMsgBoxConfirm((est ? "Al regresar al solicitante se corre el riesgo de que se eliminen la(s) solicitud(es) de cotización al haber cambio de ítem o eliminación de la partida.\n" : "") + 
+                            "¿Esta seguro/a de regresar al solicitante?") == JOptionPane.OK_OPTION) {
                         String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
                         if (! message.isEmpty()) {
                             miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);

@@ -369,8 +369,10 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             }
             else {
                 try {
-                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de devolver la requisición a estatus de nuevo?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
-                        int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    boolean est = SMaterialRequestUtils.hasMatReqEstimation(null, key);
+                    if (miClient.showMsgBoxConfirm((est ? "Al regresar al solicitante se corre el riesgo de que se eliminen la(s) solicitudes de cotización al haber cambio de ítem o eliminación de la partida.\n" : "") + 
+                            "¿Esta seguro/a de regresar al solicitante?") == JOptionPane.OK_OPTION) {
                         String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
                         if (! message.isEmpty()) {
                             miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);
@@ -515,7 +517,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
                 + "v.fk_usr_req = ur.id_usr "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ_ETY) + " AS mre ON "
-                + "ve.id_mat_req = mre.fk_mat_req_n AND ve.id_ety = fk_mat_req_ety_n "
+                + "ve.id_mat_req = mre.fk_mat_req_n AND ve.id_ety = fk_mat_req_ety_n AND NOT mre.b_del "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAINT_USER) + " AS mu ON "
                 + "v.fk_contractor_n = mu.id_maint_user "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS entc ON "
