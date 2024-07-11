@@ -368,7 +368,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else {
                 try {
                     int[] key = (int[]) gridRow.getRowPrimaryKey();
-                    boolean est = SMaterialRequestUtils.hasMatReqEstimation(null, key);
+                    boolean est = SMaterialRequestUtils.hasMatReqEstimation(miClient.getSession(), key);
                     if (miClient.showMsgBoxConfirm((est ? "Al regresar al solicitante se corre el riesgo de que se eliminen la(s) solicitud(es) de cotización al haber cambio de ítem o eliminación de la partida.\n" : "") + 
                             "¿Esta seguro/a de regresar al solicitante?") == JOptionPane.OK_OPTION) {
                         String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
