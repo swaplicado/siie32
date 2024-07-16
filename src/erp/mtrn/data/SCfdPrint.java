@@ -1391,6 +1391,72 @@ public class SCfdPrint {
                         paramsMap.put("sCceRecCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
                     }
                 }
+                else if (element.getName().compareTo("cartaporte31:CartaPorte") == 0) {
+                    cfd.ver4.ccp31.DElementCartaPorte ccp = (cfd.ver4.ccp31.DElementCartaPorte) element;
+                    SDbBillOfLading bol = new SDbBillOfLading();
+                    bol.read(miClient.getSession(), new int[] { dps.getDbmsDataCfdBol().getFkBillOfLadingId_n() });
+                    
+                    paramsMap.put("bCcp", true);
+                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                    paramsMap.put("sIdCcp", ccp.getAttIdCCP().getString());
+                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+                    
+                    for (cfd.ver4.ccp31.DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                        cfd.ver4.ccp31.DElementDomicilio dom = ub.getEltDomicilio();
+                        if (!dom.getAttLocalidad().getString().isEmpty()) {
+                            dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        }
+                        if (!dom.getAttMunicipio().getString().isEmpty()) {
+                            dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        }
+                        dom.getAttEstado().setString(dom.getAttEstado().getString());
+                        dom.getAttPais().setString(dom.getAttPais().getString());
+                    }
+                    
+                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                    paramsMap.put("sCcpLogisticaInversa", ccp.getEltMercancias().getAttLogisticaInversaRecoleccionDevolucion().getString());
+                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+                    
+                    cfd.ver4.ccp31.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                    paramsMap.put("dCcpPesoVeh", aut.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                    if (aut.getEltRemolques() != null) {
+                        int i = 1;
+                        for (cfd.ver4.ccp31.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                            i++;
+                        }
+                    }
+                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    for (cfd.ver4.ccp31.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
+                }
                 else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
                     cfd.ver4.ccp30.DElementCartaPorte ccp = (cfd.ver4.ccp30.DElementCartaPorte) element;
                     SDbBillOfLading bol = new SDbBillOfLading();
@@ -1953,6 +2019,72 @@ public class SCfdPrint {
                         paramsMap.put("sCceRecPais", dom.getAttPais().getString().isEmpty() ? "-" : dom.getAttPais().getString());
                         paramsMap.put("sCceRecCP", dom.getAttCodigoPostal().getString().isEmpty() ? "-" : dom.getAttCodigoPostal().getString());
                     }
+                }
+                else if (element.getName().compareTo("cartaporte31:CartaPorte") == 0) {
+                    cfd.ver4.ccp31.DElementCartaPorte ccp = (cfd.ver4.ccp31.DElementCartaPorte) element;
+                    SDbBillOfLading bol = new SDbBillOfLading();
+                    bol.read(miClient.getSession(), new int[] { dps.getDbmsDataCfdBol().getFkBillOfLadingId_n() });
+                    
+                    paramsMap.put("bCcp", true);
+                    paramsMap.put("sCcpComplemento", ccp.getElementForXml());
+                    paramsMap.put("sIdCcp", ccp.getAttIdCCP().getString());
+                    paramsMap.put("sCcpVersion", ccp.getAttVersion().getString());
+                    paramsMap.put("sCcpTranspInternac", ccp.getAttTransInternac().getString());
+                    paramsMap.put("dCcpTotalDistRec", ccp.getAttTotalDistRec().getDouble());
+                    
+                    for (cfd.ver4.ccp31.DElementUbicacion ub : ccp.getEltUbicaciones().getEltUbicaciones()) {
+                        cfd.ver4.ccp31.DElementDomicilio dom = ub.getEltDomicilio();
+                        if (!dom.getAttLocalidad().getString().isEmpty()) {
+                            dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                        }
+                        if (!dom.getAttMunicipio().getString().isEmpty()) {
+                            dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                        }
+                        dom.getAttEstado().setString(dom.getAttEstado().getString());
+                        dom.getAttPais().setString(dom.getAttPais().getString());
+                    }
+                    
+                    paramsMap.put("oCcpUbicaciones", ccp.getEltUbicaciones().getEltUbicaciones());
+                    paramsMap.put("dCcpPesoBrutoTotal", ccp.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                    paramsMap.put("sCcpUnidadPeso", ccp.getEltMercancias().getAttUnidadPeso().getString());
+                    paramsMap.put("nCcpNoTotalMercancias", ccp.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                    paramsMap.put("sCcpLogisticaInversa", ccp.getEltMercancias().getAttLogisticaInversaRecoleccionDevolucion().getString());
+                    paramsMap.put("oCcpMercancias", ccp.getEltMercancias().getEltMercancias());
+                    
+                    cfd.ver4.ccp31.DElementAutotransporte aut = ccp.getEltMercancias().getEltAutotransporte();
+                    paramsMap.put("sCcpPermSCT", aut.getAttPermSCT().getString());
+                    paramsMap.put("sCcpNumPermSCT", aut.getAttNumPermisoSCT().getString());
+                    paramsMap.put("sCcpConfVeh", aut.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                    paramsMap.put("sCcpPlacaVM", aut.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                    paramsMap.put("nCcpAnio", aut.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                    paramsMap.put("dCcpPesoVeh", aut.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                    if (aut.getEltRemolques() != null) {
+                        int i = 1;
+                        for (cfd.ver4.ccp31.DElementRemolque rem : aut.getEltRemolques().getEltRemolques()) {
+                            paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                            paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                            i++;
+                        }
+                    }
+                    paramsMap.put("sCcpAsegRespCivil", aut.getEltSeguros().getAttAseguraRespCivil().getString());
+                    paramsMap.put("sCcpPolRespCivil", aut.getEltSeguros().getAttPolizaRespCivil().getString());
+                    paramsMap.put("sCcpAsegMedAmbiente", aut.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                    paramsMap.put("sCcpPolMedAmbiente", aut.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                    paramsMap.put("sCcpAsegCarga", aut.getEltSeguros().getAttAseguraCarga().getString());
+                    paramsMap.put("sCcpPolCarga", aut.getEltSeguros().getAttPolizaCarga().getString());
+                    paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                    
+                    for (cfd.ver4.ccp31.DElementTiposFigura f : ccp.getEltFiguraTransporte().getEltTiposFigura()) {
+                        if (f.getAttTipoFigura().getString().equals("01")) {
+                            paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                            paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                            paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                            paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                            paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                        }
+                    }
+                    
+                    paramsMap.put("oCcpFiguraTransp", ccp.getEltFiguraTransporte().getEltTiposFigura());
                 }
                 else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
                     cfd.ver4.ccp30.DElementCartaPorte ccp = (cfd.ver4.ccp30.DElementCartaPorte) element;
@@ -4278,6 +4410,71 @@ public class SCfdPrint {
                         }
 
                         paramsMap.put("oCcpFiguraTransp", ccp30.getEltFiguraTransporte().getEltTiposFigura());
+                
+                        break;
+                        
+                    case "cartaporte31:CartaPorte":
+                        cfd.ver4.ccp31.DElementCartaPorte ccp31 = (cfd.ver4.ccp31.DElementCartaPorte) element;
+                    
+                        paramsMap.put("bCcp", true);
+                        paramsMap.put("sIdCcp", ccp31.getAttIdCCP().getString());
+                        paramsMap.put("sCcpComplemento", ccp31.getElementForXml());
+                        paramsMap.put("sCcpVersion", ccp31.getAttVersion().getString());
+                        paramsMap.put("sCcpTranspInternac", ccp31.getAttTransInternac().getString());
+                        paramsMap.put("dCcpTotalDistRec", ccp31.getAttTotalDistRec().getDouble());
+
+                        for (cfd.ver4.ccp31.DElementUbicacion ub : ccp31.getEltUbicaciones().getEltUbicaciones()) {
+                            cfd.ver4.ccp31.DElementDomicilio dom = ub.getEltDomicilio();
+                            if (!dom.getAttLocalidad().getString().isEmpty()) {
+                                dom.getAttLocalidad().setString(dom.getAttLocalidad().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_LOCALITY, dom.getAttLocalidad().getString(), dom.getAttEstado().getString())); 
+                            }
+                            if (!dom.getAttMunicipio().getString().isEmpty()) {
+                                dom.getAttMunicipio().setString(dom.getAttMunicipio().getString() + " - " + SModDataUtils.getLocCatalogNameByCode(miClient.getSession(), SModConsts.LOCS_BOL_COUNTY, dom.getAttMunicipio().getString(), dom.getAttEstado().getString()));
+                            }
+                            dom.getAttEstado().setString(dom.getAttEstado().getString());
+                            dom.getAttPais().setString(dom.getAttPais().getString());
+                        }
+
+                        paramsMap.put("oCcpUbicaciones", ccp31.getEltUbicaciones().getEltUbicaciones());
+                        paramsMap.put("dCcpPesoBrutoTotal", ccp31.getEltMercancias().getAttPesoBrutoTotal().getDouble());
+                        paramsMap.put("sCcpUnidadPeso", ccp31.getEltMercancias().getAttUnidadPeso().getString());
+                        paramsMap.put("nCcpNoTotalMercancias", ccp31.getEltMercancias().getAttNumTotalMercancias().getInteger());
+                        paramsMap.put("oCcpMercancias", ccp31.getEltMercancias().getEltMercancias());
+
+                        cfd.ver4.ccp31.DElementAutotransporte aut31 = ccp31.getEltMercancias().getEltAutotransporte();
+                        paramsMap.put("sCcpPermSCT", aut31.getAttPermSCT().getString());
+                        paramsMap.put("sCcpNumPermSCT", aut31.getAttNumPermisoSCT().getString());
+                        paramsMap.put("sCcpConfVeh", aut31.getEltIdentificacionVehicular().getAttConfigVehicular().getString());
+                        paramsMap.put("sCcpPlacaVM", aut31.getEltIdentificacionVehicular().getAttPlacaVM().getString());
+                        paramsMap.put("nCcpAnio", aut31.getEltIdentificacionVehicular().getAttAnioModeloVM().getInteger());
+                        paramsMap.put("dCcpPesoVeh", aut31.getEltIdentificacionVehicular().getAttPesoBrutoVehicular().getDouble());
+                        if (aut31.getEltRemolques() != null) {
+                            int i = 1;
+                            for (cfd.ver4.ccp31.DElementRemolque rem : aut31.getEltRemolques().getEltRemolques()) {
+                                paramsMap.put("sCcpSubtipoRemolque" + i, rem.getAttSubTipoRem().getString());
+                                paramsMap.put("sCcpPlacaRemolque" + i, rem.getAttPlaca());
+                                i++;
+                            }
+                        }
+                        paramsMap.put("sCcpAsegRespCivil", aut31.getEltSeguros().getAttAseguraRespCivil().getString());
+                        paramsMap.put("sCcpPolRespCivil", aut31.getEltSeguros().getAttPolizaRespCivil().getString());
+                        paramsMap.put("sCcpAsegMedAmbiente", aut31.getEltSeguros().getAttAseguraMedAmbiente().getString());
+                        paramsMap.put("sCcpPolMedAmbiente", aut31.getEltSeguros().getAttPolizaMedAmbiente().getString());
+                        paramsMap.put("sCcpAsegCarga", aut31.getEltSeguros().getAttAseguraCarga().getString());
+                        paramsMap.put("sCcpPolCarga", aut31.getEltSeguros().getAttPolizaCarga().getString());
+                        paramsMap.put("sCcpPrima", SLibUtils.getDecimalFormatAmount().format(aut31.getEltSeguros().getAttPrimaSeguro().getDouble()));
+                        
+                        for (cfd.ver4.ccp31.DElementTiposFigura f : ccp31.getEltFiguraTransporte().getEltTiposFigura()) {
+                            if (f.getAttTipoFigura().getString().equals("01")) {
+                                paramsMap.put("sCcpRfcChofer", f.getAttRFCFigura().getString());
+                                paramsMap.put("sCcpNombreChofer", f.getAttNombreFigura().getString());
+                                paramsMap.put("sCcpLicenciaChofer", f.getAttNumLicencia().getString());
+                                paramsMap.put("sCcpRegTribChofer", f.getAttNumRegIdTribFigura().getString());
+                                paramsMap.put("sCcpResFiscalChofer", f.getAttResidenciaFiscalFigura().getString());
+                            }
+                        }
+
+                        paramsMap.put("oCcpFiguraTransp", ccp31.getEltFiguraTransporte().getEltTiposFigura());
                 
                         break;
                         

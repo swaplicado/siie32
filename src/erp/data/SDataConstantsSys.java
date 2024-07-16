@@ -1199,6 +1199,7 @@ public abstract class SDataConstantsSys {
     
     public static final int TRNS_CFD_BOL_VER_20 = 20;        // bol version 20
     public static final int TRNS_CFD_BOL_VER_30 = 30;        // bol version 30
+    public static final int TRNS_CFD_BOL_VER_31 = 31;        // bol version 31
 
     public static final int TRNS_TP_STK_SEG_SHIP = 1;       // shipment
     public static final int TRNS_TP_STK_SEG_MFG_ORD = 2;    // manufacturing order

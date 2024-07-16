@@ -6583,6 +6583,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             cfd.ver40.DElementComprobante comprobanteCartaPorte = DCfdUtils.getCfdi40(moDbmsDataCfdBol.getDocXml());
             cfd.ver3.ccp20.DElementCartaPorte ccp20 = null;
             cfd.ver4.ccp30.DElementCartaPorte ccp30 = null;
+            cfd.ver4.ccp31.DElementCartaPorte ccp31 = null;
             if (comprobanteCartaPorte.getEltOpcComplemento() != null) {
                 for (DElement element : comprobanteCartaPorte.getEltOpcComplemento().getElements()) {
                     if (element.getName().compareTo("cartaporte20:CartaPorte") == 0) {
@@ -6591,6 +6592,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     else if (element.getName().compareTo("cartaporte30:CartaPorte") == 0) {
                         ccp30 = (cfd.ver4.ccp30.DElementCartaPorte) element;
+                        break;
+                    }
+                    else if (element.getName().compareTo("cartaporte31:CartaPorte") == 0) {
+                        ccp31 = (cfd.ver4.ccp31.DElementCartaPorte) element;
                         break;
                     }
                 }
@@ -6607,6 +6612,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     complemento = new cfd.ver40.DElementComplemento();
                 }
                 complemento.getElements().add((DElement) ccp30);
+            }
+            else if (ccp31 != null) {
+                if (complemento == null) {
+                    complemento = new cfd.ver40.DElementComplemento();
+                }
+                complemento.getElements().add((DElement) ccp31);
             }
         }
         

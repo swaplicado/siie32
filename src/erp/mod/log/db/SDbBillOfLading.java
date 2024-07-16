@@ -1493,6 +1493,365 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         return ccp;
     }
+    
+    private cfd.ver4.ccp31.DElementCartaPorte complemento31() {
+        
+        // Encabezado:
+        
+        cfd.ver4.ccp31.DElementCartaPorte ccp = new cfd.ver4.ccp31.DElementCartaPorte();
+        ccp.getAttIdCCP().setString(msBillOfLadingUuid);
+        ccp.getAttTransInternac().setString(mbInternationalBol ? DCfdi40Catalogs.TextoSí : DCfdi40Catalogs.TextoNo);
+        if (mbInternationalBol) {
+            ccp.getAttEntradaSalidaMerc().setString(msInputOutputBol);
+            ccp.getAttViaEntradaSalida().setString(msInputOutputWay);
+            ccp.getAttPaisOrigenDestino().setString(msXtaCtyCode);
+        }
+        ccp.getAttTotalDistRec().setDouble(mdTotalDistance);
+        
+        // Ubicaciones:
+        
+        ArrayList<cfd.ver4.ccp31.DElementUbicacion> ubicaciones = ccp.getEltUbicaciones().getEltUbicaciones();
+        for (SDbBolLocation location : maBolLocations) {
+            cfd.ver4.ccp31.DElementUbicacion origen = null;
+            cfd.ver4.ccp31.DElementUbicacion destino = null;
+            
+            if (location.getXtaIsOrigin()) {
+                origen = new cfd.ver4.ccp31.DElementUbicacion();
+                origen.getAttTipoUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónOrigen);
+                origen.getAttIDUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónOrigenPrefijoId + location.getDataBizPartnerBranchAddress().getAddressCode());
+                if (location.getDataBizPartner().getFiscalId().isEmpty()) {
+                    origen.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
+                    origen.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
+                    origen.getAttResidenciaFiscal().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
+                }
+                else {
+                    origen.getAttRFCRemitenteDestinatario().setString(location.getDataBizPartner().getFiscalId());
+                }
+                origen.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateDeparture_n());
+                
+                // Domicilio: 
+                
+                cfd.ver4.ccp31.DElementDomicilio domicilio = origen.getEltDomicilio();
+                if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
+                }
+                domicilio.getAttEstado().setString(location.getDataBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getDataBizPartnerBranchAddress().getZipCode()); 
+                if (location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode bolZipCode = location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                    if (bolZipCode.getDbmsBolCounty() != null) {
+                        domicilio.getAttMunicipio().setString(bolZipCode.getDbmsBolCounty().getPkCountyCode());
+                    }
+                    if (bolZipCode.getDbmsBolLocality() != null) {
+                        domicilio.getAttLocalidad().setString(bolZipCode.getDbmsBolLocality().getPkLocalityCode());
+                    }
+                }
+            }
+            
+            if (location.getXtaIsDestination()) {
+                destino = new cfd.ver4.ccp31.DElementUbicacion();
+                destino.getAttTipoUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónDestino);
+                destino.getAttIDUbicacion().setString(DCfdi40Catalogs.CcpUbicaciónDestinoPrefijoId + location.getDataBizPartnerBranchAddress().getAddressCode());
+                if (location.getDataBizPartner().getFiscalId().isEmpty()) {
+                    destino.getAttNumRegIdTrib().setString(location.getDataBizPartner().getFiscalId());
+                    destino.getAttNombreRemitenteDestinatario().setString(location.getDataBizPartner().getBizPartner());
+                    destino.getAttResidenciaFiscal().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode()); 
+                }
+                else {
+                    destino.getAttRFCRemitenteDestinatario().setString(location.getDataBizPartner().getFiscalId());
+                }
+                destino.getAttFechaHoraSalidaLlegada().setDatetime(location.getDateArrival_n());
+                destino.getAttDistanciaRecorrida().setDouble(location.getDistance());
+                
+                // Domicilio: 
+                
+                cfd.ver4.ccp31.DElementDomicilio domicilio = destino.getEltDomicilio();
+                if (location.getDbmsBizPartnerBranchNeighborhood() != null) {
+                    domicilio.getAttColonia().setString(location.getDbmsBizPartnerBranchNeighborhood().getDbmsBolNeighborhood().getNeighborhoodCode());
+                }
+                domicilio.getAttEstado().setString(location.getDataBizPartnerBranchAddress().getDbmsDataState().getStateCode());
+                domicilio.getAttPais().setString(location.getDataBizPartnerBranchAddress().getDbmsDataCountry().getCountryCode());
+                domicilio.getAttCodigoPostal().setString(location.getDataBizPartnerBranchAddress().getZipCode()); 
+                if (location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode() != null) {
+                    SDataBolZipCode zipCode = location.getDataBizPartnerBranchAddress().getDbmsDataBolZipCode();
+                    if (zipCode.getDbmsBolCounty() != null) {
+                        domicilio.getAttMunicipio().setString(zipCode.getDbmsBolCounty().getPkCountyCode());
+                    }
+                    if (zipCode.getDbmsBolLocality() != null) {
+                        domicilio.getAttLocalidad().setString(zipCode.getDbmsBolLocality().getPkLocalityCode());
+                    }
+                }
+            }
+            
+            if (origen != null) {
+                ubicaciones.add(origen);
+            }
+            
+            if (destino != null) {
+                ubicaciones.add(destino);
+            }
+        }
+        
+        // Encabezado Mercancias:
+        
+        cfd.ver4.ccp31.DElementMercancias encabezadoMercancias = ccp.getEltMercancias();
+        encabezadoMercancias.getAttPesoBrutoTotal().setDouble(mdGrossWeight);
+        encabezadoMercancias.getAttUnidadPeso().setString(msXtaGrossWeightUnitCode);
+        encabezadoMercancias.getAttNumTotalMercancias().setInteger(maBolMerchandises.size());
+        if (mbReverseLogistics) {
+            encabezadoMercancias.getAttLogisticaInversaRecoleccionDevolucion().setString(DCfdi40Catalogs.TextoSí);
+        }
+        
+        // Mercancias:
+        
+        ArrayList<cfd.ver4.ccp31.DElementMercancia> mercancias = encabezadoMercancias.getEltMercancias();
+        for (SDbBolMerchandise merch : maBolMerchandises) {
+            cfd.ver4.ccp31.DElementMercancia mercancia = new cfd.ver4.ccp31.DElementMercancia();
+            mercancia.getAttBienesTransp().setString(merch.getXtaItemClaveProdServ());
+            mercancia.getAttDescripcion().setString(merch.getDataItem().getItem());
+            mercancia.getAttCantidad().setDouble(merch.getQuantity());
+            mercancia.getAttClaveUnidad().setString(merch.getXtaClaveUnidad());
+            mercancia.getAttPesoEnKg().setDouble(merch.getXtaClaveUnidad().equals("KGM") ? merch.getQuantity() : merch.getWeight());
+            mercancia.getAttFraccionArancelaria().setString(merch.getExternalUUID());
+            
+            // Cantidad transporta:
+            
+            ArrayList<SDbBolMerchandiseQuantity> qtyOr = new ArrayList<>();
+            ArrayList<SDbBolMerchandiseQuantity> qtyDe = new ArrayList<>();
+            for (SDbBolMerchandiseQuantity qty : merch.getChildBolMerchandiseQuantities()) {
+                if (qty.getDataOriginBizPartnerBranchAddress() != null) {
+                    qtyOr.add(qty);
+                }
+                if (qty.getDataDestinationBizPartnerBranchAddress() != null) {
+                    qtyDe.add(qty);
+                }
+            }
+            
+            ArrayList<cfd.ver4.ccp31.DElementCantidadTransporta> transporta = mercancia.getEltCantidadTransportas();
+            
+            for (SDbBolMerchandiseQuantity or : qtyOr) {
+                if (or.getQuantity() > 0) {
+                    for (SDbBolMerchandiseQuantity de : qtyDe) {
+                        if (de.getQuantity() > 0) {
+                            cfd.ver4.ccp31.DElementCantidadTransporta elementTransp = new cfd.ver4.ccp31.DElementCantidadTransporta();
+                            elementTransp.getAttIDOrigen().setString(DCfdi40Catalogs.CcpUbicaciónOrigenPrefijoId + or.getDataOriginBizPartnerBranchAddress().getAddressCode());
+                            elementTransp.getAttIDDestino().setString(DCfdi40Catalogs.CcpUbicaciónDestinoPrefijoId + de.getDataDestinationBizPartnerBranchAddress().getAddressCode());
+                            if (or.getQuantity() > de.getQuantity()) {
+                                or.setQuantity(or.getQuantity() - de.getQuantity());                                
+                                elementTransp.getAttCantidad().setDouble(de.getQuantity());
+                                de.setQuantity(0);                                
+                            }
+                            else if (or.getQuantity() < de.getQuantity()) {
+                                de.setQuantity(de.getQuantity() - or.getQuantity());
+                                elementTransp.getAttCantidad().setDouble(or.getQuantity());
+                                or.setQuantity(0);
+                            }
+                            else if (or.getQuantity() == de.getQuantity()) {
+                                elementTransp.getAttCantidad().setDouble(or.getQuantity());
+                                or.setQuantity(0);
+                                de.setQuantity(0);
+                            }
+                            transporta.add(elementTransp);
+                        }
+                    }
+                }
+            }
+            
+            // Documentación aduanera:
+            
+            //ArrayList<DElementDocumentacionAduanera> docAdu = mercancia.getEltDocumentacionAduanera();
+            
+            mercancias.add(mercancia);
+        }
+        
+        // Autotransporte:
+        
+        cfd.ver4.ccp31.DElementAutotransporte autotransporte = encabezadoMercancias.getEltAutotransporte();
+        autotransporte.getAttPermSCT().setString(moBolTransportationMode.getDataVehicle().getPermissonSctType());
+        autotransporte.getAttNumPermisoSCT().setString(moBolTransportationMode.getDataVehicle().getPermissonSctNumber());
+        
+        // Identificación vehicular:
+        
+        cfd.ver4.ccp31.DElementIdentificacionVehicular idVehicular = autotransporte.getEltIdentificacionVehicular();
+        idVehicular.getAttConfigVehicular().setString(moBolTransportationMode.getDataVehicle().getVehicleConfiguration());
+        idVehicular.getAttPlacaVM().setString(moBolTransportationMode.getDataVehicle().getPlate());
+        idVehicular.getAttAnioModeloVM().setInteger(moBolTransportationMode.getDataVehicle().getVehicleYear());
+        idVehicular.getAttPesoBrutoVehicular().setDouble(moBolTransportationMode.getDataVehicle().getGrossWeight());
+        
+        // Seguros: 
+        
+        cfd.ver4.ccp31.DElementSeguros seguros = autotransporte.getEltSeguros();
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
+        seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
+        seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
+        seguros.getAttAseguraCarga().setString(moDataMerchandiseInsurer.getName());
+        seguros.getAttPolizaCarga().setString(msMerchandiseInsurerPolicy);
+        seguros.getAttPrimaSeguro().setDouble(SLibUtils.parseDouble(msPremium));
+        
+        // Remolques:
+        
+        cfd.ver4.ccp31.DElementRemolques elementRemolques = new cfd.ver4.ccp31.DElementRemolques();
+        ArrayList<cfd.ver4.ccp31.DElementRemolque> remolques = new ArrayList<>();
+        if (moBolTransportationMode.getDataTrailer1().getPkTrailerId() != 0) {
+            cfd.ver4.ccp31.DElementRemolque remolque = new cfd.ver4.ccp31.DElementRemolque();
+            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getDataTrailer1().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getDataTrailer1().getPlate());
+            remolques.add(remolque);
+        }
+        if (moBolTransportationMode.getDataTrailer2().getPkTrailerId() != 0) {
+            cfd.ver4.ccp31.DElementRemolque remolque = new cfd.ver4.ccp31.DElementRemolque();
+            remolque.getAttSubTipoRem().setString(moBolTransportationMode.getDataTrailer2().getTrailerSubtype());
+            remolque.getAttPlaca().setString(moBolTransportationMode.getDataTrailer2().getPlate());
+            remolques.add(remolque);
+        }
+        if (remolques.size() > 0) {
+            elementRemolques.getEltRemolques().addAll(remolques);
+            autotransporte.setEltRemolques(elementRemolques); 
+        }
+        
+        // Figura transporte:
+        
+        ArrayList<cfd.ver4.ccp31.DElementTiposFigura> figuras = ccp.getEltFiguraTransporte().getEltTiposFigura();
+        cfd.ver4.ccp31.DElementTiposFigura chofer = new cfd.ver4.ccp31.DElementTiposFigura();
+        chofer.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteChofer);
+        chofer.getAttNumLicencia().setString(moBolTransportationMode.getDataDriver().getDriverLicense()); 
+        if (!moBolTransportationMode.getDataDriver().getFiscalId().isEmpty()) {
+            chofer.getAttRFCFigura().setString(moBolTransportationMode.getDataDriver().getFiscalId());
+            chofer.getAttNombreFigura().setString(moBolTransportationMode.getDataDriver().getName());
+        }
+        else {
+            chofer.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataDriver().getFiscalForeginId());
+            chofer.getAttNombreFigura().setString(moBolTransportationMode.getDataDriver().getName());
+            chofer.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataDriver().getDataCountry().getCountryCode());
+        }
+        figuras.add(chofer);
+        
+        // Propietario 1
+        
+        if (moBolTransportationMode.getDataOwner1().getPkBolPersonId() != 0) {
+            cfd.ver4.ccp31.DElementTiposFigura propietario = new cfd.ver4.ccp31.DElementTiposFigura();
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransportePropietario);
+            if (!moBolTransportationMode.getDataOwner1().getFiscalId().isEmpty()) {
+                propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner1().getFiscalId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner1().getName());
+            }
+            else {
+                propietario.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataOwner1().getFiscalForeginId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner1().getName());
+                propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataOwner1().getDataCountry().getCountryCode());
+            }
+            ArrayList<cfd.ver4.ccp31.DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte(); 
+            cfd.ver4.ccp31.DElementPartesTransporte parte = new cfd.ver4.ccp31.DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner1());
+            partesTransporte.add(parte);
+            figuras.add(propietario);
+        }
+        
+        // Propietario 2
+        
+        if (moBolTransportationMode.getDataOwner2().getPkBolPersonId() != 0) {
+            cfd.ver4.ccp31.DElementTiposFigura propietario = new cfd.ver4.ccp31.DElementTiposFigura();
+            propietario.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransportePropietario);
+            if (!moBolTransportationMode.getDataOwner2().getFiscalId().isEmpty()) {
+                propietario.getAttRFCFigura().setString(moBolTransportationMode.getDataOwner2().getFiscalId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner2().getName());
+            }
+            else {
+                propietario.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataOwner2().getFiscalForeginId());
+                propietario.getAttNombreFigura().setString(moBolTransportationMode.getDataOwner2().getName());
+                propietario.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataOwner2().getDataCountry().getCountryCode());
+            }
+            ArrayList<cfd.ver4.ccp31.DElementPartesTransporte> partesTransporte = propietario.getEltPartesTransporte(); 
+            cfd.ver4.ccp31.DElementPartesTransporte parte = new cfd.ver4.ccp31.DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartOwner2());
+            partesTransporte.add(parte);
+            figuras.add(propietario);
+        }
+        
+        // Arrendador 1
+        
+        if (moBolTransportationMode.getDataLessor1().getPkBolPersonId() != 0) {
+            cfd.ver4.ccp31.DElementTiposFigura arrendador = new cfd.ver4.ccp31.DElementTiposFigura();
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteArrendador);
+            if (!moBolTransportationMode.getDataLessor1().getFiscalId().isEmpty()) {
+                arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor1().getFiscalId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor1().getName());
+            }
+            else {
+                arrendador.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataLessor1().getFiscalForeginId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor1().getName());
+                arrendador.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataLessor1().getDataCountry().getCountryCode());
+            }
+            ArrayList<cfd.ver4.ccp31.DElementPartesTransporte> partesTransporte = arrendador.getEltPartesTransporte();
+            cfd.ver4.ccp31.DElementPartesTransporte parte = new cfd.ver4.ccp31.DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartLessor1());
+            partesTransporte.add(parte);
+            figuras.add(arrendador);
+        }
+        
+        // Arrendador 2
+        
+        if (moBolTransportationMode.getDataLessor2().getPkBolPersonId() != 0) {
+            cfd.ver4.ccp31.DElementTiposFigura arrendador = new cfd.ver4.ccp31.DElementTiposFigura();
+            arrendador.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteArrendador);
+            if (!moBolTransportationMode.getDataLessor2().getFiscalId().isEmpty()) {
+                arrendador.getAttRFCFigura().setString(moBolTransportationMode.getDataLessor2().getFiscalId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor2().getName());
+            }
+            else {
+                arrendador.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataLessor2().getFiscalForeginId());
+                arrendador.getAttNombreFigura().setString(moBolTransportationMode.getDataLessor2().getName());
+                arrendador.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataLessor2().getDataCountry().getCountryCode());
+            }
+            ArrayList<cfd.ver4.ccp31.DElementPartesTransporte> partesTransporte = arrendador.getEltPartesTransporte();
+            cfd.ver4.ccp31.DElementPartesTransporte parte = new cfd.ver4.ccp31.DElementPartesTransporte();
+            parte.getAttParteTransporte().setString(moBolTransportationMode.getTransportationPartLessor2());
+            partesTransporte.add(parte);
+            figuras.add(arrendador);
+        }
+        
+        if (moBolTransportationMode.getDataNotified().getPkBolPersonId() != 0) {
+            cfd.ver4.ccp31.DElementTiposFigura notificado = new cfd.ver4.ccp31.DElementTiposFigura();
+            notificado.getAttTipoFigura().setString(DCfdi40Catalogs.ClaveFiguraTransporteNotificado);
+            if (!moBolTransportationMode.getDataNotified().getFiscalId().isEmpty()) {
+                notificado.getAttRFCFigura().setString(moBolTransportationMode.getDataNotified().getFiscalId());
+                notificado.getAttNombreFigura().setString(moBolTransportationMode.getDataNotified().getName());
+            }
+            else {
+                notificado.getAttNumRegIdTribFigura().setString(moBolTransportationMode.getDataNotified().getFiscalForeginId());
+                notificado.getAttNombreFigura().setString(moBolTransportationMode.getDataNotified().getName());
+                notificado.getAttResidenciaFiscalFigura().setString(moBolTransportationMode.getDataNotified().getDataCountry().getCountryCode());
+            } 
+            figuras.add(notificado);
+        }
+        
+        for (SDbBolTransportationModeExtra tme : moBolTransportationMode.getBolTransportationModeExtra()) {
+            cfd.ver4.ccp31.DElementTiposFigura figura = new cfd.ver4.ccp31.DElementTiposFigura();
+            figura.getAttTipoFigura().setString(tme.getBolPerson().getDbmsBolPersonTypeCode());
+            if (!tme.getBolPerson().getFiscalId().isEmpty()) {
+                figura.getAttRFCFigura().setString(tme.getBolPerson().getFiscalId());
+                figura.getAttNombreFigura().setString(tme.getBolPerson().getName());
+            }
+            else {
+                figura.getAttNumRegIdTribFigura().setString(tme.getBolPerson().getFiscalForeginId());
+                figura.getAttNombreFigura().setString(tme.getBolPerson().getName());
+                figura.getAttResidenciaFiscalFigura().setString(tme.getBolPerson().getDataCountry().getCountryCode());
+            }
+            figura.getAttNumLicencia().setString(tme.getBolPerson().getDriverLicense());
+            if (!figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveFiguraTransporteNotificado) &&
+                    !figura.getAttTipoFigura().getString().equals(DCfdi40Catalogs.ClaveFiguraTransporteChofer)) {
+                ArrayList<cfd.ver4.ccp31.DElementPartesTransporte> partesTransporte = figura.getEltPartesTransporte();
+                cfd.ver4.ccp31.DElementPartesTransporte parte = new cfd.ver4.ccp31.DElementPartesTransporte();
+                parte.getAttParteTransporte().setString(tme.getTransportationPart());
+                partesTransporte.add(parte);
+            }
+            figuras.add(figura);
+        }
+        
+        return ccp;
+    }
 
     @Override
     public int getCfdType() { // CFDI 3.3 & 4.0
@@ -1699,6 +2058,9 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         
         if (moDataCfd != null) {
             switch (moDataCfd.getComplementVersion()) {
+                case SDataConstantsSys.TRNS_CFD_BOL_VER_31:
+                    complemento.getElements().add(complemento31());
+                    break;
                 case SDataConstantsSys.TRNS_CFD_BOL_VER_30:
                     complemento.getElements().add(complemento30());
                     break;
