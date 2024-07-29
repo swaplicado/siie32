@@ -265,8 +265,21 @@ public class SStockValuationUtils {
                 double qtyDiogEty = res.getDouble("mov_out");
                 double qtyToConsume = qtyDiogEty;
                 lTempConsumptions.clear();
+                /**
+                 * Se deja este comentario para cuando se requiera hacer una inspección
+                 * del proceso. Edwin Carmona 2024-07-29  
+                 */
+//                if (res.getInt("id_item") == 24015) {
+//                    int r = 0;
+//                }
                 for (SDbStockValuationMvt entry : entries) {
-                    if (res.getInt("id_item") == entry.getFkItemId() && res.getInt("id_unit") == entry.getFkUnitId() && ! entry.isAuxConsumed()) {
+//                    if (entry.getFkItemId() == 24015) {
+//                        int r = 0;
+//                    }
+                    if (res.getInt("id_item") == entry.getFkItemId() && res.getInt("id_unit") == entry.getFkUnitId()) {
+                        if (entry.isAuxConsumed()) {
+                            continue;
+                        }
                         double consumeQuantity = 0d;
                         double entryAvailableQuantity = entry.getQuantityMovement() - entry.getAuxConsumption();
                         if (qtyToConsume >= entryAvailableQuantity) {

@@ -722,16 +722,20 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         for (int i = 0; i < moGridMatReqEty.getTable().getRowCount(); i++) {
             oMatReqRow = (SMaterialRequestEntryRow) moGridMatReqEty.getGridRow(i);
             if (oMatReqRow.getAuxToSupply() > 0) {
+                if (oMatReqRow.getAuxDataItem().getIsDeleted()) {
+                    miClient.showMsgBoxWarning("No se puede suministrar esta partida (" + oMatReqRow.getAuxItemCode() + " - " + oMatReqRow.getAuxItemName() + "), el ítem está eliminado.");
+                    return;
+                }
                 if (oMatReqRow.getFkItemId() == mnItemDefaultId || oMatReqRow.isItemNew()) {
-                    miClient.showMsgBoxWarning("No se puede suministrar esta partida, el ítem debe ser cambiado.");
+                    miClient.showMsgBoxWarning("No se puede suministrar esta partida (" + oMatReqRow.getAuxItemCode() + " - " + oMatReqRow.getAuxItemName() + "), el ítem debe ser cambiado.");
                     return;
                 }
                 if (oMatReqRow.getAuxToSupply() > oMatReqRow.getAuxStock()) {
-                    miClient.showMsgBoxWarning("No puede suministrar más de lo que hay en existencia.");
+                    miClient.showMsgBoxWarning("No puede suministrar más de lo que hay en existencia (" + oMatReqRow.getAuxItemCode() + " - " + oMatReqRow.getAuxItemName() + ").");
                     return;
                 }
                 if (oMatReqRow.getAuxToSupply() > (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied())) {
-                    miClient.showMsgBoxWarning("No puede suministrar más de lo restante por suministrar.");
+                    miClient.showMsgBoxWarning("No puede suministrar más de lo pendiente por suministrar (" + oMatReqRow.getAuxItemCode() + " - " + oMatReqRow.getAuxItemName() + ").");
                     return;
                 }
                 dToSupply += oMatReqRow.getAuxToSupply();

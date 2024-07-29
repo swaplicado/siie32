@@ -54,6 +54,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     
     SClientInterface miClient;
     
+    protected SDataItem moDataItem;
     protected int mnFormType;
     
     public static int FORM_SEGREGATION = 1;
@@ -90,6 +91,8 @@ public class SMaterialRequestEntryRow implements SGridRow {
         msAuxUnitCode = unit.getSymbol();
         msAuxPartNum = item.getPartNumber();
         mbAuxBulk = item.getIsBulk();
+        
+        moDataItem = item;
     }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
@@ -132,6 +135,7 @@ public class SMaterialRequestEntryRow implements SGridRow {
     public double getAuxToSupply() { return mdAuxToSupply; }
     public double getAuxQuantityToEstimate() { return mdAuxToEstimate; }
     public boolean getAuxIsEstimated() { return mbAuxIsEstimated; }
+    public SDataItem getAuxDataItem() { return moDataItem; }
     public boolean isToEstimate() { return mbAuxEstimate; }
 
     @Override

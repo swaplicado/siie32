@@ -135,6 +135,13 @@ public class SStockValuationRecordUtils {
             }
 
             if (nItemReference == 0) {
+                /**
+                 * Se deja este comentario para cuando se requiera hacer una inspección
+                 * del proceso. Edwin Carmona 2024-07-29  
+                 */
+//                if (oConsumption.getFkItemId() == 18829) {
+//                    int r = 0;
+//                }
                 if (oItem.getFkDefaultItemRefId_n() > 0) {
                     nItemReference = oItem.getFkDefaultItemRefId_n();
                 }
