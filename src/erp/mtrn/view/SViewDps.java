@@ -551,7 +551,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintByRange.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbPrintAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbPrintPhotoInvoice.setEnabled(mbIsCategorySal && mbIsDoc);
-        jbPrintEnglish.setEnabled(mbIsOrd || mbIsCategorySal && (mbIsEstEst || mbIsEstCon || mbIsDoc || mbIsDocAdj) || (mbIsCategoryPur && mbIsEstCon));
+        jbPrintEnglish.setEnabled(mbIsCategorySal && ( mbIsDoc || mbIsDocAdj));
         jbPrintContractKgAsTon.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
@@ -1634,17 +1634,31 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                         salesFreight *= 1000.0;
                                     }
                                     
-                                    textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                    if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] {  SDataConstantsSys.TRNU_TP_DPS_SAL_CON })) {
                                     
-                                    textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                        textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                        SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
-                                    textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                        textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                        SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+
+                                        textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                        SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                    }
+                                    if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] {  SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
+                                    
+                                        textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkLanguajeId(), currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+
+                                        textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkLanguajeId(), currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+
+                                        textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                        dps.getFkLanguajeId(), currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                    }
                                 }
                             }
                             
@@ -1668,9 +1682,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                         unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { entry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
                                     }
                                     
-                                    textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
-                                    unit.getUnit(), unit.getUnit()));
+                                    if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] {  SDataConstantsSys.TRNU_TP_DPS_SAL_CON })) {
+                                        textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
+                                        dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
+                                        unit.getUnit(), unit.getUnit()));
+                                    }
+                                    if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] {  SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
+                                        textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
+                                        dps.getFkLanguajeId() , 
+                                        unit.getUnit(), unit.getSymbol().toUpperCase()));
+                                    }
                                 }
                             }
                             
@@ -1725,10 +1746,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             map.put("bIsSalesContract", hasAnalysis);
 
-                            jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CON, map);
-                            jasperViewer = new JasperViewer(jasperPrint, false);
-                            jasperViewer.setTitle("Impresión de contrato");
-                            jasperViewer.setVisible(true);
+                            if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] {  SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CON_PUR, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Impresión de contrato");
+                                jasperViewer.setVisible(true);
+                            }
+                            else {
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CON, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Impresión de contrato");
+                                jasperViewer.setVisible(true);
+                            }
                         }
                         catch (Exception e) {
                             SLibUtilities.renderException(this, e);

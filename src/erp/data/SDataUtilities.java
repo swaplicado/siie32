@@ -3073,6 +3073,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_CON:
                 name = "reps/trn_con.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_CON_PUR:
+                name = "reps/trn_con_pur.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_CON_MOV:
                 name = "reps/trn_con_mov.jasper";
                 break;

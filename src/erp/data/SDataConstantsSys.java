@@ -1744,6 +1744,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_DPS_LIST = 207018;
     public static final int REP_TRN_DPS_ORDER = 207019;
     public static final int REP_TRN_CON = 207020;
+    public static final int REP_TRN_CON_PUR = 207029;
     public static final int REP_TRN_CON_MOV = 207021;
     public static final int REP_TRN_BAL_AGI = 207022;
     public static final int REP_TRN_BPS_MOV_DPS = 207023;

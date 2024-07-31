@@ -628,6 +628,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbSalesSupervisor = new javax.swing.JButton();
         jPanel64 = new javax.swing.JPanel();
         jlFkContactId_n = new javax.swing.JLabel();
+        jPanel80 = new javax.swing.JPanel();
         jcbFkContactId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jpOtherLogistics = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
@@ -1934,7 +1935,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpOtherMarketing.setBorder(javax.swing.BorderFactory.createTitledBorder("Comercialización:"));
         jpOtherMarketing.setLayout(new java.awt.BorderLayout());
 
-        jPanel46.setLayout(new java.awt.GridLayout(9, 1, 0, 1));
+        jPanel46.setLayout(new java.awt.GridLayout(10, 1, 0, 1));
 
         jPanel60.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -2029,10 +2030,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFkContactId_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel64.add(jlFkContactId_n);
 
-        jcbFkContactId_n.setPreferredSize(new java.awt.Dimension(208, 23));
-        jPanel64.add(jcbFkContactId_n);
-
         jPanel46.add(jPanel64);
+
+        jPanel80.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jcbFkContactId_n.setPreferredSize(new java.awt.Dimension(285, 23));
+        jPanel80.add(jcbFkContactId_n);
+
+        jPanel46.add(jPanel80);
 
         jpOtherMarketing.add(jPanel46, java.awt.BorderLayout.NORTH);
 
@@ -5787,6 +5792,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftDateDocLapsing_n.setFocusable(mbIsDpsOrder || mbIsDpsEstimate);
         jbDateDocLapsing_n.setEnabled(mbIsDpsOrder || mbIsDpsEstimate);
 
+        /* Isabel Servín 17/07/2024: Se comenta ya que se requere que se quede hablitado para ambos tipos de documentos
         jlSalesAgentBizPartner.setEnabled(mbIsSales);
         jtfSalesAgentBizPartnerRo.setEnabled(mbIsSales);
         jlSalesAgent.setEnabled(mbIsSales);
@@ -5799,7 +5805,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbSalesSupervisor.setEnabled(mbIsSales);
         jlFkContactId_n.setEnabled(mbIsSales);
         jcbFkContactId_n.setEnabled(mbIsSales);
+        */
         jckIsRebill.setEnabled(mbIsDpsOrder);
+        
+        if (!mbIsSales) {
+            updateAgentBizPartnerLabels();
+        }
+    }
+    
+    private void updateAgentBizPartnerLabels(){
+        
+        jlSalesAgentBizPartner.setText("Agente de compras del asociado de negocios:");
+        jlSalesAgent.setText("Agente de compras del documento:");
+        jlSalesSupervisorBizPartner.setText("Supervisor de compras del asociado de negocios:");
+        jlSalesSupervisor.setText("Supervisor de compras del documento:");
     }
 
     private void updateDpsFieldsStatus(boolean enable) {
@@ -10444,6 +10463,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel78;
     private javax.swing.JPanel jPanel79;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel80;
     private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel83;
