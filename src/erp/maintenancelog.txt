@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 254.11/ 2024-07-31
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de los botones de "Ver tarjeta de auxiliar de almacén" y "Ver unidades segregadas" además del filtro de eliminados
+    en la vista de Existencias por de movimientos de almacén.
+2) Corrección en la consulta del dialogo de unidades segregadas.
+
+================================================================================
 SIIE 3.2 254.10/ 2024-07-31
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

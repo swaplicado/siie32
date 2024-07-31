@@ -6,14 +6,21 @@
 package erp.mtrn.view;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.table.STabFilterDate;
+import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mod.SModConsts;
+import erp.mtrn.form.SDialogStockCardex;
+import erp.mtrn.form.SDialogStockSegregations;
+import static erp.mtrn.view.SViewStock.TXT_DEC_DEC;
+import static erp.mtrn.view.SViewStock.TXT_DEC_INC;
+import erp.table.STabFilterCompanyBranchEntity;
 import java.awt.Dimension;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,7 +36,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -43,16 +53,27 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Isabel Servín
  */
 public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private static String[] columns = {"Numero de parte", "Ítem", "Unidad", "Costo unitario"};
     private static final List<SDataStockExcel> stockExportExcel = new ArrayList<>();
     
+    private int mnColIn;
+    private int mnColOut;
+    private int mnColStock;
+    private javax.swing.JButton jbCardex;
+    private javax.swing.JButton jbSegregations;
     private javax.swing.JButton jbExportExcel;
     private javax.swing.JButton jbExportTxt;
+    private javax.swing.JToggleButton jtbDecimals;
     private erp.lib.table.STabFilterDate moTabFilterDate;
+    private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
+    
+    private erp.mtrn.form.SDialogStockCardex moDialogStockCardex;
+    private erp.mtrn.form.SDialogStockSegregations moDialogStockSegregations;
 
     /*
      * @param auxType01 Constants defined in SDataConstats (TRNX_STK_...).
@@ -68,13 +89,41 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDate = new STabFilterDate(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
-
+        moTabFilterDeleted = new STabFilterDeleted(this);
+        moDialogStockCardex = new SDialogStockCardex(miClient);
+        moDialogStockSegregations = new SDialogStockSegregations(miClient);
+        moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
+        
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
 
+        jbCardex = new JButton(miClient.getImageIcon(SLibConstants.ICON_KARDEX));
+        jbCardex.setPreferredSize(new Dimension(23, 23));
+        jbCardex.setToolTipText("Ver tarjeta auxiliar de almacén");
+        jbCardex.addActionListener(this);
+        addTaskBarUpperComponent(jbCardex);
+
+        jbSegregations = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")));
+        jbSegregations.setPreferredSize(new Dimension(23, 23));
+        jbSegregations.setToolTipText("Ver unidades segregadas");
+        jbSegregations.addActionListener(this);
+        addTaskBarUpperComponent(jbSegregations);
+        addTaskBarUpperSeparator();        
         addTaskBarUpperComponent(moTabFilterDate);
-       
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDeleted);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterCompanyBranchEntity);
+        addTaskBarUpperSeparator();
+        
+        jtbDecimals = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dec_inc.gif")));
+        jtbDecimals.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_dec_dec.gif")));
+        jtbDecimals.setPreferredSize(new Dimension(23, 23));
+        jtbDecimals.setToolTipText(TXT_DEC_INC);
+        jtbDecimals.addActionListener(this);
+        addTaskBarUpperComponent(jtbDecimals);
+        
         jbExportExcel = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
         jbExportExcel.setPreferredSize(new Dimension(23, 23));
         jbExportExcel.setToolTipText("Importar a excel");
@@ -86,6 +135,17 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         jbExportTxt.addActionListener(this);
         addTaskBarUpperComponent(jbExportTxt);
                 
+        i = 0;
+        aoKeyFields = new STableField[2];
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+        
+        for (i = 0; i < aoKeyFields.length; i++) {
+            moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
+        }
+        
+        i = 0;
+        
         switch (mnTabTypeAux01) {
             case SDataConstants.TRNX_STK_ITEM:
                 aoTableColumns = new STableColumn[7];
@@ -97,10 +157,13 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
+        mnColStock = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "priceUnit", "Promedio valor", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        mnColIn = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovI", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        mnColOut = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovO", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -230,6 +293,9 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_year = " + year + " AND " +
                         "s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(date) + "' ";
             }
+            if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT i.b_del ";
+            }
         }
         
         msSql = "SELECT "
@@ -306,6 +372,62 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         }        
     }
     
+    public void actionCardex() {
+        int mode = jtbDecimals.isSelected() ? SLibConstants.MODE_QTY_EXT : SLibConstants.MODE_QTY;
+        if (jbCardex.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                int[] whKey = showWarehouses() ? new int[] { key[key.length - 2], key[key.length - 1] } : moTabFilterCompanyBranchEntity.getCompanyBranchEntityKey();
+                int itemId = key[0];
+                int unitId = key[1];
+                int lotId = showLots() ? key[2] : SLibConstants.UNDEFINED;
+
+                moDialogStockCardex.formReset();
+                moDialogStockCardex.setFormParams(moTabFilterDate.getDate(), itemId, unitId, lotId, whKey, mode);
+                moDialogStockCardex.setVisible(true);
+           }
+        }
+    }
+    
+    public void actionSegregations() {
+        int mode = jtbDecimals.isSelected() ? SLibConstants.MODE_QTY_EXT : SLibConstants.MODE_QTY;
+        if (jbSegregations.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() != null) {
+                int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                int[] whKey = showWarehouses() ? new int[] { key[key.length - 2], key[key.length - 1] } : moTabFilterCompanyBranchEntity.getCompanyBranchEntityKey();
+                int itemId = key[0];
+                int unitId = key[1];
+
+                moDialogStockSegregations.formReset();
+                moDialogStockSegregations.setFormParams(moTabFilterDate.getDate(), itemId, unitId, whKey, mode);
+                moDialogStockSegregations.setVisible(true);
+            }
+        }
+    }
+    
+    public void actionDecimals() {
+        String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
+        DefaultTableCellRenderer tcr = !jtbDecimals.isSelected() ?
+            miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
+            miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary();
+
+        moTablePane.getTableColumn(mnColIn).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColOut).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColStock).setCellRenderer(tcr);
+
+        jtbDecimals.setToolTipText(toolTipText);
+
+        actionRefresh(STableConstants.REFRESH_MODE_RELOAD);
+    }
+    
+     private boolean showWarehouses() {
+        return mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH || mnTabTypeAux01 == SDataConstants.TRNX_STK_LOT_WH;
+    }
+
+    private boolean showLots() {
+        return mnTabTypeAux01 == SDataConstants.TRNX_STK_LOT || mnTabTypeAux01 == SDataConstants.TRNX_STK_LOT_WH;
+    }
+    
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
@@ -329,6 +451,19 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 } catch (SQLException ex) {
                     Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+            else if (button == jbCardex) {
+                actionCardex();
+            }
+            else if (button == jbSegregations) {
+                actionSegregations();
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JToggleButton) {
+            JToggleButton toggleButton = (JToggleButton) e.getSource();
+
+            if (toggleButton == jtbDecimals) {
+                actionDecimals();
             }
         }
     }

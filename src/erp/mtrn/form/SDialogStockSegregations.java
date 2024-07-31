@@ -264,7 +264,7 @@ public class SDialogStockSegregations extends javax.swing.JDialog implements jav
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " swe ON swh.id_stk_seg = swe.id_stk_seg AND swh.id_cob = swe.id_cob AND swh.id_whs = swe.id_whs " +
                     "INNER JOIN mfg_ord ord ON seg.fid_ref_1 = ord.id_year AND seg.fid_ref_2_n = ord.id_ord " +
                     "INNER JOIN erp.trns_tp_stk_seg tps ON seg.fid_tp_stk_seg = tps.id_tp_stk_seg " +
-                    "INNER JOIN erp.cfgu_cob_ent whse ON swh.fid_cob = whse.id_cob AND swh.fid_whs = whse.id_ent " +
+                    "INNER JOIN erp.cfgu_cob_ent whse ON swh.id_cob = whse.id_cob AND swh.id_whs = whse.id_ent " +
                     "INNER JOIN erp.itmu_unit AS uni ON swe.fid_unit = uni.id_unit " +
                     "INNER JOIN erp.usru_usr AS une ON seg.fid_usr_new = une.id_usr " +
                     "INNER JOIN erp.usru_usr AS uup ON seg.fid_usr_edit = uup.id_usr " +
