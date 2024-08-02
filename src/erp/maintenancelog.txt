@@ -247,17 +247,17 @@ Edwin Omar CARMONA FIGUEROA
 Requisiciones de materiales. 15/04/24
 
 1) Botón de regresar a nuevo en cualquier pantalla
-	- Todas las RM
+	- todas las RM
 2) Botón bitácora
 	- x solicitada cotización
 	- RM solicitadas cotización
 3) RM solicitadas (cotización)
-	→ correo cuando caiga x segundo vez
-	→ columna con conto de reincidencia
+	- correo cuando caiga x segunda vez
+	- columna con conto de reincidencia
 4) RM pedidas
-	- Revisar por qué aparecen si no tienen docto
+	- revisar por qué aparecen si no tienen documento
 5) RM x pedir a detalle
-	- solo que aparezca lo pendiente x pedir.
+	- sólo que aparezca lo pendiente x pedir
 6) Refactorización de Vistas de RM de resurtido
 
 ================================================================================
@@ -423,7 +423,6 @@ Edwin Omar CARMONA FIGUEROA
 2) Ajuste en las columnas de RM al cotizar y al importar
 
 ================================================================================
-
 SIIE 3.2 240.3/ 2024-02-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
