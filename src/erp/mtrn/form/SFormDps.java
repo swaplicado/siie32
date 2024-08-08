@@ -5791,8 +5791,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftDateDocLapsing_n.setEditable(mbIsDpsOrder || mbIsDpsEstimate);
         jftDateDocLapsing_n.setFocusable(mbIsDpsOrder || mbIsDpsEstimate);
         jbDateDocLapsing_n.setEnabled(mbIsDpsOrder || mbIsDpsEstimate);
-
-        /* Isabel Servín 17/07/2024: Se comenta ya que se requere que se quede hablitado para ambos tipos de documentos
+        
         jlSalesAgentBizPartner.setEnabled(mbIsSales);
         jtfSalesAgentBizPartnerRo.setEnabled(mbIsSales);
         jlSalesAgent.setEnabled(mbIsSales);
@@ -5805,7 +5804,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbSalesSupervisor.setEnabled(mbIsSales);
         jlFkContactId_n.setEnabled(mbIsSales);
         jcbFkContactId_n.setEnabled(mbIsSales);
-        */
+        
         jckIsRebill.setEnabled(mbIsDpsOrder);
         
         if (!mbIsSales) {
