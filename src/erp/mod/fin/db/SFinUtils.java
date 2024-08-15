@@ -428,10 +428,8 @@ public abstract class SFinUtils {
         
         try {
             try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
-                SFinBalanceTax tax;
-                
                 while (resultSet.next()) {
-                    tax = new SFinBalanceTax();
+                    SFinBalanceTax tax = new SFinBalanceTax();
                     tax.setTaxBasicId(resultSet.getInt("fid_tax_bas_n"));
                     tax.setTaxId(resultSet.getInt("fid_tax_n"));
                     

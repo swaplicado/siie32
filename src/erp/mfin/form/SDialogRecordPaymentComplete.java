@@ -1582,11 +1582,11 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         SDataRecord record = new SDataRecord();
-        String accountOpId = "";
         String concept = "";
-        
-        // get accounting configuration:
-        
+        String accountOpId = "";
+
+        // Get accounting configuration:
+
         try {
             Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategory,
                     moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
@@ -1598,10 +1598,24 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             SLibUtilities.renderException(this, e);
             return null;
         }
-        
+
+        /*
+         * ADVERTENCIA DE CÓDIGO FUENTE ESPEJEADO:
+         * Este mismo algoritmo está en los métodos getRegistry() de las clases SDialogRecordPayment y SDialogRecordPaymentMultiple.
+         * ¡Sin embargo, el algoritmo de esta clase SDialogRecordPaymentComplete aún carece de la diferenciación de pagos por agrupación de impuestos!
+         * ¡Cualquier modificación realizado en este código fuente, hay que espejearlo con las clases mencionadas!
+         *
+         * 2024-08-15, Sergio Flores: Revisión y espejeo de este código fuente contra el de las clases mencionadas, ¡porque no eran iguales entre sí!
+         */
+
+        ////////////////////////////////////////////////////////////////////////
+        // ¡El código fuente espejeado empieza aquí!
+        ////////////////////////////////////////////////////////////////////////
+
         // DSM entry:
 
         SDataDsmEntry dsmEntry = new SDataDsmEntry();
+
         dsmEntry.setPkYearId(miClient.getSessionXXX().getWorkingYear());
         dsmEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         dsmEntry.setUserNewTs(miClient.getSessionXXX().getSystemDate());
@@ -1630,11 +1644,6 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         dsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
         dsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
 
-        /*
-        oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
-        oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
-        oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
-        */
         dsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
         dsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
         dsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
@@ -1643,9 +1652,9 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         dsmEntry.setFkBizPartnerId(moDps.getFkBizPartnerId_r());
         dsmEntry.setDbmsFkBizPartnerBranchId_n(moDps.getFkBizPartnerBranchId());
         dsmEntry.setDbmsAccountOp(accountOpId);
-        
+
         // DSM:
-        
+
         SDataDsm dsm = new SDataDsm();
         dsm.setDbmsSubsystemTypeBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_CT_BP, new int[] { mnBizPartnerCategory }, SLibConstants.DESCRIPTION_CODE));
 
@@ -1656,20 +1665,23 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             case SDataConstantsSys.BPSS_CT_BP_CUS:
                 dsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_CUS);
                 break;
+            default:
+                // do nothing
         }
 
-        SDataBizPartnerBranch branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { moParamRecord.getFkCompanyBranchId_n() });
+        int branchId = moParamRecord.getFkCompanyBranchId_n() != 0 ? moParamRecord.getFkCompanyBranchId_n() : moParamRecord.getFkCompanyBranchId();
+        SDataBizPartnerBranch branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { branchId });
 
-        dsm.setDate(miClient.getSessionXXX().getWorkingDate());
         dsm.setDbmsErpTaxModel(miClient.getSessionXXX().getParamsErp().getTaxModel());
+        dsm.setDate(miClient.getSessionXXX().getWorkingDate());
         dsm.setFkSubsystemCategoryId(mnBizPartnerCategory);
-        dsm.setFkCompanyBranchId(moParamRecord.getFkCompanyBranchId_n());
+        dsm.setFkCompanyBranchId(branchId);
         dsm.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         dsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
         dsm.setDbmsCompanyBranchCode(branch.getCode());
         dsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         dsm.setDbmsIsRecordSaved(false);
-        dsm.getDbmsEntries().add(dsmEntry);
+        dsm.getDbmsEntries().add(dsmEntry); // WARNING: difference in mirrowed source code: only one entry!
 
         try {
             dsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(dsm);
@@ -1677,7 +1689,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
 
             concept = SFinConsts.TXT_INVOICE + " " + moDps.getDpsNumber() + " ";
             concept += miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM).toString();
-            
+
             for (SDataRecordEntry entry : entries) {
                 entry.setConcept(concept);
                 entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { entry.getFkAccountIdXXX() }));
@@ -1685,18 +1697,23 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
 
                 if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
                     entry.setDbmsAccountComplement(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
+                    //entry.setAuxCheckNumber(...); // not required, but preserved for consistence with mirrowed source code!
                 }
             }
-            
+
             record.getDbmsRecordEntries().addAll(entries);
         }
         catch(Exception e) {
             SLibUtilities.renderException(this, e);
             return null;
         }
-        
-        // check if an exchange-rate-difference entry is needed:
-        
+
+        ////////////////////////////////////////////////////////////////////////
+        // ¡El código fuente espejeado termina aquí!
+        ////////////////////////////////////////////////////////////////////////
+
+        // Check if an exchange-rate-difference entry is needed:
+
         if (moDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
             double xrtDiff = SLibUtils.roundAmount(moFieldAccValue.getDouble() - moFieldDpsValue.getDouble());
 
@@ -1704,8 +1721,8 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
                 record.getDbmsRecordEntries().add(createRecordEntryXrtDiff(concept, xrtDiff));
             }
         }
-        
-        // cash account entry:
+
+        // Cash account entry:
 
         record.getDbmsRecordEntries().insertElementAt(createRecordEntryAccountCash(concept), 0);
 

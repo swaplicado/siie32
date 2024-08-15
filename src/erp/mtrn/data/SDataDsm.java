@@ -80,7 +80,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     /*
-     * Private functions
+     * Private methods
      */
 
     private erp.mfin.data.SDataRecord saveRecord(java.sql.Connection connection, boolean isNewRecord) {
@@ -153,80 +153,9 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return record;
     }
 
-    private int saveRecordEntries(java.sql.Connection connection, erp.mfin.data.SDataRecord record) {
-        mnLastDbActionResult = SLibConstants.UNDEFINED;
-
-        try {
-            // Determinar si existe configuración de impuestos:
-            
-            boolean hasTaxConfig = false;
-            
-            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
-                hasTaxConfig = dsmEntry.getTaxPk() != null;
-                if (hasTaxConfig) {
-                    break;
-                }
-            }
-            
-            // Procesar movimientos contables:
-            
-            int sortPos = 1;
-            Vector<String> accounts = new Vector<>();
-            
-            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
-                if (dsmEntry != null) {
-                    // Render concept for the entry:
-
-                    String concept = renderSubsystemSourceToDestiny(dsmEntry);
-
-                    // Get accounts debit and credit:
-
-                    accounts.removeAllElements();
-                    accounts.add(dsmEntry.getDbmsAccountPay());
-                    accounts.add(dsmEntry.getDbmsAccountOp());
-
-                    for (int accountCase = 0; accountCase < accounts.size(); accountCase++) {
-                        // Check if account isn't empty [SFormRecordApp]:
-
-                        if (!accounts.get(accountCase).isEmpty()) {
-                            SDataRecordEntry recordEntry = new SDataRecordEntry();
-                            prepareRecordEntry(recordEntry, 0, dsmEntry, concept, sortPos);
-
-                            // Save accounting data depending of subsystem type:
-
-                            recordEntry = renderReferenceDps(accountCase, dsmEntry, recordEntry);
-                            recordEntry.setIsSystem(true);
-                            record.getDbmsRecordEntries().add(recordEntry);
-
-                            sortPos++;
-                        }
-                    }
-
-                    // Record entry for taxes source:
-
-                    if (dsmEntry.getFkSourceDpsYearId_n() != 0 && dsmEntry.getFkSourceDpsDocId_n() != 0) {
-                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, sortPos, 0, dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(), concept);
-                    }
-
-                    // Record entry for taxes destiny:
-
-                    if (dsmEntry.getFkDestinyDpsYearId_n() != 0 && dsmEntry.getFkDestinyDpsDocId_n() != 0) {
-                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, sortPos, 0, dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(), concept);
-                    }
-
-                    mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
-                }
-            }
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return mnLastDbActionResult;
-    }
-
-    private void prepareRecordEntry(erp.mfin.data.SDataRecordEntry recordEntry, int numberId, erp.mtrn.data.SDataDsmEntry dsmEntry, java.lang.String concept, int sortPos) {
+    private erp.mfin.data.SDataRecordEntry createRecordEntry(int numberId, erp.mtrn.data.SDataDsmEntry dsmEntry, java.lang.String concept, int sortPos) {
+        SDataRecordEntry recordEntry = new SDataRecordEntry();
+        
         // Prepare record entry header:
 
         if (moDbmsRecordKey != null) {
@@ -282,38 +211,72 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         recordEntry.setUserNewTs(mtDate);
         recordEntry.setUserEditTs(mtDate);
         recordEntry.setUserDeleteTs(mtDate);
+        
+        return recordEntry;
     }
 
-    private int saveRecordEntriesTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord, erp.mfin.data.SDataRecordEntry oRecordEntry, erp.mtrn.data.SDataDsmEntry dataDsmEntry,
-            int nPkNumberId, java.lang.String sConcept, int nDpsYearId, int nDpsDocId, int nDpsCategoryId,
-            int nSortPos, Vector<Object> vTpSysMovId, int nPkTaxBasicId, int nPkTaxId, double dValueTax, double dValueTaxCur, int nTypeSource) {
-
-        Vector<Object> vAccs = new Vector<>();
-
-        // Add accounts (debit, credit):
-
-        vAccs.add(vTpSysMovId.get(0));
-        vAccs.add(vTpSysMovId.get(3));
+    private int saveRecordEntries(java.sql.Connection connection, erp.mfin.data.SDataRecord record) {
+        mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            for (int j = 0; j < vAccs.size(); j++) {
+            // Determinar si existe configuración de impuestos:
+            
+            boolean hasTaxConfig = false;
+            
+            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
+                hasTaxConfig = dsmEntry.getTaxPk() != null;
+                if (hasTaxConfig) {
+                    break;
+                }
+            }
+            
+            // Procesar movimientos contables:
+            
+            int sortPos = 1;
+            Vector<String> accounts = new Vector<>();
+            
+            for (SDataDsmEntry dsmEntry : mvDbmsDsmEntries) {
+                if (dsmEntry != null) {
+                    // Render concept for the entry:
 
-                oRecordEntry = new SDataRecordEntry();
-                prepareRecordEntry(oRecordEntry, nPkNumberId, dataDsmEntry, sConcept, nSortPos);
+                    String concept = renderSubsystemSourceToDestiny(dsmEntry);
 
-                // Complement record entry:
+                    // Get accounts debit and credit:
 
-                oRecordEntry.setFkDpsYearId_n(nDpsYearId);
-                oRecordEntry.setFkDpsDocId_n(nDpsDocId);
+                    accounts.removeAllElements();
+                    accounts.add(dsmEntry.getDbmsAccountPay());
+                    accounts.add(dsmEntry.getDbmsAccountOp());
 
-                oRecordEntry.setFkAccountIdXXX(vAccs.get(j).toString());
-                oRecordEntry.setFkTaxBasicId_n(nPkTaxBasicId);
-                oRecordEntry.setFkTaxId_n(nPkTaxId);
-                oRecordEntry = renderRecordEntryValuesTaxes(oRecordEntry, dataDsmEntry, j, dValueTax, dValueTaxCur, nTypeSource, vTpSysMovId, nDpsCategoryId);
-                oRecordEntry.setIsSystem(true);
-                oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                    for (int accountCase = 0; accountCase < accounts.size(); accountCase++) {
+                        // Check if account isn't empty [SFormRecordApp]:
 
-                nSortPos = nSortPos + 1;
+                        if (!accounts.get(accountCase).isEmpty()) {
+                            SDataRecordEntry recordEntry = createRecordEntry(0, dsmEntry, concept, sortPos);
+
+                            // Save accounting data depending of subsystem type:
+
+                            recordEntry = renderReferenceDps(accountCase, dsmEntry, recordEntry);
+                            recordEntry.setIsSystem(true);
+                            record.getDbmsRecordEntries().add(recordEntry);
+
+                            sortPos++;
+                        }
+                    }
+
+                    // Record entry for taxes source:
+
+                    if (dsmEntry.getFkSourceDpsYearId_n() != 0 && dsmEntry.getFkSourceDpsDocId_n() != 0) {
+                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, sortPos, 0, dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(), concept);
+                    }
+
+                    // Record entry for taxes destiny:
+
+                    if (dsmEntry.getFkDestinyDpsYearId_n() != 0 && dsmEntry.getFkDestinyDpsDocId_n() != 0) {
+                        sortPos = calculateDpsTaxes(connection, record, dsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, sortPos, 0, dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(), concept);
+                    }
+
+                    mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+                }
             }
         }
         catch (java.lang.Exception e) {
@@ -321,27 +284,66 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             SLibUtilities.printOutException(this, e);
         }
 
-        return nSortPos;
+        return mnLastDbActionResult;
     }
 
-    private erp.mfin.data.SDataRecordEntry renderRecordEntryValuesTaxes(erp.mfin.data.SDataRecordEntry oRecordEntry, erp.mtrn.data.SDataDsmEntry oDsmEntry, int j, double dValueTax, double dValueTaxCur, int nTypeSource, Vector<Object> vTpSysMovId, int nDpsCategory) {
+    private int saveRecordEntriesTaxes(erp.mfin.data.SDataRecord record, erp.mtrn.data.SDataDsmEntry dsmEntry,
+            int numberId, java.lang.String concept, int dpsYearId, int dpsDocId, int dpsCategoryId, int sortPos,
+            Vector<Object> typeSysMovIds, int taxBasicId, int taxId, double valueTax, double valueTaxCur, int typeSource) {
+        Vector<Object> accounts = new Vector<>();
+
+        // Add accounts (debit, credit):
+
+        accounts.add(typeSysMovIds.get(0));
+        accounts.add(typeSysMovIds.get(3));
+
+        try {
+            for (int index = 0; index < accounts.size(); index++) {
+                SDataRecordEntry recordEntry = createRecordEntry(numberId, dsmEntry, concept, sortPos);
+
+                // Complement record entry:
+
+                recordEntry.setFkDpsYearId_n(dpsYearId);
+                recordEntry.setFkDpsDocId_n(dpsDocId);
+
+                recordEntry.setFkAccountIdXXX(accounts.get(index).toString());
+                recordEntry.setFkTaxBasicId_n(taxBasicId);
+                recordEntry.setFkTaxId_n(taxId);
+                recordEntry = renderRecordEntryValuesTaxes(recordEntry, dsmEntry,
+                        index, valueTax, valueTaxCur, typeSource, typeSysMovIds, dpsCategoryId);
+                recordEntry.setIsSystem(true);
+                record.getDbmsRecordEntries().add(recordEntry);
+
+                sortPos = sortPos + 1;
+            }
+        }
+        catch (java.lang.Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return sortPos;
+    }
+
+    private erp.mfin.data.SDataRecordEntry renderRecordEntryValuesTaxes(erp.mfin.data.SDataRecordEntry recordEntry, erp.mtrn.data.SDataDsmEntry dsmEntry,
+            int index, double valueTax, double valueTaxCur, int typeSource, Vector<Object> typeSysMovIds, int dpsCategoryId) {
         int[] sysMoveTypeKey = null;
 
         // Assign values depending if it is debit or credit:
 
-        if (j == 0) {
-            oRecordEntry.setDebit(dValueTax);
-            oRecordEntry.setCredit(0);
-            oRecordEntry.setDebitCy(dValueTaxCur);
-            oRecordEntry.setCreditCy(0);
+        if (index == 0) {
+            recordEntry.setDebit(valueTax);
+            recordEntry.setCredit(0);
+            recordEntry.setDebitCy(valueTaxCur);
+            recordEntry.setCreditCy(0);
 
             // Set type system move:
 
-            oRecordEntry.setFkSystemMoveCategoryIdXXX((Integer)((int [])  vTpSysMovId.get(1))[0]);
-            oRecordEntry.setFkSystemMoveTypeIdXXX((Integer)((int [])  vTpSysMovId.get(1))[1]);
-            oRecordEntry.setReference(vTpSysMovId.get(2).toString());
+            recordEntry.setFkSystemMoveCategoryIdXXX((Integer)((int [])  typeSysMovIds.get(1))[0]);
+            recordEntry.setFkSystemMoveTypeIdXXX((Integer)((int [])  typeSysMovIds.get(1))[1]);
+            recordEntry.setReference(typeSysMovIds.get(2).toString());
 
-            switch (nDpsCategory) {
+            switch (dpsCategoryId) {
                 case SDataConstantsSys.TRNS_CT_DPS_PUR:
                     sysMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_DBT_PAI;
                     break;
@@ -352,18 +354,18 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
         else {
-            oRecordEntry.setDebit(0);
-            oRecordEntry.setCredit(dValueTax);
-            oRecordEntry.setDebitCy(0);
-            oRecordEntry.setCreditCy(dValueTaxCur);
+            recordEntry.setDebit(0);
+            recordEntry.setCredit(valueTax);
+            recordEntry.setDebitCy(0);
+            recordEntry.setCreditCy(valueTaxCur);
 
             // Set type system move:
 
-            oRecordEntry.setFkSystemMoveCategoryIdXXX((Integer)((int [])  vTpSysMovId.get(4))[0]);
-            oRecordEntry.setFkSystemMoveTypeIdXXX((Integer)((int [])  vTpSysMovId.get(4))[1]);
-            oRecordEntry.setReference(vTpSysMovId.get(5).toString());
+            recordEntry.setFkSystemMoveCategoryIdXXX((Integer)((int [])  typeSysMovIds.get(4))[0]);
+            recordEntry.setFkSystemMoveTypeIdXXX((Integer)((int [])  typeSysMovIds.get(4))[1]);
+            recordEntry.setReference(typeSysMovIds.get(5).toString());
 
-            switch (nDpsCategory) {
+            switch (dpsCategoryId) {
                 case SDataConstantsSys.TRNS_CT_DPS_PUR:
                     sysMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_PUR_TAX_CDT_PAI;
                     break;
@@ -374,231 +376,230 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
 
-        oRecordEntry.setFkSystemMoveClassId(sysMoveTypeKey[0]);
-        oRecordEntry.setFkSystemMoveTypeId(sysMoveTypeKey[1]);
-        oRecordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
-        oRecordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);
+        recordEntry.setFkSystemMoveClassId(sysMoveTypeKey[0]);
+        recordEntry.setFkSystemMoveTypeId(sysMoveTypeKey[1]);
+        recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
+        recordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);
 
-        if (nTypeSource == SDataConstants.TRNX_DSM_ETY_SOURCE) {
-            oRecordEntry.setExchangeRate(oDsmEntry.getSourceExchangeRate());
-            oRecordEntry.setExchangeRateSystem(oDsmEntry.getSourceExchangeRateSystem());
-            oRecordEntry.setFkCurrencyId(oDsmEntry.getFkSourceCurrencyId());
+        if (typeSource == SDataConstants.TRNX_DSM_ETY_SOURCE) {
+            recordEntry.setExchangeRate(dsmEntry.getSourceExchangeRate());
+            recordEntry.setExchangeRateSystem(dsmEntry.getSourceExchangeRateSystem());
+            recordEntry.setFkCurrencyId(dsmEntry.getFkSourceCurrencyId());
         }
         else {
-            oRecordEntry.setExchangeRate(oDsmEntry.getDestinyExchangeRate());
-            oRecordEntry.setExchangeRateSystem(oDsmEntry.getDestinyExchangeRateSystem());
-            oRecordEntry.setFkCurrencyId(oDsmEntry.getFkDestinyCurrencyId());
+            recordEntry.setExchangeRate(dsmEntry.getDestinyExchangeRate());
+            recordEntry.setExchangeRateSystem(dsmEntry.getDestinyExchangeRateSystem());
+            recordEntry.setFkCurrencyId(dsmEntry.getFkDestinyCurrencyId());
         }
 
-        return oRecordEntry;
+        return recordEntry;
     }
 
-    private erp.mfin.data.SDataRecordEntry renderCreditDebit(erp.mfin.data.SDataRecordEntry oRecordEntry, java.lang.String sRef, int nDpsYearId, int nDpsDocId,
-            double dDebit, double dCredit, double dDebitCy, double dCreditCy, double dExchangeRate, double dExchangeRateSystem, int nFkCurrencyId, java.lang.String sFkAccountId,
-            int[] anSysAccountTypeKey, int[] anSysMoveTypeKey, int[] anSysMoveTypeKeyXXX) {
+    private erp.mfin.data.SDataRecordEntry renderCreditDebit(erp.mfin.data.SDataRecordEntry recordEntry, java.lang.String reference, int dpsYearId, int dpsDocId,
+            double debit, double credit, double debitCur, double creditCur, double exchangeRate, double exchangeRateSys, int currencyId, java.lang.String accountId,
+            int[] sysAccountTypeKey, int[] sysMoveTypeKey, int[] sysMoveTypeKeyXXX) {
+        recordEntry.setDebit(debit);
+        recordEntry.setCredit(credit);
+        recordEntry.setDebitCy(debitCur);
+        recordEntry.setCreditCy(creditCur);
+        recordEntry.setExchangeRate(exchangeRate);
+        recordEntry.setExchangeRateSystem(exchangeRateSys);
+        recordEntry.setFkCurrencyId(currencyId);
+        recordEntry.setReference(reference);
+        recordEntry.setFkDpsYearId_n(dpsYearId);
+        recordEntry.setFkDpsDocId_n(dpsDocId);
+        recordEntry.setFkAccountIdXXX(accountId);
+        recordEntry.setFkSystemMoveClassId(sysMoveTypeKey[0]);
+        recordEntry.setFkSystemMoveTypeId(sysMoveTypeKey[1]);
+        recordEntry.setFkSystemAccountClassId(sysAccountTypeKey[0]);
+        recordEntry.setFkSystemAccountTypeId(sysAccountTypeKey[1]);
+        recordEntry.setFkSystemMoveCategoryIdXXX(sysMoveTypeKeyXXX[0]);
+        recordEntry.setFkSystemMoveTypeIdXXX(sysMoveTypeKeyXXX[1]);
 
-        oRecordEntry.setDebit(dDebit);
-        oRecordEntry.setCredit(dCredit);
-        oRecordEntry.setDebitCy(dDebitCy);
-        oRecordEntry.setCreditCy(dCreditCy);
-        oRecordEntry.setExchangeRate(dExchangeRate);
-        oRecordEntry.setExchangeRateSystem(dExchangeRateSystem);
-        oRecordEntry.setFkCurrencyId(nFkCurrencyId);
-        oRecordEntry.setReference(sRef);
-        oRecordEntry.setFkDpsYearId_n(nDpsYearId);
-        oRecordEntry.setFkDpsDocId_n(nDpsDocId);
-        oRecordEntry.setFkAccountIdXXX(sFkAccountId);
-        oRecordEntry.setFkSystemMoveClassId(anSysMoveTypeKey[0]);
-        oRecordEntry.setFkSystemMoveTypeId(anSysMoveTypeKey[1]);
-        oRecordEntry.setFkSystemAccountClassId(anSysAccountTypeKey[0]);
-        oRecordEntry.setFkSystemAccountTypeId(anSysAccountTypeKey[1]);
-        oRecordEntry.setFkSystemMoveCategoryIdXXX(anSysMoveTypeKeyXXX[0]);
-        oRecordEntry.setFkSystemMoveTypeIdXXX(anSysMoveTypeKeyXXX[1]);
-
-        return oRecordEntry;
+        return recordEntry;
     }
 
     /**
      * 
-     * @param pnAccCase 0 = payment; 1 = operations
-     * @param poDsmEntry
-     * @param poRecordEntry
+     * @param accountingCase 0 = payment; 1 = operations
+     * @param dsmEntry
+     * @param recordEntry
      * @return 
      */
-    private erp.mfin.data.SDataRecordEntry renderReferenceDps(int pnAccCase, erp.mtrn.data.SDataDsmEntry poDsmEntry, erp.mfin.data.SDataRecordEntry poRecordEntry) {
-        int[] anAccMovSubtype = new int[] {poDsmEntry.getFkAccountingMoveTypeId(), poDsmEntry.getFkAccountingMoveClassId(), poDsmEntry.getFkAccountingMoveSubclassId() };
+    private erp.mfin.data.SDataRecordEntry renderReferenceDps(int accountingCase, erp.mtrn.data.SDataDsmEntry dsmEntry, erp.mfin.data.SDataRecordEntry recordEntry) {
+        int[] accMovSubclassKey = new int[] {dsmEntry.getFkAccountingMoveTypeId(), dsmEntry.getFkAccountingMoveClassId(), dsmEntry.getFkAccountingMoveSubclassId() };
 
-        if (pnAccCase == 0) {
-            if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
+        if (accountingCase == 0) {
+            if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_MI_SUP_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_CDR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_DBR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getSourceReference(), 0, 0,
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getSourceReference(), 0, 0,
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getFkSourceAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getFkSourceAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getFkSourceAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getFkSourceAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_MI_SUP_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_CDR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_DBR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkSourceDpsYearId_n(), poDsmEntry.getFkSourceDpsDocId_n(),
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkSourceDpsYearId_n(), dsmEntry.getFkSourceDpsDocId_n(),
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), 0, poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getFkSourceAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), 0, dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getFkSourceAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            0, poDsmEntry.getSourceValue(), 0, poDsmEntry.getSourceValueCy(), poDsmEntry.getSourceExchangeRate(),
-                            poDsmEntry.getSourceExchangeRateSystem(), poDsmEntry.getFkSourceCurrencyId(), poDsmEntry.getFkSourceAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            0, dsmEntry.getSourceValue(), 0, dsmEntry.getSourceValueCy(), dsmEntry.getSourceExchangeRate(),
+                            dsmEntry.getSourceExchangeRateSystem(), dsmEntry.getFkSourceCurrencyId(), dsmEntry.getFkSourceAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
@@ -607,176 +608,176 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
         else {
-            if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
+            if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_MI_SUP_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_CDR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_DBR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getFkDestinyAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getFkDestinyAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getFkDestinyAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getFkDestinyAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_DBR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_MI_SUP_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_CDR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, poDsmEntry.getDestinyReference(), 0, 0,
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountPay(),
+                        recordEntry = renderCreditDebit(recordEntry, dsmEntry.getDestinyReference(), 0, 0,
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountPay(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY : SModSysConsts.FINS_TP_SYS_MOV_MI_DBR_PAY,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
                 switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getFkDestinyAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getFkDestinyAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", 0, 0,
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getFkDestinyAccountId_n(),
+                        recordEntry = renderCreditDebit(recordEntry, "", 0, 0,
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getFkDestinyAccountId_n(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_DEC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_DEC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_NA);
                         break;
                 }
             }
-            else if (SLibUtilities.compareKeys(anAccMovSubtype, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
+            else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
                  switch (mnFkSubsystemCategoryId) {
                     case SDataConstantsSys.BPSS_CT_BP_SUP:
                     case SDataConstantsSys.BPSS_CT_BP_CDR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            0, poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            0, dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_CDR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_CDR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
                         break;
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                     case SDataConstantsSys.BPSS_CT_BP_DBR:
-                        poRecordEntry = renderCreditDebit(poRecordEntry, "", poDsmEntry.getFkDestinyDpsYearId_n(), poDsmEntry.getFkDestinyDpsDocId_n(),
-                            poDsmEntry.getDestinyValue(), 0, poDsmEntry.getDestinyValueCy(), 0, poDsmEntry.getDestinyExchangeRate(),
-                            poDsmEntry.getDestinyExchangeRateSystem(), poDsmEntry.getFkDestinyCurrencyId(), poDsmEntry.getDbmsAccountOp(),
+                        recordEntry = renderCreditDebit(recordEntry, "", dsmEntry.getFkDestinyDpsYearId_n(), dsmEntry.getFkDestinyDpsDocId_n(),
+                            dsmEntry.getDestinyValue(), 0, dsmEntry.getDestinyValueCy(), 0, dsmEntry.getDestinyExchangeRate(),
+                            dsmEntry.getDestinyExchangeRateSystem(), dsmEntry.getFkDestinyCurrencyId(), dsmEntry.getDbmsAccountOp(),
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_ACC_BPR_CUS_BAL : SModSysConsts.FINS_TP_SYS_ACC_BPR_DBR_BAL,
                             mnFkSubsystemCategoryId == SDataConstantsSys.BPSS_CT_BP_CUS ? SModSysConsts.FINS_TP_SYS_MOV_CUS_BAL_INC_TRA : SModSysConsts.FINS_TP_SYS_MOV_DBR_BAL_INC_TRA,
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
@@ -785,59 +786,55 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
 
-        return poRecordEntry;
+        return recordEntry;
     }
 
-    private java.lang.String renderReference(erp.mtrn.data.SDataDsmEntry dataDsmEntry, boolean bSource) {
-        String sReference = "";
-
-        sReference = "REP. '" + (bSource ? dataDsmEntry.getSourceReference() : dataDsmEntry.getDestinyReference())  + "' ";
-
-        return sReference;
+    private java.lang.String renderReference(erp.mtrn.data.SDataDsmEntry dataDsmEntry, boolean isSource) {
+        return "REP. '" + (isSource ? dataDsmEntry.getSourceReference() : dataDsmEntry.getDestinyReference())  + "' ";
     }
 
-    private java.lang.String renderSubsystemSourceToDestiny(erp.mtrn.data.SDataDsmEntry oDsmEntry) {
-        Object oKey = new int[] {oDsmEntry.getFkAccountingMoveTypeId(), oDsmEntry.getFkAccountingMoveClassId(), oDsmEntry.getFkAccountingMoveSubclassId() };
+    private java.lang.String renderSubsystemSourceToDestiny(erp.mtrn.data.SDataDsmEntry dsmEntry) {
+        int[] accMovSubclassKey = new int[] {dsmEntry.getFkAccountingMoveTypeId(), dsmEntry.getFkAccountingMoveClassId(), dsmEntry.getFkAccountingMoveSubclassId() };
         String sSubsystem = "";
 
-        if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
-            sSubsystem = "APP; " + oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; " +
-                    renderReference(oDsmEntry, true);
+        if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
+            sSubsystem = "APP; " + dsmEntry.getDbmsDestinyTpDps() + " " + dsmEntry.getDbmsDestinyDps() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; " +
+                    renderReference(dsmEntry, true);
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
-            sSubsystem = "TRP; " + renderReference(oDsmEntry, true) + " > " + renderReference(oDsmEntry, false) + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner());
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
+            sSubsystem = "TRP; " + renderReference(dsmEntry, true) + " > " + renderReference(dsmEntry, false) + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner());
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
-            sSubsystem = "CIP; " + oDsmEntry.getFkDestinyAccountId_n() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
-                    renderReference(oDsmEntry, true);
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
+            sSubsystem = "CIP; " + dsmEntry.getFkDestinyAccountId_n() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; "  +
+                    renderReference(dsmEntry, true);
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
-            sSubsystem = "ABP; " + oDsmEntry.getFkSourceAccountId_n() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
-                    renderReference(oDsmEntry, false);
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
+            sSubsystem = "ABP; " + dsmEntry.getFkSourceAccountId_n() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; "  +
+                    renderReference(dsmEntry, false);
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
-            sSubsystem = "APS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
-                    renderReference(oDsmEntry, false);
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
+            sSubsystem = "APS; " + dsmEntry.getDbmsSourceTpDps() + " " + dsmEntry.getDbmsSourceDps() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; "  +
+                    renderReference(dsmEntry, false);
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
-            sSubsystem = "TRS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + " > " +
-                    oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner());
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
+            sSubsystem = "TRS; " + dsmEntry.getDbmsSourceTpDps() + " " + dsmEntry.getDbmsSourceDps() + " > " +
+                    dsmEntry.getDbmsDestinyTpDps() + " " + dsmEntry.getDbmsDestinyDps() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner());
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
-            sSubsystem = "CIS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
-                     oDsmEntry.getFkDestinyAccountId_n();
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
+            sSubsystem = "CIS; " + dsmEntry.getDbmsSourceTpDps() + " " + dsmEntry.getDbmsSourceDps() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; "  +
+                     dsmEntry.getFkDestinyAccountId_n();
         }
-        else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
-            sSubsystem = "ABS; " + oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
-                    oDsmEntry.getFkSourceAccountId_n();
+        else if (SLibUtilities.compareKeys(accMovSubclassKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
+            sSubsystem = "ABS; " + dsmEntry.getDbmsDestinyTpDps() + " " + dsmEntry.getDbmsDestinyDps() + "; " +
+                    (dsmEntry.getDbmsBizPartner().toString().length() > 30 ? dsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : dsmEntry.getDbmsBizPartner()) + "; "  +
+                    dsmEntry.getFkSourceAccountId_n();
         }
 
         return sSubsystem;
@@ -990,7 +987,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private java.util.Vector<Object> renderTaxAccDbtCdtPayTra(java.lang.String sAccTaxPayPend, java.lang.String sAccTaxPayPendAdv, int nPkTaxType, int nTypeSource) {
-
         Vector<Object> vTpSysMov = new Vector<>(); // 0. DB_ACC, 1. DBT_TP, 2. DBT_REF, 3. CDT_ACC, 4. CDT_TP, 5. CDT_REF
 
         switch (mnFkSubsystemCategoryId) {
@@ -1150,7 +1146,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     private java.util.Vector<Object> renderTaxAccDbtCdt(java.util.Vector<Object> vTpSysMov, java.lang.Object oKey, 
             java.lang.String sAccTaxPay, java.lang.String sAccTaxPayPend, java.lang.String sAccTaxPayPendAdv, int nPkTaxType, int nTypeSource) {
-
         if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
             vTpSysMov = renderTaxAccDbtCdtPayApp(sAccTaxPay, sAccTaxPayPend, nPkTaxType);
         }
@@ -1256,7 +1251,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
                 + "WHERE NOT r.b_del AND NOT re.b_del AND "
-                + "re.fid_dps_year_n = " + dpsYearId +  " AND re.fid_dps_doc_n = " + dpsDocId +  " AND "
+                + "re.fid_dps_year_n = " + dpsYearId +  " AND re.fid_dps_doc_n = " + dpsDocId + " AND "
                 + "re.fid_tax_bas_n = " + taxBasicId + " AND re.fid_tax_n = " + taxId + " AND "
                 + "re.fid_ct_sys_mov_xxx = " + sysMoveTypeKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeKey[1] + ";";
 
@@ -1284,8 +1279,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @return 
      */
     private int calculateDpsTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord record, erp.mtrn.data.SDataDsmEntry dsmEntry, int sourceType, int sortPos, int numberId, int dpsYearId, int dpsDocId, java.lang.String concept) {
-        SDataRecordEntry recordEntry = null;
-
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
@@ -1322,7 +1315,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     int taxTypeApp = resultSet.getInt("det.fid_tp_tax_app");
                     int taxTypeCal = resultSet.getInt("det.fid_tp_tax_cal");
                     
-                    if (taxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH && taxTypeCal == SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                    if (taxTypeApp == SModSysConsts.FINS_TP_TAX_APP_CASH && (taxTypeCal == SModSysConsts.FINS_TP_TAX_CAL_RATE || taxTypeCal == SModSysConsts.FINS_TP_TAX_CAL_EXEMPT)) {
                         // Find accounts for debits and credits:
                         
                         int taxType = resultSet.getInt("det.fid_tp_tax");
@@ -1388,7 +1381,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                         valueTaxCur = SLibUtils.roundAmount(taxBalance[1]);
 
-                                        if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                        if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_XRT_DOP) {
                                             valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * (sourceType == SDataConstants.TRNX_DSM_ETY_SOURCE ? dsmEntry.getSourceExchangeRate() : dsmEntry.getDestinyExchangeRate()));
                                         }
                                         else {
@@ -1402,7 +1395,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             case SDataConstants.TRNX_DSM_ETY_SOURCE:
                                                 valueTaxCur = SLibUtils.roundAmount(((taxBalance[1] / dpsBalance[1]) * dsmEntry.getSourceValueCy()));
 
-                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_XRT_DOP) {
                                                     valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * dsmEntry.getSourceExchangeRate());
                                                 }
                                                 else {
@@ -1413,7 +1406,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             case SDataConstants.TRNX_DSM_ETY_DESTINY:
                                                 valueTaxCur = SLibUtils.roundAmount(((taxBalance[1] / dpsBalance[1]) * dsmEntry.getDestinyValueCy()));
 
-                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC) {
+                                                if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_XRT_DOP) {
                                                     valueTaxLoc = SLibUtils.roundAmount(valueTaxCur * dsmEntry.getDestinyExchangeRate());
                                                 }
                                                 else {
@@ -1426,28 +1419,24 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         }
 
                                         // validate tax to be accounted:
+                                        
+                                        if (mnDbmsTaxModel == SDataConstantsSys.CFGS_TAX_MODEL_XRT_ORIG) {
+                                            if (valueTaxCur > taxBalance[1]) {
+                                                valueTaxCur = SLibUtils.roundAmount(taxBalance[1]);
+                                            }
 
-                                        switch (mnDbmsTaxModel) {
-                                            case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
-                                                if (valueTaxCur > taxBalance[1]) {
-                                                    valueTaxCur = SLibUtils.roundAmount(taxBalance[1]);
-                                                }
-
-                                                if (valueTaxLoc > taxBalance[0]) {
-                                                    valueTaxLoc = SLibUtils.roundAmount(taxBalance[0]);
-                                                }
-                                                break;
-
-                                            case SDataConstantsSys.CFGS_TAX_MODEL_DPS_EXC:
-                                                // do nothing
-                                                break;
-
-                                            default:
-                                                // do nothing
+                                            if (valueTaxLoc > taxBalance[0]) {
+                                                valueTaxLoc = SLibUtils.roundAmount(taxBalance[0]);
+                                            }
+                                        }
+                                        else {
+                                            // do nothing
                                         }
                                     }
 
-                                    sortPos = saveRecordEntriesTaxes(connection, record, recordEntry, dsmEntry, numberId, concept, dpsYearId, dpsDocId, dpsCategory, sortPos, sysMoveTypeKeys, taxBasicId, taxId, valueTaxLoc, valueTaxCur, sourceType);
+                                    sortPos = saveRecordEntriesTaxes(record, dsmEntry,
+                                            numberId, concept, dpsYearId, dpsDocId, dpsCategory, sortPos,
+                                            sysMoveTypeKeys, taxBasicId, taxId, valueTaxLoc, valueTaxCur, sourceType);
                                 }
                             }
                         }
@@ -1516,7 +1505,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     /*
-     * Public functions
+     * Public methods
      */
 
     public void setPkYearId(int n) { mnPkYearId = n; }
@@ -1657,8 +1646,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         String sql;
         ResultSet resultSet = null;
         java.sql.Statement statementAux = null;
-        SDataDsmNotes oDsmNotes = null;
-        SDataDsmEntry oDsmEntry = null;
+        SDataDsmNotes dsmNotes = null;
+        SDataDsmEntry dsmEntry = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -1742,12 +1731,12 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     " ORDER BY nts ";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    oDsmNotes = new SDataDsmNotes();
-                    if (oDsmNotes.read(new int[] { resultSet.getInt("id_year"), resultSet.getInt("id_doc"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    dsmNotes = new SDataDsmNotes();
+                    if (dsmNotes.read(new int[] { resultSet.getInt("id_year"), resultSet.getInt("id_doc"), resultSet.getInt("id_nts") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDsmNotes.add(oDsmNotes);
+                        mvDbmsDsmNotes.add(dsmNotes);
                     }
                 }
 
@@ -1761,12 +1750,12 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     " ORDER BY id_doc ";
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
-                    oDsmEntry = new SDataDsmEntry();
-                    if (oDsmEntry.read(new int[] { resultSet.getInt("id_year"), resultSet.getInt("id_doc"), resultSet.getInt("id_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    dsmEntry = new SDataDsmEntry();
+                    if (dsmEntry.read(new int[] { resultSet.getInt("id_year"), resultSet.getInt("id_doc"), resultSet.getInt("id_ety") }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDsmEntries.add(oDsmEntry);
+                        mvDbmsDsmEntries.add(dsmEntry);
                     }
                 }
 
@@ -1788,9 +1777,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int save(java.sql.Connection connection) {
-        boolean bIsNewRecord = false;
-        int nParam = 1;
-        int i = 0;
+        boolean isNewRecord = false;
+        int param = 1;
         String sql = "";
 
         SDataDsmNotes dataDsmNotes = null;
@@ -1806,28 +1794,28 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, " +
                     "?, ?) }");
-            callableStatement.setInt(nParam++, mnPkYearId);
-            callableStatement.setInt(nParam++, mnPkDocId);
-            callableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
-            callableStatement.setString(nParam++, msConcept.length() > 100 ? msConcept.substring(0, 96).trim() + "..." : msConcept);
-            callableStatement.setBoolean(nParam++, mbIsAudited);
-            callableStatement.setBoolean(nParam++, mbIsAuthorized);
-            callableStatement.setBoolean(nParam++, mbIsRecordAutomatic);
-            callableStatement.setBoolean(nParam++, mbIsSystem);
-            callableStatement.setBoolean(nParam++, mbIsDeleted);
-            callableStatement.setInt(nParam++, mnFkSubsystemCategoryId);
-            callableStatement.setInt(nParam++, mnFkCompanyBranchId);
-            callableStatement.setInt(nParam++, mnFkUserAuditedId);
-            callableStatement.setInt(nParam++, mnFkUserAuthorizedId);
-            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+            callableStatement.setInt(param++, mnPkYearId);
+            callableStatement.setInt(param++, mnPkDocId);
+            callableStatement.setDate(param++, new java.sql.Date(mtDate.getTime()));
+            callableStatement.setString(param++, msConcept.length() > 100 ? msConcept.substring(0, 96).trim() + "..." : msConcept);
+            callableStatement.setBoolean(param++, mbIsAudited);
+            callableStatement.setBoolean(param++, mbIsAuthorized);
+            callableStatement.setBoolean(param++, mbIsRecordAutomatic);
+            callableStatement.setBoolean(param++, mbIsSystem);
+            callableStatement.setBoolean(param++, mbIsDeleted);
+            callableStatement.setInt(param++, mnFkSubsystemCategoryId);
+            callableStatement.setInt(param++, mnFkCompanyBranchId);
+            callableStatement.setInt(param++, mnFkUserAuditedId);
+            callableStatement.setInt(param++, mnFkUserAuthorizedId);
+            callableStatement.setInt(param++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
+            callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
             callableStatement.execute();
 
-            mnPkDocId = callableStatement.getInt(nParam - 3);
-            mnDbmsErrorId = callableStatement.getInt(nParam - 2);
-            msDbmsError = callableStatement.getString(nParam - 1);
+            mnPkDocId = callableStatement.getInt(param - 3);
+            mnDbmsErrorId = callableStatement.getInt(param - 2);
+            msDbmsError = callableStatement.getString(param - 1);
 
             if (mnDbmsErrorId != 0) {
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
@@ -1840,7 +1828,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 statementAux.execute(sql);
                 statementAux.close();
 
-                for (i = 0; i < mvDbmsDsmNotes.size(); i++) {
+                for (int i = 0; i < mvDbmsDsmNotes.size(); i++) {
                     dataDsmNotes = (SDataDsmNotes) mvDbmsDsmNotes.get(i);
                     if (dataDsmNotes != null) {
                         dataDsmNotes.setPkYearId(mnPkYearId);
@@ -1901,7 +1889,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 //System.out.println("Save 4");
                                 if (moAuxRecordUserKey == null || !mbAuxIsRecordAutomatic) {
                                     //System.out.println("Save 5");
-                                    bIsNewRecord = true;
+                                    isNewRecord = true;
                                     // moDbmsRecordKey = (Object[]) createAccountingRecordKey(statementAux);
                                 }
                                 else {
@@ -1911,7 +1899,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         //System.out.println("Save 7");
                                     }
                                     else {
-                                        bIsNewRecord = true;
+                                        isNewRecord = true;
                                         //System.out.println("Save 8");
                                         // moDbmsRecordKey = (Object[]) createAccountingRecordKey(statementAux);
                                     }
@@ -1929,7 +1917,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // Save record:
 
-                        saveRecord(connection, bIsNewRecord);
+                        saveRecord(connection, isNewRecord);
                     }
                 }
                 else {

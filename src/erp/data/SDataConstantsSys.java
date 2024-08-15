@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -80,8 +80,8 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_TP_DBMS_SQL_SERVER_2000 = 2;
     public static final int CFGS_TP_DBMS_SQL_SERVER_2005 = 3;
 
-    public static final int CFGS_TAX_MODEL_DPS = 1;
-    public static final int CFGS_TAX_MODEL_DPS_EXC = 2;
+    public static final int CFGS_TAX_MODEL_XRT_ORIG = 1; // Exchange rate original
+    public static final int CFGS_TAX_MODEL_XRT_DOP = 2; // Exchange rate of day of payment
 
     public static final int CFGS_LOT_MODEL_CONS = 1;
     public static final int CFGS_LOT_MODEL_CONS_DATE = 2;

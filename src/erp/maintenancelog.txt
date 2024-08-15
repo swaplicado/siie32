@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 254.13/ 2024-08-15
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión de generación de movimientos contables de pagos a documentos para inclusión de partidas gravadas con IVA exento.
+2) Refactorización general de métodos de generación de movimientos contables de pagos a documentos de la clase erp.mtrn.dataSDataDsm.
+3) Homologación del código fuente espejeado de los algoritmos de generación de movimientos contables de pagos a documentos de las clases SDialogRecordPayment, SDialogRecordPaymentMultiple y SDialogRecordComplete del paquete erp.mfin.form.
+
+================================================================================
 SIIE 3.2 254.12/ 2024-08-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

@@ -1668,15 +1668,15 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         SDataRecord record = new SDataRecord();
-        String accountOpId = "";
         String concept = "";
-        String dpsNumbers = "";
+        String docsNumbers = "";
         
         for (STableRow row : moGridDocs.getGridRows()) {
             SRowDpsPaymentMultiple rowDpsPm = (SRowDpsPaymentMultiple) row;
             
             if (rowDpsPm.IsPayed) {
-                // settings of document:
+                // Settings of document:
+                
                 SThinDps thinDps = new SThinDps();
 
                 try {
@@ -1686,12 +1686,22 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     SLibUtilities.renderException(this, e);
                     return null;
                 }
-                /**
-                * Esta misma funcionalidad se realizó en la clase SDialogRecordPayment en la función getRegistry().
-                * Cualquier modificación que se realice en este archivo debe realizarse en ese también.
-                * Edwin Carmona: 2024-03-06
-                */
-                // DSM entry:
+                
+                docsNumbers += (docsNumbers.isEmpty() ? "" : ", ") + thinDps.getDpsNumber();
+                
+                /*
+                 * ADVERTENCIA DE CÓDIGO FUENTE ESPEJEADO:
+                 * Este mismo algoritmo está en los métodos getRegistry() de las clases SDialogRecordPayment y SDialogRecordPaymentComplete.
+                 * ¡Sin embargo, el algoritmo de la clase SDialogRecordPaymentComplete aún carece de la diferenciación de pagos por agrupación de impuestos!
+                 * ¡Cualquier modificación realizado en este código fuente, hay que espejearlo con las clases mencionadas!
+                 * 2024-03-06, Edwin Carmona
+                 * 2024-08-15, Sergio Flores: Revisión y espejeo de este código fuente contra el de las clases mencionadas, ¡porque no eran iguales entre sí!
+                 */
+                
+                ////////////////////////////////////////////////////////////////////////
+                // ¡El código fuente espejeado empieza aquí!
+                ////////////////////////////////////////////////////////////////////////
+                
                 ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(),
                         SLibTimeUtils.digestYear(moParamRecord.getDate())[0],
                         rowDpsPm.DpsKey[0], rowDpsPm.DpsKey[1],
@@ -1707,28 +1717,28 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
                 }
 
-                String tax;
                 double perc;
                 double percCur;
                 double amtToPay = 0;
                 double amtToPayCur = 0;
-                int[] taxMax = new int[]{0, 0};
+                int[] taxMax = new int[] {0, 0};
                 double amtMax = 0d;
                 HashMap<String, double[]> taxBalances = new HashMap<>();
+                ArrayList<SDataDsmEntry> dsmEntries = new ArrayList<>();
 
                 for (SFinBalanceTax balance : balances) {
-                    tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
                     perc = balance.getBalance() / dTotalBalance;
                     percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
 
-                    taxBalances.put(tax, new double[]{perc, percCur});
+                    String taxKey = balance.getTaxBasicId() + "_" + balance.getTaxId();
+                    taxBalances.put(taxKey, new double[] { perc, percCur });
 
                     amtToPay += SLibUtilities.round(rowDpsPm.Payment * perc, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
                     amtToPayCur += SLibUtilities.round(rowDpsPm.PaymentCy * percCur, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
 
                     if (balance.getBalanceCurrency() > amtMax) {
                         amtMax = balance.getBalanceCurrency();
-                        taxMax = new int[]{balance.getTaxBasicId(), balance.getTaxId()};
+                        taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
                     }
                 }
 
@@ -1741,20 +1751,20 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     diff = SLibUtilities.round(rowDpsPm.Payment - amtToPay, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
                 }
 
-                ArrayList<SDataDsmEntry> lEntries = new ArrayList<>();
+                // DSM entries:
+                
                 for (SFinBalanceTax balance : balances) {
                     if (rowDpsPm.PaymentCy <= 0d) {
                         break;
                     }
                     
                     SDataDsmEntry dsmEntry = new SDataDsmEntry();
-                
-                    tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
+                    String taxKey = balance.getTaxBasicId() + "_" + balance.getTaxId();
                     
-                    dsmEntry.setSourceValue(SLibUtilities.round(rowDpsPm.Payment * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-                    dsmEntry.setDestinyValue(SLibUtilities.round(rowDpsPm.Payment * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-                    dsmEntry.setSourceValueCy(SLibUtilities.round(rowDpsPm.PaymentCy * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
-                    dsmEntry.setDestinyValueCy(SLibUtilities.round(rowDpsPm.PaymentCy * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                    dsmEntry.setSourceValue(SLibUtilities.round(rowDpsPm.Payment * taxBalances.get(taxKey)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                    dsmEntry.setDestinyValue(SLibUtilities.round(rowDpsPm.Payment * taxBalances.get(taxKey)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                    dsmEntry.setSourceValueCy(SLibUtilities.round(rowDpsPm.PaymentCy * taxBalances.get(taxKey)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                    dsmEntry.setDestinyValueCy(SLibUtilities.round(rowDpsPm.PaymentCy * taxBalances.get(taxKey)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
 
                     if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
                         dsmEntry.setSourceValue(SLibUtilities.round(rowDpsPm.Payment + diff, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
@@ -1763,20 +1773,29 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                         dsmEntry.setDestinyValueCy(SLibUtilities.round(rowDpsPm.PaymentCy + diffCur, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
                     }
 
+                    dsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
+                    dsmEntry.setFkTaxId_n(balance.getTaxId());
+
                     dsmEntry.setPkYearId(miClient.getSessionXXX().getWorkingYear());
                     dsmEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                     dsmEntry.setUserNewTs(miClient.getSessionXXX().getSystemDate());
 
-                    // settings of account cash:
+                    // Settings of account cash (emulated, because is not needed):
 
                     dsmEntry.setSourceReference("");
                     dsmEntry.setFkSourceCurrencyId(moParamAccountCash != null ? moParamAccountCash.getFkCurrencyId() : miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                    //dsmEntry.setSourceValueCy(...); // not required, but preserved for consistence with mirrowed source code!
+                    //dsmEntry.setSourceValue(...); // not required, but preserved for consistence with mirrowed source code!
                     dsmEntry.setSourceExchangeRateSystem(moFieldAccExchangeRateSys.getDouble());
                     dsmEntry.setSourceExchangeRate(rowDpsPm.PaymentXrt);
+
+                    // Settings of document:
 
                     dsmEntry.setFkDestinyDpsYearId_n(thinDps.getPkYearId());
                     dsmEntry.setFkDestinyDpsDocId_n(thinDps.getPkDocId());
                     dsmEntry.setFkDestinyCurrencyId(thinDps.getFkCurrencyId());
+                    //dsmEntry.setDestinyValueCy(...); // not required, but preserved for consistence with mirrowed source code!
+                    //dsmEntry.setDestinyValue(...); // not required, but preserved for consistence with mirrowed source code!
                     dsmEntry.setDestinyExchangeRateSystem(moFieldAccExchangeRateSys.getDouble() != 0 ? moFieldAccExchangeRateSys.getDouble() : rowDpsPm.PaymentXrt);
                     dsmEntry.setDestinyExchangeRate(rowDpsPm.PaymentXrt);
                     dsmEntry.setDbmsFkDpsCategoryId(thinDps.getFkDpsCategoryId());
@@ -1785,11 +1804,6 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     dsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { thinDps.getFkBizPartnerId_r() }));
                     dsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { thinDps.getFkDpsCategoryId(), thinDps.getFkDpsClassId(), thinDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
 
-                    /*
-                    oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
-                    oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
-                    oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
-                    */
                     dsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
                     dsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
                     dsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
@@ -1797,17 +1811,18 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     dsmEntry.setDbmsTpSysMovId(mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
                     dsmEntry.setFkBizPartnerId(thinDps.getFkBizPartnerId_r());
                     dsmEntry.setDbmsFkBizPartnerBranchId_n(thinDps.getFkBizPartnerBranchId());
-                    dsmEntry.setDbmsAccountOp(accountOpId);
+                    //dsmEntry.setDbmsAccountOp(...); // not required, but preserved for consistence with mirrowed source code!
                     
                     try {
-                        // get accounting configuration:
+                        // Get accounting configuration:
+                        
                         Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, rowDpsPm.BizPartnerId, mnBizPartnerCategory,
                                 moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, thinDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, balance.getTaxKey());
                         if (config.size() > 0) {
                             dsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
                         }
 
-                        lEntries.add(dsmEntry);
+                        dsmEntries.add(dsmEntry);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -1826,20 +1841,23 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     case SDataConstantsSys.BPSS_CT_BP_CUS:
                         dsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_CUS);
                         break;
+                    default:
+                        // do nothing
                 }
 
-                SDataBizPartnerBranch branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { moParamRecord.getFkCompanyBranchId() });
+                int branchId = moParamRecord.getFkCompanyBranchId_n() != 0 ? moParamRecord.getFkCompanyBranchId_n() : moParamRecord.getFkCompanyBranchId();
+                SDataBizPartnerBranch branch = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { branchId });
 
-                dsm.setDate(miClient.getSessionXXX().getWorkingDate());
                 dsm.setDbmsErpTaxModel(miClient.getSessionXXX().getParamsErp().getTaxModel());
+                dsm.setDate(miClient.getSessionXXX().getWorkingDate());
                 dsm.setFkSubsystemCategoryId(mnBizPartnerCategory);
-                dsm.setFkCompanyBranchId(moParamRecord.getFkCompanyBranchId());
+                dsm.setFkCompanyBranchId(branchId);
                 dsm.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                dsm.setDbmsFkCompanyBranch(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+                dsm.setDbmsFkCompanyBranch(moParamRecord.getFkCompanyBranchId());
                 dsm.setDbmsCompanyBranchCode(branch.getCode());
                 dsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
                 dsm.setDbmsIsRecordSaved(false);
-                dsm.getDbmsEntries().addAll(lEntries);
+                dsm.getDbmsEntries().addAll(dsmEntries); // WARNING: difference in mirrowed source code: a collection of entries!
 
                 try {
                     dsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(dsm);
@@ -1848,8 +1866,6 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
                     concept = SFinConsts.TXT_INVOICE + " " + thinDps.getDpsNumber() + " ";
                     concept += moBizPartner.getBizPartnerCommercial();
 
-                    dpsNumbers += (dpsNumbers.isEmpty() ? "" : ", ") + thinDps.getDpsNumber();
-
                     for (SDataRecordEntry entry : entries) {
                         entry.setConcept(concept);
                         entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { entry.getFkAccountIdXXX() }));
@@ -1857,6 +1873,7 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
 
                         if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
                             entry.setDbmsAccountComplement(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { thinDps.getFkBizPartnerId_r() }));
+                            //entry.setAuxCheckNumber(...); // not required, but preserved for consistence with mirrowed source code!
                         }
                     }
 
@@ -1870,23 +1887,23 @@ public class SDialogRecordPaymentMultiple extends javax.swing.JDialog implements
         }
         
         if (mnFormMode == MODE_BP_CASH_ACC && moParamAccountCash != null) {
-            // check if an exchange-rate-difference entry is needed:
+            // Check if an exchange-rate-difference entry is needed:
 
-            concept = SFinConsts.TXT_INVOICE + " VARIAS ";
-            concept += moBizPartner.getBizPartnerCommercial();
-            concept += " (" + dpsNumbers + ")";
+            String conceptCash = SFinConsts.TXT_INVOICE + " VARIAS ";
+            conceptCash += moBizPartner.getBizPartnerCommercial();
+            conceptCash += " (" + docsNumbers + ")";
 
             if (!mbIsAccountCashLocalCurrency && SLibUtils.compareAmount(moFieldAccValueCy.getDouble(), mdTotalPaymentCy)) {
                 double xrtDiff = SLibUtils.roundAmount(moFieldAccValue.getDouble() - mdTotalPayment);
 
                 if (xrtDiff != 0) {
-                    record.getDbmsRecordEntries().add(createRecordEntryXrtDiff(concept, xrtDiff));
+                    record.getDbmsRecordEntries().add(createRecordEntryXrtDiff(conceptCash, xrtDiff));
                 }
             }
 
-            // cash account entry:
+            // Cash account entry:
 
-            record.getDbmsRecordEntries().insertElementAt(createRecordEntryAccountCash(concept), 0);
+            record.getDbmsRecordEntries().insertElementAt(createRecordEntryAccountCash(conceptCash), 0);
         }
 
         return record;
