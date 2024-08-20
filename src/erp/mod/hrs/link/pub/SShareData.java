@@ -30,6 +30,7 @@ import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import erp.mod.hrs.link.db.SIncidentResponse;
 
 /**
  *
@@ -103,6 +104,19 @@ public class SShareData {
         formatterd.parse(sLastSyncDate);
 
         return SUtilsJSON.getData(sLastSyncDate);
+    }
+    
+    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+        try {
+            //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //formatterd.parse(sLastSyncDate);
+
+            return SUtilsJSON.getDataPGH(sJSon);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
     }
     
     /**
@@ -206,5 +220,53 @@ public class SShareData {
         }
         
         return null;
+    }
+    
+    /**
+     * 
+     * @param sJsonInc
+     * @return 
+     */
+    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.insertData(sJsonInc);
+    }
+    
+    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.cancelData(sJsonInc);
+    }
+    
+    /**
+     * 
+     * @param employees
+     * @return 
+     */
+    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        try {
+            return SUtilsJSON.missingPhotos(employees);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.earningData(sJsonInc);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+      try {
+            return SUtilsJSON.personalData(idEmp);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 }
