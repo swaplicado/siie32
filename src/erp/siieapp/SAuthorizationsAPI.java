@@ -13,6 +13,9 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_DPS;
+import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
+import erp.mod.trn.db.SDbMaterialRequest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,16 +40,63 @@ public class SAuthorizationsAPI {
     }
 
     /**
-     * Metodo autorizar recurso
-     *
+     * Autorizar recurso
+     * 
+     * @param typeResource
+     * @param pk
+     * @param userId
+     * @return 
      */
     public String approbeResouorce(int typeResource, Object pk, int userId) {
         String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, "");
+        if (res != null && res.isEmpty()) {
+            switch(typeResource) {
+                case AUTH_TYPE_MAT_REQUEST:
+                    try {
+                        SDbMaterialRequest req = new SDbMaterialRequest();
+                        req.read(oSession, (int[]) pk);
+                        req.save(oSession);
+                    }
+                    catch (Exception ex) {
+                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case AUTH_TYPE_DPS:
+
+                    break;
+            }
+        }
         return res;
     }
-
+    
+    /**
+     * Rechazar recurso
+     * 
+     * @param typeResource
+     * @param pk
+     * @param userId
+     * @param comment
+     * @return 
+     */
     public String rejectResource(int typeResource, Object pk, int userId, String comment) {
         String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
+        if (res != null && res.isEmpty()) {
+            switch(typeResource) {
+                case AUTH_TYPE_MAT_REQUEST:
+                    try {
+                        SDbMaterialRequest req = new SDbMaterialRequest();
+                        req.read(oSession, (int[]) pk);
+                        req.save(oSession);
+                    }
+                    catch (Exception ex) {
+                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case AUTH_TYPE_DPS:
+
+                    break;
+            }
+        }
         return res;
     }
 
