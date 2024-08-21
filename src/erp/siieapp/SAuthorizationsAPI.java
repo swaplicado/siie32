@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import java.sql.ResultSet;
@@ -108,57 +109,68 @@ public class SAuthorizationsAPI {
                 + "ELSE '(NO APLICA)' "
                 + "END "
                 + "        WHEN v.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " THEN 'dps_status'"
-                + "        ELSE '---' "
+                + "        ELSE 'NO APLICA' "
                 + "END AS doc_authorn_status, "
                 + "v.id_authorn_step AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "cta.name AS authorn_type, "
+                + "  IF((cta.name IS NULL), 'REQUISICIÓN DE MATERIALES', cta.name) AS authorn_type,"
                 + "v.*, "
                 + "IF(v.b_authorn, " + SGridConsts.ICON_THUMBS_UP + ", IF(v.b_reject, " + SGridConsts.ICON_THUMBS_DOWN + ", " + SGridConsts.ICON_NULL + ")) AS f_ico_auth_st, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", "
-                + "ua.usr AS auth_user, "
-                + "ur.usr AS rej_user, "
-                + /**
-                 * Requisiciones
-                 */
-                "tmr.num as folio_req, "
+                + "tmr.num as folio_req, "
                 + "tmr.dt as dt_req, "
-                + //                        "tmce.name AS mr_cons_ent, " +
-                //                        "tmpe.name AS mr_prov_ent, " +
-                /**
-                 * DPS
-                 */
-                "us.usr AS step_user, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
-                + "ui.usr AS user_creator, "
-                + "uu.usr AS user_updator "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS v "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
-                + "v.fk_tp_authorn = cta.id_tp_authorn "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr ON "
-                + "v.res_pk_n1_n = tmr.id_mat_req "
-                + //                        "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CONS_ENT) + " AS tmce ON " +
-                //                        "tmr.fk_ent_mat_cons_ent = tmce.id_mat_cons_ent " +
-                //                        "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS tmpe ON " +
-                //                        "tmr.fk_mat_prov_ent = tmpe.id_mat_prov_ent " +
-                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-                + "v.fk_usr_ins = ui.id_usr "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
-                + "v.fk_usr_upd = uu.id_usr "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON "
-                + "v.fk_usr_authorn_n = ua.id_usr "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
-                + "v.fk_usr_reject_n = ur.id_usr "
-                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS us ON "
-                + "v.fk_usr_step = us.id_usr "
+                + "pe.name AS prov_ent, "
+                + "ur.usr AS usr_req, "
+                + "tmr.id_mat_req, "
+                + " (IF(v.id_authorn_step IS NULL, "
+                + "        'NO APLICA', "
+                + "        (SELECT "
+                + "                usr "
+                + "            FROM "
+                + "                " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " "
+                + "            WHERE "
+                + "                id_usr = v.fk_usr_step))) AS authorn_usr, "
+                + "tmr.fk_mat_req_pty, "
+                + "pty.name as priority, "
+                + "trn_get_cons_info(tmr.id_mat_req, 1) AS ent_cons, "
+                + "trn_get_cons_info(tmr.id_mat_req, 2) AS s_ent_cons, "
+                + "trn_get_cons_info(tmr.id_mat_req, 3) AS f_cc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS tmr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
+                + "tmr.fk_mat_prov_ent = pe.id_mat_prov_ent "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
+                + "tmr.fk_usr_req = ur.id_usr "
+                + "INNER JOIN erp.trnu_mat_req_pty as pty ON tmr.fk_mat_req_pty = pty.id_mat_req_pty "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS v ON "
+                + "v.res_pk_n1_n = tmr.id_mat_req AND NOT v.b_del "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
+                + "v.fk_tp_authorn = cta.id_tp_authorn AND NOT v.b_del "
                 + "WHERE "
-                + "NOT v.b_del "
-                + "GROUP BY v.fk_tp_authorn, res_pk_n1_n, res_pk_n2_n, res_pk_n3_n, res_pk_n4_n, res_pk_n5_n "
-                + "ORDER BY v.fk_tp_authorn ASC, v.lev ASC";
+                + "NOT tmr.b_del AND tmr.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " AND ( " +
+                "    v.res_pk_n1_n IS NULL OR ( " +
+                "        v.res_pk_n1_n IS NOT NULL AND ( " +
+//                "            -- Cuando authorn_grouper_n no es nulo, obtener el más alto " +
+                "            v.authorn_grouper_n = ( " +
+                "                SELECT MAX(stps.authorn_grouper_n) " +
+                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
+                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
+                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
+                "                    AND stps.res_pk_len = v.res_pk_len " +
+                "                    AND NOT stps.b_del " +
+                "            ) " +
+//                "            -- Cuando authorn_grouper_n es nulo, igualar a id_authorn_step más alto " +
+                "            OR v.id_authorn_step = ( " +
+                "                SELECT MAX(stps.id_authorn_step) " +
+                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
+                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
+                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
+                "                    AND stps.res_pk_len = v.res_pk_len " +
+                "                    AND NOT stps.b_del))));";
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataResponse dr = new SDataResponse();
@@ -174,32 +186,58 @@ public class SAuthorizationsAPI {
                         au.setFkUserUpdator(res.getInt("fk_usr_upd"));
                         au.setDateInsert(res.getString("ts_usr_ins"));
                         au.setDateUpdate(res.getString("ts_usr_upd"));
-                        au.setUserCreator(res.getString("user_creator"));
-                        au.setUserUpdator(res.getString("user_updator"));
+                        au.setUserCreator(res.getString("usr_req"));
+                        au.setConsumeEntity(res.getString("ent_cons"));
+                        au.setSubConsumeEntity(res.getString("s_ent_cons"));
+                        au.setSupplierEntity(res.getString("prov_ent"));
+                        au.setFkPriority(res.getInt("fk_mat_req_pty"));
+                        au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("DOCUMENTO");
+                        au.setDataType(2);
 
                         break;
                     case SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST:
-                        au.setIdData(new int[]{res.getInt("res_pk_n1_n")});
+                        au.setIdData(new int[]{res.getInt("id_mat_req")});
                         au.setDate(res.getString("dt_req"));
                         au.setFolio(res.getString("folio_req"));
                         au.setFkUserCreator(res.getInt("fk_usr_ins"));
                         au.setFkUserUpdator(res.getInt("fk_usr_upd"));
                         au.setDateInsert(res.getString("ts_usr_ins"));
                         au.setDateUpdate(res.getString("ts_usr_upd"));
-                        au.setUserCreator(res.getString("user_creator"));
-                        au.setUserUpdator(res.getString("user_updator"));
-//                        au.setConsumeEntity(res.getString("mr_cons_ent"));
-//                        au.setSupplierEntity(res.getString("mr_prov_ent"));
-
+                        au.setUserCreator(res.getString("usr_req"));
+                        au.setConsumeEntity(res.getString("ent_cons"));
+                        au.setSubConsumeEntity(res.getString("s_ent_cons"));
+                        au.setSupplierEntity(res.getString("prov_ent"));
+                        au.setFkPriority(res.getInt("fk_mat_req_pty"));
+                        au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("REQUISICIÓN");
+                        au.setDataType(1);
+                        
                         break;
                     default:
-                        break;
+                        au.setIdData(new int[]{res.getInt("id_mat_req")});
+                        au.setDate(res.getString("dt_req"));
+                        au.setFolio(res.getString("folio_req"));
+                        au.setFkUserCreator(res.getInt("fk_usr_ins"));
+                        au.setFkUserUpdator(res.getInt("fk_usr_upd"));
+                        au.setDateInsert(res.getString("ts_usr_ins"));
+                        au.setDateUpdate(res.getString("ts_usr_upd"));
+                        au.setUserCreator(res.getString("usr_req"));
+                        au.setConsumeEntity(res.getString("ent_cons"));
+                        au.setSubConsumeEntity(res.getString("s_ent_cons"));
+                        au.setSupplierEntity(res.getString("prov_ent"));
+                        au.setFkPriority(res.getInt("fk_mat_req_pty"));
+                        au.setPriority(res.getString("priority"));
+                        au.setDataTypeName("REQUISICIÓN");
+                        au.setDataType(1);
+                        
+                    break;
                 }
                 au.setAuthorizationStatusName(res.getString("doc_authorn_status"));
                 au.setAuthorizationTypeName(res.getString("authorn_type"));
-                au.setDataTypeName(res.getString("authorn_type"));
-                au.setDataType(res.getInt("fk_tp_authorn"));
                 au.setAuthorizationStatus(res.getInt("authorn_status"));
+                au.setAuthorizationUser(res.getString("authorn_usr"));
+                
                 lAuthData.add(au);
             }
 
@@ -243,18 +281,25 @@ public class SAuthorizationsAPI {
         ArrayList<SAuthorizationEty> lAuthEtyData = new ArrayList<>();
         String jsonDr = "";
 
-        String sql = "SELECT t.*, ui.id_item, ui.item_key, ui.item, uu.id_unit, uu.unit, uu.symbol "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " as t "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " as ui ON ui.id_item = t.fk_item "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " as uu ON uu.id_unit = t.fk_unit "
-                + "WHERE t.id_mat_req = " + pk + " AND NOT t.b_del";
-
+        String sql = "SELECT t.*, ui.id_item, ui.item_key, ui.item, uu.id_unit, uu.unit, uu.symbol, "
+                    + "IF(ISNULL(entc.name), trn_get_cons_info(t.id_mat_req, 1), entc.name) AS ent_cons, "
+                    + "IF(ISNULL(sentc.name), trn_get_cons_info(t.id_mat_req, 2), sentc.name) AS s_ent_cons, "
+                    + "IF(ISNULL(fcc.id_cc), trn_get_cons_info(t.id_mat_req, 3), fcc.id_cc) AS f_cc "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " as t "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " as ui ON ui.id_item = t.fk_item "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " as uu ON uu.id_unit = t.fk_unit "
+                    + "LEFT JOIN trn_mat_cons_ent AS entc ON t.fk_ent_mat_cons_ent_n = entc.id_mat_cons_ent "
+                    + "LEFT JOIN trn_mat_cons_subent AS sentc ON t.fk_subent_mat_cons_ent_n = sentc.id_mat_cons_ent "
+                    + "AND t.fk_subent_mat_cons_subent_n = sentc.id_mat_cons_subent "
+                    + "LEFT JOIN fin_cc AS fcc ON t.fk_cc_n = fcc.pk_cc "
+                    + "WHERE t.id_mat_req = " + pk + " AND NOT t.b_del";
+        
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(sql)) {
             while (res.next()) {
                 SAuthorizationEty auEty = new SAuthorizationEty();
                 auEty.setIdEty(res.getInt("id_mat_req"));
                 auEty.setQty(res.getFloat("qty"));
-                auEty.setFactConv(res.getFloat("fact_conv"));
+//                auEty.setFactConv(res.getFloat("fact_conv"));
                 auEty.setPriceUnitSys(res.getFloat("price_u_sys"));
                 auEty.setPriceUnit(res.getFloat("price_u"));
                 auEty.setTotal(res.getFloat("tot_r"));
@@ -264,6 +309,9 @@ public class SAuthorizationsAPI {
                 auEty.setIdUnit(res.getInt("id_unit"));
                 auEty.setUnit(res.getString("unit"));
                 auEty.setSymbol(res.getString("symbol"));
+                auEty.setConsumeEntity(res.getString("ent_cons"));
+                auEty.setSubConsumeEntity(res.getString("s_ent_cons"));
+                auEty.setFcc(res.getString("f_cc"));
 
                 lAuthEtyData.add(auEty);
             }
