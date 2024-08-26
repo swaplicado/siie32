@@ -83,7 +83,7 @@ public class SStockValuationRecordUtils {
         bookkeepingNumber.setPkYearId(oRecord.getPkYearId());
         bookkeepingNumber.setFkUserNewId(session.getUser().getPkUserId());
         if (bookkeepingNumber.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + " Error al guardar SDataBookkeepingNumber.");
         }
         for (SDbStockValuationMvt oConsumption : lConsumptions) {
             System.out.println("Contabilizando " + i + " de " + n);

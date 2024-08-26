@@ -688,7 +688,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             }
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
-                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_CAN;
+                mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_NEW;
             }
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     "fk_st_mat_req = " + mnFkMatRequestStatusId + " " + 

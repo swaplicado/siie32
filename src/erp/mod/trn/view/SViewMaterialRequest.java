@@ -571,14 +571,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             case SModSysConsts.TRNS_ST_MAT_REQ_AUTH:
                 needAuthJoin = true;
                 authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
-                        + "v.id_mat_req = aut.res_pk_n1_n ";
+                        + "v.id_mat_req = aut.res_pk_n1_n AND NOT aut.b_del ";
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " ";
                 break;
             case SModSysConsts.TRNX_MAT_REQ_AUTHO:
                 needAuthJoin = true;
                 select += "uaut.usr AS autorizo, ";
                 authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
-                        + "v.id_mat_req = aut.res_pk_n1_n "
+                        + "v.id_mat_req = aut.res_pk_n1_n AND NOT aut.b_del "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uaut ON " 
                         + "aut.fk_usr_authorn_n = uaut.id_usr "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS urej ON " 
@@ -593,7 +593,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 needAuthJoin = true;
                 select += "urej.usr AS rechazo, ";
                 authJoin += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS aut ON "
-                        + "v.id_mat_req = aut.res_pk_n1_n "
+                        + "v.id_mat_req = aut.res_pk_n1_n AND NOT aut.b_del "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uaut ON " 
                         + "aut.fk_usr_authorn_n = uaut.id_usr "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS urej ON " 
@@ -602,7 +602,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 if (filter != null) {
                     where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
                 }
-                where += (where.isEmpty() ? "" : "AND ") + "aut.fk_usr_reject_n IS NOT NULL AND aut.fk_usr_step = " + usrId + " ";
+                where += (where.isEmpty() ? "" : "AND ") + "cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                                                            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
+                                                            + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " "
+                                                            + "AND aut.fk_usr_step = " + usrId + " ";
                 break;
             case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
                 switch (mnGridSubmode) {
