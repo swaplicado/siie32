@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 255/ 2024-08-29
+SIIE 3.2 255.0/ 2024-08-29
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Adición del campo conds_pay en la forma del captura del DPS con su incorporación al CML y CFDI
