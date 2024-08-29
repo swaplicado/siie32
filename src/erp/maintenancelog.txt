@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 255.1/ 2024-08-29
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Inhabilitación de botón de regresar a solicitante en vista de reclasificación de Requisiciones de materiales
+para el usuario de contabilidad
+
+================================================================================
 SIIE 3.2 255.0/ 2024-08-29
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------

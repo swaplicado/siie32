@@ -183,6 +183,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
             jbRowEdit.setEnabled(hasMatReqReclassRight);
+            mjbToNew.setEnabled(false);
         }
         
         if (mnGridSubtype == SModConsts.TRNX_MAT_REQ_ALL) {
