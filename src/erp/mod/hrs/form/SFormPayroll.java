@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -2228,7 +2228,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
 
             if (ppayroll == null) {
-                miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
+                miClient.showMsgBoxError("Ocurrió un error al importar la prenómina");
                 return;
             }
 

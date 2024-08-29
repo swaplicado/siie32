@@ -4669,6 +4669,7 @@ public abstract class SCfdUtils implements Serializable {
         // Comprobante:
         
         boolean isGlobal = xmlCfdi.getElementInformacionGlobal() != null;
+        SDataDps dpsXml = (SDataDps) xmlCfdi;
         
         cfd.ver40.DElementComprobante comprobante = new cfd.ver40.DElementComprobante();
 
@@ -4681,7 +4682,9 @@ public abstract class SCfdUtils implements Serializable {
         }
         comprobante.getAttNoCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertNumber());
         comprobante.getAttCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertBase64());
-        if (!isGlobal && !xmlCfdi.getComprobanteTipoComprobante().equals("E")) comprobante.getAttCondicionesDePago().setString(xmlCfdi.getComprobanteCondicionesPago());
+        if (!isGlobal && !xmlCfdi.getComprobanteTipoComprobante().equals("E")) { comprobante.getAttCondicionesDePago().setString(
+            !dpsXml.getConditionsPayment().isEmpty() ? dpsXml.getConditionsPayment() : xmlCfdi.getComprobanteCondicionesPago());
+        }
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
         comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());

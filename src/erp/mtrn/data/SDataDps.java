@@ -150,6 +150,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msNumber;
     protected java.lang.String msNumberReference;
     protected java.lang.String msCommissionsReference;
+    protected java.lang.String msConditionsPayment;
     protected int mnApprovalYear;
     protected int mnApprovalNumber;
     protected int mnDaysOfCredit;
@@ -1833,6 +1834,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setNumber(java.lang.String s) { msNumber = s; }
     public void setNumberReference(java.lang.String s) { msNumberReference = s; }
     public void setCommissionsReference(java.lang.String s) { msCommissionsReference = s; }
+    public void setConditionsPayment(java.lang.String s) { msConditionsPayment = s; }
     public void setApprovalYear(int n) { mnApprovalYear = n; }
     public void setApprovalNumber(int n) { mnApprovalNumber = n; }
     public void setDaysOfCredit(int n) { mnDaysOfCredit = n; }
@@ -1956,6 +1958,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getNumber() { return msNumber; }
     public java.lang.String getNumberReference() { return msNumberReference; }
     public java.lang.String getCommissionsReference() { return msCommissionsReference; }
+    public java.lang.String getConditionsPayment() { return msConditionsPayment; }
     public int getApprovalYear() { return mnApprovalYear; }
     public int getApprovalNumber() { return mnApprovalNumber; }
     public int getDaysOfCredit() { return mnDaysOfCredit; }
@@ -2259,6 +2262,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msNumber = "";
         msNumberReference = "";
         msCommissionsReference = "";
+        msConditionsPayment = "";
         mnApprovalYear = 0;
         mnApprovalNumber = 0;
         mnDaysOfCredit = 0;
@@ -2453,6 +2457,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msNumber = oResultSet.getString("d.num");
                 msNumberReference = oResultSet.getString("d.num_ref");
                 msCommissionsReference = oResultSet.getString("d.comms_ref");
+                msConditionsPayment = oResultSet.getString("d.conds_pay") != null ? oResultSet.getString("d.conds_pay") : "";
                 mnApprovalYear = oResultSet.getInt("d.approve_year");
                 mnApprovalNumber = oResultSet.getInt("d.approve_num");
                 mnDaysOfCredit = oResultSet.getInt("d.days_cred");
@@ -2843,7 +2848,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2857,6 +2862,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setString(nParam++, msNumber);
             oCallableStatement.setString(nParam++, msNumberReference);
             oCallableStatement.setString(nParam++, msCommissionsReference);
+            oCallableStatement.setString(nParam++, msConditionsPayment);
             oCallableStatement.setInt(nParam++, mnApprovalYear);
             oCallableStatement.setInt(nParam++, mnApprovalNumber);
             oCallableStatement.setInt(nParam++, mnDaysOfCredit);

@@ -43,6 +43,7 @@ import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
+import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataSign;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -88,7 +89,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -1295,6 +1296,22 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
                                 dps.setAuxDpsTime(((SDataDps) moRegistry).getAuxDpsTime());
+                                if (dps.getDbmsDataAddenda() != null  ) { 
+                                    if(dps.getDbmsDataAddenda().getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71) {
+                                        for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++){
+                                            SDataDpsEntry entry = dps.getDbmsDpsEntries().get(i);
+                                            String concept = entry.getConcept();
+                                            if (concept.contains("&")) {
+                                                concept = concept.replace("&", "'N");
+                                                entry.setConcept(concept);
+                                            }                                        
+                                        }
+                                        SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                    }
+                                    else {
+                                        SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                    }
+                                }
                                 SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                             }
                             catch (java.lang.Exception e) {

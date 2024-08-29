@@ -142,7 +142,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
@@ -253,6 +253,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdiPdfFile;
     private erp.lib.form.SFormField moFieldCfdiPaymentWay;
     private erp.lib.form.SFormField moFieldCfdiPaymentMethod;
+    private erp.lib.form.SFormField moFieldConditionsPayment;
     private erp.lib.form.SFormField moFieldCfdiTaxRegimeIss;
     private erp.lib.form.SFormField moFieldCfdiTaxRegimeRec;
     private erp.lib.form.SFormField moFieldCfdiCfdiUsage;
@@ -474,6 +475,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlCfdiPaymentMethod = new javax.swing.JLabel();
         jcbCfdiPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel25 = new javax.swing.JPanel();
+        jlConditionsPayment = new javax.swing.JLabel();
+        jtfConditionsPayment = new javax.swing.JTextField();
         jPanel27 = new javax.swing.JPanel();
         jlFkDpsStatus = new javax.swing.JLabel();
         jtfFkDpsStatusRo = new javax.swing.JTextField();
@@ -1280,6 +1283,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel5.add(jPanel32);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlConditionsPayment.setText("Condiciones pago: ");
+        jlConditionsPayment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlConditionsPayment);
+
+        jtfConditionsPayment.setText("TEXTO");
+        jtfConditionsPayment.setToolTipText("Condiciones pago");
+        jtfConditionsPayment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel25.add(jtfConditionsPayment);
+
         jPanel5.add(jPanel25);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -3352,6 +3365,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentTypeId, jlFkPaymentTypeId);
         moFieldCfdiPaymentWay = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiPaymentWay, jlCfdiPaymentWay);
         moFieldCfdiPaymentMethod = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiPaymentMethod, jlCfdiPaymentMethod);
+        moFieldConditionsPayment = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfConditionsPayment, jlConditionsPayment);
+        moFieldConditionsPayment.setLengthMax(50);
         moFieldFkLanguajeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLanguageId, jlFkLanguageId);
         moFieldFkDpsNatureId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsNatureId, jlFkDpsNatureId);
         moFieldFkFunctionalAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalAreaId, jlFkFunctionalAreaId);
@@ -3582,6 +3597,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldFkPaymentTypeId);
         mvFields.add(moFieldCfdiPaymentWay);
         mvFields.add(moFieldCfdiPaymentMethod);
+        mvFields.add(moFieldConditionsPayment);
         mvFields.add(moFieldFkLanguajeId);
         mvFields.add(moFieldFkDpsNatureId);
         mvFields.add(moFieldFkFunctionalAreaId);
@@ -4159,7 +4175,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jTabbedPane.setEnabledAt(TAB_CFD_INT_COM, isCfdIntCommerceRequired());
         jTabbedPane.setEnabledAt(TAB_CFD_ADD, isCfdAddendaRequired());
         jTabbedPane.setEnabledAt(TAB_CFD_XML, isCfdEmissionRequired || isCfdXmlFilePermitted());   // enable aswell XML file for expenses documents
-        
         jcbCfdiPaymentWay.setEnabled(enable && isCfdEmissionRequired);
         jcbCfdiPaymentMethod.setEnabled(enable && isCfdEmissionRequired);
         
@@ -4867,7 +4882,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (moDps.getDbmsDataDpsCfd().getPaymentWay().isEmpty()) {
                     moFieldCfdiPaymentWay.setFieldValue(moBizPartnerCategory.getCfdiPaymentWay());
                 }
-                
+
                 if (moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
                     moFieldCfdiPaymentMethod.setFieldValue(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD);
                 }
@@ -5325,6 +5340,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         dps.setDateStartCredit(miClient.getSessionXXX().getWorkingDate());
         dps.setNumberSeries("");
         dps.setNumber("");
+        dps.setConditionsPayment("");
         dps.setApprovalYear(0);
         dps.setApprovalNumber(0);
         dps.setIsRegistryNew(true);
@@ -5857,6 +5873,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateStartCredit.setFocusable(false);
             jbDateStartCredit.setEnabled(false);
             jbDateMaturity.setEnabled(false);
+            jtfConditionsPayment.setEditable(false);
+            jtfConditionsPayment.setFocusable(false);
             //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
             jcbFkFunctionalAreaId.setEnabled(false);
@@ -5970,6 +5988,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jftDateStartCredit.setEditable(...);  // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jftDateStartCredit.setFocusable(...); // status already set by previous call to method itemChangeFkPaymentTypeId()
             //jbDateStartCredit.setEnabled(...);    // status already set by previous call to method itemChangeFkPaymentTypeId()
+            jtfConditionsPayment.setEditable(true);
+            jtfConditionsPayment.setFocusable(true);
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
             jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalAreaId.getItemCount() - 1) != 1); // enable when functional areas applying and only one asignated to current user
@@ -10680,6 +10700,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlCfdiTaxRegimeIssuing;
     private javax.swing.JLabel jlCfdiTaxRegimeReceptor;
     private javax.swing.JLabel jlCompanyBranch;
+    private javax.swing.JLabel jlConditionsPayment;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlDateDelivery_n;
@@ -10828,6 +10849,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfCfdiConfirmation;
     private javax.swing.JTextField jtfCompanyBranchCodeRo;
     private javax.swing.JTextField jtfCompanyBranchRo;
+    private javax.swing.JTextField jtfConditionsPayment;
     private javax.swing.JTextField jtfCurrencyKeyRo;
     private javax.swing.JTextField jtfCurrencySystemKeyRo;
     private javax.swing.JTextField jtfDaysOfCredit;
@@ -11846,17 +11868,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             if (!validation.getIsError()) {
                                 for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                                     SDataDpsEntry entry = ((SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData());
-
-                                    for (SDataItemConfigBizPartner itemConfig : moBizPartner.getDbmsItemConfigs()) {
-                                        if (entry.getFkItemId() == itemConfig.getPkItemId() && !itemConfig.getCfdiUsage().isEmpty() && !itemConfig.getIsDeleted()) {
-                                            if (!moFieldCfdiCfdiUsage.getKey().toString().equals(itemConfig.getCfdiUsage())) {
-                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + itemConfig.getCfdiUsage() + "'.");
-                                                validation.setComponent(jcbCfdiCfdiUsage);
-                                                validation.setTabbedPaneIndex(TAB_CFD_XML);
-                                                break;
+                                        for (SDataItemConfigBizPartner itemConfig : moBizPartner.getDbmsItemConfigs()) {
+                                            if (entry.getFkItemId() == itemConfig.getPkItemId() && !itemConfig.getCfdiUsage().isEmpty() && !itemConfig.getIsDeleted() &&
+                                                    !(moDps.getDbmsDataDpsCfd() != null)  ) {
+                                                if (!moFieldCfdiCfdiUsage.getKey().toString().equals(itemConfig.getCfdiUsage())) {
+                                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_CFDI_USE + "'" + itemConfig.getCfdiUsage() + "'.");
+                                                    validation.setComponent(jcbCfdiCfdiUsage);
+                                                    validation.setTabbedPaneIndex(TAB_CFD_XML);
+                                                    break;
+                                                }
                                             }
                                         }
-                                    }
+//                                    }    
                                 }
                             }
                         }
@@ -11992,6 +12015,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldNumberSeries.setFieldValue(moDps.getNumberSeries());
         moFieldNumber.setFieldValue(moDps.getNumber());
         moFieldNumberReference.setFieldValue(moDps.getNumberReference());
+        moFieldConditionsPayment.setFieldValue(moDps.getConditionsPayment());
         
         if (areNumberSeriesBySystem()) {
             if (moDps.getIsRegistryNew()) {
@@ -12331,6 +12355,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setNumber(moFieldNumber.getString());
             moDps.setNumberReference(moFieldNumberReference.getString());
             moDps.setDaysOfCredit(moFieldDaysOfCredit.getInteger());
+            moDps.setConditionsPayment(moFieldConditionsPayment.getString());
 
             if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment)) {
                 if (moDps.getIsRegistryNew()) {
@@ -12482,7 +12507,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd.setCfdiType(mbIsDpsInvoice ? DCfdi33Catalogs.CFD_TP_I : DCfdi33Catalogs.CFD_TP_E);
                 dpsCfd.setPaymentWay(moFieldCfdiPaymentWay.getFieldValue().toString());
                 dpsCfd.setPaymentMethod(moFieldCfdiPaymentMethod.getFieldValue().toString());
-                dpsCfd.setPaymentConditions(moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS");  // XXX: implement method!
+                dpsCfd.setPaymentConditions(!moFieldConditionsPayment.getString().isEmpty() ? moFieldConditionsPayment.getString() : (moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH ? "CONTADO" : "CRÉDITO " + moFieldDaysOfCredit.getInteger() + " DÍAS"));  // XXX: implement method!
                 if (jcbGblPeriodicity.getSelectedIndex() > 0) {
                     dpsCfd.setGlobalPeriodocity(moFieldCfdiGblPeriodicity.getFieldValue().toString());
                     dpsCfd.setGlobalMonths(moFieldCfdiGblMonth.getFieldValue().toString());
