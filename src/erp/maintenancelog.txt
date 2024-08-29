@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 255/ 2024-08-29
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adición del campo conds_pay en la forma del captura del DPS con su incorporación al CML y CFDI
+2) Corrección de la lectura y modificación de los ítems personalizados
+3) Corrección del uso del CFDI desde ítems personalizados para notas de crédito 
+4) Sustitución del carácter & por 'N para la generación del XML
+5) Adición de la leyenda "FAVOR DE CONFIRMAR DE RECIBIDO" en el cuerpo del email de OC
+6) Corrección reporte de auxiliares contables para cuentas en 0
+
+================================================================================
 SIIE 3.2 254.15/ 2024-08-27
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
