@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 254.15/ 2024-08-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de percepción normal en importación de nóminas desde CAP. No se remueve el recibo,
+solo se resetean las percepciones.
+
+================================================================================
+SIIE 3.2 254.14/ 2024-08-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Actualización de estatus de la RM cuando es rechazada, ahora pasa a estatus NUEVO.
+2) Validación de steps de autorización eliminados
+3) Se habilita el botón de suministro en vista de RM suministradas solo cuando el usuario tiene el permiso de suministrar.
+
+================================================================================
 SIIE 3.2 254.13/ 2024-08-15
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
