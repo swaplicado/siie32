@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -1679,8 +1679,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 SHrsPayrollUtils.createRowPayrollEmployees(miClient.getSession(), moHrsPayroll.getHrsReceipts())));
         
         maBonusPayed = new ArrayList<>();
-        
-        System.out.println(moGridPanePayrollReceipts.getModel().getRowCount());
         
         for (SHrsReceipt hrsReceipt : moHrsPayroll.getHrsReceipts()) {
             for (SHrsReceiptEarning hrsReceiptEarning : hrsReceipt.getHrsReceiptEarnings()) {
