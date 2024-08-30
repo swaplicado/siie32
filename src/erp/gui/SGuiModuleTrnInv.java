@@ -779,7 +779,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
-        jmiStkStockValuation = new JMenuItem("Valuación de conumos de materiales");
+        jmiStkStockValuation = new JMenuItem("Valuación de consumos de materiales");
         jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiItemHistoric = new JMenuItem("Historial ítems");

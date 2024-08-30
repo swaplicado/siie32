@@ -11,6 +11,7 @@
 
 package erp.mtrn.form;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -48,6 +49,7 @@ import erp.mtrn.data.SDataDiogNotes;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataStockLot;
+import erp.mtrn.data.SSupplyZeroConfiguration;
 import erp.mtrn.data.STrnDpsStockReturnRow;
 import erp.mtrn.data.STrnDpsStockSupplyRow;
 import erp.mtrn.data.STrnDpsUtilities;
@@ -63,9 +65,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
@@ -1692,21 +1696,52 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         
                         int nDpsFixedAssetNat = 0; // document nature that should be treated as fixed asset, can be zero
                         Date tPurAccAssetStart = null; // validity start of puchases accounting as asset (inventory), can be null
+                        SSupplyZeroConfiguration oCfg = null;
                         
                         try {
+                            // Obtener y convertir valor de parámetro relacionado con activos fijos
                             String sDpsFixedAssetNat = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
                             nDpsFixedAssetNat = Integer.parseInt(sDpsFixedAssetNat);
+                        }
+                        catch (SQLException ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error al obtener o convertir el valor de activos fijos", ex);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error desconocido al procesar activos fijos", ex);
+                        }
+
+                        try {
+                            // Obtener y parsear fecha de inicio de cuenta de activos de compra
                             String sPurAccAssetStart = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_PUR_ACC_ASSET_START);
                             SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
                             tPurAccAssetStart = formatDate.parse(sPurAccAssetStart);
                         }
                         catch (SQLException ex) {
-                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error al obtener la fecha de inicio de cuenta de activos de compra", ex);
+                        }
+                        catch (ParseException ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error al parsear la fecha de inicio de cuenta de activos de compra", ex);
                         }
                         catch (Exception ex) {
-                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error desconocido al procesar la fecha de inicio de cuenta de activos de compra", ex);
                         }
 
+                        try {
+                            // Configuración de los ítems que deben ser ingresados al almacén en cero
+                            String sSuppZeroCfg = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_STK_SUPP_ZERO);
+                            ObjectMapper mapper = new ObjectMapper();
+                            oCfg = mapper.readValue(sSuppZeroCfg, SSupplyZeroConfiguration.class);
+                        }
+                        catch (SQLException ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error al obtener la configuración de ítems para almacén en cero", ex);
+                        }
+                        catch (IOException ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error al leer la configuración de ítems para almacén en cero", ex);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SFormDiog.class.getName()).log(Level.SEVERE, "Error desconocido al procesar la configuración de ítems para almacén en cero", ex);
+                        }
+                        
                         for (int row = 0; row < stockSupplyRowsAux.size(); row++) {
                             stockSupplyRow = stockSupplyRowsAux.get(row);
                             item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockSupplyRow.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
@@ -1735,8 +1770,12 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             
                             double diogEntryValueUnitary = 0d;
                             if (moParamDpsSource.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                                // Se revisa la configuración de los ítems que deben ser ingresados al almacén en cero
+                                if (oCfg != null && oCfg.getItems() != null && oCfg.getItems().contains(stockSupplyRow.getFkItemId())) {
+                                    diogEntryValueUnitary = 0d;
+                                }
                                 // Cuando la naturaleza del documento sea diferente a la considerada como activo
-                                if (moParamDpsSource.getFkDpsNatureId() != nDpsFixedAssetNat) {
+                                else if (moParamDpsSource.getFkDpsNatureId() != nDpsFixedAssetNat) {
                                     // Si no existe configuración de corte de contabilización como activo
                                     if (tPurAccAssetStart == null) {
                                         diogEntryValueUnitary = dpsEntry.getPriceUnitaryReal_r();
