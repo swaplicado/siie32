@@ -4,6 +4,7 @@
  */
 package erp.mod.bps.db;
 
+import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
@@ -303,5 +304,25 @@ public abstract class SBpsUtils {
         }
         
         return address;
+    }
+    
+    public static SDataBizPartnerBranchContact getBizParterContact (SGuiSession session, int bp) throws Exception {
+        SDataBizPartnerBranchContact con = null;
+        int[] conPk = null;
+        
+        String sql = "SELECT bpbc.id_bpb, bpbc.id_con FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bp.id_bp = bpb.fid_bp " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bpbc ON bpb.id_bpb = bpbc.id_bpb " +
+                "WHERE bp.id_bp = " + bp + " AND NOT bpb.b_del AND NOT bpbc.b_del ";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            conPk = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+        }
+        if (conPk != null) {
+            con = new SDataBizPartnerBranchContact();
+            con.read(conPk, session.getStatement());
+        }
+        
+        return con;
     }
 }

@@ -36,7 +36,7 @@ public class SCliMailer {
         //args = new String[] { "2852", "i", "s", "2020-08-01", "2020-08-31", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-2", "today-2", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "sflores@swaplicado.com.mx" };
-        //args = new String[] { "2852;2217", "i", "s", "today", "today", "sflores@swaplicado.com.mx;isabel.garcia@swaplicado.com.mx" };
+        //args = new String[] { "2852;2217", "i", "s", "today", "today", "isabel.garcia@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "gortiz@aeth.mx", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "gortiz@aeth.mx;sflores@swaplicado.com.mx", "floresgtz@hotmail.com;cesar.orozco@swaplicado.com.mx" };
         //args = new String[] { "1211", "i", "s", "2020-01-01", "2020-12-31", "sflores@swaplicado.com.mx;sflores@aeth.mx", "floresgtz@hotmail.com" };

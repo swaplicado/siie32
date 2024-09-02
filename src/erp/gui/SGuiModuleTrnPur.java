@@ -161,6 +161,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkRetReturned;
     private javax.swing.JMenuItem jmiStkRetReturnedEntry;
     private javax.swing.JMenuItem jmiStkRetDiog;
+    private javax.swing.JMenu jmSca;
+    private javax.swing.JMenuItem jmiSca;
+    private javax.swing.JMenuItem jmiScaBpMap;
+    private javax.swing.JMenuItem jmiScaBpDetMap;
+    private javax.swing.JMenuItem jmiScaItMap;
+    private javax.swing.JMenuItem jmiScaItDetMap;
     private javax.swing.JMenu jmAccPend;
     private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenu jmRep;
@@ -267,8 +273,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightReports = false;
         boolean hasRightItemConfig = false;
         boolean hasRightCreditConfig = false;
+        boolean hasRightScaleCfg = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
+        int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
 
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
@@ -480,6 +488,19 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmStkRet.add(jmiStkRetReturnedEntry);
         jmStkRet.addSeparator();
         jmStkRet.add(jmiStkRetDiog);
+        
+        jmSca = new JMenu("Báscula");
+        jmiSca = new JMenuItem("Boletos de entrada de báscula");
+        jmiScaBpMap = new JMenuItem("Mapeo de proveedores de báscula");
+        jmiScaBpDetMap = new JMenuItem("Mapeo de proveedores de báscula a detalle");
+        jmiScaItMap = new JMenuItem("Mapeo de productos de báscula");
+        jmiScaItDetMap = new JMenuItem("Mapeo de productos de báscula a detalle");
+        jmSca.add(jmiSca);
+        jmSca.addSeparator();
+        jmSca.add(jmiScaBpMap);
+        jmSca.add(jmiScaBpDetMap);
+        jmSca.add(jmiScaItMap);
+        jmSca.add(jmiScaItDetMap);
 
         jmAccPend = new JMenu("CXP");
         jmiAccPend = new JMenuItem("Cuentas por pagar");
@@ -711,6 +732,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.addActionListener(this);
         jmiStkRetReturnedEntry.addActionListener(this);
         jmiStkRetDiog.addActionListener(this);
+        jmiSca.addActionListener(this);
+        jmiScaBpMap.addActionListener(this);
+        jmiScaBpDetMap.addActionListener(this);
+        jmiScaItMap.addActionListener(this);
+        jmiScaItDetMap.addActionListener(this);
         jmiAccPend.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
@@ -780,12 +806,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         hasRightInventoryOut = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_PUR).HasRight ||
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DIOG_OUT).HasRight;
         hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_REP).HasRight;
+        hasRightScaleCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_SCA_CFG).HasRight;
         hasRightItemConfig =
                 hasRightDocOrder && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level == SUtilConsts.LEV_MANAGER ||
                 hasRightDocTransaction && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level == SUtilConsts.LEV_MANAGER;
         hasRightCreditConfig = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_CRED_CONFIG).HasRight;
         levelRightDocOrder = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
         levelRightDocTransaction = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
+        levelRightScaleTic = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_SCA_TIC).Level;
 
         jmCat.setEnabled(hasRightDnsDps || hasRightDnsDiog || hasRightBizPartnerBlocking || hasRightItemConfig);
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
@@ -848,6 +876,13 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryOut);
         jmiStkRetDiog.setEnabled(hasRightInventoryOut);
 
+        jmSca.setEnabled(false);
+        jmiSca.setEnabled(levelRightScaleTic >= SUtilConsts.LEV_READ);
+        jmiScaBpMap.setEnabled(hasRightScaleCfg);
+        jmiScaBpDetMap.setEnabled(hasRightScaleCfg);
+        jmiScaItMap.setEnabled(hasRightScaleCfg);
+        jmiScaItDetMap.setEnabled(hasRightScaleCfg);
+        
         jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
         jmRep.setEnabled(hasRightReports);
@@ -1538,7 +1573,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmAccPend, jmRep };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmStkDvy, jmStkRet, jmSca, jmAccPend, jmRep };
     }
 
     @Override
@@ -1778,6 +1813,18 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkRetDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_OUT_PUR[0], SDataConstantsSys.TRNS_CL_IOG_OUT_PUR[1]);
+            }
+            else if (item == jmiScaBpMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSU_SCA_BP, SDataConstants.MOD_PUR);
+            }
+            else if (item == jmiScaBpDetMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_SCA_BP_DET, SDataConstants.MOD_PUR);
+            }
+            else if (item == jmiScaItMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMU_SCA_ITEM);
+            }
+            else if (item == jmiScaItDetMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMX_SCA_ITEM_DET);
             }
             else if (item == jmiAccPend) {
                 miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_SUP, null);

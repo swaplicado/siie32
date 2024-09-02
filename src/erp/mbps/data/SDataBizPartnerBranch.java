@@ -656,7 +656,8 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         SDataBizPartnerBranchContact contact = null;
         
         for (SDataBizPartnerBranchContact bpbc : mvDbmsBizPartnerBranchContacts) {
-            if (bpbc.getFkContactTypeId() == contactType && ((includeDefaultContact && bpbc.getPkContactId() == 1) || (!includeDefaultContact && bpbc.getPkContactId() != 1))) {
+            if (bpbc.getFkContactTypeId() == contactType && ((includeDefaultContact && bpbc.getPkContactId() == 1) || (!includeDefaultContact && bpbc.getPkContactId() != 1))
+                    && !bpbc.mbIsDeleted) {
                 contact = bpbc;
                 break;
             }

@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 257.0/ 2024-09-02
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de los campos de correo arbitrario y caso mail para indicar cual será el correo remitente y en que casos aplica.
+2) Modificación de las clases CLI para que el envío sea con la configuración definida en la base de datos del tipo SModSysConsts.CFGS_TP_MMS_MAIL_REPS.
+3) Creación de la importación de boletos desde una báscula externa y su vinculación a pedidos y facturas, con el fin de generar un 
+    informe de movimientos de salidas de boletos de báscula.
+4) Modificación a los contratos para que aparezca la firma en la parte media del contacto administrador de la empresa que emite el documento.
+
+================================================================================
 SIIE 3.2 256.0/ 2024-08-30
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

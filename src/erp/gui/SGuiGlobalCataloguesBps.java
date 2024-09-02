@@ -26,13 +26,14 @@ import erp.mbps.form.SFormBizPartnerBranchContact;
 import erp.mbps.form.SFormBizPartnerEmployee;
 import erp.mbps.form.SFormBizPartnerSimple;
 import erp.mbps.form.SFormBizPartnerType;
+import erp.mbps.form.SFormScaleBizPartner;
+import erp.mcfg.data.SDataScale;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import redis.clients.jedis.Jedis;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores, Sergio Flores
+ * @author Sergio Flores, Alfonso Flores, Sergio Flores, Isabel Servín
  */
 public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -88,6 +89,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private erp.mbps.form.SFormBizPartnerAddressee moFormBizPartnerAddresseeCustomer;
     private erp.mbps.form.SFormBizPartnerType moFormBizPartnerType;
     private erp.mbps.form.SFormBizPartnerBizArea moFormBizPartnerBizArea;
+    private erp.mbps.form.SFormScaleBizPartner moFormScaleBizPartnerSal;
+    private erp.mbps.form.SFormScaleBizPartner moFormScaleBizPartnerPur;
 
     private erp.form.SFormOptionPicker moPickerBizPartnerIdentity;
     private erp.form.SFormOptionPicker moPickerBizPartnerType;
@@ -496,6 +499,25 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormBizPartnerBizArea;
                     break;
+                case SDataConstants.BPSU_SCA_BP:
+                    switch (auxType) {
+                        case SDataConstants.MOD_SAL:
+                            if (moFormScaleBizPartnerSal == null) {
+                                moFormScaleBizPartnerSal = new SFormScaleBizPartner(miClient, auxType);
+                            }
+                            miForm = moFormScaleBizPartnerSal;
+                            break;
+                        case SDataConstants.MOD_PUR:
+                            if (moFormScaleBizPartnerPur == null) {
+                                moFormScaleBizPartnerPur = new SFormScaleBizPartner(miClient, auxType);
+                            }
+                            miForm = moFormScaleBizPartnerPur;
+                            break;
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataScale();
+                    }
+                    break;    
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
             }
@@ -734,6 +756,26 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.BPSU_BA:
                     oViewClass = erp.mbps.view.SViewBizPartnerBizArea.class;
                     sViewTitle = "Áreas negocios";
+                    break;
+                    
+                case SDataConstants.BPSU_SCA_BP:
+                    oViewClass = erp.mbps.view.SViewScaleBizPartner.class;
+                    switch (auxType01) {
+                        case SDataConstants.MOD_SAL:
+                            sViewTitle = "Mapeo clientes báscula"; break;
+                        case SDataConstants.MOD_PUR:
+                            sViewTitle = "Mapeo proveedores báscula"; break;
+                    }
+                    break;
+                    
+                case SDataConstants.BPSX_SCA_BP_DET:
+                    oViewClass = erp.mbps.view.SViewScaleBizPartnerDetail.class;
+                    switch (auxType01) {
+                        case SDataConstants.MOD_SAL:
+                            sViewTitle = "Mapeo clientes báscula (detalle)"; break;
+                        case SDataConstants.MOD_PUR:
+                            sViewTitle = "Mapeo proveedores báscula (detalle)"; break;
+                    }
                     break;
                     
                 default:

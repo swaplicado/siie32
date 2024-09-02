@@ -264,6 +264,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.util.Vector<SDataDpsNotes> mvDbmsDpsNotes;
     protected java.util.Vector<SDataDpsEntry> mvDbmsDpsEntries;
     protected java.util.Vector<SDataDpsCustomAccEntry> mvDbmsDpsCustomAccEntries;
+    protected java.util.Vector<SDataScaleTicketDps> mvDbmsScaleTickets;
 
     protected java.lang.Object moDbmsRecordKey;
     protected java.util.Date mtDbmsRecordDate;
@@ -314,6 +315,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mvDbmsDpsNotes = new Vector<>();
         mvDbmsDpsEntries = new Vector<>();
         mvDbmsDpsCustomAccEntries = new Vector<>();
+        mvDbmsScaleTickets = new Vector<>();
         reset();
     }
 
@@ -2072,6 +2074,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Vector<erp.mtrn.data.SDataDpsEntry> getDbmsDpsEntries() { return mvDbmsDpsEntries; }
     public java.util.Vector<erp.mtrn.data.SDataDpsNotes> getDbmsDpsNotes() { return mvDbmsDpsNotes; }
     public java.util.Vector<SDataDpsCustomAccEntry> getDbmsDpsCustomAccEntries() { return mvDbmsDpsCustomAccEntries; }
+    public java.util.Vector<SDataScaleTicketDps> getDbmsScaleTickets() { return mvDbmsScaleTickets; }
 
     public void setDbmsRecordKey(java.lang.Object o) { moDbmsRecordKey = o; }
     public void setDbmsRecordDate(java.util.Date t) { mtDbmsRecordDate = t; }
@@ -2376,6 +2379,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mvDbmsDpsEntries.clear();
         mvDbmsDpsNotes.clear();
         mvDbmsDpsCustomAccEntries.clear();
+        mvDbmsScaleTickets.clear();
 
         moDbmsRecordKey = null;
         mtDbmsRecordDate = null;
@@ -2627,6 +2631,23 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     else {
                         mvDbmsDpsCustomAccEntries.add(entry);
+                    }
+                }
+                
+                // Read aswell scale ticket links:
+
+                sSql = "SELECT id_sca_tic " +
+                        "FROM trn_sca_tic_dps " +
+                        "WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " " +
+                        "ORDER BY id_sca_tic;";
+                oResultSet = statement.executeQuery(sSql);
+                while (oResultSet.next()) {
+                    SDataScaleTicketDps entry = new SDataScaleTicketDps();
+                    if (entry.read(new int[] { oResultSet.getInt("id_sca_tic"), mnPkYearId, mnPkDocId }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                    else {
+                        mvDbmsScaleTickets.add(entry);
                     }
                 }
 
@@ -3014,6 +3035,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
+                sSql = "DELETE FROM trn_sca_tic_dps WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + ";";
+                oStatement.execute(sSql); 
+
+                for (SDataScaleTicketDps tic : mvDbmsScaleTickets) {
+                    tic.setPkDpsYearId(mnPkYearId);
+                    tic.setPkDpsDocId(mnPkDocId);
+                    if (tic.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
                 for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                     if (dpsEntry.getIsRegistryNew() || dpsEntry.getIsRegistryEdited()) {
                         dpsEntry.setPkYearId(mnPkYearId);
@@ -3070,7 +3102,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
                 }
-
+                
                 // 4. Save aswell journal voucher if this document class requires it:
 
                 anAccMvtSubclassKey = getAccMvtSubclassKeyBizPartner();

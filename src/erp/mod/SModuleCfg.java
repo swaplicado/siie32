@@ -173,6 +173,11 @@ public class SModuleCfg extends SGuiModule {
                         "WHERE NOT b_del " +
                         "ORDER BY name, id_func ";
                 break;
+            case SModConsts.CFGU_SCA:
+                settings = new SGuiCatalogueSettings("Báscula", 1);
+                sql = "SELECT id_sca AS " + SDbConsts.FIELD_ID + "1, CONCAT('(', sca_key,') - ', sca) AS " + SDbConsts.FIELD_ITEM + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " ";
+                break;
             case SModConsts.LOCU_CTY:
                 settings = new SGuiCatalogueSettings("País", 1);
                 sql = "SELECT id_cty AS " + SDbConsts.FIELD_ID + "1, cty AS " + SDbConsts.FIELD_ITEM + " " +

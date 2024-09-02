@@ -12,6 +12,7 @@ import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
+import erp.mcfg.data.SDataScale;
 import erp.mitm.data.SDataBrand;
 import erp.mitm.data.SDataBrandType;
 import erp.mitm.data.SDataElement;
@@ -47,6 +48,7 @@ import erp.mitm.form.SFormManufacturer;
 import erp.mitm.form.SFormManufacturerType;
 import erp.mitm.form.SFormMaterialAttribute;
 import erp.mitm.form.SFormMaterialType;
+import erp.mitm.form.SFormScaleItem;
 import erp.mitm.form.SFormUnit;
 import erp.mitm.form.SFormUnitType;
 import erp.mitm.form.SFormVariety;
@@ -56,7 +58,7 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -113,7 +115,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private erp.mitm.form.SFormItemLevelType moFormItemLevelType;
     private erp.mitm.form.SFormMaterialType moFormMaterialType;
     private erp.mitm.form.SFormItemConfigBizPartnerItems moFormItemConfigBizPartnerItems;
-
+    private erp.mitm.form.SFormScaleItem moFormScaleItem;
+    
     private erp.form.SFormOptionPicker moPickerItemCategory;
     private erp.form.SFormOptionPicker moPickerItemClass;
     private erp.form.SFormOptionPicker moPickerItemType;
@@ -503,6 +506,15 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormItemConfigBizPartnerItems;
                     break;
+                case SDataConstants.ITMU_SCA_ITEM:
+                    if (moFormScaleItem == null) {
+                        moFormScaleItem = new SFormScaleItem(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataScale();
+                    }
+                    miForm = moFormScaleItem;
+                    break;
                 case SDataConstants.ITMX_ITEM_SIMPLE:
                     if (moFormItemSimplified == null) {
                         moFormItemSimplified = new SFormItemSimplified(miClient);
@@ -661,6 +673,14 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.ITMU_MAT_ATT:
                     oViewClass = erp.mitm.view.SViewMaterialAttribute.class;
                     sViewTitle = "Atributos de materiales";
+                    break;
+                case SDataConstants.ITMU_SCA_ITEM:
+                    oViewClass = erp.mitm.view.SViewScaleItem.class;
+                    sViewTitle = "Mapeo productos báscula";
+                    break; 
+                case SDataConstants.ITMX_SCA_ITEM_DET:
+                    oViewClass = erp.mitm.view.SViewScaleItemDetail.class;
+                    sViewTitle = "Mapeo productos báscula (detalle)";
                     break;
                 case SDataConstants.ITMX_ITEM_PACK:
                     oViewClass = erp.mitm.view.SViewItemPackage.class;

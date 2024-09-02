@@ -121,6 +121,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
     public static final String CFG_PARAM_TRN_DIOG_OUT_DEF_CC = "TRN_DIOG_OUT_DEF_CC";
     public static final String CFG_PARAM_TRN_DIOG_CL_AUTHORN = "TRN_DIOG_CL_AUTHORN";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_CFG = "TRN_MAIL_REP_SCA_TIC_CFG";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_GRP = "TRN_MAIL_REP_SCA_TIC_GRP";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_TO = "TRN_MAIL_REP_SCA_TIC_TO";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
@@ -269,6 +272,9 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
+    public static final int PRV_PUR_SCA_CFG = 103101;
+    public static final int PRV_PUR_SCA_TIC = 103102;
+    public static final int PRV_PUR_SCA_TIC_REP = 103106;
     public static final int PRV_PUR_REP = 103901;
     
     public static final int PRV_SAL_DPS_DNS = 104001;
@@ -304,6 +310,9 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_COMP_SIGN_RESTRICT = 104062;
     public static final int PRV_SAL_COMP_SIGN_IMMEX = 104063;
+    public static final int PRV_SAL_SCA = 104101;
+    public static final int PRV_SAL_SCA_TIC = 104102;
+    public static final int PRV_SAL_SCA_TIC_REP = 104106;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;

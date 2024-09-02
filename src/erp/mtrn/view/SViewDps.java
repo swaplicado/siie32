@@ -1721,6 +1721,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 textContact = bprBranchContact.getFirstname() + (bprBranchContact.getFirstname().length() > 0 ? " " : "") + bprBranchContact.getLastname();
                             }
 
+                            SDataBizPartnerBranchContact companyContact = comBranch.getDbmsBizPartnerBranchContactByType(SDataConstantsSys.BPSS_TP_CON_ADM, false);
+                            SDataBizPartner supr = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkSalesSupervisorId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                            SDataBizPartner agt = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkSalesAgentId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                            String companyContactName = ""; 
+                            String acro = "";
+                            if (companyContact != null) {
+                                companyContactName = companyContact.getFirstname() + " " + companyContact.getLastname();
+                                String aux[] = companyContactName.split(" ");
+                                for (String s : aux) {
+                                    acro += s.charAt(0); 
+                                }
+                            }
+                            
                             map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
@@ -1731,7 +1744,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("nFidTpCarBp", SModSysConsts.LOGS_TP_CAR_CAR);
                             map.put("nLogIncotermExw", SModSysConsts.LOGS_INC_EXW);
                             map.put("bPrintTon", contractKgAsTon);
-                            
+                            map.put("sSignatureCharge", companyContact == null ? null : companyContact.getCharge());
+                            map.put("sSignatureName", companyContact == null ? null : SLibUtils.textToAscii(companyContactName));
+                            map.put("sSuprAgt", supr == null ? null : SLibUtils.textToAscii(supr.getFirstname() + " " + supr.getLastname()));
+                            map.put("sAgt", agt == null ? null : SLibUtils.textToAscii(agt.getFirstname() + " " + agt.getLastname()));
+                            map.put("sAcro", acro);
+
                             boolean hasAnalysis = false;
                             boolean isPrint = true;
                             if (! dps.getDbmsDpsEntries().isEmpty() && SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {

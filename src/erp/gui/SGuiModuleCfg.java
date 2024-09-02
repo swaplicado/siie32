@@ -86,7 +86,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatCompanyBranchEntity;
     private javax.swing.JMenuItem jmiImpCfdiGeneration;
     private javax.swing.JMenuItem jmiNoWorkingDays;
-
+    
     private erp.mcfg.form.SFormLanguage moFormLanguage;
     private erp.mcfg.form.SFormCurrency moFormCurrency;
     private erp.mcfg.form.SFormCompanyBranchEntity moFormCompanyBranchEntity;
@@ -151,7 +151,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por correo-e");
         jmiCfgItemRequiredDps = new JMenuItem("Configuración de ítems obligatorios con documentos origen");
         jmiNoWorkingDays = new JMenuItem("Calendario dias no laborables");
-
+        
         jmCfg.add(jmiCfgParamsCompany);
         jmCfg.add(jmiCfgParamsErp);
         jmCfg.add(jsCfgParams); // separator
@@ -182,7 +182,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgItemRequiredDps);
         jmCfg.addSeparator();
         jmCfg.add(jmiNoWorkingDays);
-
+        
         jmCat = new JMenu("Catálogos");
         
         jmiCatLanguage = new JMenuItem("Idiomas");
@@ -425,7 +425,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
             }
-
+            
             result = processForm(pk, isCopy);
             clearFormComplement();
         }

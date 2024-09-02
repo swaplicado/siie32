@@ -146,6 +146,7 @@ public class SBankLayoutCourier extends Thread {
             if (mms != null && mms.getQueryResultId() == SDbConsts.READ_OK) {
                 int mailsSent = 0;
                 SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                sender.setMailReplyTo(mms.getXtaMailReplyTo());
 
                 for (SLayoutBankPaymentRow layoutBankPaymentRow : moBankLayout.getAuxLayoutBankPaymentRows()) {
                     ArrayList<String> recipients = layoutBankPaymentRow.getLayoutBankPayment().getEmailRecipients();

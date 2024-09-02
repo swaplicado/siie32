@@ -81,6 +81,8 @@ import erp.mtrn.data.SDataEntryDpsDpsAdjustment;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataPdf;
+import erp.mtrn.data.SDataScaleTicketDps;
+import erp.mtrn.data.SDataScaleTicketDpsEntry;
 import erp.mtrn.data.SDataSystemNotes;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
@@ -170,6 +172,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbMatRequestImport;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
+    
+    private Vector<SDataScaleTicketDps> mvScaleTicDps;
 
     private erp.mtrn.data.SDataDps moDps;
     private erp.mtrn.data.SDataDps moLastDpsSource;
@@ -670,6 +674,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel36 = new javax.swing.JPanel();
         jlTicket = new javax.swing.JLabel();
         jtfTicket = new javax.swing.JTextField();
+        jtbLinkTicket = new javax.swing.JToggleButton();
         jbEditLogistics = new javax.swing.JButton();
         jpNotes = new javax.swing.JPanel();
         jpNotesControls = new javax.swing.JPanel();
@@ -2208,8 +2213,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel36.add(jlTicket);
 
         jtfTicket.setText("TEXT");
-        jtfTicket.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfTicket.setPreferredSize(new java.awt.Dimension(177, 23));
         jPanel36.add(jtfTicket);
+
+        jtbLinkTicket.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_off.gif"))); // NOI18N
+        jtbLinkTicket.setToolTipText("Vinculación de boletos de báscula o captura manual");
+        jtbLinkTicket.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbLinkTicket.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif"))); // NOI18N
+        jPanel36.add(jtbLinkTicket);
 
         jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
         jbEditLogistics.setToolTipText("Modificar datos");
@@ -3909,6 +3920,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCustomAccEntryDelete.addActionListener(this);
         jbCustomAccEntryOk.addActionListener(this);
         jbCustomAccEntryCancel.addActionListener(this);
+        jtbLinkTicket.addActionListener(this);
 
         // Focus listeners:
 
@@ -3948,7 +3960,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         // Change listeners:
         
         jTabbedPane.addChangeListener(this);
-        
+                
         // Action map:
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentNew", "dependentNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
@@ -4961,6 +4973,60 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
+    private void setLogisticsData() {
+        if (jtbLinkTicket.isSelected()) {
+            SDataDpsEntry entry;
+            Vector<SDataScaleTicketDps>aux = new Vector<>();
+            ArrayList<String> numTics = new ArrayList<>();
+            for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                if (i == 0) {
+                    moFieldDriver.setString(entry.getDriver());
+                    moFieldPlate.setString(entry.getPlate());
+                }
+                for (SDataScaleTicketDpsEntry ticDpsEty : entry.getDbmsScaleTicketsEty()) {
+                    SDataScaleTicketDps ticDps = new SDataScaleTicketDps();
+                    ticDps.setPkScaleTicketId(ticDpsEty.getPkScaleTicketId());
+                    aux.add(ticDps);
+                }
+                String[] num = entry.getTicket().split(", ");
+                boolean found = false;
+                for (int j = 0; j < num.length; j++) {
+                    for (String x : numTics) {
+                        if (x.equals(num[j])) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        numTics.add(num[j]);
+                    }
+                }
+            }
+            mvScaleTicDps.clear();
+            for (SDataScaleTicketDps ticDpsAux : aux) {
+                if (mvScaleTicDps.isEmpty()) {
+                    mvScaleTicDps.add(ticDpsAux);
+                }
+                else {
+                    boolean found = false;
+                    for (SDataScaleTicketDps ticDps : mvScaleTicDps) {
+                        if (ticDps.getPkScaleTicketId() == ticDpsAux.getPkScaleTicketId()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        mvScaleTicDps.add(ticDpsAux);
+                    }
+                }
+            }
+            String tickets = "";
+            for (String num : numTics) {
+                tickets += (tickets.isEmpty() ? "" : ", ") + num;
+            }
+            moFieldTicket.setString(tickets);
+        }
+    }
     /**
      * Updates current document, when new, with business partner default settings.
      */
@@ -5942,6 +6008,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jcbPlate.setEnabled(false);
             jtfTicket.setEditable(false);
             jtfTicket.setFocusable(false);
+            jtbLinkTicket.setEnabled(false);
             
             jbEditLogistics.setEnabled(false);
             
@@ -7289,7 +7356,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
                 moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
                 moFormEntry.setValue(SDataConstants.FINU_TAX_REG, ((SFormComponentItem) jcbTaxRegionId.getSelectedItem()).getPrimaryKey());
-
+                moFormEntry.setValue(SFormDpsEntry.LINK_TICKET_SELECT, jtbLinkTicket.isSelected());
+                moFormEntry.setValue(SFormDpsEntry.LINKED_TICKET, mvScaleTicDps);
+                
                 moFormEntry.setFormVisible(true);
 
                 if (moFormEntry.getFormResult() == SLibConstants.FORM_RESULT_OK) {
@@ -7299,6 +7368,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     renderEntries();
                     calculateTotal();
                     updateDpsEntryCfdiSettings();
+                    setLogisticsData();
                     moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                 }
             }
@@ -7346,6 +7416,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFormEntry.setValue(SDataConstants.BPSU_BPB, moBizPartnerBranch);
                     moFormEntry.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, postEmissionEditionAllowed);
                     moFormEntry.setValue(SLibConstants.VALUE_IS_MAT_REQ, mbMatRequestImport);
+                    moFormEntry.setValue(SFormDpsEntry.LINK_TICKET_SELECT, jtbLinkTicket.isSelected());
+                    if (jbEditLogistics.isEnabled()) {
+                        moFormEntry.setValue(SFormDpsEntry.LINK_TICKET_ENABLED, jtbLinkTicket.isEnabled());
+                    }
+                    moFormEntry.setValue(SFormDpsEntry.LINKED_TICKET, mvScaleTicDps);
                     moFormEntry.setEnableDataAddenda(isCfdAddendaRequired());
                     moFormEntry.setRegistry(entry);
 
@@ -7439,6 +7514,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         renderEntries();
                         calculateTotal();
                         updateDpsEntryCfdiSettings();
+                        setLogisticsData();
                         moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
                         
                         if (mbIsDpsOrder) {
@@ -7519,6 +7595,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 renderEntries();
                                 calculateTotal();
                                 updateDpsEntryCfdiSettings();
+                                setLogisticsData();
                                 moPaneGridEntries.setTableRowSelection(index < moPaneGridEntries.getTableGuiRowCount() ? index : moPaneGridEntries.getTableGuiRowCount() - 1);
                                 if (moPaneGridEntries.getTableGuiRowCount() == 0) {
                                     updateCurrencyFieldsStatus(true);
@@ -7805,7 +7882,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     moDps.setIsCopied(oDpsSource.getIsCopied() || moDps.getIsCopied()); // preserve "is copied" attribute if document already is so!
                                     moDps.setFkSourceYearId_n(moDps.getFkSourceYearId_n() != SLibConstants.UNDEFINED ? moDps.getFkSourceYearId_n() : oDpsSource.getPkYearId());
                                     moDps.setFkSourceDocId_n(moDps.getFkSourceDocId_n() != SLibConstants.UNDEFINED ? moDps.getFkSourceDocId_n() : oDpsSource.getPkDocId());
-
+                                    moDps.getDbmsScaleTickets().clear();
+                                    
                                     if (addendaReq) {
                                         DLG_LINK:
                                         for (SDataEntryDpsDpsLink entryLink : (Vector<SDataEntryDpsDpsLink>) moDialogDpsLink.getValue(SDataConstants.TRNX_DPS_DES)) {
@@ -7831,48 +7909,56 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         }
                                     }
                                     else {
+                                        ETY_SELECTED:
                                         for (SDataEntryDpsDpsLink entryLink : (Vector<SDataEntryDpsDpsLink>) moDialogDpsLink.getValue(SDataConstants.TRNX_DPS_DES)) {
                                             for (SDataDpsEntry dpsSourceEntry : oDpsSource.getDbmsDpsEntries()) {
                                                 if (SLibUtilities.compareKeys(entryLink.getDpsEntryKey(), dpsSourceEntry.getPrimaryKey())) {
-                                                    dpsSourceEntry.setAuxPkDpsEntryPrice(null);
-                                                    dpsSourceEntry.getDbmsEntryPrices().clear();
-                                                    dpsSourceEntry.setContractPriceYear(SLibConstants.UNDEFINED);
-                                                    dpsSourceEntry.setContractPriceMonth(SLibConstants.UNDEFINED);
-                                                    dpsSourceEntry.setIsPriceVariable(false);
-                                                    dpsSourceEntry.setIsPriceConfirm(false);
-                                                    dpsSourceEntry.setContractBase(0d);
-                                                    dpsSourceEntry.setContractFuture(0d);
-                                                    dpsSourceEntry.setContractFactor(0d);
-                                                    
-                                                    if (entryLink.getAuxSGuiDpsEntryPrice() != null) {
-                                                        dpsSourceEntry.setAuxPkDpsEntryPrice((int[]) entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey());
-                                                        dpsSourceEntry.setContractPriceYear(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceYear());
-                                                        dpsSourceEntry.setContractPriceMonth(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceMonth());
-                                                        /* XXX Check this bug in edition of the orders sales (jbarajas, 2015-08-18)
-                                                        dpsSourceEntry.setAuxPkDpsEntryPrice((int[]) entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey());
+                                                    if ((jtbLinkTicket.isSelected() && !dpsSourceEntry.getDbmsScaleTicketsEty().isEmpty()) || (!jtbLinkTicket.isSelected() && dpsSourceEntry.getDbmsScaleTicketsEty().isEmpty())) {
+                                                        dpsSourceEntry.setAuxPkDpsEntryPrice(null);
                                                         dpsSourceEntry.getDbmsEntryPrices().clear();
-                                                        dpsSourceEntry.setContractPriceYear(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceYear());
-                                                        dpsSourceEntry.setContractPriceMonth(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceMonth());
+                                                        dpsSourceEntry.setContractPriceYear(SLibConstants.UNDEFINED);
+                                                        dpsSourceEntry.setContractPriceMonth(SLibConstants.UNDEFINED);
                                                         dpsSourceEntry.setIsPriceVariable(false);
                                                         dpsSourceEntry.setIsPriceConfirm(false);
                                                         dpsSourceEntry.setContractBase(0d);
                                                         dpsSourceEntry.setContractFuture(0d);
                                                         dpsSourceEntry.setContractFactor(0d);
-                                                        */
-                                                        if(jtfNumberReference.getText().isEmpty()) {
-                                                            jtfNumberReference.setText(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getReferenceNumber());
+
+                                                        if (entryLink.getAuxSGuiDpsEntryPrice() != null) {
+                                                            dpsSourceEntry.setAuxPkDpsEntryPrice((int[]) entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey());
+                                                            dpsSourceEntry.setContractPriceYear(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceYear());
+                                                            dpsSourceEntry.setContractPriceMonth(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceMonth());
+                                                            /* XXX Check this bug in edition of the orders sales (jbarajas, 2015-08-18)
+                                                            dpsSourceEntry.setAuxPkDpsEntryPrice((int[]) entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getPrimaryKey());
+                                                            dpsSourceEntry.getDbmsEntryPrices().clear();
+                                                            dpsSourceEntry.setContractPriceYear(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceYear());
+                                                            dpsSourceEntry.setContractPriceMonth(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceMonth());
+                                                            dpsSourceEntry.setIsPriceVariable(false);
+                                                            dpsSourceEntry.setIsPriceConfirm(false);
+                                                            dpsSourceEntry.setContractBase(0d);
+                                                            dpsSourceEntry.setContractFuture(0d);
+                                                            dpsSourceEntry.setContractFactor(0d);
+                                                            */
+                                                            if(jtfNumberReference.getText().isEmpty()) {
+                                                                jtfNumberReference.setText(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getReferenceNumber());
+                                                            }
+                                                            double price = 0.0;
+                                                            if(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getIsPriceVariable() && entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getOriginalPriceUnitaryCy() == 0d) {
+                                                                double conversionFactor = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(0, SModSysConsts.ITMU_UNIT_KG, SModSysConsts.ITMU_UNIT_LB);
+                                                                double conversionOriginalQuantity = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(dpsSourceEntry.getFkItemId(), SModSysConsts.ITMU_UNIT_MT_TON, dpsSourceEntry.getFkOriginalUnitId());
+                                                                price = STrnUtilities.calculateDpsEntryPriceUnitary(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractBase() , entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractFuture(), conversionFactor, entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractFactor(), conversionOriginalQuantity);
+                                                            }
+                                                            else {
+                                                                price = entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getOriginalPriceUnitaryCy();
+                                                            }
+                                                            dpsSourceEntry.setOriginalPriceUnitaryCy(price);
                                                         }
-                                                        double price = 0.0;
-                                                        if(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getIsPriceVariable() && entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getOriginalPriceUnitaryCy() == 0d) {
-                                                            double conversionFactor = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(0, SModSysConsts.ITMU_UNIT_KG, SModSysConsts.ITMU_UNIT_LB);
-                                                            double conversionOriginalQuantity = ((SSessionCustom) miClient.getSession().getSessionCustom()).getUnitsFactorForQuantity(dpsSourceEntry.getFkItemId(), SModSysConsts.ITMU_UNIT_MT_TON, dpsSourceEntry.getFkOriginalUnitId());
-                                                            price = STrnUtilities.calculateDpsEntryPriceUnitary(entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractBase() , entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractFuture(), conversionFactor, entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractFactor(), conversionOriginalQuantity);
-                                                        }
-                                                        else {
-                                                            price = entryLink.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getOriginalPriceUnitaryCy();
-                                                        }
-                                                        dpsSourceEntry.setOriginalPriceUnitaryCy(price);
-                                                    }                                                    
+                                                    }
+                                                    else {
+                                                        miClient.showMsgBoxInformation("No se puede vincular la(s) partida(s) debido a que el modo de vinculación de boletos no coincide con el seleccionado en la captura.");
+                                                        dpsSourceEntries.clear();
+                                                        break ETY_SELECTED;
+                                                    }
                                                     dpsSourceEntries.add(dpsSourceEntry);
                                                 }
                                             }
@@ -7891,6 +7977,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                                         renderEntries();
                                         calculateTotal();
+                                        setLogisticsData();
                                         moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                                     }
                                 }
@@ -8445,6 +8532,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         renderEntries();
                         calculateTotal();
                         updateDpsEntryCfdiSettings();
+                        setLogisticsData();
                         moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                     }
                     else {
@@ -8915,44 +9003,52 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         miClient.pickOption(SModConsts.LOG_VEH, moFieldFkVehicleId_n, new int[] { moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] });
     }
 
-    private void actionEditLogistics() {             
-        moFormCom.formReset();
-        moFormCom.setRegistry(moDps);
-        moFormCom.setVisible(true);
-        
-        if (moFormCom.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            mbPostEmissionEdition = true;
-            
-            SDataDps dps = (SDataDps) moFormCom.getRegistry(); // convenience variable, dps is the same object as moDps!
-            
-            moFieldFkCarrierTypeId.setFieldValue(new int[] { dps.getFkCarrierTypeId() });
-            itemStateChangedFkCarrierTypeId();
-            moFieldFkCarrierId_n.setFieldValue(new int[] { dps.getFkCarrierId_n() });
-            moFieldFkVehicleTypeId_n.setFieldValue(new int[] { dps.getFkVehicleTypeId_n() });
-            itemStateChangedFkVehicleTypeId_n();
-            moFieldFkVehicleId_n.setFieldValue(new int[] { dps.getFkVehicleId_n() });
+    private void actionEditLogistics() {       
+        if (mvScaleTicDps.isEmpty()) {
+            moFormCom.formReset();
+            moFormCom.setRegistry(moDps);
+            moFormCom.setVisible(true);
 
-            moFieldDriver.setFieldValue(dps.getDriver());
-            moFieldPlate.setFieldValue(dps.getPlate());
-            moFieldTicket.setFieldValue(dps.getTicket());
-            
-            mnSalesAgentId_n = dps.getFkSalesAgentId_n();
-            renderSalesAgentOfDocument(new int[] { mnSalesAgentId_n });
-            
-            mnSalesSupervisorId_n = dps.getFkSalesSupervisorId_n();
-            renderSalesSupervisorOfDocument(new int[] { mnSalesSupervisorId_n });
-            
-            // fields shoud not be editable in this context (post-emission edition):
-            jcbFkCarrierTypeId.setEnabled(false);
-            jcbFkCarrierId_n.setEnabled(false);
-            jcbFkVehicleTypeId_n.setEnabled(false);
-            jcbFkVehicleId_n.setEnabled(false);
-            jcbDriver.setEnabled(false);
-            jcbPlate.setEnabled(false);
-            jtfTicket.setEditable(false);
-            jtfTicket.setFocusable(false);
-            
-            jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
+            if (moFormCom.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                mbPostEmissionEdition = true;
+
+                SDataDps dps = (SDataDps) moFormCom.getRegistry(); // convenience variable, dps is the same object as moDps!
+
+                moFieldFkCarrierTypeId.setFieldValue(new int[] { dps.getFkCarrierTypeId() });
+                itemStateChangedFkCarrierTypeId();
+                moFieldFkCarrierId_n.setFieldValue(new int[] { dps.getFkCarrierId_n() });
+                moFieldFkVehicleTypeId_n.setFieldValue(new int[] { dps.getFkVehicleTypeId_n() });
+                itemStateChangedFkVehicleTypeId_n();
+                moFieldFkVehicleId_n.setFieldValue(new int[] { dps.getFkVehicleId_n() });
+
+                moFieldDriver.setFieldValue(dps.getDriver());
+                moFieldPlate.setFieldValue(dps.getPlate());
+                moFieldTicket.setFieldValue(dps.getTicket());
+
+                mnSalesAgentId_n = dps.getFkSalesAgentId_n();
+                renderSalesAgentOfDocument(new int[] { mnSalesAgentId_n });
+
+                mnSalesSupervisorId_n = dps.getFkSalesSupervisorId_n();
+                renderSalesSupervisorOfDocument(new int[] { mnSalesSupervisorId_n });
+
+                // fields shoud not be editable in this context (post-emission edition):
+                jcbFkCarrierTypeId.setEnabled(false);
+                jcbFkCarrierId_n.setEnabled(false);
+                jcbFkVehicleTypeId_n.setEnabled(false);
+                jcbFkVehicleId_n.setEnabled(false);
+                jcbDriver.setEnabled(false);
+                jcbPlate.setEnabled(false);
+                jtfTicket.setEditable(false);
+                jtfTicket.setFocusable(false);
+                jtbLinkTicket.setEnabled(false);
+
+                jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
+            }
+        }
+        else {
+            jtbLinkTicket.setEnabled(true);
+            jtbLinkTicket.setSelected(true);
+            jbOk.setEnabled(true);
         }
     }
     
@@ -9160,6 +9256,43 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     jtbSwitchCustomAcc.setSelected(true); // switch on again
                 }
+            }
+        }
+    }
+    
+    private void actionLinkTicket() {
+        if (jtbLinkTicket.isEnabled()) {
+            if (!jtfTicket.getText().isEmpty()) {
+                if (miClient.showMsgBoxConfirm("Ya hay boletos capturados, si cambia el modo de captura los datos se perderán\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
+                    jcbDriver.setEnabled(!jtbLinkTicket.isSelected());
+                    jcbPlate.setEnabled(!jtbLinkTicket.isSelected());
+                    jtfTicket.setEnabled(!jtbLinkTicket.isSelected());   
+                    jcbDriver.removeAllItems();
+                    jcbPlate.removeAllItems();
+                    jtfTicket.setText("");
+                    mvScaleTicDps.clear();
+                    for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
+                        SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
+                        entry.setDriver("");
+                        entry.setPlate("");
+                        entry.setTicket("");
+                        entry.getDbmsScaleTicketsEty().clear();                        
+                    }
+                }
+                else {
+                    jtbLinkTicket.removeActionListener(this);
+                    jtbLinkTicket.setEnabled(!jtbLinkTicket.isSelected());
+                    jtbLinkTicket.addActionListener(this);
+                }
+            }
+            else {
+                jcbDriver.setEnabled(!jtbLinkTicket.isSelected());
+                jcbPlate.setEnabled(!jtbLinkTicket.isSelected());
+                jtfTicket.setEnabled(!jtbLinkTicket.isSelected());           
+                jcbDriver.removeAllItems();
+                jcbPlate.removeAllItems();
+                jtfTicket.setText("");
+                mvScaleTicDps.clear();
             }
         }
     }
@@ -9382,8 +9515,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         return;
                 }
 
-                //entry.setPkYearId(...);
-                //entry.setPkDocId(...);
+                //entry.setPkDpsYearId(...);
+                //entry.setPkDpsDocId(...);
                 //entry.setPkAccEntryId(...);
                 entry.setConcept(moFieldAccConcept.getString());
                 entry.setQuantity(moFieldAccQuantity.getDouble());
@@ -9790,17 +9923,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkCarrierId_n.setEnabled(enableCarrier);
         jbFkCarrierId_n.setEnabled(enableCarrier);
         
+        
+        jtbLinkTicket.setEnabled(mbIsDpsOrder || mbIsDpsInvoice);
+        jtbLinkTicket.setSelected(mvScaleTicDps != null && !mvScaleTicDps.isEmpty());
+        
         jcbFkVehicleTypeId_n.setEnabled(enableTypeVehicle);
-        jcbDriver.setEnabled(enableTypeVehicle);
-        jcbPlate.setEnabled(enableTypeVehicle);
-        jtfTicket.setEditable(enableTypeVehicle);
-        jtfTicket.setFocusable(enableTypeVehicle);
+        jcbDriver.setEnabled(enableTypeVehicle && !jtbLinkTicket.isSelected());
+        jcbPlate.setEnabled(enableTypeVehicle && !jtbLinkTicket.isSelected());
+        jtfTicket.setEnabled(enableTypeVehicle && !jtbLinkTicket.isSelected());
+        jtfTicket.setEditable(enableTypeVehicle && !jtbLinkTicket.isSelected());
+        jtfTicket.setFocusable(enableTypeVehicle && !jtbLinkTicket.isSelected());
         
         if (!enableCarrier) {
             moFieldFkCarrierId_n.setFieldValue(null);
         }
 
-        if (!enableTypeVehicle) {
+        if (!enableTypeVehicle && !jtbLinkTicket.isSelected()) {
             moFieldFkVehicleTypeId_n.setFieldValue(null);
             moFieldDriver.setFieldValue("");
             moFieldPlate.setFieldValue("");
@@ -10801,6 +10939,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JSeparator jsNotes02;
     private javax.swing.JTextArea jtaCfdiRelated;
     private javax.swing.JToggleButton jtbEntryFilter;
+    private javax.swing.JToggleButton jtbLinkTicket;
     private javax.swing.JToggleButton jtbNotesFilter;
     private javax.swing.JToggleButton jtbSwitchCustomAcc;
     private javax.swing.JTextField jtfAccConcept;
@@ -11037,7 +11176,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckShipments.setSelected(false);
         jckIsRebill.setSelected(false);
         jtbSwitchCustomAcc.setSelected(false);
+        jtbLinkTicket.setSelected(false);
 
+        mvScaleTicDps = new Vector<>();
+        
         moFieldDate.setFieldValue(moDps.getDate());
         moFieldDateDoc.setFieldValue(moDps.getDate());
         moFieldDateStartCredit.setFieldValue(moDps.getDate());
@@ -11182,6 +11324,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 validation.setComponent(mvFields.get(i).getComponent());
                 break;
             }
+        }
+        
+        if (jtbLinkTicket.isSelected() && mvScaleTicDps.isEmpty()) {
+            miClient.showMsgBoxInformation("Se seleccionó la opcion de vincular boletos desde báscula pero no se vinculó ninguno\n"
+                    + "Se tendra que volver a elegir la opción si se quiere vincular boletos de esta forma.");
         }
 
         if (!mbPostEmissionEdition) {
@@ -12122,6 +12269,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moPaneGridNotes.renderTableRows();
         moPaneGridNotes.setTableRowSelection(0);
         
+        for (SDataScaleTicketDps t : moDps.getDbmsScaleTickets()) {
+            mvScaleTicDps.add(t);
+        }
+        
         // customized-accounting entries:
         
         /*
@@ -12370,9 +12521,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             moDps.setIsRebill(jckIsRebill.isSelected());
 
-            moDps.setDriver(!moFieldDriver.getComponent().isEnabled() ? "" : moFieldDriver.getString());
-            moDps.setPlate(!moFieldPlate.getComponent().isEnabled() ? "" : moFieldPlate.getString());
-            moDps.setTicket(!moFieldTicket.getComponent().isEnabled() ? "" : moFieldTicket.getString());
+            moDps.setDriver(jtbLinkTicket.isSelected() || moFieldDriver.getComponent().isEnabled() ? moFieldDriver.getString() : "");
+            moDps.setPlate(jtbLinkTicket.isSelected() || moFieldPlate.getComponent().isEnabled() ? moFieldPlate.getString() : "");
+            moDps.setTicket(jtbLinkTicket.isSelected() || moFieldTicket.getComponent().isEnabled() ? moFieldTicket.getString() : "");
             moDps.setIsRecordAutomatic(!jckRecordUser.isSelected());
             moDps.setShipments(!moFieldShipments.getComponent().isEnabled() ? 0 : moFieldShipments.getInteger());
             //moDps.setPayments(...     // about to be deprecated!
@@ -12501,8 +12652,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (isCfdEmissionRequired) {
                 SDataDpsCfd dpsCfd = new SDataDpsCfd();
 
-                //dpsCfd.setPkYearId(...    // set when DPS saved!
-                //dpsCfd.setPkDocId(...     // set when DPS saved!
+                //dpsCfd.setPkDpsYearId(...    // set when DPS saved!
+                //dpsCfd.setPkDpsDocId(...     // set when DPS saved!
                 //dpsCfd.setVersion(...     // set when DPS saved!
                 dpsCfd.setCfdiType(mbIsDpsInvoice ? DCfdi33Catalogs.CFD_TP_I : DCfdi33Catalogs.CFD_TP_E);
                 dpsCfd.setPaymentWay(moFieldCfdiPaymentWay.getFieldValue().toString());
@@ -12663,6 +12814,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (!jtfBillOfLading.getText().isEmpty()) {
                 moDps.setFkBillOfLading_n(moBillOfLading.getPkBillOfLadingId());
                 moDps.setDbmsDataCfdBol(moBillOfLading == null ? null : moBillOfLading.getDataCfd());
+            }
+            
+            moDps.getDbmsScaleTickets().clear(); 
+            for (SDataScaleTicketDps t : mvScaleTicDps) {
+                moDps.getDbmsScaleTickets().add(t);
             }
             
             return moDps;
@@ -12921,6 +13077,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (toggleButton == jtbSwitchCustomAcc) {
                 actionSwitchCustomAcc();
+            }
+            else if (toggleButton == jtbLinkTicket) {
+                actionLinkTicket();
             }
         }
     }
