@@ -608,16 +608,16 @@ public class SFormScaleItem extends javax.swing.JDialog implements erp.lib.form.
             for (ArrayList<SDataScaleItemMapRow> arr : maHashOfScaleItemMapRows.values()) {
                 for (SDataScaleItemMapRow row : arr)  {
                     SDataScaleItemMap itemMap = new SDataScaleItemMap();
-                    if (row.mbIsEdit) {
-                        itemMap.read(new int[] {row.moScaId[0], row.moScaId[1], row.mnItemId}, miClient.getSession().getStatement());
+                    if (row.mbIsNew) {
+                        itemMap.setPkScaleId(moScale.getPkScaleId());
+                        itemMap.setPkScaleItemId(row.moScaId[1]);
+                        itemMap.setPkItemId(row.mnItemId);
                         itemMap.setIsDefault(row.mbDefault);
                         itemMap.setFkUserId(miClient.getSession().getUser().getPkUserId());
                         itemMap.save(miClient.getSession().getDatabase().getConnection());
                     }
-                    else if (row.mbIsNew) {
-                        itemMap.setPkScaleId(moScale.getPkScaleId());
-                        itemMap.setPkScaleItemId(row.moScaId[1]);
-                        itemMap.setPkItemId(row.mnItemId);
+                    else if (row.mbIsEdit) {
+                        itemMap.read(new int[] {row.moScaId[0], row.moScaId[1], row.mnItemId}, miClient.getSession().getStatement());
                         itemMap.setIsDefault(row.mbDefault);
                         itemMap.setFkUserId(miClient.getSession().getUser().getPkUserId());
                         itemMap.save(miClient.getSession().getDatabase().getConnection());

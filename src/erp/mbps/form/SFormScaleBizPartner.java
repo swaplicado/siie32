@@ -63,7 +63,7 @@ public class SFormScaleBizPartner extends javax.swing.JDialog implements erp.lib
     
     private final String msSqlTpMap;
     
-    /** Creates new form SFormScaleItem
+    /** Creates new form SFormScaleBizPartner
      * @param client
      * @param subType */
     public SFormScaleBizPartner(erp.client.SClientInterface client, int subType) {
@@ -615,17 +615,17 @@ public class SFormScaleBizPartner extends javax.swing.JDialog implements erp.lib
             for (ArrayList<SDataScaleBizPartnerMapRow> arr : maHashOfScaleBizPartnerMapRows.values()) {
                 for (SDataScaleBizPartnerMapRow row : arr)  {
                     SDataScaleBizPartnerMap bpMap = new SDataScaleBizPartnerMap();
-                    if (row.mbIsEdit) {
-                        bpMap.read(new int[] {row.moScaId[0], row.moScaId[1], row.mnBizPartnerId}, miClient.getSession().getStatement());
-                        bpMap.setIsDefault(row.mbDefault);
-                        bpMap.setFkUserId(miClient.getSession().getUser().getPkUserId());
-                        bpMap.save(miClient.getSession().getDatabase().getConnection());
-                    }
-                    else if (row.mbIsNew) {
+                    if (row.mbIsNew) {
                         bpMap.setPkScaleId(moScale.getPkScaleId());
                         bpMap.setPkScaleBizPartnerId(row.moScaId[1]);
                         bpMap.setPkBizPartnerId(row.mnBizPartnerId);
                         bpMap.setTypeMap(mnFormSubtype == SDataConstants.MOD_SAL ? 2 : 1);
+                        bpMap.setIsDefault(row.mbDefault);
+                        bpMap.setFkUserId(miClient.getSession().getUser().getPkUserId());
+                        bpMap.save(miClient.getSession().getDatabase().getConnection());
+                    }
+                    else if (row.mbIsEdit) {
+                        bpMap.read(new int[] {row.moScaId[0], row.moScaId[1], row.mnBizPartnerId}, miClient.getSession().getStatement());
                         bpMap.setIsDefault(row.mbDefault);
                         bpMap.setFkUserId(miClient.getSession().getUser().getPkUserId());
                         bpMap.save(miClient.getSession().getDatabase().getConnection());
