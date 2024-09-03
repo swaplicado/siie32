@@ -36,7 +36,7 @@ public abstract class SDataScaleUtils {
         String driver = "";
         String user = "";
         String pass = "";
-        int tpDbms = 0;
+        int typeDbms = 0;
         
         try {
             String sql = "SELECT * FROM erp.cfgu_sca WHERE id_sca = " + pk;
@@ -46,23 +46,25 @@ public abstract class SDataScaleUtils {
                 host = resultSet.getString("host");
                 port = resultSet.getString("port");
                 db = resultSet.getString("db_name");
-                tpDbms = resultSet.getInt("fid_tp_dbms");
+                typeDbms = resultSet.getInt("fid_tp_dbms");
                 user = resultSet.getString("user_name");
                 pass = resultSet.getString("user_pswd");
             } 
             String url = "";
             Class.forName(driver).newInstance();
 
-            switch (tpDbms){
-                case SDbConsts.DBMS_MYSQL: break;
-                case SDbConsts.DBMS_SQL_SERVER: break;
+            switch (typeDbms){
                 case SDbConsts.DBMS_SYBASE: 
                     url = "jdbc:sybase:Tds:" + host + ":" +
                             port + "/" + 
                             db;
                     break;
+                case SDbConsts.DBMS_MYSQL:
+                case SDbConsts.DBMS_SQL_SERVER:
                 default:
+                    throw new UnsupportedOperationException("Not supported yet.");
             }
+            
             Properties properties = new Properties();
             properties.put("user", user);
             properties.put("password", pass);
