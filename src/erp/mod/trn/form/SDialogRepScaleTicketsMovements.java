@@ -447,10 +447,10 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
                 "<b>" +
                 "<td colspan='3'>" + SLibUtils.textToHtml("TOTAL AETH") + "</td>" +
                 "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethMes)) + "</td>" +
-                "<td style='border-left: 1px' align='right'></td>" +
-                (tri2 ? "<td align='right'></td>" : "") +
-                (tri3 ? "<td align='right'></td>" : "") +
-                (tri4 ? "<td align='right'></td>" : "") +
+                "<td style='border-left: 1px' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethTri1)) + "</td>" +
+                (tri2 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethTri2)) + "</td>" : "") +
+                (tri3 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethTri3)) + "</td>" : "") +
+                (tri4 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethTri4)) + "</td>" : "") +
                 "<td style='border-left: 1px' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethAnio)) + "</td>" +
                 "</b></tr>";
         
@@ -510,7 +510,7 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
                     "<td style='border-left: 1px; background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri1)) + "</td>" +
                     (tri2 ? "<td style='background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri2)) + "</td>" : "") +
                     (tri3 ? "<td style='background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri3)) + "</td>" : "") +
-                    (tri4 ? "<td style='background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalAethTri4)) + "</td>" : "") +
+                    (tri4 ? "<td style='background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri4)) + "</td>" : "") +
                     "<td style='border-left: 1px; background-color: LemonChiffon' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqAnio)) + "</td>" +
                     "</b>"+
                     "</tr>";
@@ -519,10 +519,10 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
                     "<b>" +
                     "<td colspan='3'>" + SLibUtils.textToHtml("TOTAL MAQUILAS") + "</td>" +
                     "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqMes)) + "</td>" +
-                    "<td style='border-left: 1px' align='right'></td>" +
-                    (tri2 ? "<td align='right'></td>" : "") +
-                    (tri3 ? "<td align='right'></td>" : "") +
-                    (tri4 ? "<td align='right'></td>" : "") +
+                    "<td style='border-left: 1px' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri1)) + "</td>" +
+                    (tri2 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri2)) + "</td>" : "") +
+                    (tri3 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri3)) + "</td>" : "") +
+                    (tri4 ? "<td align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqTri4)) + "</td>" : "") +
                     "<td style='border-left: 1px' align='right'>" + SLibUtils.textToHtml(SLibUtils.DecimalFormatValue0D.format(totalMaqAnio)) + "</td>" +
                     "</b></tr>";
         }
