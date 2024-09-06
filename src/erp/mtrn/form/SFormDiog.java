@@ -3287,15 +3287,23 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     }
     
     private void actionCostCenter() {
+        int maxLevel = SFinUtils.getCostCenterMaxLevel(miClient.getSession());
         if (moDialogCostCenter == null) {
             moDialogCostCenter = new SDialogCostCenter(miClient);
         }
         moDialogCostCenter.setVisible(true);
         if (moDialogCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
-            String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
-            jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
-            jtfCostCenter.setCaretPosition(0);
+            if (moCostCenter.getLevel() == maxLevel) {
+                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
+                jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
+                jtfCostCenter.setCaretPosition(0);
+            }
+            else {
+                miClient.showMsgBoxInformation("No se puede seleccionar el centro de costo elegido debido a que no tiene la profundidad necesaria.");
+                jtfCostCenter.setText("");
+                moCostCenter = null;
+            }
         }
     }
 

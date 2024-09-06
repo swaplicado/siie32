@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 257.3/ 2024-09-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega filtro en la vista de documentos de inventarios para no poder seleccionar un centro de costo que no tenga el nivel máximo de la tabla.
+
+================================================================================
 SIIE 3.2 257.2/ 2024-09-05
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
