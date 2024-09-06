@@ -1,8 +1,9 @@
 ================================================================================
 SIIE 3.2 257.4/ 2024-09-06
-Edwin Omar CARMONA FIGUEROA
+Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agrega redondeo de centavos en el prorrateo de partidas de pólizas contables en valuación de consumos de inventario.
+2) Se agrega permiso para la vista de "Existencias por precio comercial".
 
 ================================================================================
 SIIE 3.2 257.3/ 2024-09-06

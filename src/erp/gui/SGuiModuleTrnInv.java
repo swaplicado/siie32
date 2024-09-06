@@ -287,6 +287,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqPur = false;
         boolean hasRightMatReqAdm = false;
         boolean hasRightValMatCons = false;
+        boolean hasRightStkCommPrice = false;
         int levelRightValMatCons = 0;
         boolean hasRightMatReqReclass = false;
 
@@ -908,6 +909,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
         levelRightValMatCons = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasRightStkCommPrice = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_STOCK_COMM_PRICE).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmiCatMatCostCenterGrp.setEnabled(hasRightMatReqAdm);
@@ -1024,7 +1026,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockLot.setEnabled(hasRightStock);
-        jmiStkStockCommPrice.setEnabled(hasRightStock);
+        //jmiStkStockCommPrice.setEnabled(hasRightStock);
+        jmiStkStockCommPrice.setEnabled(hasRightStkCommPrice);
         jmiStkStockWarehouse.setEnabled(hasRightStock);
         jmiStkStockWarehouseLot.setEnabled(hasRightStock);
         jmiStkStockMovements.setEnabled(hasRightStock);
