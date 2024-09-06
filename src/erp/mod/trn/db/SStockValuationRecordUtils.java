@@ -185,7 +185,7 @@ public class SStockValuationRecordUtils {
                     oConfig.setAuxAmount(SLibUtils.roundAmount(oConfig.getPercentage() * oConsumption.getCost_r()));
                     dTotalAmount = SLibUtils.roundAmount(dTotalAmount + oConfig.getAuxAmount());
                 }
-                if (Math.abs(dTotalAmount - oConsumption.getCost_r()) >= 0.01d) {
+                if (Math.abs(SLibUtils.roundAmount(dTotalAmount - oConsumption.getCost_r())) >= 0.01d) {
                     if (oConfigMaj != null) {
                         oConfigMaj.setAuxAmount(SLibUtils.roundAmount(oConfigMaj.getAuxAmount() + (oConsumption.getCost_r() - dTotalAmount)));
                     }
