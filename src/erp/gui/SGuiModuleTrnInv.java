@@ -1022,7 +1022,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
-        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons);
+        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockLot.setEnabled(hasRightStock);
