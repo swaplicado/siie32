@@ -316,6 +316,7 @@ public class SFormScaleBizPartner extends javax.swing.JDialog implements erp.lib
     }
     
     private void populateScaleBizPartnerTable() {
+        maHashOfScaleBizPartnerMapRows.clear();
         maScaleBizPartnerRows = new ArrayList<>();
         
         try {

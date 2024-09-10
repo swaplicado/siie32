@@ -76,12 +76,15 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
         jPanel6 = new javax.swing.JPanel();
         jlTo = new javax.swing.JLabel();
         moTextTo = new sa.lib.gui.bean.SBeanFieldText();
+        jlAddingMultipleMailHelp = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jlCc = new javax.swing.JLabel();
         moTextCc = new sa.lib.gui.bean.SBeanFieldText();
+        jlAddingMultipleMailHelp1 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jlBcc = new javax.swing.JLabel();
         moTextBcc = new sa.lib.gui.bean.SBeanFieldText();
+        jlAddingMultipleMailHelp2 = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         moBooleanSaveEmails = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel4 = new javax.swing.JPanel();
@@ -118,6 +121,13 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
         moTextTo.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel6.add(moTextTo);
 
+        jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAddingMultipleMailHelp.setToolTipText("Separar varias cuentas con \";\", sin espacios, p. ej., \"cuenta1@mail.com;cuenta2@mail.com\"");
+        jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel6.add(jlAddingMultipleMailHelp);
+
         jPanel2.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -130,6 +140,13 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
         moTextCc.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel7.add(moTextCc);
 
+        jlAddingMultipleMailHelp1.setForeground(new java.awt.Color(109, 109, 109));
+        jlAddingMultipleMailHelp1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAddingMultipleMailHelp1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAddingMultipleMailHelp1.setToolTipText("Separar varias cuentas con \";\", sin espacios, p. ej., \"cuenta1@mail.com;cuenta2@mail.com\"");
+        jlAddingMultipleMailHelp1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jlAddingMultipleMailHelp1);
+
         jPanel2.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -141,6 +158,13 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
 
         moTextBcc.setPreferredSize(new java.awt.Dimension(450, 23));
         jPanel8.add(moTextBcc);
+
+        jlAddingMultipleMailHelp2.setForeground(new java.awt.Color(109, 109, 109));
+        jlAddingMultipleMailHelp2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAddingMultipleMailHelp2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAddingMultipleMailHelp2.setToolTipText("Separar varias cuentas con \";\", sin espacios, p. ej., \"cuenta1@mail.com;cuenta2@mail.com\"");
+        jlAddingMultipleMailHelp2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel8.add(jlAddingMultipleMailHelp2);
 
         jPanel2.add(jPanel8);
 
@@ -184,6 +208,9 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbSend;
+    private javax.swing.JLabel jlAddingMultipleMailHelp;
+    private javax.swing.JLabel jlAddingMultipleMailHelp1;
+    private javax.swing.JLabel jlAddingMultipleMailHelp2;
     private javax.swing.JLabel jlBcc;
     private javax.swing.JLabel jlCc;
     private javax.swing.JLabel jlDate;

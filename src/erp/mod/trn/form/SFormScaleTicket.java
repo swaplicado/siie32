@@ -148,6 +148,7 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         jPanel2.add(moKeyScale);
 
         moBoolTared.setText("Boleto tarado");
+        moBoolTared.setEnabled(false);
         jPanel2.add(moBoolTared);
 
         jPanel1.add(jPanel2);
@@ -187,6 +188,7 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         jlBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlBizPartner);
 
+        moKeyBizPartner.setMaximumRowCount(16);
         moKeyBizPartner.setPreferredSize(new java.awt.Dimension(600, 23));
         jPanel6.add(moKeyBizPartner);
 
@@ -198,6 +200,7 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         jlItem.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlItem);
 
+        moKeyItem.setMaximumRowCount(16);
         moKeyItem.setPreferredSize(new java.awt.Dimension(600, 23));
         jPanel7.add(moKeyItem);
 
@@ -426,11 +429,8 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         moRadioOptionMaquila.setBooleanSettings(moRadioOptionOpe.getText(), false);
         moTextCommentArr.setTextSettings(SGuiUtils.getLabelName(jlCommentArr), 500, 0);
         moTextCommentDep.setTextSettings(SGuiUtils.getLabelName(jlCommentDep), 500, 0);
-//        moCurCost.setCompoundFieldSettings(miClient);
-//        moCurCost.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCost), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
-//        
+   
         moFields.addField(moKeyScale);
-        moFields.addField(moBoolTared);
         moFields.addField(moIntNumber);
         moFields.addField(moDate);
         moFields.addField(moKeyBizPartner);
@@ -577,7 +577,6 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         moDatetimeDeparture.setEnabled(enable);
         moTextCommentArr.setEnabled(enable);
         moTextCommentDep.setEnabled(enable);
-        moBoolTared.setEnabled(enable);
         moKeyScale.setEnabled(enable);
         moTextPlateCage.setEnabled(!mbHasLinks);
         moRadioOptionMaquila.setEnabled(!mbHasLinks);
@@ -597,6 +596,8 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
             moScale = new SDataScale();
             moScale.read(moKeyScale.getValue(), miClient.getSession().getStatement());
             jbImportTicket.setEnabled(moScale.hasConnection());
+            moTextDriver.setMinLength(moScale.hasConnection() ? 1 : 0);
+            jlDriver.setText(moScale.hasConnection() ? "Chofer vehículo:*" : "Chofer vehículo:");
         }
         else {
             jbImportTicket.setEnabled(false);
@@ -604,11 +605,18 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
     }
     
     private void focusLostWeightDeparture() {
-        if (moDecWeightArrival.getValue() > moDecWeightDeparture.getValue()) {
-            moDecWeightNet.setValue(moDecWeightArrival.getValue() - moDecWeightDeparture.getValue());
+        if (moDecWeightArrival.getValue() != 0.0 && moDecWeightDeparture.getValue() != 0.0) {
+            if (moDecWeightArrival.getValue() > moDecWeightDeparture.getValue()) {
+                moDecWeightNet.setValue(moDecWeightArrival.getValue() - moDecWeightDeparture.getValue());
+            }
+            else {
+                moDecWeightNet.setValue(moDecWeightDeparture.getValue() - moDecWeightArrival.getValue());
+            }
+            moBoolTared.setSelected(true);
         }
         else {
-            moDecWeightNet.setValue(moDecWeightDeparture.getValue() - moDecWeightArrival.getValue());
+            moDecWeightNet.setValue(0.0);
+            moBoolTared.setSelected(false);
         }
     }
 
@@ -617,6 +625,7 @@ public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemL
         jbImportTicket.addActionListener(this);
         jbCleanTicket.addActionListener(this);
         moKeyScale.addItemListener(this);
+        moDecWeightArrival.addFocusListener(this);
         moDecWeightDeparture.addFocusListener(this);
     }
 

@@ -309,6 +309,7 @@ public class SFormScaleItem extends javax.swing.JDialog implements erp.lib.form.
     }
     
     private void populateScaleItemTable() {
+        maHashOfScaleItemMapRows.clear();
         maScaleItemRows = new ArrayList<>();
         
         try {
@@ -403,7 +404,7 @@ public class SFormScaleItem extends javax.swing.JDialog implements erp.lib.form.
             arr.stream().forEach((row) -> {
                 moScaleItemMapPane.addTableRow(row);
             });
-        }    
+            }
         moScaleItemMapPane.renderTableRows();
         moScaleItemMapPane.setTableRowSelection(0);
     }

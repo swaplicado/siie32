@@ -4978,11 +4978,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             SDataDpsEntry entry;
             Vector<SDataScaleTicketDps>aux = new Vector<>();
             ArrayList<String> numTics = new ArrayList<>();
+            ArrayList<String> dri = new ArrayList<>();
+            ArrayList<String> pla = new ArrayList<>();
             for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                 entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
-                if (i == 0) {
-                    moFieldDriver.setString(entry.getDriver());
-                    moFieldPlate.setString(entry.getPlate());
+                boolean foundDriver = false;
+                for (String driver : dri) {
+                    if (driver.equals(entry.getDriver())) {
+                        foundDriver = true;
+                        break;
+                    }
+                }
+                if (!foundDriver) {
+                    dri.add(entry.getDriver());
+                }
+                boolean foundPlate = false;
+                for (String plate : pla) {
+                    if (plate.equals(entry.getPlate())) {
+                        foundPlate = true;
+                        break;
+                    }
+                }
+                if (!foundPlate) {
+                    pla.add(entry.getPlate());
                 }
                 for (SDataScaleTicketDpsEntry ticDpsEty : entry.getDbmsScaleTicketsEty()) {
                     SDataScaleTicketDps ticDps = new SDataScaleTicketDps();
@@ -5024,6 +5042,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             for (String num : numTics) {
                 tickets += (tickets.isEmpty() ? "" : ", ") + num;
             }
+            String plates = "";
+            for (String plate : pla) {
+                plates += (plates.isEmpty() ? "" : ", ") + plate;
+            }
+            String drivers = "";
+            for (String driver : dri) {
+                drivers += (drivers.isEmpty() ? "" : ", ") + driver;
+            }
+            moFieldDriver.setString(drivers);
+            moFieldPlate.setString(plates);
             moFieldTicket.setString(tickets);
         }
     }

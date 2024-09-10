@@ -997,6 +997,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryIn);
         jmiStkRetDiog.setEnabled(hasRightInventoryIn);
         
+        jmSca.setEnabled(levelRightScaleTic >= SUtilConsts.LEV_READ || hasRightScaleCfg || hasRightScaleRep);
         jmiSca.setEnabled(levelRightScaleTic >= SUtilConsts.LEV_READ);
         jmiScaBpMap.setEnabled(hasRightScaleCfg);
         jmiScaBpDetMap.setEnabled(hasRightScaleCfg);
