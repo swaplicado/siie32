@@ -4,7 +4,7 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Solución de bug al momento de hacer el mapeo de productos y empresas después de hacer la importación de báscula.
 2) Cambios en la forma de captura de boletos para el chofer y el cálculo del peso neto.
-3) Se agregan notas de ayuda para indicar la separación de multiples correos en la forma del envío del reporte de salidas de báscula.
+3) Se agregan notas de ayuda para indicar la separación de múltiples correos en la forma del envío del reporte de salidas de báscula.
 
 ================================================================================
 SIIE 3.2 257.5/ 2024-09-09 Jhonatan Claudio PEÑA HERNÄNDEZ
