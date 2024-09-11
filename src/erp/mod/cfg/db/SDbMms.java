@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SDbMms extends SDbRegistryUser {
 
@@ -211,16 +211,17 @@ public class SDbMms extends SDbRegistryUser {
                 case 1:
                     user = new SDataUser();
                     user.read(new int [] { session.getUser().getPkUserId() }, statment);
-                    msXtaMailReplyTo = user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Usuario o arbitrario o servicio
-                    break;
-                case 2:
-                    user = new SDataUser();
-                    user.read(new int [] { session.getUser().getPkUserId() }, statment);
                     SDataBizPartnerBranchContact con = null;
                     if (user.getFkBizPartnerId_n() != 0) {
                         con = SBpsUtils.getBizParterContact(session, user.getFkBizPartnerId_n());
                     }
-                    msXtaMailReplyTo = con != null && !con.getEmail02().isEmpty() ? con.getEmail02() : user.getEmail().isEmpty() ? msUser : user.getEmail(); // Empleado o usuario o servicio
+                    // El campo Email01 corresponde al email personal, el Email02 es el institucional
+                    msXtaMailReplyTo = con != null && !con.getEmail02().isEmpty() ? con.getEmail02() : user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Empleado o usuario o arbitrario o servicio
+                    break;
+                case 2:
+                    user = new SDataUser();
+                    user.read(new int [] { session.getUser().getPkUserId() }, statment);
+                    msXtaMailReplyTo = user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Usuario o arbitrario o servicio
                     break;
                 case 3:
                     msXtaMailReplyTo = msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail; // Arbitrario o servicio

@@ -1,10 +1,11 @@
 ================================================================================
 SIIE 3.2 257.7/ 2024-09-11 
-Jhonatan Claudio PEÑA HERNÁNDEZ
+Jhonatan Claudio PEÑA HERNÁNDEZ / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Corrección a la duplicidad de XML con addendas 
 2) Adición de espacio a los contratos de ventas/compras entre dirección general/comprador/vendedor
 3) Adición de la vista Docs. consumos de materiales a detalle
+4) Cambios en la configuración de los casos del envío de correo. 
 
 ================================================================================
 SIIE 3.2 257.6/ 2024-09-10
