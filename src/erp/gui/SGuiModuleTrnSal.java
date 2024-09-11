@@ -1334,22 +1334,22 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             if (result == SLibConstants.DB_ACTION_SAVE_OK && moRegistry != null) {
                 switch (formType) {
                     case SDataConstants.TRN_DPS:
-                        // compute associated CFD of current DPS:
+                        // compute associated CFD of current DPS:                        
                         if (moRegistry instanceof SDataDps && ((SDataDps) moRegistry).getAuxIsNeedCfd()) {
                             try {
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
                                 dps.setAuxDpsTime(((SDataDps) moRegistry).getAuxDpsTime());
-                                if (dps.getDbmsDataAddenda() != null  ) { 
-                                    if(dps.getDbmsDataAddenda().getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71) {
-                                        for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++){
+                                if (dps.getDbmsDataAddenda() != null) { 
+                                    if (dps.getDbmsDataAddenda().getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71) {
+                                        for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++) {
                                             SDataDpsEntry entry = dps.getDbmsDpsEntries().get(i);
                                             String concept = entry.getConcept();
                                             if (concept.contains("&")) {
                                                 concept = concept.replace("&", "'N");
                                                 entry.setConcept(concept);
-                                            }                                        
+                                            }
                                         }
                                         SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                                     }
@@ -1357,7 +1357,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                         SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                                     }
                                 }
-                                SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                if (dps.getDbmsDataAddenda() == null) {
+                                    SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                }
                             }
                             catch (java.lang.Exception e) {
                                 throw new Exception("Ha ocurrido una excepción al generar el CFD: " + e);

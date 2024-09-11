@@ -305,11 +305,11 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         switch (mnTabTypeAux02) {
             case SUtilConsts.PER_DOC:
                 aoKeyFields = new STableField[2];
-                aoTableColumns = new STableColumn[29];
+                aoTableColumns = new STableColumn[30];
                 break;
             case SUtilConsts.PER_ITM:
                 aoKeyFields = new STableField[3];
-                aoTableColumns = new STableColumn[30];
+                aoTableColumns = new STableColumn[31];
                 break;
             default:
                 aoKeyFields = null;
@@ -360,6 +360,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "req.num", "Requisición", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num_cp", "Folio doc. complemento", STableConstants.WIDTH_DOC_NUM);
@@ -535,7 +536,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 else if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                     msSql +=  "ioge.id_year, ioge.id_doc, ioge.id_ety, ioge.b_del, iogn.nts, " ;
                 }
-                msSql += "iog.dt, iog.val_r, iog.b_audit, iog.b_authorn, iog.b_sys, " +
+                msSql += "iog.dt, iog.val_r, iog.b_audit, iog.b_authorn, iog.b_sys, req.num, " +
                 "CONCAT(iog.num_ser, IF(LENGTH(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num, " +
                 "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, " +
                 "maint.bp, supv.name, ";
@@ -564,7 +565,9 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 }
                 msSql += "INNER JOIN erp.usru_usr AS un ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_del = ud.id_usr ";
+                "INNER JOIN erp.usru_usr AS ud ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_del = ud.id_usr " +
+                "INNER JOIN trn_mat_req AS req ON req.id_mat_req = iog. fid_mat_req_n " ; 
+
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                     msSql += "LEFT OUTER JOIN " +
                             "(SELECT *, COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
