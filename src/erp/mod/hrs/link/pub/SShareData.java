@@ -106,6 +106,11 @@ public class SShareData {
         return SUtilsJSON.getData(sLastSyncDate);
     }
     
+    public String getEmployeesSiieData()throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException{
+    
+        return SUtilsJSON.getEmployeesSiieData();
+    }
+    
     public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
         try {
             //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -267,6 +272,44 @@ public class SShareData {
         } catch (IOException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return null;
+        }
+    }
+    
+    public String getPersonalInfo(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.personalInfo(idEmp);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    /**
+     * 
+     * @param sJsonInc
+     * @return 
+     */
+    public String insertPersonalInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.insertPersonalInfo(sJsonInc);
+    }
+    
+    public String getBreachInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        try {
+            return SUtilsJSON.breachInfo(sJsonInc);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return "fallo";
+        }
+    }
+    
+    public String getAdmRecInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        try {
+            return SUtilsJSON.docAdmRecInfo(sJsonInc);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return "fallo";
         }
     }
 }

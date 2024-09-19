@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.hrs.link.db.SBreachInfoResponse;
 import erp.mod.hrs.link.db.SCancelResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SDataEmployee;
@@ -19,6 +20,7 @@ import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
+import erp.mod.hrs.link.db.SPersonalInfoResponse;
 import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -83,6 +85,21 @@ public class SUtilsJSON {
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
     }
+    
+    public static String getEmployeesSiieData() throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+            SShareDB sDb = new SShareDB();
+            
+            SEmployeeJSON objResponse = new SEmployeeJSON();
+            
+            objResponse.employees = sDb.getEmployeesSiie();
+            
+            // Java objects to JSON string - pretty-print
+            String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+            return jsonInString2;
+    } 
     
     public static String getDataPGH(String sJson) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
             ObjectMapper mapper = new ObjectMapper();
@@ -356,5 +373,94 @@ public class SUtilsJSON {
         String jsonInStringDataEmploye = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataEmployee);
         return jsonInStringDataEmploye; 
       
+    }
+    
+    public static String personalInfo(String idEmp)  throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        
+        SPersonalInfoResponse personalInfoResponse = new SPersonalInfoResponse();
+        SShareDB sDb = new SShareDB();
+        
+        personalInfoResponse = sDb.getPersonalInfo(idEmp);
+        String jsonInStringDataEmploye = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(personalInfoResponse);
+        return jsonInStringDataEmploye;
+    }
+
+    public static String insertPersonalInfo(String sJsonInc) {
+        ObjectMapper mapper = new ObjectMapper();
+        boolean setInfo = false;
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+        SShareDB sDb = new SShareDB();
+        try {
+            setInfo = sDb.insertPersonalInfo(sJsonInc);
+        } catch (SQLException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SConfigException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        // Java objects to JSON string - pretty-print
+        String jsonInString2 = "";
+        try {
+            jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(setInfo);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        return jsonInString2;
+        
+    }
+    
+    public static String docAdmRecInfo(String sJsonInc) throws ParseException{
+        ObjectMapper mapper = new ObjectMapper();
+        SBreachInfoResponse objResponse = new SBreachInfoResponse();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+        SShareDB sDb = new SShareDB();
+        try {
+            objResponse  = sDb.getAdmRecInfo(sJsonInc);
+        } catch (SQLException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SConfigException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String jsonInString2 = "";
+        try {
+            jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        return jsonInString2;
+    }
+    
+    public static String breachInfo(String sJsonInc) throws ParseException{
+        ObjectMapper mapper = new ObjectMapper();
+        SBreachInfoResponse objResponse = new SBreachInfoResponse();
+        mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
+        SShareDB sDb = new SShareDB();
+        try {
+            objResponse  = sDb.getBreachInfo(sJsonInc);
+        } catch (SQLException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SConfigException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String jsonInString2 = "";
+        try {
+            jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(SUtilsJSON.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        return jsonInString2;
     }
 }

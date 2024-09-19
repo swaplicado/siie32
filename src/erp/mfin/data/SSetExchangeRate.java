@@ -5,9 +5,13 @@
  */
 package erp.mfin.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.SParamsApp;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.link.db.SConfigException;
+import erp.mod.hrs.link.db.SShareDB;
+import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -345,83 +349,26 @@ public class SSetExchangeRate {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            SParamsApp paramsApp = new SParamsApp();
-
-            if (!paramsApp.read()) {
-                throw new Exception(erp.SClient.ERR_PARAMS_APP_READING);
-            }
-
-            //conect to erp database
-            SDbDatabase dbErp = new SDbDatabase(SDbConsts.DBMS_MYSQL);
-            int result = dbErp.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(),
-                    paramsApp.getDatabaseName(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
-
-            if (result != SDbConsts.CONNECTION_OK) {
-                throw new Exception(SDbConsts.ERR_MSG_DB_CONNECTION);
-            }
-
-            ArrayList bankNbDays = readBankNbDay(dbErp.getConnection());
-
-            if (isActualDayBankBussDay(bankNbDays)) {
-                // total databases:
-
-                ArrayList<String> companiesDb = new ArrayList<>();
-
-                String sql = "SELECT bd "
-                        + "FROM erp.cfgu_co ;";
-
-                try (ResultSet resultSet = dbErp.getConnection().createStatement().executeQuery(sql)) {
-                    while (resultSet.next()) {
-                        String bd = resultSet.getString("bd");
-                        companiesDb.add(bd);
-                    }
-                }
-
-                Double valueExchangeRate = readXmlExchangeRate();
-
-                for (Object companiesDb1 : companiesDb) {
-                    // connect to company database:
-
-                    SDbDatabase dbCompany = new SDbDatabase(SDbConsts.DBMS_MYSQL);
-                    result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), companiesDb1.toString(), paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
-                    if (result == SDbConsts.CONNECTION_OK) {
-                        int exchangeRatePolicy = getExchangeRatePolicy(dbCompany.getConnection());
-                        ArrayList<String> exchangeRateDays = setExchangeRateDays(exchangeRatePolicy, bankNbDays);
-                        saveExchangeRate(dbCompany.getConnection(), valueExchangeRate, exchangeRateDays);
-                    }
-                }
-            }
-
-        } 
-        catch (Exception e) {
-            try{
-                    Logger logger = Logger.getLogger("logs/logsExchangeRate_");
-                    logger.setUseParentHandlers(false);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy_MM");
-                    FileHandler fh;
-                    fh = new FileHandler("logs/logsExchangeRate_" + format.format(Calendar.getInstance().getTime()) + ".log", true);
-                    logger.addHandler(fh);
-                    SimpleFormatter formatter = new SimpleFormatter() {
-                            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            
-                            public String format() {
-                                return String.format("%s \n", dateFormat.format(Calendar.getInstance().getTime()));
-                            }
-                    };
-                    fh.setFormatter(formatter);
-                    String message = " - " + e;
-                    logger.info(message);
-                    fh.close();
-                } catch (SecurityException ex) {
-                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(SSetExchangeRate.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            System.err.println(e);
-            
-        }
+    public static void main(String[] args) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        SShareData sd = new SShareData();
+        SShareDB sdb = new SShareDB();
+        sd.setJsonConn("{\"dbHost\":\"192.168.1.233\",\"dbName\":\"erp\",\"dbPort\":\"3306\",\"dbUser\":\"root\",\"dbPass\":\"msroot\",\"dbMainId\":\"1211\"}");
+        String incidents = "{\"year\":\"2023\",\"num\":\"20\",\"type_pay\":\"2\",\"rows\":[{\"id_emp\":\"3774\",\"company_id\":\"2852\"},{\"id_emp\":\"3505\",\"company_id\":\"1211\"}]}";
+        String json = "{\"year\":2023,\"num\":20,\"type_pay\":2,\"rows\":[{\"id_emp\":4675,\"company_id\":2852}]}";
+        String prueba ="[{\"id_company\":1,\"external_id\":2852,\"company_db_name\":\"erp_aeth\",\"last_sync_date\":\"2023-01-01 17:01:42\"},{\"id_company\":2,\"external_id\":1,\"company_db_name\":\"erp_th\",\"last_sync_date\":null},{\"id_company\":3,\"external_id\":1211,\"company_db_name\":\"erp_otsa\",\"last_sync_date\":\"2023-12-05 17:01:42\"},{\"id_company\":4,\"external_id\":1603,\"company_db_name\":\"erp_sasa\",\"last_sync_date\":\"2023-12-05 17:01:42\"},{\"id_company\":5,\"external_id\":2217,\"company_db_name\":\"erp_amesa\",\"last_sync_date\":\"2023-12-05 17:01:42\"}]";
+        String jsonString = "[{\"id_company\":1,\"external_id\":2852,\"company_db_name\":\"erp_aeth\",\"last_sync_date\":\"2023-12-05 17:01:42\"},{\"id_company\":2,\"external_id\":1,\"company_db_name\":\"erp_th\",\"last_sync_date\":null},{\"id_company\":3,\"external_id\":1211,\"company_db_name\":\"erp_otsa\",\"last_sync_date\":\"2023-12-05 17:01:42\"},{\"id_company\":4,\"external_id\":1603,\"company_db_name\":\"erp_sasa\",\"last_sync_date\":\"2023-12-05 17:01:42\"},{\"id_company\":5,\"external_id\":2217,\"company_db_name\":\"erp_amesa\",\"last_sync_date\":\"2023-12-05 17:01:42\"}]";
+        String fecha = "2024-01-03 13:45:34";
+//      String res = sd.getEmployeesSiieData();
+        String jsonS = "[{\"company\":2852,\"lEmployees\":[5811,5952]},{\"company\":1211,\"lEmployees\":[5059]}]";
+        String per = "5059";
+        //String jsonText = "{\"id_bp\":5059,\"lastname1\":\"AVILES\",\"lastname2\":\"GOMEZ\",\"names\":\"ADRIAN ALEJANDRO\",\"rfc\":null,\"id_bpb\":\"5071\",\"id_add\":\"1\",\"id_con\":\"1\",\"fk_cl_cat_sex\":1,\"fk_tp_cat_sex\":2,\"fk_cl_cat_blo\":2,\"fk_tp_cat_blo\":3,\"fk_cl_cat_mar\":3,\"fk_tp_cat_mar\":2,\"fk_cl_cat_edu\":4,\"fk_tp_cat_edu\":6,\"email_01\":\"adrian.alejandro.aviles@gmail.com\",\"email_02\":\"adrian.aviles@swaplicado.com.mx\",\"tel_num_01\":\"4525223239\",\"tel_num_02\":null,\"emergs_tel_num\":\"4522090000\",\"emergs_con\":\"maria magdalena\",\"street\":\"JOAQUIN AMARO 42\",\"street_num_ext\":\"773\",\"street_num_int\":null,\"neighborhood\":\"GUSTAVO DIAZ ORDAZ\",\"locality\":\"MORELIA\",\"state\":16,\"zip_code\":\"58057\",\"county\":\"MORELIA\",\"mate\":\"prueba :p\",\"mate_dt_bir_n\":\"10-10-1995\",\"fk_cl_cat_sex_mate\":1,\"fk_tp_cat_sex_mate\":3,\"benefs\":\"madre 70% hermano 30%\",\"son_1\":\"hijo2\",\"son_dt_bir_1_n\":\"10-10-1995\",\"fk_cl_cat_sex_son_1\":1,\"fk_tp_cat_sex_son_1\":3,\"son_2\":\"\",\"son_dt_bir_2_n\":\"\",\"fk_cl_cat_sex_son_2\":\"\",\"fk_tp_cat_sex_son_2\":\"\",\"son_3\":\"\",\"son_dt_bir_3_n\":\"\",\"fk_cl_cat_sex_son_3\":\"\",\"fk_tp_cat_sex_son_3\":\"\",\"son_4\":\"\",\"son_dt_bir_4_n\":\"\",\"fk_cl_cat_sex_son_4\":\"\",\"fk_tp_cat_sex_son_4\":\"\",\"son_5\":\"\",\"son_dt_bir_5_n\":\"\",\"fk_cl_cat_sex_son_5\":\"\",\"fk_tp_cat_sex_son_5\":\"\"}";
+        //String jsonText ="{\"id_bp\":5059,\"id_add\":1,\"id_con\":1,\"id_bpb\":5071,\"lastname1\":\"AVILES\",\"lastname2\":\"GOMEZ\",\"names\":\"ADRIAN ALEJANDRO\",\"rfc\":\"AIGA951010GN9\",\"fk_cl_cat_sex\":1,\"fk_tp_cat_sex\":2,\"fk_cl_cat_blo\":2,\"fk_tp_cat_blo\":1,\"fk_cl_cat_mar\":3,\"fk_tp_cat_mar\":2,\"fk_cl_cat_edu\":4,\"fk_tp_cat_edu\":6,\"email_01\":\"aviles@gmail.com\",\"email_02\":\"ADRIASWAP@gmail.com\",\"tel_num_01\":\"\",\"tel_num_02\":\"45200000\",\"emergs_tel_num\":\"4522090000\",\"emergs_con\":\"maria - madre\",\"street\":\"\",\"street_num_ext\":\"10\",\"street_num_int\":\"1\",\"neighborhood\":\"una col de gdl\",\"locality\":\"Guadalajara\",\"state\":\"14\",\"zip_code\":\"50000\",\"county\":\"Guadalajara\",\"mate\":\"no hay :,c\",\"mate_dt_bir_n\":\"1995-10-10\",\"fk_cl_cat_sex_mate\":1,\"fk_tp_cat_sex_mate\":3,\"benefs\":\"asklfjsokdfsojjf\",\"son_1\":\"hijo1\",\"son_dt_bir_1_n\":\"2000-10-10\",\"fk_cl_cat_sex_son_1\":1,\"fk_tp_cat_sex_son_1\":2,\"son_2\":\"hijo2\",\"son_dt_bir_2_n\":\"2001-10-10\",\"fk_cl_cat_sex_son_2\":1,\"fk_tp_cat_sex_son_2\":3,\"son_3\":\"\",\"son_dt_bir_3_n\":\"\",\"fk_cl_cat_sex_son_3\":1,\"fk_tp_cat_sex_son_3\":1,\"son_4\":\"\",\"son_dt_bir_4_n\":\"\",\"fk_cl_cat_sex_son_4\":1,\"fk_tp_cat_sex_son_4\":1,\"son_5\":\"\",\"son_dt_bir_5_n\":\"\",\"fk_cl_cat_sex_son_5\":1,\"fk_tp_cat_sex_son_5\":1}";
+        String jsonText = "{\"id_bp\":5059,\"id_add\":1,\"id_con\":1,\"id_bpb\":5071,\"lastname1\":\"AVILES\",\"lastname2\":\"GOMEZ\",\"names\":\"ADRIAN ALEJANDRO\",\"rfc\":\"AIGA951010GN9\",\"fk_cl_cat_sex\":1,\"fk_tp_cat_sex\":2,\"fk_cl_cat_blo\":2,\"fk_tp_cat_blo\":3,\"fk_cl_cat_mar\":3,\"fk_tp_cat_mar\":6,\"fk_cl_cat_edu\":4,\"fk_tp_cat_edu\":7,\"email_01\":\"aviles@gmail.com\",\"email_02\":\"sw@gmail.com\",\"tel_num_01\":\"4525223239\",\"tel_num_02\":\"4520000\",\"tel_ext_02\":\"151\",\"emergs_tel_num\":\"452090000\",\"emergs_con\":\"maria magdalena\",\"fk_tp_cat_kin_emergs\":21,\"fk_cl_cat_kin_emergs\":5,\"street\":\"una calle de gdl\",\"street_num_ext\":\"1\",\"street_num_int\":\"0\",\"neighborhood\":\"una col de gdl\",\"locality\":\"gdl\",\"state\":\"14\",\"zip_code\":\"50000\",\"county\":\"gdl\",\"reference\":\"una referencia\",\"mate\":\"no hay, no existe, :p\",\"mate_dt_bir_n\":\"1995-10-10\",\"fk_cl_cat_sex_mate\":1,\"fk_tp_cat_sex_mate\":3,\"benefs\":\"madre-hermano\",\"son_1\":\"hijo1\",\"son_dt_bir_1_n\":\"2000-10-10\",\"fk_cl_cat_sex_son_1\":1,\"fk_tp_cat_sex_son_1\":2,\"son_2\":\"hijo2\",\"son_dt_bir_2_n\":\"2001-10-10\",\"fk_cl_cat_sex_son_2\":1,\"fk_tp_cat_sex_son_2\":3,\"son_3\":\"\",\"son_dt_bir_3_n\":\"\",\"fk_cl_cat_sex_son_3\":1,\"fk_tp_cat_sex_son_3\":1,\"son_4\":\"\",\"son_dt_bir_4_n\":\"\",\"fk_cl_cat_sex_son_4\":1,\"fk_tp_cat_sex_son_4\":1,\"son_5\":\"\",\"son_dt_bir_5_n\":\"\",\"fk_cl_cat_sex_son_5\":1,\"fk_tp_cat_sex_son_5\":1}";
+//sd.getPersonalInfo(per);
+        String jsonAdrian = "{\"id_bp\":\"5059\",\"id_add\":\"1\",\"id_con\":\"1\",\"id_bpb\":\"5071\",\"lastname1\":\"áñILES\",\"lastname2\":\"GOMEZ\",\"names\":\"ADRIAN ALEJANDRO\",\"rfc\":\"AIGA951010GN9\",\"fk_cl_cat_sex\":\"1\",\"fk_tp_cat_sex\":\"2\",\"fk_cl_cat_blo\":\"2\",\"fk_tp_cat_blo\":\"1\",\"fk_cl_cat_mar\":\"3\",\"fk_tp_cat_mar\":\"2\",\"fk_cl_cat_edu\":\"4\",\"fk_tp_cat_edu\":\"6\",\"email_01\":\"adrian.alejandro.aviles@gmail.com\",\"email_02\":\"adrian.aviles@swaplicado.com.mx\",\"tel_num_01\":\"4525223239\",\"tel_num_02\":\"4434712128\",\"tel_ext_02\":\"\",\"emergs_tel_num\":\"4522090000\",\"emergs_con\":\"Maria Magdalena\",\"fk_tp_cat_kin_emergs\":\"21\",\"fk_cl_cat_kin_emergs\":\"5\",\"street\":\"ANDRES QUINTANA ROO\",\"street_num_ext\":\"773\",\"street_num_int\":\"\",\"neighborhood\":\"JUAREZ\",\"locality\":\"MORELIA\",\"fid_sta_n\":\"16\",\"zip_code\":\"58010\",\"county\":\"MORELIA\",\"reference\":\"A UN COSTADO DE SORIANA CENTRO\",\"mate\":\"césar ñ\",\"mate_dt_bir_n\":\"\",\"fk_cl_cat_sex_mate\":\"1\",\"fk_tp_cat_sex_mate\":\"1\",\"benefs\":\"Madre - 70% hermano 30%\",\"son_1\":\"\",\"son_dt_bir_1_n\":\"\",\"fk_cl_cat_sex_son_1\":\"1\",\"fk_tp_cat_sex_son_1\":\"1\",\"son_2\":\"\",\"son_dt_bir_2_n\":\"\",\"fk_cl_cat_sex_son_2\":\"1\",\"fk_tp_cat_sex_son_2\":\"1\",\"son_3\":\"\",\"son_dt_bir_3_n\":\"\",\"fk_cl_cat_sex_son_3\":\"1\",\"fk_tp_cat_sex_son_3\":\"1\",\"son_4\":\"\",\"son_dt_bir_4_n\":\"\",\"fk_cl_cat_sex_son_4\":\"1\",\"fk_tp_cat_sex_son_4\":\"1\",\"son_5\":\"\",\"son_dt_bir_5_n\":\"\",\"fk_cl_cat_sex_son_5\":\"1\",\"fk_tp_cat_sex_son_5\":\"1\"}";
+        String base64EncodedJson = "eyJpZF9icCI6NTA1OSwiaWRfYWRkIjoxLCJpZF9jb24iOjEsImlkX2JwYiI6NTA3MSwibGFzdG5hbWUxIjoiQVZJTEVTIiwibGFzdG5hbWUyIjoiR09NRVoiLCJuYW1lcyI6IkFEUklBTiBBTEVKQU5EUk8iLCJyZmMiOiJBSUdBOTUxMDEwR045IiwiZmtfY2xfY2F0X3NleCI6MSwiZmtfdHBfY2F0X3NleCI6MiwiZmtfY2xfY2F0X2JsbyI6MiwiZmtfdHBfY2F0X2JsbyI6MSwiZmtfY2xfY2F0X21hciI6MywiZmtfdHBfY2F0X21hciI6MiwiZmtfY2xfY2F0X2VkdSI6NCwiZmtfdHBfY2F0X2VkdSI6NiwiZW1haWxfMDEiOiJhZHJpYW4uYWxlamFuZHJvLmF2aWxlc0BnbWFpbC5jb20iLCJlbWFpbF8wMiI6ImFkcmlhbi5hdmlsZXNAc3dhcGxpY2Fkby5jb20ubXgiLCJ0ZWxfbnVtXzAxIjoiNDUyNTIyMzIzOSIsInRlbF9udW1fMDIiOiI0NDM0NzEyMTI4IiwidGVsX2V4dF8wMiI6IiIsImVtZXJnc190ZWxfbnVtIjoiNDUyMjA5MDAwMCIsImVtZXJnc19jb24iOiJNYXJpYSBNYWdkYWxlbmEiLCJma190cF9jYXRfa2luX2VtZXJncyI6MjEsImZrX2NsX2NhdF9raW5fZW1lcmdzIjo1LCJzdHJlZXQiOiJBTkRSRVMgUVVJTlRBTkEgUk9PIiwic3RyZWV0X251bV9leHQiOiI3NzMiLCJzdHJlZXRfbnVtX2ludCI6IiIsIm5laWdoYm9yaG9vZCI6IkpVQVJFWiIsImxvY2FsaXR5IjoiTU9SRUxJQSIsImZpZF9zdGFfbiI6MTYsInppcF9jb2RlIjoiNTgwMTAiLCJjb3VudHkiOiJNT1JFTElBIiwicmVmZXJlbmNlIjoiQSBVTiBDT1NUQURPIERFIFNPUklBTkEgQ0VOVFJPIiwibWF0ZSI6IkFkcmnDocOxIiwibWF0ZV9kdF9iaXJfbiI6IiIsImZrX2NsX2NhdF9zZXhfbWF0ZSI6MSwiZmtfdHBfY2F0X3NleF9tYXRlIjoxLCJiZW5lZnMiOiJNYWRyZSAtIDcwJSBoZXJtYW5vIDMwJSIsInNvbl8xIjoiIiwic29uX2R0X2Jpcl8xX24iOiIiLCJma19jbF9jYXRfc2V4X3Nvbl8xIjoxLCJma190cF9jYXRfc2V4X3Nvbl8xIjoxLCJzb25fMiI6IiIsInNvbl9kdF9iaXJfMl9uIjoiIiwiZmtfY2xfY2F0X3NleF9zb25fMiI6MSwiZmtfdHBfY2F0X3NleF9zb25fMiI6MSwic29uXzMiOiIiLCJzb25fZHRfYmlyXzNfbiI6IiIsImZrX2NsX2NhdF9zZXhfc29uXzMiOjEsImZrX3RwX2NhdF9zZXhfc29uXzMiOjEsInNvbl80IjoiIiwic29uX2R0X2Jpcl80X24iOiIiLCJma19jbF9jYXRfc2V4X3Nvbl80IjoxLCJma190cF9jYXRfc2V4X3Nvbl80IjoxLCJzb25fNSI6IiIsInNvbl9kdF9iaXJfNV9uIjoiIiwiZmtfY2xfY2F0X3NleF9zb25fNSI6MSwiZmtfdHBfY2F0X3NleF9zb25fNSI6MX0=";
+        //sdb.insertPersonalInfo(base64EncodedJson);
+        sdb.getPersonalInfo(per);
     }
 
 }

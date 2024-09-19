@@ -38,9 +38,11 @@ import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
 import erp.mod.hrs.link.utils.SIncidentsJSON;
 import erp.musr.data.SDataUser;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
@@ -304,7 +306,11 @@ public class SShareDB {
                 + "    e.fk_pos, "
                 + "    e.b_act, "
                 + "    e.b_del, "
-                + "    bpcon.email_01 "
+                + "    bpcon.email_01, "
+                + "    bpcon.email_02, "
+                + "    bpcon.tel_area_code_02, "
+                + "    bpcon.tel_num_02, "
+                + "    bpcon.tel_ext_02 "
                 + "FROM "
                 + "    erp.hrsu_emp e "
                 + "        INNER JOIN "
@@ -339,8 +345,107 @@ public class SShareDB {
                 emp.leave_date = res.getString("dt_dis_n");
                 emp.benefit_date = res.getString("dt_ben");
                 emp.dt_bir = res.getString("dt_bir");
-//                emp.dt_tp_pay = res.getString("dt_tp_pay");
+//              emp.dt_tp_pay = res.getString("dt_tp_pay");
                 emp.email = res.getString("email_01");
+                emp.emailEmp = res.getString("email_02");
+                emp.telArea = res.getString("tel_area_code_02");
+                emp.telNum = res.getString("tel_num_02");
+                emp.ext = res.getString("tel_ext_02");
+                emp.overtime_policy = res.getInt("overtime");
+                emp.checker_policy = res.getInt("checker_policy");
+                emp.way_pay = res.getInt("fk_tp_pay");
+                emp.dept_rh_id = res.getInt("fk_dep");
+                emp.siie_job_id = res.getInt("fk_pos");
+                emp.is_active = res.getBoolean("b_act");
+                emp.is_deleted = res.getBoolean("b_del");
+
+                lEmps.add(emp);
+            }
+
+            conn.close();
+            st.close();
+            res.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        lEmps = this.assignCompany(lEmps);
+
+        return lEmps;
+    }
+    
+    public ArrayList<SEmployee> getEmployeesSiie() throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT  "
+                + "    e.id_emp, "
+                + "    e.num, "
+                + "    e.lastname1, "
+                + "    e.lastname2, "
+                + "    bp.bp, "
+                + "    bp.lastname, "
+                + "    bp.firstname, "
+                + "    e.dt_bir, "
+                + "    e.dt_ben, "
+                + "    e.dt_hire, "
+                + "    e.dt_dis_n, "
+//                + "    e.dt_tp_pay, "
+                + "    e.overtime, "
+                + "    e.checker_policy, "
+                + "    e.fk_tp_pay, "
+                + "    e.fk_dep, "
+                + "    e.fk_pos, "
+                + "    e.b_act, "
+                + "    e.b_del, "
+                + "    bpcon.email_01, "
+                + "    bpcon.email_02, "
+                + "    bpcon.tel_area_code_02, "
+                + "    bpcon.tel_num_02, "
+                + "    bpcon.tel_ext_02 "
+                + "FROM "
+                + "    erp.hrsu_emp e "
+                + "        INNER JOIN "
+                + "    erp.bpsu_bp bp ON e.id_emp = bp.id_bp "
+                + "INNER JOIN "
+                + "	erp.bpsu_bpb bpb ON bp.id_bp = bpb.fid_bp "
+                + "INNER JOIN "
+                + "	erp.bpsu_bpb_con bpcon ON bpb.id_bpb = bpcon.id_bpb "
+                + "WHERE "
+                + "    e.b_act = 1"
+                + "    AND bp.b_att_emp;";
+
+        ArrayList<SEmployee> lEmps = null;
+
+        try {
+            Statement st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+
+            lEmps = new ArrayList();
+            SEmployee emp = null;
+            while (res.next()) {
+                emp = new SEmployee();
+
+                emp.id_employee = res.getInt("id_emp");
+                emp.num_employee = res.getInt("num");
+                emp.lastname1 = res.getString("lastname1");
+                emp.lastname2 = res.getString("lastname2");
+                emp.lastname = res.getString("lastname");
+                emp.firstname = res.getString("firstname");
+                emp.admission_date = res.getString("dt_hire");
+                emp.leave_date = res.getString("dt_dis_n");
+                emp.benefit_date = res.getString("dt_ben");
+                emp.dt_bir = res.getString("dt_bir");
+//              emp.dt_tp_pay = res.getString("dt_tp_pay");
+                emp.email = res.getString("email_01");
+                emp.emailEmp = res.getString("email_02");
+                emp.telArea = res.getString("tel_area_code_02");
+                emp.telNum = res.getString("tel_num_02");
+                emp.ext = res.getString("tel_ext_02");
                 emp.overtime_policy = res.getInt("overtime");
                 emp.checker_policy = res.getInt("checker_policy");
                 emp.way_pay = res.getInt("fk_tp_pay");
@@ -1665,10 +1770,10 @@ public class SShareDB {
                     insert.setEffectiveDays(Integer.parseInt(row.get("effective_days").toString()));
                     insert.setBenefitsYear(Integer.parseInt(row.get("year").toString()));
                     insert.setBenefitsAnniversary(Integer.parseInt(row.get("anniversary").toString()));
-                    //insert.setExternarRe//questId(Integer.parseInt(row.get("breakdown_id").toString()));
+                    insert.setExternalRequestId(Integer.parseInt(row.get("breakdown_id").toString()));
                     insert.setFkAbsenceClassId(Integer.parseInt(root.get("cl_abs").toString()));
                     insert.setFkAbsenceTypeId(Integer.parseInt(root.get("tp_abs").toString()));
-                    insert.setFkUserClosedId(SUtilConsts.USR_NA_ID);
+                    insert.setFkUserClosedId(152);
 
                     insert.save(session);
 
@@ -2079,6 +2184,479 @@ public class SShareDB {
 
         return lDataComp.get(0);
     }
+    public SPersonalInfoResponse getPersonalInfo(String idEmp) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        SPersonalInfoResponse response = new SPersonalInfoResponse();
+
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT bp.id_bp, bp.lastname, bp.firstname, bp.fiscal_id, branch.id_bpb, address.id_add, contact.id_con, address.street, address.street_num_ext, address.street_num_int," +
+                    " address.neighborhood, address.locality, address.county, address.zip_code, address.reference," +
+                    " address.fid_sta_n, address.id_add, address.id_bpb, contact.tel_num_01," +
+                    " contact.tel_num_02, contact.tel_ext_02, emp.zip_code," +
+                    " contact.email_01, contact.email_02, contact.id_con, emp.fk_cl_cat_sex, emp.fk_tp_cat_sex, emp.fk_cl_cat_blo, emp.fk_tp_cat_blo, emp.fk_cl_cat_mar, emp.fk_tp_cat_mar," +
+                    " emp.fk_cl_cat_edu, emp.fk_tp_cat_edu, family.mate, family.mate_dt_bir_n,"+ 
+                    " family.fk_cl_cat_sex_mate, family.fk_tp_cat_sex_mate, family.son_1, family.son_dt_bir_1_n,"+ 
+                    " family.fk_cl_cat_sex_son_1, family.fk_tp_cat_sex_son_1, family.son_2, family.son_dt_bir_2_n," +
+                    " family.fk_cl_cat_sex_son_2, family.fk_tp_cat_sex_son_2, family.son_3, family.son_dt_bir_3_n,"+
+                    " family.fk_cl_cat_sex_son_3, family.fk_tp_cat_sex_son_3, family.son_4, family.son_dt_bir_4_n," +
+                    " family.fk_cl_cat_sex_son_4, family.fk_tp_cat_sex_son_4, family.son_5, family.son_dt_bir_5_n," +
+                    " family.fk_cl_cat_sex_son_5, family.fk_tp_cat_sex_son_5, family.fk_cl_cat_kin_emergs, family.fk_tp_cat_kin_emergs," +
+                    " family.emergs_con, family.emergs_tel_num, family.benefs" +
+                    " FROM bpsu_bp AS bp" +
+                    " INNER JOIN erp.bpsu_bpb AS branch ON branch.fid_bp = bp.id_bp"+
+                    " INNER JOIN erp.bpsu_bpb_add AS address ON address.id_bpb = branch.id_bpb" +
+                    " INNER JOIN erp.bpsu_bpb_con AS contact ON contact.id_bpb = branch.id_bpb" +
+                    " INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = bp.id_bp"+
+                    " INNER JOIN erp.hrsu_emp_rel AS family ON family.id_emp = bp.id_bp"+
+                    " WHERE bp.b_del = 0 AND branch.b_del = 0 AND address.b_del = 0 AND contact.b_del = 0 AND emp.b_del = 0 AND emp.b_act = 1" +
+                    " AND id_bp = " + idEmp + ";";
+                    
+        try {
+            Statement st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+            SPersonalInfo emp = new SPersonalInfo();
+
+            while (res.next()) {
+               emp.setNumEmployee(res.getInt("bp.id_bp"));
+               emp.setFirstName(res.getString("bp.firstname"));
+               emp.setLastName(res.getString("bp.lastname"));
+               emp.setRfc(res.getString("bp.fiscal_id"));
+               emp.setIdBpb(res.getInt("branch.id_bpb"));
+               emp.setIdAdd(res.getInt("address.id_add"));
+               emp.setIdCon(res.getInt("contact.id_con"));
+               emp.setTelNumber01(res.getString("contact.tel_num_01"));
+               emp.setTelNumber02(res.getString("contact.tel_num_02"));
+               emp.setTelExt02(res.getString("contact.tel_ext_02"));
+               emp.setEmail01(res.getString("contact.email_01"));
+               emp.setEmail02(res.getString("contact.email_02"));
+               emp.setStreet(res.getString("address.street"));
+               emp.setStreetNumExt(res.getString("address.street_num_ext"));
+               emp.setStreetNumInt(res.getString("address.street_num_int"));
+               emp.setNeighborhood(res.getString("address.neighborhood"));
+               emp.setLocality(res.getString("address.locality"));
+               emp.setCounty(res.getString("address.county"));
+               emp.setZipCode(res.getString("address.zip_code"));
+               emp.setZipCodeFiscal(res.getString("emp.zip_code"));
+               emp.setReference(res.getString("address.reference"));
+               emp.setFidSta(res.getInt("address.fid_sta_n"));
+               emp.setMaritalCl(res.getInt("emp.fk_cl_cat_mar"));
+               emp.setMaritalTp(res.getInt("emp.fk_tp_cat_mar"));
+               emp.setEducationCl(res.getInt("emp.fk_cl_cat_edu"));
+               emp.setEducationTp(res.getInt("emp.fk_tp_cat_edu"));
+               emp.setSexCl(res.getInt("emp.fk_cl_cat_sex"));
+               emp.setSexTp(res.getInt("emp.fk_tp_cat_sex"));
+               emp.setBloodCl(res.getInt("emp.fk_cl_cat_blo"));
+               emp.setBloodTp(res.getInt("emp.fk_tp_cat_blo"));
+               emp.setMate(res.getString("family.mate"));
+               emp.setDtBirMate(res.getString("family.mate_dt_bir_n"));
+               emp.setSexMateTp(res.getInt("family.fk_tp_cat_sex_mate"));
+               emp.setSexMateCl(res.getInt("family.fk_cl_cat_sex_mate"));
+               emp.setSon1(res.getString("family.son_1"));
+               emp.setDtBirSon1(res.getString("family.son_dt_bir_1_n"));
+               emp.setSexSonTp1(res.getInt("family.fk_tp_cat_sex_son_1"));
+               emp.setSexSonCl1(res.getInt("family.fk_cl_cat_sex_son_1"));
+               emp.setSon2(res.getString("family.son_2"));
+               emp.setDtBirSon2(res.getString("family.son_dt_bir_2_n"));
+               emp.setSexSonTp2(res.getInt("family.fk_tp_cat_sex_son_2"));
+               emp.setSexSonCl2(res.getInt("family.fk_cl_cat_sex_son_2"));
+               emp.setSon3(res.getString("family.son_3"));
+               emp.setDtBirSon3(res.getString("family.son_dt_bir_3_n"));
+               emp.setSexSonTp3(res.getInt("family.fk_tp_cat_sex_son_3"));
+               emp.setSexSonCl3(res.getInt("family.fk_cl_cat_sex_son_3"));
+               emp.setSon4(res.getString("family.son_4"));
+               emp.setDtBirSon4(res.getString("family.son_dt_bir_4_n"));
+               emp.setSexSonTp4(res.getInt("family.fk_tp_cat_sex_son_4"));
+               emp.setSexSonCl4(res.getInt("family.fk_cl_cat_sex_son_4"));
+               emp.setSon5(res.getString("family.son_5"));
+               emp.setDtBirSon5(res.getString("family.son_dt_bir_5_n"));
+               emp.setSexSonTp5(res.getInt("family.fk_tp_cat_sex_son_5"));
+               emp.setSexSonCl5(res.getInt("family.fk_cl_cat_sex_son_5"));
+               emp.setEmergCl(res.getInt("family.fk_cl_cat_kin_emergs"));
+               emp.setEmergTp(res.getInt("family.fk_tp_cat_kin_emergs"));
+               emp.setEmergsCon(res.getString("family.emergs_con"));
+               emp.setEmergsTel(res.getString("family.emergs_tel_num"));
+               emp.setBenefs(res.getString("family.benefs"));
+            }
+            String queryCatCl = "SELECT *" +
+                    " FROM hrss_cl_hrs_cat " +
+                    " WHERE b_del = 0;";
+            
+            Statement stCatCl = conn.createStatement();
+            ResultSet resCatCl = stCatCl.executeQuery(queryCatCl);
+            ArrayList<SClassHrsCat> catClass = null;
+            catClass = new ArrayList();
+
+            while (resCatCl.next()) {
+               SClassHrsCat classHrs = new SClassHrsCat();
+               classHrs.setIdCl(resCatCl.getInt("id_cl_hrs_cat"));
+               classHrs.setName(resCatCl.getString("name"));
+               catClass.add(classHrs);
+            }
+            
+            String queryCatTp = "SELECT *" +
+                    " FROM hrss_cl_hrs_cat " +
+                    " WHERE b_del = 0;";
+            
+            Statement stCatTp = conn.createStatement();
+            ResultSet resCatTp = stCatTp.executeQuery(queryCatTp);
+            ArrayList<STpHrsCat> catType = null;
+            catType = new ArrayList();
+
+            while (resCatTp.next()) {
+               STpHrsCat typeHrs = new STpHrsCat();
+//               typeHrs.setIdTp(resCatTp.getInt("id_tp_hrs_cat"));
+               typeHrs.setIdCl(resCatTp.getInt("id_cl_hrs_cat"));
+               typeHrs.setName(resCatTp.getString("name"));
+               catType.add(typeHrs);
+            }
+            
+            String queryLocuSta = "SELECT *" +
+                    " FROM locu_sta" +
+                    " WHERE b_del = 0 " +
+                    " AND fid_cty = 251;";
+            
+            Statement stLocu = conn.createStatement();
+            ResultSet resLocu = stLocu.executeQuery(queryLocuSta);
+            ArrayList<SLocuSta> locuSta = null;
+            locuSta = new ArrayList();
+
+            while (resLocu.next()) {
+               SLocuSta typeLocu = new SLocuSta();
+               typeLocu.setIdSta(resLocu.getInt("id_sta"));
+               typeLocu.setNameSta(resLocu.getString("sta"));
+               locuSta.add(typeLocu);
+            }
+            
+            String queryTpTel = "SELECT *" +
+                    " FROM bpss_tp_tel " +
+                    " WHERE b_del = 0;" ;
+            
+            Statement stTpTel = conn.createStatement();
+            ResultSet resLTpTel = stTpTel.executeQuery(queryTpTel);
+            ArrayList<STpTel> telType = null;
+            telType = new ArrayList();
+
+            while (resLTpTel.next()) {
+               STpTel tpTel = new STpTel();
+               tpTel.setIdTel(resLTpTel.getInt("id_tp_tel"));
+               tpTel.setTpTel(resLTpTel.getString("tp_tel"));
+               telType.add(tpTel);
+            }
+            
+            response.setPersonalInfo(emp);
+            response.setClassHrsCat(catClass);
+            response.setTpHrsCat(catType);
+            response.setLocuSta(locuSta);
+            response.setTpTel(telType);
+            
+            conn.close();
+            st.close();
+            res.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return response;
+    }
+     
+    public boolean insertPersonalInfo(String JsonInfo) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return false;
+        }
+        byte[] decodedBytes = Base64.getDecoder().decode(JsonInfo);
+        String decodedJson = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        // Utilizar la librería org.json.simple para analizar la cadena en un objeto JSON
+        JSONParser parser = new JSONParser();
+        //Convertir la cadena decodificada en un objeto JSON usando la librería org.json.simple
+        JSONObject root;
+        try{
+            conn.setAutoCommit(false);
+            root = (JSONObject) parser.parse(decodedJson);
+            
+        String queryBP = "UPDATE BPSU_BP SET "
+                    +" fid_usr_edit = 152"
+                    +", ts_edit = now()"
+                    + " WHERE id_bp = " + root.get("id_bp")+";";
+        Statement stBP = conn.createStatement();
+        int resBP = stBP.executeUpdate(queryBP);
+        
+        String queryBpb = "UPDATE BPSU_BPB SET "
+                    +" fid_usr_edit = 152"
+                    +", ts_edit = now()"
+                    + " WHERE fid_bp = " + root.get("id_bp")+";";
+        Statement stBpb = conn.createStatement();
+        int resBpb = stBpb.executeUpdate(queryBpb);
+        
+        String queryContact = "UPDATE BPSU_BPB_CON SET "
+                    + " tel_num_01 = " + (!root.get("tel_num_01").equals("") ? ("'"+root.get("tel_num_01")+"'") : "''")
+                    + ", tel_num_02 = " + (!root.get("tel_num_02").equals("") ? ("'"+root.get("tel_num_02")+"'") : "''")
+                    + ", tel_ext_02 = " + (!root.get("tel_ext_02").equals("") ? ("'"+root.get("tel_ext_02")+"'") : "''")
+                    + ", email_01 = " + (!root.get("email_01").equals("") ? ("'"+root.get("email_01")+"'") : "''")
+                    + ", email_02 = " + (!root.get("email_02").equals("") ? ("'"+root.get("email_02")+"'") : "''")
+                    + ", fid_usr_edit = 152"
+                    + ", ts_edit = now()"
+                    + " WHERE id_bpb = " + root.get("id_bpb")
+                    + " AND id_con = " + root.get("id_con")+";";
+        
+        Statement stCon = conn.createStatement();
+        int resCon = stCon.executeUpdate(queryContact);
+                    
+        String queryAddress = "UPDATE BPSU_BPB_ADD SET "
+                    + " street = " + (!root.get("street").equals("") ? ("'"+root.get("street")+"'") : "''")
+                    + ", street_num_ext = " + (!root.get("street_num_ext").equals("") ? ("'"+root.get("street_num_ext")+"'") : "''")
+                    + ", street_num_int = " + (!root.get("street_num_int").equals("") ? ("'"+root.get("street_num_int")+"'") : "''")
+                    + ", neighborhood = " + (!root.get("neighborhood").equals("") ? ("'"+root.get("neighborhood")+"'") : "''") 
+                    + ", reference = " + (!root.get("reference").equals("") ? ("'"+root.get("reference")+"'") : "''")
+                    + ", locality = " + (!root.get("locality").equals("") ? ("'"+root.get("locality")+"'") : "''")
+                    + ", county = " + (!root.get("county").equals("") ? ("'"+root.get("county")+"'") : "''")
+                    + ", zip_code = " + (!root.get("zip_code").equals("") ? ("'"+root.get("zip_code")+"'") : "''")
+                    + ", fid_sta_n = " + root.get("fid_sta_n")
+                    + ", fid_usr_edit = 152"
+                    + ", ts_edit = now()"
+                    + " WHERE id_bpb = " + root.get("id_bpb")
+                    + " AND id_add = " + root.get("id_add")+";";
+        
+        Statement stAdd = conn.createStatement();
+        int resAdd = stAdd.executeUpdate(queryAddress);
+        
+        String queryEmp = "UPDATE HRSU_EMP SET "
+                    + " fk_cl_cat_mar = " + root.get("fk_cl_cat_mar")
+                    + ", fk_tp_cat_mar = " + root.get("fk_tp_cat_mar")
+                    + ", fk_cl_cat_edu = " + root.get("fk_cl_cat_edu")
+                    + ", fk_tp_cat_edu = " + root.get("fk_tp_cat_edu")
+                    + ", fk_cl_cat_sex = " + root.get("fk_cl_cat_sex")
+                    + ", fk_tp_cat_sex = " + root.get("fk_tp_cat_sex")
+                    + ", fk_cl_cat_blo = " + root.get("fk_cl_cat_blo")
+                    + ", fk_tp_cat_blo = " + root.get("fk_tp_cat_blo")
+                    + ", fk_usr_upd = 152"
+                    + ", ts_usr_upd = now()"
+                    + " WHERE id_emp = " + root.get("id_bp")+";";
+        
+        Statement stEmp = conn.createStatement();
+        int resEmp = stEmp.executeUpdate(queryEmp);
+        
+        String queryEmpRel = "UPDATE HRSU_EMP_REL SET "
+                    + " mate = " + (!root.get("mate").equals("") ? ("'"+root.get("mate")+"'") : "''")
+                    + ", mate_dt_bir_n = " + (!root.get("mate_dt_bir_n").equals("") ? ("'"+root.get("mate_dt_bir_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_mate = " + root.get("fk_cl_cat_sex_mate")
+                    + ", fk_tp_cat_sex_mate = " + root.get("fk_tp_cat_sex_mate")
+                    + ", son_1 = " + (!root.get("son_1").equals("") ? ("'"+root.get("son_1")+"'") : "''")
+                    + ", son_dt_bir_1_n = " + (!root.get("son_dt_bir_1_n").equals("") ? ("'"+root.get("son_dt_bir_1_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_son_1 = " + root.get("fk_cl_cat_sex_son_1")
+                    + ", fk_tp_cat_sex_son_1 = " + root.get("fk_tp_cat_sex_son_1")
+                    + ", son_2 = " + (!root.get("son_2").equals("") ? ("'"+root.get("son_2")+"'") : "''")
+                    + ", son_dt_bir_2_n = " + (!root.get("son_dt_bir_2_n").equals("") ? ("'"+root.get("son_dt_bir_2_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_son_2 = " + root.get("fk_cl_cat_sex_son_2")
+                    + ", fk_tp_cat_sex_son_2 = " + root.get("fk_tp_cat_sex_son_2")
+                    + ", son_3 = " + (!root.get("son_3").equals("") ? ("'"+root.get("son_3")+"'") : "''")
+                    + ", son_dt_bir_3_n = " + (!root.get("son_dt_bir_3_n").equals("") ? ("'"+root.get("son_dt_bir_3_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_son_3 = " + root.get("fk_cl_cat_sex_son_3")
+                    + ", fk_tp_cat_sex_son_3 = " + root.get("fk_tp_cat_sex_son_3")
+                    + ", son_4 = " + (!root.get("son_4").equals("") ? ("'"+root.get("son_4")+"'") : "''")
+                    + ", son_dt_bir_4_n = " + (!root.get("son_dt_bir_4_n").equals("") ? ("'"+root.get("son_dt_bir_4_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_son_4 = " + root.get("fk_cl_cat_sex_son_4")
+                    + ", fk_tp_cat_sex_son_4 = " + root.get("fk_tp_cat_sex_son_4")
+                    + ", son_5 = " + (!root.get("son_5").equals("") ? ("'"+root.get("son_5")+"'") : "''")
+                    + ", son_dt_bir_5_n = " + (!root.get("son_dt_bir_5_n").equals("") ? ("'"+root.get("son_dt_bir_5_n")+"'") : "null")
+                    + ", fk_cl_cat_sex_son_5 = " + root.get("fk_cl_cat_sex_son_5")
+                    + ", fk_tp_cat_sex_son_5 = " + root.get("fk_tp_cat_sex_son_5")
+                    + ", emergs_con = " + (!root.get("emergs_con").equals("") ? ("'"+root.get("emergs_con")+"'") : "''")
+                    + ", emergs_tel_num = " + (!root.get("emergs_tel_num").equals("") ? ("'"+root.get("emergs_tel_num")+"'") : "''")
+                    + ", benefs = " + (!root.get("benefs").equals("") ? ("'"+root.get("benefs")+"'") : "''")
+                    + ", fk_cl_cat_kin_emergs = " + root.get("fk_cl_cat_kin_emergs")
+                    + ", fk_tp_cat_kin_emergs = " + root.get("fk_tp_cat_kin_emergs")
+                    + " WHERE id_emp = " + root.get("id_bp")+";";
+        
+        Statement stRel = conn.createStatement();
+        int resRel = stRel.executeUpdate(queryEmpRel);
+        conn.commit();
+        return true;
+        
+        }catch (SQLException ex) {
+            conn.rollback();
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (ParseException ex) {
+            conn.rollback();
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }        
+    }
     
+    public SBreachInfoResponse getBreachInfo(String sJsonInc) throws SQLException, ClassNotFoundException, SConfigException, ParseException {
+        ResultSet resultSet;
+        int company = 0;
+
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        SBreachInfoResponse objResponse = new SBreachInfoResponse();
+        
+        if (conn == null) {
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
+        }
+        
+        JSONParser parser = new JSONParser();
+        JSONArray root;
+        root = (JSONArray) parser.parse(sJsonInc);
+        ArrayList<SBreachEmployee> AEmployee = new ArrayList();
+        for(int i = 0; root.size() > i; i++){
+            JSONObject row = (JSONObject) parser.parse(root.get(i).toString());
+            JSONArray lemp = (JSONArray) parser.parse(row.get("lEmployees").toString());
+            
+            if (row.get("company") == null) {
+                continue;
+            }
+            company = Integer.parseInt(row.get("company").toString());
+            String companies = "SELECT * "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                        + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
+            } 
+            // query percepciones de empresa del empleado
+            SMySqlClass empresa = new SMySqlClass();
+            Connection conn_empresa = empresa.connect("", "", resultSet.getString("bd"), "", "");
+            
+            for(int j = 0; lemp.size() > j; j++){
+                SBreachEmployee breachEmp = new SBreachEmployee();
+                ArrayList<SBreachInfo> Abreach = new ArrayList();
+                String query = "SELECT hrs_prec_sec.name AS nameSec, hrs_prec_subsec.name AS nameSub, hrs_prec.name AS namePrec, num, breach_ts, breach_abstract, breach_descrip, fk_emp_author, fk_emp_offender, fk_emp_boss" +
+                    " FROM hrs_doc_breach_prec_subsec" +
+                    " INNER JOIN hrs_prec_sec ON hrs_prec_sec.id_prec = hrs_doc_breach_prec_subsec.id_prec AND hrs_prec_sec.id_sec = hrs_doc_breach_prec_subsec.id_sec" +
+                    " INNER JOIN hrs_prec_subsec ON hrs_prec_subsec.id_prec = hrs_doc_breach_prec_subsec.id_prec AND hrs_prec_subsec.id_sec = hrs_doc_breach_prec_subsec.id_sec AND hrs_prec_subsec.id_subsec = hrs_doc_breach_prec_subsec.id_subsec" +
+                    " INNER JOIN hrs_doc_breach ON hrs_doc_breach.id_doc_breach = hrs_doc_breach_prec_subsec.id_doc_breach" + 
+                    " INNER JOIN hrs_prec ON hrs_doc_breach_prec_subsec.id_prec = hrs_prec.id_prec" +
+                    " WHERE hrs_doc_breach.b_del = 0" +
+                    " AND fk_emp_offender = " + lemp.get(j)  + ";";
+                    
+                Statement st = conn_empresa.createStatement();
+                ResultSet res = st.executeQuery(query);
+                while (res.next()) {
+                    SBreachInfo bi = new SBreachInfo();
+                    bi.setNum(res.getInt("num"));
+                    bi.setBreachTs(res.getString("breach_ts"));
+                    bi.setBreachAbstract(res.getString("breach_abstract"));
+                    bi.setBreachDescrip(res.getString("breach_descrip"));
+                    bi.setFk_emp_author(res.getInt("fk_emp_author"));
+                    bi.setFk_emp_offender(res.getInt("fk_emp_offender"));
+                    bi.setFk_emp_boss(res.getInt("fk_emp_boss"));
+                    bi.setSec(res.getString("nameSec"));
+                    bi.setSub(res.getString("nameSub"));
+                    bi.setPrec(res.getString("namePrec"));
+                    Abreach.add(bi);
+                }
+                breachEmp.setBreach(Abreach);
+                breachEmp.setId_emp((long)lemp.get(j));
+                AEmployee.add(breachEmp);
+            }
+            
+            conn_empresa.close();
+        }
+        objResponse.setCode(200);
+        objResponse.setMessage("Se completo con exito");
+        objResponse.setBreach(AEmployee);
+
+        return objResponse;
+    }
+    
+    public SBreachInfoResponse getAdmRecInfo(String sJsonInc) throws SQLException, ClassNotFoundException, SConfigException, ParseException {
+        ResultSet resultSet;
+        int company = 0;
+
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        SBreachInfoResponse objResponse = new SBreachInfoResponse();
+        
+        if (conn == null) {
+            objResponse.setCode(RESPONSE_ERROR );
+            objResponse.setMessage("Hubo un error al tratar de conectarse a la BD");
+            return objResponse;
+        }
+        
+        JSONParser parser = new JSONParser();
+        JSONArray root;
+        root = (JSONArray) parser.parse(sJsonInc);
+        ArrayList<SBreachEmployee> AEmployee = new ArrayList();
+        for(int i = 0; root.size() > i; i++){
+            JSONObject row = (JSONObject) parser.parse(root.get(i).toString());
+            JSONArray lemp = (JSONArray) parser.parse(row.get("lEmployees").toString());
+            
+            if (row.get("company") == null) {
+                continue;
+            }
+            company = Integer.parseInt(row.get("company").toString());
+            String companies = "SELECT * "
+                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                                        + "WHERE id_co = " + company ;
+            Statement stCon = conn.createStatement();
+
+            resultSet = stCon.executeQuery(companies);
+            if(!resultSet.next()){
+                objResponse.setCode(RESPONSE_ERROR );
+                objResponse.setMessage("El id de la empresa no corresponde con nuestros registros");
+                return objResponse;
+            } 
+            // query percepciones de empresa del empleado
+            SMySqlClass empresa = new SMySqlClass();
+            Connection conn_empresa = empresa.connect("", "", resultSet.getString("bd"), "", "");
+            
+            for(int j = 0; lemp.size() > j; j++){
+                
+                SBreachEmployee breachEmp = new SBreachEmployee();
+                ArrayList<SAdmRecInfo> AAdmRec = new ArrayList();
+                String query = "SELECT hrs_prec_sec.name AS nameSec, hrs_prec_subsec.name AS nameSub, hrs_prec.name AS namePrec, num, rec_dt_sta, rec_dt_end, breach_abstract, breach_descrip, fk_emp_offender, fk_emp_boss" +
+                    " FROM hrs_doc_adm_rec_prec_subsec" +
+                    " INNER JOIN hrs_prec_sec ON hrs_prec_sec.id_prec = hrs_doc_adm_rec_prec_subsec.id_prec AND hrs_prec_sec.id_sec = hrs_doc_adm_rec_prec_subsec.id_sec" +
+                    " INNER JOIN hrs_prec_subsec ON hrs_prec_subsec.id_prec = hrs_doc_adm_rec_prec_subsec.id_prec AND hrs_prec_subsec.id_sec = hrs_doc_adm_rec_prec_subsec.id_sec AND hrs_prec_subsec.id_subsec = hrs_doc_adm_rec_prec_subsec.id_subsec" +
+                    " INNER JOIN hrs_doc_adm_rec ON hrs_doc_adm_rec.id_doc_adm_rec = hrs_doc_adm_rec_prec_subsec.id_doc_adm_rec" + 
+                    " INNER JOIN hrs_prec ON hrs_doc_adm_rec_prec_subsec.id_prec = hrs_prec.id_prec" +
+                    " WHERE hrs_doc_adm_rec.b_del = 0" +
+                    " AND fk_emp_offender = " + lemp.get(j) + ";";
+                    
+                Statement st = conn_empresa.createStatement();
+                ResultSet res = st.executeQuery(query);
+                while (res.next()) {
+                    SAdmRecInfo ar = new SAdmRecInfo();
+                    ar.setNum(res.getInt("num"));
+                    ar.setSec(res.getString("nameSec"));
+                    ar.setSub(res.getString("nameSub"));
+                    ar.setPrec(res.getString("namePrec"));
+                    ar.setRecDtSta(res.getString("rec_dt_sta"));
+                    ar.setRecDtEnd(res.getString("rec_dt_end"));
+                    ar.setBreachAbstract(res.getString("breach_abstract"));
+                    ar.setBreachDescrip(res.getString("breach_descrip"));
+                    ar.setFk_emp_offender(res.getInt("fk_emp_offender"));
+                    ar.setFk_emp_boss(res.getInt("fk_emp_boss"));
+                    AAdmRec.add(ar);
+                }
+                breachEmp.setAdmRec(AAdmRec);
+                breachEmp.setId_emp((long)lemp.get(j));
+                AEmployee.add(breachEmp);
+            }
+            
+            conn_empresa.close();
+            
+        }
+        objResponse.setCode(200);
+        objResponse.setMessage("Se completo con exito");
+        objResponse.setBreach(AEmployee);
+
+        return objResponse;
+    }
             
 }

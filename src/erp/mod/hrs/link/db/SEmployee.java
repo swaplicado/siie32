@@ -22,6 +22,10 @@ public class SEmployee {
     String dt_bir;
     String benefit_date;
     String email;
+    String emailEmp;
+    String telArea;
+    String telNum;
+    String ext;
     int company_id;
     int overtime_policy;
     int checker_policy;
