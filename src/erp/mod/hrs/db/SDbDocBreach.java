@@ -27,10 +27,12 @@ public class SDbDocBreach extends SDbRegistryUser {
     protected Date mtBreachTs;
     protected String msBreachAbstract;
     protected String msBreachDescrip;
+    protected String msEndingNotes;
     protected String msFilevaultId;
     protected Date mtFilevaultTs_n;
     protected String msFileType;
     protected boolean mbOffenderUnionized;
+    protected boolean mbOffenderSigned;
     /*
     protected boolean mbDeleted;
     */
@@ -62,10 +64,12 @@ public class SDbDocBreach extends SDbRegistryUser {
     public void setBreachTs(Date t) { mtBreachTs = t; }
     public void setBreachAbstract(String s) { msBreachAbstract = s; }
     public void setBreachDescrip(String s) { msBreachDescrip = s; }
+    public void setEndingNotes(String s) { msEndingNotes = s; }
     public void setFilevaultId(String s) { msFilevaultId = s; }
     public void setFilevaultTs_n(Date t) { mtFilevaultTs_n = t; }
     public void setFileType(String s) { msFileType = s; }
     public void setOffenderUnionized(boolean b) { mbOffenderUnionized = b; }
+    public void setOffenderSigned(boolean b) { mbOffenderSigned = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkDocumentId(int n) { mnFkDocumentId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
@@ -85,10 +89,12 @@ public class SDbDocBreach extends SDbRegistryUser {
     public Date getBreachTs() { return mtBreachTs; }
     public String getBreachAbstract() { return msBreachAbstract; }
     public String getBreachDescrip() { return msBreachDescrip; }
+    public String getEndingNotes() { return msEndingNotes; }
     public String getFilevaultId() { return msFilevaultId; }
     public Date getFilevaultTs_n() { return mtFilevaultTs_n; }
     public String getFileType() { return msFileType; }
     public boolean isOffenderUnionized() { return mbOffenderUnionized; }
+    public boolean isOffenderSigned() { return mbOffenderSigned; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkDocumentId() { return mnFkDocumentId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
@@ -153,10 +159,12 @@ public class SDbDocBreach extends SDbRegistryUser {
         mtBreachTs = null;
         msBreachAbstract = "";
         msBreachDescrip = "";
+        msEndingNotes = "";
         msFilevaultId = "";
         mtFilevaultTs_n = null;
         msFileType = "";
         mbOffenderUnionized = false;
+        mbOffenderSigned = false;
         mbDeleted = false;
         mnFkDocumentId = 0;
         mnFkCompanyBranchId = 0;
@@ -224,10 +232,12 @@ public class SDbDocBreach extends SDbRegistryUser {
             mtBreachTs = resultSet.getTimestamp("breach_ts");
             msBreachAbstract = resultSet.getString("breach_abstract");
             msBreachDescrip = resultSet.getString("breach_descrip");
+            msEndingNotes = resultSet.getString("ending_notes");
             msFilevaultId = resultSet.getString("filevault_id");
             mtFilevaultTs_n = resultSet.getTimestamp("filevault_ts_n");
             msFileType = resultSet.getString("file_type");
             mbOffenderUnionized = resultSet.getBoolean("b_offender_uni");
+            mbOffenderSigned = resultSet.getBoolean("b_offender_sign");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkDocumentId = resultSet.getInt("fk_doc");
             mnFkCompanyBranchId = resultSet.getInt("fk_cob");
@@ -307,10 +317,12 @@ public class SDbDocBreach extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDatetime.format(mtBreachTs) + "'" + ", " + 
                     "'" + msBreachAbstract + "', " + 
                     "'" + msBreachDescrip + "', " + 
+                    "'" + msEndingNotes + "', " + 
                     "'" + msFilevaultId + "', " + 
                     filevaultTs_n + ", " + 
                     "'" + msFileType + "', " + 
                     (mbOffenderUnionized ? 1 : 0) + ", " + 
+                    (mbOffenderSigned ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkDocumentId + ", " + 
                     mnFkCompanyBranchId + ", " + 
@@ -335,10 +347,12 @@ public class SDbDocBreach extends SDbRegistryUser {
                     "breach_ts = " + "'" + SLibUtils.DbmsDateFormatDatetime.format(mtBreachTs) + "'" + ", " +
                     "breach_abstract = '" + msBreachAbstract + "', " +
                     "breach_descrip = '" + msBreachDescrip + "', " +
+                    "ending_notes = '" + msEndingNotes + "', " +
                     "filevault_id = '" + msFilevaultId + "', " +
                     "filevault_ts_n = " + filevaultTs_n + ", " +
                     "file_type = '" + msFileType + "', " +
                     "b_offender_uni = " + (mbOffenderUnionized ? 1 : 0) + ", " +
+                    "b_offender_sign = " + (mbOffenderSigned ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_doc = " + mnFkDocumentId + ", " +
                     "fk_cob = " + mnFkCompanyBranchId + ", " +
@@ -389,10 +403,12 @@ public class SDbDocBreach extends SDbRegistryUser {
         registry.setBreachTs(this.getBreachTs());
         registry.setBreachAbstract(this.getBreachAbstract());
         registry.setBreachDescrip(this.getBreachDescrip());
+        registry.setEndingNotes(this.getEndingNotes());
         registry.setFilevaultId(this.getFilevaultId());
         registry.setFilevaultTs_n(this.getFilevaultTs_n());
         registry.setFileType(this.getFileType());
         registry.setOffenderUnionized(this.isOffenderUnionized());
+        registry.setOffenderSigned(this.isOffenderSigned());
         registry.setDeleted(this.isDeleted());
         registry.setFkDocumentId(this.getFkDocumentId());
         registry.setFkCompanyBranchId(this.getFkCompanyBranchId());

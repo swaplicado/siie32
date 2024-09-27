@@ -24,6 +24,7 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
 import erp.mod.hrs.form.SDialogLayoutAF02;
+import erp.mod.hrs.form.SDialogRepBreaches;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
 import erp.mod.hrs.form.SDialogRepHrsEarningDeduction;
@@ -169,6 +170,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiSanDocBreachSum;
     private javax.swing.JMenuItem jmiSanDocAdminRecord;
     private javax.swing.JMenuItem jmiSanDocAdminRecordSum;
+    private javax.swing.JMenuItem jmiSanReport;
     
     private javax.swing.JMenu jmImp;
     private javax.swing.JMenuItem jmiImpFormerPayroll;
@@ -199,6 +201,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private int mnParamPayrollAccProcess;
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
+    private SDialogRepBreaches modDialogRepBreaches;
 
     public SGuiModuleHrs(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_HRS);
@@ -467,12 +470,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiSanDocBreachSum = new JMenuItem("Infracciones por empleado (resumen)");
         jmiSanDocAdminRecord = new JMenuItem("Actas administrativas");
         jmiSanDocAdminRecordSum = new JMenuItem("Actas administrativas por empleado (resumen)");
+        jmiSanReport = new JMenuItem("Reporte de sanciones...");
         
         jmSan.add(jmiSanDocBreach);
         jmSan.add(jmiSanDocBreachSum);
         jmSan.addSeparator();
         jmSan.add(jmiSanDocAdminRecord);
         jmSan.add(jmiSanDocAdminRecordSum);
+        jmSan.add(jmiSanReport);
         
         jmImp = new JMenu("Importación");
         jmiImpFormerPayroll = new JMenuItem("Nóminas importadas");
@@ -641,6 +646,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiSanDocBreachSum.addActionListener(this);
         jmiSanDocAdminRecord.addActionListener(this);
         jmiSanDocAdminRecordSum.addActionListener(this);
+        jmiSanReport.addActionListener(this);
         
         jmiImpFormerPayroll.addActionListener(this);
         jmiImpFormerPayrollEmp.addActionListener(this);
@@ -803,6 +809,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiSanDocBreachSum.setEnabled(hasRightDocBreach && SLibUtilities.belongsTo(levelRightDocBreach, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
         jmiSanDocAdminRecord.setEnabled(hasRightDocAdminRecord);
         jmiSanDocAdminRecordSum.setEnabled(hasRightDocAdminRecord && SLibUtilities.belongsTo(levelRightDocAdminRecord, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
+        jmiSanReport.setEnabled(hasRightDocAdminRecord && SLibUtilities.belongsTo(levelRightDocAdminRecord, new int[] { SUtilConsts.LEV_READ, SUtilConsts.LEV_EDITOR, SUtilConsts.LEV_MANAGER }));
 
         boolean hasRightImport = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_IMP).HasRight;
         
@@ -1345,6 +1352,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiSanDocAdminRecordSum) {
                 miClient.getSession().showView(SModConsts.HRSX_DOC_ADM_REC_SUM, 0, null);
+            }
+            else if (item == jmiSanReport) {
+                modDialogRepBreaches = new SDialogRepBreaches((SGuiClient) miClient);
+                modDialogRepBreaches.setVisible(true);
             }
             else if (item == jmiImpFormerPayroll) {
                 showView(SDataConstants.HRS_SIE_PAY);

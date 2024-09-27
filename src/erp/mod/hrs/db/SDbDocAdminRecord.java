@@ -30,11 +30,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     protected String msBreachAbstract;
     protected String msBreachDescrip;
     protected String msOffenderComments1;
+    protected String msEndingNotes;
     protected String msOffenderComments2;
     protected String msFilevaultId;
     protected Date mtFilevaultTs_n;
     protected String msFileType;
     protected boolean mbOffenderUnionized;
+    protected boolean mbOffenderSigned;
+    protected boolean mbOffenderDismissed;
     protected boolean mbHumanResourcesWitness1;
     protected boolean mbHumanResourcesWitness2;
     /*
@@ -76,11 +79,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     public void setBreachAbstract(String s) { msBreachAbstract = s; }
     public void setBreachDescrip(String s) { msBreachDescrip = s; }
     public void setOffenderComments1(String s) { msOffenderComments1 = s; }
+    public void setEndingNotes(String s) { msEndingNotes = s; }
     public void setOffenderComments2(String s) { msOffenderComments2 = s; }
     public void setFilevaultId(String s) { msFilevaultId = s; }
     public void setFilevaultTs_n(Date t) { mtFilevaultTs_n = t; }
     public void setFileType(String s) { msFileType = s; }
     public void setOffenderUnionized(boolean b) { mbOffenderUnionized = b; }
+    public void setOffenderSigned(boolean b) { mbOffenderSigned = b; }
+    public void setOffenderDismissed(boolean b) { mbOffenderDismissed = b; }
     public void setHumanResourcesWitness1(boolean b) { mbHumanResourcesWitness1 = b; }
     public void setHumanResourcesWitness2(boolean b) { mbHumanResourcesWitness2 = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -110,11 +116,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
     public String getBreachAbstract() { return msBreachAbstract; }
     public String getBreachDescrip() { return msBreachDescrip; }
     public String getOffenderComments1() { return msOffenderComments1; }
+    public String getEndingNotes() { return msEndingNotes; }
     public String getOffenderComments2() { return msOffenderComments2; }
     public String getFilevaultId() { return msFilevaultId; }
     public Date getFilevaultTs_n() { return mtFilevaultTs_n; }
     public String getFileType() { return msFileType; }
     public boolean isOffenderUnionized() { return mbOffenderUnionized; }
+    public boolean isOffenderSigned() { return mbOffenderSigned; }
+    public boolean isOffenderDismissed() { return mbOffenderDismissed; }
     public boolean isHumanResourcesWitness1() { return mbHumanResourcesWitness1; }
     public boolean isHumanResourcesWitness2() { return mbHumanResourcesWitness2; }
     public boolean isDeleted() { return mbDeleted; }
@@ -189,11 +198,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         msBreachAbstract = "";
         msBreachDescrip = null;
         msOffenderComments1 = null;
+        msEndingNotes = "";
         msOffenderComments2 = null;
         msFilevaultId = "";
         mtFilevaultTs_n = null;
         msFileType = "";
         mbOffenderUnionized = false;
+        mbOffenderSigned = false;
+        mbOffenderDismissed = false;
         mbHumanResourcesWitness1 = false;
         mbHumanResourcesWitness2 = false;
         mbDeleted = false;
@@ -271,11 +283,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
             msBreachAbstract = resultSet.getString("breach_abstract");
             msBreachDescrip = resultSet.getString("breach_descrip");
             msOffenderComments1 = resultSet.getString("offender_cmts_1");
+            msEndingNotes = resultSet.getString("ending_notes");
             msOffenderComments2 = resultSet.getString("offender_cmts_2");
             msFilevaultId = resultSet.getString("filevault_id");
             mtFilevaultTs_n = resultSet.getTimestamp("filevault_ts_n");
             msFileType = resultSet.getString("file_type");
             mbOffenderUnionized = resultSet.getBoolean("b_offender_uni");
+            mbOffenderSigned = resultSet.getBoolean("b_offender_sign");
+            mbOffenderDismissed = resultSet.getBoolean("b_offender_dis");
             mbHumanResourcesWitness1 = resultSet.getBoolean("b_hrs_witness_1");
             mbHumanResourcesWitness2 = resultSet.getBoolean("b_hrs_witness_2");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -365,11 +380,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                     "'" + msBreachAbstract + "', " + 
                     "'" + msBreachDescrip + "', " + 
                     "'" + msOffenderComments1 + "', " + 
+                    "'" + msEndingNotes + "', " + 
                     "'" + msOffenderComments2 + "', " + 
                     "'" + msFilevaultId + "', " + 
                     filevaultTs_n + ", " + 
                     "'" + msFileType + "', " + 
                     (mbOffenderUnionized ? 1 : 0) + ", " + 
+                    (mbOffenderSigned ? 1 : 0) + ", " + 
+                    (mbOffenderDismissed ? 1 : 0) + ", " + 
                     (mbHumanResourcesWitness1 ? 1 : 0) + ", " + 
                     (mbHumanResourcesWitness2 ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -404,11 +422,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
                     "breach_abstract = '" + msBreachAbstract + "', " +
                     "breach_descrip = '" + msBreachDescrip + "', " +
                     "offender_cmts_1 = '" + msOffenderComments1 + "', " +
+                    "ending_notes = '" + msEndingNotes + "', " +
                     "offender_cmts_2 = '" + msOffenderComments2 + "', " +
                     "filevault_id = '" + msFilevaultId + "', " +
                     "filevault_ts_n = " + filevaultTs_n + ", " +
                     "file_type = '" + msFileType + "', " +
                     "b_offender_uni = " + (mbOffenderUnionized ? 1 : 0) + ", " +
+                    "b_offender_sign = " + (mbOffenderSigned ? 1 : 0) + ", " +
+                    "b_offender_dis = " + (mbOffenderDismissed ? 1 : 0) + ", " +
                     "b_hrs_witness_1 = " + (mbHumanResourcesWitness1 ? 1 : 0) + ", " +
                     "b_hrs_witness_2 = " + (mbHumanResourcesWitness2 ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -469,11 +490,14 @@ public class SDbDocAdminRecord extends SDbRegistryUser {
         registry.setBreachAbstract(this.getBreachAbstract());
         registry.setBreachDescrip(this.getBreachDescrip());
         registry.setOffenderComments1(this.getOffenderComments1());
+        registry.setEndingNotes(this.getEndingNotes());
         registry.setOffenderComments2(this.getOffenderComments2());
         registry.setFilevaultId(this.getFilevaultId());
         registry.setFilevaultTs_n(this.getFilevaultTs_n());
         registry.setFileType(this.getFileType());
         registry.setOffenderUnionized(this.isOffenderUnionized());
+        registry.setOffenderSigned(this.isOffenderSigned());
+        registry.setOffenderDismissed(this.isOffenderDismissed());
         registry.setHumanResourcesWitness1(this.isHumanResourcesWitness1());
         registry.setHumanResourcesWitness2(this.isHumanResourcesWitness2());
         registry.setDeleted(this.isDeleted());

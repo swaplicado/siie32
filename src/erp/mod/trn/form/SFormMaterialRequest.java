@@ -1837,7 +1837,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
         moTextUnitUsr.setValue(moUnitEty.getSymbol());
         moTextUnit.setValue(moUnitEty.getSymbol());
-        moKeyItemRefEty.setValue(new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
+        moKeyItemRefEty.setValue(moKeyItemRef.getValue()[0] != 0 ? new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() } : 0);
         obtainItemPrice();
     }
     

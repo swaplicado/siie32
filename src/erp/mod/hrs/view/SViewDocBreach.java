@@ -172,10 +172,12 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 + "db.num AS " + SDbConsts.FIELD_NAME + ", "
                 + "db.breach_ts, "
                 + "db.breach_abstract, "
+                + "db.ending_notes, "
                 + "db.filevault_id, "
                 + "db.filevault_ts_n, "
                 + "db.file_type, "
                 + "db.b_offender_uni, "
+                + "db.b_offender_sign, "
                 + "cob.code AS _cob_code, "
                 + "ba.bp AS _emp_author, "
                 + "bo.bp AS _emp_offender, "
@@ -220,7 +222,9 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_dep_name", "Depto. empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pos_name", "Puesto empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "db.b_offender_uni", "Sindicalizado empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "db.b_offender_sign", "El empleado firmó"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "db.breach_abstract", "Falta cometida"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "db.ending_notes", "Notas finales"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_author", "Reporta"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_boss", "Jefe inmediato"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_union_n", "Rep. sindical"));

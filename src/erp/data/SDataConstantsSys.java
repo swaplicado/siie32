@@ -121,6 +121,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
     public static final String CFG_PARAM_TRN_DIOG_OUT_DEF_CC = "TRN_DIOG_OUT_DEF_CC";
     public static final String CFG_PARAM_TRN_DIOG_CL_AUTHORN = "TRN_DIOG_CL_AUTHORN";
+    public static final String CFG_PARAM_DOC_HRS_NTS_BREACH = "DOC_HRS_NTS_BREACH";
+    public static final String CFG_PARAM_DOC_HRS_NTS_ADM_REC = "DOC_HRS_NTS_ADM_REC";
+    public static final String CFG_PARAM_DOC_HRS_MAIL_BREACH_TO = "DOC_HRS_MAIL_BREACH_TO";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_CFG = "TRN_MAIL_REP_SCA_TIC_CFG";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_GRP = "TRN_MAIL_REP_SCA_TIC_GRP";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_TO = "TRN_MAIL_REP_SCA_TIC_TO";

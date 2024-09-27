@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 258.0/ 2024-09-27
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de los campos de notas finales y si el empleado firmó las sanciones y actas administrativas, así como si fue desvinculado al recibir esta última.
+2) Ajuste en las requisiciones de materiales para mantener el ítem de referencia del ítem aunque este tenga uno predefinido.
+
+================================================================================
 SIIE 3.2 257.7/ 2024-09-11 
 Jhonatan Claudio PEÑA HERNÁNDEZ / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
