@@ -27,7 +27,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public abstract class SLibUtilities {
 
@@ -642,7 +642,9 @@ public abstract class SLibUtilities {
         String sText = "";
         String sBlank = "";
         DecimalFormat formatDecs = new DecimalFormat("." + SLibUtilities.textRepeat("0", decs));
-
+        String unitSingularEnglish = (unitSingular.equals("TONELADA MÉTRICA")) ? "METRIC TON" : "KILOGRAM";
+        String unitPluralEnglish = (unitPlural.equals("TONELADA MÉTRICA")) ? "METRIC TONS" : "KILOGRAMS";;
+                
         if (units > MAX_VALUE) {
             sText = "(ERROR: cantidad mayor a " + MAX_VALUE + ")";
         }
@@ -836,13 +838,13 @@ public abstract class SLibUtilities {
                     // Final text:
 
                     if (units == 0d) {
-                        sText += MONEY_ENG_ZERO + " " + unitPlural;
+                        sText += MONEY_ENG_ZERO + " " + unitPluralEnglish;
                     }
                     else if (units == 1d) {
-                        sText += " " + unitSingular;
+                        sText += " " + unitSingularEnglish;
                     }
                     else {
-                        sText += " " + unitPlural;
+                        sText += " " + unitPluralEnglish;
                     }
 
                     sText += ")";
