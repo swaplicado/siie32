@@ -185,7 +185,7 @@ public class SDiotLayout {
         int entries = 0;
         int entriesWithoutTax = 0;
         int entriesWithoutBizPartner = 0;
-        int entriesForCompany = 0;
+        int entriesForThisCompany = 0;
         int entriesVatZeroUndefined = 0;
         int entriesVatNonZeroUndefined = 0;
         double debit = 0;
@@ -378,15 +378,15 @@ public class SDiotLayout {
                 
                 // process out business partner:
                 
-                boolean isCompany = false;
+                boolean isThisCompany = false;
                 
                 if (bizPartner == null) {
                     entriesWithoutBizPartner++;
                 }
                 else {
-                    isCompany = SDiotTercero.checkIsCompany(miClient, bizPartner.getPkBizPartnerId());
-                    if (isCompany) {
-                        entriesForCompany++;
+                    isThisCompany = SDiotTercero.checkIsThisCompany(miClient, bizPartner.getPkBizPartnerId());
+                    if (isThisCompany) {
+                        entriesForThisCompany++;
                     }
                 }
                 
@@ -404,7 +404,7 @@ public class SDiotLayout {
                     }
                 }
                 else {
-                    if (isCompany) {
+                    if (isThisCompany) {
                         terceroClave = SDiotTercero.GLOBAL_CLAVE; // when business partner in current entry is the company itself, then third is treated as the global one
                     }
                     else {
@@ -862,7 +862,7 @@ public class SDiotLayout {
             layout += "\"renglones pólizas contables procesados:\"," + entries + "\n";
             layout += "\"renglones pólizas contables sin impuesto:\"," + entriesWithoutTax + ",\"(asignadas el impuesto predeterminado para DIOT: " + vatDefault.getTax() + ")\"\n";
             layout += "\"renglones pólizas contables sin asociado de negocios:\"," + entriesWithoutBizPartner + ",\"(asignados a " + SDiotConsts.THIRD_GLOBAL_NAME + ")\"\n";
-            layout += "\"renglones pólizas contables de la empresa '" + miClient.getSessionXXX().getCurrentCompanyName() + "':\"," + entriesForCompany + ",\"(incluidos en este layout)\"\n";
+            layout += "\"renglones pólizas contables de la empresa '" + miClient.getSessionXXX().getCurrentCompanyName() + "':\"," + entriesForThisCompany + ",\"(incluidos en este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto igual a cero, pero de tipo IVA desconocido:\"," + entriesVatZeroUndefined + ",\"(excluidos de este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto distinto a cero, pero de tipo IVA desconocido:\"," + entriesVatNonZeroUndefined + ",\"(excluidos de este layout)\"\n";
             layout += "\"terceros totalmente en cero:\"," + totallyZero + ",\"" + (excludeTotallyZero ? "(excluídos de este layout)" : "(incluidos en este layout)") + "\"\n";

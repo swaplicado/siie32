@@ -1,8 +1,14 @@
 ================================================================================
+SIIE 3.2 258.2/ 2024-10-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cambio de nombre de método y de variables en utilerías de generación de layouts DIOT para clarificar que el algoritmo considera a la empresa actual de la sesión de usuario.
+
+================================================================================
 SIIE 3.2 258.1/ 2024-10-02
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Adicción contratos em ingles para todos los asociados de negocios, Mejoras a los contratos
+1) Adicción contratos em inglés para todos los asociados de negocios. Mejoras a la impresión de los contratos.
 
 ================================================================================
 SIIE 3.2 258.0/ 2024-09-27

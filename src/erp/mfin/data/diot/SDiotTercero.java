@@ -74,7 +74,7 @@ public class SDiotTercero {
      * @param bizPartner 
      */
     public SDiotTercero(final SClientInterface client, final SDataBizPartner bizPartner) {
-        if (bizPartner == null || checkIsCompany(client, bizPartner.getPkBizPartnerId())) {
+        if (bizPartner == null || checkIsThisCompany(client, bizPartner.getPkBizPartnerId())) {
             resetTercero(true, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
         }
         else {
@@ -270,7 +270,7 @@ public class SDiotTercero {
                 "\"24. IVA correspondiente a las devoluciones, descuentos y bonificaciones sobre compras\"";
     }
     
-    public static boolean checkIsCompany(final SClientInterface client, final int bizPartnerId) {
+    public static boolean checkIsThisCompany(final SClientInterface client, final int bizPartnerId) {
         return bizPartnerId == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
     }
     
