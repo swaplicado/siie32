@@ -71,7 +71,7 @@ import sa.lib.gui.bean.SBeanFieldKey;
  * @author Isabel Servín
  * 
  */
-public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener, FocusListener, CellEditorListener {
+public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements SGridPaneFormOwner, ActionListener, ListSelectionListener, ItemListener, FocusListener, CellEditorListener {
 
     private SDbMaterialRequest moRegistry;
     
@@ -1837,7 +1837,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements  
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
         moTextUnitUsr.setValue(moUnitEty.getSymbol());
         moTextUnit.setValue(moUnitEty.getSymbol());
-        moKeyItemRefEty.setValue(moKeyItemRef.getValue()[0] != 0 ? new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() } : 0);
+        moKeyItemRefEty.setValue(moKeyItemRef.getValue()[0] != 0 ? new int[] { 0 } : new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
         obtainItemPrice();
     }
     
