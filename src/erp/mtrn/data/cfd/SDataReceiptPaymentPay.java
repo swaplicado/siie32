@@ -345,14 +345,14 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-
+        
         return mnLastDbActionResult;
     }
-
+    
     @Override
     public int save(java.sql.Connection connection) {
         mnLastDbActionResult = SLibConstants.UNDEFINED;
-
+        
         try {
             try (Statement statement = connection.createStatement()) {
                 String sql = "";
@@ -468,7 +468,7 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
-
+        
         return mnLastDbActionResult;
     }
 
@@ -542,12 +542,12 @@ public class SDataReceiptPaymentPay extends erp.lib.data.SDataRegistry implement
         paymentEntry.AccountDestFiscalId = msPayeeBankFiscalId;
         paymentEntry.AccountDestNumber = msPayeeBankAccount;
         paymentEntry.AccountDestKey = getBankPayeeKey();
-
+        
         if (moParentReceiptPayment.getDbmsFactoringBank_n() != null) {
             paymentEntry.AuxFactoringBankId = moParentReceiptPayment.getDbmsFactoringBank_n().getPkBizPartnerId();
             paymentEntry.AuxFactoringBankFiscalId = moParentReceiptPayment.getDbmsFactoringBank_n().getFiscalId();
         }
-                        
+        
         for (SDataReceiptPaymentPayDoc payDoc : maDbmsReceiptPaymentPayDocs) {
             SCfdPaymentEntryDoc paymentEntryDoc = payDoc.createCfdPaymentEntryDoc(paymentEntry, statement);
             paymentEntryDoc.prepareTableRow();

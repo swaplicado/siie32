@@ -79,7 +79,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected SDataBizPartner moAuxCfdDbmsDataReceptorFactoring;
     protected String msAuxCfdCfdiRelacionadosTipoRelacion;
     protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party CFDI
-    protected STrnCfdRelated moAuxCfdiDocRelacionados;
+    protected STrnCfdRelatedDocs moAuxCfdRelatedDocs;
     protected SDataCfd moAuxCfdDbmsDataCfdCfdiRelacionado; // available when CFDI is stored in SIIE
     protected ArrayList<SCfdPaymentEntry> maAuxCfdPaymentEntries;
     
@@ -159,7 +159,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public void setAuxCfdDbmsDataReceptorFactoring(SDataBizPartner o) { moAuxCfdDbmsDataReceptorFactoring = o; }
     public void setAuxCfdCfdiRelacionadosTipoRelacion(String s) { msAuxCfdCfdiRelacionadosTipoRelacion = s; }
     public void setAuxCfdCfdiRelacionadoUuid(String s) { msAuxCfdCfdiRelacionadoUuid = s; }
-    public void setAuxCfdiDocRelacionados(STrnCfdRelated o) { moAuxCfdiDocRelacionados = o; }
+    public void setAuxCfdRelatedDocs(STrnCfdRelatedDocs o) { moAuxCfdRelatedDocs = o; }
     public void setAuxCfdDbmsDataCfdCfdiRelacionado(SDataCfd o) { moAuxCfdDbmsDataCfdCfdiRelacionado = o; }
     
     public String getAuxCfdConfirmacion() { return msAuxCfdConfirmacion; }
@@ -169,7 +169,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public SDataBizPartner getAuxCfdDbmsDataReceptorFactoring() { return moAuxCfdDbmsDataReceptorFactoring; }
     public String getAuxCfdCfdiRelacionadosTipoRelacion() { return msAuxCfdCfdiRelacionadosTipoRelacion; }
     public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
-    public STrnCfdRelated getAuxCfdiDocRelacionados() { return moAuxCfdiDocRelacionados; }
+    public STrnCfdRelatedDocs getAuxCfdRelatedDocs() { return moAuxCfdRelatedDocs; }
     public SDataCfd getAuxCfdDbmsDataCfdCfdiRelacionado() { return moAuxCfdDbmsDataCfdCfdiRelacionado; }
     public ArrayList<SCfdPaymentEntry> getAuxCfdPaymentEntries() { return maAuxCfdPaymentEntries; }
     
@@ -201,7 +201,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.moAuxCfdDbmsDataReceptorFactoring = sourceCfdPayment.moAuxCfdDbmsDataReceptorFactoring;
         this.msAuxCfdCfdiRelacionadosTipoRelacion = sourceCfdPayment.msAuxCfdCfdiRelacionadosTipoRelacion;
         this.msAuxCfdCfdiRelacionadoUuid = sourceCfdPayment.msAuxCfdCfdiRelacionadoUuid;
-        this.moAuxCfdiDocRelacionados = sourceCfdPayment.moAuxCfdiDocRelacionados;
+        this.moAuxCfdRelatedDocs = sourceCfdPayment.moAuxCfdRelatedDocs;
         this.moAuxCfdDbmsDataCfdCfdiRelacionado = sourceCfdPayment.moAuxCfdDbmsDataCfdCfdiRelacionado;
         this.maAuxCfdPaymentEntries.clear();
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
@@ -1043,12 +1043,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     }
     
     @Override
-    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
-        STrnCfdRelated rd = new STrnCfdRelated();
+    public STrnCfdRelatedDocs getCfdiRelacionados() { // CFDI 4.0
+        STrnCfdRelatedDocs cfdRelatedDocs = new STrnCfdRelatedDocs();
         if (!msAuxCfdCfdiRelacionadoUuid.isEmpty()) {
-            rd.addRelatedDocument(msAuxCfdCfdiRelacionadosTipoRelacion, msAuxCfdCfdiRelacionadoUuid);
+            cfdRelatedDocs.addCfdRelatedDoc(msAuxCfdCfdiRelacionadosTipoRelacion, msAuxCfdCfdiRelacionadoUuid);
         }
-        return rd;
+        return cfdRelatedDocs;
     }
     
     @Override

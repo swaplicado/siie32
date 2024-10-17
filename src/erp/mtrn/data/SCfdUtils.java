@@ -4720,13 +4720,13 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.setEltOpcInformacionGlobal((DElementInformacionGlobal) xmlCfdi.getElementInformacionGlobal());
         }
         
-        if (xmlCfdi.getCfdiRelacionados() != null && xmlCfdi.getCfdiRelacionados().getRelatedDocuments() != null &&
-                !xmlCfdi.getCfdiRelacionados().getRelatedDocuments().isEmpty()) {
+        if (xmlCfdi.getCfdiRelacionados() != null && xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs() != null &&
+                !xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs().isEmpty()) {
             ArrayList<cfd.ver40.DElementCfdiRelacionados> arrCfdiRelacionados = new ArrayList<>();
-            for (SRowRelatedDocument row : xmlCfdi.getCfdiRelacionados().getRelatedDocuments()) {
-                SRowRelatedDocument relatedDocument = row;
+            for (SRowCfdRelatedDocs row : xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs()) {
+                SRowCfdRelatedDocs relatedDocument = row;
                 cfd.ver40.DElementCfdiRelacionados cfdiRelacionados = new cfd.ver40.DElementCfdiRelacionados();
-                cfdiRelacionados.getAttTipoRelacion().setString(relatedDocument.getRelationTypeId());
+                cfdiRelacionados.getAttTipoRelacion().setString(relatedDocument.getRelationType());
                for (String uuid : relatedDocument.getDocUuids().trim().split(",")) { 
                     cfd.ver40.DElementCfdiRelacionado cfdiRelacionado = new cfd.ver40.DElementCfdiRelacionado();
                     cfdiRelacionado.getAttUuid().setString(uuid);

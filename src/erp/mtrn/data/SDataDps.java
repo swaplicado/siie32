@@ -286,7 +286,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
     protected int[] manAuxDpsTime;
-    protected int mnAuxAssetDpsNat;
+    protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
+    protected double mdAuxAppPrepayCurCrossPayExchangeRate; // case of an application of prepayment with currency crossing: payment's exchange rate
+    protected boolean mbXtaTestLinks;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
     */
@@ -294,7 +296,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected sa.lib.srv.redis.SRedisLock moAuxUserRedisLock;
     */
     protected sa.lib.srv.SLock moAuxUserSLock;
-    protected double mdTempCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
@@ -307,7 +308,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
     
-    protected boolean mbXtaTestLinks;
+    protected int mnPrcAssetDpsNat; // internal-processing member
+    protected double mdPrcCfdIvaPorcentaje; // internal-processing member
     
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
@@ -1337,9 +1339,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             double valueMxn = 0;
             double valueUsd = 0;
 
-            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                if (dpsEntry.isAccountable()) {
-                    valueMxn = SLibUtils.round((dpsEntry.getSubtotalCy_r() * mdExchangeRate), decs);
+            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                if (entry.isAccountable()) {
+                    valueMxn = SLibUtils.round((entry.getSubtotalCy_r() * mdExchangeRate), decs);
                     valueUsd = SLibUtils.round(valueUsd + SLibUtils.round((valueMxn / exr), decs), decs);
                 }
             }
@@ -1567,7 +1569,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int id = SDataConstantsSys.UNDEFINED;
 
         if (isDocumentPur()) {
-            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+            if (mnFkDpsNatureId == mnPrcAssetDpsNat) {
                 id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
             }
             else {
@@ -1578,7 +1580,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             id = SDataConstantsSys.FINS_TP_ACC_ITEM_SAL;
         }
         else if (isAdjustmentPur()) {
-            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+            if (mnFkDpsNatureId == mnPrcAssetDpsNat) {
                 id = SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET;
             }
             else {
@@ -1790,10 +1792,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         boolean hasAccountableEntries = false;
         boolean isPrepaymentOnly = true;
         
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.isAccountable()) {
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.isAccountable()) {
                 hasAccountableEntries = true;
-                if (!dpsEntry.getIsPrepayment()) {
+                if (!entry.getIsPrepayment()) {
                     isPrepaymentOnly = false;
                     break;
                 }
@@ -1810,8 +1812,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @return The method is returning a boolean value.
      */
     public boolean isMaterialRequestDocument() {
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.getDbmsDpsEntryMatRequestLink() != null) {
                 return true;
             }
         }
@@ -2096,6 +2098,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
     public void setAuxDpsTime (int[] o) { manAuxDpsTime = o; } 
+    public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
+    public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
+    public void setAuxTestLinks(boolean b) { mbXtaTestLinks = b; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
     */
@@ -2103,6 +2108,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxUserRedisLock(sa.lib.srv.redis.SRedisLock o) { moAuxUserRedisLock = o; }
     */
     public void setAuxUserSLock(sa.lib.srv.SLock o) { moAuxUserSLock = o; }
+    
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
@@ -2130,6 +2136,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
     public int[] getAuxDpsTime() { return manAuxDpsTime; }
+    public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
+    public double getAuxAppPrepayCurCrossPayExchangeRate() { return mdAuxAppPrepayCurCrossPayExchangeRate; }
+    public boolean getXtaTestLinks() { return mbXtaTestLinks; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
     */
@@ -2137,6 +2146,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public sa.lib.srv.redis.SRedisLock getAuxUserRedisLock() { return moAuxUserRedisLock; }
     */
     public sa.lib.srv.SLock getAuxUserSLock() { return moAuxUserSLock; }
+    
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
@@ -2147,20 +2157,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getOldDate() { return mtOldDate; }
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
-    
-    public void setTestLinks(boolean b) { mbXtaTestLinks = b; }
 
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
-        SDataDpsEntry entry = null;
+        SDataDpsEntry entryFound = null;
 
-        for (SDataDpsEntry e : mvDbmsDpsEntries) {
-            if (SLibUtils.compareKeys(pk, e.getPrimaryKey())) {
-                entry = e;
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (SLibUtils.compareKeys(pk, entry.getPrimaryKey())) {
+                entryFound = entry;
                 break;
             }
         }
 
-        return entry;
+        return entryFound;
     }
 
     public java.lang.String getDpsNumber() {
@@ -2401,6 +2409,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
         manAuxDpsTime = null;
+        mnAuxAppPrepayCurCrossPayCurrencyId = 0;
+        mdAuxAppPrepayCurCrossPayExchangeRate = 0;
+        mbXtaTestLinks = true;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
         */
@@ -2408,7 +2419,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAuxUserRedisLock = null;
         */
         moAuxUserSLock = null;
-        mdTempCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
@@ -2421,7 +2431,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msXtaTotalCyAsText = "";
         createXtaDpsType();
         
-        mbXtaTestLinks = true;
+        mnPrcAssetDpsNat = 0;
+        mdPrcCfdIvaPorcentaje = 0;
     }
                         
     @Override
@@ -2816,10 +2827,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         int nParam = 0;
         int nSortingPosition = 0;
         int nDecimals = SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits();
+        int nLocalCurrencyId = SLibConsts.UNDEFINED;
         int nTaxTypeId = SLibConsts.UNDEFINED;
         int nTaxAppTypeId = SLibConsts.UNDEFINED;
         int nTaxAccTypeId = SLibConsts.UNDEFINED;
         int nPositionToAdjust = 0;
+        double dAdminPriceAvg = 0;
         double dDebit = 0;
         double dCredit = 0;
         double dDebitCy = 0;
@@ -2998,40 +3011,52 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 computeXtaTotalCyAsText(oStatement);
                 
-                // 1. Obtain decimals for calculations:
+                // 1. Obtain decimals and local currency for calculations:
 
-                sSql = "SELECT decs_val FROM erp.cfg_param_erp WHERE id_erp = 1 ";
+                sSql = "SELECT decs_val, fid_cur FROM erp.cfg_param_erp WHERE id_erp = 1 ";
                 oResultSet = oStatement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     nDecimals = oResultSet.getInt("decs_val");
+                    nLocalCurrencyId = oResultSet.getInt("fid_cur");
                 }
 
                 // 2. Save aswell document entries:
 
                 nSortingPosition = 0;
-
-                double addPrice = 0.0;
+                dAdminPriceAvg = 0;
                 
                 if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
-                    int admCpt = SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
+                    int paramAdministrativeConceptType = SLibUtils.parseInt(
+                            erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
                             SDataConstantsSys.CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT));
-                    int inv = 0;
-                    double admPrice = 0.0;
-                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                        SDataItem item = new SDataItem();
-                        item.read(new int[] { dpsEntry.getFkItemId() } , oStatement);
-                        if (admCpt != 0 && item.getFkAdministrativeConceptTypeId() == admCpt) {
-                            admPrice += dpsEntry.getPriceUnitary();
+                    
+                    if (paramAdministrativeConceptType != 0) {
+                        double adminPrice = 0;
+                        int inventoriableItems = 0;
+
+                        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                            if (dpsEntry.isAccountable()) {
+                                SDataItem item = new SDataItem();
+                                item.read(new int[] { dpsEntry.getFkItemId() } , oStatement);
+
+                                if (item.getFkAdministrativeConceptTypeId() == paramAdministrativeConceptType) {
+                                    adminPrice += dpsEntry.getPriceUnitary();
+                                }
+                                else if (item.getIsInventoriable()) {
+                                    inventoriableItems++;
+                                    dpsEntry.setXtaIsPurInvoiceInventoriable(true);
+                                }
+                            }
                         }
-                        else if (item.getIsInventoriable()) {
-                            inv++;
-                            dpsEntry.setXtaIsPurInvoiceInventoriable(true);
+
+                        if (inventoriableItems > 0) {
+                            try {
+                                dAdminPriceAvg = adminPrice / inventoriableItems;
+                            }
+                            catch(Exception e) {
+                                System.err.println(e.getMessage());
+                            }
                         }
-                    }
-                    try {
-                        addPrice = admPrice / inv;
-                    } catch(Exception e) {
-                        System.err.println(e.getMessage());
                     }
                 }
                 
@@ -3059,7 +3084,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         
                         if (dpsEntry.getXtaIsPurInvoiceInventoriable()) {
-                            dpsEntry.setXtaPriceCommUnitary(dpsEntry.getPriceUnitary() + (addPrice / dpsEntry.getQuantity()));
+                            dpsEntry.setXtaPriceCommUnitary(dpsEntry.getPriceUnitary() + (dAdminPriceAvg / dpsEntry.getQuantity()));
                         }
 
                         if (dpsEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
@@ -3251,32 +3276,34 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         ArrayList<TaxForAccounting> aTaxesForAccountingArray = new ArrayList<>();
                         
                         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                            if (dpsEntry.getDbmsEntryTaxes().isEmpty()) {
-                                if (!bFoundEmptyTaxes) {
-                                    aTaxesForAccountingArray.add(new TaxForAccounting()); // dummy tax, added only once
-                                    bFoundEmptyTaxes = true;
-                                }
-                            }
-                            else {
-                                for (SDataDpsEntryTax dpsEntryTax : dpsEntry.getDbmsEntryTaxes()) {
-                                    if (dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // para la contabilización por tasa de impuesto sólo juegan los impuestos trasladados
-                                        boolean found = false;
-                                        
-                                        for (TaxForAccounting tax : aTaxesForAccountingArray) {
-                                            if (tax.equalsTax(dpsEntryTax.getPkTaxBasicId(), dpsEntryTax.getPkTaxId())) {
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                        
-                                        if (!found) {
-                                            aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntryTax.getPkTaxBasicId(), dpsEntryTax.getPkTaxId()));
-                                        }
-                                        break; // se asume que sólo hay un impuesto trasladado
+                            if (dpsEntry.isAccountable()) {
+                                if (dpsEntry.getDbmsEntryTaxes().isEmpty()) {
+                                    if (!bFoundEmptyTaxes) {
+                                        aTaxesForAccountingArray.add(new TaxForAccounting()); // dummy tax, added only once
+                                        bFoundEmptyTaxes = true;
                                     }
                                 }
-                                if (aTaxesForAccountingArray.isEmpty()) {
-                                    aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxBasicId(), dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxId()));
+                                else {
+                                    for (SDataDpsEntryTax dpsEntryTax : dpsEntry.getDbmsEntryTaxes()) {
+                                        if (dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // para la contabilización por tasa de impuesto sólo juegan los impuestos trasladados
+                                            boolean found = false;
+
+                                            for (TaxForAccounting tax : aTaxesForAccountingArray) {
+                                                if (tax.equalsTax(dpsEntryTax.getPkTaxBasicId(), dpsEntryTax.getPkTaxId())) {
+                                                    found = true;
+                                                    break;
+                                                }
+                                            }
+
+                                            if (!found) {
+                                                aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntryTax.getPkTaxBasicId(), dpsEntryTax.getPkTaxId()));
+                                            }
+                                            break; // se asume que sólo hay un impuesto trasladado
+                                        }
+                                    }
+                                    if (aTaxesForAccountingArray.isEmpty()) {
+                                        aTaxesForAccountingArray.add(new TaxForAccounting(dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxBasicId(), dpsEntry.getDbmsEntryTaxes().get(0).getPkTaxId()));
+                                    }
                                 }
                             }
                         }
@@ -3285,7 +3312,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         ArrayList<SFinAccountConfig> aAccountConfigsOperationsArray = new ArrayList<>();
                         
-                        // Obtención de la configuración de contabilización predeterminada (sin impuesto):
+                        // a) Obtención de la configuración de contabilización predeterminada (i.e., ¡sin impuesto!):
                         
                         SFinAccountConfig oAccountConfigForOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                 mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
@@ -3294,7 +3321,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         aAccountConfigsOperationsArray.add(oAccountConfigForOperations);
                         
-                        // Obtención de las configuraciones de contabilización en base a los impuestos del documento:
+                        // b) Obtención de las configuraciones de contabilización en base a los impuestos del documento, en caso de que las haya:
                         
                         for (TaxForAccounting tax : aTaxesForAccountingArray) {
                             if (tax.isDummy()) {
@@ -3536,7 +3563,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         anSysMvtTypeKeyBprXXX = getSysMvtTypeKeyBizPartnerXXX();
                         
                         for (SFinAmount amount : oAmounts.getAmounts()) {
-                            if (amount.IsPrepaymentInvoiced && (isDocument() && amount.MovementType == SFinMovementType.Increment || isAdjustment()&& amount.MovementType == SFinMovementType.Decrement)) {
+                            if (amount.IsPrepaymentInvoiced && ((isDocument() && amount.MovementType == SFinMovementType.Increment) || (isAdjustment() && amount.MovementType == SFinMovementType.Decrement))) {
                                 switch (amount.AccountType) {
                                     case ACC_CASH_ACCOUNT:
                                         // user requested accounting of prepayments into a cash account:
@@ -3644,17 +3671,47 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
                                         }
 
+                                        // afectación del saldo del asociado de negocios:
+                                        
+                                        double value = aAmountsEntriesArray.get(i).Amount;
+                                        double valueCy = 0;
+                                        double exchangeRate = 0;
+                                        
+                                        if (mnAuxAppPrepayCurCrossPayCurrencyId != 0 && amount.MovementType == SFinMovementType.Decrement) {
+                                            // hay procesamiento con cruce de moneda, preservar la original:
+                                            
+                                            if (mnAuxAppPrepayCurCrossPayCurrencyId == nLocalCurrencyId) {
+                                                // el documento de origen está en moneda local:
+                                                valueCy = value;
+                                                exchangeRate = 1;
+                                            }
+                                            else {
+                                                // el documento de origen está en moneda extranjera:
+                                                valueCy = SLibUtils.roundAmount(aAmountsEntriesArray.get(i).AmountCy / mdAuxAppPrepayCurCrossPayExchangeRate);
+                                                exchangeRate = mdAuxAppPrepayCurCrossPayExchangeRate;
+                                            }
+                                            
+                                            oRecordEntry.setExchangeRate(exchangeRate);
+                                            oRecordEntry.setExchangeRateSystem(exchangeRate);
+                                            oRecordEntry.setFkCurrencyId(mnAuxAppPrepayCurCrossPayCurrencyId);
+                                        }
+                                        else {
+                                            // procesamiento normal:
+                                            
+                                            valueCy = aAmountsEntriesArray.get(i).AmountCy;
+                                        }
+                                        
                                         if (isDebitForBizPartner()) {
-                                            oRecordEntry.setDebit(aAmountsEntriesArray.get(i).Amount);
+                                            oRecordEntry.setDebit(value);
                                             oRecordEntry.setCredit(0);
-                                            oRecordEntry.setDebitCy(aAmountsEntriesArray.get(i).AmountCy);
+                                            oRecordEntry.setDebitCy(valueCy);
                                             oRecordEntry.setCreditCy(0);
                                         }
                                         else {
                                             oRecordEntry.setDebit(0);
-                                            oRecordEntry.setCredit(aAmountsEntriesArray.get(i).Amount);
+                                            oRecordEntry.setCredit(value);
                                             oRecordEntry.setDebitCy(0);
-                                            oRecordEntry.setCreditCy(aAmountsEntriesArray.get(i).AmountCy);
+                                            oRecordEntry.setCreditCy(valueCy);
                                         }
 
                                         oRecordEntry.setConcept(sConcept);
@@ -3724,7 +3781,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             // 4.4.1 Standard accounting:
                             
                             String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
-                            mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                            mnPrcAssetDpsNat = Integer.parseInt(sDpsAssetNat);
                             HashSet<erp.mfin.data.SFinAccountConfigEntry> lAccCfg = new HashSet<>();
                             
                             /**
@@ -3732,7 +3789,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                              * para determinar las partidas que sí tienen configuración y repartir las que no en estas
                              * configuraciones.
                              */
-                            if (mnFkDpsNatureId == mnAuxAssetDpsNat) {
+                            if (mnFkDpsNatureId == mnPrcAssetDpsNat) {
                                 for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                                     if (dpsEntry.isAccountable()) {
                                         switch (dpsEntry.getOperationsType()) {
@@ -4274,25 +4331,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                     moDbmsDataAddenda.getDbmsDpsAddendaEntries().clear();
 
-                    for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                        SDataDpsAddendaEntry addendaEntry = new SDataDpsAddendaEntry();
+                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                        if (dpsEntry.isAccountable()) {
+                            SDataDpsAddendaEntry addendaEntry = new SDataDpsAddendaEntry();
 
-                        addendaEntry.setPkYearId(entry.getPkYearId());
-                        addendaEntry.setPkDocId(entry.getPkDocId());
-                        addendaEntry.setPkEntryId(entry.getPkEntryId());
-                        addendaEntry.setBachocoNumeroPosicion(entry.getDbmsAddBachocoNumeroPosicion());
-                        addendaEntry.setBachocoCentro(entry.getDbmsAddBachocoCentro());
-                        addendaEntry.setLorealEntryNumber(entry.getDbmsAddLorealEntryNumber());
-                        addendaEntry.setSorianaCodigo(entry.getDbmsAddSorianaCodigo());
-                        addendaEntry.setElektraOrder(entry.getDbmsAddElektraOrder());
-                        addendaEntry.setElektraBarcode(entry.getDbmsAddElektraBarcode());
-                        addendaEntry.setElektraCages(entry.getDbmsAddElektraCages());
-                        addendaEntry.setElektraCagePriceUnitary(entry.getDbmsAddElektraCagePriceUnitary());
-                        addendaEntry.setElektraParts(entry.getDbmsAddElektraParts());
-                        addendaEntry.setElektraPartPriceUnitary(entry.getDbmsAddElektraPartPriceUnitary());
-                        addendaEntry.setJsonData(entry.getDbmsAddJsonData());
+                            addendaEntry.setPkYearId(dpsEntry.getPkYearId());
+                            addendaEntry.setPkDocId(dpsEntry.getPkDocId());
+                            addendaEntry.setPkEntryId(dpsEntry.getPkEntryId());
+                            addendaEntry.setBachocoNumeroPosicion(dpsEntry.getDbmsAddBachocoNumeroPosicion());
+                            addendaEntry.setBachocoCentro(dpsEntry.getDbmsAddBachocoCentro());
+                            addendaEntry.setLorealEntryNumber(dpsEntry.getDbmsAddLorealEntryNumber());
+                            addendaEntry.setSorianaCodigo(dpsEntry.getDbmsAddSorianaCodigo());
+                            addendaEntry.setElektraOrder(dpsEntry.getDbmsAddElektraOrder());
+                            addendaEntry.setElektraBarcode(dpsEntry.getDbmsAddElektraBarcode());
+                            addendaEntry.setElektraCages(dpsEntry.getDbmsAddElektraCages());
+                            addendaEntry.setElektraCagePriceUnitary(dpsEntry.getDbmsAddElektraCagePriceUnitary());
+                            addendaEntry.setElektraParts(dpsEntry.getDbmsAddElektraParts());
+                            addendaEntry.setElektraPartPriceUnitary(dpsEntry.getDbmsAddElektraPartPriceUnitary());
+                            addendaEntry.setJsonData(dpsEntry.getDbmsAddJsonData());
 
-                        moDbmsDataAddenda.getDbmsDpsAddendaEntries().add(addendaEntry);
+                            moDbmsDataAddenda.getDbmsDpsAddendaEntries().add(addendaEntry);
+                        }
                     }
 
                     if (moAuxCfdParams.getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
@@ -4414,7 +4473,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // 2.1. Standard accounting:
                     
                     String sDpsAssetNat = SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_FA_DPS_NAT);
-                    mnAuxAssetDpsNat = Integer.parseInt(sDpsAssetNat);
+                    mnPrcAssetDpsNat = Integer.parseInt(sDpsAssetNat);
                     ArrayList<erp.mfin.data.SFinAccountConfigEntry> lAccConfigs = new ArrayList<>();
                     boolean hasAccountables = false;
                     for (SDataDpsEntry entry : mvDbmsDpsEntries) {
@@ -4910,9 +4969,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         dpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
         toRecipients = new ArrayList<>();
         
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             try {
-                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, dpsEntry.getFkItemId());
+                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
                 
                 if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                     mmsConfig = new SDbMmsConfig();
@@ -4943,37 +5002,39 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 try {
                     String body = STrnUtilities.computeMailHeaderBeginTable(companyName, dpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
 
-                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, dpsEntry.getFkItemId());
+                    for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                        if (entry.isAccountable()) {
+                            mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
 
-                        if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
-                            mmsConfig = new SDbMmsConfig();
-                            mmsConfig.read(client.getSession(), mmsConfigKey);
+                            if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
+                                mmsConfig = new SDbMmsConfig();
+                                mmsConfig.read(client.getSession(), mmsConfigKey);
 
-                            if (emailList.compareTo(mmsConfig.getEmail()) == 0) {
-                                SDataDps dpsSource = null;
-                                String dpsSourceDpsNumber = "";
-                                int dpsSourceYearId = 0;
-                                int dpsSourceDocId = 0;
-                                int dpsSourceMonths = 0;
-                                int dpsContractPriceYear = 0;
-                                int dpsContractPriceMonth = 0;
-                                
-                                if (dpsEntry.getDbmsDpsLinksAsDestiny()!= null && !dpsEntry.getDbmsDpsLinksAsDestiny().isEmpty()) {
-                                    dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
-                                    dpsSourceDpsNumber = dpsSource.getDpsNumber();
-                                    dpsSourceYearId = dpsSource.getPkYearId();
-                                    dpsSourceDocId = dpsSource.getPkDocId();
-                                    dpsSourceMonths = SGuiUtilities.getPeriodMonths(mtDateDocDelivery_n, mtDateDocLapsing_n);
-                                    dpsContractPriceYear = dpsEntry.getContractPriceYear();
-                                    dpsContractPriceMonth = dpsEntry.getContractPriceMonth();
+                                if (emailList.compareTo(mmsConfig.getEmail()) == 0) {
+                                    SDataDps dpsSource = null;
+                                    String dpsSourceDpsNumber = "";
+                                    int dpsSourceYearId = 0;
+                                    int dpsSourceDocId = 0;
+                                    int dpsSourceMonths = 0;
+                                    int dpsContractPriceYear = 0;
+                                    int dpsContractPriceMonth = 0;
+
+                                    if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                        dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
+                                        dpsSourceDpsNumber = dpsSource.getDpsNumber();
+                                        dpsSourceYearId = dpsSource.getPkYearId();
+                                        dpsSourceDocId = dpsSource.getPkDocId();
+                                        dpsSourceMonths = SGuiUtilities.getPeriodMonths(mtDateDocDelivery_n, mtDateDocLapsing_n);
+                                        dpsContractPriceYear = entry.getContractPriceYear();
+                                        dpsContractPriceMonth = entry.getContractPriceMonth();
+                                    }
+
+                                    body += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), 
+                                            dpsSourceDpsNumber.isEmpty() ? "N/D" : dpsSourceDpsNumber, dpsSourceYearId, dpsSourceDocId, dpsSourceMonths, dpsContractPriceYear, dpsContractPriceMonth, 
+                                            msNumberSeries, msNumber, msNumberReference.isEmpty() ? "N/D" : msNumberReference, 
+                                            entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
+                                            getDpsTypeKey(), isEdited, mbIsRebill);
                                 }
-
-                                body += STrnUtilities.computeMailItem(client, dpsEntry.getFkItemId(), dpsEntry.getFkOriginalUnitId(), dpsEntry.getConceptKey(), dpsEntry.getConcept(), 
-                                        dpsSourceDpsNumber.isEmpty() ? "N/D" : dpsSourceDpsNumber, dpsSourceYearId, dpsSourceDocId, dpsSourceMonths, dpsContractPriceYear, dpsContractPriceMonth, 
-                                        msNumberSeries, msNumber, msNumberReference.isEmpty() ? "N/D" : msNumberReference, 
-                                        dpsEntry.getOriginalQuantity(), dpsEntry.getDbmsOriginalUnitSymbol(), mtDate, 
-                                        getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
                     }
@@ -5557,7 +5618,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
             if (entry.isAccountable()) {
-
                 oDetalle = new DElementDetalle();
                 oDetalle.getAttFolio().setString(entry.getDbmsAddElektraOrder());
 
@@ -5823,40 +5883,40 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
             
-            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                if (dpsEntry.isAccountable()) {
-                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
-                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
+            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                if (entry.isAccountable()) {
+                    if (entry.getDbmsCustomsUnitSymbol().isEmpty() && entry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + entry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                     }
                     
-                    double valueMxn = SLibUtils.roundAmount((dpsEntry.getSubtotalCy_r() * mdExchangeRate));
+                    double valueMxn = SLibUtils.roundAmount((entry.getSubtotalCy_r() * mdExchangeRate));
                     double valueUsd = SLibUtils.roundAmount((valueMxn / exr));
                     
                     // compose node Mercancia:
                     
                     cfd.ver3.cce11.DElementMercancia mercancia = new cfd.ver3.cce11.DElementMercancia();
                     
-                    mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
-                    mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariff());
+                    mercancia.getAttNoIdentificacion().setString(entry.getConceptKey());
+                    mercancia.getAttFraccionArancelaria().setString(entry.getDbmsTariff());
                     
                     double equivUnitOriginal;
                     double equivUnitCustoms;
                     String customsUnit;
                     
-                    if (!dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                    if (!entry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
                         // special conversion required:
-                        equivUnitOriginal = dpsEntry.getDbmsOriginalUnitBaseEquivalence();
-                        equivUnitCustoms = dpsEntry.getDbmsItemCustomsUnitEquivalence();
-                        customsUnit = dpsEntry.getDbmsItemCustomsUnitSymbol();
+                        equivUnitOriginal = entry.getDbmsOriginalUnitBaseEquivalence();
+                        equivUnitCustoms = entry.getDbmsItemCustomsUnitEquivalence();
+                        customsUnit = entry.getDbmsItemCustomsUnitSymbol();
                     }
                     else {
                         // no special conversion needed:
                         equivUnitOriginal = 1;
                         equivUnitCustoms = 1;
-                        customsUnit = dpsEntry.getDbmsCustomsUnitSymbol();
+                        customsUnit = entry.getDbmsCustomsUnitSymbol();
                     }
                     
-                    double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
+                    double quantityCustoms = SLibUtils.round(entry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
                     mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
                     mercancia.getAttUnidadAduana().setString(customsUnit);
                     if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
@@ -5872,9 +5932,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     
                     // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
-                    if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
+                    if (entry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && entry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
                         cfd.ver3.cce11.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver3.cce11.DElementDescripcionesEspecificas();
-                        descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
+                        descripcionesEspecificas.getAttMarca().setString(entry.getDbmsItemBrand());
                         mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
                     }
                     
@@ -5908,40 +5968,40 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
             
-            for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-                if (dpsEntry.isAccountable()) {
-                    if (dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
-                        throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
+            for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                if (entry.isAccountable()) {
+                    if (entry.getDbmsCustomsUnitSymbol().isEmpty() && entry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                        throw new Exception("La unidad '" + entry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                     }
                     
-                    double valueMxn = SLibUtils.roundAmount((dpsEntry.getSubtotalCy_r() * mdExchangeRate));
+                    double valueMxn = SLibUtils.roundAmount((entry.getSubtotalCy_r() * mdExchangeRate));
                     double valueUsd = SLibUtils.roundAmount((valueMxn / exr));
                     
                     // compose node Mercancia:
                     
                     cfd.ver4.cce20.DElementMercancia mercancia = new cfd.ver4.cce20.DElementMercancia();
                     
-                    mercancia.getAttNoIdentificacion().setString(dpsEntry.getConceptKey());
-                    mercancia.getAttFraccionArancelaria().setString(dpsEntry.getDbmsTariff());
+                    mercancia.getAttNoIdentificacion().setString(entry.getConceptKey());
+                    mercancia.getAttFraccionArancelaria().setString(entry.getDbmsTariff());
                     
                     double equivUnitOriginal;
                     double equivUnitCustoms;
                     String customsUnit;
                     
-                    if (!dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                    if (!entry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
                         // special conversion required:
-                        equivUnitOriginal = dpsEntry.getDbmsOriginalUnitBaseEquivalence();
-                        equivUnitCustoms = dpsEntry.getDbmsItemCustomsUnitEquivalence();
-                        customsUnit = dpsEntry.getDbmsItemCustomsUnitSymbol();
+                        equivUnitOriginal = entry.getDbmsOriginalUnitBaseEquivalence();
+                        equivUnitCustoms = entry.getDbmsItemCustomsUnitEquivalence();
+                        customsUnit = entry.getDbmsItemCustomsUnitSymbol();
                     }
                     else {
                         // no special conversion needed:
                         equivUnitOriginal = 1;
                         equivUnitCustoms = 1;
-                        customsUnit = dpsEntry.getDbmsCustomsUnitSymbol();
+                        customsUnit = entry.getDbmsCustomsUnitSymbol();
                     }
                     
-                    double quantityCustoms = SLibUtils.round(dpsEntry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
+                    double quantityCustoms = SLibUtils.round(entry.getOriginalQuantity() * equivUnitOriginal * equivUnitCustoms, mercancia.getAttCantidadAduana().getDecimals());
                     mercancia.getAttCantidadAduana().setDouble(quantityCustoms);
                     mercancia.getAttUnidadAduana().setString(customsUnit);
                     if (customsUnit.equals(cfd.ver3.cce11.DCce11Catalogs.UA_SERV)) {
@@ -5957,9 +6017,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                     
                     // add node DescripcionesEspecificas if necessary, that is, if item of DPS entry has been set with a valid brand:
-                    if (dpsEntry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && dpsEntry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
+                    if (entry.getDbmsItemBrandId() != SLibConstants.UNDEFINED && entry.getDbmsItemBrandId() != SDataConstantsSys.ITMU_BRD_NA) {
                         cfd.ver4.cce20.DElementDescripcionesEspecificas descripcionesEspecificas = new cfd.ver4.cce20.DElementDescripcionesEspecificas();
-                        descripcionesEspecificas.getAttMarca().setString(dpsEntry.getDbmsItemBrand());
+                        descripcionesEspecificas.getAttMarca().setString(entry.getDbmsItemBrand());
                         mercancia.getEltDescripcionesEspecificas().add(descripcionesEspecificas);
                     }
                     
@@ -6111,7 +6171,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     impuestoXml.setTasa(key * 100.0);
                     impuestoXml.setImporte(dImpto);
                     
-                    mdTempCfdIvaPorcentaje = (key * 100.0);
+                    mdPrcCfdIvaPorcentaje = (key * 100.0);
 
                     impuestosXml.add(impuestoXml);
                 }
@@ -6203,7 +6263,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             impuesto.setImporte(dpsEntryTax.getTaxCy());
                             impuesto.setTipoFactor(dpsEntryTax.getDbmsTaxCalculationType());
                             
-                            mdTempCfdIvaPorcentaje = (tasa * 100.0); // if there are more than one tax rate, this will not work properly
+                            mdPrcCfdIvaPorcentaje = (tasa * 100.0); // if there are more than one tax rate, this will not work properly
                             
                             if (dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
                                 taxes.addTaxCharged(impuesto);
@@ -6414,12 +6474,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public ArrayList<String> getCfdiRelacionados33() { // CFDI 3.3 
-        return moDbmsDataDpsCfd.getCfdiRelacionados();
+        return moDbmsDataDpsCfd.getUuidRelacionados();
     }
 
     @Override
-    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
-        return moDbmsDataDpsCfd.getRelatedDocument();
+    public STrnCfdRelatedDocs getCfdiRelacionados() { // CFDI 4.0
+        return moDbmsDataDpsCfd.getCfdRelatedDocs();
     }
     
     @Override
@@ -6518,66 +6578,66 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.2 & 3.3 & 4.0
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         
-        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
-            if (dpsEntry.isAccountable()) {
-                if (dpsEntry.getDbmsItemClaveProdServ().isEmpty()) {
-                    throw new Exception("El ítem '" + dpsEntry.getDbmsItem()+ "' no tiene clave de producto o servicio del SAT.");
+        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+            if (entry.isAccountable()) {
+                if (entry.getDbmsItemClaveProdServ().isEmpty()) {
+                    throw new Exception("El ítem '" + entry.getDbmsItem()+ "' no tiene clave de producto o servicio del SAT.");
                 }
-                else if (dpsEntry.getDbmsOriginalUnidadClave().isEmpty()) {
-                    throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene clave de unidad del SAT.");
+                else if (entry.getDbmsOriginalUnidadClave().isEmpty()) {
+                    throw new Exception("La unidad '" + entry.getDbmsUnitSymbol() + "' no tiene clave de unidad del SAT.");
                 }
-                else if (requireComplementoComercioExterior() && dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
-                    throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
+                else if (requireComplementoComercioExterior() && entry.getDbmsCustomsUnitSymbol().isEmpty() && entry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                    throw new Exception("La unidad '" + entry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                 }
                 
                 SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
-                if (dpsEntry.getDbmsDpsCfdEntry() == null || dpsEntry.getDbmsDpsCfdEntry().getConcept().isEmpty()) {
+                if (entry.getDbmsDpsCfdEntry() == null || entry.getDbmsDpsCfdEntry().getConcept().isEmpty()) {
                     //use original data of current document entry:
                     
-                    String descripcion = dpsEntry.getConcept();
+                    String descripcion = entry.getConcept();
                     
-                    for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
+                    for (SDataDpsEntryNotes dpsEntryNotes : entry.getDbmsEntryNotes()) {
                         if (dpsEntryNotes.getIsCfd()) {
                             descripcion += " - " + dpsEntryNotes.getNotes();
                         }
                     }
                     
-                    concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
-                    concepto.setNoIdentificacion(dpsEntry.getConceptKey());
-                    concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
-                    concepto.setUnidad(dpsEntry.getDbmsOriginalUnitSymbol());
+                    concepto.setClaveProdServ(entry.getDbmsItemClaveProdServ());
+                    concepto.setNoIdentificacion(entry.getConceptKey());
+                    concepto.setClaveUnidad(entry.getDbmsOriginalUnidadClave());
+                    concepto.setUnidad(entry.getDbmsOriginalUnitSymbol());
                     concepto.setDescripcion(descripcion);
                 }
                 else {
                     //use custom (user defined) data of current document entry:
                     
-                    concepto.setClaveProdServ(dpsEntry.getDbmsDpsCfdEntry().getCfdProdServ());
-                    concepto.setNoIdentificacion(dpsEntry.getDbmsDpsCfdEntry().getConceptKey());
-                    concepto.setClaveUnidad(dpsEntry.getDbmsDpsCfdEntry().getCfdUnit());
+                    concepto.setClaveProdServ(entry.getDbmsDpsCfdEntry().getCfdProdServ());
+                    concepto.setNoIdentificacion(entry.getDbmsDpsCfdEntry().getConceptKey());
+                    concepto.setClaveUnidad(entry.getDbmsDpsCfdEntry().getCfdUnit());
                     concepto.setUnidad("");
-                    concepto.setDescripcion(dpsEntry.getDbmsDpsCfdEntry().getConcept());
+                    concepto.setDescripcion(entry.getDbmsDpsCfdEntry().getConcept());
                 }
                 
-                if (dpsEntry.getDbmsDpsCfdEntry() != null && dpsEntry.getDbmsDpsCfdEntry().getPredial().isEmpty()) {
-                    concepto.setPredial(dpsEntry.getDbmsDpsCfdEntry().getPredial());
+                if (entry.getDbmsDpsCfdEntry() != null && entry.getDbmsDpsCfdEntry().getPredial().isEmpty()) {
+                    concepto.setPredial(entry.getDbmsDpsCfdEntry().getPredial());
                 }
                 
                 double price;
-                if (requireComplementoComercioExterior() || SLibUtils.compareAmount(dpsEntry.getSubtotalProvisionalCy_r(), SLibUtils.roundAmount(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity()))) {
-                    price = dpsEntry.getOriginalPriceUnitaryCy();
+                if (requireComplementoComercioExterior() || SLibUtils.compareAmount(entry.getSubtotalProvisionalCy_r(), SLibUtils.roundAmount(entry.getOriginalPriceUnitaryCy() * entry.getOriginalQuantity()))) {
+                    price = entry.getOriginalPriceUnitaryCy();
                 }
                 else {
-                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
+                    price = entry.getSubtotalProvisionalCy_r() / entry.getOriginalQuantity();
                 }
                 
-                concepto.setCantidad(dpsEntry.getOriginalQuantity());
+                concepto.setCantidad(entry.getOriginalQuantity());
                 concepto.setValorUnitario(price);
-                concepto.setImporte(dpsEntry.getSubtotalProvisionalCy_r());
-                concepto.setDescuento(dpsEntry.getDiscountDocCy());
-                concepto.setObjetoImpuesto(dpsEntry.getSubtotalCy_r() > 0 ? dpsEntry.getDbmsDpsCfdEntry().getTaxObject() : DCfdi40Catalogs.ClaveObjetoImpNo);
+                concepto.setImporte(entry.getSubtotalProvisionalCy_r());
+                concepto.setDescuento(entry.getDiscountDocCy());
+                concepto.setObjetoImpuesto(entry.getSubtotalCy_r() > 0 ? entry.getDbmsDpsCfdEntry().getTaxObject() : DCfdi40Catalogs.ClaveObjetoImpNo);
                 
-                concepto.computeCfdImpuestosConceptos(dpsEntry);
+                concepto.computeCfdImpuestosConceptos(entry);
                 
                 conceptos.add(concepto);
             }
@@ -6678,19 +6738,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdPrcCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdPrcCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdPrcCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdPrcCfdIvaPorcentaje));
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -87,7 +87,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -1162,7 +1162,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (jbRevertLinks.isEnabled()) {
                 if (isRowSelected()) {
                     SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    dps.setTestLinks(false);
+                    dps.setAuxTestLinks(false);
                     boolean movs = false;
                     String message = "";
                     String sql = "SELECT DISTINCT 6 AS f_id_type, 'SURTIDO ALMACÉN' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, 0 AS f_tot, 0 AS f_tot_cur, 'N/A' AS f_cur, b.code AS f_cob " +

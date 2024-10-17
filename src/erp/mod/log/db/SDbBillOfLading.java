@@ -19,7 +19,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mloc.data.SDataBolZipCode;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataCfd;
-import erp.mtrn.data.STrnCfdRelated;
+import erp.mtrn.data.STrnCfdRelatedDocs;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -88,7 +88,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     protected String msAuxCfdExportation;
     protected String msAuxCfdCfdiRelacionado33TipoRelacion;
     protected String msAuxCfdCfdiRelacionado33Uuid; // available when CFDI is not stored in SIIE, e.g., third-party
-    protected STrnCfdRelated moAuxCfdiRelacionados;
+    protected STrnCfdRelatedDocs moAuxCfdRelatedDocs;
     protected SDataBizPartner moAuxDbmsDataEmisor;
     protected SDataBizPartnerBranch moAuxDbmsDataEmisorSucursal;
     
@@ -268,7 +268,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     public void setAuxCfdExportation(String s) { msAuxCfdExportation = s; }
     public void setAuxCfdCfdiRelacionado33TipoRelacion(String s) { msAuxCfdCfdiRelacionado33TipoRelacion = s; }
     public void setAuxCfdCfdiRelacionado33Uuid(String s) { msAuxCfdCfdiRelacionado33Uuid = s; }
-    public void setCfdiRelacionados(STrnCfdRelated o) { moAuxCfdiRelacionados = o; }
+    public void setAuxCfdRelatedDocs(STrnCfdRelatedDocs o) { moAuxCfdRelatedDocs = o; }
     public void setAuxDbmsDataEmisor(SDataBizPartner o) { moAuxDbmsDataEmisor = o; }
     public void setAuxDbmsDataEmisorSucursal(SDataBizPartnerBranch o) { moAuxDbmsDataEmisorSucursal = o; }
     
@@ -352,7 +352,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         msAuxCfdExportation = "";
         msAuxCfdCfdiRelacionado33TipoRelacion = "";
         msAuxCfdCfdiRelacionado33Uuid = ""; 
-        moAuxCfdiRelacionados = null;
+        moAuxCfdRelatedDocs = null;
         moAuxDbmsDataEmisor = null;
         moAuxDbmsDataEmisorSucursal = null;
         
@@ -691,7 +691,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setAuxCfdExportation(this.getAuxCfdExportation());
         registry.setAuxCfdCfdiRelacionado33TipoRelacion(this.getAuxCfdCfdiRelacionado33TipoRelacion());
         registry.setAuxCfdCfdiRelacionado33Uuid(this.getAuxCfdCfdiRelacionado33Uuid());
-        registry.setCfdiRelacionados(this.getCfdiRelacionados()); // este miembro no se clona
+        registry.setAuxCfdRelatedDocs(this.getCfdiRelacionados()); // este miembro no se clona
         registry.setAuxDbmsDataEmisor(this.getAuxDbmsDataEmisor()); // el clon comparte este registro que es de sólo lectura
         registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal()); // el clon comparte este registro que es de sólo lectura
 
@@ -1956,8 +1956,8 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     }
     
     @Override
-    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
-        return moAuxCfdiRelacionados;
+    public STrnCfdRelatedDocs getCfdiRelacionados() { // CFDI 4.0
+        return moAuxCfdRelatedDocs;
     }
     
     @Override
