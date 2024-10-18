@@ -11968,7 +11968,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
 
                             if (!validation.getIsError()) {
-                                 if ((isCfdCfdiRelatedRequired() || applicationsCy != 0) && jtaCfdiRelatedDocs.getText().isEmpty()) {
+                                 if ((isCfdCfdiRelatedRequired() || applicationsCy != 0) && (moCfdRelatedDocs == null || moCfdRelatedDocs.getRowCfdRelatedDocs().isEmpty())) {
                                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jbCfdiRelatedDocs.getText() + "'.");
                                     validation.setComponent(jbCfdiRelatedDocs);
                                     validation.setTabbedPaneIndex(TAB_CFD_XML);
@@ -12710,7 +12710,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd.setTaxRegimeReceptor(moFieldCfdiTaxRegimeRec.getFieldValue().toString());
                 dpsCfd.setCfdiUsage(moFieldCfdiCfdiUsage.getFieldValue().toString());
 
-                if (isCfdCfdiRelatedRequired() || !moCfdRelatedDocs.getRowCfdRelatedDocs().isEmpty()) {
+                if (isCfdCfdiRelatedRequired() || (moCfdRelatedDocs != null && !moCfdRelatedDocs.getRowCfdRelatedDocs().isEmpty())) {
                     // Include related CFDI data node:
                     
                     SRowCfdRelatedDocs firstRow = moCfdRelatedDocs.getRowCfdRelatedDocs().get(0);

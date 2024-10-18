@@ -1,8 +1,9 @@
 ================================================================================
-SIIE 3.2 258.5/ 2024-10-17
+SIIE 3.2 258.5/ 2024-10-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización de la funcionalidad de creación, recuperación, modificación y, ahora, eliminación de CFDI relacionados en DPS.
+1.1) Corrección adicional a la validación de captura de DPS cuando no tiene CFDI relacionados derivada dal punto previo.
 2) Implementación provisional y contabilización mejorada de la aplicación de anticipos facturados como descuentos directos en DPS con monedas distintas.
 
 ================================================================================
