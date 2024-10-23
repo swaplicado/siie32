@@ -1,6 +1,6 @@
 ================================================================================
 SIIE 3.2 258.6/ 2024-10-23
-Sergio Abraham FLORES GUTIÉRREZ / Isabel Danae GARCÍA SERVÍN
+Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de nueva constante para fijar tipo de columna de grid "ícono circular" en forma de captura de nóminas.
 2) Corrección a los tipos de movimiento contable, pérdidas y ganancias, de la funcionalidad de cierre del ejercicio.
@@ -48,7 +48,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 257.7/ 2024-09-11 
-Jhonatan Claudio PEÑA HERNÁNDEZ / Isabel Danae GARCÍA SERVÍN
+Jhonatan Claudio PEÑA HERNÁNDEZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Corrección a la duplicidad de XML con addendas 
 2) Adición de espacio a los contratos de ventas/compras entre dirección general/comprador/vendedor
@@ -70,7 +70,7 @@ SIIE 3.2 257.5/ 2024-09-09 Jhonatan Claudio PEÑA HERNÄNDEZ
 
 ================================================================================
 SIIE 3.2 257.4/ 2024-09-06
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agrega redondeo de centavos en el prorrateo de partidas de pólizas contables en valuación de consumos de inventario.
 2) Se agrega permiso para la vista de "Existencias por precio comercial".
@@ -461,7 +461,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 245.0*/ 2024-03-20
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Exclusión de la validación de periodo cerrado al guardar una cotización, contrato o pedido.
 2) Implementación del historial de cambios de cantidad para los contratos. 
@@ -517,7 +517,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 243.1/ 2024-03-07
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Corrección de ortografía.
 2) Se agrega el botón de "Enviar al solicitante" en la vista de cotizaciones.
@@ -613,7 +613,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 238.0/ 2024-02-13
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agrega la naturaleza de documento en las requisiciónes de materiales.
 2) Se agrega la consulta de los consumos de almacenes a detalle
@@ -640,7 +640,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 
 ================================================================================
 SIIE 3.2 236.0/ 2024-01-29 
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de valuación y contabilización de consumos de almacén.
 2) Creación de la bitácora de precios comerciales de ítems que puede ser llenada manualmente o al generar facturas de compras.
@@ -848,7 +848,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 226.0/ 2023-11-16
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementar la captura de texto opcional en el pase "hacia adelante" o "hacia atrás" en el cambio de estatus de las RM.
 2) Implementar cárdex de status de RM.
@@ -857,7 +857,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 225.7/ 2023-11-16
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
 2) Filtro de partidas de RM.
@@ -869,7 +869,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 225.6/ 2023-11-09
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Actualización de montos al importar requisiciones de materiales.
 2) Cambios al formato de impresión de la requisición de materiales.
@@ -1050,7 +1050,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 216.0/ 2023-07-14
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Creación de las requisiciones de materiales en el módulo de inventarios.
 
