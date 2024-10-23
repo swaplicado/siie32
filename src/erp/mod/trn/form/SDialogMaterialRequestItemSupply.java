@@ -8,6 +8,7 @@ package erp.mod.trn.form;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SRowMaterialRequestItemSupply;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -54,6 +56,12 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
     private int mnConsEntId;
     private int[] moWahId;
     
+    private JLabel moLabelRowsGridItem;
+    private JLabel moLabelRowsGridItemSelected;
+    
+    private Cursor cursorDefault;
+    private Cursor cursorWait;
+    
     /**
      * Creates new form SDialogMaterialRequestItemSupply
      * @param client
@@ -82,10 +90,10 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         moKeyWhs = new sa.lib.gui.bean.SBeanFieldKey();
         jbContinue = new javax.swing.JButton();
         jbRestart = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jIGen = new javax.swing.JLabel();
         moKeyIGen = new sa.lib.gui.bean.SBeanFieldKey();
-        jbShow = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jrbDownMin = new javax.swing.JRadioButton();
         jrbUpMin = new javax.swing.JRadioButton();
@@ -94,6 +102,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         jrbDownMax = new javax.swing.JRadioButton();
         jrbUpMax = new javax.swing.JRadioButton();
         jrbAllItems = new javax.swing.JRadioButton();
+        jbShow = new javax.swing.JButton();
         jpGridContainer = new javax.swing.JPanel();
         jpGridAllItems = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
@@ -104,6 +113,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         jbRemove = new javax.swing.JButton();
         jbRemoveAll = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jbMinSupply = new javax.swing.JButton();
         jbPoSupply = new javax.swing.JButton();
         jbMaxSupply = new javax.swing.JButton();
@@ -118,7 +128,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
 
         jpContent.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(3, 0));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
 
@@ -137,7 +147,10 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         jbRestart.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel2.add(jbRestart);
 
-        jPanel1.add(jPanel2);
+        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtrar por:"));
+        jPanel5.setLayout(new java.awt.GridLayout(2, 0));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -148,22 +161,18 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         moKeyIGen.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel3.add(moKeyIGen);
 
-        jbShow.setText("Mostrar");
-        jbShow.setPreferredSize(new java.awt.Dimension(90, 23));
-        jPanel3.add(jbShow);
-
-        jPanel1.add(jPanel3);
+        jPanel5.add(jPanel3);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbgItems.add(jrbDownMin);
         jrbDownMin.setText("<= mínimo");
-        jrbDownMin.setPreferredSize(new java.awt.Dimension(110, 23));
+        jrbDownMin.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel4.add(jrbDownMin);
 
         jbgItems.add(jrbUpMin);
         jrbUpMin.setText("> mínimo");
-        jrbUpMin.setPreferredSize(new java.awt.Dimension(110, 23));
+        jrbUpMin.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel4.add(jrbUpMin);
 
         jbgItems.add(jrbDownPo);
@@ -188,16 +197,22 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
 
         jbgItems.add(jrbAllItems);
         jrbAllItems.setText("Todo");
-        jrbAllItems.setPreferredSize(new java.awt.Dimension(110, 23));
+        jrbAllItems.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel4.add(jrbAllItems);
 
-        jPanel1.add(jPanel4);
+        jbShow.setText("Mostrar");
+        jbShow.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel4.add(jbShow);
+
+        jPanel5.add(jPanel4);
+
+        jPanel1.add(jPanel5, java.awt.BorderLayout.SOUTH);
 
         jpContent.add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jpGridContainer.setLayout(new java.awt.BorderLayout());
 
-        jpGridAllItems.setBorder(javax.swing.BorderFactory.createTitledBorder("Ítems disponibles para solicitar"));
+        jpGridAllItems.setBorder(javax.swing.BorderFactory.createTitledBorder("Ítems disponibles para solicitar:"));
         jpGridAllItems.setPreferredSize(new java.awt.Dimension(914, 280));
         jpGridAllItems.setVerifyInputWhenFocusTarget(false);
         jpGridAllItems.setLayout(new java.awt.BorderLayout());
@@ -216,7 +231,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
 
         jpGridContainer.add(jpGridAllItems, java.awt.BorderLayout.NORTH);
 
-        jpGridItemSelected.setBorder(javax.swing.BorderFactory.createTitledBorder("Ítems seleccionados para solicitar"));
+        jpGridItemSelected.setBorder(javax.swing.BorderFactory.createTitledBorder("Ítems seleccionados para solicitar:"));
         jpGridItemSelected.setLayout(new java.awt.BorderLayout());
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -232,16 +247,19 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         jLabel1.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel20.add(jLabel1);
 
+        jLabel2.setText("Cant. a requisitar:");
+        jPanel20.add(jLabel2);
+
         jbMinSupply.setText(" =  al mínimo");
-        jbMinSupply.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbMinSupply.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jbMinSupply);
 
         jbPoSupply.setText("= pto. reorden");
-        jbPoSupply.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbPoSupply.setPreferredSize(new java.awt.Dimension(105, 23));
         jPanel20.add(jbPoSupply);
 
         jbMaxSupply.setText("= máximo");
-        jbMaxSupply.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbMaxSupply.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jbMaxSupply);
 
         moDecQtySup.setText("0.0000");
@@ -249,11 +267,11 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         jPanel20.add(moDecQtySup);
 
         jbFreeSupply.setText("= cantidad");
-        jbFreeSupply.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbFreeSupply.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jbFreeSupply);
 
         jbErase.setText("Borrar todo");
-        jbErase.setPreferredSize(new java.awt.Dimension(110, 23));
+        jbErase.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jbErase);
 
         jpGridItemSelected.add(jPanel20, java.awt.BorderLayout.SOUTH);
@@ -287,12 +305,14 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jIGen;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JButton jbAdd;
     private javax.swing.JButton jbAddAll;
     private javax.swing.JButton jbCancel;
@@ -335,6 +355,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         
         // Items disponibles
         
+        moLabelRowsGridItem = new JLabel();
         moGridItems = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_ITM_SUP, 0, "Items disponibles") {
             
             @Override
@@ -354,7 +375,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Existencias", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Segregado", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Disponible", 70));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Requisitado", 70));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Requisitado resurtido", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 
                 return columns;
@@ -362,10 +383,12 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         };
         
         mvFormGrids.add(moGridItems);
+        moGridItems.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moLabelRowsGridItem);
         jpGridAllItems.add(moGridItems, BorderLayout.CENTER);
         
         //Items seleccionados
         
+        moLabelRowsGridItemSelected = new JLabel();
         moGridItemsSelected = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_ITM_SUP_SEL, 0, "Items seleccionados") {
 
             @Override
@@ -388,7 +411,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Existencias", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Segregado", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Disponible", 70));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Requisitado", 70));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Requisitado resurtido", 70));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 columns.add(col);
                 
@@ -398,7 +421,12 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
         };
         
         mvFormGrids.add(moGridItemsSelected);
+        moGridItemsSelected.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moLabelRowsGridItemSelected);
         jpGridItemSelected.add(moGridItemsSelected, BorderLayout.CENTER);
+        
+        cursorDefault = new Cursor(Cursor.DEFAULT_CURSOR);
+        cursorWait = new Cursor(Cursor.WAIT_CURSOR);
+        this.setCursor(cursorDefault);
     }
     
     private String getSql() {
@@ -453,27 +481,27 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
                 "HAVING f_stk <> 0 " +
                 "ORDER BY i.item_key, i.item, s.id_item, u.symbol, i.part_num, s.id_unit , bpb.code, ent.code, s.id_cob, s.id_wh) AS stk " +
                 "LEFT JOIN( " +
-                "SELECT i.id_item, u.id_unit, COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per " +
-                "FROM trn_mat_req AS v " +
-                "LEFT JOIN trn_mat_req_ety AS ve ON v.id_mat_req = ve.id_mat_req " +
-                "LEFT JOIN " +
-                "  (SELECT de.fid_mat_req_n, de.fid_mat_req_ety_n, SUM(de.qty * IF(d.fid_ct_iog = 1, -1, 1)) AS sumi_qty " +
-                "  FROM trn_diog AS d " +
-                "  INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                "  INNER JOIN trn_mat_req AS v ON de.fid_mat_req_n = v.id_mat_req " +
-                "  WHERE de.fid_mat_req_n IS NOT NULL AND de.fid_mat_req_ety_n IS NOT NULL AND NOT de.b_del " +
-                "  AND NOT d.b_del AND d.fid_ct_iog IN (1, 2) AND d.fid_cl_iog = 7 AND d.fid_tp_iog = 1 " +
-                "  GROUP BY de.fid_mat_req_n, de.fid_mat_req_ety_n  ORDER BY de.fid_mat_req_n, de.fid_mat_req_ety_n ) AS de " +
-                "ON ve.id_mat_req = de.fid_mat_req_n AND ve.id_ety = de.fid_mat_req_ety_n " +
-                "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item " +
-                "INNER JOIN erp.itmu_unit AS u ON ve.fk_unit = u.id_unit " +
-                "LEFT JOIN erp.trnu_mat_req_pty AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty " +
-                "WHERE v.b_del = 0 " +
-                "AND cfg_get_st_authorn(1, 'trn_mat_req', v.id_mat_req, NULL, NULL, NULL, NULL) != 5 " +
-                "AND NOT v.b_clo_prov " +
-                "AND v.tp_req = 'C' " +
-                "GROUP BY i.id_item, u.id_unit HAVING per < 1 " +
-                "ORDER BY i.id_item, u.id_unit ) AS req " +
+                "   SELECT i.id_item, u.id_unit, COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per " +
+                "   FROM trn_mat_req AS v " +
+                "   LEFT JOIN trn_mat_req_ety AS ve ON v.id_mat_req = ve.id_mat_req " +
+                "   LEFT JOIN " +
+                "       (SELECT de.fid_mat_req_n, de.fid_mat_req_ety_n, SUM(de.qty * IF(d.fid_ct_iog = 1, -1, 1)) AS sumi_qty " +
+                "       FROM trn_diog AS d " +
+                "       INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
+                "       INNER JOIN trn_mat_req AS v ON de.fid_mat_req_n = v.id_mat_req " +
+                "       WHERE de.fid_mat_req_n IS NOT NULL AND de.fid_mat_req_ety_n IS NOT NULL AND NOT de.b_del " +
+                "       AND NOT d.b_del AND d.fid_ct_iog IN (1, 2) AND d.fid_cl_iog = 7 AND d.fid_tp_iog = 1 " +
+                "       GROUP BY de.fid_mat_req_n, de.fid_mat_req_ety_n  ORDER BY de.fid_mat_req_n, de.fid_mat_req_ety_n ) AS de " +
+                "   ON ve.id_mat_req = de.fid_mat_req_n AND ve.id_ety = de.fid_mat_req_ety_n " +
+                "   INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item " +
+                "   INNER JOIN erp.itmu_unit AS u ON ve.fk_unit = u.id_unit " +
+                "   LEFT JOIN erp.trnu_mat_req_pty AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty " +
+                "   WHERE v.b_del = 0 " +
+                "   AND cfg_get_st_authorn(1, 'trn_mat_req', v.id_mat_req, NULL, NULL, NULL, NULL) != 5 " +
+                "   AND NOT v.b_clo_prov " +
+                "   AND v.tp_req = 'R' " +
+                "   GROUP BY i.id_item, u.id_unit HAVING per < 1 " +
+                "   ORDER BY i.id_item, u.id_unit) AS req " +
                 "ON stk.id_item = req.id_item AND stk.id_unit = req.id_unit " +
                 "WHERE stk.id_cob = " + moKeyWhs.getValue()[0] + " AND stk.id_wh = " + moKeyWhs.getValue()[1] + " " + 
                 sqlWhere;
@@ -629,6 +657,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
             vRows.addAll(maGridItems);
         }
         moGridItems.populateGrid(vRows);
+        moLabelRowsGridItem.setText("Cantidad de renglones: " + vRows.size());
     }
     
     private void populateGridItemsSelected() {
@@ -637,6 +666,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
             vRows.addAll(maGridItemsSelected);
         }
         moGridItemsSelected.populateGrid(vRows);
+        moLabelRowsGridItemSelected.setText("Cantidad de renglones: " + vRows.size());
     }
     
     private void actionContinue() {
@@ -644,13 +674,16 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
             miClient.showMsgBoxInformation("Debe seleccionar un almacén");
         }
         else {
+            this.setCursor(cursorWait);
             readAllItems();
             mbIsCaptureMode = true;
             setEnabledComponets(mbIsCaptureMode);
+            this.setCursor(cursorDefault);
         }
     }
     
     private void actionShow() {
+        this.setCursor(cursorWait);
         if (jrbAllItems.isSelected() && moKeyIGen.getSelectedIndex() < 1) {
             readAllItems();
         }
@@ -658,6 +691,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
             reloadItemList();
         }
         
+        this.setCursor(cursorDefault);
         jbShow.setEnabled(false);
     }
     

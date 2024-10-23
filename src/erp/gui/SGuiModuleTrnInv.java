@@ -1471,7 +1471,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                             title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase();
                             break;
                         case SModSysConsts.TRNX_CONS_MAT:
-                            title += "Consumo de materiales";
+                            switch (auxType02) {
+                                case SUtilConsts.PER_ITM:
+                                    title += "Consumo de materiales a detalle";
+                                    break;
+                                case SUtilConsts.PER_DOC:                           
+                                    title += "Consumo de materiales";
+                                    break;
+                                default:
+                            }
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);

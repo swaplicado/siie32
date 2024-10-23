@@ -1,9 +1,11 @@
 ================================================================================
 SIIE 3.2 258.6/ 2024-10-23
-Sergio Abraham FLORES GUTIÉRREZ
+Sergio Abraham FLORES GUTIÉRREZ / Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de nueva constante para fijar tipo de columna de grid "ícono circular" en forma de captura de nóminas.
 2) Corrección a los tipos de movimiento contable, pérdidas y ganancias, de la funcionalidad de cierre del ejercicio.
+3) Reacomodo de los controles de la pantalla de máximos y mínimos de las RM.
+4) Cambio de nombre en las columnas de las tablas de seguimientos de compras.
 
 ================================================================================
 SIIE 3.2 258.5/ 2024-10-18
