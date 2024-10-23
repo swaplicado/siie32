@@ -1213,9 +1213,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Número empleado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
-                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Tipo régimen (empleado)");
-                columnForm.setCellRenderer(new SGridCellRendererIconCircle());
-                gridColumnsForm.add(columnForm);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON_CIRC, "Tipo régimen (empleado)"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
 
                 return gridColumnsForm;
