@@ -476,9 +476,9 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
                 "INNER JOIN erp.bpsu_bpb AS bpb ON s.id_cob = bpb.id_bpb " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent " +
                 "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = bpb.id_bpb AND sc.id_wh = ent.id_ent " +
-                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND s.dt <= '" + year + "-12-31' AND s.id_cob = " + cob + " " +
+                "WHERE NOT s.b_del AND NOT i.b_del AND s.id_year = " + year + " AND s.dt <= '" + year + "-12-31' AND s.id_cob = " + cob + " " +
                 "GROUP BY s.id_item, s.id_unit, s.id_cob, s.id_wh, bpb.code, ent.code, i.item_key, i.item, i.fid_igen, u.symbol " +
-                "HAVING f_stk <> 0 " +
+                //"HAVING f_stk <> 0 " +
                 "ORDER BY i.item_key, i.item, s.id_item, u.symbol, i.part_num, s.id_unit , bpb.code, ent.code, s.id_cob, s.id_wh) AS stk " +
                 "LEFT JOIN( " +
                 "   SELECT i.id_item, u.id_unit, COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per " +

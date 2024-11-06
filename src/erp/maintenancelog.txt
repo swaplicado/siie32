@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 258.7/ 2024-11-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Enviar las RM de resurtido directamente a compras.
+2) Ajuste a la consulta de la vista de máximos y mínimos de RM para mostrar los ítems que no tienen stock.
+
+================================================================================
 SIIE 3.2 258.6/ 2024-10-23
 Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
