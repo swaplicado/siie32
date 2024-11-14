@@ -1,4 +1,155 @@
 ================================================================================
+SIIE 3.2 258.7/ 2024-11-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Enviar las RM de resurtido directamente a compras.
+2) Ajuste a la consulta de la vista de máximos y mínimos de RM para mostrar los ítems que no tienen stock.
+
+================================================================================
+SIIE 3.2 258.6/ 2024-10-23
+Sergio Abraham FLORES GUTIÉRREZ/ Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de nueva constante para fijar tipo de columna de grid "ícono circular" en forma de captura de nóminas.
+2) Corrección a los tipos de movimiento contable, pérdidas y ganancias, de la funcionalidad de cierre del ejercicio.
+3) Reacomodo de los controles de la pantalla de máximos y mínimos de las RM.
+4) Cambio de nombre en las columnas de las tablas de seguimientos de compras.
+
+================================================================================
+SIIE 3.2 258.5/ 2024-10-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de la funcionalidad de creación, recuperación, modificación y, ahora, eliminación de CFDI relacionados en DPS.
+1.1) Corrección adicional a la validación de captura de DPS cuando no tiene CFDI relacionados derivada dal punto previo.
+2) Implementación provisional y contabilización mejorada de la aplicación de anticipos facturados como descuentos directos en DPS con monedas distintas.
+
+================================================================================
+SIIE 3.2 258.4/ 2024-10-14
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Correción consulta requisiciones por suministrar para agilizarla.
+
+================================================================================
+SIIE 3.2 258.3/ 2024-10-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en las requisiciones de materiales para mantener el ítem de referencia del ítem aunque este tenga uno predefinido.
+
+================================================================================
+SIIE 3.2 258.2/ 2024-10-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cambio de nombre de método y de variables en utilerías de generación de layouts DIOT para clarificar que el algoritmo considera a la empresa actual de la sesión de usuario.
+
+================================================================================
+SIIE 3.2 258.1/ 2024-10-02
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adicción contratos em inglés para todos los asociados de negocios. Mejoras a la impresión de los contratos.
+
+================================================================================
+SIIE 3.2 258.0/ 2024-09-27
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de los campos de notas finales y si el empleado firmó las sanciones y actas administrativas, así como si fue desvinculado al recibir esta última.
+2) Ajuste en las requisiciones de materiales para mantener el ítem de referencia del ítem aunque este tenga uno predefinido.
+
+================================================================================
+SIIE 3.2 257.7/ 2024-09-11 
+Jhonatan Claudio PEÑA HERNÁNDEZ/ Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección a la duplicidad de XML con addendas 
+2) Adición de espacio a los contratos de ventas/compras entre dirección general/comprador/vendedor
+3) Adición de la vista Docs. consumos de materiales a detalle
+4) Cambios en la configuración de los casos del envío de correo. 
+
+================================================================================
+SIIE 3.2 257.6/ 2024-09-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Solución de bug al momento de hacer el mapeo de productos y empresas después de hacer la importación de báscula.
+2) Cambios en la forma de captura de boletos para el chofer y el cálculo del peso neto.
+3) Se agregan notas de ayuda para indicar la separación de múltiples correos en la forma del envío del reporte de salidas de báscula.
+
+================================================================================
+SIIE 3.2 257.5/ 2024-09-09 Jhonatan Claudio PEÑA HERNÄNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a error que no dejaba crear carta porte, o nominas por las condiciones de pago
+
+================================================================================
+SIIE 3.2 257.4/ 2024-09-06
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega redondeo de centavos en el prorrateo de partidas de pólizas contables en valuación de consumos de inventario.
+2) Se agrega permiso para la vista de "Existencias por precio comercial".
+
+================================================================================
+SIIE 3.2 257.3/ 2024-09-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega filtro en la vista de documentos de inventarios para no poder seleccionar un centro de costo que no tenga el nivel máximo de la tabla.
+
+================================================================================
+SIIE 3.2 257.2/ 2024-09-05
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregan los totales por trimestre en el reporte de movimientos de salida de báscula.
+
+================================================================================
+SIIE 3.2 257.1/ 2024-09-04
+Jhonatan Claudio PEÑA HERNÄNDEZ
+--------------------------------------------------------------------------------
+1) Adición del campo condiciones de pago en los reportes de contratos compra/ventas
+
+================================================================================
+SIIE 3.2 257.0/ 2024-09-02
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de los campos de correo arbitrario y caso mail para indicar cual será el correo remitente y en que casos aplica.
+2) Modificación de las clases CLI para que el envío sea con la configuración definida en la base de datos del tipo SModSysConsts.CFGS_TP_MMS_MAIL_REPS.
+3) Creación de la importación de boletos desde una báscula externa y su vinculación a pedidos y facturas, con el fin de generar un 
+    informe de movimientos de salidas de boletos de báscula.
+4) Modificación a los contratos para que aparezca la firma en la parte media del contacto administrador de la empresa que emite el documento.
+
+================================================================================
+SIIE 3.2 256.0/ 2024-08-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Adición de configuración a la tabla de configuraciones de la empresa para determinar qué ítems entran al almacén con valor 0
+
+================================================================================
+SIIE 3.2 255.1/ 2024-08-29
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Inhabilitación de botón de regresar a solicitante en vista de reclasificación de Requisiciones de materiales
+para el usuario de contabilidad
+
+================================================================================
+SIIE 3.2 255.0/ 2024-08-29
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adición del campo conds_pay en la forma del captura del DPS con su incorporación al CML y CFDI
+2) Corrección de la lectura y modificación de los ítems personalizados
+3) Corrección del uso del CFDI desde ítems personalizados para notas de crédito 
+4) Sustitución del carácter & por 'N para la generación del XML
+5) Adición de la leyenda "FAVOR DE CONFIRMAR DE RECIBIDO" en el cuerpo del email de OC
+6) Corrección reporte de auxiliares contables para cuentas en 0
+
+================================================================================
+SIIE 3.2 254.15/ 2024-08-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de percepción normal en importación de nóminas desde CAP. No se remueve el recibo,
+solo se resetean las percepciones.
+
+================================================================================
+SIIE 3.2 254.14/ 2024-08-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Actualización de estatus de la RM cuando es rechazada, ahora pasa a estatus NUEVO.
+2) Validación de steps de autorización eliminados
+3) Se habilita el botón de suministro en vista de RM suministradas solo cuando el usuario tiene el permiso de suministrar.
+
+================================================================================
 SIIE 3.2 254.13/ 2024-08-15
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
@@ -317,7 +468,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 245.0*/ 2024-03-20
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Exclusión de la validación de periodo cerrado al guardar una cotización, contrato o pedido.
 2) Implementación del historial de cambios de cantidad para los contratos. 
@@ -373,7 +524,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 243.1/ 2024-03-07
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Corrección de ortografía.
 2) Se agrega el botón de "Enviar al solicitante" en la vista de cotizaciones.
@@ -469,7 +620,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 238.0/ 2024-02-13
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agrega la naturaleza de documento en las requisiciónes de materiales.
 2) Se agrega la consulta de los consumos de almacenes a detalle
@@ -496,7 +647,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 
 ================================================================================
 SIIE 3.2 236.0/ 2024-01-29 
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de valuación y contabilización de consumos de almacén.
 2) Creación de la bitácora de precios comerciales de ítems que puede ser llenada manualmente o al generar facturas de compras.
@@ -704,7 +855,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 226.0/ 2023-11-16
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementar la captura de texto opcional en el pase "hacia adelante" o "hacia atrás" en el cambio de estatus de las RM.
 2) Implementar cárdex de status de RM.
@@ -713,7 +864,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 225.7/ 2023-11-16
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Procesamiento de los pasos de autorización cuando la RM regresa a nuevo.
 2) Filtro de partidas de RM.
@@ -725,7 +876,7 @@ Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 225.6/ 2023-11-09
-Edwin Omar CARMONA FIGUEROA / Isabel Danae GARCÍA SERVÍN
+Edwin Omar CARMONA FIGUEROA/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Actualización de montos al importar requisiciones de materiales.
 2) Cambios al formato de impresión de la requisición de materiales.
@@ -906,7 +1057,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 216.0/ 2023-07-14
-Isabel Danae GARCÍA SERVÍN / Edwin Omar CARMONA FIGUEROA
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Creación de las requisiciones de materiales en el módulo de inventarios.
 

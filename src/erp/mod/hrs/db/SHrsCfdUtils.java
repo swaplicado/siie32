@@ -510,7 +510,7 @@ public abstract class SHrsCfdUtils {
                                 hrsFormerReceipt.getCfdiRelacionados33().add(resultSet.getString("pri.uuid_rel"));
                                 break;
                             case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
-                                hrsFormerReceipt.getCfdiRelacionados().addRelatedDocument(DCfdi40Catalogs.ClaveTipoRelaciónSustitución, resultSet.getString("pri.uuid_rel"));
+                                hrsFormerReceipt.getCfdiRelacionados().addCfdRelatedDoc(DCfdi40Catalogs.ClaveTipoRelaciónSustitución, resultSet.getString("pri.uuid_rel"));
                                 break;
                             default:
                         }

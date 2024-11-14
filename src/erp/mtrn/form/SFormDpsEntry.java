@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
@@ -55,6 +56,9 @@ import erp.mtrn.data.SDataDpsEntryPriceRow;
 import erp.mtrn.data.SDataDpsEntryQuantityChange;
 import erp.mtrn.data.SDataDpsEntryTax;
 import erp.mtrn.data.SDataDpsEntryTaxRow;
+import erp.mtrn.data.SDataScaleTicketDps;
+import erp.mtrn.data.SDataScaleTicketDpsEntry;
+import erp.mtrn.data.SRowTicketsPicker;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import java.awt.BorderLayout;
@@ -95,6 +99,9 @@ import sa.lib.gui.SGuiConsts;
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
     public static final int CONCEPT_LENGTH_MAX = 130;
+    public static final int LINK_TICKET_SELECT = 1; 
+    public static final int LINK_TICKET_ENABLED = 2; 
+    public static final int LINKED_TICKET = 3; 
     
     private static final int TAB_TAX = 0;
     private static final int TAB_SAL_CMS = 1; // sales comissions
@@ -115,6 +122,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbResetingForm;
     private boolean mbUpdatingForm;
     private boolean mbMatRequestImport;
+    private boolean mbScaleTicketLink;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     
@@ -215,6 +223,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private SGridPaneForm moGridAnalysis;
     private erp.mtrn.form.SDialogPriceUnitaryWizard moDialogPriceUnitaryWizard;
     private erp.mtrn.form.SDialogItemPriceHistory moDialogItemPriceHistory;
+    private erp.mtrn.form.SDialogTicketsPicker moDialogTicketsPicker;
     private erp.mtrn.form.SFormDpsEntryNotes moFormNotes;
     private erp.mtrn.form.SFormDpsComEntry moFormComEntry;
     private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
@@ -242,6 +251,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbIsLastPrc;
     private erp.mmkt.data.SParamsItemPriceList moParamsItemPriceList;
     private ArrayList<SDataDpsEntryAnalysis> mlDpsEntryAnalysis;
+    private Vector<SDataScaleTicketDpsEntry> mvScaleTicDpsEty;
+    private Vector<SDataScaleTicketDps> mvScaleTicDps;
     
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
@@ -506,10 +517,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel56 = new javax.swing.JPanel();
         jlTicket = new javax.swing.JLabel();
         jtfTicket = new javax.swing.JTextField();
+        jbTicketPicker = new javax.swing.JButton();
+        jbCleanTickets = new javax.swing.JButton();
+        jbEditLogistics = new javax.swing.JButton();
         jPanel58 = new javax.swing.JPanel();
         jlVgm = new javax.swing.JLabel();
         jtfVgm = new javax.swing.JTextField();
-        jbEditLogistics = new javax.swing.JButton();
+        jlVGMHelp3 = new javax.swing.JLabel();
         jpExtraDataUnits = new javax.swing.JPanel();
         jpExtraDataUnitsNorth = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
@@ -1756,8 +1770,22 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel56.add(jlTicket);
 
         jtfTicket.setText("TEXT");
-        jtfTicket.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfTicket.setPreferredSize(new java.awt.Dimension(102, 23));
         jPanel56.add(jtfTicket);
+
+        jbTicketPicker.setText("...");
+        jbTicketPicker.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel56.add(jbTicketPicker);
+
+        jbCleanTickets.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_erase.gif"))); // NOI18N
+        jbCleanTickets.setToolTipText("Borrar boletos");
+        jbCleanTickets.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel56.add(jbCleanTickets);
+
+        jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
+        jbEditLogistics.setToolTipText("Modificar datos");
+        jbEditLogistics.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel56.add(jbEditLogistics);
 
         jPanel38.add(jPanel56);
 
@@ -1771,10 +1799,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfVgm.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel58.add(jtfVgm);
 
-        jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
-        jbEditLogistics.setToolTipText("Modificar datos");
-        jbEditLogistics.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel58.add(jbEditLogistics);
+        jlVGMHelp3.setForeground(new java.awt.Color(109, 109, 109));
+        jlVGMHelp3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlVGMHelp3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlVGMHelp3.setToolTipText("Verify Gross Mass");
+        jlVGMHelp3.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel58.add(jlVGMHelp3);
 
         jPanel38.add(jPanel58);
 
@@ -2859,6 +2889,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDialogItemPriceHistory = new SDialogItemPriceHistory(miClient);
         moFormNotes = new SFormDpsEntryNotes(miClient);
         moFormComEntry = new SFormDpsComEntry(miClient);
+        moDialogTicketsPicker = null;
 
         // Miscellaneous:
 
@@ -2906,6 +2937,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtbGridPricesFilter.addActionListener(this);
         jbItemComposition.addActionListener(this);
         jbDateQuantityChg.addActionListener(this);
+        jbTicketPicker.addActionListener(this);
+        jbCleanTickets.addActionListener(this);
 
         // Focus listeners:
 
@@ -4257,6 +4290,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSecuritySeal.setFocusable(false);
             jtfTicket.setEditable(false);
             jtfTicket.setFocusable(false);
+            jbTicketPicker.setEnabled(false);
+            jbCleanTickets.setEnabled(false);
             jtfVgm.setEditable(false);
             jtfVgm.setFocusable(false);
             jbEditLogistics.setEnabled(mbPostEmissionEdition);
@@ -4326,18 +4361,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbEditFkThirdTaxCausingId_n.setEnabled(true);
 
             jcbFkVehicleTypeId_n.setEnabled(true);
-            jtfDriver.setEditable(true);
-            jtfDriver.setFocusable(true);
-            jtfVehicleNumber.setEditable(true);
-            jtfVehicleNumber.setFocusable(true);
-            jtfContTank.setEditable(true);
-            jtfContTank.setFocusable(true);
+//            jtfDriver.setEditable(true);
+//            jtfDriver.setFocusable(true);
+//            jtfVehicleNumber.setEditable(true);
+//            jtfVehicleNumber.setFocusable(true);
+//            jtfContTank.setEditable(true);
+//            jtfContTank.setFocusable(true);
             jtfSealQuality.setEditable(true);
             jtfSealQuality.setFocusable(true);
             jtfSecuritySeal.setEditable(true);
             jtfSecuritySeal.setFocusable(true);
-            jtfTicket.setEditable(true);
-            jtfTicket.setFocusable(true);
+//            jtfTicket.setEditable(true);
+//            jtfTicket.setFocusable(true);
             jtfVgm.setEditable(true);
             jtfVgm.setFocusable(true);
             jbEditLogistics.setEnabled(false);
@@ -4364,6 +4399,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             enableItemFields();
             
             renderFieldsStatus();
+            
+            enableLog();
         }
     }
 
@@ -4376,6 +4413,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         calculateTotal();
 
         moPaneTaxes.setTableRowSelection(index);
+    }
+    
+    private void enableLog() {
+        jtfDriver.setEditable(!mbScaleTicketLink);
+        jtfDriver.setFocusable(!mbScaleTicketLink);
+        jtfVehicleNumber.setEditable(!mbScaleTicketLink);
+        jtfVehicleNumber.setFocusable(!mbScaleTicketLink);
+        jtfContTank.setEditable(!mbScaleTicketLink);
+        jtfContTank.setFocusable(!mbScaleTicketLink);
+        jtfTicket.setEditable(!mbScaleTicketLink);
+        jtfTicket.setFocusable(!mbScaleTicketLink);
+        jbTicketPicker.setEnabled(mbScaleTicketLink);
+        jbCleanTickets.setEnabled(mbScaleTicketLink);
     }
 
     private void itemStateIsDiscountUnitaryPercentage(boolean recalculate) {
@@ -5084,6 +5134,68 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void actionDateQuantityChg() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateQuantityChg.getDate(), moFieldDateQuantityChg);
     }
+    
+    private void actionTicketPicker() {
+        try {
+            if (jcbFkItemId.getSelectedIndex() <= 1) {
+                miClient.showMsgBoxInformation("Seleccione un ítem para la partida");
+            }
+            else {
+                if (moDialogTicketsPicker == null) {
+                    moDialogTicketsPicker = new SDialogTicketsPicker(miClient);
+                }
+                moDialogTicketsPicker.setValue(SDialogTicketsPicker.BP_ID, moParamBizPartner.getPkBizPartnerId());
+                moDialogTicketsPicker.setValue(SDialogTicketsPicker.ITEM_ID, moItem.getPkItemId());
+                moDialogTicketsPicker.setValue(SDialogTicketsPicker.TICKET_IN_OUT, moParamDps.isForSales());
+                moDialogTicketsPicker.populateTicketTable();
+                if (!mvScaleTicDpsEty.isEmpty()) {
+                    moDialogTicketsPicker.setValue(SDialogTicketsPicker.TICKETS_LINKED, mvScaleTicDpsEty);
+                }
+                if (!mvScaleTicDps.isEmpty()) {
+                    moDialogTicketsPicker.setValue(SDialogTicketsPicker.TICKETS_LINKED_DPS, mvScaleTicDps);
+                }
+                moDialogTicketsPicker.setFormVisible(true);
+                if (moDialogTicketsPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    boolean found = false;
+                    SRowTicketsPicker ticSelcted = (SRowTicketsPicker) moDialogTicketsPicker.getSelectedOption();
+                    SDbScaleTicket tic = new SDbScaleTicket();
+                    if (mvScaleTicDpsEty.isEmpty()) {
+                        tic.read(miClient.getSession(), new int[] { ticSelcted.mnPk });
+                        jtfDriver.setText(jtfDriver.getText().isEmpty() ? tic.getDriver() : jtfDriver.getText());
+                        jtfVehicleNumber.setText(jtfVehicleNumber.getText().isEmpty() ? tic.getPlate() : jtfVehicleNumber.getText());
+                        jtfContTank.setText(jtfContTank.getText().isEmpty() ?  tic.getPlateCage() : jtfContTank.getText());
+                    }
+                    else {
+                        for (SDataScaleTicketDpsEntry s : mvScaleTicDpsEty) {
+                            if (s.getPkScaleTicketId() == ticSelcted.mnPk) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        SDataScaleTicketDpsEntry ticDps = new SDataScaleTicketDpsEntry();
+                        ticDps.setPkScaleTicketId(ticSelcted.mnPk);
+                        jtfTicket.setText(jtfTicket.getText() + (jtfTicket.getText().isEmpty() ? "" : ", ") + ticSelcted.mnNum);
+                        mvScaleTicDpsEty.add(ticDps);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+    
+    private void actionCleanTickets() {
+        if (miClient.showMsgBoxConfirm("Se eliminarán todos los boletos vinculados hasta ahora, ¿Desea continuar?.") == JOptionPane.OK_OPTION) {
+            jtfDriver.setText("");
+            jtfVehicleNumber.setText("");
+            jtfContTank.setText("");
+            jtfTicket.setText("");
+            mvScaleTicDpsEty.clear();
+        }
+    }
 
     private void actionPricesFilter() {
         if (jtbGridPricesFilter.isEnabled()) {
@@ -5298,6 +5410,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCleanTickets;
     private javax.swing.JButton jbConcept;
     private javax.swing.JButton jbConceptKey;
     private javax.swing.JButton jbDateQuantityChg;
@@ -5326,6 +5439,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbPriceNew;
     private javax.swing.JButton jbPriceSave;
     private javax.swing.JButton jbSetPrepayment;
+    private javax.swing.JButton jbTicketPicker;
     private javax.swing.JComboBox<SFormComponentItem> jcbAddGenBarcode;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCashAccountId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemId;
@@ -5436,6 +5550,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlTaxRetained_r;
     private javax.swing.JLabel jlTicket;
     private javax.swing.JLabel jlTotal_r;
+    private javax.swing.JLabel jlVGMHelp3;
     private javax.swing.JLabel jlVehicleNumber;
     private javax.swing.JLabel jlVgm;
     private javax.swing.JLabel jlVolume;
@@ -5968,6 +6083,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jckIsQuantityChg.setVisible(false);
         jftDateQuantityChg.setVisible(false);
         jbDateQuantityChg.setVisible(false);
+        
+        mvScaleTicDpsEty = new Vector<>();
+        mvScaleTicDps = new Vector<>();
     }
 
     @Override
@@ -6523,6 +6641,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldItemCompositionQuantity.setFieldValue(moDpsEntry.getDbmsDpsEntryItemComposition().getQuantity());
         }
         
+        for (SDataScaleTicketDpsEntry ety : moDpsEntry.getDbmsScaleTicketsEty()) {
+            mvScaleTicDpsEty.add(ety);
+        }
+        mbScaleTicketLink = !mvScaleTicDpsEty.isEmpty();
+                
         if (mbMatRequestImport) {
             calculateTotal();
             moDpsEntry.setFlagOpenedByMatRequestImport(true);
@@ -6716,6 +6839,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.getDbmsDpsEntryQuantityChange().add(chg);
         }
         
+        moDpsEntry.getDbmsScaleTicketsEty().clear();
+        for (SDataScaleTicketDpsEntry ety : mvScaleTicDpsEty) {
+            moDpsEntry.getDbmsScaleTicketsEty().add(ety);
+        }
+        
         moDpsEntry.setFlagDpsEtyOpened(true);
         return moDpsEntry;
     }
@@ -6836,6 +6964,28 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             case SLibConstants.VALUE_IS_MAT_REQ:
                 mbMatRequestImport = (Boolean) value;
                 break;
+            
+            case LINK_TICKET_SELECT:
+                mbScaleTicketLink = (Boolean) value;
+                if (mbScaleTicketLink && mnFormStatus != SLibConstants.FORM_STATUS_READ_ONLY) {
+                    enableLog();
+                }
+                if (!mbScaleTicketLink) {
+                    mvScaleTicDpsEty.clear();
+                    enableLog();
+                    jtfTicket.setText("");
+                }
+                break;
+                
+            case LINK_TICKET_ENABLED:
+                jbTicketPicker.setEnabled((Boolean) value);
+                jbCleanTickets.setEnabled((Boolean) value);
+                jbEditLogistics.setEnabled(!(Boolean) value);
+                break;
+            
+            case LINKED_TICKET:
+                mvScaleTicDps = (Vector<SDataScaleTicketDps>) value;
+                break;
                 
             default:
                 // do nothing
@@ -6946,6 +7096,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbDateQuantityChg) {
                 actionDateQuantityChg();
             }
+            else if (button == jbTicketPicker) {
+                actionTicketPicker();
+            }
+            else if (button == jbCleanTickets) {
+                actionCleanTickets();
+            }            
         }
         if (e.getSource() instanceof javax.swing.JToggleButton) {
             JToggleButton toggleButton = (JToggleButton) e.getSource();

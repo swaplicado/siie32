@@ -34,7 +34,7 @@ import javax.swing.JComboBox;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores, Claudio Peña
  */
 public class SFormItemConfigBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -494,7 +494,11 @@ public class SFormItemConfigBizPartner extends javax.swing.JDialog implements er
         if (jckIsItemDescriptionApplying.isSelected()) {
             jtfKey.setEnabled(true);
             jtfItem.setEnabled(true);
-            jtfItemShort.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemShortApplying());
+            if (moItem != null) {
+                jtfItemShort.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemShortApplying());
+            } else {
+               jtfItemShort.setEnabled(moItemConfigBizPartner.getFkUnitId() != 0); 
+            }
             jcbFkUnitId.setEnabled(true);
             jbFkUnitId.setEnabled(true);
         }
@@ -614,13 +618,16 @@ public class SFormItemConfigBizPartner extends javax.swing.JDialog implements er
                 break;
             }
         }
-        
-        if (!validation.getIsError()) {
-            if (!jckIsItemDescriptionApplying.isSelected() && jcbCfdiUsage.getSelectedIndex() <= 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiUsage.getText() + "'.");
-                validation.setComponent(jcbCfdiUsage);
-            }
-        }
+        /*        
+        Se quita la validación debido a la Solicitud #1273; 09/08/2024; AETH/ Heriberto Briseño; SIIE/ CXCP:
+        Solo el uso de CFDI no era obligatorio cuando se aplica descripción personalizada de ítems
+        */
+//        if (!validation.getIsError()) {
+//            if (!jckIsItemDescriptionApplying.isSelected() && jcbCfdiUsage.getSelectedIndex() <= 0) {
+//                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiUsage.getText() + "'.");
+//                validation.setComponent(jcbCfdiUsage);
+//            }
+//        }
 
         return validation;
     }
@@ -648,10 +655,11 @@ public class SFormItemConfigBizPartner extends javax.swing.JDialog implements er
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
-        
+
+        SDataItemConfigBizPartner moItemConfigBizPartner = (erp.mitm.data.SDataItemConfigBizPartner) registry;
+      
         moFieldPkItemId.setFieldValue(new int[] { moItemConfigBizPartner.getPkItemId() });
         renderItemSettings();   // units combobox populated aswell
-        
         moFieldIsItemDescriptionApplying.setFieldValue(moItemConfigBizPartner.getIsItemDescription());
         renderIsItemDescriptionApplying();
         

@@ -191,7 +191,8 @@ public class SShareData {
             
             try (Scanner scanner = new Scanner(response)) {
                 String responseBody = scanner.useDelimiter("\\A").next();
-                System.out.println(responseBody);
+                System.out.println("Respuesta desde " + sURL);
+//                System.out.println(responseBody);
                 
                 ObjectMapper mapper = new ObjectMapper();
                 SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);

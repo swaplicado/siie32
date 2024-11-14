@@ -107,6 +107,23 @@ public abstract class SFinUtils {
 
         return id;
     }
+    
+    public static int getCostCenterMaxLevel(final SGuiSession session) {
+        int level = 0;
+        
+        try {
+            String sql = "SELECT MAX(lev) FROM " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " ";
+            ResultSet resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                level = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e){
+            SLibUtils.showException(SFinUtils.class.getName(), e);
+        }
+        
+        return level;
+    }
 
     public static int getCashCurrencyId(SGuiSession session, int[] keyCash) {
         int idCurrency = SLibConsts.UNDEFINED;

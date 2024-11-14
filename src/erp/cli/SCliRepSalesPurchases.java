@@ -8,6 +8,7 @@ package erp.cli;
 import erp.SClient;
 import erp.SParamsApp;
 import erp.lib.SLibUtilities;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.STrnUtilities;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +56,8 @@ public class SCliRepSalesPurchases {
     private static String msSqlWhere;
     private static String msSqlWhereParam;
     
+    private static SMailSender moMailSender;
+    
     /**
      * @param args Los argumentos de la interfaz de línea de comandos (CLI).
      * Argumentos esperados:
@@ -101,7 +104,7 @@ public class SCliRepSalesPurchases {
                 msSubject = "[SIIE] Ventas netas item-cliente ";
                 File report = createPdfReport(dbErp); 
 
-                SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
+                //SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
 
                 ArrayList<String> recipientsTo = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailTo, ";")));
 
@@ -110,7 +113,7 @@ public class SCliRepSalesPurchases {
                     recipientsBcc = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mailBcc, ";")));
                 }
 
-                SMail mail = new SMail(sender, SMailUtils.encodeSubjectUtf8(msSubject), composeMailBody(), recipientsTo);
+                SMail mail = new SMail(moMailSender, SMailUtils.encodeSubjectUtf8(msSubject), composeMailBody(), recipientsTo);
                 if (recipientsBcc != null) {
                     mail.getBccRecipients().addAll(recipientsBcc);
                 }
@@ -233,17 +236,31 @@ public class SCliRepSalesPurchases {
         String sql;
         ResultSet resultSet;
         
+        moMailSender = null;
         msCompaniesNames = "";
         msSqlWhere = "";
         msSqlWhereParam = "";
         
         for (String id : ids) {
+            String bd = "";
             msSqlWhere += (msSqlWhere.isEmpty() ? "WHERE " : "OR ") + "id_co = " + id + " ";
             msSqlWhereParam += (msSqlWhereParam.isEmpty() ? "WHERE " : "AND ") + "id_bp <> " + id + " ";
-            sql = "SELECT co_key FROM erp.cfgu_co WHERE id_co = " + id;
+            sql = "SELECT co_key, bd FROM erp.cfgu_co WHERE id_co = " + id;
             resultSet = db.getConnection().createStatement().executeQuery(sql);
             if (resultSet.next()) {
                 msCompaniesNames += (msCompaniesNames.isEmpty() ? "" : " + ") + resultSet.getString("co_key") + "";
+                bd = resultSet.getString("bd");
+            }
+            resultSet.close();
+            
+            if (moMailSender == null && !bd.isEmpty()) {
+                sql = "SELECT * FROM " + bd + ".cfg_mms WHERE fk_tp_mms = " + SModSysConsts.CFGS_TP_MMS_MAIL_REPS;
+                resultSet = db.getConnection().createStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    moMailSender = new SMailSender(resultSet.getString("host"), resultSet.getString("port"), resultSet.getString("prot"), 
+                            resultSet.getBoolean("b_tls"), resultSet.getBoolean("b_auth"), resultSet.getString("usr"), resultSet.getString("usr_pswd"), resultSet.getString("arb_email"));
+                }
+                resultSet.close();
             }
         }
     }

@@ -58,6 +58,7 @@ public class SDialogDpsDeliveryAckSend extends javax.swing.JDialog implements er
 
     /**
      * Creates new form SDialogDpsDeliveryAckReasign
+     * @param client
      */
     public SDialogDpsDeliveryAckSend(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
@@ -265,6 +266,7 @@ public class SDialogDpsDeliveryAckSend extends javax.swing.JDialog implements er
         }
         else {
             moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+            moMailSender.setMailReplyTo(mms.getXtaMailReplyTo());
         }
     }
     

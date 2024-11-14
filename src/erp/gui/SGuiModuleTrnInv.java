@@ -129,6 +129,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiMaintStockToolLost;
     private javax.swing.JMenuItem jmiMaintStockTool;
     private javax.swing.JMenuItem jmiConsumeMaterial;
+    private javax.swing.JMenuItem jmiConsumeMaterialDetail;
     private javax.swing.JMenuItem jmiMaintMovementPart;
     private javax.swing.JMenuItem jmiMaintMovementPartDetail;
     private javax.swing.JMenuItem jmiMaintMovementTool;
@@ -287,6 +288,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqPur = false;
         boolean hasRightMatReqAdm = false;
         boolean hasRightValMatCons = false;
+        boolean hasRightStkCommPrice = false;
         int levelRightValMatCons = 0;
         boolean hasRightMatReqReclass = false;
 
@@ -592,6 +594,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
         jmiMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
         jmiConsumeMaterial = new JMenuItem("Docs. consumos de materiales");
+        jmiConsumeMaterialDetail = new JMenuItem("Docs. consumos de materiales a detalle");
         jmiMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
         jmiMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
         jmiMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
@@ -614,6 +617,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuMaint.add(jmiMaintStockTool);
         jmMenuMaint.addSeparator();
         jmMenuMaint.add(jmiConsumeMaterial);
+        jmMenuMaint.add(jmiConsumeMaterialDetail);
         jmMenuMaint.addSeparator();
         jmMenuMaint.add(jmiMaintMovementPart);
         jmMenuMaint.add(jmiMaintMovementPartDetail);
@@ -638,6 +642,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolLost.addActionListener(this);
         jmiMaintStockTool.addActionListener(this);
         jmiConsumeMaterial.addActionListener(this);
+        jmiConsumeMaterialDetail.addActionListener(this);
         jmiMaintMovementPart.addActionListener(this);
         jmiMaintMovementPartDetail.addActionListener(this);
         jmiMaintMovementTool.addActionListener(this);
@@ -779,7 +784,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
-        jmiStkStockValuation = new JMenuItem("Valuación de conumos de materiales");
+        jmiStkStockValuation = new JMenuItem("Valuación de consumos de materiales");
         jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiItemHistoric = new JMenuItem("Historial ítems");
@@ -908,6 +913,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
         levelRightValMatCons = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasRightStkCommPrice = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_STOCK_COMM_PRICE).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmiCatMatCostCenterGrp.setEnabled(hasRightMatReqAdm);
@@ -977,6 +983,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintStockToolLost.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiConsumeMaterial.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiConsumeMaterialDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementPartDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
         jmiMaintMovementTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
@@ -1020,11 +1027,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
-        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons);
+        jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockLot.setEnabled(hasRightStock);
-        jmiStkStockCommPrice.setEnabled(hasRightStock);
+        //jmiStkStockCommPrice.setEnabled(hasRightStock);
+        jmiStkStockCommPrice.setEnabled(hasRightStkCommPrice);
         jmiStkStockWarehouse.setEnabled(hasRightStock);
         jmiStkStockWarehouseLot.setEnabled(hasRightStock);
         jmiStkStockMovements.setEnabled(hasRightStock);
@@ -1463,7 +1471,15 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                             title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase();
                             break;
                         case SModSysConsts.TRNX_CONS_MAT:
-                            title += "Consumo de materiales";
+                            switch (auxType02) {
+                                case SUtilConsts.PER_ITM:
+                                    title += "Consumo de materiales a detalle";
+                                    break;
+                                case SUtilConsts.PER_DOC:                           
+                                    title += "Consumo de materiales";
+                                    break;
+                                default:
+                            }
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1891,6 +1907,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiConsumeMaterial) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_CONS_MAT, SUtilConsts.PER_DOC);
+            }
+            else if (item == jmiConsumeMaterialDetail) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_CONS_MAT, SUtilConsts.PER_ITM);
             }
             else if (item == jmiMaintMovementPart) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);

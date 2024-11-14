@@ -33,6 +33,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogCustomReportFsc;
+import erp.mod.trn.form.SDialogRepScaleTicketsMovements;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
 import erp.mod.trn.form.SDialogSendMailContract;
@@ -43,6 +44,7 @@ import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
+import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataSign;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -88,7 +90,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -195,6 +197,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkRetReturned;
     private javax.swing.JMenuItem jmiStkRetReturnedEntry;
     private javax.swing.JMenuItem jmiStkRetDiog;
+    private javax.swing.JMenu jmSca;
+    private javax.swing.JMenuItem jmiSca;
+    private javax.swing.JMenuItem jmiScaBpMap;
+    private javax.swing.JMenuItem jmiScaBpDetMap;
+    private javax.swing.JMenuItem jmiScaItMap;
+    private javax.swing.JMenuItem jmiScaItDetMap;
+    private javax.swing.JMenuItem jmiScaRep;
     private javax.swing.JMenu jmAccPend;
     private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenu jmRep;
@@ -287,6 +296,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SFormStamp moFormStamp;
     private erp.mtrn.form.SFormDpsDeliveryAck moFormDpsDeliveryAck;
     private erp.mtrn.form.SFormCfdPayment moFormCfdPayment;
+    private erp.mod.trn.form.SDialogRepScaleTicketsMovements moDialogRepScaleTicketMov;
 
     public SGuiModuleTrnSal(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_SAL);
@@ -306,8 +316,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightInventoryOut = false;
         boolean hasRightReports = false;
         boolean hasRightItemConfig = false;
+        boolean hasRightScaleCfg = false;
+        boolean hasRightScaleRep = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
+        int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
         
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de ventas");
@@ -557,6 +570,22 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmStkRet.add(jmiStkRetReturnedEntry);
         jmStkRet.addSeparator();
         jmStkRet.add(jmiStkRetDiog);
+        
+        jmSca = new JMenu("Báscula");
+        jmiSca = new JMenuItem("Boletos de salida de báscula");
+        jmiScaBpMap = new JMenuItem("Mapeo de clientes de báscula");
+        jmiScaBpDetMap = new JMenuItem("Mapeo de clientes de báscula a detalle");
+        jmiScaItMap = new JMenuItem("Mapeo de productos de báscula");
+        jmiScaItDetMap = new JMenuItem("Mapeo de productos de báscula a detalle");
+        jmiScaRep = new JMenuItem("Envío de reporte de boletos de salida de báscula");
+        jmSca.add(jmiSca);
+        jmSca.addSeparator();
+        jmSca.add(jmiScaBpMap);
+        jmSca.add(jmiScaBpDetMap);
+        jmSca.add(jmiScaItMap);
+        jmSca.add(jmiScaItDetMap);
+        jmSca.addSeparator();
+        jmSca.add(jmiScaRep);
 
         jmAccPend = new JMenu("CXC");
         jmiAccPend = new JMenuItem("Cuentas por cobrar");
@@ -811,6 +840,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.addActionListener(this);
         jmiStkRetReturnedEntry.addActionListener(this);
         jmiStkRetDiog.addActionListener(this);
+        jmiSca.addActionListener(this);
+        jmiScaBpMap.addActionListener(this);
+        jmiScaBpDetMap.addActionListener(this);
+        jmiScaItMap.addActionListener(this);
+        jmiScaItDetMap.addActionListener(this);
+        jmiScaRep.addActionListener(this);
         jmiAccPend.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
@@ -885,9 +920,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         hasRightItemConfig =
                 hasRightDocOrder && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level == SUtilConsts.LEV_MANAGER ||
                 hasRightDocTransaction && miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_TRN).Level == SUtilConsts.LEV_MANAGER;
+        hasRightScaleCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_SCA).HasRight;
+        hasRightScaleRep = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_SCA_TIC_REP).HasRight;
         levelRightDocOrder = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level;
         levelRightDocTransaction = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_TRN).Level;
-
+        levelRightScaleTic = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_SCA_TIC).Level;
+        
         jmCat.setEnabled(hasRightDnsDps || hasRightDnsDiog || hasRightBizPartnerBlocking || hasRightItemConfig);
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
@@ -958,6 +996,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkRetReturned.setEnabled(hasRightInventoryIn);
         jmiStkRetReturnedEntry.setEnabled(hasRightInventoryIn);
         jmiStkRetDiog.setEnabled(hasRightInventoryIn);
+        
+        jmSca.setEnabled(levelRightScaleTic >= SUtilConsts.LEV_READ || hasRightScaleCfg || hasRightScaleRep);
+        jmiSca.setEnabled(levelRightScaleTic >= SUtilConsts.LEV_READ);
+        jmiScaBpMap.setEnabled(hasRightScaleCfg);
+        jmiScaBpDetMap.setEnabled(hasRightScaleCfg);
+        jmiScaItMap.setEnabled(hasRightScaleCfg);
+        jmiScaItDetMap.setEnabled(hasRightScaleCfg);
+        jmiScaRep.setEnabled(hasRightScaleRep);
         
         jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
@@ -1288,14 +1334,32 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             if (result == SLibConstants.DB_ACTION_SAVE_OK && moRegistry != null) {
                 switch (formType) {
                     case SDataConstants.TRN_DPS:
-                        // compute associated CFD of current DPS:
+                        // compute associated CFD of current DPS:                        
                         if (moRegistry instanceof SDataDps && ((SDataDps) moRegistry).getAuxIsNeedCfd()) {
                             try {
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
                                 dps.setAuxDpsTime(((SDataDps) moRegistry).getAuxDpsTime());
-                                SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                if (dps.getDbmsDataAddenda() != null) { 
+                                    if (dps.getDbmsDataAddenda().getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71) {
+                                        for (int i = 0; i < dps.getDbmsDpsEntries().size(); i++) {
+                                            SDataDpsEntry entry = dps.getDbmsDpsEntries().get(i);
+                                            String concept = entry.getConcept();
+                                            if (concept.contains("&")) {
+                                                concept = concept.replace("&", "'N");
+                                                entry.setConcept(concept);
+                                            }
+                                        }
+                                        SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                    }
+                                    else {
+                                        SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                    }
+                                }
+                                if (dps.getDbmsDataAddenda() == null) {
+                                    SCfdUtils.computeCfdInvoice(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
+                                }
                             }
                             catch (java.lang.Exception e) {
                                 throw new Exception("Ha ocurrido una excepción al generar el CFD: " + e);
@@ -1821,7 +1885,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmDpsDvy, jmStkDvy, jmStkRet, jmAccPend, jmRep };
+        return new JMenu[] { jmCat, jmEst, jmCon, jmOrd, jmDps, jmDpsAdj, jmDpsDvy, jmStkDvy, jmStkRet, jmSca, jmAccPend, jmRep };
     }
 
     @Override
@@ -2100,6 +2164,25 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkRetDiog) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRN_DIOG, SDataConstantsSys.TRNS_CL_IOG_IN_SAL[0], SDataConstantsSys.TRNS_CL_IOG_IN_SAL[1]);
+            }
+            else if (item == jmiSca) {
+                miClient.getSession().showView(SModConsts.TRNU_SCA_TIC, SModSysConsts.TRNS_CT_IOG_OUT, null);
+            }
+            else if (item == jmiScaBpMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSU_SCA_BP, SDataConstants.MOD_SAL);
+            }
+            else if (item == jmiScaBpDetMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_SCA_BP_DET, SDataConstants.MOD_SAL);
+            }
+            else if (item == jmiScaItMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMU_SCA_ITEM);
+            }
+            else if (item == jmiScaItDetMap) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMX_SCA_ITEM_DET);
+            }
+            else if (item == jmiScaRep) {
+                moDialogRepScaleTicketMov = new SDialogRepScaleTicketsMovements((SGuiClient) miClient, SDataConstants.MOD_SAL);
+                moDialogRepScaleTicketMov.setVisible(true);
             }
             else if (item == jmiAccPend) {
                 miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_CUS, null);

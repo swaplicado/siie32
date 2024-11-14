@@ -54,31 +54,37 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
         double debitCur = 0;
         double creditCur = 0;
         double excRate = 0;
-        int[] sysAccountTypeKey = null;
-        int[] sysAccountMovTypeKey = null;
+        int[] sysAccTypeKeyResults = null;
+        int[] sysAccTypeKeyProfitLoss = null;
+        int[] sysAccMoveTypeKeyProfitLoss = null;
         ResultSet rs = st.executeQuery(sql);
 
         while (rs.next()) {
             if (rs.getDouble("f_bal") >= 0) {
+                // loss (credits will be interchanged to debits to register loss):
+                
                 debit = 0;
                 credit = rs.getDouble("f_bal");
-                sysAccountTypeKey = SModSysConsts.FINS_TP_SYS_MOV_YO_CDT;
-                sysAccountMovTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_PROF;
-            }
-            else {
-                debit = - rs.getDouble("f_bal");
-                credit = 0;
-                sysAccountTypeKey = SModSysConsts.FINS_TP_SYS_MOV_YO_DBT;
-                sysAccountMovTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_LOSS;
-            }
-
-            if (rs.getDouble("f_bal_cur") >= 0) {
+                
                 debitCur = 0;
                 creditCur = rs.getDouble("f_bal_cur");
+                
+                sysAccTypeKeyResults = SModSysConsts.FINS_TP_SYS_MOV_YO_CDT; // to close results account
+                sysAccTypeKeyProfitLoss = SModSysConsts.FINS_TP_SYS_MOV_YO_DBT; // to register profit & loss
+                sysAccMoveTypeKeyProfitLoss = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_LOSS;
             }
             else {
-                debitCur = - rs.getDouble("f_bal_cur");
+                // profit (debits will be interchanged to register profit):
+                
+                debit = -rs.getDouble("f_bal"); // make it positive
+                credit = 0;
+                
+                debitCur = -rs.getDouble("f_bal_cur"); // make it positive
                 creditCur = 0;
+                
+                sysAccTypeKeyResults = SModSysConsts.FINS_TP_SYS_MOV_YO_DBT; // to close results account
+                sysAccTypeKeyProfitLoss = SModSysConsts.FINS_TP_SYS_MOV_YO_CDT; // to register profit & loss
+                sysAccMoveTypeKeyProfitLoss = SDataConstantsSys.FINS_TP_SYS_MOV_PROF_PROF;
             }
 
             if (debit != 0 && debitCur != 0) {
@@ -91,7 +97,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                 excRate = 0;
             }
 
-            // 1. Insert account results:
+            // 1. Journal entry for closing current results account:
 
             mnAuxEntryId++;
             sql = "INSERT INTO fin_rec_ety VALUES (" +
@@ -105,8 +111,8 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[0] + ", " +
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[1] + ", " +
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[2] + ", " +
-                    "" + sysAccountTypeKey[0] + ", " +
-                    "" + sysAccountTypeKey[1] + ", " +
+                    "" + sysAccTypeKeyResults[0] + ", " +
+                    "" + sysAccTypeKeyResults[1] + ", " +
                     "" + rs.getInt("fid_cl_sys_acc") + ", " +
                     "" + rs.getInt("fid_tp_sys_acc") + ", " +
                     "" + rs.getInt("fid_ct_sys_mov_xxx") + ", " +
@@ -122,7 +128,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + mnFkUserId + ", " + mnFkUserId + ", " + mnFkUserId + ", NOW(), NOW(), NOW()); ";
             stUpd.execute(sql);
 
-            // 2. Insert counterpart:
+            // 1. Journal entry for registering the counterpart balance of current results account into given profit & loss account:
 
             mnAuxEntryId++;
             sql = "INSERT INTO fin_rec_ety VALUES (" +
@@ -136,14 +142,14 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[0] + ", " +
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[1] + ", " +
                     "" + SDataConstantsSys.FINS_CLS_ACC_MOV_FY_CLOSE[2] + ", " +
-                    "" + sysAccountTypeKey[0] + ", " +
-                    "" + sysAccountTypeKey[1] + ", " +
+                    "" + sysAccTypeKeyProfitLoss[0] + ", " +
+                    "" + sysAccTypeKeyProfitLoss[1] + ", " +
                     "" + rs.getInt("fid_cl_sys_acc") + ", " +
                     "" + rs.getInt("fid_tp_sys_acc") + ", " +
                     //"" + rs.getInt("fid_ct_sys_mov_xxx") + ", " +
                     //"" + rs.getInt("fid_tp_sys_mov_xxx") + ", " +
-                    "" + sysAccountMovTypeKey[0] + ", " +
-                    "" + sysAccountMovTypeKey[1] + ", " +
+                    "" + sysAccMoveTypeKeyProfitLoss[0] + ", " +
+                    "" + sysAccMoveTypeKeyProfitLoss[1] + ", " +
                     "" + rs.getInt("fid_cur") + ", " +
                     "NULL, " +  // no cost center needed
                     "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +

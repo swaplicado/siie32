@@ -6,16 +6,12 @@
 package erp.mod.trn.db;
 
 import erp.client.SClientInterface;
-import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mtrn.data.STrnUtilities;
-import erp.musr.data.SDataUser;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
@@ -93,11 +89,12 @@ public abstract class SMaterialRequestEstimationUtils {
     public static void sendMails(SGuiClient client, ArrayList<SProviderMailRow> lProviderRows) {
         SDbMms mms = STrnUtilities.getMms((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ);
         SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-        SDataUser user = (SDataUser) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.USRU_USR, new int[] { client.getSession().getUser().getPkUserId() }, SLibConstants.EXEC_MODE_SILENT);
-        if (user != null && user.getEmail() != null && user.getEmail().length() > 0) {
-            //sender.setMailFrom(user.getEmail());
-            sender.setMailReplyTo(user.getEmail());
-        }
+//        SDataUser user = (SDataUser) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.USRU_USR, new int[] { client.getSession().getUser().getPkUserId() }, SLibConstants.EXEC_MODE_SILENT);
+//        if (user != null && user.getEmail() != null && user.getEmail().length() > 0) {
+//            //sender.setMailFrom(user.getEmail());
+//            sender.setMailReplyTo(user.getEmail());
+//        }
+        sender.setMailReplyTo(mms.getXtaMailReplyTo());
         String img = "firmas/" + client.getSession().getUser().getName() + ".jpg";
         String basePath = System.getProperty("user.dir");
         String imageFilePath = basePath + "/" + img;

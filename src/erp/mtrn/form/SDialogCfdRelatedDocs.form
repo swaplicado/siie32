@@ -106,7 +106,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlCfdiCfdiRelated">
+                    <Component class="javax.swing.JLabel" name="jlCfdiRelatedUuids">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="CFDI relacionados:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -114,7 +114,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfCfdiCfdiRelated">
+                    <Component class="javax.swing.JTextField" name="jtfCfdiRelatedUuids">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="TEXT"/>
                         <Property name="toolTipText" type="java.lang.String" value="UUID de CFDI relacionados"/>
@@ -123,7 +123,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbCfdiCfdiRelated">
+                    <Component class="javax.swing.JButton" name="jbAddCfdiRelated">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="+"/>
                         <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
@@ -135,14 +135,14 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JLabel" name="jlCfdiCfdiRelatedHint">
+                    <Component class="javax.swing.JLabel" name="jlCfdiRelatedUuidsHint">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="(separar varios UUID con coma, sin espacios intermedios; m&#xe1;ximo hasta 100 UUID)"/>
+                        <Property name="text" type="java.lang.String" value="(separar con coma, sin espacios; m&#xe1;x. 100)"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[450, 23]"/>
+                          <Dimension value="[225, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -164,7 +164,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbDelRow">
+                    <Component class="javax.swing.JButton" name="jbDeleteRow">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Eliminar"/>
                         <Property name="toolTipText" type="java.lang.String" value="Quita el rengl&#xf3;n seleccionado de la tabla"/>
@@ -223,7 +223,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="jbCancel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Cerrar"/>
+            <Property name="text" type="java.lang.String" value="Cancelar"/>
             <Property name="toolTipText" type="java.lang.String" value="[Escape]"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[80, 23]"/>

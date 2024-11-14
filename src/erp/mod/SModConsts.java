@@ -87,6 +87,7 @@ public abstract class SModConsts {
     public static final int CFGU_CO = 1012002;
     public static final int CFGU_COB_ENT = 1012003;
     public static final int CFGU_LAN = 1012004;
+    public static final int CFGU_SCA = 1012091;
     public static final int CFG_PARAM_ERP = 1012005;
     
     public static final int CFGU_CERT = 1013001;
@@ -174,6 +175,8 @@ public abstract class SModConsts {
     public static final int BPSU_TP_BP = 1042015;
     public static final int BPSU_BA = 1042016;
     public static final int BPSU_BP_ADDEE = 1042031;
+    public static final int BPSU_SCA_BP = 1042091;
+    public static final int BPSU_SCA_BP_MAP = 1042092;
 
     public static final int BPSX_BP_ATT_BANK = 1044001;
     public static final int BPSX_BP_ATT_CARR = 1044002;
@@ -204,6 +207,8 @@ public abstract class SModConsts {
     public static final int ITMU_TP_MAT_MAT_ATT = 1052010;
     public static final int ITMU_ITEM_MAT_ATT = 1052011;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 1052021;
+    public static final int ITMU_SCA_ITEM = 1052091;
+    public static final int ITMU_SCA_ITEM_MAP = 1052092;
 
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
@@ -383,6 +388,7 @@ public abstract class SModConsts {
     public static final int TRNU_TP_IOG_ADJ = 2022004;
     public static final int TRNU_TP_DPS_ANN = 2022005;
     public static final int TRNU_MAT_REQ_PTY = 2022007;
+    public static final int TRNU_SCA_TIC = 2022091;
     
     public static final int TRN_DNS_DPS = 2023001;
     public static final int TRN_DNS_DIOG = 2023002;
@@ -421,6 +427,8 @@ public abstract class SModConsts {
     public static final int TRN_DPS_IOG_CHG = 2023026;
     public static final int TRN_DPS_IOG_WAR = 2023027;
     public static final int TRN_DPS_REC = 2023028;
+    public static final int TRN_SCA_TIC_DPS = 2023390;
+    public static final int TRN_SCA_TIC_DPS_ETY = 2023391;
     public static final int TRN_DIOG = 2023029;
     public static final int TRN_DIOG_NTS = 2023030;
     public static final int TRN_DIOG_ETY = 2023031;
@@ -947,6 +955,7 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
         TablesMap.put(CFGU_COB_ENT, "erp.cfgu_cob_ent");
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
+        TablesMap.put(CFGU_SCA, "erp.cfgu_sca");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
         
         TablesMap.put(CFGU_CERT, "cfgu_cert");
@@ -1022,6 +1031,8 @@ public abstract class SModConsts {
         TablesMap.put(BPSU_TP_BP, "erp.bpsu_tp_bp");
         TablesMap.put(BPSU_BA, "erp.bpsu_ba");
         TablesMap.put(BPSU_BP_ADDEE, "erp.bpsu_bp_addee");
+        TablesMap.put(BPSU_SCA_BP, "erp.bpsu_sca_bp");
+        TablesMap.put(BPSU_SCA_BP_MAP, "erp.bpsu_sca_bp_map");
 
         TablesMap.put(ITMS_CT_ITEM, "erp.itms_ct_item");
         TablesMap.put(ITMS_CL_ITEM, "erp.itms_cl_item");
@@ -1044,6 +1055,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
         TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP, "erp.itmu_match_item_cpt_bp");
+        TablesMap.put(ITMU_SCA_ITEM, "erp.itmu_sca_item");
+        TablesMap.put(ITMU_SCA_ITEM_MAP, "erp.itmu_sca_item_map");
 
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
@@ -1203,6 +1216,7 @@ public abstract class SModConsts {
         TablesMap.put(TRNU_TP_IOG_ADJ, "erp.trnu_tp_iog_adj");
         TablesMap.put(TRNU_TP_DPS_ANN, "erp.trnu_tp_dps_ann");
         TablesMap.put(TRNU_MAT_REQ_PTY, "erp.trnu_mat_req_pty");
+        TablesMap.put(TRNU_SCA_TIC, "erp.trnu_sca_tic");
 
         TablesMap.put(TRN_DNS_DPS, "trn_dns_dps");
         TablesMap.put(TRN_DNS_DIOG, "trn_dns_diog");
@@ -1240,6 +1254,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
         TablesMap.put(TRN_DPS_REC, "trn_dps_rec");
+        TablesMap.put(TRN_SCA_TIC_DPS, "trn_sca_tic_dps");
+        TablesMap.put(TRN_SCA_TIC_DPS_ETY, "trn_sca_tic_dps_ety");
         TablesMap.put(TRN_DIOG, "trn_diog");
         TablesMap.put(TRN_DIOG_NTS, "trn_diog_nts");
         TablesMap.put(TRN_DIOG_ETY, "trn_diog_ety");

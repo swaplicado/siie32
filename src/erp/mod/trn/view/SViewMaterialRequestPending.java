@@ -226,7 +226,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else {
                 jbSegregate.setEnabled(false);
-                mjbSupply.setEnabled(false);
+                mjbSupply.setEnabled(true);
                 mjbCloseOpenSupply.setEnabled(true);
                 mjbToNew.setEnabled(false);
                 mjbToPur.setEnabled(false);
@@ -845,11 +845,17 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         subWhere += "AND d.fid_ct_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[0] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[0] + ") ";
         subWhere += "AND d.fid_cl_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[1] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[1] + ") ";
         subWhere += "AND d.fid_tp_iog IN (" + SModSysConsts.TRNS_TP_IOG_IN_DEV_CONS[2] + ", " + SModSysConsts.TRNS_TP_IOG_OUT_SUPP_CONS[2] + ") ";
+//        Se quita esta consulta porque demoraba mas de 26 segundos en ejecutarse, se optimizo po el EXISTS42          
+//        if (usrId != 2 || !mbHasAdmRight) { // SUPER
+//            join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "  
+//                    +  "pe.id_mat_prov_ent = peu.id_mat_prov_ent ";
+//            where += (where.isEmpty() ? "" : "AND ") + "peu.id_usr = " + usrId + " ";
+//        }
         
-        if (usrId != 2 || !mbHasAdmRight) { // SUPER
-            join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "  
-                    +  "pe.id_mat_prov_ent = peu.id_mat_prov_ent ";
-            where += (where.isEmpty() ? "" : "AND ") + "peu.id_usr = " + usrId + " ";
+        if (usrId != 2 || !mbHasAdmRight) { // SUPER          
+            where += (where.isEmpty() ? "" : "AND ") + " EXISTS (SELECT 1 FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu " +
+            "WHERE pe.id_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " )" ;
+            
         }
         
         if (msSeekQueryText.length() > 0) {

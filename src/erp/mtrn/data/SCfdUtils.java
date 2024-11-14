@@ -4669,6 +4669,10 @@ public abstract class SCfdUtils implements Serializable {
         // Comprobante:
         
         boolean isGlobal = xmlCfdi.getElementInformacionGlobal() != null;
+        SDataDps dpsXml = null;
+        if (xmlCfdi instanceof SDataDps) {
+            dpsXml = (SDataDps) xmlCfdi;
+        }
         
         cfd.ver40.DElementComprobante comprobante = new cfd.ver40.DElementComprobante();
 
@@ -4681,7 +4685,15 @@ public abstract class SCfdUtils implements Serializable {
         }
         comprobante.getAttNoCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertNumber());
         comprobante.getAttCertificado().setString(client.getCfdSignature(DCfdConsts.CFDI_VER_40).getCertBase64());
-        if (!isGlobal && !xmlCfdi.getComprobanteTipoComprobante().equals("E")) comprobante.getAttCondicionesDePago().setString(xmlCfdi.getComprobanteCondicionesPago());
+        if (!isGlobal && !xmlCfdi.getComprobanteTipoComprobante().equals("E")) {
+            String condicionesPago = null;
+            if (dpsXml != null && !dpsXml.getConditionsPayment().isEmpty()) {
+                condicionesPago = dpsXml.getConditionsPayment();
+            } else {
+                condicionesPago = xmlCfdi.getComprobanteCondicionesPago();
+            }
+            comprobante.getAttCondicionesDePago().setString(condicionesPago);
+        }
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
         comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
@@ -4708,13 +4720,13 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.setEltOpcInformacionGlobal((DElementInformacionGlobal) xmlCfdi.getElementInformacionGlobal());
         }
         
-        if (xmlCfdi.getCfdiRelacionados() != null && xmlCfdi.getCfdiRelacionados().getRelatedDocuments() != null &&
-                !xmlCfdi.getCfdiRelacionados().getRelatedDocuments().isEmpty()) {
+        if (xmlCfdi.getCfdiRelacionados() != null && xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs() != null &&
+                !xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs().isEmpty()) {
             ArrayList<cfd.ver40.DElementCfdiRelacionados> arrCfdiRelacionados = new ArrayList<>();
-            for (SRowRelatedDocument row : xmlCfdi.getCfdiRelacionados().getRelatedDocuments()) {
-                SRowRelatedDocument relatedDocument = row;
+            for (SRowCfdRelatedDocs row : xmlCfdi.getCfdiRelacionados().getRowCfdRelatedDocs()) {
+                SRowCfdRelatedDocs relatedDocument = row;
                 cfd.ver40.DElementCfdiRelacionados cfdiRelacionados = new cfd.ver40.DElementCfdiRelacionados();
-                cfdiRelacionados.getAttTipoRelacion().setString(relatedDocument.getRelationTypeId());
+                cfdiRelacionados.getAttTipoRelacion().setString(relatedDocument.getRelationType());
                for (String uuid : relatedDocument.getDocUuids().trim().split(",")) { 
                     cfd.ver40.DElementCfdiRelacionado cfdiRelacionado = new cfd.ver40.DElementCfdiRelacionado();
                     cfdiRelacionado.getAttUuid().setString(uuid);

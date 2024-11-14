@@ -174,10 +174,13 @@ public class SViewDocAdminRecord extends SGridPaneView implements ActionListener
                 + "dar.rec_dt_sta, "
                 + "dar.rec_dt_end, "
                 + "dar.breach_abstract, "
+                + "dar.ending_notes, "
                 + "dar.filevault_id, "
                 + "dar.filevault_ts_n, "
                 + "dar.file_type, "
                 + "dar.b_offender_uni, "
+                + "dar.b_offender_sign, "
+                + "dar.b_offender_dis, "
                 + "dar.b_hrs_witness_1, "
                 + "dar.b_hrs_witness_2, "
                 + "cob.code AS _cob_code, "
@@ -228,7 +231,10 @@ public class SViewDocAdminRecord extends SGridPaneView implements ActionListener
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_dep_name", "Depto. empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pos_name", "Puesto empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_offender_uni", "Sindicalizado empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_offender_sign", "El empleado firmó"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "dar.b_offender_dis", "El empleado se desvinculó"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "dar.breach_abstract", "Falta cometida"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "dar.ending_notes", "Notas finales"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_boss", "Jefe inmediato"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_hrs", "Rep. patronal"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "_emp_union_n", "Rep. sindical"));

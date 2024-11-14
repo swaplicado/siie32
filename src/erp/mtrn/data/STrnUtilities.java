@@ -1813,6 +1813,7 @@ public abstract class STrnUtilities {
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
+                sender.setMailReplyTo(mms.getXtaMailReplyTo());
                 toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
 
                 if (toRecipients.isEmpty()) {
@@ -1893,6 +1894,7 @@ public abstract class STrnUtilities {
                     bccRecipients = recipientsBcc;
 
                     sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    sender.setMailReplyTo(mms.getXtaMailReplyTo());
 
                     if (!mms.getRecipientTo().isEmpty() && toRecipients == null) {
                         toRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientTo(), ";")));
@@ -2175,6 +2177,7 @@ public abstract class STrnUtilities {
                     }
  
                     SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    sender.setMailReplyTo(mms.getXtaMailReplyTo());
                     SMail mail = new SMail(sender, mailSubject, SLibUtils.textToHtml(mailBody), new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mails, ";"))));
 
                     // PDF of CFDI:
@@ -3436,6 +3439,7 @@ public abstract class STrnUtilities {
                     SMailSender sender;
                     if (senderReceived == null) {
                         sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                        sender.setMailReplyTo(mms.getXtaMailReplyTo());
                     }
                     else {
                         sender = senderReceived;
@@ -3519,6 +3523,7 @@ public abstract class STrnUtilities {
                 }
 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                sender.setMailReplyTo(mms.getXtaMailReplyTo());
 
                 if (ccRecipients == null) {
                     mail = new SMail(sender, subject, body, toRecipients);

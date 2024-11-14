@@ -21,6 +21,8 @@ import erp.mod.hrs.utils.SDocUtils;
 import erp.musr.data.SDataUser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JButton;
@@ -42,7 +44,7 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
+public class SFormDocAdminRecord extends SBeanForm implements ActionListener, FocusListener {
     
     private SDbDocAdminRecord moRegistry;
     private SDbEmployee moOffender;
@@ -174,6 +176,14 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         jlOffenderComments2 = new javax.swing.JLabel();
         jspOffenderComments2 = new javax.swing.JScrollPane();
         jtaOffenderComments2 = new javax.swing.JTextArea();
+        jPanelSanC2 = new javax.swing.JPanel();
+        jPanelSanC21 = new javax.swing.JPanel();
+        jlEndingNotes = new javax.swing.JLabel();
+        jPanelSanC22 = new javax.swing.JPanel();
+        jcbEndingNotes = new javax.swing.JComboBox();
+        jPanelSanC23 = new javax.swing.JPanel();
+        moBoolOffenderSign = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolOffenderDis = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jPanel.setLayout(new java.awt.BorderLayout());
 
@@ -545,6 +555,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
 
         jPanelSanC1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
+        jPanelSanC11.setPreferredSize(new java.awt.Dimension(400, 128));
         jPanelSanC11.setLayout(new java.awt.BorderLayout());
 
         jlBreachDescrip.setForeground(new java.awt.Color(0, 102, 102));
@@ -568,6 +579,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
 
         jPanelSanC1.add(jPanelSanC11);
 
+        jPanelSanC12.setPreferredSize(new java.awt.Dimension(400, 128));
         jPanelSanC12.setLayout(new java.awt.BorderLayout());
 
         jlOffenderComments1.setForeground(new java.awt.Color(0, 102, 102));
@@ -591,6 +603,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
 
         jPanelSanC1.add(jPanelSanC12);
 
+        jPanelSanC13.setPreferredSize(new java.awt.Dimension(400, 128));
         jPanelSanC13.setLayout(new java.awt.BorderLayout());
 
         jlOffenderComments2.setForeground(new java.awt.Color(0, 102, 102));
@@ -615,6 +628,39 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         jPanelSanC1.add(jPanelSanC13);
 
         jPanelSanC.add(jPanelSanC1, java.awt.BorderLayout.PAGE_START);
+
+        jPanelSanC2.setLayout(new java.awt.GridLayout(3, 0));
+
+        jPanelSanC21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 5));
+
+        jlEndingNotes.setForeground(new java.awt.Color(0, 102, 102));
+        jlEndingNotes.setText("Comentarios finales:");
+        jlEndingNotes.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanelSanC21.add(jlEndingNotes);
+
+        jPanelSanC2.add(jPanelSanC21);
+
+        jPanelSanC22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jcbEndingNotes.setEditable(true);
+        jcbEndingNotes.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanelSanC22.add(jcbEndingNotes);
+
+        jPanelSanC2.add(jPanelSanC22);
+
+        jPanelSanC23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 5));
+
+        moBoolOffenderSign.setText("El empleado firmó");
+        moBoolOffenderSign.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanelSanC23.add(moBoolOffenderSign);
+
+        moBoolOffenderDis.setText("El empleado se desvinculó");
+        moBoolOffenderDis.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanelSanC23.add(moBoolOffenderDis);
+
+        jPanelSanC2.add(jPanelSanC23);
+
+        jPanelSanC.add(jPanelSanC2, java.awt.BorderLayout.CENTER);
 
         jPanelSan.add(jPanelSanC, java.awt.BorderLayout.CENTER);
 
@@ -650,6 +696,10 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
     private javax.swing.JPanel jPanelSanC11;
     private javax.swing.JPanel jPanelSanC12;
     private javax.swing.JPanel jPanelSanC13;
+    private javax.swing.JPanel jPanelSanC2;
+    private javax.swing.JPanel jPanelSanC21;
+    private javax.swing.JPanel jPanelSanC22;
+    private javax.swing.JPanel jPanelSanC23;
     private javax.swing.JPanel jPanelSanN;
     private javax.swing.JButton jbPickEmployeeBoss;
     private javax.swing.JButton jbPickEmployeeHumanResources;
@@ -659,6 +709,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
     private javax.swing.JButton jbPickEmployeeWitness2;
     private javax.swing.JButton jbPickPreceptSubsections;
     private javax.swing.JButton jbViewFile;
+    private javax.swing.JComboBox jcbEndingNotes;
     private javax.swing.JCheckBox jckOffenderActive;
     private javax.swing.JCheckBox jckOffenderUnionized;
     private javax.swing.JLabel jlBreachAbstract;
@@ -675,6 +726,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
     private javax.swing.JLabel jlEmployeeUnion_n;
     private javax.swing.JLabel jlEmployeeWitness1;
     private javax.swing.JLabel jlEmployeeWitness2;
+    private javax.swing.JLabel jlEndingNotes;
     private javax.swing.JLabel jlFilevault;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlOffenderComments1;
@@ -711,6 +763,8 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
     private javax.swing.JTextField jtfState;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolHumanResourcesWitness1;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolHumanResourcesWitness2;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolOffenderDis;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolOffenderSign;
     private sa.lib.gui.bean.SBeanFieldDatetime moDatetimeEnd;
     private sa.lib.gui.bean.SBeanFieldDatetime moDatetimeStart;
     private sa.lib.gui.bean.SBeanFieldText moTextBreachAbstract;
@@ -725,12 +779,18 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         moBoolHumanResourcesWitness2.setBooleanSettings(moBoolHumanResourcesWitness2.getText(), false);
         moTextBreachAbstract.setTextSettings(SGuiUtils.getLabelName(jlBreachAbstract), 100);
         moTextBreachAbstract.setTextCaseType(0);
-
+        
+        jcbEndingNotes.setEditable(true);
+        moBoolOffenderSign.setBooleanSettings(moBoolOffenderSign.getText(), false);
+        moBoolOffenderDis.setBooleanSettings(moBoolOffenderDis.getText(), false);
+        
         moFields.addField(moDatetimeStart);
         moFields.addField(moDatetimeEnd);
         moFields.addField(moBoolHumanResourcesWitness1);
         moFields.addField(moBoolHumanResourcesWitness2);
         moFields.addField(moTextBreachAbstract);
+        moFields.addField(moBoolOffenderSign);
+        moFields.addField(moBoolOffenderDis);
 
         moFields.setFormButton(jbSave);
         
@@ -958,6 +1018,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         jbPickEmployeeWitness2.addActionListener(this);
         jbPickPreceptSubsections.addActionListener(this);
         jbViewFile.addActionListener(this);
+        jcbEndingNotes.getEditor().getEditorComponent().addFocusListener(this);
     }
 
     @Override
@@ -970,14 +1031,26 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         jbPickEmployeeWitness2.removeActionListener(this);
         jbPickPreceptSubsections.removeActionListener(this);
         jbViewFile.removeActionListener(this);
+        jcbEndingNotes.getEditor().getEditorComponent().removeFocusListener(this);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
-
+        try {
+            jcbEndingNotes.removeAllItems();
+            String breaches[] = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_DOC_HRS_NTS_ADM_REC).split(";");
+            for (String breach : breaches) {
+                jcbEndingNotes.addItem(breach);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setRegistry(SDbRegistry registry) throws Exception {
         validateShowForm();
         
@@ -1099,6 +1172,13 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
 
         jtaOffenderComments2.setText(moRegistry.getOffenderComments2());
         jtaOffenderComments2.setCaretPosition(0);
+        
+        jcbEndingNotes.addItem(moRegistry.getEndingNotes());
+        jcbEndingNotes.setSelectedIndex(jcbEndingNotes.getItemCount()-1);
+        ((JTextField)jcbEndingNotes.getEditor().getEditorComponent()).setCaretPosition(0);
+
+        moBoolOffenderSign.setValue(moRegistry.isOffenderSigned());
+        moBoolOffenderDis.setValue(moRegistry.isOffenderDismissed());
 
         setFormEditable(true);
         
@@ -1131,10 +1211,13 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
         registry.setBreachAbstract(moTextBreachAbstract.getValue());
         registry.setBreachDescrip(jtaBreachDescrip.getText());
         registry.setOffenderComments1(jtaOffenderComments1.getText());
+        registry.setEndingNotes(jcbEndingNotes.getSelectedItem() == null ? "" : jcbEndingNotes.getSelectedItem().toString());
         registry.setOffenderComments2(jtaOffenderComments2.getText());
         //registry.setFilevaultId(...);
         //registry.setFilevaultTs_n(...);
         registry.setOffenderUnionized(jckOffenderUnionized.isSelected());
+        registry.setOffenderSigned(moBoolOffenderSign.getValue());
+        registry.setOffenderDismissed(moBoolOffenderDis.getValue());
         registry.setHumanResourcesWitness1(moBoolHumanResourcesWitness1.getValue());
         registry.setHumanResourcesWitness2(moBoolHumanResourcesWitness2.getValue());
         //registry.setDeleted(...);
@@ -1258,6 +1341,21 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener {
             else if (button == jbViewFile) {
                 actionPerformedViewFile();
             }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) { }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void focusLost(FocusEvent e) {
+        if (jcbEndingNotes.getSelectedItem() != null && !jcbEndingNotes.getSelectedItem().toString().isEmpty()) {
+            String text = jcbEndingNotes.getSelectedItem().toString();
+            jcbEndingNotes.removeItem(jcbEndingNotes.getSelectedItem());
+            jcbEndingNotes.addItem(SLibUtils.textTrim(text).substring(0, 100));
+            jcbEndingNotes.setSelectedIndex(jcbEndingNotes.getItemCount()-1);
+            ((JTextField)jcbEndingNotes.getEditor().getEditorComponent()).setCaretPosition(0);
         }
     }
 }

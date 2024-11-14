@@ -112,6 +112,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
     public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
+    public static final String CFG_PARAM_TRN_STK_SUPP_ZERO = "TRN_STK_SUPP_ZERO";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
@@ -120,6 +121,12 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
     public static final String CFG_PARAM_TRN_DIOG_OUT_DEF_CC = "TRN_DIOG_OUT_DEF_CC";
     public static final String CFG_PARAM_TRN_DIOG_CL_AUTHORN = "TRN_DIOG_CL_AUTHORN";
+    public static final String CFG_PARAM_DOC_HRS_NTS_BREACH = "DOC_HRS_NTS_BREACH";
+    public static final String CFG_PARAM_DOC_HRS_NTS_ADM_REC = "DOC_HRS_NTS_ADM_REC";
+    public static final String CFG_PARAM_DOC_HRS_MAIL_BREACH_TO = "DOC_HRS_MAIL_BREACH_TO";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_CFG = "TRN_MAIL_REP_SCA_TIC_CFG";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_GRP = "TRN_MAIL_REP_SCA_TIC_GRP";
+    public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_TO = "TRN_MAIL_REP_SCA_TIC_TO";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
@@ -268,6 +275,9 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
+    public static final int PRV_PUR_SCA_CFG = 103101;
+    public static final int PRV_PUR_SCA_TIC = 103102;
+    public static final int PRV_PUR_SCA_TIC_REP = 103106;
     public static final int PRV_PUR_REP = 103901;
     
     public static final int PRV_SAL_DPS_DNS = 104001;
@@ -303,6 +313,9 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_COMP_SIGN_RESTRICT = 104062;
     public static final int PRV_SAL_COMP_SIGN_IMMEX = 104063;
+    public static final int PRV_SAL_SCA = 104101;
+    public static final int PRV_SAL_SCA_TIC = 104102;
+    public static final int PRV_SAL_SCA_TIC_REP = 104106;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;
@@ -337,6 +350,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_REQ_MAT_PUR = 105064;       // comprador
     public static final int PRV_INV_REQ_MAT_ADMOR = 105065;     // administrador
     public static final int PRV_INV_REQ_MAT_RECLASS = 105066;   // contabilidad
+    public static final int PRV_INV_STOCK_COMM_PRICE = 105101;
     public static final int PRV_INV_REP = 105901;
     public static final int PRV_INV_VAL_MAT_CONS = 105907;
 

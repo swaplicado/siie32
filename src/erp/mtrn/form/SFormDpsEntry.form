@@ -2410,7 +2410,37 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="TEXT"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[102, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbTicketPicker">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbCleanTickets">
+                              <Properties>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_std_erase.gif"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Borrar boletos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbEditLogistics">
+                              <Properties>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Modificar datos"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -2440,12 +2470,16 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbEditLogistics">
+                            <Component class="javax.swing.JLabel" name="jlVGMHelp3">
                               <Properties>
-                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                                  <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
+                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="6d" green="6d" red="6d" type="rgb"/>
                                 </Property>
-                                <Property name="toolTipText" type="java.lang.String" value="Modificar datos"/>
+                                <Property name="horizontalAlignment" type="int" value="0"/>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_view_help.png"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Verify Gross Mass"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
                                 </Property>

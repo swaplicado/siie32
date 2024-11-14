@@ -5,9 +5,13 @@
 
 package erp.mod.cfg.db;
 
+import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mod.SModConsts;
+import erp.mod.bps.db.SBpsUtils;
+import erp.musr.data.SDataUser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
@@ -16,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SDbMms extends SDbRegistryUser {
 
@@ -31,6 +35,8 @@ public class SDbMms extends SDbRegistryUser {
     protected String msRecipientTo;
     protected String msRecipientCarbonCopy;
     protected String msRecipientBlindCarbonCopy;
+    protected String msArbitraryEmail;
+    protected int mnMmsCase;
     protected boolean mbStartTls;
     protected boolean mbAuth;
     //protected boolean mbDeleted;
@@ -41,6 +47,8 @@ public class SDbMms extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected String msXtaMailReplyTo;
     
     public SDbMms() {
         super(SModConsts.CFG_MMS);
@@ -57,6 +65,8 @@ public class SDbMms extends SDbRegistryUser {
     public void setRecipientTo(String s) { msRecipientTo = s; }
     public void setRecipientCarbonCopy(String s) { msRecipientCarbonCopy = s; }
     public void setRecipientBlindCarbonCopy(String s) { msRecipientBlindCarbonCopy = s; }
+    public void setArbitraryMail(String s) { msArbitraryEmail = s; }
+    public void setMmsCase(int n) { mnMmsCase = n; }
     public void setStartTls(boolean b) { mbStartTls = b; }
     public void setAuth(boolean b) { mbAuth = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -77,6 +87,8 @@ public class SDbMms extends SDbRegistryUser {
     public String getRecipientTo() { return msRecipientTo; }
     public String getRecipientCarbonCopy() { return msRecipientCarbonCopy; }
     public String getRecipientBlindCarbonCopy() { return msRecipientBlindCarbonCopy; }
+    public String getArbitraryMail() { return msArbitraryEmail; }
+    public int getMmsCase() { return mnMmsCase; }
     public boolean isStartTls() { return mbStartTls; }
     public boolean isAuth() { return mbAuth; }
     public boolean isDeleted() { return mbDeleted; }
@@ -85,6 +97,10 @@ public class SDbMms extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public void setXtaMailReplyTo(String s) { msXtaMailReplyTo = s; }
+    
+    public String getXtaMailReplyTo() { return msXtaMailReplyTo; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -111,6 +127,8 @@ public class SDbMms extends SDbRegistryUser {
         msRecipientTo = "";
         msRecipientCarbonCopy = "";
         msRecipientBlindCarbonCopy = "";
+        msArbitraryEmail = "";
+        mnMmsCase = 0;
         mbStartTls = false;
         mbAuth = false;
         mbDeleted = false;
@@ -119,6 +137,8 @@ public class SDbMms extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        msXtaMailReplyTo = "";
     }
 
     @Override
@@ -151,8 +171,10 @@ public class SDbMms extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        ResultSet resultSet = null;
-
+        ResultSet resultSet;
+        Statement statment = session.getDatabase().getConnection().createStatement();
+        SDataUser user;
+        
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
@@ -174,6 +196,8 @@ public class SDbMms extends SDbRegistryUser {
             msRecipientTo = resultSet.getString("rec_to");
             msRecipientCarbonCopy = resultSet.getString("rec_cc");
             msRecipientBlindCarbonCopy = resultSet.getString("rec_bcc");
+            msArbitraryEmail = resultSet.getString("arb_email");
+            mnMmsCase = resultSet.getInt("mms_case");
             mbStartTls = resultSet.getBoolean("b_tls");
             mbAuth = resultSet.getBoolean("b_auth");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -182,6 +206,31 @@ public class SDbMms extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            switch (mnMmsCase) {
+                case 1:
+                    user = new SDataUser();
+                    user.read(new int [] { session.getUser().getPkUserId() }, statment);
+                    SDataBizPartnerBranchContact con = null;
+                    if (user.getFkBizPartnerId_n() != 0) {
+                        con = SBpsUtils.getBizParterContact(session, user.getFkBizPartnerId_n());
+                    }
+                    // El campo Email01 corresponde al email personal, el Email02 es el institucional
+                    msXtaMailReplyTo = con != null && !con.getEmail02().isEmpty() ? con.getEmail02() : user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Empleado o usuario o arbitrario o servicio
+                    break;
+                case 2:
+                    user = new SDataUser();
+                    user.read(new int [] { session.getUser().getPkUserId() }, statment);
+                    msXtaMailReplyTo = user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Usuario o arbitrario o servicio
+                    break;
+                case 3:
+                    msXtaMailReplyTo = msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail; // Arbitrario o servicio
+                    break;
+                case 4:
+                default:
+                    msXtaMailReplyTo = msUser; // Servicio
+                    break;
+            }
 
             mbRegistryNew = false;
         }
@@ -216,6 +265,8 @@ public class SDbMms extends SDbRegistryUser {
                     "'" + msRecipientTo + "', " + 
                     "'" + msRecipientCarbonCopy + "', " + 
                     "'" + msRecipientBlindCarbonCopy + "', " +
+                    "'" + msArbitraryEmail + "', " + 
+                    mnMmsCase + ", " + 
                     (mbStartTls ? 1 : 0) + ", " +
                     (mbAuth ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -243,6 +294,8 @@ public class SDbMms extends SDbRegistryUser {
                     "rec_to = '" + msRecipientTo + "', " +
                     "rec_cc = '" + msRecipientCarbonCopy + "', " +
                     "rec_bcc = '" + msRecipientBlindCarbonCopy + "', " +
+                    "arb_email = '" + msArbitraryEmail + "', " +
+                    "mms_case = " + mnMmsCase + ", " +
                     "b_tls = " + (mbStartTls ? 1 : 0) + ", " +
                     "b_auth = " + (mbAuth ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -274,6 +327,8 @@ public class SDbMms extends SDbRegistryUser {
         registry.setRecipientTo(this.getRecipientTo());
         registry.setRecipientCarbonCopy(this.getRecipientCarbonCopy());
         registry.setRecipientBlindCarbonCopy(this.getRecipientBlindCarbonCopy());
+        registry.setArbitraryMail(this.getArbitraryMail());
+        registry.setMmsCase(this.getMmsCase());
         registry.setStartTls(this.isStartTls());
         registry.setAuth(this.isAuth());
         registry.setDeleted(this.isDeleted());
@@ -282,7 +337,9 @@ public class SDbMms extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
-
+        
+        registry.setXtaMailReplyTo(this.getXtaMailReplyTo());
+        
         return registry;
     }
 }

@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -1213,9 +1213,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Número empleado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
-                SGridColumnForm columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Tipo régimen (empleado)");
-                columnForm.setCellRenderer(new SGridCellRendererIconCircle());
-                gridColumnsForm.add(columnForm);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON_CIRC, "Tipo régimen (empleado)"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
 
                 return gridColumnsForm;
@@ -2228,7 +2226,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moModuleConfig.getTimeClockPolicy(), sCompanyKey);
 
             if (ppayroll == null) {
-                miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
+                miClient.showMsgBoxError("Ocurrió un error al importar la prenómina");
                 return;
             }
 
@@ -2331,9 +2329,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
 
         for (SRowTimeClock timeClockRow : timeClockRows) {
-            if (timeClockRow.getEmployeeId() == 6658) {
-                int i = 0;
-            }
             SHrsReceipt receipt = null;
             boolean receiptFound = false;
 
@@ -2468,7 +2463,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             return;
         }
         
-        int rowIndex = -1;
+        ArrayList<SRowPayrollEmployee> lRowAux = new ArrayList<>();
         for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
             SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
             int moveId = -1;
@@ -2478,9 +2473,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             again = true;
             while (again) {
                 moveId = -1;
-                for (SHrsReceiptDeduction hrsReceiptEarningToRemove : row.getHrsReceipt().getHrsReceiptDeductions()) {
-                    if (hrsReceiptEarningToRemove.getPayrollReceiptDeduction().isTimeClockSourced()) {
-                        moveId = hrsReceiptEarningToRemove.getPayrollReceiptDeduction().getPkMoveId();
+                for (SHrsReceiptDeduction hrsReceiptDeductionToRemove : row.getHrsReceipt().getHrsReceiptDeductions()) {
+                    if (hrsReceiptDeductionToRemove.getPayrollReceiptDeduction().isTimeClockSourced()) {
+                        moveId = hrsReceiptDeductionToRemove.getPayrollReceiptDeduction().getPkMoveId();
                         break;
                     }
                 }
@@ -2497,14 +2492,24 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             // remover percepciones
             while (again) {
                 moveId = -1;
+                boolean hasNormalPerception = false;
                 for (SHrsReceiptEarning hrsReceiptEarningToRemove : row.getHrsReceipt().getHrsReceiptEarnings()) {
                     if (hrsReceiptEarningToRemove.getPayrollReceiptEarning().isTimeClockSourced()) {
                         moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
                         if (hrsReceiptEarningToRemove.getEarning().getPkEarningId() == moModuleConfig.getFkEarningEarningId_n()) {
-                            rowIndex = i;
+                            lRowAux.add(row);
+                            hasNormalPerception = true;
                         }
                         break;
                     }
+                }
+                
+                /**
+                 * Cuando el recibo tiene modificada la percepción normal se opta por eliminar las percepciones
+                 * y agregarlas de nuevo.
+                 */
+                if (hasNormalPerception) {
+                    break;
                 }
 
                 if (moveId > -1) {
@@ -2516,10 +2521,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
         }
         
-        if (rowIndex > -1) {
-            moGridPanePayrollReceipts.setSelectedGridRow(rowIndex);
-            actionReceiptRemove();
-            removeByImportation(false);
+        // por cada recibo con la percepción normal modificada se resetean las percepciones
+        for (SRowPayrollEmployee oRowAux : lRowAux) {
+            try {
+                if (oRowAux != null && oRowAux.getHrsReceipt() != null) {
+                    oRowAux.getHrsReceipt().getHrsReceiptEarnings().clear();
+                    oRowAux.getHrsReceipt().getHrsReceiptEarnings().addAll(moHrsPayroll.createHrsReceiptEarnings(oRowAux.getHrsReceipt(), moDateDateStart.getValue(), moDateDateEnd.getValue()));
+                }
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         if (showMessage) {

@@ -21,8 +21,9 @@ import java.util.Date;
 import sa.lib.xml.SXmlElement;
 
 /**
- * Handling additional information for CFDI.
- * @author Juan Barajas, Sergio Flores, Isabel Servín, Claudio Peña
+ * Handling of additional information for CFDI.
+ * 
+ * @author Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -42,11 +43,11 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     protected String msTaxRegimeIssuing;
     protected java.lang.String msTaxRegimeReceptor;
     protected String msCfdiUsage;
-    protected String msRelationType;
-    protected String msRelatedUuid;
-    protected String msXml;
-    protected int mnFkRelatedDpsYearId_n;
-    protected int mnFkRelatedDpsDocId_n;
+    protected String msRelationType; // tipo de relación de CFDI
+    protected String msRelatedUuid; // UUID del primero de los CFDI relacionados
+    protected String msXml; // información adicional para el CFDI estructurada en formato XML
+    protected int mnFkRelatedDpsYearId_n; // PK del primero de los CFDI relacionados
+    protected int mnFkRelatedDpsDocId_n; // PK del primero de los CFDI relacionados
 
     protected ArrayList<SDataDpsCfdEntry> maDbmsDpsCfdEntries;
     
@@ -61,13 +62,13 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     protected String msCfdCceNumeroExportadorConfiable;
     protected String msCfdCceIncoterm;
     
-    protected ArrayList<String> maCfdiRelacionados;
-    protected STrnCfdRelated moRelatedDocumet;
+    protected STrnCfdRelatedDocs moCfdRelatedDocs; // ADVERTENCIA: La información de CFDI relacionados no está normalizada.
+    protected ArrayList<String> maUuidRelacionados; // lista de UUID de CFDI relacionados según el tipo de relación de este registro
     
     public SDataDpsCfd() {
         super(SDataConstants.TRN_DPS_CFD);
         maDbmsDpsCfdEntries = new ArrayList<>();
-        maCfdiRelacionados = new ArrayList<>();
+        maUuidRelacionados = new ArrayList<>();
         reset();
     }
 
@@ -104,7 +105,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public void setCfdCceNumeroExportadorConfiable(String s) { msCfdCceNumeroExportadorConfiable = s; }
     public void setCfdCceIncoterm(String s) { msCfdCceIncoterm = s; }
     
-    public void setRelatedDocument(STrnCfdRelated o) { moRelatedDocumet = o; }
+    public void setCfdRelatedDocs(STrnCfdRelatedDocs o) { moCfdRelatedDocs = o; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -141,8 +142,8 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public String getCfdCceNumeroExportadorConfiable() { return msCfdCceNumeroExportadorConfiable; }
     public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
     
-    public ArrayList<String> getCfdiRelacionados() { return maCfdiRelacionados; }
-    public STrnCfdRelated getRelatedDocument() { return moRelatedDocumet; }
+    public STrnCfdRelatedDocs getCfdRelatedDocs() { return moCfdRelatedDocs; }
+    public ArrayList<String> getUuidRelacionados() { return maUuidRelacionados; }
     
     public boolean hasInternationalCommerce() { return !msCfdCceTipoOperacion.isEmpty(); }
     
@@ -159,44 +160,108 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
         
         boolean add = true;
         
-        for (String cfdi : maCfdiRelacionados) {
-            if (cfdi.equals(uuid)) {
+        for (String uuidRelacionado : maUuidRelacionados) {
+            if (uuidRelacionado.equals(uuid)) {
                 add = false;
                 break;
             }
         }
         
         if (add) {
-            maCfdiRelacionados.add(uuid);
+            maUuidRelacionados.add(uuid);
         }
         
         return add;
     }
 
     /**
-     * Generate the XML with infromation aditional for CFDI.
+     * Parse complementary data for CFDI from inner XML.
+     * Load values in fields from XML.
      * @throws Exception 
      */
-    private void computeXml() throws Exception {
-        SXmlDpsCfd dpsCfd = new SXmlDpsCfd();
-        
-        if (moRelatedDocumet != null) {
-            for (SRowRelatedDocument relatedDocument : moRelatedDocumet.getRelatedDocuments()) {
-                DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
-                cfdiRelacionados.getAttTipoRelacion().setString(relatedDocument.getRelationTypeId());
+    private void parseInnerXml() throws Exception {
+        if (!msXml.isEmpty()) {
+            SXmlDpsCfd xmlDpsCfd = new SXmlDpsCfd();
+            xmlDpsCfd.processXml(msXml);
 
-                for (String uuid : relatedDocument.getDocUuids().trim().split(",")) {
+            if (xmlDpsCfd.isAvailableCfdiRelacionados()) {
+                for (DElement element : xmlDpsCfd.getElements()) {
+                    if (element instanceof DElementCfdiRelacionados) {
+                        DElementCfdiRelacionados cfdiRelacionados = (DElementCfdiRelacionados) element;
+                        
+                        String relationType = cfdiRelacionados.getAttTipoRelacion().getString();
+                        String docUuids = "";
+                        
+                        for (DElementCfdiRelacionado cfdiRelacionado : cfdiRelacionados.getEltCfdiRelacionados()) {
+                            docUuids += (docUuids.isEmpty() ? "" : ",") + cfdiRelacionado.getAttUuid().getString();
+                        }
+                        
+                        SRowCfdRelatedDocs row = new SRowCfdRelatedDocs(relationType, docUuids);
+                        
+                        if (moCfdRelatedDocs == null) {
+                            moCfdRelatedDocs = new STrnCfdRelatedDocs();
+                        }
+                        
+                        if (moCfdRelatedDocs.getRowCfdRelatedDocs().isEmpty()) {
+                            if (!msRelatedUuid.isEmpty() && mnFkRelatedDpsYearId_n != 0 && mnFkRelatedDpsDocId_n != 0 && row.getDocUuids().contains(msRelatedUuid)) {
+                                row.setFirstDocUuid(msRelatedUuid);
+                                row.setFirstDocKey(new int[] { mnFkRelatedDpsYearId_n, mnFkRelatedDpsDocId_n });
+                            }
+                        }
+                        
+                        moCfdRelatedDocs.getRowCfdRelatedDocs().add(row);
+                    }
+                }
+            }
+
+            if (xmlDpsCfd.isAvailableIntCommerce()) {
+                for (SXmlElement element : xmlDpsCfd.getXmlElements()) {
+                    if (element instanceof SXmlDpsCfdCce) {
+                        SXmlDpsCfdCce dpsCfdCce = (SXmlDpsCfdCce) element;
+                        msCfdCceMotivoTraslado = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).getValue().toString();
+                        msCfdCceTipoOperacion = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).getValue().toString();
+                        msCfdCceClaveDePedimento = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).getValue().toString();
+                        msCfdCceCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).getValue().toString();
+                        msCfdCceNumCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getValue().toString();
+                        msCfdCceSubdivision = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).getValue().toString();
+                        msCfdCceTipoCambioUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).getValue().toString();
+                        msCfdCceTotalUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).getValue().toString();
+                        msCfdCceNumeroExportadorConfiable = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getValue().toString();
+                        msCfdCceIncoterm = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).getValue().toString();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Generate inner XML with complementary data for CFDI.
+     * @throws Exception 
+     */
+    private void generateInnerXml() throws Exception {
+        SXmlDpsCfd xmlDpsCfd = new SXmlDpsCfd();
+        
+        if (moCfdRelatedDocs != null) {
+            // attributes for related CFDI:
+            
+            for (SRowCfdRelatedDocs row : moCfdRelatedDocs.getRowCfdRelatedDocs()) {
+                DElementCfdiRelacionados cfdiRelacionados = new DElementCfdiRelacionados();
+                cfdiRelacionados.getAttTipoRelacion().setString(row.getRelationType());
+
+                for (String uuid : row.getDocUuids().trim().split(",")) {
                     DElementCfdiRelacionado cfdiRelacionado = new DElementCfdiRelacionado();
                     cfdiRelacionado.getAttUuid().setString(uuid);
                     cfdiRelacionados.getEltCfdiRelacionados().add(cfdiRelacionado);
                 }
 
-                dpsCfd.getElements().add(cfdiRelacionados);
+                xmlDpsCfd.getElements().add(cfdiRelacionados);
             }
         }
         
         if (hasInternationalCommerce()) {
             // attributes for international commerce:
+            
             SXmlDpsCfdCce cfdCce = new SXmlDpsCfdCce();
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).setValue(msCfdCceMotivoTraslado);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).setValue(msCfdCceTipoOperacion);
@@ -209,55 +274,10 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumeroExportadorConfiable);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).setValue(msCfdCceIncoterm);
 
-            dpsCfd.getXmlElements().add(cfdCce);
+            xmlDpsCfd.getXmlElements().add(cfdCce);
         }
         
-        msXml = dpsCfd.getXmlString();
-    }
-    
-    /**
-     * Load values in fields from XML.
-     * @throws Exception 
-     */
-    private void processXml(final String xml) throws Exception {
-        SXmlDpsCfd dpsCfd = new SXmlDpsCfd();
-        dpsCfd.processXml(xml);
-        moRelatedDocumet = null;
-        
-        if (dpsCfd.isAvailableCfdiRelacionados()) {
-            for (DElement element : dpsCfd.getElements()) {
-                if (element instanceof DElementCfdiRelacionados) {
-                    DElementCfdiRelacionados cfdiRelacionados = (DElementCfdiRelacionados) element;
-                    if (moRelatedDocumet == null) {
-                        moRelatedDocumet = new STrnCfdRelated();
-                    }
-                    String uuid = "";
-                    for (DElementCfdiRelacionado cfdiRelacionado : cfdiRelacionados.getEltCfdiRelacionados()) {
-                        uuid += (uuid.isEmpty() ? "" : ",") + cfdiRelacionado.getAttUuid().getString();
-                    }
-                    moRelatedDocumet.addRelatedDocument(cfdiRelacionados.getAttTipoRelacion().getString(), uuid); 
-                }
-            }
-        }
-        
-        if (dpsCfd.isAvailableIntCommerce()) {
-            for (SXmlElement element : dpsCfd.getXmlElements()) {
-                if (element instanceof SXmlDpsCfdCce) {
-                    SXmlDpsCfdCce dpsCfdCce = (SXmlDpsCfdCce) element;
-                    msCfdCceMotivoTraslado = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_MOT_TRAS).getValue().toString();
-                    msCfdCceTipoOperacion = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_OPE).getValue().toString();
-                    msCfdCceClaveDePedimento = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CVE_PED).getValue().toString();
-                    msCfdCceCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).getValue().toString();
-                    msCfdCceNumCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getValue().toString();
-                    msCfdCceSubdivision = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).getValue().toString();
-                    msCfdCceTipoCambioUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).getValue().toString();
-                    msCfdCceTotalUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).getValue().toString();
-                    msCfdCceNumeroExportadorConfiable = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getValue().toString();
-                    msCfdCceIncoterm = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).getValue().toString();
-                    break;
-                }
-            }
-        }
+        msXml = xmlDpsCfd.getXmlString();
     }
     
     @Override
@@ -310,8 +330,8 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
         msCfdCceNumeroExportadorConfiable = "";
         msCfdCceIncoterm = "";
         
-        maCfdiRelacionados.clear();
-        moRelatedDocumet = null;
+        moCfdRelatedDocs = null;
+        maUuidRelacionados.clear();
     }
 
     @Override
@@ -353,7 +373,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                 mnFkRelatedDpsYearId_n = resultSet.getInt("fid_related_dps_year_n");
                 mnFkRelatedDpsDocId_n = resultSet.getInt("fid_related_dps_doc_n");
                 
-                processXml(msXml);
+                parseInnerXml();
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -388,7 +408,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                 }
             }
             
-            computeXml();
+            generateInnerXml();
 
             if (mbIsRegistryNew) {
                 sql = "INSERT INTO trn_dps_cfd VALUES (" +

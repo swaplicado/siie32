@@ -127,7 +127,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Fecha inicio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha fin"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "rec", "Pólza contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "rec", "Póliza contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

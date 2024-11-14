@@ -101,6 +101,7 @@ public abstract class SDataConstants {
     public static final int CFGU_CO = 201012;
     public static final int CFGU_COB_ENT = 201013;
     public static final int CFGU_LAN = 201014;
+    public static final int CFGU_SCA = 201091;
     public static final int CFG_PARAM_ERP = 201015;
     public static final int CFG_PARAM_CO = 201016;
     public static final int CFGU_CERT = 201017;
@@ -174,6 +175,8 @@ public abstract class SDataConstants {
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
     public static final int BPSU_BP_ADDEE = 204031;
+    public static final int BPSU_SCA_BP = 204091;
+    public static final int BPSU_SCA_BP_MAP = 204092;    
 
     public static final int BPSX_TP_BP_CO = 204501;
     public static final int BPSX_TP_BP_SUP = 204502;
@@ -234,6 +237,8 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_ATT_EMP = 204553;
     public static final int BPSX_BP_ATT_EMP_MFG = 204554;
     public static final int BPSX_BP_ATT_SAL_AGT = 204555;
+    
+    public static final int BPSX_SCA_BP_DET = 204701;
 
     public static final int ITMS_CT_ITEM = 205001;
     public static final int ITMS_CL_ITEM = 205002;
@@ -253,6 +258,9 @@ public abstract class SDataConstants {
     public static final int ITMU_TP_MAT_MAT_ATT = 205029;
     public static final int ITMU_ITEM_MAT_ATT = 205030;
     public static final int ITMU_MATCH_ITEM_CPT_BP = 205051;
+    public static final int ITMU_SCA_ITEM = 205091;
+    public static final int ITMU_SCA_ITEM_MAP = 205092;
+    
     public static final int ITMU_TP_UNIT = 205014;
     public static final int ITMU_TP_LEV = 205015;
     public static final int ITMU_UNIT = 205016;
@@ -287,6 +295,8 @@ public abstract class SDataConstants {
     public static final int ITMX_ITEM_IDX_PUR_EXP = 205525;
     public static final int ITMX_ITEM_IDX_EXP_MFG = 205526;
     public static final int ITMX_ITEM_IDX_EXP_OPE = 205527;
+    
+    public static final int ITMX_SCA_ITEM_DET = 205531;
 
     public static final int FINS_TP_TAX = 206001;
     public static final int FINS_TP_TAX_CAL = 206002;
@@ -460,6 +470,8 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
     public static final int TRN_DPS_CUSTOM_ACC_ETY = 207251;
+    public static final int TRN_SCA_TIC_DPS = 207291;
+    public static final int TRN_SCA_TIC_DPS_ETY = 207292;
     public static final int TRN_DIOG = 207059;
     public static final int TRN_DIOG_NTS = 207060;
     public static final int TRN_DIOG_ETY = 207061;
@@ -776,6 +788,7 @@ public abstract class SDataConstants {
         TablesMap.put(CFGU_CO, "erp.cfgu_co");
         TablesMap.put(CFGU_COB_ENT, "erp.cfgu_cob_ent");
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
+        TablesMap.put(CFGU_SCA, "erp.cfgu_sca");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
         TablesMap.put(CFGU_CERT, "erp.cfgu_cert");
 
@@ -835,6 +848,8 @@ public abstract class SDataConstants {
         TablesMap.put(BPSU_TP_BP, "erp.bpsu_tp_bp");
         TablesMap.put(BPSU_BA, "erp.bpsu_ba");
         TablesMap.put(BPSU_BP_ADDEE, "erp.bpsu_bp_addee");
+        TablesMap.put(BPSU_SCA_BP, "erp.bpsu_sca_bp");
+        TablesMap.put(BPSU_SCA_BP_MAP, "erp.bpsu_sca_bp_map");
 
         TablesMap.put(ITMS_CT_ITEM, "erp.itms_ct_item");
         TablesMap.put(ITMS_CL_ITEM, "erp.itms_cl_item");
@@ -852,6 +867,9 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
         TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
         TablesMap.put(ITMU_ITEM_MAT_ATT, "erp.itmu_item_mat_att");
+        TablesMap.put(ITMU_SCA_ITEM, "erp.itmu_sca_item");
+        TablesMap.put(ITMU_SCA_ITEM_MAP, "erp.itmu_sca_item_map");
+        
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
         TablesMap.put(ITMU_UNIT, "erp.itmu_unit");
@@ -1021,6 +1039,8 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
         TablesMap.put(TRN_DPS_REC, "trn_dps_rec");
         TablesMap.put(TRN_DPS_CUSTOM_ACC_ETY, "trn_dps_custom_acc_ety");
+        TablesMap.put(TRN_SCA_TIC_DPS, "trn_sca_tic_dps");
+        TablesMap.put(TRN_SCA_TIC_DPS_ETY, "trn_sca_tic_dps_ety");
         TablesMap.put(TRN_DIOG, "trn_diog");
         TablesMap.put(TRN_DIOG_NTS, "trn_diog_nts");
         TablesMap.put(TRN_DIOG_ETY, "trn_diog_ety");

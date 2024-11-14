@@ -24,7 +24,7 @@ import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mtrn.data.STrnCfdRelated;
+import erp.mtrn.data.STrnCfdRelatedDocs;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibConsts;
@@ -92,7 +92,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
     protected String msRegimenFiscal;
     protected String msCfdiRelacionados33TipoRelacion;
     protected ArrayList<String> maCfdiRelacionados33;
-    protected STrnCfdRelated moCfdiRelacionados;
+    protected STrnCfdRelatedDocs moCfdiRelatedDocs;
     
     protected int mnAuxEmpleadoId;
     protected double mdAuxSueldoMensual;
@@ -147,7 +147,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         msRegimenFiscal = "";
         msCfdiRelacionados33TipoRelacion = "";
         maCfdiRelacionados33 = new ArrayList<>();
-        moCfdiRelacionados = new STrnCfdRelated();
+        moCfdiRelatedDocs = new STrnCfdRelatedDocs();
         
         mnAuxEmpleadoId = 0;
         mdAuxSueldoMensual = 0;
@@ -909,8 +909,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
     }
     
     @Override
-    public STrnCfdRelated getCfdiRelacionados() { // CFDI 4.0
-        return moCfdiRelacionados;
+    public STrnCfdRelatedDocs getCfdiRelacionados() { // CFDI 4.0
+        return moCfdiRelatedDocs;
     }
     
     @Override

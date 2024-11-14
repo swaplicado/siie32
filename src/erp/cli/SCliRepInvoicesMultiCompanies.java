@@ -9,6 +9,7 @@ import erp.SClient;
 import erp.SParamsApp;
 import static erp.cli.SCliMailer.ARG_IDX_COMPANY_ID;
 import erp.data.SDataConstantsSys;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.STrnUtilities;
 import java.sql.ResultSet;
@@ -97,6 +98,8 @@ public class SCliRepInvoicesMultiCompanies {
     private String msLocalCurrencyCode;
     private String msLocalCurrencyName;
     private Statement miStatement;
+    
+    private SMailSender moMailSender;
     
     /**
      * Create report of summary invoices of items and business partners.
@@ -200,6 +203,7 @@ public class SCliRepInvoicesMultiCompanies {
                 maRecipientsBcc = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(msArgMailsBcc, ";")));
             }
             
+            moMailSender = null;
             
             // connect to company database:
             SParamsApp paramsApp = new SParamsApp();
@@ -252,6 +256,17 @@ public class SCliRepInvoicesMultiCompanies {
                 
                 msHtml += composeHtmlMailBody();
                 msHtml += "<hr>\n";
+                
+                if (moMailSender == null) {
+                    sql = "SELECT * FROM cfg_mms WHERE fk_tp_mms = " + SModSysConsts.CFGS_TP_MMS_MAIL_REPS;
+                    ResultSet resultSet = moCompanyDatabase.getConnection().createStatement().executeQuery(sql);
+
+                    if (resultSet.next()) {
+                        moMailSender = new SMailSender(resultSet.getString("host"), resultSet.getString("port"), resultSet.getString("prot"), 
+                                resultSet.getBoolean("b_tls"), resultSet.getBoolean("b_auth"), resultSet.getString("usr"), resultSet.getString("usr_pswd"), resultSet.getString("arb_email"));
+                    }
+                }
+                
                 moCompanyDatabase.disconnect();
             }
             msHtml += STrnUtilities.composeMailFooter("warning");
@@ -1058,13 +1073,13 @@ public class SCliRepInvoicesMultiCompanies {
     public void sendMail() throws Exception {
         String subject = composeMailSubject();
         
-        SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "NGkeu-wR9z*D", "facturacion@aeth.mx");
+        //SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "facturacion@aeth.mx", "-1WXGFygX*d}", "facturacion@aeth.mx");
         //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "siie@swaplicado.com.mx", "s11E2020!+", "siie@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "cap@swaplicado.com.mx", "C492020*&", "cap@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.swaplicado.com.mx", "26", "smtp", false, true, "sflores@swaplicado.com.mx", "Ch3c0m4n", "sflores@swaplicado.com.mx");
         //SMailSender sender = new SMailSender("mail.tron.com.mx", "26", "smtp", false, true, "som@aeth.mx", "AETHSOM", "som@aeth.mx");
 
-        SMail mail = new SMail(sender, subject, msHtml, maRecipientsTo);
+        SMail mail = new SMail(moMailSender, subject, msHtml, maRecipientsTo);
         if (maRecipientsBcc != null && !maRecipientsBcc.isEmpty()) {
             mail.getBccRecipients().addAll(maRecipientsBcc);
         }

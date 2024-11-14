@@ -39,6 +39,7 @@ import erp.mod.trn.db.SDbMaterialProvisionEntity;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
@@ -65,6 +66,7 @@ import erp.mod.trn.form.SFormMaterialProvisionEntity;
 import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
+import erp.mod.trn.form.SFormScaleTicket;
 import erp.mod.trn.form.SFormStockValuation;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewConfEmployeeVsEntity;
@@ -114,6 +116,7 @@ import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
+import erp.mod.trn.view.SViewScaleTicket;
 import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewStockValuationDetail;
 import erp.mod.trn.view.SViewValCost;
@@ -170,7 +173,8 @@ public class SModuleTrn extends SGuiModule {
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
     private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
     private SFormStockValuation moFormStockValuation;
-
+    private SFormScaleTicket moFormScaleTicket;
+    
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
         moModuleIcon = miClient.getImageIcon(mnModuleSubtype);
@@ -196,6 +200,9 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
                     public String getSqlWhere(int[] pk) { return "WHERE id_ct_dps = " + pk[0] + " AND id_cl_dps = " + pk[1] + " AND id_tp_dps = " + pk[2] + " "; }
                 };
+                break;
+            case SModConsts.TRNU_SCA_TIC:
+                registry = new SDbScaleTicket();
                 break;
             case SModConsts.TRNS_TP_MAINT_MOV:
                 registry = new SDbRegistrySysFly(type) {
@@ -509,6 +516,13 @@ public class SModuleTrn extends SGuiModule {
         switch (type) {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 view = new SViewItemRequiredDpsConfig(miClient, "Configuración ítems obligatorios documentos origen");
+                break;
+            case SModConsts.TRNU_SCA_TIC:
+                switch (subtype) {
+                    case SModSysConsts.TRNS_CT_IOG_OUT: title = "Boletos salida báscula"; break; 
+                    case SModSysConsts.TRNS_CT_IOG_IN: title = "Boletos entrada báscula"; break; 
+                }
+                view = new SViewScaleTicket(miClient, title, subtype);
                 break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 switch (subtype) {
@@ -844,6 +858,15 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNU_TP_DPS_SRC_ITEM:
                 if(moFormItemRequiredDpsConfig == null) moFormItemRequiredDpsConfig = new SFormItemRequiredDpsConfig(miClient, "Configuración de ítems obligatorios con documentos origen");
                 form = moFormItemRequiredDpsConfig;
+                break;
+            case SModConsts.TRNU_SCA_TIC:
+                String title = "";
+                switch (subtype) {
+                    case SModSysConsts.TRNS_CT_IOG_OUT: title = "Boleto de salida báscula"; break; 
+                    case SModSysConsts.TRNS_CT_IOG_IN: title = "Boleto de entrada báscula"; break; 
+                }
+                if (moFormScaleTicket == null) moFormScaleTicket = new SFormScaleTicket(miClient, title, subtype);
+                form = moFormScaleTicket;
                 break;
             case SModConsts.TRN_INV_VAL:
                 if (moFormInventoryValuationPrcCalc == null) moFormInventoryValuationPrcCalc = new SFormInventoryValuation(miClient, SModConsts.TRNX_INV_VAL_PRC_CALC, "Valuación de inventarios");

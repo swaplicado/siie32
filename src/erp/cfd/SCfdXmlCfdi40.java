@@ -4,7 +4,7 @@
  */
 package erp.cfd;
 
-import erp.mtrn.data.STrnCfdRelated;
+import erp.mtrn.data.STrnCfdRelatedDocs;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -36,7 +36,7 @@ public interface SCfdXmlCfdi40 {
     public String getComprobanteLugarExpedicion();  // LugarExpedicion
     public String getComprobanteConfirmacion();     // Confirmacion
     public cfd.DElement getElementInformacionGlobal();
-    public STrnCfdRelated getCfdiRelacionados();
+    public STrnCfdRelatedDocs getCfdiRelacionados();
     public int getEmisorId();
     public int getEmisorSucursalId();
     public String getEmisorRegimenFiscal();         // Emisor/RegimentFiscal

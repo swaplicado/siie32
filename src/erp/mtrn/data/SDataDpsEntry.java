@@ -184,6 +184,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> mvDbmsDpsLinksAsDestiny;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsDps;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsAdjustment;
+    protected java.util.Vector<SDataScaleTicketDpsEntry> mvDbmsScaleTicketsEty;
     
     protected erp.mtrn.data.SDataDpsCfdEntry moDbmsDpsCfdEntry;
 
@@ -229,6 +230,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsDpsLinksAsDestiny = new Vector<>();
         mvDbmsDpsAdjustmentsAsDps = new Vector<>();
         mvDbmsDpsAdjustmentsAsAdjustment = new Vector<>();
+        mvDbmsScaleTicketsEty = new Vector<>();
 
         mbFlagReadLinksAswell = true; // must be independent of a reset!
 
@@ -522,6 +524,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsLink> getDbmsDpsLinksAsDestiny() { return mvDbmsDpsLinksAsDestiny; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsDps() { return mvDbmsDpsAdjustmentsAsDps; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsAdjustment() { return mvDbmsDpsAdjustmentsAsAdjustment; }
+    public java.util.Vector<erp.mtrn.data.SDataScaleTicketDpsEntry> getDbmsScaleTicketsEty() { return mvDbmsScaleTicketsEty; }
 
     public void setDbmsDpsCfdEntry(erp.mtrn.data.SDataDpsCfdEntry o) { moDbmsDpsCfdEntry = o; }
 
@@ -736,6 +739,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsDpsLinksAsDestiny.clear();
         mvDbmsDpsAdjustmentsAsDps.clear();
         mvDbmsDpsAdjustmentsAsAdjustment.clear();
+        mvDbmsScaleTicketsEty.clear();
         
         moDbmsDpsCfdEntry = null;
 
@@ -1150,6 +1154,19 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             mvDbmsDpsAdjustmentsAsAdjustment.add(adjustment);
                         }
                     }
+                    
+                    sql = "SELECT id_sca_tic FROM trn_sca_tic_dps_ety " +
+                            "WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " AND id_dps_ety = " + mnPkEntryId + " ";
+                    resultSet = statement.executeQuery(sql);
+                    while (resultSet.next()) {
+                        SDataScaleTicketDpsEntry tic = new SDataScaleTicketDpsEntry();
+                        if (tic.read(new int[] { resultSet.getInt(1), mnPkYearId, mnPkDocId, mnPkEntryId }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                        else {
+                            mvDbmsScaleTicketsEty.add(tic);
+                        }
+                    }
 
                     // Read aswell document entry complement, if any:
 
@@ -1448,6 +1465,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     mvDbmsDpsLinksAsDestiny.clear();
                     mvDbmsDpsAdjustmentsAsDps.clear();
                     mvDbmsDpsAdjustmentsAsAdjustment.clear();
+                    mvDbmsScaleTicketsEty.clear();
                     mlDbmsDpsEntryAnalysis.clear();
                     mlDbmsDpsEntryQuantityChange.clear();
                 }
@@ -1515,6 +1533,19 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         adjustment.setPkDpsAdjustmentEntryId(mnPkEntryId);
 
                         if (adjustment.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        }
+                    }
+                    
+                    String oSql = "DELETE FROM trn_sca_tic_dps_ety WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + ";";
+                    statement.execute(oSql); 
+                    
+                    for (SDataScaleTicketDpsEntry tic : mvDbmsScaleTicketsEty) {
+                        tic.setPkYearId(mnPkYearId);
+                        tic.setPkDocId(mnPkDocId);
+                        tic.setPkEntryId(mnPkEntryId);
+
+                        if (tic.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                     }
@@ -2106,6 +2137,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         clone.setDbmsDpsCfdEntry(moDbmsDpsCfdEntry == null ? null : moDbmsDpsCfdEntry.clone());
 
+        clone.getDbmsScaleTicketsEty().addAll(mvDbmsScaleTicketsEty);
+        
         clone.setAuxPkDpsYearId(mnAuxPkDpsYearId);
         clone.setAuxPkDpsDocId(mnAuxPkDpsDocId);
         clone.setAuxPkDpsEntryPrice(manAuxPkDpsEntryPrice);
