@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  *
@@ -82,5 +84,40 @@ public class SMySqlClass {
 
     public int getMainBb() {
         return gmaindb;
+    }
+    
+    public String getMainDatabaseName() throws ClassNotFoundException {
+        String query = "SELECT "
+                + "    bd "
+                + "FROM "
+                + "    erp.cfgu_co "
+                + "WHERE "
+                + "    id_co = " + this.getMainBb() + ";";
+        
+            Statement st;
+        try {
+            String ruta = "jdbc:mysql://"; 
+            String servidor = this.gserverHost + ":" + this.gdbPort + "/";
+
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(ruta + servidor + this.gdb, this.guser, this.gpass); 
+            st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+            
+            String name = "";
+            if (res.next()) {
+                name = res.getString("bd");
+            }
+
+            conn.close();
+            st.close();
+            res.close();
+            
+            return name;
+        } catch (SQLException ex) {
+            Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }

@@ -5,6 +5,8 @@
  */
 package erp.mod.hrs.link.pub;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.utils.SPrepayroll;
 import erp.mod.hrs.link.utils.SUtilsJSON;
@@ -31,6 +33,12 @@ import erp.mod.hrs.utils.SCAPResponse;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import erp.mod.hrs.link.db.SIncidentResponse;
+import erp.mod.trn.api.db.STrnDBCore;
+import erp.mod.trn.api.data.SDocumentsResponse;
+import erp.mod.trn.api.data.SWebDps;
+import erp.mod.trn.api.data.SWebDpsEty;
+import erp.mod.trn.api.data.SWebDpsNote;
+import erp.mod.trn.api.data.SWebDpsRow;
 
 /**
  *
@@ -156,12 +164,14 @@ public class SShareData {
     
     /**
      * 
+     * @param sURL
      * @param tStartDate
      * @param tEndDate
      * @param lEmployees
      * @param payType
      * @param dataType Policy for requesting information from external time clock: 1 = all; 2 = official; 3 = non-official
      * @param companyKey
+     * 
      * @return 
      */
     public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
@@ -269,5 +279,37 @@ public class SShareData {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+    
+    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser) {
+        ArrayList<SWebDpsRow> lDocs = STrnDBCore.getDocuments(startDate, endDate, idUser);
+
+        return lDocs;
+    }
+    
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser) {
+        SWebDps oWebDocument = new SWebDps(idYear, idDoc);
+        
+        /**
+         * Se obtiene el DPS
+         */
+        SWebDpsRow oDps = STrnDBCore.getDocumentByPk(idYear, idDoc);
+        oWebDocument.setoDpsHeader(oDps);
+        
+        /**
+         * Entries del DPS
+         */
+        ArrayList<SWebDpsEty> lEties = STrnDBCore.getWebDpsEties(idYear, idDoc);
+        oWebDocument.getlEtys().clear();
+        oWebDocument.getlEtys().addAll(lEties);
+
+        /**
+         * Notas del DPS
+         */
+        ArrayList<SWebDpsNote> lNotes = STrnDBCore.getWebDpsNotes(idYear, idDoc);
+        oWebDocument.getlNotes().clear();
+        oWebDocument.getlNotes().addAll(lNotes);
+        
+        return oWebDocument;
     }
 }

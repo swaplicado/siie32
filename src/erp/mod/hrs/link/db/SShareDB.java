@@ -244,7 +244,7 @@ public class SShareDB {
         Statement st = conn.createStatement();
         ResultSet res = st.executeQuery(query);
 
-        lPositions = new ArrayList();
+        lPositions = new ArrayList<>();
         SPosition pos = null;
         while (res.next()) {
             pos = new SPosition();
@@ -324,7 +324,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lEmps = new ArrayList();
+            lEmps = new ArrayList<>();
             SEmployee emp = null;
             while (res.next()) {
                 emp = new SEmployee();
@@ -375,7 +375,7 @@ public class SShareDB {
      */
     private ArrayList<SEmployee> assignCompany(ArrayList<SEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
-        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
+        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList<>();
         for (SCompany company : companies) {
             ids.add(this.getEmployeesFromCompany(company));
         }
@@ -403,7 +403,7 @@ public class SShareDB {
      */
     private ArrayList<SDataEmployee> assignCompanyData(ArrayList<SDataEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
-        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
+        ArrayList<HashMap<Integer, Integer>> ids = new ArrayList<>();
         for (SCompany company : companies) {
             ids.add(this.getEmployeesFromCompany(company));
         }
@@ -445,7 +445,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lEmpIds = new HashMap();
+            lEmpIds = new HashMap<>();
 
             while (res.next()) {
                 lEmpIds.put(res.getInt("id_emp"), company.getId_company());
@@ -505,7 +505,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lHolidays = new ArrayList();
+            lHolidays = new ArrayList<>();
 
             SHoliday hol = null;
             while (res.next()) {
@@ -570,7 +570,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lFDYs = new ArrayList();
+            lFDYs = new ArrayList<>();
 
             SFirstDayYear fdy = null;
             while (res.next()) {
@@ -610,7 +610,7 @@ public class SShareDB {
             return null;
         }
 
-        ArrayList<SAbsence> lAbss = new ArrayList();
+        ArrayList<SAbsence> lAbss = new ArrayList<>();
         for (SCompany db : dbs) {
             lAbss.addAll(this.getAbsences(lastSyncDate, db.getDatabase_nm()));
         }
@@ -667,7 +667,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lAbss = new ArrayList();
+            lAbss = new ArrayList<>();
 
             SAbsence abs = null;
             while (res.next()) {
@@ -756,7 +756,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lCuts = new ArrayList();
+            lCuts = new ArrayList<>();
 
             SPrepayCutCalendar cut = null;
             while (res.next()) {
@@ -906,7 +906,7 @@ public class SShareDB {
         empresas[4] = "erp_sasa";
         
         ArrayList<SEmployeeVacations> lEmp = null;
-        lEmp = new ArrayList();
+        lEmp = new ArrayList<>();
         SEmployeeVacations emp = null;
         
         //query para revisar si hay cambios en un empleado en particular
@@ -1113,12 +1113,12 @@ public class SShareDB {
                 
                 // Listado de vacaciones
                 ArrayList<SDataVacations> lVac = null;
-                lVac = new ArrayList();
+                lVac = new ArrayList<>();
                 SDataVacations vac = null;
                 
                 //Listado de incidentes
                 ArrayList<SDataIncidents> lInc = null;
-                lInc = new ArrayList();
+                lInc = new ArrayList<>();
                 SDataIncidents incidents = null;
 
                     for (int anniversary = resV.getInt("_seniority") + 1; anniversary >= 1; anniversary--) {
@@ -1267,7 +1267,7 @@ public class SShareDB {
         
         //Creación de arraylist de incidencias si hay en las fechas que se envian.
         ArrayList<SIncident> lIncidents = null;
-        lIncidents = new ArrayList();
+        lIncidents = new ArrayList<>();
         //Creación del objeto respuesta.
         SIncidentResponse objResponse = new SIncidentResponse();
         
@@ -1714,7 +1714,7 @@ public class SShareDB {
         String mainDataBase = this.getMainDatabase();
         
         ArrayList<SPlanVacations> lPlanVac = null;
-        lPlanVac = new ArrayList();
+        lPlanVac = new ArrayList<>();
         SPlanVacations planVac = null;
          
         SMySqlClass mdb = new SMySqlClass();
@@ -1735,7 +1735,7 @@ public class SShareDB {
                 planVac.setWay_pay(resV.getInt("pay"));
                 
                 ArrayList<SPlanVacationsAux> lPlanVacAux = null;
-                lPlanVacAux = new ArrayList();
+                lPlanVacAux = new ArrayList<>();
                 SPlanVacationsAux planVacAux = null;
                 
                 String queryAux = "";
@@ -1782,7 +1782,7 @@ public class SShareDB {
         JSONArray rows = (JSONArray) root.get("rows");
         
         // lista para colocar los empleados
-        ArrayList<SEmployeeEar> lEmp = new ArrayList();
+        ArrayList<SEmployeeEar> lEmp = new ArrayList<>();
         
         for (int i = 0 ; rows.size() > i ; i++){
             boolean bonusFlag = false;
@@ -1845,7 +1845,7 @@ public class SShareDB {
             resultSet = stConEar.executeQuery(earnings);
             
             // arraylist para colocar los SEarning
-            ArrayList<SEarning> lEar = new ArrayList();
+            ArrayList<SEarning> lEar = new ArrayList<>();
      
             while(resultSet.next()){
                 // clase para colocar los ear
@@ -1998,7 +1998,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lEmps = new ArrayList();
+            lEmps = new ArrayList<>();
             SDataEmployee emp = null;
             while (res.next()) {
                 emp = new SDataEmployee();
@@ -2054,7 +2054,7 @@ public class SShareDB {
             Statement st = conn.createStatement();
             ResultSet res = st.executeQuery(query);
 
-            lDataComp = new ArrayList();
+            lDataComp = new ArrayList<>();
             SDataCompany com = null;
             while (res.next()) {
                 com = new SDataCompany();
