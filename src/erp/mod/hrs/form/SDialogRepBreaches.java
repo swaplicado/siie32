@@ -222,7 +222,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         jPanel10.add(moRadAccesCompany);
 
         buttonGroup1.add(moRadCustom);
-        moRadCustom.setText("Personalizado");
+        moRadCustom.setText("Selección personalizada");
         moRadCustom.setToolTipText("");
         moRadCustom.setPreferredSize(new java.awt.Dimension(190, 23));
         jPanel10.add(moRadCustom);
@@ -231,6 +231,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jScrollPane2.setViewportView(jListCompanies);
