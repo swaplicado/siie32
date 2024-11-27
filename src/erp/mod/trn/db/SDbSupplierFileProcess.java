@@ -1,0 +1,162 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.mod.trn.db;
+
+import erp.mod.SModConsts;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistryUser;
+import sa.lib.gui.SGuiSession;
+
+/**
+ *
+ * @author Isabel Servín
+ */
+public class SDbSupplierFileProcess extends SDbRegistryUser {
+    
+    protected int mnPkYearId;
+    protected int mnPkDocId;
+    
+    protected SDbDps moDps;
+    protected ArrayList<SDbSupplierFile> maSuppFiles;
+    protected ArrayList<SDbSupplierFile> maSuppFilesDeleted;
+
+    public SDbSupplierFileProcess() {
+        super(SModConsts.TRNX_SUP_FILE_DPS_PROC);
+    }
+    
+    public void setPkYearId(int n) { mnPkYearId = n; }
+    public void setPkDocId(int n) { mnPkDocId = n; }
+    
+    public void setDps(SDbDps o) { moDps = o; }
+    
+    public int getPkYearId() { return mnPkYearId; }
+    public int getPkDocId() { return mnPkDocId; }
+
+    public SDbDps getDps() { return moDps; }
+    public ArrayList<SDbSupplierFile> getSuppFiles() { return maSuppFiles; }
+    public ArrayList<SDbSupplierFile> getSuppFilesDeleted() { return maSuppFilesDeleted; }
+
+    @Override
+    public void setPrimaryKey(int[] pk) {
+        mnPkYearId = pk[0];
+        mnPkDocId = pk[1];
+    }
+
+    @Override
+    public int[] getPrimaryKey() {
+        return new int[] { mnPkYearId, mnPkDocId };
+    }
+
+    @Override
+    public void initRegistry() {
+        initBaseRegistry();
+        
+        mnPkYearId = 0;
+        mnPkDocId = 0;
+        
+        moDps = null;
+        maSuppFiles = new ArrayList<>();
+        maSuppFilesDeleted = new ArrayList<>();
+    }
+
+    @Override
+    public String getSqlTable() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getSqlWhere() {
+        return "WHERE id_year = " + mnPkYearId + " " +
+                "AND id_doc = " + mnPkDocId + " ";
+    }
+
+    @Override
+    public String getSqlWhere(int[] pk) {
+        return "WHERE id_year = " + pk[0] + " " +
+                "AND id_doc = " + pk[1] + " ";
+    }
+
+    @Override
+    public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        ResultSet resultSet;
+        Statement statement;
+        SDbSupplierFile file;
+        
+        initRegistry();
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.READ_ERROR;
+        
+        moDps = new SDbDps();
+        moDps.read(session, pk);
+        
+        mnPkYearId = moDps.getPkYearId();
+        mnPkDocId = moDps.getPkDocId();
+        
+        statement = session.getDatabase().getConnection().createStatement();
+        
+        msSql = "SELECT id_sup_file FROM trn_sup_file_dps " +
+                "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+        resultSet = statement.executeQuery(msSql);
+        while (resultSet.next()) {
+            file = new SDbSupplierFile();
+            file.read(session, new int[] { resultSet.getInt(1) });
+            file.readSuppFileDps(session, mnPkYearId, mnPkDocId);
+            maSuppFiles.add(file);
+        }
+        
+        mbRegistryNew = false;
+        
+        mnQueryResultId = SDbConsts.READ_OK;
+    }
+
+    @Override
+    public void save(SGuiSession session) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        for (SDbSupplierFile file : maSuppFiles) {
+            file.save(session);
+        }
+        
+        for (SDbSupplierFile file : maSuppFilesDeleted) {
+            file.delete(session);
+        }
+        
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+
+    @Override
+    public SDbSupplierFileProcess clone() throws CloneNotSupportedException {
+        SDbSupplierFileProcess registry = new SDbSupplierFileProcess();
+        
+        registry.setPkYearId(this.getPkYearId());
+        registry.setPkDocId(this.getPkDocId());
+        registry.setDps(this.getDps());
+        
+        for (SDbSupplierFile file : this.getSuppFiles()) {
+            registry.getSuppFiles().add(file);
+        }
+        
+        return registry;
+    }
+    
+    @Override
+    public void delete(final SGuiSession session) throws SQLException, Exception {
+        for (SDbSupplierFile file : maSuppFiles) {
+            file.delete(session);
+        }
+    }
+}

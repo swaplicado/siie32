@@ -47,6 +47,13 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;
     public static final int CFGS_TP_MMS_MAIL_REPS = 99;
     
+    public static final int CFGS_ST_AUTHORN_NA = 1; // not applicable
+    public static final int CFGS_ST_AUTHORN_PEND = 2; // pending
+    public static final int CFGS_ST_AUTHORN_PROC = 3; // processing
+    public static final int CFGS_ST_AUTHORN_AUTH = 4; // authorized
+    public static final int CFGS_ST_AUTHORN_REJ = 5; // rejected
+    public static final int CFGS_ST_AUTHORN_SND = 11; // sending
+    
     public static final int CFGS_TP_DOC_BREACH = 9001; // breach
     public static final int CFGS_TP_DOC_ADM_REC = 9002; // administrative record
 
@@ -750,6 +757,14 @@ public abstract class SModSysConsts {
     public static final int TRN_MAINT_AREA_NA = 1; // not applicable
     
     public static final int TRN_MAINT_USER_SUPV_NA = 1; // not applicable
+    
+    public static final String TRN_SUP_FILE_TYPE_Q = "Q";
+    public static final String TRN_SUP_FILE_TYPE_T = "T";
+    
+    public static final String TRN_SUP_FILE_DPS_TYPE_PICK_Q = "Q";    
+    public static final String TRN_SUP_FILE_DPS_TYPE_HIG_Q = "Q+";    
+    public static final String TRN_SUP_FILE_DPS_TYPE_LOW_Q = "Q-";    
+    public static final String TRN_SUP_FILE_DPS_TYPE_T = "T";    
     
     public static final int TRNX_DIOG_CST_ASIG_NA = 0;
     public static final int TRNX_DIOG_CST_ASIG_NO = 1;
