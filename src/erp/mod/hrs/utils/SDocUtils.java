@@ -22,6 +22,7 @@ import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbDocument;
 import erp.mod.hrs.db.SRowPreceptSubsection;
 import erp.mod.hrs.form.SDialogDocImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -249,6 +250,66 @@ public abstract class SDocUtils {
         }
         
         return filenameFound;
+    }
+    
+    /**
+     * Download file from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @param location Location to save the downloaded file.
+     * @return File object file downloaded, if was found.
+     * @throws IOException, Exception
+     */
+    public static File downloadAndGetFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+        String filePath = SDocUtils.downloadFile(session, bucketName, filevaultId, location);
+        File downloadedFile = new File(filePath);
+        return downloadedFile;
+    }
+    
+    /**
+     * Download file from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @param location Location to save the downloaded file.
+     * @return Bytes of file downloaded, if was found.
+     * @throws IOException, Exception
+     */
+    public static byte[] getFileBytes(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+        String filenameFound = "";
+        String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
+        String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
+
+        byte[] fileData;
+
+        // Conexión a MongoDB y descarga del archivo en memoria
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoDatabase database = client.getDatabase(db);
+            GridFSBucket bucket = GridFSBuckets.create(database, bucketName);
+
+            ObjectId objectId = new ObjectId(filevaultId);
+            Bson query = Filters.eq("_id", objectId);
+            Bson sort = Sorts.descending("uploadDate");
+
+            GridFSFile file = bucket.find(query).sort(sort).limit(1).first();
+            if (file == null) {
+                throw new Exception("No se encontró ningún archivo con el ObjectId '" + filevaultId + "'!");
+            }
+
+            filenameFound = file.getFilename();
+            System.out.println("Descargando archivo '" + filenameFound + "', ObjectId '" + filevaultId + "'...");
+
+            // Descargar el archivo en un flujo de salida en memoria
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                bucket.downloadToStream(objectId, outputStream);
+                fileData = outputStream.toByteArray();
+            }
+        }
+
+        System.out.println("Archivo descargado en memoria: '" + filenameFound + "'.");
+        
+        return fileData;
     }
     
     /**
