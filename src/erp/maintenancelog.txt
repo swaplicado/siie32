@@ -1,8 +1,14 @@
 ================================================================================
-SIIE 3.2 258.8/ 2024-11-26
+SIIE 3.2 258.9/ 2024-11-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización general con fines de estandarización a vistas y consultas, diálogos y opciones de menú relacionados con movimientos de almacén, existencias y su valor.
+
+================================================================================
+SIIE 3.2 258.8/ 2024-11-27
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó un border title en la ventana de envío de reporte de incidencias para clarificar la función del TextArea.
 
 ================================================================================
 SIIE 3.2 258.7/ 2024-11-06
