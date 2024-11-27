@@ -284,7 +284,7 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="Seleccionar empresas:"/>
+                <TitledBorder title="Seleccionar empresas con M&#xf3;dulo de RH:"/>
               </Border>
             </Property>
           </Properties>
@@ -313,6 +313,25 @@
                     <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                       <StringArray count="0"/>
                     </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel11">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="North"/>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlNote">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Para seleccionar varias opciones mantenga presionada la tecla Ctrl"/>
+                    <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>

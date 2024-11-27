@@ -60,7 +60,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+1"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo configuraci&#xf3;n"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Configuraci&#xf3;n"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleFin">
@@ -68,7 +68,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+2"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo contabilidad"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Contabilidad"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModulePur">
@@ -76,7 +76,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+3"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo egresos y CXP"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Egresos y CXP"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleSal">
@@ -84,7 +84,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+4"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo ingresos y CXC"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Ingresos y CXC"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleInv">
@@ -92,7 +92,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+5"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo inventarios"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Inventarios"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleMkt">
@@ -100,7 +100,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+6"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo comercializaci&#xf3;n"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Comercializaci&#xf3;n"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleLog">
@@ -108,7 +108,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+7"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo embarques"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Embarques"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleMfg">
@@ -116,7 +116,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+8"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo producci&#xf3;n"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Producci&#xf3;n"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmiViewModuleQlt">
@@ -124,7 +124,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+9"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo calidad"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Calidad"/>
                 <Property name="inheritsPopupMenu" type="boolean" value="true"/>
               </Properties>
             </MenuItem>
@@ -133,7 +133,7 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="M&#xf3;dulo recursos humanos"/>
+                <Property name="text" type="java.lang.String" value="M&#xf3;dulo Recursos Humanos"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -483,7 +483,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/erp/img/mod_hrs_bw.png"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Recursos humanos [Ctrl+0]"/>
+                <Property name="toolTipText" type="java.lang.String" value="Recursos Humanos [Ctrl+0]"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="0"/>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

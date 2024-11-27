@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servin, Sergio Flores
  */
 public class SViewPriceCommercialLog extends SGridPaneView implements ActionListener {
     
@@ -46,10 +46,10 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
     }
     
     private void initComponetsCustom() {
-        jbItemPriceCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de precios comerciales de ítems", this);
+        jbItemPriceCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver tarjeta auxiliar de precios comerciales del ítem", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbItemPriceCardex);
         
-        moDialogItemPriceCardex = new SDialogItemPriceCardex(miClient, "Cardex de precios comerciales de ítems");
+        moDialogItemPriceCardex = new SDialogItemPriceCardex(miClient, "Tarjeta auxiliar de precios comerciales del ítem");
     }
     
     private void actionCardex() {
@@ -157,7 +157,7 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, "Clave ítem"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Ítem"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "price", "Precio comercial"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "price", "Precio comercial $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_dps", "Fecha documento"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "num_dps", "Folio documento", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp", "Asociado de negocios"));

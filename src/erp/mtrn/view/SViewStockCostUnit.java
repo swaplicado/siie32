@@ -53,16 +53,18 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Claudio Peña, Isabel Servín
+ * @author Claudio Peña, Isabel Servín, Sergio Flores
+ * 2024-11-26 Sergio Flores:
+ * Esta vista ya es obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
  */
 public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
-    private static String[] columns = {"Numero de parte", "Ítem", "Unidad", "Costo unitario"};
+    private static final String[] COLUMNS = { "Número de parte", "Ítem", "Unidad", "Costo unitario" };
     private static final List<SDataStockExcel> stockExportExcel = new ArrayList<>();
     
     private int mnColIn;
     private int mnColOut;
-    private int mnColStock;
+    private int mnColStk;
     private javax.swing.JButton jbCardex;
     private javax.swing.JButton jbSegregations;
     private javax.swing.JButton jbExportExcel;
@@ -89,7 +91,7 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDate = new STabFilterDate(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
-        moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDeleted = new STabFilterDeleted(this, "Filtrar ítems sin existencias");
         moDialogStockCardex = new SDialogStockCardex(miClient);
         moDialogStockSegregations = new SDialogStockSegregations(miClient);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
@@ -123,15 +125,17 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         jtbDecimals.setToolTipText(TXT_DEC_INC);
         jtbDecimals.addActionListener(this);
         addTaskBarUpperComponent(jtbDecimals);
+        addTaskBarUpperSeparator();
         
         jbExportExcel = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
         jbExportExcel.setPreferredSize(new Dimension(23, 23));
-        jbExportExcel.setToolTipText("Importar a excel");
+        jbExportExcel.setToolTipText("Exportar a archivo de Excel (*.xls)");
         jbExportExcel.addActionListener(this);
         addTaskBarUpperComponent(jbExportExcel);
+        
         jbExportTxt = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
         jbExportTxt.setPreferredSize(new Dimension(23, 23));
-        jbExportTxt.setToolTipText("Importar a txt");
+        jbExportTxt.setToolTipText("Exportar a archivo de texto (*.txt)");
         jbExportTxt.addActionListener(this);
         addTaskBarUpperComponent(jbExportTxt);
                 
@@ -148,24 +152,38 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         
         switch (mnTabTypeAux01) {
             case SDataConstants.TRNX_STK_ITEM:
-                aoTableColumns = new STableColumn[7];
+                aoTableColumns = new STableColumn[8];
                 break;
             default:
                 aoTableColumns = null;
         }
         
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+        if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+        }
+        else {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
+        }
+        
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
-        mnColStock = i;
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "priceUnit", "Promedio valor", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "priceUnit", "Valor promedio", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        
         mnColIn = i;
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovI", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_in", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        
         mnColOut = i;
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_MovO", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_out", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        
+        mnColStk = i;
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stock", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Ultima fecha compra", STableConstants.WIDTH_DATE);
         
@@ -186,7 +204,6 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
         mvSuscriptors.add(SDataConstants.TRNX_DPS_RETURN_PEND_ETY);
 
         populateTable();
-
     }
 
     @Override
@@ -213,10 +230,10 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
     public void actionExportExcel() throws FileNotFoundException, IOException, SQLException {
         File folder = new File("/Inventarios-Refacciones");
         
-
         if (!folder.exists()) {
             folder.mkdir();
         }
+        
         String routeXLSX = "C:\\Inventarios-Refacciones\\" + ("Inventario.xls");
                 
         if (jbExportExcel.isEnabled()) {
@@ -224,8 +241,8 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 int [] idItem = (int []) moTablePane.getTableRow(i).getPrimaryKey();
                 
                 stockExportExcel.add(new SDataStockExcel(
-                        (String) moTablePane.getTableRow(i).getValues().elementAt(1), (String) moTablePane.getTableRow(i).getValues().elementAt(1),
-                        (String) moTablePane.getTableRow(i).getValues().elementAt(5), (double) moTablePane.getTableRow(i).getValues().elementAt(2))); // Verificar el precio o quitarlo
+                        (String) moTablePane.getTableRow(i).getValues().elementAt(0), (String) moTablePane.getTableRow(i).getValues().elementAt(1),
+                        (String) moTablePane.getTableRow(i).getValues().elementAt(6), (double) moTablePane.getTableRow(i).getValues().elementAt(2))); // Verificar el precio o quitarlo
             }
 
             Workbook workbook = new XSSFWorkbook();
@@ -242,11 +259,12 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
             Row headerRow = sheet.createRow(0);
             headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
             headerCellStyle.setFillPattern(headerCellStyle.SOLID_FOREGROUND);
-            for (int i = 0; i < columns.length; i++) { 
+            for (int i = 0; i < COLUMNS.length; i++) { 
                 Cell cell = headerRow.createCell(i);
-                cell.setCellValue(columns[i]);
+                cell.setCellValue(COLUMNS[i]);
                 cell.setCellStyle(headerCellStyle);
             }
+            
             CellStyle dateCellStyle = workbook.createCellStyle();
             dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy"));
             int rowNum = 1;
@@ -256,10 +274,9 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 row.createCell(1).setCellValue(SDataStockExcel.getItem());
                 row.createCell(2).setCellValue(SDataStockExcel.getUnidad());
                 row.createCell(3).setCellValue(SDataStockExcel.getCosto());
-
             }
 
-            for (int i = 0; i < columns.length; i++) {
+            for (int i = 0; i < COLUMNS.length; i++) {
                 sheet.autoSizeColumn(i);
             }
             
@@ -268,47 +285,11 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
             FileOutputStream fileOut = new FileOutputStream(file);
             workbook.write(fileOut);
             fileOut.close(); 
-            
-            
         }
         
         miClient.showMsgBoxInformation("Excel de existencias generado exitosamente \nEl archivo se a guardado en: Disco local (C)->Inventarios-Refacciones/Existencias");        
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void createSqlQuery() {
-        int year = 0;
-        int[] key = null;
-        Date date = null;
-        String sqlWhere = "";
-        STableSetting setting = null;
-
-        for (int i = 0; i < mvTableSettings.size(); i++) {
-            setting = (STableSetting) mvTableSettings.get(i);
-
-            if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                date = (Date) setting.getSetting();
-                year = SLibTimeUtilities.digestYear(date)[0];
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_year = " + year + " AND " +
-                        "s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(date) + "' ";
-            }
-            if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT i.b_del ";
-            }
-        }
-        
-        msSql = "SELECT "
-            + "AVG(s.cost_u) AS priceUnit , "
-            + "i.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, i.part_num, "
-            + "SUM(s.mov_in) AS _MovI, SUM(s.mov_out) AS _MovO "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit WHERE  not s.b_del AND " + sqlWhere + " "
-            + "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol "
-            + "ORDER BY s.dt DESC, i.item, i.item_key, s.id_item, u.symbol, s.id_unit ";
-    }
-    
     public void actionExportTxt(SGuiClient client) throws FileNotFoundException, IOException, SQLException {
         ResultSet resultSet = null;
         BufferedWriter bw = null;
@@ -359,17 +340,58 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
                 buffer += "\n";
             }
 
-                bw.write(buffer);
+            bw.write(buffer);
             bw.close();
             resultSet.close();
+            
             miClient.showMsgBoxInformation("Archivo de texto de existencias generado exitosamente.\nEl archivo se a guardado en: Disco local C:\\Inventarios-Refacciones");    
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             ex.printStackTrace();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }        
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public void createSqlQuery() {
+        int year = 0;
+        int[] key = null;
+        Date date = null;
+        String sqlWhere = "";
+        String sqlHaving = "";
+        STableSetting setting = null;
+
+        for (int i = 0; i < mvTableSettings.size(); i++) {
+            setting = (STableSetting) mvTableSettings.get(i);
+
+            if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
+                sqlHaving = "HAVING _stk <> 0 ";
+            }
+            else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
+                date = (Date) setting.getSetting();
+                year = SLibTimeUtilities.digestYear(date)[0];
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "s.id_year = " + year + " AND " +
+                        "s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(date) + "' ";
+            }
+        }
+        
+        msSql = "SELECT "
+                + "AVG(s.cost_u) AS priceUnit, "
+                + "i.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, i.part_num, "
+                + "SUM(s.mov_in) AS _mov_in, SUM(s.mov_out) AS _mov_out, SUM(s.mov_in - s.mov_out) AS _stk "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON s.id_item = i.id_item "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON s.id_unit = u.id_unit "
+                + "WHERE NOT s.b_del AND " + sqlWhere + " "
+                + "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol "
+                + sqlHaving
+                + "ORDER BY s.dt DESC, i.item, i.item_key, s.id_item, u.symbol, s.id_unit ";
     }
     
     public void actionCardex() {
@@ -407,13 +429,14 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
     
     public void actionDecimals() {
         String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
+        
         DefaultTableCellRenderer tcr = !jtbDecimals.isSelected() ?
             miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
             miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary();
 
         moTablePane.getTableColumn(mnColIn).setCellRenderer(tcr);
         moTablePane.getTableColumn(mnColOut).setCellRenderer(tcr);
-        moTablePane.getTableColumn(mnColStock).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColStk).setCellRenderer(tcr);
 
         jtbDecimals.setToolTipText(toolTipText);
 
@@ -438,17 +461,22 @@ public class SViewStockCostUnit extends erp.lib.table.STableTab implements java.
             if (button == jbExportExcel) {
                 try {
                     actionExportExcel();
-                } catch (IOException ex) {
-                    Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
+                }
+                catch (IOException ex) {
                     Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else if (button == jbExportTxt) {
+                catch (SQLException ex) {
+                    Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else if (button == jbExportTxt) {
                 try {
                     actionExportTxt((SGuiClient) miClient);
-                } catch (IOException ex) {
+                }
+                catch (IOException ex) {
                     Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
+                }
+                catch (SQLException ex) {
                     Logger.getLogger(SViewStockCostUnit.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

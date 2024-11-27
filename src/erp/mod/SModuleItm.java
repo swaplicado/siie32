@@ -36,7 +36,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín, Sergio Flores
  */
 public class SModuleItm extends SGuiModule {
 
@@ -248,10 +248,10 @@ public class SModuleItm extends SGuiModule {
         
         switch (type) {
             case SModConsts.ITMU_PRICE_COMM_LOG:
-                view = new SViewPriceCommercialLog(miClient, "Bitácora precios com. ítems");
+                view = new SViewPriceCommercialLog(miClient, "Precios comerciales ítems");
                 break;
             case SModConsts.ITMU_ITEM_COMP:
-                view = new SViewItemComposition(miClient, "Conf. ítems con composición");
+                view = new SViewItemComposition(miClient, "Config. ítems c/composición");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona
+ * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public abstract class SDataConstants {
 
@@ -594,7 +594,8 @@ public abstract class SDataConstants {
     public static final int TRNX_STK_MOVES_ETY = 207586;
     public static final int TRNX_STK_ROTATION = 207587;
     public static final int TRNX_STK_COMSUME = 207588;
-    public static final int TRNX_STK_COMM_PRICE = 207610;
+    public static final int TRNX_STK_VALUE_COMM = 207610;
+    public static final int TRNX_STK_VALUE_ACC = 207616;
     public static final int TRNX_STK_VAL_DET = 207613;
     public static final int TRNX_DIOG_MFG = 207589;
     public static final int TRNX_DIOG_MFG_RM = 207590;
@@ -607,7 +608,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
     public static final int TRNX_STK_PERIOD = 207598;
     public static final int TRNX_STK_ITEM = 207601;
-    public static final int TRNX_STK_ITEM_HIS = 207602;
+    public static final int TRNX_STK_ITEM_HIST = 207602;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;

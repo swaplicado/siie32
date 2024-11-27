@@ -113,6 +113,8 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jListCompanies = new javax.swing.JList();
+        jPanel11 = new javax.swing.JPanel();
+        jlNote = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jbSend = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -231,12 +233,20 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas con Módulo de RH:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jScrollPane2.setViewportView(jListCompanies);
 
         jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlNote.setText("Para seleccionar varias opciones mantenga presionada la tecla Ctrl");
+        jlNote.setEnabled(false);
+        jPanel11.add(jlNote);
+
+        jPanel5.add(jPanel11, java.awt.BorderLayout.NORTH);
 
         jPanel1.add(jPanel5, java.awt.BorderLayout.CENTER);
 
@@ -263,6 +273,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
     private javax.swing.JList jListCompanies;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -280,6 +291,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
     private javax.swing.JLabel jlBcc;
     private javax.swing.JLabel jlCc;
     private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlNote;
     private javax.swing.JLabel jlReportCompanies;
     private javax.swing.JLabel jlTo;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanSaveEmails;
@@ -331,12 +343,29 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         Vector<String> modeloLista = new Vector<>();
         SDataUser user = new SDataUser();
         user.read(new int[] { miClient.getSession().getUser().getPkUserId() }, miClient.getSession().getStatement());
-        for (SDataAccessCompany accCom : user.getDbmsAccessCompanies()) {
-            SDataCompany c = new SDataCompany();
-            c.read(new int[] {accCom.getPkCompanyId()}, miClient.getSession().getStatement());
-            if (c.getIsModuleHrs() && !c.getIsDeleted()) {
-                moVecCompanies.addElement(c);
-                modeloLista.add(c.getCompany());
+        if (user.isSupervisor()) {
+            try {    
+                String sql = "SELECT id_co FROM erp.cfgu_co WHERE NOT b_del AND b_mod_hrs";
+                ResultSet resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sql);
+                while (resultSet.next()) {
+                    SDataCompany c = new SDataCompany();
+                    c.read(new int[] { resultSet.getInt(1) }, miClient.getSession().getStatement());
+                    moVecCompanies.addElement(c);
+                    modeloLista.add(c.getCompany());
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxError(e.getMessage());
+            }
+        } 
+        else {
+            for (SDataAccessCompany accCom : user.getDbmsAccessCompanies()) {
+                SDataCompany c = new SDataCompany();
+                c.read(new int[] {accCom.getPkCompanyId()}, miClient.getSession().getStatement());
+                if (c.getIsModuleHrs() && !c.getIsDeleted()) {
+                    moVecCompanies.addElement(c);
+                    modeloLista.add(c.getCompany());
+                }
             }
         }
         
