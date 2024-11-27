@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -27,7 +28,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelectionListener{
     
@@ -58,7 +59,6 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
         jpPriceList = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Cardex precios comerciales de ítems");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -69,7 +69,7 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jpPriceList.setBorder(javax.swing.BorderFactory.createTitledBorder("Listado de precios comerciales:"));
+        jpPriceList.setBorder(javax.swing.BorderFactory.createTitledBorder("Precios comerciales del ítem:"));
         jpPriceList.setPreferredSize(new java.awt.Dimension(100, 200));
         jpPriceList.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpPriceList, java.awt.BorderLayout.CENTER);
@@ -143,7 +143,10 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
         try {
             maPriceComLog = new ArrayList<>();
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT id_log FROM itmu_price_comm_log WHERE id_item = " + pk[0] + " AND id_unit = " + pk[1];
+            String sql = "SELECT id_log "
+                    + "FROM itmu_price_comm_log "
+                    + "WHERE NOT b_del AND id_item = " + pk[0] + " AND id_unit = " + pk[1] + " "
+                    + "ORDER BY id_log;";
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     SDbPriceCommercialLog log = new SDbPriceCommercialLog();
@@ -154,6 +157,7 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
             showPriceLog();
         }
         catch (Exception e) {
+            SLibUtils.showException(this, e);
         }
     }
     

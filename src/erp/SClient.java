@@ -114,7 +114,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 258.7"; // fecha release: 2024-11-06
+    public static final String APP_RELEASE = "3.2 258.8"; // fecha release: 2024-11-26
     public static final String APP_COPYRIGHT = "2007-2024";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -445,7 +445,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jButtonGroup.add(jtbModuleHrs);
         jtbModuleHrs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/mod_hrs_bw.png"))); // NOI18N
-        jtbModuleHrs.setToolTipText("Recursos humanos [Ctrl+0]");
+        jtbModuleHrs.setToolTipText("Recursos Humanos [Ctrl+0]");
         jtbModuleHrs.setFocusable(false);
         jtbModuleHrs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jtbModuleHrs.setMaximumSize(new java.awt.Dimension(64, 64));
@@ -632,44 +632,44 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmView.setText("Ver");
 
         jmiViewModuleCfg.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleCfg.setText("Módulo configuración");
+        jmiViewModuleCfg.setText("Módulo Configuración");
         jmView.add(jmiViewModuleCfg);
 
         jmiViewModuleFin.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleFin.setText("Módulo contabilidad");
+        jmiViewModuleFin.setText("Módulo Contabilidad");
         jmView.add(jmiViewModuleFin);
 
         jmiViewModulePur.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_3, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModulePur.setText("Módulo egresos y CXP");
+        jmiViewModulePur.setText("Módulo Egresos y CXP");
         jmView.add(jmiViewModulePur);
 
         jmiViewModuleSal.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_4, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleSal.setText("Módulo ingresos y CXC");
+        jmiViewModuleSal.setText("Módulo Ingresos y CXC");
         jmView.add(jmiViewModuleSal);
 
         jmiViewModuleInv.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_5, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleInv.setText("Módulo inventarios");
+        jmiViewModuleInv.setText("Módulo Inventarios");
         jmView.add(jmiViewModuleInv);
 
         jmiViewModuleMkt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_6, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleMkt.setText("Módulo comercialización");
+        jmiViewModuleMkt.setText("Módulo Comercialización");
         jmView.add(jmiViewModuleMkt);
 
         jmiViewModuleLog.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_7, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleLog.setText("Módulo embarques");
+        jmiViewModuleLog.setText("Módulo Embarques");
         jmView.add(jmiViewModuleLog);
 
         jmiViewModuleMfg.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleMfg.setText("Módulo producción");
+        jmiViewModuleMfg.setText("Módulo Producción");
         jmView.add(jmiViewModuleMfg);
 
         jmiViewModuleQlt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleQlt.setText("Módulo calidad");
+        jmiViewModuleQlt.setText("Módulo Calidad");
         jmiViewModuleQlt.setInheritsPopupMenu(true);
         jmView.add(jmiViewModuleQlt);
 
         jmiViewModuleHrs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleHrs.setText("Módulo recursos humanos");
+        jmiViewModuleHrs.setText("Módulo Recursos Humanos");
         jmView.add(jmiViewModuleHrs);
 
         jMenuBar.add(jmView);

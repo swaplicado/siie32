@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -38,7 +38,9 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     
     private int mnColIn;
     private int mnColOut;
-    private int mnColStock;
+    private int mnColStk;
+    private int mnColSeg;
+    private int mnColAvl;
     private javax.swing.JButton jbCardex;
     private javax.swing.JButton jbSegregations;
     private javax.swing.JToggleButton jtbDecimals;
@@ -62,7 +64,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDate = new STabFilterDate(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
-        moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDeleted = new STabFilterDeleted(this, "Filtrar ítems sin existencias");
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moDialogStockCardex = new SDialogStockCardex(miClient);
         moDialogStockSegregations = new SDialogStockSegregations(miClient);
@@ -142,12 +144,22 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoTableColumns = new STableColumn[12];
                 break;
             
-            case SDataConstants.TRNX_STK_COMM_PRICE:
+            case SDataConstants.TRNX_STK_VALUE_COMM:
                 i = 0;
                 aoKeyFields = new STableField[2];
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+                
                 aoTableColumns = new STableColumn[11];
+                break;
+                
+            case SDataConstants.TRNX_STK_VALUE_ACC:
+                i = 0;
+                aoKeyFields = new STableField[2];
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+                
+                aoTableColumns = new STableColumn[10];
                 break;
                 
             default:
@@ -160,12 +172,12 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
         i = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
         }
         
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
@@ -198,19 +210,41 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         mnColOut = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        mnColStock = i;
+        mnColStk = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH || mnTabTypeAux01 == SDataConstants.TRNX_STK_COMM_PRICE) {
+        
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_WH || mnTabTypeAux01 == SDataConstants.TRNX_STK_VALUE_COMM) {
+            mnColSeg = i;
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_seg", "Segregadas", STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_avble", "Disponibles", STableConstants.WIDTH_QUANTITY_2X);
+            mnColAvl = i;
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk_ava", "Disponibles", STableConstants.WIDTH_QUANTITY_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
+        else {
+            mnColSeg = -1;
+            mnColAvl = -1;
+        }
+        
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_COMM_PRICE){
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "price", "Precio comercial", STableConstants.WIDTH_QUANTITY_2X);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "comm_val", "Valor comercial", STableConstants.WIDTH_QUANTITY_2X);
+        
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_VALUE_COMM) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "pc.price", "Precio comercial $", STableConstants.WIDTH_VALUE_UNITARY);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_comm_val", "Valor comercial $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true); // add column for total commercial value!
+            
+            setIsSummaryApplying(true);
+        }
+        else if (mnTabTypeAux01 == SDataConstants.TRNX_STK_VALUE_ACC) {
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_dbt", "Debe $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true); // add column for total commercial value!
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_cdt", "Haber $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true); // add column for total commercial value!
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_bal", "Balance $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true); // add column for total commercial value!
+            
+            setIsSummaryApplying(true);
         }
  
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -304,7 +338,15 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
         moTablePane.getTableColumn(mnColIn).setCellRenderer(tcr);
         moTablePane.getTableColumn(mnColOut).setCellRenderer(tcr);
-        moTablePane.getTableColumn(mnColStock).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColStk).setCellRenderer(tcr);
+        
+        if (mnColSeg != -1) {
+            moTablePane.getTableColumn(mnColSeg).setCellRenderer(tcr);
+        }
+        
+        if (mnColAvl != -1) {
+            moTablePane.getTableColumn(mnColAvl).setCellRenderer(tcr);
+        }
 
         jtbDecimals.setToolTipText(toolTipText);
 
@@ -322,12 +364,16 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         String sqlHaving = "";
         String segregationQuery = "";
         STableSetting setting = null;
+        
+        if (mnTabTypeAux01 == SDataConstants.TRNX_STK_VALUE_ACC) {
+            sqlHaving = "HAVING f_bal <> 0 ";
+        }
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (STableSetting) mvTableSettings.get(i);
 
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlHaving = "HAVING f_stk <> 0 ";
+                sqlHaving += (sqlHaving.isEmpty() ? "HAVING " : "OR ") + "f_stk <> 0 ";
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 date = (Date) setting.getSetting();
@@ -384,11 +430,10 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 + "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") > sc.rop  AND (SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", "
                 + "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, ") +
                 "SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                (mnTabTypeAux01 == SDataConstants.TRNX_STK_VALUE_ACC ? "SUM(s.debit) AS f_dbt, SUM(s.credit) AS f_cdt, SUM(s.debit - s.credit) AS f_bal, " : "") +
                 segregationQuery + " AS f_stk_seg, " +
-                "(SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") AS f_stk_avble, " +
-                "(SELECT COALESCE(MAX(sx.cost_u), 0.0) FROM trn_stk AS sx WHERE sx.id_year = " + year + " AND sx.id_item = s.id_item AND NOT sx.b_del " +
-                ") AS f_val_u, " +
-                "pc.price, SUM(s.mov_in - s.mov_out) * pc.price AS comm_val " +
+                "(SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") AS f_stk_ava, " +
+                "pc.price, SUM(s.mov_in - s.mov_out) * pc.price AS f_comm_val " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +

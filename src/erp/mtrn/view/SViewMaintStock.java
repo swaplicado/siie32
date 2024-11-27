@@ -29,7 +29,7 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Sergio Flores, Gil De Jesús, Claudio Peña
+ * @author Sergio Flores, Gil De Jesús, Claudio Peña, Sergio Flores
  */
 public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -64,7 +64,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDate = new STabFilterDate(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
-        moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDeleted = new STabFilterDeleted(this, "Filtrar ítems sin existencias");
         moDialogStockCardex = new SDialogStockCardex(miClient);
         moMaintConfig = (SDbMaintConfig) miClient.getSession().readRegistry(SModConsts.TRN_MAINT_CFG, new int[] { 1 });
 

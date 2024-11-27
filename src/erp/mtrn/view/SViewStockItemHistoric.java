@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package erp.mitm.view;
+package erp.mtrn.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -16,70 +16,67 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
+import erp.mtrn.form.SDialogStockCardexHistoric;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
 import javax.swing.JButton;
-import sa.gui.util.SUtilConsts;
 
 /**
- *
- * @author Alfonso Flores, Cesar Orozco, Claudio Peña, Sergio Flores
+ * Esta vista es una copia de la vista del catálogo de ítems, salvo que permite consultar movimientos de almacén.
+ * 2024-11-27 Sergio Flores:
+ * No es apropiado que se puedan consultar movimientos de almacén en una vista del catálogo de ítems, porque dicho catálogo es de la base de datos del ERP, mas no de la empresa.
+ * Sin embargo, por conveniencia y por no invertir más tiempo en refactorizar esta vista, por el momento se queda así.
+ * @author Claudio Peña, Sergio Flores
  */
-public class SViewItem extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewStockItemHistoric extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
-    private javax.swing.JButton jbCopy;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
+    private javax.swing.JButton jbStockCardex;
+    private erp.mtrn.form.SDialogStockCardexHistoric moDialogStockCardexHistoric;
 
-    public SViewItem(erp.client.SClientInterface client, java.lang.String tabTitle) {
-        super(client, tabTitle, SDataConstants.ITMU_ITEM);
+    public SViewStockItemHistoric(erp.client.SClientInterface client, java.lang.String tabTitle,  int auxType01) {
+        super(client, tabTitle, SDataConstants.TRNX_STK_ITEM_HIST, auxType01);
+
         initComponents();
     }
 
     private void initComponents() {
         int i;
-        int levelRightEdit = SDataConstantsSys.UNDEFINED;
-
-        jbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
-        jbCopy.setPreferredSize(new Dimension(23, 23));
-        jbCopy.setToolTipText("Copiar");
-        jbCopy.addActionListener(this);
-
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(jbCopy);
-
         moTabFilterDeleted = new STabFilterDeleted(this);
         moPanelFilterItemGeneric = new SPanelFilterItemGeneric(miClient, this);
+        moDialogStockCardexHistoric = new SDialogStockCardexHistoric(miClient);
 
+        jbStockCardex = new JButton(miClient.getImageIcon(SLibConstants.ICON_KARDEX));
+        jbStockCardex.setPreferredSize(new Dimension(23, 23));
+        jbStockCardex.setToolTipText("Ver tarjeta auxiliar de movimientos de inventarios históricos");
+        jbStockCardex.addActionListener(this);
+        addTaskBarUpperComponent(jbStockCardex);
+        
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moPanelFilterItemGeneric);
 
-        levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_ITM_ITEM).Level;
-
-        jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        jbCopy.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        jbDelete.setEnabled(false);
-
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[49];
+        STableColumn[] aoTableColumns = new STableColumn[50]; // 1 columna adicional a la de la vista de ítems para mostrar si el ítem tiene movimientos de inventarios
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
+        
+        // NOTA: Estas columnas deben ser IDÉNTICAS a las de la vista de ítems:
 
         i = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 400);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 400);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "il.line", "Línea ítems", 75);
@@ -87,6 +84,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_code", "ClaveProdServ SAT", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_name", "ProdServ SAT", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.tariff", "Fracc. arancelaria", 55);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f_movs", "Movimientos inventarios", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_bulk", "Granel", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_inv", "Inventariable", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_lot", "Lote", STableConstants.WIDTH_BOOLEAN);
@@ -151,22 +149,13 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
 
     @Override
     public void actionNew() {
-        if (jbNew.isEnabled()) {
-            if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).refreshCatalogues(mnTabType);
-            }
-        }
+        
     }
 
     @Override
     public void actionEdit() {
-        if (jbEdit.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                        miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).refreshCatalogues(mnTabType);
-                }
-            }
-        }
+        actionCardex();
+
     }
 
     @Override
@@ -175,13 +164,16 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
 
         }
     }
-
-    public void actionCopy() {
-        if (jbCopy.isEnabled()) {
+    
+    public void actionCardex() {
+        if (jbStockCardex.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).refreshCatalogues(mnTabType);
-                }
+                int[] rowKey = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                int itemId = rowKey[0];
+
+                moDialogStockCardexHistoric.formReset();
+                moDialogStockCardexHistoric.setFormParams(itemId, SLibConstants.UNDEFINED, SLibConstants.MODE_QTY);
+                moDialogStockCardexHistoric.setVisible(true);
             }
         }
     }
@@ -207,7 +199,8 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
                 "i.units_virt, i.prod_time, i.prod_cost, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, i.b_pre_pay, i.tariff, i.custs_unit, i.custs_equiv, " +
                 "i.b_free_price, i.b_free_disc, i.b_free_disc_u, i.b_free_disc_ety, i.b_free_disc_doc, i.b_free_comms, i.b_sales_freight_req, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
                 "ig.igen, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, COALESCE(ucomm.symbol, '') AS un_comm, tua.tp_unit, tl.tp_lev, brd.brd, " +
-                "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name " +
+                "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name, " +
+                "(SELECT COUNT(*) > 0 FROM trn_stk AS s WHERE s.id_year = " + miClient.getSession().getCurrentYear() + " AND s.id_item = i.id_item AND NOT s.b_del) AS f_movs " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON " +
                 "i.fid_igen = ig.id_igen " +
@@ -257,9 +250,9 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
-
-            if (button == jbCopy) {
-                actionCopy();
+            
+            if (button == jbStockCardex) {
+                actionCardex();
             }
         }
     }
