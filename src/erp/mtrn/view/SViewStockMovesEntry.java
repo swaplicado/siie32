@@ -28,7 +28,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SViewStockMovesEntry extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -37,8 +37,8 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
 
     private int mnColIn;
     private int mnColOut;
-    private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
+    private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
     private erp.table.STabFilterDocumentType moTabFilterTypeDocument;
     private erp.table.STabFilterUsers moTabFilterUser;
@@ -84,14 +84,15 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
         aoTableColumns = new STableColumn[40];
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
         }
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "l.lot", "Lote", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "l.dt_exp_n", "Caducidad", STableConstants.WIDTH_DATE);

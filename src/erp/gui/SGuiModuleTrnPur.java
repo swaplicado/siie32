@@ -70,7 +70,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -287,7 +287,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
-        jmiCatPriceCommercialLog = new JMenuItem("Bitácora de precios comerciales de ítems");
+        jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);

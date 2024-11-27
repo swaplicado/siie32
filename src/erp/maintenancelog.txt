@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 258.9/ 2024-11-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización general con fines de estandarización a vistas y consultas, diálogos y opciones de menú relacionados con movimientos de almacén, existencias y su valor.
+
+================================================================================
 SIIE 3.2 258.8/ 2024-11-27
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
