@@ -50,6 +50,7 @@ public abstract class SDocUtils {
     
     public static final String BUCKET_DOC_BREACH = "docBreach";
     public static final String BUCKET_DOC_ADM_REC = "docAdminRecord";
+    public static final String BUCKET_DOC_DPS_SUPPLIER = "docDpsSupplier";
     
     public static final String FILE_TYPE_IMG = "IMG";
     public static final String FILE_TYPE_PDF = "PDF";
@@ -374,6 +375,41 @@ public abstract class SDocUtils {
     }
     
     /**
+     * Get file name from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @return GridFSfile, if found.
+     * @throws java.io.IOException
+     * @throws Exception
+     */
+    public static String getFileName(final SGuiSession session, final String bucketName, final String filevaultId) throws IOException, Exception {
+        String filenameFound = "";
+        String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
+        String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
+        
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoDatabase database = client.getDatabase(db);
+            GridFSBucket bucket = GridFSBuckets.create(database, bucketName);
+            
+            ObjectId objectId = new ObjectId(filevaultId);
+            Bson query = Filters.eq("_id", objectId);
+            Bson sort = Sorts.descending("uploadDate");
+            
+            for (GridFSFile file : bucket.find(query).sort(sort).limit(1)) {
+                filenameFound = file.getFilename();
+                break;
+            }
+            
+            if (filenameFound.isEmpty()) {
+                throw new Exception("No se encontró ningún archivo con el ObjectId '" + filevaultId + "'!");
+            }
+        }
+        
+        return filenameFound;
+    }
+    
+    /**
      * Get file image icon from MongoDB vault.
      * @param session GUI session.
      * @param bucketName Name of Mongo GridFS bucket.
@@ -444,5 +480,17 @@ public abstract class SDocUtils {
      */
     public static boolean isPdf(final File file) {
         return file.getName().toLowerCase().endsWith(FILE_TYPE_PDF.toLowerCase());
+    }
+    
+    public static String getExtensionFile (final File file) {
+        String name = file.getName();
+        int index = name.lastIndexOf(".");
+        
+        if (index > 0 && index < name.length() - 1) {
+            return name.substring(index + 1);
+        }
+        else {
+            return "";
+        }
     }
 }
