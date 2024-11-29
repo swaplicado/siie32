@@ -1343,10 +1343,10 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAdvanceSettlement(miClient, "Control adelantos liquidación");
                 break;
             case SModConsts.HRS_DOC_BREACH:
-                view = new SViewDocBreach(miClient, "Infracciones");
+                view = new SViewDocBreach(miClient, "Incidencias");
                 break;
             case SModConsts.HRSX_DOC_BREACH_SUM:
-                view = new SViewDocBreachSummary(miClient, "Infracciones x empleado");
+                view = new SViewDocBreachSummary(miClient, "Incidencias x empleado");
                 break;
             case SModConsts.HRS_DOC_ADM_REC:
                 view = new SViewDocAdminRecord(miClient, "Actas administrativas");
@@ -1732,7 +1732,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moAdvanceSettlement;
                 break;
             case SModConsts.HRS_DOC_BREACH:
-                if (moFormDocBreach == null) moFormDocBreach = new SFormDocBreach(miClient, "Infracción");
+                if (moFormDocBreach == null) moFormDocBreach = new SFormDocBreach(miClient, "Incidencia");
                 form = moFormDocBreach;
                 break;
             case SModConsts.HRS_DOC_ADM_REC:

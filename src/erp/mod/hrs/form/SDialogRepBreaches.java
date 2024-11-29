@@ -51,7 +51,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogRepBreaches extends JDialog implements ActionListener {
 
@@ -119,7 +119,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         jbSend = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
 
-        setTitle("Reporte de sanciones");
+        setTitle("Reporte de consecuencias");
         setIconImage(null);
         setIconImages(null);
         setModal(true);

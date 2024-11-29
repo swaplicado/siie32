@@ -435,7 +435,7 @@ public class SFormDocBreach extends SBeanForm implements ActionListener, FocusLi
 
         jPanel.add(jPanelDoc, java.awt.BorderLayout.CENTER);
 
-        jPanelSan.setBorder(javax.swing.BorderFactory.createTitledBorder("Sanción:"));
+        jPanelSan.setBorder(javax.swing.BorderFactory.createTitledBorder("Diligencia:"));
         jPanelSan.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanelSanN.setLayout(new java.awt.GridLayout(2, 1));

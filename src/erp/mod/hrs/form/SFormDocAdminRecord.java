@@ -537,7 +537,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
 
         jPanel.add(jPanelDoc, java.awt.BorderLayout.CENTER);
 
-        jPanelSan.setBorder(javax.swing.BorderFactory.createTitledBorder("Sanción:"));
+        jPanelSan.setBorder(javax.swing.BorderFactory.createTitledBorder("Diligencia:"));
         jPanelSan.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanelSanN.setLayout(new java.awt.GridLayout(2, 1));
@@ -654,7 +654,7 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
         moBoolOffenderSign.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanelSanC23.add(moBoolOffenderSign);
 
-        moBoolOffenderDis.setText("El empleado se desvinculó");
+        moBoolOffenderDis.setText("El empleado fue desvinculado");
         moBoolOffenderDis.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanelSanC23.add(moBoolOffenderDis);
 
