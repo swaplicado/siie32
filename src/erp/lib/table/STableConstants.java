@@ -108,6 +108,11 @@ public abstract class STableConstants {
     public static final int ICON_VIEW_LIG_RED = 1208;
     public static final int ICON_VIEW_LIG_WHI = 1209;
     public static final int ICON_VIEW_LIG_YEL = 1210;
+    public static final int ICON_VIEW_OK_GREEN = 1211;
+    public static final int ICON_VIEW_REJECTED = 1212;
+    public static final int ICON_VIEW_FOLDER = 1213;
+    public static final int ICON_VIEW_FOLDER_ALERT = 1214;
+    public static final int ICON_VIEW_SAL = 1215;
 
     public static final int STYLE_BOLD = 1;
     public static final int STYLE_ITALIC = 2;

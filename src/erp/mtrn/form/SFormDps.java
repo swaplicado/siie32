@@ -10235,6 +10235,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) {
             msg += "\n- Este documento de ajuste es un CFDI y está en proceso de almacenamiento en el disco.";
         }
+        if (moDps.getXtaHasSuppFiles()) {
+            msg += "\n- Este documento tiene archivos de soporte anexados.";
+        }
+        if (moDps.getXtaHasAuthWeb()) {
+            msg += "\n- Este documento ya inició el proceso de autorización via web.";
+        }
 
         if (msg.length() == 0) {
             msg += "\n- No se pudo determinar por qué razón el documento no se puede modificar.";
@@ -12466,7 +12472,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 (!mbIsPeriodOpen && (mbIsDpsInvoice || mbIsDpsAdjustment)) || moDps.getFkDpsValidityStatusId() != SDataConstantsSys.TRNS_ST_DPS_VAL_EFF ||
                 (mnParamCurrentUserPrivilegeLevel != SDataConstantsSys.UNDEFINED && mnParamCurrentUserPrivilegeLevel < SUtilConsts.LEV_AUTHOR);
 
-        jbEdit.setEnabled(!(denyEdition ||
+        jbEdit.setEnabled(!(denyEdition || moDps.getXtaHasSuppFiles() || moDps.getXtaHasAuthWeb() ||
                 (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) ||
                 (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) ||
                 (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||

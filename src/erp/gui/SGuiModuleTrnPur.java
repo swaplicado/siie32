@@ -19,6 +19,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
 import erp.mfin.form.SDialogRepBizPartnerAdvances;
@@ -115,6 +116,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersAutPending;
     private javax.swing.JMenuItem jmiOrdersAutAutorized;
     private javax.swing.JMenuItem jmiOrdersAutRejected;
+    private javax.swing.JMenuItem jmiOrderExtAutProcess;
+    private javax.swing.JMenuItem jmiOrderExtAutConclused;
     private javax.swing.JMenuItem jmiOrdersPrice;
     private javax.swing.JMenuItem jmiOrdersPriceHist;
     private javax.swing.JMenuItem jmiOrdersFunctionalArea;
@@ -274,6 +277,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightItemConfig = false;
         boolean hasRightCreditConfig = false;
         boolean hasRightScaleCfg = false;
+        boolean hasComAuthAppWeb = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
@@ -362,6 +366,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutPending = new JMenuItem("Pedidos por autorizar");
         jmiOrdersAutAutorized = new JMenuItem("Pedidos autorizados");
         jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
+        jmiOrderExtAutProcess = new JMenuItem("Pedidos por autorizar app web");
+        jmiOrderExtAutConclused = new JMenuItem("Pedidos concluidos autorización app web");
         jmiOrdersPrice = new JMenuItem("Precios de compras");
         jmiOrdersPriceHist = new JMenuItem("Historial de precios de compras");
         jmiOrdersFunctionalArea = new JMenuItem("Control de límite máximo mensual por área funcional");
@@ -382,6 +388,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersAutPending);
         jmOrd.add(jmiOrdersAutAutorized);
         jmOrd.add(jmiOrdersAutRejected);
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrderExtAutProcess);
+        jmOrd.add(jmiOrderExtAutConclused);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersPrice);
         jmOrd.add(jmiOrdersPriceHist);
@@ -690,6 +699,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersAutPending.addActionListener(this);
         jmiOrdersAutAutorized.addActionListener(this);
         jmiOrdersAutRejected.addActionListener(this);
+        jmiOrderExtAutProcess.addActionListener(this);
+        jmiOrderExtAutConclused.addActionListener(this);
         jmiOrdersPrice.addActionListener(this);
         jmiOrdersPriceHist.addActionListener(this);
         jmiOrdersFunctionalArea.addActionListener(this);
@@ -814,6 +825,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         levelRightDocOrder = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
         levelRightDocTransaction = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
         levelRightScaleTic = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_SCA_TIC).Level;
+        
+        try {
+            hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == 1;
+        } 
+        catch (Exception e) {}
 
         jmCat.setEnabled(hasRightDnsDps || hasRightDnsDiog || hasRightBizPartnerBlocking || hasRightItemConfig);
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
@@ -834,6 +850,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersUsr.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiOrdersMailPending.setEnabled(hasRightDocOrder);
         jmiOrdersMailSent.setEnabled(hasRightDocOrder);
+        jmiOrderExtAutProcess.setEnabled(hasComAuthAppWeb);
+        jmiOrderExtAutConclused.setEnabled(hasComAuthAppWeb);
 
         jmDps.setEnabled(hasRightDocTransaction);
         jmiDpsDoc.setEnabled(hasRightDocTransaction);
@@ -1477,6 +1495,17 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
                     break;
+                case SDataConstants.TRNX_DPS_AUTH_APP:
+                    oViewClass = erp.mtrn.view.SViewDpsAppAuthorn.class;
+                    switch (auxType01) {
+                        case SDataConstantsSys.CFGS_ST_AUTHORN_PROC:
+                            sViewTitle = "Pedidos x autorizar app web";
+                            break;
+                        default:
+                            sViewTitle = "Pedidos concluidos aut. app web";
+                            break;
+                    }
+                break;
 
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1693,6 +1722,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiOrdersAutRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_REJ);
+            }
+            else if (item == jmiOrderExtAutProcess) {
+                showView(SDataConstants.TRNX_DPS_AUTH_APP, SDataConstantsSys.CFGS_ST_AUTHORN_PROC);
+            }
+            else if (item == jmiOrderExtAutConclused) {
+                showView(SDataConstants.TRNX_DPS_AUTH_APP, SDataConstantsSys.CFGS_ST_AUTHORN_AUTH);
             }
             else if (item == jmiOrdersMailPending) {
                 showView(SDataConstants.TRNX_DPS_SEND_PEND, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
