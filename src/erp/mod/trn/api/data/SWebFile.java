@@ -20,6 +20,7 @@ public class SWebFile {
     private String cloudStorageName;
     private String cloudFileUrl;
     private String externalBpName;
+    private int fkCurQuot;
 
     public SWebFile() {
         this.idSupFile = 0;
@@ -31,6 +32,7 @@ public class SWebFile {
         this.cloudStorageName = "";
         this.cloudFileUrl = "";
         this.externalBpName = "";
+        this.fkCurQuot = 0;
     }
 
     public int getIdSupFile() {
@@ -105,4 +107,11 @@ public class SWebFile {
         this.externalBpName = externalBpName;
     }
 
+    public int getFkCurQuot() {
+        return fkCurQuot;
+    }
+
+    public void setFkCurQuot(int fkCurQuot) {
+        this.fkCurQuot = fkCurQuot;
+    }
 }
