@@ -85,6 +85,13 @@ public abstract class SDataConstantsSys {
 
     public static final int CFGS_LOT_MODEL_CONS = 1;
     public static final int CFGS_LOT_MODEL_CONS_DATE = 2;
+    
+    public static final int CFGS_ST_AUTHORN_NA = 1; // not applicable
+    public static final int CFGS_ST_AUTHORN_PEND = 2; // pending
+    public static final int CFGS_ST_AUTHORN_PROC = 3; // processing
+    public static final int CFGS_ST_AUTHORN_AUTH = 4; // authorized
+    public static final int CFGS_ST_AUTHORN_REJ = 5; // rejected
+    public static final int CFGS_ST_AUTHORN_SND = 11; // sending
 
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
@@ -113,6 +120,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
     public static final String CFG_PARAM_TRN_STK_SUPP_ZERO = "TRN_STK_SUPP_ZERO";
+    public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";

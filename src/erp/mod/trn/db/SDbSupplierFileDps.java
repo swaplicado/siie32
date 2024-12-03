@@ -44,6 +44,8 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
     */
     
     ArrayList<SDbSupplierFileDpsEntry> maSuppFileDpsEty;
+    
+    protected String msXtaDpsCurKey; 
 
     public SDbSupplierFileDps() {
         super(SModConsts.TRN_SUP_FILE_DPS);
@@ -68,6 +70,8 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
+    public void setXtaDpsCurKey(String s) { msXtaDpsCurKey = s; }
+    
     public int getPkSupplierFileId() { return mnPkSupplierFileId; }
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -88,6 +92,8 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public ArrayList<SDbSupplierFileDpsEntry> getSuppFileDpsEty() { return maSuppFileDpsEty; }
+    
+    public String getXtaDpsCurKey() { return msXtaDpsCurKey; }
     
     public String getSupplierFileDpsTypeDecode() {
         switch (msSupplierFileDpsType) {
@@ -136,6 +142,8 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         maSuppFileDpsEty = new ArrayList<>();
+        
+        msXtaDpsCurKey = "";
     }
 
     @Override
@@ -210,6 +218,15 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
                 entry = new SDbSupplierFileDpsEntry();
                 entry.read(session, new int[] { mnPkYearId, mnPkDocId, resultSet.getInt(1), mnPkSupplierFileId });
                 maSuppFileDpsEty.add(entry);
+            }
+            
+            msSql = "SELECT cur_key " +
+                    "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " " + 
+                    "WHERE id_cur = " + mnFkCurrencyDpsId;
+                    
+            resultSet = statement.executeQuery(msSql);
+            if (resultSet.next()) {
+                msXtaDpsCurKey = resultSet.getString(1);
             }
             
             mbRegistryNew = false;
@@ -317,6 +334,8 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
         for (SDbSupplierFileDpsEntry ety : this.getSuppFileDpsEty()) {
             registry.getSuppFileDpsEty().add(ety);
         }
+        
+        registry.setXtaDpsCurKey(this.getXtaDpsCurKey());
         
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

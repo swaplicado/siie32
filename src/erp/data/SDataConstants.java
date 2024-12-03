@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona
+ * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public abstract class SDataConstants {
 
@@ -523,6 +523,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_UPD_DT_LOG = 207093;
     public static final int TRN_DPS_CFD_PAY = 207196;
     public static final int TRN_DPS_CFD_PAY_DONE = 207197;
+    public static final int TRN_DPS_AUTHORN = 207198;
     public static final int TRN_CFD_PAY = 207191;
 
     public static final int TRNX_DPS_RO_STK = 207504;
@@ -594,7 +595,8 @@ public abstract class SDataConstants {
     public static final int TRNX_STK_MOVES_ETY = 207586;
     public static final int TRNX_STK_ROTATION = 207587;
     public static final int TRNX_STK_COMSUME = 207588;
-    public static final int TRNX_STK_COMM_PRICE = 207610;
+    public static final int TRNX_STK_VALUE_COMM = 207610;
+    public static final int TRNX_STK_VALUE_ACC = 207616;
     public static final int TRNX_STK_VAL_DET = 207613;
     public static final int TRNX_DIOG_MFG = 207589;
     public static final int TRNX_DIOG_MFG_RM = 207590;
@@ -607,7 +609,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
     public static final int TRNX_STK_PERIOD = 207598;
     public static final int TRNX_STK_ITEM = 207601;
-    public static final int TRNX_STK_ITEM_HIS = 207602;
+    public static final int TRNX_STK_ITEM_HIST = 207602;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
@@ -649,6 +651,8 @@ public abstract class SDataConstants {
     public static final int TRNX_MFG_ORD_FINISH_PEND_ETY = 207635;
     public static final int TRNX_MFG_ORD_FINISHED = 207636;
     public static final int TRNX_MFG_ORD_FINISHED_ETY = 207637;
+    
+    public static final int TRNX_DPS_AUTH_APP = 207638;
 
     public static final int TRNR_ACCOUNT_CASH_PDAY = 207640;
     public static final int TRNR_ACCOUNT_BANK_PDAY = 207641;
@@ -1091,6 +1095,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
         TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
         TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_DPS_AUTHORN, "trn_dps_authorn");
         TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");

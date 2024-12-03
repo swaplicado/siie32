@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implements ActionListener, ItemListener {
 
@@ -38,7 +38,7 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
     private SDataItem moItem;
 
     /**
-     * Creates new form SFormVehicleType
+     * Creates new form SFormPriceCommercialLog
      * @param client
      * @param title
      */
@@ -72,12 +72,13 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel27 = new javax.swing.JPanel();
         jlPrice = new javax.swing.JLabel();
-        moDecPrice = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moCurPrice = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlPriceHint = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel23.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel23.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -123,9 +124,12 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         jlPrice.setText("Precio comercial:*");
         jlPrice.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlPrice);
+        jPanel27.add(moCurPrice);
 
-        moDecPrice.setText("0.00");
-        jPanel27.add(moDecPrice);
+        jlPriceHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlPriceHint.setText("(¡Precio sin impuestos!)");
+        jlPriceHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel27.add(jlPriceHint);
 
         jPanel23.add(jPanel27);
 
@@ -146,9 +150,10 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlPrice;
+    private javax.swing.JLabel jlPriceHint;
     private javax.swing.JLabel jlUnit;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPrice;
     private sa.lib.gui.bean.SBeanFieldDate moDate;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecPrice;
     private sa.lib.gui.bean.SBeanFieldKey moKeyItem;
     private sa.lib.gui.bean.SBeanFieldKey moKeyUnit;
     // End of variables declaration//GEN-END:variables
@@ -159,12 +164,13 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         moDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate), true);
         moKeyItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem), true);
         moKeyUnit.setKeySettings(miClient, SGuiUtils.getLabelName(jlUnit), true);
-        moDecPrice.setDecimalSettings(SGuiUtils.getLabelName(jlPrice), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moCurPrice.setCompoundFieldSettings(miClient);
+        moCurPrice.getField().setDecimalSettings(SGuiUtils.getLabelName(jlPrice), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
         
         moFields.addField(moDate);
         moFields.addField(moKeyItem);
         moFields.addField(moKeyUnit);
-        moFields.addField(moDecPrice);
+        moFields.addField(moCurPrice.getField());
         
         moFields.setFormButton(jbSave);
     }
@@ -213,7 +219,7 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
 
         moKeyItem.setValue(new int[] { moRegistry.getPkItemId() });
         moKeyUnit.setValue(new int[] { moRegistry.getPkUnitId() });
-        moDecPrice.setValue(moRegistry.getPrice());
+        moCurPrice.getField().setValue(moRegistry.getPrice());
         
         setFormEditable(true);
 
@@ -231,7 +237,7 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         registry.setPkItemId(moKeyItem.getValue()[0]);
         registry.setPkUnitId(moKeyUnit.getValue()[0]);
         registry.setDate(moDate.getValue());
-        registry.setPrice(moDecPrice.getValue());
+        registry.setPrice(moCurPrice.getField().getValue());
         
         return registry;
     }

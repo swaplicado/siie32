@@ -24,9 +24,10 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     protected int mnPkDocId;
     
     protected SDbDps moDps;
+    protected String msDpsStatus;
     protected ArrayList<SDbSupplierFile> maSuppFiles;
     protected ArrayList<SDbSupplierFile> maSuppFilesDeleted;
-
+    
     public SDbSupplierFileProcess() {
         super(SModConsts.TRNX_SUP_FILE_DPS_PROC);
     }
@@ -35,13 +36,20 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     public void setPkDocId(int n) { mnPkDocId = n; }
     
     public void setDps(SDbDps o) { moDps = o; }
+    public void setDpsStatus(String s) { msDpsStatus = s; }
     
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
 
     public SDbDps getDps() { return moDps; }
+    public String getDpsStatus() { return msDpsStatus; }
     public ArrayList<SDbSupplierFile> getSuppFiles() { return maSuppFiles; }
     public ArrayList<SDbSupplierFile> getSuppFilesDeleted() { return maSuppFilesDeleted; }
+    
+    public void updateDpsStatus(SGuiSession session, int stAuth) throws Exception {
+        msSql = "UPDATE trn_dps SET fid_st_dps_authorn = " + stAuth + " WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+        session.getStatement().execute(msSql);
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -64,6 +72,8 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         moDps = null;
         maSuppFiles = new ArrayList<>();
         maSuppFilesDeleted = new ArrayList<>();
+        
+        msDpsStatus = "";
     }
 
     @Override
@@ -105,6 +115,12 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         mnPkDocId = moDps.getPkDocId();
         
         statement = session.getDatabase().getConnection().createStatement();
+        
+        msSql = "SELECT st_dps_authorn FROM erp.trns_st_dps_authorn WHERE id_st_dps_authorn = " + moDps.getFkDpsAuthorizationStatusId();
+        resultSet = statement.executeQuery(msSql);
+        if (resultSet.next()) {
+            msDpsStatus = resultSet.getString(1);
+        }
         
         msSql = "SELECT id_sup_file FROM trn_sup_file_dps " +
                 "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;

@@ -289,6 +289,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
     protected double mdAuxAppPrepayCurCrossPayExchangeRate; // case of an application of prepayment with currency crossing: payment's exchange rate
     protected boolean mbXtaTestLinks;
+    protected boolean mbXtaHasSuppFiles;
+    protected boolean mbXtaHasAuthWeb;
+    
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
     */
@@ -576,13 +579,25 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             if (isDpsTypeContractPur() && isAutPurContract || isDpsTypeContractSal() && isAutSalContract || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
                     isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
-                if (isDpsAuthorized(connection)) {
-                    mbIsAuthorized = true;
-                    mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
+                boolean hasComAuthAppWeb = true;
+                try {
+                    hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == 1;
+                } 
+                catch (Exception e) {}
+                
+                if (hasComAuthAppWeb) {
+                    mbIsAuthorized = false;
+                    mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA;
                 }
                 else {
-                    mbIsAuthorized = false;
-                    mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
+                    if (isDpsAuthorized(connection)) {
+                        mbIsAuthorized = true;
+                        mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
+                    }
+                    else {
+                        mbIsAuthorized = false;
+                        mnFkDpsAuthorizationStatusId = SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
+                    }
                 }
 
                 mnFkUserAuthorizedId = mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId;
@@ -2101,6 +2116,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
     public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
     public void setAuxTestLinks(boolean b) { mbXtaTestLinks = b; }
+    public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
+    public void setXtaHasAuthWeb(boolean b) { mbXtaHasAuthWeb = b;}
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
     */
@@ -2139,6 +2156,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
     public double getAuxAppPrepayCurCrossPayExchangeRate() { return mdAuxAppPrepayCurCrossPayExchangeRate; }
     public boolean getXtaTestLinks() { return mbXtaTestLinks; }
+    public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
+    public boolean getXtaHasAuthWeb() { return mbXtaHasAuthWeb; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
     */
@@ -2412,6 +2431,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
         mdAuxAppPrepayCurCrossPayExchangeRate = 0;
         mbXtaTestLinks = true;
+        mbXtaHasSuppFiles = false;
+        mbXtaHasAuthWeb = false;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
         */
@@ -2793,7 +2814,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
-                }	
+                }
                 
                 if (mnFkBillOfLading_n != 0) {
                     sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_bol_n = " + mnFkBillOfLading_n + " ";
@@ -2803,7 +2824,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         if (moDbmsDataCfdBol.read(new int[] { oResultSet.getInt("id_cfd") }, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
-                    }			 
+                    }
+                }
+                
+                sSql = "SELECT * FROM trn_sup_file_dps WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    mbXtaHasSuppFiles = true;
+                }
+                
+                sSql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    mbXtaHasAuthWeb = true;
                 }
                 
                 mbIsRegistryNew = false;

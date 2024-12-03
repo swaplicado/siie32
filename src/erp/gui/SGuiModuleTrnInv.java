@@ -46,7 +46,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -204,19 +204,20 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
-    private javax.swing.JMenuItem jmiStkStockValueCost;
     private javax.swing.JMenuItem jmiStkStockLot;
-    private javax.swing.JMenuItem jmiStkStockCommPrice;
     private javax.swing.JMenuItem jmiStkStockWarehouse;
     private javax.swing.JMenuItem jmiStkStockWarehouseLot;
+    private javax.swing.JMenuItem jmiStkStockValueComm;
+    private javax.swing.JMenuItem jmiStkStockValueAcc;
+    //private javax.swing.JMenuItem jmiStkStockValueCost; // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
     private javax.swing.JMenuItem jmiStkStockMovements;
     private javax.swing.JMenuItem jmiStkStockMovementsEntry;
     private javax.swing.JMenuItem jmiStkStockRotation;
     private javax.swing.JMenuItem jmiStkStockRotationLot;
     private javax.swing.JMenuItem jmiStkStockValuation;
     private javax.swing.JMenuItem jmiStkStockValuationDetail;
+    private javax.swing.JMenuItem jmiStkStockItemHistoric;
     private javax.swing.JMenuItem jmiStkStockClosing;
-    private javax.swing.JMenuItem jmiItemHistoric;
     
     private javax.swing.JMenu jmMenuRep;
     private javax.swing.JMenuItem jmiReportStock;
@@ -775,27 +776,30 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
-        jmiStkStockValueCost = new JMenuItem("Existencias valor mov. almacén");
         jmiStkStockLot = new JMenuItem("Existencias por lote");
-        jmiStkStockCommPrice = new JMenuItem("Existencias por precio comercial");
         jmiStkStockWarehouse = new JMenuItem("Existencias por almacén");
         jmiStkStockWarehouseLot = new JMenuItem("Existencias por almacén por lote");
+        jmiStkStockValueComm = new JMenuItem("Existencias a valor comercial");
+        jmiStkStockValueAcc = new JMenuItem("Existencias a valor contable");
+        //jmiStkStockValueCost = new JMenuItem("Existencias valor mov. almacén"); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements = new JMenuItem("Movimientos de inventarios");
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
         jmiStkStockValuation = new JMenuItem("Valuación de consumos de materiales");
         jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
+        jmiStkStockItemHistoric = new JMenuItem("Movimientos de inventarios históricos");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
-        jmiItemHistoric = new JMenuItem("Historial ítems");
         
         jmMenuStk.add(jmiStkStock);
-        jmMenuStk.add(jmiStkStockValueCost);
         jmMenuStk.add(jmiStkStockLot);
-        jmMenuStk.add(jmiStkStockCommPrice);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockWarehouse);
         jmMenuStk.add(jmiStkStockWarehouseLot);
+        jmMenuStk.addSeparator();
+        jmMenuStk.add(jmiStkStockValueComm);
+        jmMenuStk.add(jmiStkStockValueAcc);
+        //jmMenuStk.add(jmiStkStockValueCost); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockMovements);
         jmMenuStk.add(jmiStkStockMovementsEntry);
@@ -806,24 +810,25 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.add(jmiStkStockValuation);
         jmMenuStk.add(jmiStkStockValuationDetail);
         jmMenuStk.addSeparator();
-        jmMenuStk.add(jmiStkStockClosing);
+        jmMenuStk.add(jmiStkStockItemHistoric);
         jmMenuStk.addSeparator();
-        jmMenuStk.add(jmiItemHistoric);
+        jmMenuStk.add(jmiStkStockClosing);
         
         jmiStkStock.addActionListener(this);
-        jmiStkStockValueCost.addActionListener(this);
         jmiStkStockLot.addActionListener(this);
-        jmiStkStockCommPrice.addActionListener(this);
         jmiStkStockWarehouse.addActionListener(this);
         jmiStkStockWarehouseLot.addActionListener(this);
+        jmiStkStockValueComm.addActionListener(this);
+        jmiStkStockValueAcc.addActionListener(this);
+        //jmiStkStockValueCost.addActionListener(this); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements.addActionListener(this);
         jmiStkStockMovementsEntry.addActionListener(this);
         jmiStkStockRotation.addActionListener(this);
         jmiStkStockRotationLot.addActionListener(this);
         jmiStkStockValuation.addActionListener(this);
         jmiStkStockValuationDetail.addActionListener(this);
+        jmiStkStockItemHistoric.addActionListener(this);
         jmiStkStockClosing.addActionListener(this);
-        jmiItemHistoric.addActionListener(this);
 
         jmMenuRep = new JMenu("Reportes");
         jmiReportStock = new JMenuItem("Reporte de existencias...");
@@ -1029,12 +1034,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
-        jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockLot.setEnabled(hasRightStock);
-        //jmiStkStockCommPrice.setEnabled(hasRightStock);
-        jmiStkStockCommPrice.setEnabled(hasRightStkCommPrice);
         jmiStkStockWarehouse.setEnabled(hasRightStock);
         jmiStkStockWarehouseLot.setEnabled(hasRightStock);
+        jmiStkStockValueComm.setEnabled(hasRightStkCommPrice);
+        jmiStkStockValueAcc.setEnabled(hasRightStkCommPrice);
+        //jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements.setEnabled(hasRightStock);
         jmiStkStockMovementsEntry.setEnabled(hasRightStock);
         jmiStkStockRotation.setEnabled(hasRightStock);
@@ -1042,7 +1047,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockValuation.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
         jmiStkStockValuationDetail.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiStkStockItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
 
@@ -1286,7 +1291,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         try {
             setFrameWaitCursor();
 
-            switch (viewType) {              
+            switch (viewType) {
                 case SDataConstants.TRN_LOT:
                     viewClass = erp.mtrn.view.SViewStockLot.class;
                     title = "Lotes";
@@ -1322,8 +1327,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstants.TRNX_STK_LOT_WH:
                             title = "Existencias x almacén x lote";
                             break;
-                        case SDataConstants.TRNX_STK_COMM_PRICE:
-                            title = "Existencias x precio comercial";
+                        case SDataConstants.TRNX_STK_VALUE_COMM:
+                            title = "Existencias valor comercial";
+                            break;
+                        case SDataConstants.TRNX_STK_VALUE_ACC:
+                            title = "Existencias valor contable";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1354,9 +1362,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
                     break;
-                case SDataConstants.TRNX_STK_ITEM_HIS:
-                    viewClass = erp.mitm.view.SViewItemHistoric.class;
-                    title = "Ítems históricos";
+                case SDataConstants.TRNX_STK_ITEM_HIST:
+                    viewClass = erp.mtrn.view.SViewStockItemHistoric.class;
+                    title = "Movimientos inventarios históricos";
                     break;
                 case SDataConstants.TRNX_STK_COMSUME:
                     viewClass = erp.mtrn.view.SViewDpsStockConsume.class;
@@ -2127,17 +2135,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
             }
-            else if (item == jmiStkStockValueCost) {
-                showView(SDataConstants.TRNX_STK_ITEM, SDataConstants.TRNX_STK_ITEM);
-            }
-            else if (item == jmiReportStockPeriod) {
-                menuRepStockPeriod();
-            }
             else if (item == jmiStkStockLot) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_LOT);
-            }
-            else if (item == jmiStkStockCommPrice) {
-                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_COMM_PRICE);
             }
             else if (item == jmiStkStockWarehouse) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_WH);
@@ -2145,6 +2144,17 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkStockWarehouseLot) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_LOT_WH);
             }
+            else if (item == jmiStkStockValueComm) {
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_VALUE_COMM);
+            }
+            else if (item == jmiStkStockValueAcc) {
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_VALUE_ACC);
+            }
+            /* 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
+            else if (item == jmiStkStockValueCost) {
+                showView(SDataConstants.TRNX_STK_ITEM, SDataConstants.TRNX_STK_ITEM);
+            }
+            */
             else if (item == jmiStkStockMovements) {
                 showView(SDataConstants.TRNX_STK_MOVES);
             }
@@ -2163,15 +2173,18 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkStockValuationDetail) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_VAL_DET, SLibConstants.UNDEFINED, null);
             }
+            else if (item == jmiStkStockItemHistoric) {
+                showView(SDataConstants.TRNX_STK_ITEM_HIST, SDataConstants.TRNX_STK_STK); // poner las de la nueva clse
+            }
             else if (item == jmiStkStockClosing) {
                 moDialogUtilStockClosing.resetForm();
                 moDialogUtilStockClosing.setVisible(true);
             }
-            else if (item == jmiItemHistoric) {
-                showView(SDataConstants.TRNX_STK_ITEM_HIS, SDataConstants.TRNX_STK_STK); // poner las de la nueva clse
-            }
             else if (item == jmiReportStock) {
                 menuRepStock();
+            }
+            else if (item == jmiReportStockPeriod) {
+                menuRepStockPeriod();
             }
             else if (item == jmiReportStockMoves) {
                 menuRepStockMoves();
