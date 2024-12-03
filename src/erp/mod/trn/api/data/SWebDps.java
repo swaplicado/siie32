@@ -18,7 +18,7 @@ public class SWebDps {
     int idUser;
     SWebDpsRow oDpsHeader;
     ArrayList<SWebDpsEty> lEtys;
-    ArrayList<SWebDpsEtyFolder> lFolders;
+    ArrayList<SWebDpsFile> lFiles;
     ArrayList<SWebDpsNote> lNotes;
     SWebAuthorization oWebAuthorization;
 
@@ -27,7 +27,7 @@ public class SWebDps {
         this.idDoc = idDoc;
 
         this.lEtys = new ArrayList<>();
-        this.lFolders = new ArrayList<>();
+        this.lFiles = new ArrayList<>();
         this.lNotes = new ArrayList<>();
     }
 
@@ -71,12 +71,12 @@ public class SWebDps {
         this.lEtys = lEtys;
     }
 
-    public ArrayList<SWebDpsEtyFolder> getlFolders() {
-        return lFolders;
+    public ArrayList<SWebDpsFile> getlFiles() {
+        return lFiles;
     }
 
-    public void setlFolders(ArrayList<SWebDpsEtyFolder> lFolders) {
-        this.lFolders = lFolders;
+    public void setlFiles(ArrayList<SWebDpsFile> lFiles) {
+        this.lFiles = lFiles;
     }
 
     public SWebAuthorization getoWebAuthorization() {

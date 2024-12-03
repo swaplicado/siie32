@@ -37,8 +37,10 @@ import erp.mod.trn.api.db.STrnDBCore;
 import erp.mod.trn.api.data.SDocumentsResponse;
 import erp.mod.trn.api.data.SWebDps;
 import erp.mod.trn.api.data.SWebDpsEty;
+import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
+import erp.mod.trn.api.db.STrnDBDocuments;
 
 /**
  *
@@ -309,6 +311,13 @@ public class SShareData {
         ArrayList<SWebDpsNote> lNotes = STrnDBCore.getWebDpsNotes(idYear, idDoc);
         oWebDocument.getlNotes().clear();
         oWebDocument.getlNotes().addAll(lNotes);
+        
+        /**
+         * Documentos
+         */
+        ArrayList<SWebDpsFile> lDpsFiles = STrnDBDocuments.getDpsFiles(idYear, idDoc);
+        oWebDocument.getlFiles().clear();
+        oWebDocument.getlFiles().addAll(lDpsFiles);
         
         return oWebDocument;
     }
