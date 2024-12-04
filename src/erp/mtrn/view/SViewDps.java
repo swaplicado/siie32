@@ -35,9 +35,11 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
@@ -3045,9 +3047,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
                     fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    new SProcDpsSendAuthornWeb(miClient, fileProcess).start();
-                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
-                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
+                        SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) miClient);
+                        dialog.setVisible(true);
+                        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            ArrayList<SDbAuthorizationPath> paths = dialog.getSelectedAuthPaths();
+                            
+                            new SProcDpsSendAuthornWeb(miClient, fileProcess, paths).start();
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+                    }
                 }
             }
         }

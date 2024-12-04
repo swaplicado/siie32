@@ -390,10 +390,9 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
             } 
             else if (moRadCustom.isSelected()) {
                 List list = jListCompanies.getSelectedValuesList();
-                list.get(0);
-                for (int i = 0; i < list.size(); i++) {
+                for (Object list1 : list) {
                     for (SDataCompany company : moVecCompanies) {
-                        String companyName = list.get(i).toString();
+                        String companyName = list1.toString();
                         if (company.getCompany().equals(companyName)) {
                             companiesIds += (companiesIds.isEmpty() ? "" : ";") + company.getPkCompanyId();
                             break;

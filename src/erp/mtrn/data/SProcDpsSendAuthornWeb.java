@@ -11,6 +11,8 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.mod.hrs.utils.SDocUtils;
+import erp.mod.cfg.db.SDbAuthorizationPath;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
@@ -29,10 +31,12 @@ public class SProcDpsSendAuthornWeb extends Thread {
 
     private final SClientInterface miClient;
     private final SDbSupplierFileProcess moSuppFileProc;
-
-    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc) {
+    private final ArrayList<SDbAuthorizationPath> maAuthPaths;
+    
+    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, ArrayList<SDbAuthorizationPath> paths) {
         miClient = client;
         moSuppFileProc = proc;
+        maAuthPaths = paths;
         setDaemon(true);
     }
 
@@ -42,19 +46,19 @@ public class SProcDpsSendAuthornWeb extends Thread {
             Connection connection = miClient.getSession().getDatabase().getConnection();
             SDbDps dps = moSuppFileProc.getDps();
             if (dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
-                SDataDpsAuthorn auth = new SDataDpsAuthorn();
-                auth.setPrimaryKey(dps.getPrimaryKey());
-                auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SND);
-                auth.setFkUserId(miClient.getSession().getUser().getPkUserId());
-                auth.save(connection);
+            SDataDpsAuthorn auth = new SDataDpsAuthorn();
+            auth.setPrimaryKey(dps.getPrimaryKey());
+            auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SND);
+            auth.setFkUserId(miClient.getSession().getUser().getPkUserId());
+            auth.save(connection);
 
-                if (sendAuthorn()) {
-                    auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
-                    auth.save(connection);
-                    moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+            if (sendAuthorn()) {
+                auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
+                auth.save(connection);
+                moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
                 } else {
-                    auth.delete(connection);
-                }
+                auth.delete(connection);
+            }
             } else {
                 miClient.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + moSuppFileProc.getDpsStatus());
             }
@@ -74,6 +78,9 @@ public class SProcDpsSendAuthornWeb extends Thread {
             return false;
         }
 
+        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, 
+                SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
+        
         System.out.println("Documento enviado con éxito.");
         return send;
     }

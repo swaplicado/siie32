@@ -16,6 +16,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -25,6 +26,7 @@ import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.db.SRowSupplierFileDpsEntry;
 import erp.mod.trn.db.SRowSupplierFileDpsFiles;
 import erp.mtrn.data.SDataDpsType;
+import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -1455,6 +1457,26 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         }
     }
     
+    private void actionSaveAndSend() {
+        try {
+            SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath(miClient);
+            dialog.setVisible(true);
+            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                super.actionSave();
+                ArrayList<SDbAuthorizationPath> paths = dialog.getSelectedAuthPaths();
+                            
+                SDbSupplierFileProcess aux = new SDbSupplierFileProcess();
+                aux.read(miClient.getSession(), moRegistry.getPrimaryKey());
+                new SProcDpsSendAuthornWeb((SClientInterface) miClient, aux, paths).start();
+                ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
     private void focusSuppCurTotal() {
         moDecSuppTotalDoc.setValue(moDecSuppCurTotal.getValue() * mdExchangeRateDoc);
         moDecSuppTotal.setValue(moDecSuppTotalDoc.getValue() * mdExchangeRateLoc);
@@ -1548,6 +1570,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbDeleteRow.addActionListener(this);
         jbSelectAll.addActionListener(this);
         jbDeselectAll.addActionListener(this);
+        jbSaveAndSend.addActionListener(this);
         
         moDecSuppCurTotal.addFocusListener(this);
         moDecSuppExchangeRateDoc.addFocusListener(this);
@@ -1571,6 +1594,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbDeleteRow.removeActionListener(this);
         jbSelectAll.removeActionListener(this);
         jbDeselectAll.removeActionListener(this);
+        jbSaveAndSend.removeActionListener(this);
         
         moDecSuppCurTotal.removeFocusListener(this);
         moDecSuppExchangeRateDoc.removeFocusListener(this);
@@ -1735,6 +1759,9 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             }
             else if (button == jbDeselectAll) {
                 actionDeselectAll();
+            }
+            else if (button == jbSaveAndSend) {
+                actionSaveAndSend();
             }
         }
     }

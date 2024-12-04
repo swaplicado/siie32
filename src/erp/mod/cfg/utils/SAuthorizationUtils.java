@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * Clase de utilería de autorizaciones
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SAuthorizationUtils {
     
@@ -698,6 +698,41 @@ public abstract class SAuthorizationUtils {
     }
     
     /**
+     * Procesa la configuración especificamente de un DPS y guarda en la base de datos la ruta de autorizaciones con los
+     * usuarios correspondientes.
+     * 
+     * @param session
+     * @param paths recibe ya las rutas de autorizacón
+     * @param authorizationType
+     * @param pk
+     * @param reset determina si los pasos previos de autorización tienen que borrarse
+     * 
+     * @throws Exception 
+     */
+    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pk, final boolean reset) throws Exception {
+        if (reset) {
+            SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pk);
+        }
+        
+        // Si el recurso ya tiene pasos de autorización no se determinan nuevamente
+        if (!reset && SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pk)) {
+            return;
+        }
+        
+        // Lectura de path de configuración
+        ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
+        for (SDbAuthorizationPath oCfg : paths) {
+            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+            
+            for (SDbAuthorizationStep oStep : lSteps) {
+                if (! SAuthorizationUtils.stepExists(session, oStep)) {
+                    oStep.save(session);
+                }
+            }
+        }
+    }
+    
+    /**
      * Devuelve todas las configuraciones asociadas a un tipo de autorización.
      * 
      * @param session
@@ -722,6 +757,60 @@ public abstract class SAuthorizationUtils {
                 cfgItem = new SDbAuthorizationPath();
                 cfgItem.read(session, new int[]{ res.getInt("id_authorn_path") });
                 lCfgs.add(cfgItem);
+            }
+            
+            return lCfgs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Devuelve todas las configuraciones asociadas a un tipo de autorización y DPS.
+     * 
+     * @param session
+     * @param dpsType
+     * 
+     * @return 
+     */
+    public static ArrayList<SDbAuthorizationPath> getConfigurationsDps(SGuiSession session, final HashMap<String, Integer> dpsType) {
+        String sql = "SELECT id_authorn_path "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_PATH) + " "
+                + "WHERE NOT b_del AND fk_tp_authorn = 2 "
+                + "AND (('" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' BETWEEN dt_sta AND dt_end_n) OR "
+                + "(dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' AND dt_end_n IS NULL)) "
+                + "ORDER BY sort, name, lev;";
+        
+        try {
+            ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+            ArrayList<SDbAuthorizationPath> lCfgs = new ArrayList<>();
+            SDbAuthorizationPath cfgItem;
+            while(res.next()) {
+                boolean add = true;
+                cfgItem = new SDbAuthorizationPath();
+                cfgItem.read(session, new int[]{ res.getInt("id_authorn_path") });
+                forConditions:
+                for (SCondition cond : cfgItem.getAuthorizationConfigObject().getConditions()) {
+                    switch (cond.getOperator()) {
+                        case "=" :
+                            int dpsTypeCond = dpsType.get(cond.getKeyName()) == null ? 0 : dpsType.get(cond.getKeyName());
+                            if (SLibUtils.parseInt(cond.getStrValue()) != dpsTypeCond) {
+                                add = false;
+                                break forConditions;
+                            }
+                        break;
+                        default: break forConditions;
+                    }
+                }
+                if (add) {
+                    lCfgs.add(cfgItem);
+                }
             }
             
             return lCfgs;
