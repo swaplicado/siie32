@@ -3023,13 +3023,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         miClient.showMsgBoxWarning("Este documento no tiene archivos de soporte anexados.");
                     }
                     else{
-                        if (miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar todos los archivos de soporte del documento seleccionado?") == JOptionPane.YES_OPTION) {
-                            int cant = fileProcess.getSuppFiles().size();
-                            fileProcess.delete(miClient.getSession());
-                            
-                            miClient.showMsgBoxInformation("Se eliminaron un total de " + cant + " archivos de soporte.");
-                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
-                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA ||
+                                fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                            if (miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar todos los archivos de soporte del documento seleccionado?") == JOptionPane.YES_OPTION) {
+                                int cant = fileProcess.getSuppFiles().size();
+                                fileProcess.delete(miClient.getSession());
+
+                                miClient.showMsgBoxInformation("Se eliminaron un total de " + cant + " archivos de soporte.");
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pueden eliminar los archivos de soporte anexados al documento debido a que el estatus es " + fileProcess.getDpsStatus());
                         }
                     }
                 }
