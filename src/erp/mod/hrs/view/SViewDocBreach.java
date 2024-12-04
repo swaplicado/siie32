@@ -326,7 +326,8 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                 else {
                     if (moFileChooserDownload.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                         try {
-                            String filename = SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_BREACH, filevaultId, moFileChooserDownload.getSelectedFile());
+                            boolean returnPath = false;
+                            String filename = SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_BREACH, filevaultId, moFileChooserDownload.getSelectedFile(), returnPath);
                             
                             miClient.showMsgBoxInformation("El archivo del documento '" + filename + "' (ID: '" + filevaultId + "') ha sido descargado.");
                         }

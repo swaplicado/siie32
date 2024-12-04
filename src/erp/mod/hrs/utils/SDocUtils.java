@@ -209,10 +209,11 @@ public abstract class SDocUtils {
      * @param bucketName Name of Mongo GridFS bucket.
      * @param filevaultId ObjectId of file to download.
      * @param location Location to save the downloaded file.
+     * @param returnPath
      * @return Filename of file downloaded, if found.
      * @throws IOException, Exception
      */
-    public static String downloadFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+    public static String downloadFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location, final boolean returnPath) throws IOException, Exception {
         if (!location.isDirectory()) {
             throw new Exception("El parámetro File '" + location.getPath() + "' no es un directorio.");
         }
@@ -249,6 +250,10 @@ public abstract class SDocUtils {
             }
         }
         
+        if (returnPath) {
+            return location.getPath() + File.separator + filenameFound;
+        }
+        
         return filenameFound;
     }
     
@@ -262,7 +267,8 @@ public abstract class SDocUtils {
      * @throws IOException, Exception
      */
     public static File downloadAndGetFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
-        String filePath = SDocUtils.downloadFile(session, bucketName, filevaultId, location);
+        boolean returnPath = true;
+        String filePath = SDocUtils.downloadFile(session, bucketName, filevaultId, location, returnPath);
         File downloadedFile = new File(filePath);
         return downloadedFile;
     }
@@ -272,11 +278,10 @@ public abstract class SDocUtils {
      * @param session GUI session.
      * @param bucketName Name of Mongo GridFS bucket.
      * @param filevaultId ObjectId of file to download.
-     * @param location Location to save the downloaded file.
      * @return Bytes of file downloaded, if was found.
      * @throws IOException, Exception
      */
-    public static byte[] getFileBytes(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+    public static byte[] getFileBytes(final SGuiSession session, final String bucketName, final String filevaultId) throws IOException, Exception {
         String filenameFound = "";
         String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
         String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
@@ -522,7 +527,8 @@ public abstract class SDocUtils {
                             if (file.exists()) {
                                 file.delete();
                             }
-                            String fileDownloaded = downloadFile(client.getSession(), bucketName, filevaultId, new File(tempLocation));
+                            boolean returnPath = false;
+                            String fileDownloaded = downloadFile(client.getSession(), bucketName, filevaultId, new File(tempLocation), returnPath);
                             System.out.println("Abriendo PDF '" + fileDownloaded + "' desde '" + filePdf + "'...");
                             SLibUtils.launchFile(filePdf);
                             break;
@@ -553,5 +559,22 @@ public abstract class SDocUtils {
         else {
             return "";
         }
+    }
+    
+    /**
+     * 
+     * @param dbCom
+     * @param idYear
+     * @param idDoc
+     * @param idSupFile
+     * @param extension
+     * @return 
+     */
+    public static String generateFileName(String dbCom, int idYear, int idDoc, int idSupFile, String extension) {
+        String fileName = "";
+        
+        fileName += dbCom + "-" + idYear + "-" + idDoc + "-" + idSupFile + "." + extension;
+        
+        return fileName;
     }
 }

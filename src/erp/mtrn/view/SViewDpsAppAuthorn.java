@@ -316,7 +316,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                             int cant = 0;
                             for (SDbSupplierFile file : fileProcess.getSuppFiles()) {
                                 if (!file.getFilevaultId().isEmpty()) {
-                                    SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, file.getFilevaultId(), moFileChooserDownload.getSelectedFile());
+                                    boolean returnPath = false;
+                                    SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, file.getFilevaultId(), moFileChooserDownload.getSelectedFile(), returnPath);
                                     cant++;
                                 }
                             }
