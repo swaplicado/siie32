@@ -50,7 +50,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         msSql = "UPDATE trn_dps SET fid_st_dps_authorn = " + stAuth + " WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
         session.getStatement().execute(msSql);
     }
-
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkYearId = pk[0];
