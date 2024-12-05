@@ -27,6 +27,9 @@ import sa.lib.SLibUtils;
 public class SDbAuthorizationPath extends SDbRegistryUser {
 
     protected int mnPkAuthorizationPathId;
+    protected String msCode;
+    protected String msName;
+    protected int mnSortingPos;
     protected String msConditionTableName;
     protected String msConditionField;
     protected String msConditionOperator;
@@ -54,6 +57,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
     }
     
     public void setPkAuthorizationPathId(int n) { mnPkAuthorizationPathId = n; }
+    public void setCode(String s) { msCode = s; }
+    public void setName(String s) { msName = s; }
+    public void setSortingPos(int n) { mnSortingPos = n; }
     public void setConditionTableName(String s) { msConditionTableName = s; }
     public void setConditionField(String s) { msConditionField = s; }
     public void setConditionOperator(String s) { msConditionOperator = s; }
@@ -75,6 +81,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 //    public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
     public int getPkAuthorizationPathId() { return mnPkAuthorizationPathId; }
+    public String getCode() { return msCode; }
+    public String getName() { return msName; }
+    public int getSortingPos() { return mnSortingPos; }
     public String getCondictionTableName() { return msConditionTableName; }
     public String getConditionField() { return msConditionField; }
     public String getConditionOperator() { return msConditionOperator; }
@@ -112,6 +121,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkAuthorizationPathId = 0;
+        msCode = "";
+        msName = "";
+        mnSortingPos = 0;
         msConditionTableName = "";
         msConditionField = "";
         msConditionOperator = "";
@@ -176,6 +188,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         }
         else {
             mnPkAuthorizationPathId = resultSet.getInt("id_authorn_path");
+            msCode = resultSet.getString("code");
+            msName = resultSet.getString("name");
+            mnSortingPos = resultSet.getInt("sort");
             msConditionTableName = resultSet.getString("cond_tab_name");
             msConditionField = resultSet.getString("cond_field");
             msConditionOperator = resultSet.getString("cond_operator");
@@ -221,6 +236,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkAuthorizationPathId + ", " + 
+                    "'" + msCode + "', " + 
+                    "'" + msName + "', " + 
+                    mnSortingPos + ", " + 
                     "'" + msConditionTableName + "', " + 
                     "'" + msConditionField + "', " + 
                     "'" + msConditionOperator + "', " + 
@@ -247,6 +265,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
 //                    "id_authorn_path = " + mnPkAuthorizationPathId + ", " +
+                    "code = '" + msCode + "', " +
+                    "name = '" + msName + "', " +
+                    "sort = " + mnSortingPos + ", " +
                     "cond_tab_name = '" + msConditionTableName + "', " +
                     "cond_field = '" + msConditionField + "', " +
                     "cond_operator = '" + msConditionOperator + "', " +
@@ -279,6 +300,9 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
         SDbAuthorizationPath registry = new SDbAuthorizationPath();
 
         registry.setPkAuthorizationPathId(this.getPkAuthorizationPathId());
+        registry.setCode(this.getCode());
+        registry.setName(this.getName());
+        registry.setSortingPos(this.getSortingPos());
         registry.setConditionTableName(this.getCondictionTableName());
         registry.setConditionField(this.getConditionField());
         registry.setConditionOperator(this.getConditionOperator());

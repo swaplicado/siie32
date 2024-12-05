@@ -24,19 +24,19 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SDialogStockCardexHistoric extends javax.swing.JDialog implements java.awt.event.ActionListener {
-
 
     private boolean mbFirstTime;
     private final erp.client.SClientInterface miClient;
     private erp.lib.table.STablePane moPaneStockMoves;
 
+    private int mnYear;
     private int mnParamFormMode; // SLibConstants.MODE_QTY o SLibConstants.MODE_QTY_EXT
     private erp.mitm.data.SDataItem moParamItem;
 
-    /** Creates new form SDialogStockDetail */
+    /** Creates new form SDialogStockCardexHistoric */
     public SDialogStockCardexHistoric(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -59,6 +59,10 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
         jlItem = new javax.swing.JLabel();
         jtfItemKey = new javax.swing.JTextField();
         jtfItem = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jlYear = new javax.swing.JLabel();
+        jtfYear = new javax.swing.JTextField();
+        jlYearHint = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlIn = new javax.swing.JLabel();
@@ -80,7 +84,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
         jtfMaintUser = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Tarjeta auxiliar de almacén");
+        setTitle("Tarjeta auxiliar de movimientos de inventarios históricos");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -93,7 +97,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
         jPanel4.setPreferredSize(new java.awt.Dimension(550, 80));
         jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 1));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlItem.setText("Ítem:");
         jlItem.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -108,19 +112,38 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
         jtfItem.setEditable(false);
         jtfItem.setText("TEXT");
         jtfItem.setFocusable(false);
-        jtfItem.setPreferredSize(new java.awt.Dimension(275, 23));
+        jtfItem.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel7.add(jtfItem);
 
         jPanel4.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlYear.setText("Año actual:");
+        jlYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel8.add(jlYear);
+
+        jtfYear.setEditable(false);
+        jtfYear.setText("TEXT");
+        jtfYear.setFocusable(false);
+        jtfYear.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel8.add(jtfYear);
+
+        jlYearHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlYearHint.setText("(Los movimientos de inventarios que se muestran son de este año.)");
+        jlYearHint.setPreferredSize(new java.awt.Dimension(375, 23));
+        jPanel8.add(jlYearHint);
+
+        jPanel4.add(jPanel8);
 
         jpParams.add(jPanel4, java.awt.BorderLayout.WEST);
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Existencias:"));
         jPanel6.setMinimumSize(new java.awt.Dimension(150, 60));
         jPanel6.setPreferredSize(new java.awt.Dimension(400, 80));
-        jPanel6.setLayout(new java.awt.GridLayout(1, 2, 0, 3));
+        jPanel6.setLayout(new java.awt.GridLayout(1, 3, 5, 0));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel11.setLayout(new java.awt.GridLayout(2, 1));
 
         jlIn.setText("Entradas:");
         jlIn.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -136,7 +159,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
 
         jPanel6.add(jPanel11);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel12.setLayout(new java.awt.GridLayout(2, 1));
 
         jlOut.setText("Salidas:");
         jlOut.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -152,7 +175,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
 
         jPanel6.add(jPanel12);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel13.setLayout(new java.awt.GridLayout(2, 1));
 
         jlStock.setText("Existencias:");
         jlStock.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -173,7 +196,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
 
         getContentPane().add(jpParams, java.awt.BorderLayout.NORTH);
 
-        jpStockMoves.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimientos de inventarios:"));
+        jpStockMoves.setBorder(javax.swing.BorderFactory.createTitledBorder("Todos los movimientos de inventarios históricos del ítem del año actual:"));
         jpStockMoves.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 3, 0));
@@ -354,7 +377,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
                     "LEFT OUTER JOIN erp.mfgu_tp_ord AS mfgt ON mfg.fid_tp_ord = mfgt.id_tp " +
                     "LEFT OUTER JOIN erp.bpsu_bpb AS mfg_cob ON mfg.fid_cob = mfg_cob.id_bpb " +
                     "LEFT OUTER JOIN erp.cfgu_cob_ent AS mfg_ent ON mfg.fid_cob = mfg_ent.id_cob AND mfg.fid_ent = mfg_ent.id_ent " +
-                    "WHERE s.id_item = " + moParamItem.getPkItemId() + " " +
+                    "WHERE s.id_year = " + mnYear + " AND s.id_item = " + moParamItem.getPkItemId() + " AND NOT s.b_del " +
                     "ORDER BY s.dt, st.code, st.tp_iog, iog.num_ser, erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + "), " +
                     "l.lot, s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, s.id_mov ";
 
@@ -456,6 +479,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbExportCsv;
     private javax.swing.JButton jbRefresh;
@@ -464,6 +488,8 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlOut;
     private javax.swing.JLabel jlStock;
+    private javax.swing.JLabel jlYear;
+    private javax.swing.JLabel jlYearHint;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpParams;
     private javax.swing.JPanel jpStockMoves;
@@ -474,6 +500,7 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
     private javax.swing.JTextField jtfOut;
     private javax.swing.JTextField jtfSeek;
     private javax.swing.JTextField jtfStock;
+    private javax.swing.JTextField jtfYear;
     // End of variables declaration//GEN-END:variables
 
     public void focusSeek() {
@@ -529,6 +556,9 @@ public class SDialogStockCardexHistoric extends javax.swing.JDialog implements j
     public void formReset() {
         mbFirstTime = true;
 
+        mnYear = miClient.getSession().getCurrentYear();
+        jtfYear.setText("" + mnYear);
+        
         jtfSeek.setText("");
         jtfSeek.setEnabled(false);
         jbSeek.setEnabled(false);

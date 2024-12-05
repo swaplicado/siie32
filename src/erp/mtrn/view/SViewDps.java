@@ -28,12 +28,18 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCurrency;
 import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbAuthorizationPath;
+import erp.mod.hrs.utils.SDocUtils;
+import erp.mod.trn.db.SDbSupplierFile;
+import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
@@ -43,6 +49,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryIogEntryTransfer;
 import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
+import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
@@ -134,6 +141,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbChangeDpsEntryItem;
     private javax.swing.JButton jbRestoreCfdStamped;
     private javax.swing.JButton jbRestoreCfdCancelAck;
+    private javax.swing.JButton jbAddFileSupp;
+    private javax.swing.JButton jbDownFileSupp;
+    private javax.swing.JButton jbDeleteFileSupp;
+    private javax.swing.JButton jbSendAuth;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -149,6 +160,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private JFileChooser moFileChooserDownload;
 
     private boolean mbIsCategoryPur;
     private boolean mbIsCategorySal;
@@ -163,6 +175,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightDelete;
     private boolean mbHasRightAnnul;
     private boolean mbHasRightLogistics;
+    private boolean mbHasCompAuthWeb;
     private int mnModule;
     
     /**
@@ -195,6 +208,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         mbHasRightAuthor = false;
         mbHasRightDelete = false;
         mbHasRightAnnul = false;
+        
+        try {
+            mbHasCompAuthWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == 1;
+        } 
+        catch (Exception e) {}
+        
         mbHasRightLogistics = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_CRED).HasRight;
 
         if (mbIsCategoryPur) {
@@ -433,6 +452,31 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbResetPacFlags.addActionListener(this);
         jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
         
+        jbAddFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
+        jbAddFileSupp.setPreferredSize(new Dimension(23, 23));
+        jbAddFileSupp.addActionListener(this);
+        jbAddFileSupp.setToolTipText("Anexar archivos de soporte al documento");
+        
+        jbDownFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
+        jbDownFileSupp.setPreferredSize(new Dimension(23, 23));
+        jbDownFileSupp.addActionListener(this);
+        jbDownFileSupp.setToolTipText("Descargar archivos de soporte anexados al documento");
+        
+        jbDeleteFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")));
+        jbDeleteFileSupp.setPreferredSize(new Dimension(23, 23));
+        jbDeleteFileSupp.addActionListener(this);
+        jbDeleteFileSupp.setToolTipText("Eliminar todos los archivos de soporte anexados al documento");
+        
+        jbSendAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")));
+        jbSendAuth.setPreferredSize(new Dimension(23, 23));
+        jbSendAuth.addActionListener(this);
+        jbSendAuth.setToolTipText("Enviar a autorización app web");
+        
+        moFileChooserDownload = new JFileChooser();
+        moFileChooserDownload.setAcceptAllFileFilterUsed(false);
+        moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        moFileChooserDownload.setDialogTitle("Seleccionar directorio para descargar archivo...");
+        
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
@@ -495,6 +539,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperComponent(jbViewAccountingRecord);
         addTaskBarUpperComponent(jbViewAccountingDetailsDps);
         addTaskBarUpperComponent(jbViewAccountingDetailsBizPartner);
+        
+        if (mbHasCompAuthWeb) {
+            addTaskBarUpperSeparator();
+            addTaskBarUpperComponent(jbAddFileSupp);
+            addTaskBarUpperComponent(jbDownFileSupp);
+            addTaskBarUpperComponent(jbDeleteFileSupp);
+            addTaskBarUpperComponent(jbSendAuth);
+        }
         
         addTaskBarLowerComponent(jbPrint);
         addTaskBarLowerComponent(jbPrintByRange);
@@ -566,6 +618,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbAddFileSupp.setEnabled(mbIsCategoryPur && mbIsOrd);
+        jbDownFileSupp.setEnabled(mbIsCategoryPur && mbIsOrd);
+        jbDeleteFileSupp.setEnabled(mbIsCategoryPur && mbIsOrd);
+        jbSendAuth.setEnabled(mbIsCategoryPur && mbIsOrd);
         moTabFilterDnsDps.setVisible(mbIsOrd);
 
         STableField[] aoKeyFields = new STableField[2];
@@ -575,7 +631,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns = new STableColumn[50];  // extra columns for accounting record and CFD info
         }
         else if (mbIsOrd) {
-            aoTableColumns = new STableColumn[43];
+            if (mbHasCompAuthWeb) {
+                aoTableColumns = new STableColumn[46];
+            }
+            else {
+                aoTableColumns = new STableColumn[43];
+            }
         }
         else {
             aoTableColumns = new STableColumn[42];
@@ -665,7 +726,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal cliente", 75);
             }
             if (mbIsOrd) {
-                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "autorizado", STableConstants.WIDTH_ICON);
+                if (mbHasCompAuthWeb) {
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "files", "Soportes de pedidos", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "send", "Enviado aut. app web", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "stat_auth", "Autorización app web.", STableConstants.WIDTH_ITEM);
+                }
+                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "Autorización", STableConstants.WIDTH_ICON);
                 aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
             }
         }
@@ -2897,6 +2965,116 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionAddFileSupp() {
+        try {
+            if (jbAddFileSupp.isEnabled()) {
+                if (isRowSelected()) {
+                    SGuiParams params = new SGuiParams();
+                    params.setKey((int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    ((SGuiClient) miClient).getSession().getModule(SModConsts.MOD_TRN_N).showForm(SModConsts.TRNX_SUP_FILE_DPS_PROC, SLibConstants.UNDEFINED, params);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                    
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    private void actionDownFileSupp() {
+        try {
+            if (jbAddFileSupp.isEnabled()) {
+                if (isRowSelected()) {
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getSuppFiles().isEmpty()) {
+                        miClient.showMsgBoxWarning("Este documento no tiene archivos de soporte anexados.");
+                    }
+                    else{
+                        if (moFileChooserDownload.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                            int cant = 0;
+                            for (SDbSupplierFile file : fileProcess.getSuppFiles()) {
+                                if (!file.getFilevaultId().isEmpty()) {
+                                    boolean returnPath = false;
+                                    SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, file.getFilevaultId(), moFileChooserDownload.getSelectedFile(), returnPath);
+                                    cant++;
+                                }
+                            }
+                            
+                            miClient.showMsgBoxInformation("Se descargaron un total de " + cant + " archivos de soporte.");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    private void actionDeleteFileSupp() {
+        try {
+            if (jbDeleteFileSupp.isEnabled()) {
+                if (isRowSelected()) {
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getSuppFiles().isEmpty()) {
+                        miClient.showMsgBoxWarning("Este documento no tiene archivos de soporte anexados.");
+                    }
+                    else{
+                        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA ||
+                                fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                            if (miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar todos los archivos de soporte del documento seleccionado?") == JOptionPane.YES_OPTION) {
+                                int cant = fileProcess.getSuppFiles().size();
+                                fileProcess.delete(miClient.getSession());
+
+                                miClient.showMsgBoxInformation("Se eliminaron un total de " + cant + " archivos de soporte.");
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pueden eliminar los archivos de soporte anexados al documento debido a que el estatus es " + fileProcess.getDpsStatus());
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    private void actionSendAuth() {
+        try {
+            if (jbSendAuth.isEnabled()) {
+                if (isRowSelected()) {
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
+                        SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) miClient);
+                        dialog.setVisible(true);
+                        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            ArrayList<SDbAuthorizationPath> paths = dialog.getSelectedAuthPaths();
+                            
+                            new SProcDpsSendAuthornWeb(miClient, fileProcess, paths).start();
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
     public void publicActionPrint() {
         actionPrint(false);
     }
@@ -2951,6 +3129,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                (mbHasCompAuthWeb ? "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, " +
+                "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SAL + ", 0) AS send, sah.name AS stat_auth, " : "") +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
@@ -2977,8 +3157,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr, " +
                 "CASE d.fid_st_dps_authorn " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + " THEN " + STableConstants.ICON_ST_WAIT + " " +
-                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN " + STableConstants.ICON_ST_THUMBS_UP + " " +
-                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN " + STableConstants.ICON_ST_THUMBS_DOWN + " " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN " + STableConstants.ICON_VIEW_OK_GREEN + " " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN " + STableConstants.ICON_VIEW_REJECTED + " " +
                 "ELSE " + STableConstants.ICON_NULL + " END AS f_status ";
 
         if (mbIsDoc || mbIsDocAdj) {
@@ -3051,11 +3231,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "INNER JOIN erp.usru_usr AS un ON d.fid_usr_new = un.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
                 "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr " +
+                (mbHasCompAuthWeb ? "LEFT OUTER JOIN trn_sup_file_dps AS fl ON d.id_year = fl.id_year AND d.id_doc = fl.id_doc " +
+                "LEFT OUTER JOIN trn_dps_authorn AS ah ON d.id_year = ah.id_year AND d.id_doc = ah.id_doc " +
+                "LEFT OUTER JOIN erp.cfgs_st_authorn AS sah ON ah.fid_st_authorn = sah.id_st_authorn " : "") +
                 "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc " +
                 "LEFT OUTER JOIN erp.usru_usr AS xu ON x.fid_usr_prc = xu.id_usr ";
-
+        
         if (mbIsDoc || mbIsDocAdj) {
             msSql +=
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
@@ -3066,6 +3249,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         
         msSql += (sqlSeries.isEmpty() ? "" : (sqlWhere.isEmpty() ? "WHERE " : "AND ") + sqlSeries);
 
+        if(mbHasCompAuthWeb) {
+            msSql += "GROUP BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, bp.bp, bpc.bp_key, bp.id_bp, bpb.bpb, bpb.id_bpb ";
+        }
         if (getDpsSortingType() == SDataConstantsSys.CFGS_TP_SORT_BIZ_P_DOC) {
             msSql += "ORDER BY ";
 
@@ -3091,7 +3277,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             msSql += "bp.id_bp, bpb.bpb, bpb.id_bpb ";
-        }
+        }  
     }
 
     @Override
@@ -3215,6 +3401,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbResetPacFlags) {
                     actionResetPacFlags();
+                }
+                else if (button == jbAddFileSupp) {
+                    actionAddFileSupp();
+                }
+                else if (button == jbDownFileSupp) {
+                    actionDownFileSupp();
+                }
+                else if (button == jbDeleteFileSupp) {
+                    actionDeleteFileSupp();
+                }
+                else if (button == jbSendAuth) {
+                    actionSendAuth();
                 }
             }
         }

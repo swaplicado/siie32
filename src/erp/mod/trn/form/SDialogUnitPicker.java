@@ -17,7 +17,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDialogUnitPicker extends SBeanOptionPicker implements KeyListener {
 

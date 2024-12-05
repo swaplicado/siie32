@@ -40,6 +40,11 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
     public static final javax.swing.ImageIcon moIconViewLigRed = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_lig_red.png"));
     public static final javax.swing.ImageIcon moIconViewLigWhi = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_lig_whi.png"));
     public static final javax.swing.ImageIcon moIconViewLigYel = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_lig_yel.png"));
+    public static final javax.swing.ImageIcon moIconViewFolder = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_folder.png"));
+    public static final javax.swing.ImageIcon moIconViewFolderAlert = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_folder_alert.png"));
+    public static final javax.swing.ImageIcon moIconViewOkGreen = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_ok_green.png"));
+    public static final javax.swing.ImageIcon moIconViewRejected = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_rejected.png"));
+    public static final javax.swing.ImageIcon moIconViewSal = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_mod_sal.png"));
 
     public STableCellRendererIcon() {
         moLabel = new JLabel();
@@ -131,6 +136,21 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
                 break;
             case STableConstants.ICON_VIEW_LIG_YEL:
                 moLabel.setIcon(moIconViewLigYel);
+                break;
+            case STableConstants.ICON_VIEW_OK_GREEN:
+                moLabel.setIcon(moIconViewOkGreen);
+                break;
+            case STableConstants.ICON_VIEW_REJECTED:
+                moLabel.setIcon(moIconViewRejected);
+                break;
+            case STableConstants.ICON_VIEW_FOLDER:
+                moLabel.setIcon(moIconViewFolder);
+                break;
+            case STableConstants.ICON_VIEW_FOLDER_ALERT:
+                moLabel.setIcon(moIconViewFolderAlert);
+                break;
+            case STableConstants.ICON_VIEW_SAL:
+                moLabel.setIcon(moIconViewSal);
                 break;
             default:
                 moLabel.setIcon(moIconNull);

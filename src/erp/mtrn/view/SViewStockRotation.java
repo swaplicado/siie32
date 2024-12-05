@@ -27,17 +27,17 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SViewStockRotation extends erp.lib.table.STableTab {
 
     public static final String TXT_DEC_INC = "Ver más decimales";
     public static final String TXT_DEC_DEC = "Ver menos decimales";
 
-    private int mnColStockIn;
+    private int mnColStkSta;
     private int mnColIn;
     private int mnColOut;
-    private int mnColStock;
+    private int mnColStk;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
@@ -54,7 +54,7 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
-        moTabFilterDeleted = new STabFilterDeleted(this);
+        moTabFilterDeleted = new STabFilterDeleted(this, "Filtrar ítems sin existencias");
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
 
         removeTaskBarUpperComponent(jbNew);
@@ -80,15 +80,15 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
         aoTableColumns = new STableColumn[col];
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 100);
         }
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
 
         if (showLots()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "l.lot", "Lote", 100);
@@ -96,7 +96,7 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "l.b_block", "Bloqueado", STableConstants.WIDTH_BOOLEAN);
         }
 
-        mnColStockIn = i;
+        mnColStkSta = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_inv_i", "Inventario ini.", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         mnColIn = i;
@@ -105,7 +105,7 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
         mnColOut = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        mnColStock = i;
+        mnColStk = i;
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stock", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -161,10 +161,10 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
             miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
             miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary();
 
-        moTablePane.getTableColumn(mnColStockIn).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColStkSta).setCellRenderer(tcr);
         moTablePane.getTableColumn(mnColIn).setCellRenderer(tcr);
         moTablePane.getTableColumn(mnColOut).setCellRenderer(tcr);
-        moTablePane.getTableColumn(mnColStock).setCellRenderer(tcr);
+        moTablePane.getTableColumn(mnColStk).setCellRenderer(tcr);
 
         jtbDecimals.setToolTipText(toolTipText);
 

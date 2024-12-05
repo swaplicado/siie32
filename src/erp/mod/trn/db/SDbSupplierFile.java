@@ -29,6 +29,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
     protected String msExternalBizPartnerName;
     protected String msFilevaultId;
     protected Date mtFilevaultTs_n;
+    protected String msFileName;
     protected String msFileType;
     protected String msFileStorageName;
     //protected boolean mbDeleted;
@@ -43,8 +44,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
     
     protected SDbSupplierFileDps moSuppFileDps;
     protected File msAuxFile;
-    protected String msXtaFileName;
-
+    
     public SDbSupplierFile() {
         super(SModConsts.TRN_SUP_FILE);
     }
@@ -56,6 +56,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
     public void setExternalBizPartnerName(String s) { msExternalBizPartnerName = s; }
     public void setFilevaultId(String s) { msFilevaultId = s; }
     public void setFilevaultTs_n(Date t) { mtFilevaultTs_n = t; }
+    public void setFileName(String s) { msFileName = s; }
     public void setFileType(String s) { msFileType = s; }
     public void setFileStorageName(String s) { msFileStorageName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -76,6 +77,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
     public String getExternalBizPartnerName() { return msExternalBizPartnerName; }
     public String getFilevaultId() { return msFilevaultId; }
     public Date getFilevaultTs_n() { return mtFilevaultTs_n; }
+    public String getFileName () { return msAuxFile == null ? msFileName : msAuxFile.getName(); }
     public String getFileType() { return msFileType; }
     public String getFileStorageName() { return msFileStorageName; }
     public boolean isDeleted() { return mbDeleted; }
@@ -88,10 +90,6 @@ public class SDbSupplierFile extends SDbRegistryUser {
 
     public SDbSupplierFileDps getSuppFileDps() { return moSuppFileDps; }
     public File getAuxFile() { return msAuxFile; }
-    
-    public String getFileName () {
-        return msAuxFile == null ? msXtaFileName : msAuxFile.getName();
-    }
     
     /**
      * Un objeto SupplierFile puede tener varios SupplierFileDps, sin embargo sólo nos interesa leer uno a la vez,
@@ -141,6 +139,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
         msExternalBizPartnerName = "";
         msFilevaultId = "";
         mtFilevaultTs_n = null;
+        msFileName = "";
         msFileType = "";
         msFileStorageName = "";
         mbDeleted = false;
@@ -153,7 +152,6 @@ public class SDbSupplierFile extends SDbRegistryUser {
         
         moSuppFileDps = null;
         msAuxFile = null;
-        msXtaFileName = "";
     }
 
     @Override
@@ -205,6 +203,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
             msExternalBizPartnerName = resultSet.getString("ext_bp_name");
             msFilevaultId = resultSet.getString("filevault_id");
             mtFilevaultTs_n = resultSet.getTimestamp("filevault_ts_n");
+            msFileName = resultSet.getString("file_name");
             msFileType = resultSet.getString("file_type");
             msFileStorageName = resultSet.getString("file_storage_name");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -214,11 +213,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-            
-            if (!msFilevaultId.isEmpty()){
-                msXtaFileName = SDocUtils.getFileName(session, SDocUtils.BUCKET_DOC_DPS_SUPPLIER, msFilevaultId);
-            }
-            
+                        
             mbRegistryNew = false;
         }
         
@@ -244,6 +239,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
                     "'" + msExternalBizPartnerName + "', " + 
                     "'" + msFilevaultId + "', " + 
                     "NULL, " + 
+                    "'" + msFileName + "', " + 
                     "'" + msFileType + "', " + 
                     "'" + msFileStorageName + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -266,6 +262,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
                     "ext_bp_name = '" + msExternalBizPartnerName + "', " +
                     "filevault_id = '" + msFilevaultId + "', " +
                     "filevault_ts_n = NULL, " +
+                    "file_name = '" + msFileName + "', " +
                     "file_type = '" + msFileType + "', " +
                     "file_storage_name = '" + msFileStorageName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -285,12 +282,14 @@ public class SDbSupplierFile extends SDbRegistryUser {
         if (msAuxFile != null) {
             msFileType = SDocUtils.getExtensionFile(msAuxFile);
             msFilevaultId = SDocUtils.uploadFile(session, SDocUtils.BUCKET_DOC_DPS_SUPPLIER, msFileType, msAuxFile);
+            msFileName = msAuxFile.getName();
         }
         
         msSql = "UPDATE " + getSqlTable() + " SET " +
                 "filevault_id = '" + msFilevaultId + "', " +
                 "filevault_ts_n = NULL, " +
-                "file_type = '" + msFileType + "' " +
+                "file_type = '" + msFileType + "', " +
+                "file_name = '" + msFileName + "' " +
                 getSqlWhere();
         session.getStatement().execute(msSql);
         
@@ -313,6 +312,7 @@ public class SDbSupplierFile extends SDbRegistryUser {
         registry.setExternalBizPartnerName(this.getExternalBizPartnerName());
         registry.setFilevaultId(this.getFilevaultId());
         registry.setFilevaultTs_n(this.getFilevaultTs_n());
+        registry.setFileName(this.getFileName());
         registry.setFileType(this.getFileType());
         registry.setFileStorageName(this.getFileStorageName());
         registry.setDeleted(this.isDeleted());

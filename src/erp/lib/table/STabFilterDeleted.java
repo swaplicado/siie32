@@ -17,9 +17,18 @@ public class STabFilterDeleted extends javax.swing.JPanel {
     
     /** Creates new form STabFilterDeleted */
     public STabFilterDeleted(erp.lib.table.STableTabInterface tableTab) {
+        this(tableTab, null);
+    }
+    
+    /** Creates new form STabFilterDeleted */
+    public STabFilterDeleted(erp.lib.table.STableTabInterface tableTab, java.lang.String toolTip) {
         miTableTab = tableTab;
         initComponents();
         initComponentsExtra();
+        
+        if (toolTip != null && !toolTip.isEmpty()) {
+            jtbFilter.setToolTipText(toolTip);
+        }
     }
     
     /** This method is called from within the constructor to
