@@ -51,7 +51,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogRepBreaches extends JDialog implements ActionListener {
 
@@ -119,14 +119,14 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         jbSend = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
 
-        setTitle("Reporte de sanciones");
+        setTitle("Reporte de consecuencias");
         setIconImage(null);
         setIconImages(null);
         setModal(true);
         setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(6, 0, 0, 5));
 
@@ -233,7 +233,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas con Módulo de RH:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas con Módulo Recursos Humanos:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jScrollPane2.setViewportView(jListCompanies);
