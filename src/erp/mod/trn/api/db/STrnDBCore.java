@@ -9,6 +9,8 @@ import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebAuthStep;
+import erp.mod.trn.api.data.SWebAuthorization;
 import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
@@ -28,6 +30,32 @@ import java.util.logging.Logger;
  * @author Edwin Carmona
  */
 public class STrnDBCore {
+    
+    SMySqlClass oDbObj;
+    String msMainDatabase;
+    
+    public STrnDBCore() {
+        try {
+            this.oDbObj = new SMySqlClass();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+        } catch (SConfigException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private Connection getConnection() {
+        try {
+            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
 
     // Consulta base para la obtención de un DPS
     final static String BASE_QUERY = "SELECT  "
@@ -65,7 +93,9 @@ public class STrnDBCore {
             + "    comms_cur_r, "
             + "    fid_cur, "
             + "    dusr.usr AS dps_user, "
-            + "    dusr.id_usr AS dps_user_id "
+            + "    dusr.id_usr AS dps_user_id,"
+            + "    aust.id_st_authorn, "
+            + "    COALESCE(aust.name, 'NA') AS auth_st_name "
             + "FROM "
             + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
             + "        INNER JOIN "
@@ -80,7 +110,17 @@ public class STrnDBCore {
             + "        LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON dps_mr.fid_mat_req = mr.id_mat_req "
             + "        LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS mrusr ON mr.fk_usr_ins = mrusr.id_usr ";
+            + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS mrusr ON mr.fk_usr_ins = mrusr.id_usr "
+            + "        LEFT JOIN\n"
+            + "    " + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS aust ON (SELECT "
+            + "            fid_st_authorn "
+            + "        FROM "
+            + "            " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
+            + "        WHERE "
+            + "            id_year = dps.id_year "
+            + "                AND id_doc = dps.id_doc "
+            + "        ORDER BY ts_usr DESC "
+            + "        LIMIT 1) = aust.id_st_authorn ";
 
     /**
      * Obtiene documentos entre un rango de fechas y para un usuario específico.
@@ -90,11 +130,9 @@ public class STrnDBCore {
      * @param idUser ID del usuario para filtrar.
      * @return Lista de objetos {@code SWebDpsRow} con los datos obtenidos.
      */
-    public static ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser) {
+    public ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser) {
         try {
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = this.getConnection();
 
             if (conn == null) {
                 return null;
@@ -108,7 +146,37 @@ public class STrnDBCore {
                     + "        AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' "
                     + "        AND num_ser <> 'S' "
                     + "        AND mr.id_mat_req IS NOT NULL "
-                    + "GROUP BY id_year , id_doc "
+                    + "        AND (SELECT fid_st_authorn "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
+                    + "WHERE id_year = dps.id_year AND id_doc = dps.id_doc "
+                    + "ORDER BY ts_usr DESC "
+                    + "LIMIT 1) IN (11, 2, 3, 4, 5) ";
+            if (idUser > 0) {
+                query += "AND " + idUser + " IN (SELECT  "
+                        + "    steps1.fk_usr_step "
+                        + "FROM "
+                        + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                        + "WHERE "
+                        + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                        + "        AND steps1.res_pk_n1_n = dps.id_year "
+                        + "        AND steps1.res_pk_n2_n = dps.id_doc "
+                        + "        AND NOT steps1.b_authorn "
+                        + "        AND NOT steps1.b_reject "
+                        + "        AND steps1.lev = (SELECT  "
+                        + "            step2.lev "
+                        + "        FROM "
+                        + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
+                        + "        WHERE "
+                        + "            NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                        + "                AND step2.res_pk_n1_n = dps.id_year "
+                        + "                AND step2.res_pk_n2_n = dps.id_doc "
+                        + "                AND NOT step2.b_authorn "
+                        + "                AND NOT step2.b_reject "
+                        + "        ORDER BY step2.lev ASC "
+                        + "        LIMIT 1)) ";
+            }
+
+            query += "GROUP BY id_year , id_doc "
                     + "ORDER BY dps.dt ASC;";
 
             Statement st = conn.createStatement();
@@ -118,12 +186,12 @@ public class STrnDBCore {
             ArrayList<SWebDpsRow> lDocuments = new ArrayList<>();
 
             while (res.next()) {
-                SWebDpsRow oDoc = STrnDBCore.getDataFromRow(res);
+                SWebDpsRow oDoc = this.getDataFromRow(res);
                 lDocuments.add(oDoc);
             }
 
             return lDocuments;
-        } catch (SConfigException | ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -137,11 +205,9 @@ public class STrnDBCore {
      * @param idDoc ID del documento.
      * @return Objeto {@code SWebDpsRow} con los datos obtenidos.
      */
-    public static SWebDpsRow getDocumentByPk(int idYear, int idDoc) {
+    public SWebDpsRow getDocumentByPk(int idYear, int idDoc) {
         try {
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = this.getConnection();
 
             if (conn == null) {
                 return null;
@@ -158,9 +224,9 @@ public class STrnDBCore {
             ResultSet res = st.executeQuery(query);
 
             if (res.next()) {
-                return STrnDBCore.getDataFromRow(res);
+                return this.getDataFromRow(res);
             }
-        } catch (SConfigException | ClassNotFoundException | SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -175,7 +241,7 @@ public class STrnDBCore {
      * consulta.
      * @return Objeto {@code SWebDpsRow} con los datos mapeados.
      */
-    private static SWebDpsRow getDataFromRow(ResultSet res) {
+    private SWebDpsRow getDataFromRow(ResultSet res) {
         try {
             SWebDpsRow oDoc = new SWebDpsRow();
 
@@ -217,11 +283,9 @@ public class STrnDBCore {
         return null;
     }
 
-    public static ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc) {
+    public ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc) {
         try {
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = this.getConnection();
 
             if (conn == null) {
                 return null;
@@ -243,10 +307,10 @@ public class STrnDBCore {
                     "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ety.fid_item = i.id_item "
                     + "        INNER JOIN " + //
                     "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
-                    + "WHERE " + //
-                    "   NOT dps.b_del AND NOT ety.b_del " +
-                    "   AND dps.id_year = " + idYear + " " +
-                    "   AND dps.id_doc = " + idDoc + ";";
+                    + "WHERE "
+                    + "   NOT dps.b_del AND NOT ety.b_del "
+                    + "   AND dps.id_year = " + idYear + " "
+                    + "   AND dps.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
             System.out.println(query);
@@ -274,27 +338,22 @@ public class STrnDBCore {
                 lEties.add(oEty);
             }
 
+            STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
             for (SWebDpsEty oEty : lEties) {
-                oEty.setoMaterialRequest(STrnDBMaterialRequest.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
+                oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
             }
 
             return lEties;
         } catch (SQLException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return new ArrayList<>();
     }
 
-    public static ArrayList<SWebDpsNote> getWebDpsNotes(int idYear, int idDoc) {
+    public ArrayList<SWebDpsNote> getWebDpsNotes(int idYear, int idDoc) {
         try {
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = this.getConnection();
 
             if (conn == null) {
                 return null;
@@ -322,13 +381,143 @@ public class STrnDBCore {
             return lNotes;
         } catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return new ArrayList<>();
+    }
+    
+    public SWebAuthorization getDpsAuthorization(int idYear, int idDoc) {
+        try {
+            SWebAuthorization oAuth = new SWebAuthorization();
+            
+            Connection conn = this.getConnection();
+            
+            if (conn == null) {
+                return null;
+            }
+            
+            String query = "SELECT  " +
+                    "    s.id_authorn_step, " +
+                    "    s.dt_time_authorn_n, " +
+                    "    s.dt_time_reject_n, " +
+                    "    s.comments, " +
+                    "    s.fk_usr_step, " +
+                    "    s.b_req, " +
+                    "    s.lev, " +
+                    "    s.b_authorn, " +
+                    "    s.b_reject, " +
+                    "    s.fk_usr_authorn_n, " +
+                    "    s.fk_usr_reject_n, " +
+                    "    u.usr " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS s " +
+                    "        INNER JOIN " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u ON s.fk_usr_step = u.id_usr " +
+                    "WHERE " +
+                    "    NOT s.b_del " +
+                    "        AND s.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+                    "        AND s.res_pk_n1_n = " + idYear + " " +
+                    "        AND s.res_pk_n2_n = " + idDoc + ";";
+            
+            Statement st = conn.createStatement();
+            System.out.println(query);
+            ResultSet res = st.executeQuery(query);
+            ArrayList<SWebAuthStep> lSteps = new ArrayList<>();
+            while (res.next()) {
+                SWebAuthStep oStep = new SWebAuthStep();
+                oStep.setUserName(res.getString("u.usr"));
+                oStep.setComments(res.getString("s.comments"));
+                oStep.setAuthorizedAt(res.getString("dt_time_authorn_n"));
+                oStep.setRejectedAt(res.getString("dt_time_reject_n"));
+                oStep.setStepLevel(res.getInt("s.lev"));
+                if (res.getBoolean("s.b_authorn")) {
+                    oStep.setIsAuthorized(true);
+                    oStep.setStatusName("AUTORIZADO");
+                }
+                else if (res.getBoolean("s.b_reject")) {
+                    oStep.setIsRejected(true);
+                    oStep.setStatusName("RECHAZADO");
+                }
+                else {
+                    oStep.setStatusName("PENDIENTE");
+                }
+                lSteps.add(oStep);
+            }
+            oAuth.setlSteps(lSteps);
+            
+            String queryStatus = "SELECT "
+                    + "CFG_GET_ST_AUTHORN(2, "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "', "
+                    + "" + idYear + ", "
+                    + "" + idDoc + ", "
+                    + "NULL, NULL, NULL) AS auth_st, "
+                    + "tb.name AS auth_st_name, "
+                    + "(SELECT " +
+                    "            ts_usr_upd " +
+                    "        FROM " +
+                    " " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " " +
+                    "        WHERE " +
+                    "            NOT b_del AND res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+                    "                AND res_pk_n1_n = " + idYear + " " +
+                    "                AND res_pk_n2_n = " + idDoc + " ORDER BY fk_usr_upd DESC LIMIT 1) AS last_action_at "
+                    + "FROM "
+                    + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS tb "
+                    + "WHERE "
+                    + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(2, "
+                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "', "
+                    + "" + idYear + ", "
+                    + "" + idDoc + ", "
+                    + "NULL, NULL, NULL);";
+            Statement stStatus = conn.createStatement();
+            System.out.println(queryStatus);
+            ResultSet resStatus = stStatus.executeQuery(queryStatus);
+            if (resStatus.next()) {
+                oAuth.setIdAuthStatus(resStatus.getInt("auth_st"));
+                oAuth.setAuthStatusName(resStatus.getString("auth_st_name"));
+                oAuth.setLastActionAt(resStatus.getString("last_action_at"));
+            }
+
+            String queryUsersInTurn = "SELECT  " +
+                "    steps1.fk_usr_step " +
+                "FROM " +
+                "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 " +
+                "WHERE " +
+                "    NOT steps1.b_del " +
+                "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+                "        AND steps1.res_pk_n1_n = " + idYear + " " +
+                "        AND steps1.res_pk_n2_n = " + idDoc + " " +
+                "        AND NOT steps1.b_authorn " +
+                "        AND NOT steps1.b_reject " +
+                "        AND steps1.lev = (SELECT  " +
+                "            step2.lev " +
+                "        FROM " +
+                "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
+                "        WHERE " +
+                "            NOT step2.b_del " +
+                "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+                "                AND step2.res_pk_n1_n = " + idYear + " " +
+                "                AND step2.res_pk_n2_n = " + idDoc + " " +
+                "                AND NOT step2.b_authorn " +
+                "                AND NOT step2.b_reject " +
+                "        ORDER BY step2.lev ASC " +
+                "        LIMIT 1);";
+            
+            Statement stUsersInTurn = conn.createStatement();
+            System.out.println(queryUsersInTurn);
+            ArrayList<Integer> lUsersInTurn = new ArrayList<>();
+            ResultSet resUsersInTurn = stUsersInTurn.executeQuery(queryUsersInTurn);
+            while (resUsersInTurn.next()) {
+                lUsersInTurn.add(resUsersInTurn.getInt("fk_usr_step"));
+            }
+            oAuth.getlUsersInTurn().addAll(lUsersInTurn);
+            
+            return oAuth;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 
 }

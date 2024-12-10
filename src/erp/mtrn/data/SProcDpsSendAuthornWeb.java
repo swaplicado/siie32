@@ -156,6 +156,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
                     hasError = true;
                     e.printStackTrace();
                     sError = "Error al enviar los archivos, intente de nuevo o contacte a soporte técnico. " + e.getMessage();
+                    break;
                 }
             }
 

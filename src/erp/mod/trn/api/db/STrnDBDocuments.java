@@ -27,6 +27,32 @@ import erp.mod.trn.api.data.SWebFile;
  */
 public class STrnDBDocuments {
     
+    SMySqlClass oDbObj;
+    String msMainDatabase;
+    
+    public STrnDBDocuments() {
+        try {
+            this.oDbObj = new SMySqlClass();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+        } catch (SConfigException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private Connection getConnection() {
+        try {
+            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
     /**
      * Obtiene los archivos de un documento
      * 
@@ -36,11 +62,9 @@ public class STrnDBDocuments {
      * 
      * @return ArrayList<SWebDpsFile> 
      */
-    public static ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc) {
+    public ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc) {
         try {
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = getConnection();
 
             if (conn == null) {
                 return null;
@@ -56,7 +80,7 @@ public class STrnDBDocuments {
                     "    f.file_storage_name, " +
                     "    f.file_type, " +
                     "    f.fk_cur_quot, " +
-                    "    COALESCE(bp.bp, f.ext_bp_name) AS bp_name " +
+                    "    IF(LENGTH(f.ext_bp_name) > 0, f.ext_bp_name, COALESCE(bp.bp, '')) AS bp_name " +
                     "FROM " +
                     "    " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
                     "        INNER JOIN " +
@@ -64,7 +88,7 @@ public class STrnDBDocuments {
                     "        LEFT JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON f.fid_bp_n = bp.id_bp " +
                     "WHERE " +
-                    "    NOT f.b_del " +
+                    "   NOT f.b_del " +
                     "   AND fdps.id_year = " + idYear + " " +
                     "   AND fdps.id_doc = " + idDoc + ";";
 
@@ -116,10 +140,6 @@ public class STrnDBDocuments {
 
             return lWebDpsFiles;
         } catch (SQLException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 

@@ -387,7 +387,7 @@ public abstract class SAuthorizationUtils {
     
     /**
      * Petición de autorización o rechazo de recurso.
-     * Si el proceso ha sido exitoso devuelve un Strin vacío, si ha ocurrido un error el 
+     * Si el proceso ha sido exitoso devuelve un String vacío, si ha ocurrido un error el 
      * String explicará lo que ha sucedido
      * 
      * @param session
@@ -424,7 +424,7 @@ public abstract class SAuthorizationUtils {
             
             if (res.next()) {
                 if (action == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"));
+                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"), reasonRej);
                 }
                 else {
                     return SAuthorizationUtils.rejectById(session, res.getInt("id_authorn_step"), reasonRej);
@@ -463,10 +463,11 @@ public abstract class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * @param comments
      * 
      * @return 
      */
-    public static String authorizeById(SGuiSession session, final int idAuthStep) {
+    public static String authorizeById(SGuiSession session, final int idAuthStep, String comments) {
         SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
@@ -522,7 +523,7 @@ public abstract class SAuthorizationUtils {
                 oStep.setDateTimeRejected_n(null);
                 oStep.setFkUserRejectId_n(0);
                 oStep.setRejected(false);
-                oStep.setComments("");
+                oStep.setComments(comments);
                 
                 oStep.save(session);
                 

@@ -20,10 +20,12 @@ public class SWebMaterialRequest {
     private String mrPriority;
     private String mrRequiredDate;
     private String mrType;
+    private String mrStorageCloudUrl;
     private ArrayList<SWebMatReqNote> lNotes;
     private ArrayList<SWebMatReqEtyNote> lEtyNotes;
 
     public SWebMaterialRequest() {
+        this.mrStorageCloudUrl = "";
         this.lNotes = new ArrayList<>();
         this.lEtyNotes = new ArrayList<>();
     }
@@ -82,6 +84,14 @@ public class SWebMaterialRequest {
 
     public void setMrType(String mrType) {
         this.mrType = mrType;
+    }
+
+    public String getMrStorageCloudUrl() {
+        return mrStorageCloudUrl;
+    }
+
+    public void setMrStorageCloudUrl(String mrStorageCloudUrl) {
+        this.mrStorageCloudUrl = mrStorageCloudUrl;
     }
 
     public ArrayList<SWebMatReqNote> getlNotes() {

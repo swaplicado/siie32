@@ -1,5 +1,7 @@
 package erp.mod.trn.api.db;
 
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
+import com.swaplicado.data.StorageManagerException;
 import erp.mod.SModConsts;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
@@ -18,6 +20,37 @@ import java.util.logging.Logger;
  * vinculadas a entradas específicas de documentos (DPS).
  */
 public class STrnDBMaterialRequest {
+    
+    SMySqlClass oDbObj;
+    String msMainDatabase;
+
+    public STrnDBMaterialRequest(SMySqlClass oDbObj, String mainDatabase) {
+        this.oDbObj = oDbObj;
+        this.msMainDatabase = mainDatabase;
+    }
+    
+    public STrnDBMaterialRequest() {
+        try {
+            this.oDbObj = new SMySqlClass();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+        } catch (SConfigException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private Connection getConnection() {
+        try {
+            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
     
     private static final ArrayList<SWebMaterialRequest> lMaterialRequests = new ArrayList<>();
     
@@ -40,12 +73,10 @@ public class STrnDBMaterialRequest {
      * @param idEty ID de la entrada del documento.
      * @return Una instancia de {@link SWebMaterialRequest} que contiene los datos de la requisición de material.
      */
-    public static SWebMaterialRequest getMaterialRequestOfDpsEty(final int idYear, final int idDoc, final int idEty) {
+    public SWebMaterialRequest getMaterialRequestOfDpsEty(final int idYear, final int idDoc, final int idEty) {
         try {
             // Conexión a la base de datos principal.
-            SMySqlClass mdb = new SMySqlClass();
-            String dbName = mdb.getMainDatabaseName();
-            Connection conn = mdb.connect("", "", dbName, "", "");
+            Connection conn = getConnection();
 
             if (conn == null) {
                 return null;
@@ -91,6 +122,17 @@ public class STrnDBMaterialRequest {
                 oMatReq.setMrUser(res.getString("mr_user"));
                 oMatReq.setMrPriority(res.getString("prty_name"));
                 oMatReq.setMrType(res.getString("mr.tp_req"));
+                try {
+                    String fileName = this.msMainDatabase + "-" + "RM" + "-" + oMatReq.getIdMaterialRequest() + ".pdf";
+                    if (CloudStorageManager.storagedFileExists(fileName)) {
+                        oMatReq.setMrStorageCloudUrl(CloudStorageManager.generatePresignedUrl(fileName));
+                        System.out.println(fileName);
+                    }
+                }
+                catch (StorageManagerException ex) {
+                    Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                    oMatReq.setMrStorageCloudUrl("#");
+                }
             }
 
             // Consulta para obtener las notas de la requisición de materiales.
@@ -121,11 +163,8 @@ public class STrnDBMaterialRequest {
             lMaterialRequests.add(oMatReq);
 
             return oMatReq;
-        } catch (SQLException ex) {
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
         }
 

@@ -45,10 +45,11 @@ public class SAuthorizationsAPI {
      * @param typeResource
      * @param pk
      * @param userId
+     * @param comments
      * @return 
      */
-    public String approbeResouorce(int typeResource, Object pk, int userId) {
-        String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, "");
+    public String approbeResource(int typeResource, Object pk, int userId, String comments) {
+        String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments);
         if (res != null && res.isEmpty()) {
             switch(typeResource) {
                 case AUTH_TYPE_MAT_REQUEST:

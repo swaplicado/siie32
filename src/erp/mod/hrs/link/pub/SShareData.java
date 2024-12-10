@@ -5,8 +5,6 @@
  */
 package erp.mod.hrs.link.pub;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.utils.SPrepayroll;
 import erp.mod.hrs.link.utils.SUtilsJSON;
@@ -30,11 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
+import erp.mod.trn.api.data.SWebAuthorization;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import erp.mod.hrs.link.db.SIncidentResponse;
 import erp.mod.trn.api.db.STrnDBCore;
-import erp.mod.trn.api.data.SDocumentsResponse;
 import erp.mod.trn.api.data.SWebDps;
 import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsFile;
@@ -284,40 +281,48 @@ public class SShareData {
     }
     
     public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser) {
-        ArrayList<SWebDpsRow> lDocs = STrnDBCore.getDocuments(startDate, endDate, idUser);
+        STrnDBCore oTrnCore = new STrnDBCore();
+        ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser);
 
         return lDocs;
     }
     
     public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser) {
         SWebDps oWebDocument = new SWebDps(idYear, idDoc);
-        
+        STrnDBCore oTrnCore = new STrnDBCore();
         /**
          * Se obtiene el DPS
          */
-        SWebDpsRow oDps = STrnDBCore.getDocumentByPk(idYear, idDoc);
+        SWebDpsRow oDps = oTrnCore.getDocumentByPk(idYear, idDoc);
         oWebDocument.setoDpsHeader(oDps);
         
         /**
          * Entries del DPS
          */
-        ArrayList<SWebDpsEty> lEties = STrnDBCore.getWebDpsEties(idYear, idDoc);
+        ArrayList<SWebDpsEty> lEties = oTrnCore.getWebDpsEties(idYear, idDoc);
         oWebDocument.getlEtys().clear();
         oWebDocument.getlEtys().addAll(lEties);
 
         /**
          * Notas del DPS
          */
-        ArrayList<SWebDpsNote> lNotes = STrnDBCore.getWebDpsNotes(idYear, idDoc);
+        ArrayList<SWebDpsNote> lNotes = oTrnCore.getWebDpsNotes(idYear, idDoc);
         oWebDocument.getlNotes().clear();
         oWebDocument.getlNotes().addAll(lNotes);
         
+        STrnDBDocuments oDocCore = new STrnDBDocuments();
         /**
          * Documentos
          */
-        ArrayList<SWebDpsFile> lDpsFiles = STrnDBDocuments.getDpsFiles(idYear, idDoc);
+        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc);
         oWebDocument.getlFiles().clear();
         oWebDocument.getlFiles().addAll(lDpsFiles);
+        
+        /**
+         * Autorización
+         */
+        SWebAuthorization oAuthorization = oTrnCore.getDpsAuthorization(idYear, idDoc);
+        oWebDocument.setoWebAuthorization(oAuthorization);
         
         return oWebDocument;
     }
