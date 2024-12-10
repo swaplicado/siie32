@@ -465,12 +465,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayVerifyCfdis);
         */
         
-        jmSan = new JMenu("Sanciones");
-        jmiSanDocBreach = new JMenuItem("Infracciones");
-        jmiSanDocBreachSum = new JMenuItem("Infracciones por empleado (resumen)");
+        jmSan = new JMenu("Consecuencias");
+        jmiSanDocBreach = new JMenuItem("Incidencias");
+        jmiSanDocBreachSum = new JMenuItem("Incidencias por empleado (resumen)");
         jmiSanDocAdminRecord = new JMenuItem("Actas administrativas");
         jmiSanDocAdminRecordSum = new JMenuItem("Actas administrativas por empleado (resumen)");
-        jmiSanReport = new JMenuItem("Reporte de sanciones...");
+        jmiSanReport = new JMenuItem("Reporte de consecuencias...");
         
         jmSan.add(jmiSanDocBreach);
         jmSan.add(jmiSanDocBreachSum);
