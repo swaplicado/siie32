@@ -5,13 +5,16 @@
  */
 package erp.mod.trn.db;
 
+import erp.client.SClientInterface;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -27,6 +30,9 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     protected String msDpsStatus;
     protected ArrayList<SDbSupplierFile> maSuppFiles;
     protected ArrayList<SDbSupplierFile> maSuppFilesDeleted;
+    protected ArrayList<SDbMaterialRequest> maMaterialRequests;
+    
+    protected SGuiClient miClient;
     
     public SDbSupplierFileProcess() {
         super(SModConsts.TRNX_SUP_FILE_DPS_PROC);
@@ -38,6 +44,8 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     public void setDps(SDbDps o) { moDps = o; }
     public void setDpsStatus(String s) { msDpsStatus = s; }
     
+    public void setClient(SGuiClient o) { miClient = o; };
+    
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
 
@@ -45,10 +53,23 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     public String getDpsStatus() { return msDpsStatus; }
     public ArrayList<SDbSupplierFile> getSuppFiles() { return maSuppFiles; }
     public ArrayList<SDbSupplierFile> getSuppFilesDeleted() { return maSuppFilesDeleted; }
-    
+    public ArrayList<SDbMaterialRequest> getMaterialRequests() { return maMaterialRequests; }
+        
     public void updateDpsStatus(SGuiSession session, int stAuth) throws Exception {
         msSql = "UPDATE trn_dps SET fid_st_dps_authorn = " + stAuth + " WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
         session.getStatement().execute(msSql);
+    }
+    
+    public void readMaterialRequests(SGuiSession session) throws Exception {
+        maMaterialRequests = new ArrayList<>();
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        msSql = "SELECT DISTINCT fid_mat_req FROM trn_dps_mat_req WHERE fid_dps_year = " + mnPkYearId + " AND fid_dps_doc = " + mnPkDocId;
+        ResultSet resultSet = statement.executeQuery(msSql);
+        while (resultSet.next()) {
+            SDbMaterialRequest mat = new SDbMaterialRequest();
+            mat.read(session, new int[] { resultSet.getInt(1) });
+            maMaterialRequests.add(mat);
+        }
     }
     
     @Override
@@ -72,6 +93,9 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         moDps = null;
         maSuppFiles = new ArrayList<>();
         maSuppFilesDeleted = new ArrayList<>();
+        maMaterialRequests = new ArrayList<>();
+        
+        miClient = null;
         
         msDpsStatus = "";
     }
@@ -148,6 +172,10 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         
         for (SDbSupplierFile file : maSuppFilesDeleted) {
             file.delete(session);
+        }
+        
+        if (miClient != null) {
+            SAuthorizationUtils.sendAuthornAppWeb((SClientInterface) miClient, getPrimaryKey());
         }
         
         mbRegistryNew = false;

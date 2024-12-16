@@ -2535,6 +2535,7 @@ public abstract class STrnUtilities {
             map.put("nBizPartnerCategory", isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
             map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
+            map.put("bAuthorn", hasAuthornSteps(client, dps.getPkYearId(), dps.getPkDocId()));
 
             jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             
@@ -4376,5 +4377,20 @@ public abstract class STrnUtilities {
        }
         
        return dpsDoc;
+    }
+
+    private static boolean hasAuthornSteps(SClientInterface client, int pkYearId, int pkDocId) {
+        try {
+            ResultSet resultSet;
+            String sql = "SELECT * FROM cfgu_authorn_step WHERE res_pk_n1_n = " + pkYearId + " AND res_pk_n2_n = " + pkDocId + " AND NOT b_del;";
+            resultSet = client.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+        catch (Exception e) {
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return false;
     }
 }

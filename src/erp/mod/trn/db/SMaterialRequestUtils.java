@@ -1254,4 +1254,28 @@ public abstract class SMaterialRequestUtils {
 
         return sText;
     }
+    
+    public static HashMap<String, Object> createMatReqParamsMapPdf (SGuiClient client, int idMatReq) throws Exception {
+        HashMap<String, Object> params;
+        String aut = "";
+        String rec = "";
+        String sql = "SELECT ua.usr autorizo, ur.usr rechazo, comments comentario " +
+                "FROM cfgu_authorn_step AS a " +
+                "LEFT JOIN erp.usru_usr AS ua ON a.fk_usr_authorn_n = ua.id_usr " +
+                "LEFT JOIN erp.usru_usr AS ur ON a.fk_usr_reject_n = ur.id_usr " + 
+                "WHERE a.res_pk_n1_n = " + idMatReq + " AND fk_tp_authorn = 1";
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            aut += resultSet.getString("autorizo") + "; ";
+            String com = resultSet.getString("comentario");
+            rec += resultSet.getString("rechazo") != null ? resultSet.getString("rechazo") + (com.isEmpty() ? "; " : "(" + com + "); ") : "";
+        }
+        
+        params = client.createReportParams();
+        params.put("nMatReqId", idMatReq);
+        params.put("sMatReqAut", aut);
+        params.put("sMatReqRec", rec);
+        
+        return params;
+    }
 }

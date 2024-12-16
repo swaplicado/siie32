@@ -16,7 +16,6 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -26,7 +25,6 @@ import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.db.SRowSupplierFileDpsEntry;
 import erp.mod.trn.db.SRowSupplierFileDpsFiles;
 import erp.mtrn.data.SDataDpsType;
-import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -109,6 +107,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private boolean mbIsCapturingFile;
     private boolean mbIsExistingFile;
     private boolean mbCanEdit;
+    private boolean mbSendAuth;
     
     private double mdExchangeRateDoc;
     private double mdExchangeRateLoc;
@@ -436,7 +435,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpSuppInfoRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppNum.setText("Folio:");
+        jlSuppNum.setText("Folio archivo:");
         jlSuppNum.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow2.add(jlSuppNum);
         jpSuppInfoRow2.add(moTextSuppNum);
@@ -469,7 +468,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpSuppInfoRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotes.setText("Comentarios:");
+        jlNotes.setText("Comentarios arch.:");
         jlNotes.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow6.add(jlNotes);
 
@@ -825,10 +824,10 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
                 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo", 100));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nombre"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo archivo", 100));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nombre archivo"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Asociado negocios", 150));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio archivo"));
 //                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Total mon $"));
 //                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
 //                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "TC"));
@@ -1082,6 +1081,16 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             }
         }
         
+        if (validation.isValid()) {
+            for (SDbSupplierFile file : maSuppFiles) {
+                if (file.getFileName().equals(moFile.getName())) {
+                    validation.setMessage("No puede haber dos o más documentos con el mismo nombre para el mismo pedido de compras.");
+                    validation.setComponent(jbFilePicker);
+                    break;
+                }
+            }
+        }
+        
         return validation;
     }
     
@@ -1179,8 +1188,9 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             jbHiggerQ.setEnabled(false);
             jbLowerQ.setEnabled(false);
             enableSuppComponets(true);
-            moKeySuppBp.setEnabled(true);
+            moBoolNoRegSuppBp.setSelected(true);
             moTextNoRegSuppBp.setEnabled(true);
+            moBoolNoRegSuppBp.setEnabled(false);
             moKeySuppBp.setSelectedIndex(0);
             moKeySuppBp.setEnabled(false);
             moKeySuppCur.setValue(new int[] { 1 });
@@ -1458,23 +1468,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     }
     
     private void actionSaveAndSend() {
-        try {
-            SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath(miClient);
-            dialog.setVisible(true);
-            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                super.actionSave();
-                ArrayList<SDbAuthorizationPath> paths = dialog.getSelectedAuthPaths();
-                            
-                SDbSupplierFileProcess aux = new SDbSupplierFileProcess();
-                aux.read(miClient.getSession(), moRegistry.getPrimaryKey());
-                new SProcDpsSendAuthornWeb((SClientInterface) miClient, aux, paths).start();
-                ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
-                ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
-            }
-        }
-        catch (Exception e) {
-            miClient.showMsgBoxError(e.getMessage());
-        }
+        mbSendAuth = true;
+        super.actionSave();
     }
     
     private void focusSuppCurTotal() {
@@ -1685,6 +1680,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbDeleteRow.setEnabled(mbCanEdit);
         jbSave.setEnabled(mbCanEdit);
         jbSaveAndSend.setEnabled(mbCanEdit && mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        
+        mbSendAuth = false;
     }
 
     @Override
@@ -1699,6 +1696,10 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         registry.getSuppFiles().clear();
         for (SDbSupplierFile file : maSuppFiles) {
             registry.getSuppFiles().add(file);
+        }
+        
+        if (mbSendAuth) {
+            registry.setClient(miClient);
         }
         
         return registry;

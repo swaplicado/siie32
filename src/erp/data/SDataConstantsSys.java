@@ -92,6 +92,7 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_ST_AUTHORN_AUTH = 4; // authorized
     public static final int CFGS_ST_AUTHORN_REJ = 5; // rejected
     public static final int CFGS_ST_AUTHORN_SND = 11; // sending
+    public static final int CFGS_ST_AUTHORN_SNDF = 12; // send failure
 
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
