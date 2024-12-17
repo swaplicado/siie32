@@ -379,6 +379,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private double mdAccSubtotalPct;
     private boolean mbCustomAccPrepared;
 
+    private String ClaveExportacionNoAplica = DCfdi40Catalogs.ClaveExportacionNoAplica;
+    private String ClaveExportacionDefinitivaA1 = DCfdi40Catalogs.ClaveExportacionDefinitivaA1;
+    private String ClaveExportacionTemporal = DCfdi40Catalogs.ClaveExportacionTemporal;
+    private String ClaveExportacionDefinitivaDistintaA133 = DCfdi40Catalogs.ClaveExportacionDefinitivaDistintaA1;
     /**
      * Creates new form DFormDps
      * @param client Client interface.
@@ -866,6 +870,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jLabel4 = new javax.swing.JLabel();
         jlGblYear = new javax.swing.JLabel();
         jtfGblYear = new javax.swing.JTextField();
+        jPanel132 = new javax.swing.JPanel();
+        jlExportation2 = new javax.swing.JLabel();
+        jcbExportation2 = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel115 = new javax.swing.JPanel();
         jbCfdiRelatedDocs = new javax.swing.JButton();
         jtfCfdiFirstRelatedDps = new javax.swing.JTextField();
@@ -2859,7 +2866,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel73.setBorder(javax.swing.BorderFactory.createTitledBorder("XML:"));
         jPanel73.setLayout(new java.awt.BorderLayout(0, 2));
 
-        jPanel74.setLayout(new java.awt.GridLayout(7, 2, 0, 2));
+        jPanel74.setLayout(new java.awt.GridLayout(8, 2, 0, 2));
 
         jPanel75.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel75.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -3032,6 +3039,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel114.add(jtfGblYear);
 
         jPanel74.add(jPanel114);
+
+        jPanel132.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel132.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlExportation2.setText("Tipo exportación: *");
+        jlExportation2.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel132.add(jlExportation2);
+
+        jcbExportation2.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel132.add(jcbExportation2);
+
+        jPanel74.add(jPanel132);
 
         jPanel115.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -3460,7 +3479,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceRequestKey = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdCceRequestKey, jlCfdCceRequestKey);
         moFieldCfdCceRequestKey.setTabbedPaneIndex(TAB_CFD_INT_COM, jTabbedPane);
         moFieldCfdCceExportation = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbExportation, jlExportation);
-        moFieldCfdCceExportation.setTabbedPaneIndex(TAB_CFD_INT_COM, jTabbedPane);
+        moFieldCfdCceExportation.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdCceCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfCfdCceCertificateOrigin, jlCfdCceCertificateOrigin);
         moFieldCfdCceCertificateOrigin.setTabbedPaneIndex(TAB_CFD_INT_COM, jTabbedPane);
         moFieldCfdCceNumberCertificateOrigin = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdCceNumberCertificateOrigin, jlCfdCceNumberCertificateOrigin);
@@ -3969,7 +3988,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71CompanyBranchGln.addItemListener(this);
         jcbAccItem.addItemListener(this);
         jckAccIsSubtotalPctApplying.addItemListener(this);
-        
+        jckCfdCceApplies.addItemListener(this);
+     
         // Change listeners:
         
         jTabbedPane.addChangeListener(this);
@@ -4228,6 +4248,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdiTaxRegimeIssuing.setEnabled(enableFields && isCfdi33or40);
         jcbCfdiTaxRegimeReceptor.setEnabled(enableFields && isCfdi33or40);
         jcbCfdiCfdiUsage.setEnabled(enableFields && isCfdi33or40);
+        jcbExportation.setEnabled(enableFields && isCfdi33or40);
         jtfCfdiConfirmation.setEnabled(enableFields && isCfdi33or40);
         jtfCfdiConfirmation.setFocusable(enableFields && isCfdi33or40);
         jbCfdiRelatedDocs.setEnabled(enableFields && isCfdi33or40);
@@ -4253,7 +4274,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //jcbCfdCceMoveReason.setEnabled(enableFields); // field stays disabled, required only for CFDI "T", but not supported yet!
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceRequestKey.setEnabled(enableFields);
-        jcbExportation.setEnabled(enableFields);
+        jcbExportation.setEnabled((enable && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR)));
         jtfCfdCceCertificateOrigin.setEnabled(enableFields);
         jtfCfdCceCertificateOrigin.setFocusable(enableFields);
         jtfCfdCceNumberCertificateOrigin.setEnabled(enableFields);
@@ -4939,11 +4960,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else {
                         if (isCfdIntCommerceRequired()) {
                             moFieldCfdiCfdiUsage.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF);
+                            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1); //xxx123 4933
                         }
                         else {
                             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
                             if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
                                 moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                                moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica); //xxx123 4939
                             }
                         }
                     }
@@ -6085,6 +6108,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jckShipments.setEnabled(true);
             itemStateChangedShipments();
+            
+            jckCfdCceApplies.setEnabled(true);
             
             adecuatePaymentTypeSettings();
             itemStateChangedFkPaymentTypeId(false); // invokes methods itemStatePayments() and itemStateDateStartCredit()
@@ -10114,6 +10139,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    private void itemStateChangeTypeExportation(final boolean requestFocus) { //xxx123 10120
+        if (jckCfdCceApplies.isSelected() && isCfdIntCommerceRequired()) {
+            jlExportation.setEnabled(true);
+            jcbExportation.setEnabled(true);
+            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+        }
+        else {
+            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
+        }
+    }
+    
     private void stateChangedTabbedPane() {
         if (jTabbedPane.getSelectedIndex() == TAB_ACC) { // customized-accounting tab
             if (!moDps.getDbmsDpsCustomAccEntries().isEmpty() && !mbCustomAccPrepared) {
@@ -10579,6 +10615,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel130;
     private javax.swing.JPanel jPanel131;
+    private javax.swing.JPanel jPanel132;
     private javax.swing.JPanel jPanel139;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel142;
@@ -10760,6 +10797,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegimeReceptor;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox<SFormComponentItem> jcbExportation;
+    private javax.swing.JComboBox<SFormComponentItem> jcbExportation2;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
@@ -10886,6 +10924,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSystem;
     private javax.swing.JLabel jlExportation;
+    private javax.swing.JLabel jlExportation2;
     private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
     private javax.swing.JLabel jlFiscalId;
@@ -12044,7 +12083,28 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     }
                                 }
                             }
+                            // Validate Type Export
+                            if (jcbExportation.getSelectedIndex() > 0){
+                                if (isCfdIntCommerceRequired() && jckCfdCceApplies.isSelected()){
+                                    if (moFieldCfdCceExportation.getFieldValue().toString().equals(ClaveExportacionNoAplica)) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'Tipo de exportación':\n"
+                                                        + "El tipo de exportación solo puede ser 02, 03 o 04");
+                                        validation.setComponent(jcbExportation);
+                                        validation.setTabbedPaneIndex(TAB_CFD_XML);
+                                        return validation;
+                                    }                                    
+                                }
+                                else {
+                                    if ((moFieldCfdCceExportation.getFieldValue().equals(ClaveExportacionDefinitivaA1)) || moFieldCfdCceExportation.getFieldValue().equals(ClaveExportacionTemporal)) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'Tipo de exportación':\n"
+                                                        + "El tipo de exportación solo puede ser 01 o 04");
+                                        validation.setComponent(jcbExportation);
+                                        validation.setTabbedPaneIndex(TAB_CFD_XML);
+                                        return validation;
 
+                                    }                                    
+                                }
+                            }
                             // validate CFDI usage when some item requires a specific one:
 
                             if (!validation.getIsError()) {
@@ -12418,14 +12478,39 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     jtaCfdiRelatedDocs.setText("");
                 }
-                
+                if (moDps.getIsRegistryNew() && isCfdCfdiRelatedRequired()) {
+                    if (!moDps.getDbmsDataDpsCfd().getExportation().isEmpty()) {
+                        moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
+                    } else {
+                        moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+                    }
+                }
+                else if (!moDps.getIsRegistryNew() && isCfdCfdiRelatedRequired()) {
+                    if (!moDps.getDbmsDataDpsCfd().getExportation().isEmpty()) {
+                        moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
+                    } else {
+                        moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+                    }
+                } else if(moDps.getIsRegistryNew()) {
+                    if (!moDps.getDbmsDataDpsCfd().getExportation().isEmpty()) {
+                        moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
+                    } else {
+                        moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
+                    }
+                } else {
+                    if (!moDps.getDbmsDataDpsCfd().getExportation().isEmpty()) {
+                        moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
+                    } else {
+                        moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
+                    }
+                }
                 renderCfdiFirstRelatedDps();
 
                 if (isCfdIntCommerceRequired()) {
                     moFieldCfdCceMoveReason.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdCceMotivoTraslado());
                     moFieldCfdCceOperationType.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdCceTipoOperacion());
                     moFieldCfdCceRequestKey.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdCceClaveDePedimento());
-                    moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
+//                    moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
                     moFieldCfdCceCertificateOrigin.setFieldValue(SLibUtils.parseInt(moDps.getDbmsDataDpsCfd().getCfdCceCertificadoOrigen()));
                     moFieldCfdCceNumberCertificateOrigin.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdCceNumCertificadoOrigen());
                     moFieldCfdCceSubdivision.setFieldValue(SLibUtils.parseInt(moDps.getDbmsDataDpsCfd().getCfdCceSubdivision()));
@@ -12781,7 +12866,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     dpsCfd.setCfdCceSubdivision("" + moFieldCfdCceSubdivision.getInteger());
                     dpsCfd.setCfdCceTipoCambioUsd(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
                     dpsCfd.setCfdCceTotalUsd(DCfdUtils.AmountFormat.format(moFieldCfdCceTotalUsd.getDouble()));
-                    dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+//                    dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
                     if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(DCfdi40Catalogs.AgrupaciónPaísesUE) == 0) {
                         dpsCfd.setCfdCceNumeroExportadorConfiable(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter());
                     }
@@ -12794,6 +12879,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                 }
                 else {
+                    dpsCfd.setExportation(moFieldCfdCceExportation.getFieldValue().toString()); // xxx123 12826
                     dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionNoAplica);
                 }
 
@@ -13223,6 +13309,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (checkBox == jckAccIsSubtotalPctApplying) {
                     itemStateChangedAccIsSubtotalPctApplying(true);
+                }
+                else if (checkBox == jckCfdCceApplies) {
+                    itemStateChangeTypeExportation(true);
                 }
             }
             else if (e.getSource() instanceof javax.swing.JComboBox) {
