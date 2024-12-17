@@ -9,53 +9,87 @@ import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbDps;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestExternalStorageLog;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.db.SMaterialRequestUtils;
+import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public class SProcDpsSendAuthornWeb extends Thread {
 
     private final SClientInterface miClient;
     private final SDbSupplierFileProcess moSuppFileProc;
     private final ArrayList<SDbAuthorizationPath> maAuthPaths;
+    private final String msAuthNotes;
+    
+    private String msError;
 
-    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, ArrayList<SDbAuthorizationPath> paths) {
+    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, ArrayList<SDbAuthorizationPath> paths, String notes) {
         miClient = client;
         moSuppFileProc = proc;
         maAuthPaths = paths;
+        msAuthNotes = notes;
         setDaemon(true);
     }
 
     @Override
     public void run() {
+        Connection connection = miClient.getSession().getDatabase().getConnection();
+        SDbDps dps = moSuppFileProc.getDps();
+        SDataDpsAuthorn auth = new SDataDpsAuthorn();
         try {
-            Connection connection = miClient.getSession().getDatabase().getConnection();
-            SDbDps dps = moSuppFileProc.getDps();
-            SDataDpsAuthorn auth = new SDataDpsAuthorn();
-            auth.setPrimaryKey(dps.getPrimaryKey());
+            auth.setPkYearId(dps.getPkYearId());
+            auth.setPkDocId(dps.getPkDocId());
+            auth.setNotes(msAuthNotes);
             auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SND);
-            auth.setFkUserId(miClient.getSession().getUser().getPkUserId());
+            auth.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            auth.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            auth.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
             auth.save(connection);
 
-            if (sendAuthorn()) {
-                auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
-                auth.save(connection);
-                moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+            if (auth.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_OK) {
+                if (sendAuthorn()) {
+                    auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
+                    auth.save(connection);
+                    moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+                }
+                else {
+                    auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SNDF); 
+                    if (msError.length() > 511) {
+                        auth.setException(SLibUtilities.textLeft(msError, 511));
+                    }
+                    else {
+                        auth.setException(msError);
+                    }
+                    auth.save(connection);
+                }
             }
             else {
-                auth.delete(connection);
+                miClient.showMsgBoxWarning("Ocurrió un error al cambiar el estatus del documento.\nContactar a soporte.");
             }
         }
         catch (Exception e) {
@@ -64,8 +98,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
     }
 
     private boolean sendAuthorn() throws Exception {
-        boolean send = true;
-//        Thread.sleep(60000);
+        //Thread.sleep(60000);
         // Envío de archivos
         String sResult = this.sendFilesToCloud();
         if (!sResult.isEmpty()) {
@@ -73,11 +106,10 @@ public class SProcDpsSendAuthornWeb extends Thread {
             return false;
         }
 
-        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths,
-                SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
+        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
 
         System.out.println("Documento enviado con éxito.");
-        return send;
+        return true;
     }
 
     /**
@@ -90,99 +122,118 @@ public class SProcDpsSendAuthornWeb extends Thread {
     private String sendFilesToCloud() {
         // Verifica si hay archivos para procesar
         if (moSuppFileProc != null && moSuppFileProc.getSuppFiles().size() > 0) {
-            String sError = ""; // Mensaje de error inicializado vacío
+            boolean hasError = false;
+            msError = ""; // Mensaje de error inicializado vacío
 
             try {
-                // 1. Eliminar archivos existentes en la nube
-                ArrayList<SDbSupplierFile> lFilesToDelete = new ArrayList<>();
-
-                // Agregar archivos actuales con nombre de almacenamiento para eliminar
-                for (SDbSupplierFile oFile : moSuppFileProc.getSuppFiles()) {
-                    if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
-                        lFilesToDelete.add(oFile);
-                    }
-                }
-
-                // Agregar archivos marcados como eliminados
-                for (SDbSupplierFile oFile : moSuppFileProc.getSuppFilesDeleted()) {
-                    if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
-                        lFilesToDelete.add(oFile);
-                    }
-                }
-
-                // Crear lista de nombres de archivos a eliminar y llamar al gestor de almacenamiento
-                ArrayList<String> lNames = lFilesToDelete.stream()
-                        .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
-                        .collect(Collectors.toCollection(ArrayList::new));
-                String resultDeleted = CloudStorageManager.deleteFiles(lNames);
-
-                // Actualizar los archivos locales eliminados
-                for (SDbSupplierFile oFile : lFilesToDelete) {
-                    oFile.setFileStorageName("");
-                    oFile.save(miClient.getSession());
-                }
+                // Eliminar los archivos existentes en la nube, se para a libreria para hacer uso en diferentes lugares
+                SDocUtils.deleteFilesToCloud(miClient.getSession(), moSuppFileProc); 
             } catch (Exception e) {
                 e.printStackTrace();
-                sError = "Error al eliminar los archivos anteriores, intente de nuevo o contacte a soporte técnico. " + e.getMessage();
+                hasError = true;
+                msError += "Error al eliminar los archivos anteriores, intente de nuevo o contacte a soporte técnico. " + e.getMessage() + " ";
             }
 
-            // 2. Subir nuevos archivos
-            ArrayList<SDbSupplierFile> lFileNamesToUpload = new ArrayList<>();
-            boolean hasError = false;
+            if (!hasError) {
+                // 2. Subir nuevos archivos
+                ArrayList<SDbSupplierFile> lFileNamesToUpload = new ArrayList<>();
 
-            for (SDbSupplierFile oFile : moSuppFileProc.getSuppFiles()) {
-                try {
-                    // Obtener bytes del archivo y generar un nombre único para el almacenamiento en la nube
-                    byte[] fileBytes = SDocUtils.getFileBytes(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
-                    String name = SDocUtils.generateFileName(miClient.getSession().getDatabase().getDbName(),
-                            moSuppFileProc.getPkYearId(),
-                            moSuppFileProc.getPkDocId(),
-                            oFile.getPkSupplierFileId(),
-                            oFile.getFileType());
+                for (SDbSupplierFile oFile : moSuppFileProc.getSuppFiles()) {
+                    try {
+                        // Obtener bytes del archivo y generar un nombre único para el almacenamiento en la nube
+                        byte[] fileBytes = SDocUtils.getFileBytes(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
+                        String name = SDocUtils.generateFileName(miClient.getSession().getDatabase().getDbName(),
+                                moSuppFileProc.getPkYearId(),
+                                moSuppFileProc.getPkDocId(),
+                                oFile.getPkSupplierFileId(),
+                                oFile.getFileType());
 
-                    // Subir archivo a la nube
-                    CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
-                    if (oGcsFile != null) {
-                        oFile.setFileStorageName(oGcsFile.getFileName());
-                        oFile.save(miClient.getSession());
-                        lFileNamesToUpload.add(oFile);
+                        // Subir archivo a la nube
+                        CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
+                        if (oGcsFile != null) {
+                            oFile.setFileStorageName(oGcsFile.getFileName());
+                            oFile.save(miClient.getSession());
+                            lFileNamesToUpload.add(oFile);
+                        }
+                        else {
+                            hasError = true; // Marcar error si falla la subida
+                            break;
+                        }
                     }
-                    else {
-                        hasError = true; // Marcar error si falla la subida
+                    catch (Exception e) {
+                        hasError = true;
+                        e.printStackTrace();
+                        msError += "Error al enviar los archivos, intente de nuevo o contacte a soporte técnico. " + e.getMessage() + " ";
                         break;
                     }
                 }
-                catch (Exception e) {
-                    hasError = true;
-                    e.printStackTrace();
-                    sError = "Error al enviar los archivos, intente de nuevo o contacte a soporte técnico. " + e.getMessage();
-                }
-            }
-
-            // 3. Manejo de errores en la subida
-            if (hasError) {
-                // Si ocurrió un error, eliminar los archivos subidos previamente
-                ArrayList<String> lNames = lFileNamesToUpload.stream()
-                        .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
-                        .collect(Collectors.toCollection(ArrayList::new));
-                String resultOfUpload = CloudStorageManager.deleteFiles(lNames);
-
-                for (SDbSupplierFile oFile : lFileNamesToUpload) {
-                    oFile.setFileStorageName("");
+                
+                // 3. Leer las requisiciones de materiales asociadas al documento
+                if (!hasError) {
                     try {
-                        oFile.save(miClient.getSession());
+                        moSuppFileProc.readMaterialRequests(miClient.getSession());
+                        for (SDbMaterialRequest mat : moSuppFileProc.getMaterialRequests()) {
+                            // Leer en memoria el archivo de la RM
+                            String name = miClient.getSession().getDatabase().getDbName() + "-RM-" + mat.getPkMatRequestId() + ".pdf";
+                            
+                            if(!CloudStorageManager.storagedFileExists(name)) {
+                                // Guardar en el log la RM que se subió
+                                HashMap<String, Object> params = SMaterialRequestUtils.createMatReqParamsMapPdf((SGuiClient) miClient, mat.getPkMatRequestId());
+                                SGuiReport report = new SGuiReport("reps/trn_mat_req.jasper", "Requisición de materiales");
+                                File matReqFile = new File(report.getFileName());
+                                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(matReqFile);
+                                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, miClient.getSession().getStatement().getConnection());
+                                byte[] fileBytes = JasperExportManager.exportReportToPdf(jasperPrint);
+                                SDbMaterialRequestExternalStorageLog extStoLog = new SDbMaterialRequestExternalStorageLog();
+                                extStoLog.setPkMatRequestId(mat.getPkMatRequestId());
+                                extStoLog.save(miClient.getSession());
+
+                                // Subir los formato de impresión de la requisición de materiales a la nube
+                                CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
+                                if (oGcsFile == null) {
+                                    hasError = true; // Marcar error si falla la subida
+                                    msError += "Error al enviar los archivos de RM, intente de nuevo o contacte a soporte técnico.";
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    catch (Exception ex) {
-                        Logger.getLogger(SProcDpsSendAuthornWeb.class.getName()).log(Level.SEVERE, null, ex);
+                    catch (Exception e) {
+                        hasError = true;
+                        msError += "Error al enviar los archivos de RM, intente de nuevo o contacte a soporte técnico. " + e.getMessage() + " ";
                     }
                 }
-                return sError; // Retornar mensaje de error
+            
+                // 4. Manejo de errores en la subida
+                if (hasError) {
+                    try {
+                        // Si ocurrió un error, eliminar los archivos subidos previamente
+                        ArrayList<String> lNames = lFileNamesToUpload.stream()
+                                .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        String resultOfUpload = CloudStorageManager.deleteFiles(lNames);
+
+                        for (SDbSupplierFile oFile : lFileNamesToUpload) {
+                            oFile.setFileStorageName("");
+                            try {
+                                oFile.save(miClient.getSession());
+                            }
+                            catch (Exception ex) {
+                                Logger.getLogger(SProcDpsSendAuthornWeb.class.getName()).log(Level.SEVERE, null, ex);
+                                msError += ex.getMessage();
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        msError += e.getMessage();
+                    }
+                    return msError; // Retornar mensaje de error
+                }
             }
 
-            return ""; // Operación exitosa
+            return msError; // Vacio = operación exitosa
         }
 
         return "No hay archivos para enviar"; // Mensaje si no hay archivos
-    }
-
+    } 
 }

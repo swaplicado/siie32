@@ -13,12 +13,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiFields;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 
@@ -31,6 +31,8 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     private final SGuiClient miClient;
     private ArrayList<SDbAuthorizationPath> maAllAuthPaths;
     private ArrayList<SDbAuthorizationPath> maSelectedAuthPaths;
+    private SGuiFields moFields;
+    private String msAuthNotes;
     private int mnFormResult;
     
     /**
@@ -54,10 +56,13 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jListAuthornPath = new javax.swing.JList();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jlTextComent = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        moTextComent = new sa.lib.gui.bean.SBeanFieldText();
         jPanel3 = new javax.swing.JPanel();
         jbSelect = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -77,24 +82,35 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jLabel1.setText("Para seleccionar varias opciones mantener presionada la tecla Ctrl");
-        jLabel1.setEnabled(false);
-        jLabel1.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel4.add(jLabel1);
-
-        jPanel2.add(jPanel4, java.awt.BorderLayout.NORTH);
-
+        jListAuthornPath.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(jListAuthornPath);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel5.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTextComent.setText("Comentarios del envío a autorización del pedido:");
+        jlTextComent.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel6.add(jlTextComent);
+
+        jPanel5.add(jPanel6);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moTextComent.setPreferredSize(new java.awt.Dimension(625, 23));
+        jPanel7.add(moTextComent);
+
+        jPanel5.add(jPanel7);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.SOUTH);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jbSelect.setText("Seleccionar");
+        jbSelect.setText("Aceptar");
         jbSelect.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jbSelect);
 
@@ -115,22 +131,31 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JList jListAuthornPath;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbSelect;
+    private javax.swing.JLabel jlTextComent;
+    private sa.lib.gui.bean.SBeanFieldText moTextComent;
     // End of variables declaration//GEN-END:variables
 
     @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 640, 400);
         
-        Vector<String> modeloLista = new Vector<>();
+        moFields = new SGuiFields();
+        
+        moTextComent.setTextSettings(SGuiUtils.getLabelName(jlTextComent), 255, 0);
+        
+        moFields.addField(moTextComent);
+        
+        ArrayList<String> modeloLista = new ArrayList<>();
         try {
             HashMap<String, Integer> map = new HashMap<>();
             map.put("fid_ct_dps", SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0]);
@@ -145,7 +170,12 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
             miClient.showMsgBoxError(e.getMessage());
         }
         
-        jListAuthornPath.setListData(modeloLista);
+        Vector aux = new Vector();
+        modeloLista.stream().filter((pathName) -> (!aux.contains(pathName))).forEach((pathName) -> {
+            aux.add(pathName);
+        });
+        
+        jListAuthornPath.setListData(aux);
         
         SGuiUtils.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE);
         
@@ -154,10 +184,10 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     }
     
     private SGuiValidation validateForm() {
-        SGuiValidation validation = new SGuiValidation();
+        SGuiValidation validation = moFields.validateFields();
         
-        if (jListAuthornPath.getSelectedIndex() <= -1) {
-            validation.setMessage("Debe seleccionar un esquema de autorización.");
+        if (jListAuthornPath.getSelectedIndex() < 1) {
+            validation.setMessage("Debe seleccionar una ruta de autorización.");
             validation.setComponent(jListAuthornPath);
         }
         
@@ -168,16 +198,15 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
         SGuiValidation validation = validateForm();
         if (validation.isValid()) {
             maSelectedAuthPaths = new ArrayList<>();
-            List list = jListAuthornPath.getSelectedValuesList();
-            for (Object list1 : list) {
-                for (SDbAuthorizationPath path : maAllAuthPaths) {
-                    String selectedValue = list1.toString();
-                    if (path.getName().equals(selectedValue)) {
-                        maSelectedAuthPaths.add(path);
-                        break;
-                    }
+            String pathName = (String) jListAuthornPath.getSelectedValue();
+            for (SDbAuthorizationPath path : maAllAuthPaths) {
+                if (path.getName().equals(pathName)) {
+                    maSelectedAuthPaths.add(path);
                 }
             }
+            
+            msAuthNotes = moTextComent.getValue();
+            
             mnFormResult = SGuiConsts.FORM_RESULT_OK;
             this.setVisible(false);
         }
@@ -196,6 +225,10 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     
     public int getFormResult() {
         return mnFormResult;
+    }
+    
+    public String getAuthornNotes() {
+        return msAuthNotes;
     }
     
     public ArrayList<SDbAuthorizationPath> getSelectedAuthPaths() {

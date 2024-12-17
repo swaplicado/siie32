@@ -18,10 +18,10 @@ import erp.lib.table.STableSetting;
 import erp.lib.table.STableTab;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
-import erp.mtrn.data.SDataDps;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
@@ -41,7 +41,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     private STabFilterDatePeriod moTabFilterDatePeriod;
     private JFileChooser moFileChooserDownload;
     
-    private JButton jbRestartAuth;
+    private JButton jbAnullAuth;
     private JButton jbAddFileSupp;
     private JButton jbDownFileSupp;
     private JButton jbAll;
@@ -63,10 +63,10 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         moFileChooserDownload.setDialogTitle("Seleccionar directorio para descargar archivo...");
         
-        jbRestartAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
-        jbRestartAuth.setPreferredSize(new Dimension(23, 23));
-        jbRestartAuth.addActionListener(this);
-        jbRestartAuth.setToolTipText("Reiniciar autorización");
+        jbAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
+        jbAnullAuth.setPreferredSize(new Dimension(23, 23));
+        jbAnullAuth.addActionListener(this);
+        jbAnullAuth.setToolTipText("Anular autorización");
         
         jbAddFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
         jbAddFileSupp.setPreferredSize(new Dimension(23, 23));
@@ -95,7 +95,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
-        addTaskBarUpperComponent(jbRestartAuth);
+        addTaskBarUpperComponent(jbAnullAuth);
         if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_AUTH) {
             addTaskBarUpperComponent(jbAddFileSupp);
         }
@@ -196,7 +196,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         msSql = "SELECT DISTINCT "
                 + "d.id_year, "
                 + "d.id_doc, "
-                + "a.ts_usr AS fecha_sta, " 
+                + "a.ts_edit AS fecha_sta, " 
                 + "dt.code AS doc_tp, " 
                 + "d.num AS folio, " 
                 + "d.num_ref AS ref, " 
@@ -219,7 +219,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                 + "'MXN' AS f_cur_key_local " 
                 + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_AUTHORN) + " AS a "
-                + "ON d.id_year = a.id_year AND d.id_doc = a.id_doc "
+                + "ON d.id_year = a.id_year AND d.id_doc = a.id_doc AND NOT a.b_del "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRNU_TP_DPS) + " AS dt "
                 + "ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.BPSU_BP) + " AS bp "
@@ -274,21 +274,27 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     
     private void actionRestartAuth() {
          try {
-            if (jbRestartAuth.isEnabled()) {
+            if (jbAnullAuth.isEnabled()) {
                 if (isRowSelected()) {
-                    SDataDps dps = new SDataDps();
-                    dps.read(moTablePane.getSelectedTableRow().getPrimaryKey(), miClient.getSession().getStatement());
-                    if (dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                        miClient.showMsgBoxInformation("No se puede reiniciar la autorización porque el documento está autorizado.");
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING
+                            && fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                        miClient.showMsgBoxInformation("No se puede anular la autorización porque el estatus del documento es " + fileProcess.getDpsStatus() + ".");
                     }
                     else {
                         if (miClient.showMsgBoxConfirm("El documento regresara a estatus de autorización \"N/A\".\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
-                            String sql = "DELETE FROM trn_dps_authorn WHERE id_year = " + dps.getPkYearId() + " AND id_doc = " + dps.getPkDocId();
+                            // Eliminar archivos de la nube
+                            SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
+                            
+                            // Eliminar pasos de autorización
+                            SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+                            
+                            // Actualizar estatus de autorización
+                            String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
                             miClient.getSession().getStatement().execute(sql);
                             
-                            sql = "UPDATE trn_dps SET fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA + " "
-                                    + "WHERE id_year = " + dps.getPkYearId() + " AND id_doc = " + dps.getPkDocId();
-                            miClient.getSession().getStatement().execute(sql);
+                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
                             
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
@@ -359,7 +365,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             if (button == jbAddFileSupp) {
                 actionAddFileSupp();
             }
-            if (button == jbRestartAuth) {
+            if (button == jbAnullAuth) {
                 actionRestartAuth();
             }
             else if (button == jbDownFileSupp) {

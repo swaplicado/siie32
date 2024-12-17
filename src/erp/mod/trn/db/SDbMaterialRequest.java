@@ -28,6 +28,7 @@ import sa.lib.gui.SGuiSession;
 public class SDbMaterialRequest extends SDbRegistryUser {
     
     protected int mnPkMatRequestId;
+    protected String msClassRequest;
     protected String msTypeRequest;
     protected int mnNumber;
     protected Date mtDate;
@@ -97,6 +98,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     }
     
     public void setPkMatRequestId(int n) { mnPkMatRequestId = n; }
+    public void setClassRequest(String s) { msClassRequest = s; }
     public void setTypeRequest(String s) { msTypeRequest = s; }
     public void setNumber(int n) { mnNumber = n; }
     public void setDate(Date t) { mtDate = t; }
@@ -151,6 +153,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setDbmsItemRef(SDataItem o) { moDbmsItemRef = o; }
     
     public int getPkMatRequestId() { return mnPkMatRequestId; }
+    public String getClassRequest() { return msClassRequest; }
     public String getTypeRequest() { return msTypeRequest; }
     public int getNumber() { return mnNumber; }
     public Date getDate() { return mtDate; }
@@ -246,6 +249,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkMatRequestId = 0;
+        msClassRequest = "";
         msTypeRequest = "";
         mnNumber = 0;
         mtDate = null;
@@ -352,6 +356,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         }
         else {
             mnPkMatRequestId = resultSet.getInt("id_mat_req");
+            msClassRequest = resultSet.getString("cl_req");
             msTypeRequest = resultSet.getString("tp_req");
             mnNumber = resultSet.getInt("num");
             mtDate = resultSet.getDate("dt");
@@ -504,6 +509,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         boolean updateProvisionStatus = false;
         
+        msClassRequest = "M"; // Por el momento todas las requisiciones son de materiales; S corresponde a servicios
+        
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
@@ -515,6 +522,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkMatRequestId + ", " + 
+                    "'"+ msClassRequest +"', " +
                     "'" + msTypeRequest + "', " + 
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
@@ -577,6 +585,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             msSql = "UPDATE " + getSqlTable() + " SET " + 
                     //"id_mat_req = " + mnPkMatRequestId + ", " +
+                    "cl_req = '" + msClassRequest + "', " +
                     "tp_req = '" + msTypeRequest + "', " +
                     "num = " + mnNumber + ", " +
                     "dt = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
@@ -765,6 +774,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         SDbMaterialRequest registry = new SDbMaterialRequest();
         
         registry.setPkMatRequestId(this.getPkMatRequestId());
+        registry.setClassRequest(this.getClassRequest());
         registry.setTypeRequest(this.getTypeRequest());
         registry.setNumber(this.getNumber());
         registry.setDate(this.getDate());

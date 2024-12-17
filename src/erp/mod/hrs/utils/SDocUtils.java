@@ -15,6 +15,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -22,6 +23,8 @@ import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbDocument;
 import erp.mod.hrs.db.SRowPreceptSubsection;
 import erp.mod.hrs.form.SDialogDocImage;
+import erp.mod.trn.db.SDbSupplierFile;
+import erp.mod.trn.db.SDbSupplierFileProcess;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +33,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -41,7 +45,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SDocUtils {
     
@@ -576,5 +580,42 @@ public abstract class SDocUtils {
         fileName += dbCom + "-" + idYear + "-" + idDoc + "-" + idSupFile + "." + extension;
         
         return fileName;
+    }
+    
+    /**
+     * Eliminar archivos de cloud storage
+     * @param session
+     * @param fileProcess
+     * @throws java.lang.Exception
+     */
+    public static void deleteFilesToCloud(SGuiSession session, SDbSupplierFileProcess fileProcess) throws Exception {
+        // 1. Eliminar archivos existentes en la nube
+        ArrayList<SDbSupplierFile> lFilesToDelete = new ArrayList<>();
+
+        // Agregar archivos actuales con nombre de almacenamiento para eliminar
+        for (SDbSupplierFile oFile : fileProcess.getSuppFiles()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Agregar archivos marcados como eliminados
+        for (SDbSupplierFile oFile : fileProcess.getSuppFilesDeleted()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Crear lista de nombres de archivos a eliminar y llamar al gestor de almacenamiento
+        ArrayList<String> lNames = lFilesToDelete.stream()
+                .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
+                .collect(Collectors.toCollection(ArrayList::new));
+        String resultDeleted = CloudStorageManager.deleteFiles(lNames);
+
+        // Actualizar los archivos locales eliminados
+        for (SDbSupplierFile oFile : lFilesToDelete) {
+            oFile.setFileStorageName("");
+            oFile.save(session);
+        }
     }
 }

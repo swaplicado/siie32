@@ -5,13 +5,23 @@
  */
 package erp.mod.cfg.utils;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
+import erp.mod.cfg.db.SDbMms;
+import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.form.SDialogSelectAuthornPath;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SProcDpsSendAuthornWeb;
+import erp.mtrn.data.STrnUtilities;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -20,7 +30,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
+import sa.lib.mail.SMail;
+import sa.lib.mail.SMailConsts;
+import sa.lib.mail.SMailSender;
 
 /**
  * Clase de utilería de autorizaciones
@@ -1432,6 +1447,81 @@ public abstract class SAuthorizationUtils {
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) throws Exception {
+        SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+        fileProcess.read(client.getSession(), pk);
+        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
+            SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
+            dialog.setVisible(true);
+            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getAuthornNotes()).start();
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+            return false;
+        }
+        return true;
+    }
+    
+    public static void sendAuthornMails(SClientInterface client, String to, String cc, String bcc, int pkDps) throws Exception {
+        SDataDps dps = new SDataDps();
+        dps.read(new int[] { pkDps }, client.getSession().getStatement());
+        SDbMms mms = STrnUtilities.getMms(client, SModSysConsts.CFGS_TP_MMS_MAIL_REPS);
+        
+        String subject = "[SIIE] Autorización pendiente del pedido de compras " + dps.getNumber();
+        String body = "<html>\n";
+        body += "<head>\n";
+        body += "<style>\n"
+                + "body {"
+                + " font-size: 100%;"
+                + "} "
+                + "h1 {"
+                + " font-size: 2.00em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h2 {"
+                + " font-size: 1.75em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h3 {"
+                + " font-size: 1.50em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h4 {"
+                + " font-size: 1.25em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "</style>\n";
+        body += "</head>\n";
+        body += "<body>\n";
+        body += "<h2>Estimado usuario:</h2>\n";
+        body += "<p>Tienes un pedido pendiente de autorización\n</p>\n";
+        body += "<p><b>Folio: " + dps.getNumber() + "</b>";
+        body += "<p>Te invitamos a ingresar a nuestra plataforma y autorizar este pedido de compras, gracias por tu atención.";
+        
+        body += STrnUtilities.composeMailFooter("warning");
+        
+        body += "</body>\n";
+        
+        body += "</html>";
+
+        SMailSender moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+        moMailSender.setMailReplyTo(mms.getXtaMailReplyTo());
+
+        ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")));
+        ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
+        ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
+     
+        SMail mail = new SMail(moMailSender, subject, body, toRecipients, toCcRecipients, toBccRecipients);
+        mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
+        mail.send();
+        client.showMsgBoxInformation("El correo-e ha sido enviado.");
     }
     
     /**

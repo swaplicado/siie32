@@ -104,6 +104,8 @@ public abstract class SModConsts {
     public static final int CFG_PARAM_CO = 1013502;
     public static final int CFG_CUSTOM_REP = 1013531;
     
+    public static final int CFGX_AUTHORN_COMMENTS = 1014001;
+    
     /*
      * Users
      */
@@ -509,6 +511,7 @@ public abstract class SModConsts {
     public static final int TRN_MAT_REQ_ETY_NTS = 2023347;
     public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023348;
     public static final int TRN_MAT_REQ_ST_LOG = 2023349;
+    public static final int TRN_MAT_REQ_EXT_STO_LOG = 2023360;
     public static final int TRN_EST_REQ = 2023352;
     public static final int TRN_EST_REQ_ETY = 2023353;
     public static final int TRN_EST_REQ_REC = 2023354;
@@ -1340,6 +1343,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_REQ_ETY_NTS, "trn_mat_req_ety_nts");
         TablesMap.put(TRN_MAT_REQ_ETY_ITEM_CHG, "trn_mat_req_ety_item_chg");
         TablesMap.put(TRN_MAT_REQ_ST_LOG, "trn_mat_req_st_log");
+        TablesMap.put(TRN_MAT_REQ_EXT_STO_LOG, "trn_mat_req_ext_sto_log");
         TablesMap.put(TRN_EST_REQ, "trn_est_req");
         TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
         TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
