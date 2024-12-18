@@ -1345,6 +1345,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbHiggerQ.setEnabled(true);
         jbLowerQ.setEnabled(true);
         jbTechnical.setEnabled(true);
+        valueChanged(null);
     }
     
     private void actionUpRow() {
