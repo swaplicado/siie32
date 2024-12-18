@@ -420,6 +420,7 @@ public abstract class SAuthorizationUtils {
                     + condPk + ";";
         
         try {
+            System.out.println("Obtención de Step: " + sql);
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
             if (res.next()) {
@@ -575,6 +576,7 @@ public abstract class SAuthorizationUtils {
                 
                 ArrayList<SAuthStatus> lStatus = new ArrayList<>();
                 ResultSet resRows = session.getDatabase().getConnection().createStatement().executeQuery(rowsQuery);
+                System.out.println("rechazar por ID (" +  idAuthStep + "): " + rowsQuery);
                 while (resRows.next()) {
                     if (resRows.getBoolean("b_authorn")) {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_AUTHORIZED, resRows.getString("auth_user")));
@@ -582,14 +584,18 @@ public abstract class SAuthorizationUtils {
                 }
                 
                 if (lStatus.size() > 0) {
-                    String resp = "";
-                    for (SAuthStatus oStatus : lStatus) {
-                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
-                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
-                        }
-                    }
-                    
-                    return resp;
+                    /**
+                     * Se comenta la funcionalidad para permitir el rechazo aún cuando alguien ya haya autorizado.
+                     * Edwin Carmona. 2024-12-12
+                     */
+//                    String resp = "";
+//                    for (SAuthStatus oStatus : lStatus) {
+////                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
+////                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
+////                        }
+//                    }
+//                    
+//                    return resp;
                 }
                 
                 oStep.setDateTimeAuthorized_n(null);

@@ -9,6 +9,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
@@ -16,9 +21,12 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_DPS;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 import erp.mod.trn.db.SDbMaterialRequest;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -63,7 +71,27 @@ public class SAuthorizationsAPI {
                     }
                     break;
                 case AUTH_TYPE_DPS:
+                    if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
+                        try {
+                            OutputHolder<Integer> idError = new OutputHolder<>();
+                            OutputHolder<String> errorMessage = new OutputHolder<>();
 
+                            executeTrnDpsUpd(oSession.getStatement().getConnection(),
+                                    ((int[]) pk)[0],
+                                    ((int[]) pk)[1],
+                                    SDataConstantsSys.UPD_DPS_FL_AUTHORN,
+                                    SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
+                                    userId,
+                                    idError,
+                                    errorMessage);
+
+                            System.out.println("ID Error: " + idError.getValue());
+                            System.out.println("Mensaje de Error: " + errorMessage.getValue());
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     break;
             }
         }
@@ -94,11 +122,44 @@ public class SAuthorizationsAPI {
                     }
                     break;
                 case AUTH_TYPE_DPS:
+                    try {
+                        OutputHolder<Integer> idError = new OutputHolder<>();
+                        OutputHolder<String> errorMessage = new OutputHolder<>();
 
+                        executeTrnDpsUpd(oSession.getStatement().getConnection(), 
+                                        ((int[]) pk)[0], 
+                                        ((int[]) pk)[1],
+                                        SDataConstantsSys.UPD_DPS_FL_AUTHORN,
+                                        SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT, 
+                                        userId,
+                                        idError, 
+                                        errorMessage);
+
+                        System.out.println("ID Error: " + idError.getValue());
+                        System.out.println("Mensaje de Error: " + errorMessage.getValue());
+                    }
+                    catch (Exception ex) {
+                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     break;
             }
         }
         return res;
+    }
+    
+    private void updateDpsAuthStatus(Object pk, final int authAction, final int userId) {
+        Vector<Object> params = new Vector<>();
+
+        params.add(((int[]) pk)[0]);
+        params.add(((int[]) pk)[1]);
+        params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
+        params.add(authAction);
+        params.add(userId);
+        params = SDataUtilities.callProcedure((SClientInterface) oSession.getClient(), SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
+        System.out.println("DPS actualizado: " + authAction + ", por usuario: " + userId);
+        for (Object param : params) {
+            System.out.println(param);
+        }
     }
 
     public boolean isAutorized(int pk) {
@@ -378,5 +439,52 @@ public class SAuthorizationsAPI {
         }
 
         return jsonDr;
+    }
+    
+    public void executeTrnDpsUpd(
+            Connection connection,
+            int idYear,
+            int idDoc,
+            int req,
+            int reqVal,
+            int fidUsr,
+            OutputHolder<Integer> idError,
+            OutputHolder<String> errorMessage) throws SQLException {
+
+        String storedProcedure = "{CALL trn_dps_upd(?, ?, ?, ?, ?, ?, ?)}";
+
+        try (CallableStatement callableStatement = connection.prepareCall(storedProcedure)) {
+            // Establecer los parámetros de entrada
+            callableStatement.setInt(1, idYear);
+            callableStatement.setInt(2, idDoc);
+            callableStatement.setInt(3, req);
+            callableStatement.setInt(4, reqVal);
+            callableStatement.setInt(5, fidUsr);
+
+            // Registrar los parámetros de salida
+            callableStatement.registerOutParameter(6, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(7, java.sql.Types.VARCHAR);
+
+            // Ejecutar el procedimiento almacenado
+            callableStatement.execute();
+
+            // Obtener los valores de salida
+            idError.setValue(callableStatement.getInt(6));
+            errorMessage.setValue(callableStatement.getString(7));
+        }
+    }
+
+    // Clase para manejar parámetros de salida
+    public static class OutputHolder<T> {
+
+        private T value;
+
+        public T getValue() {
+            return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
     }
 }

@@ -36,6 +36,7 @@ public class SWebDpsRow {
     private int matReqUserId;
     private String dpsUser;
     private String matReqUser;
+    private String notesAuth;
 
     public int getIdYear() {
         return idYear;
@@ -236,6 +237,13 @@ public class SWebDpsRow {
     public void setMatReqUser(String matReqUser) {
         this.matReqUser = matReqUser;
     }
-    
+
+    public String getNotesAuth() {
+        return notesAuth;
+    }
+
+    public void setNotesAuth(String notesAuth) {
+        this.notesAuth = notesAuth;
+    }
     
 }

@@ -59,43 +59,48 @@ public class STrnDBCore {
 
     // Consulta base para la obtención de un DPS
     final static String BASE_QUERY = "SELECT  "
-            + "    id_year, "
-            + "    id_doc, "
+            + "    dps.id_year, "
+            + "    dps.id_doc, "
             + "    dps.dt, "
-            + "    dt_doc, "
-            + "    IF(LENGTH(num_ser) > 0, "
-            + "        CONCAT(num_ser, '-', dps.num), "
+            + "    dps.dt_doc, "
+            + "    IF(LENGTH(dps.num_ser) > 0, "
+            + "        CONCAT(dps.num_ser, '-', dps.num), "
             + "        dps.num) AS dps_num, "
             + "    dps.num, "
-            + "    num_ref, "
+            + "    dps.num_ref, "
             + "    bp.bp, "
             + "    bp.fiscal_id, "
-            + "    stot_prov_r, "
-            + "    disc_doc_r, "
-            + "    stot_r, "
-            + "    tax_charged_r, "
-            + "    tax_retained_r, "
+            + "    dps.stot_prov_r, "
+            + "    dps.disc_doc_r, "
+            + "    dps.stot_r, "
+            + "    dps.tax_charged_r, "
+            + "    dps.tax_retained_r, "
             + "    dps.tot_r, "
             + "    tcur.cur_key, "
             + "    mr.num AS mr_num, "
             + "    mr.dt AS mr_dt, "
             + "    mrusr.usr AS mr_user, "
             + "    mrusr.id_usr AS mr_id_usr, "
-            + "    comms_r, "
-            + "    exc_rate, "
-            + "    exc_rate_sys, "
-            + "    stot_prov_cur_r, "
-            + "    disc_doc_cur_r, "
-            + "    stot_cur_r, "
-            + "    tax_charged_cur_r, "
-            + "    tax_retained_cur_r, "
-            + "    tot_cur_r, "
-            + "    comms_cur_r, "
-            + "    fid_cur, "
+            + "    dps.comms_r, "
+            + "    dps.exc_rate, "
+            + "    dps.exc_rate_sys, "
+            + "    dps.stot_prov_cur_r, "
+            + "    dps.disc_doc_cur_r, "
+            + "    dps.stot_cur_r, "
+            + "    dps.tax_charged_cur_r, "
+            + "    dps.tax_retained_cur_r, "
+            + "    dps.tot_cur_r, "
+            + "    dps.comms_cur_r, "
+            + "    dps.fid_cur, "
             + "    dusr.usr AS dps_user, "
             + "    dusr.id_usr AS dps_user_id,"
             + "    aust.id_st_authorn, "
-            + "    COALESCE(aust.name, 'NA') AS auth_st_name "
+            + "    COALESCE(aust.name, 'NA') AS auth_st_name,"
+            + "    tda.id_authorn, "
+            + "    tda.nts AS dta_notes, "
+            + "    tda.fid_st_authorn AS tda_st, "
+            + "    tda.fid_usr_new AS tda_usr_new, "
+            + "    tda.fid_usr_edit AS tda_usr_edit "
             + "FROM "
             + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
             + "        INNER JOIN "
@@ -111,16 +116,11 @@ public class STrnDBCore {
             + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON dps_mr.fid_mat_req = mr.id_mat_req "
             + "        LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS mrusr ON mr.fk_usr_ins = mrusr.id_usr "
-            + "        LEFT JOIN\n"
-            + "    " + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS aust ON (SELECT "
-            + "            fid_st_authorn "
-            + "        FROM "
-            + "            " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
-            + "        WHERE "
-            + "            id_year = dps.id_year "
-            + "                AND id_doc = dps.id_doc "
-            + "        ORDER BY ts_usr DESC "
-            + "        LIMIT 1) = aust.id_st_authorn ";
+            + "        LEFT JOIN " 
+            + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " AS tda ON dps.id_year = tda.id_year "
+            + "        AND dps.id_doc = tda.id_doc AND NOT tda.b_del "
+            + "        LEFT JOIN "
+            + "    " + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS aust ON tda.fid_st_authorn = aust.id_st_authorn ";
 
     /**
      * Obtiene documentos entre un rango de fechas y para un usuario específico.
@@ -128,9 +128,10 @@ public class STrnDBCore {
      * @param startDate Fecha inicial (YYYY-MM-DD).
      * @param endDate Fecha final (YYYY-MM-DD).
      * @param idUser ID del usuario para filtrar.
+     * @param statusFilter
      * @return Lista de objetos {@code SWebDpsRow} con los datos obtenidos.
      */
-    public ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser) {
+    public ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser, int statusFilter) {
         try {
             Connection conn = this.getConnection();
 
@@ -144,13 +145,17 @@ public class STrnDBCore {
                     + "        AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                     + "        AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                     + "        AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' "
-                    + "        AND num_ser <> 'S' "
-                    + "        AND mr.id_mat_req IS NOT NULL "
-                    + "        AND (SELECT fid_st_authorn "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
-                    + "WHERE id_year = dps.id_year AND id_doc = dps.id_doc "
-                    + "ORDER BY ts_usr DESC "
-                    + "LIMIT 1) IN (11, 2, 3, 4, 5) ";
+                    + "        AND mr.id_mat_req IS NOT NULL ";
+            if (statusFilter == -1) {
+                query += "AND tda.fid_st_authorn IN (2, 3) ";
+            }
+            else if (statusFilter == 0) {
+                query += "AND tda.fid_st_authorn IN (11, 2, 3, 4, 5) ";
+            }
+            else if (statusFilter > 0) {
+                query += "AND tda.fid_st_authorn = " + statusFilter + " ";
+            }
+            
             if (idUser > 0) {
                 query += "AND " + idUser + " IN (SELECT  "
                         + "    steps1.fk_usr_step "
@@ -274,6 +279,7 @@ public class STrnDBCore {
             oDoc.setTaxRetainedCur(res.getDouble("tax_retained_cur_r"));
             oDoc.setDpsUser(res.getString("dps_user"));
             oDoc.setDpsUserId(res.getInt("dps_user_id"));
+            oDoc.setNotesAuth(res.getString("dta_notes"));
 
             return oDoc;
         } catch (SQLException ex) {
@@ -519,5 +525,5 @@ public class STrnDBCore {
         
         return null;
     }
-
+    
 }

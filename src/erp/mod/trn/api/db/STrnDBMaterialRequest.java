@@ -23,13 +23,16 @@ public class STrnDBMaterialRequest {
     
     SMySqlClass oDbObj;
     String msMainDatabase;
+    private final ArrayList<SWebMaterialRequest> lMaterialRequests;
 
     public STrnDBMaterialRequest(SMySqlClass oDbObj, String mainDatabase) {
         this.oDbObj = oDbObj;
         this.msMainDatabase = mainDatabase;
+        this.lMaterialRequests = new ArrayList<>();
     }
     
     public STrnDBMaterialRequest() {
+        this.lMaterialRequests = new ArrayList<>();
         try {
             this.oDbObj = new SMySqlClass();
             this.msMainDatabase = this.oDbObj.getMainDatabaseName();
@@ -51,8 +54,6 @@ public class STrnDBMaterialRequest {
         
         return null;
     }
-    
-    private static final ArrayList<SWebMaterialRequest> lMaterialRequests = new ArrayList<>();
     
     private static boolean containsMatReqWithId(ArrayList<SWebMaterialRequest> list, int id) {
         return list.stream().anyMatch(obj -> obj.getIdMaterialRequest() == id);
