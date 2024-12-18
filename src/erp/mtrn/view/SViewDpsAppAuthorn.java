@@ -182,7 +182,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         }
         
         if (mnTabTypeAux01 == SDataConstantsSys.CFGS_ST_AUTHORN_PROC) {
-            where += (where.isEmpty() ? "" : "AND ") + "a.fid_st_authorn IN(" + SModSysConsts.CFGS_ST_AUTHORN_PEND + ", " + SModSysConsts.CFGS_ST_AUTHORN_PROC + ") ";
+            where += (where.isEmpty() ? "" : "AND ") + "a.fid_st_authorn IN(" + SModSysConsts.CFGS_ST_AUTHORN_PEND + ", " + SModSysConsts.CFGS_ST_AUTHORN_PROC + ") "
+                    + "AND d.fid_st_dps_authorn <> " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " ";
         }
         else {
             if (mnShow != SDataConstantsSys.CFGS_ST_AUTHORN_NA) {

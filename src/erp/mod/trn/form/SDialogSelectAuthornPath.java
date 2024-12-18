@@ -186,7 +186,7 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     private SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (jListAuthornPath.getSelectedIndex() < 1) {
+        if (jListAuthornPath.getSelectedIndex() < 0) {
             validation.setMessage("Debe seleccionar una ruta de autorización.");
             validation.setComponent(jListAuthornPath);
         }
