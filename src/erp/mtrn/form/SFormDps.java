@@ -714,8 +714,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdCceSubdivision = new javax.swing.JTextField();
         jPanel116 = new javax.swing.JPanel();
         jPanel117 = new javax.swing.JPanel();
-        jlExportation = new javax.swing.JLabel();
-        jcbExportation = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel110 = new javax.swing.JPanel();
         jPanel96 = new javax.swing.JPanel();
         jPanel103 = new javax.swing.JPanel();
@@ -871,8 +869,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlGblYear = new javax.swing.JLabel();
         jtfGblYear = new javax.swing.JTextField();
         jPanel132 = new javax.swing.JPanel();
-        jlExportation2 = new javax.swing.JLabel();
-        jcbExportation2 = new javax.swing.JComboBox<SFormComponentItem>();
+        jlExportation = new javax.swing.JLabel();
+        jcbExportation = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel115 = new javax.swing.JPanel();
         jbCfdiRelatedDocs = new javax.swing.JButton();
         jtfCfdiFirstRelatedDps = new javax.swing.JTextField();
@@ -2391,14 +2389,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel117.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel117.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
-
-        jlExportation.setText("Tipo exportación: *");
-        jlExportation.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel117.add(jlExportation);
-
-        jcbExportation.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel117.add(jcbExportation);
-
         jPanel97.add(jPanel117);
 
         jPanel109.add(jPanel97, java.awt.BorderLayout.NORTH);
@@ -3028,7 +3018,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jLabel5.setPreferredSize(new java.awt.Dimension(320, 23));
         jPanel114.add(jLabel5);
 
-        jLabel4.setPreferredSize(new java.awt.Dimension(392, 23));
+        jLabel4.setPreferredSize(new java.awt.Dimension(67, 23));
         jPanel114.add(jLabel4);
 
         jlGblYear.setText("Año:");
@@ -3043,12 +3033,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel132.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel132.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlExportation2.setText("Tipo exportación: *");
-        jlExportation2.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel132.add(jlExportation2);
+        jlExportation.setText(" Tipo exportación: *");
+        jlExportation.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel132.add(jlExportation);
 
-        jcbExportation2.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel132.add(jcbExportation2);
+        jcbExportation.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel132.add(jcbExportation);
 
         jPanel74.add(jPanel132);
 
@@ -4274,7 +4264,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //jcbCfdCceMoveReason.setEnabled(enableFields); // field stays disabled, required only for CFDI "T", but not supported yet!
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceRequestKey.setEnabled(enableFields);
-        jcbExportation.setEnabled((enable && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR)));
+        jcbExportation.setEnabled((enable && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice));
         jtfCfdCceCertificateOrigin.setEnabled(enableFields);
         jtfCfdCceCertificateOrigin.setFocusable(enableFields);
         jtfCfdCceNumberCertificateOrigin.setEnabled(enableFields);
@@ -4960,13 +4950,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else {
                         if (isCfdIntCommerceRequired()) {
                             moFieldCfdiCfdiUsage.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF);
-                            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1); //xxx123 4933
+                            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
                         }
                         else {
                             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
                             if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
                                 moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
-                                moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica); //xxx123 4939
+                                moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
                             }
                         }
                     }
@@ -10797,7 +10787,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegimeReceptor;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox<SFormComponentItem> jcbExportation;
-    private javax.swing.JComboBox<SFormComponentItem> jcbExportation2;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
@@ -10924,7 +10913,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSystem;
     private javax.swing.JLabel jlExportation;
-    private javax.swing.JLabel jlExportation2;
     private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
     private javax.swing.JLabel jlFiscalId;
@@ -12879,10 +12867,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                 }
                 else {
-                    dpsCfd.setExportation(moFieldCfdCceExportation.getFieldValue().toString()); // xxx123 12826
-                    dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionNoAplica);
+//                    moDps.setDbmsDataDpsCfd(dpsCfd);
                 }
-
+                dpsCfd.setExportation(moFieldCfdCceExportation.getFieldValue().toString()); // xxx123 12826
                 moDps.setDbmsDataDpsCfd(dpsCfd);
             }
 
