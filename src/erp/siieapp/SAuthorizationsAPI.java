@@ -9,11 +9,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
@@ -26,7 +22,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -72,21 +67,11 @@ public class SAuthorizationsAPI {
                     break;
                 case AUTH_TYPE_DPS:
                     if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
+                        System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] autorizado");
                         try {
-                            OutputHolder<Integer> idError = new OutputHolder<>();
-                            OutputHolder<String> errorMessage = new OutputHolder<>();
-
-                            executeTrnDpsUpd(oSession.getStatement().getConnection(),
-                                    ((int[]) pk)[0],
-                                    ((int[]) pk)[1],
-                                    SDataConstantsSys.UPD_DPS_FL_AUTHORN,
-                                    SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
-                                    userId,
-                                    idError,
-                                    errorMessage);
-
-                            System.out.println("ID Error: " + idError.getValue());
-                            System.out.println("Mensaje de Error: " + errorMessage.getValue());
+                            updateDpsAuthStatus(pk,
+                                        SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN, 
+                                        userId);
                         }
                         catch (Exception ex) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,20 +108,10 @@ public class SAuthorizationsAPI {
                     break;
                 case AUTH_TYPE_DPS:
                     try {
-                        OutputHolder<Integer> idError = new OutputHolder<>();
-                        OutputHolder<String> errorMessage = new OutputHolder<>();
-
-                        executeTrnDpsUpd(oSession.getStatement().getConnection(), 
-                                        ((int[]) pk)[0], 
-                                        ((int[]) pk)[1],
-                                        SDataConstantsSys.UPD_DPS_FL_AUTHORN,
+                        System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
+                        updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT, 
-                                        userId,
-                                        idError, 
-                                        errorMessage);
-
-                        System.out.println("ID Error: " + idError.getValue());
-                        System.out.println("Mensaje de Error: " + errorMessage.getValue());
+                                        userId);
                     }
                     catch (Exception ex) {
                         Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -148,17 +123,19 @@ public class SAuthorizationsAPI {
     }
     
     private void updateDpsAuthStatus(Object pk, final int authAction, final int userId) {
-        Vector<Object> params = new Vector<>();
-
-        params.add(((int[]) pk)[0]);
-        params.add(((int[]) pk)[1]);
-        params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
-        params.add(authAction);
-        params.add(userId);
-        params = SDataUtilities.callProcedure((SClientInterface) oSession.getClient(), SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
-        System.out.println("DPS actualizado: " + authAction + ", por usuario: " + userId);
-        for (Object param : params) {
-            System.out.println(param);
+        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " " +
+                    "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
+                    + "fid_st_dps_authorn = " + authAction + ", "
+                    + "fid_usr_authorn = " + userId + ", "
+                    + "ts_authorn = NOW() " +
+                    "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + ";";
+        
+        try {
+            System.out.println(sql);
+            int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
+            System.out.println("res: " + res);
+        } catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
