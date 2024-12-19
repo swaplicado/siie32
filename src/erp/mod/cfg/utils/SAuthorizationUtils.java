@@ -402,7 +402,7 @@ public abstract class SAuthorizationUtils {
     
     /**
      * Petición de autorización o rechazo de recurso.
-     * Si el proceso ha sido exitoso devuelve un Strin vacío, si ha ocurrido un error el 
+     * Si el proceso ha sido exitoso devuelve un String vacío, si ha ocurrido un error el 
      * String explicará lo que ha sucedido
      * 
      * @param session
@@ -435,11 +435,12 @@ public abstract class SAuthorizationUtils {
                     + condPk + ";";
         
         try {
+            System.out.println("Obtención de Step: " + sql);
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
             if (res.next()) {
                 if (action == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"));
+                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"), reasonRej);
                 }
                 else {
                     return SAuthorizationUtils.rejectById(session, res.getInt("id_authorn_step"), reasonRej);
@@ -478,10 +479,11 @@ public abstract class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * @param comments
      * 
      * @return 
      */
-    public static String authorizeById(SGuiSession session, final int idAuthStep) {
+    public static String authorizeById(SGuiSession session, final int idAuthStep, String comments) {
         SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
@@ -537,7 +539,7 @@ public abstract class SAuthorizationUtils {
                 oStep.setDateTimeRejected_n(null);
                 oStep.setFkUserRejectId_n(0);
                 oStep.setRejected(false);
-                oStep.setComments("");
+                oStep.setComments(comments);
                 
                 oStep.save(session);
                 
@@ -589,6 +591,7 @@ public abstract class SAuthorizationUtils {
                 
                 ArrayList<SAuthStatus> lStatus = new ArrayList<>();
                 ResultSet resRows = session.getDatabase().getConnection().createStatement().executeQuery(rowsQuery);
+                System.out.println("rechazar por ID (" +  idAuthStep + "): " + rowsQuery);
                 while (resRows.next()) {
                     if (resRows.getBoolean("b_authorn")) {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_AUTHORIZED, resRows.getString("auth_user")));
@@ -596,14 +599,18 @@ public abstract class SAuthorizationUtils {
                 }
                 
                 if (lStatus.size() > 0) {
-                    String resp = "";
-                    for (SAuthStatus oStatus : lStatus) {
-                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
-                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
-                        }
-                    }
-                    
-                    return resp;
+                    /**
+                     * Se comenta la funcionalidad para permitir el rechazo aún cuando alguien ya haya autorizado.
+                     * Edwin Carmona. 2024-12-12
+                     */
+//                    String resp = "";
+//                    for (SAuthStatus oStatus : lStatus) {
+////                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
+////                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
+////                        }
+//                    }
+//                    
+//                    return resp;
                 }
                 
                 oStep.setDateTimeAuthorized_n(null);

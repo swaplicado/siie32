@@ -14,11 +14,14 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.musr.form.SFormExportUser;
+import erp.siieapp.SUserExportUtils;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiConsts;
+import java.util.Vector;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
@@ -28,6 +31,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbExport;
+    private javax.swing.JButton jbSync;
     
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
@@ -53,8 +57,14 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         jbExport.setPreferredSize(new Dimension(23, 23));
         jbExport.addActionListener(this);
         jbExport.setToolTipText("Exportar usuario");
+        
+        jbSync = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        jbSync.setPreferredSize(new Dimension(23, 23));
+        jbSync.addActionListener(this);
+        jbSync.setToolTipText("Sincronizar con sistemas externos");
 
         addTaskBarUpperComponent(jbExport);
+        addTaskBarUpperComponent(jbSync);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
@@ -161,6 +171,13 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
         }
     }
+    
+    private void actionSynchronizeExternal(){
+        if (jbSync.isEnabled()) {
+            SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
+            boolean res = oExport.SynchronizeExternal();
+        }
+    }
 
     @Override
     public void createSqlQuery() {
@@ -201,6 +218,9 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
             else if (button == jbExport) {
                 actionExport();
+            }
+            else if (button == jbSync) {
+                actionSynchronizeExternal();
             }
         }
     }

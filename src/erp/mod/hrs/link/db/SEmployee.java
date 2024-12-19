@@ -18,6 +18,9 @@ public class SEmployee {
     String firstname;
     String admission_date;
     String leave_date;
+    String dt_tp_pay;
+    String dt_bir;
+    String benefit_date;
     String email;
     int company_id;
     int overtime_policy;
@@ -91,6 +94,22 @@ public class SEmployee {
     public void setLeave_date(String leave_date) {
         this.leave_date = leave_date;
     }
+    
+    public String getBenefit_date(){
+        return benefit_date;
+    }
+    
+    public void setBenefit_date(String benefit_date){
+        this.benefit_date = benefit_date;
+    }
+
+    public String getDt_tp_pay() {
+        return dt_tp_pay;
+    }
+
+    public void setDt_tp_pay(String dt_tp_pay) {
+        this.dt_tp_pay = dt_tp_pay;
+    }
 
     public String getEmail() {
         return email;
@@ -163,6 +182,12 @@ public class SEmployee {
     public void setIs_deleted(boolean is_deleted) {
         this.is_deleted = is_deleted;
     }
-    
-    
+
+    public String getDt_bir() {
+        return dt_bir;
+    }
+
+    public void setDt_bir(String dt_bir) {
+        this.dt_bir = dt_bir;
+    }
 }

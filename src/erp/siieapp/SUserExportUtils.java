@@ -8,22 +8,27 @@ package erp.siieapp;
 import erp.data.SDataConstantsSys;
 import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SCfgUtils;
-import erp.musr.data.SDataUser;
 import erp.musr.data.SDataUserAppRow;
-import java.math.BigInteger;
 import java.sql.Array;
+import java.util.Vector;
+import org.json.simple.JSONArray;
+import erp.musr.data.SDataUser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.simple.JSONArray;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sa.lib.gui.SGuiClient;
+import javax.swing.*;
+import java.awt.*;
+import erp.siieapp.SAuthorizationsAPI;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
@@ -231,5 +236,100 @@ public class SUserExportUtils {
     
     public Array getApps(){
         return null;
+    }
+    
+    public boolean unactiveUser(int userId, boolean isActive, boolean isDeleted) throws SQLException, ParseException{
+        String token = this.loginSiieApp();
+        
+        if(token.isEmpty()){
+            return false;
+        }
+                
+        try {
+            String data = "{"
+                        + "\"id\": \"" + userId + "\","
+                        + "\"isActive\": \"" + isActive + "\","
+                        + "\"isDeleted\": \"" + isDeleted + "\""
+                        + "}";
+
+            String urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP);
+            String arrayUrls[] = urls.split(";");
+            String urlExportUser = arrayUrls[3];
+
+            SConectionUtils oCon = new SConectionUtils(miClient);
+            oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
+
+            // Imprimir la respuesta del servidor
+            System.out.println("Código de respuesta: " + oCon.responseCode);
+            if( oCon.responseCode != 200 ){
+                miClient.showMsgBoxError("No fue posible actualizar el usuario");
+                return false;
+            }
+            System.out.println("Respuesta del servidor: " + oCon.response.toString());
+            
+            
+        } catch (Exception e) {
+            Logger.getLogger(erp.siieapp.SUserExportUtils.class.getName()).log(Level.SEVERE, null, e);
+        }
+        
+        return true;
+    }
+    
+    public boolean SynchronizeExternal(){
+        try {
+            SGuiUtils.setCursorWait(miClient);
+                
+            String token = this.loginSiieApp();
+        
+            if(token.isEmpty()){
+                return false;
+            }
+            
+            Statement statement = miClient.getSession().getStatement();
+            
+            String sql = "SELECT id_usr, b_act, b_del FROM erp.usru_usr;";
+            
+            String sJson = "[";
+
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    
+                    sJson = sJson
+                            + "{"
+                            + "\"userId\": \"" + resultSet.getString("id_usr") + "\","
+                            + "\"isActive\": \"" + resultSet.getString("b_act") + "\","
+                            + "\"isDeleted\": \"" + resultSet.getString("b_del") + "\""
+                            + "}";
+                    
+                    if(!resultSet.isLast()){
+                        sJson = sJson + ",";
+                    }
+                }
+            }
+            
+            sJson = sJson + "]";
+            
+            String data = "{"
+                    + "\"lData\": " + sJson 
+                    + "}";
+            
+            String urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP);
+            String arrayUrls[] = urls.split(";");
+            String urlExportUser = arrayUrls[4];
+            
+            SConectionUtils oCon = new SConectionUtils(miClient);
+            oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
+            
+            
+            
+        } catch (Exception e) {
+            Logger.getLogger(erp.siieapp.SUserExportUtils.class.getName()).log(Level.SEVERE, null, e);
+            miClient.showMsgBoxError(e.getMessage());
+        } finally {
+                SGuiUtils.setCursorDefault(miClient);
+                miClient.showMsgBoxInformation("Usuarios sincronizados con sistema externo");
+        }
+        
+        return true;
     }
 }

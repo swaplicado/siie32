@@ -21,4 +21,5 @@ public class SRootJSON {
     ArrayList<SFirstDayYear> fdys;
     ArrayList<SAbsence> absences;
     ArrayList<SPrepayCutCalendar> cuts;
+    ArrayList<SEmployeeVacations> vacations;
 }

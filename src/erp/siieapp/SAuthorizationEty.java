@@ -22,6 +22,9 @@ public class SAuthorizationEty {
     int idUnit;
     String unit;
     String symbol;
+    String consumeEntity;
+    String subConsumeEntity;
+    String fcc;
 
     public int getIdEty() {
         return idEty;
@@ -65,6 +68,18 @@ public class SAuthorizationEty {
 
     public float getTotal() {
         return total;
+    }
+    
+    public String getConsumeEntity() {
+        return consumeEntity;
+    }
+
+    public String getSubConsumeEntity() {
+        return subConsumeEntity;
+    }
+
+    public String getFcc() {
+        return fcc;
     }
 
     public void setTotal(float total) {
@@ -118,6 +133,16 @@ public class SAuthorizationEty {
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
-    
-    
+
+    public void setConsumeEntity(String consumeEntity) {
+        this.consumeEntity = consumeEntity;
+    }
+
+    public void setSubConsumeEntity(String subConsumeEntity) {
+        this.subConsumeEntity = subConsumeEntity;
+    }
+
+    public void setFcc(String fcc) {
+        this.fcc = fcc;
+    }
 }
