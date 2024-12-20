@@ -610,7 +610,12 @@ public abstract class SDocUtils {
         ArrayList<String> lNames = lFilesToDelete.stream()
                 .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
                 .collect(Collectors.toCollection(ArrayList::new));
-        String resultDeleted = CloudStorageManager.deleteFiles(lNames);
+        try {
+            String resultDeleted = CloudStorageManager.deleteFiles(lNames);
+        }
+        catch(Exception e) {
+            System.err.println("Error al eliminar archivos en el cloud storage");
+        }
 
         // Actualizar los archivos locales eliminados
         for (SDbSupplierFile oFile : lFilesToDelete) {

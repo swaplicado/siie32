@@ -95,7 +95,7 @@ public class SAuthorizationsAPI {
                                         }
                                     }
                                     System.out.println("Enviando mail a: " + toMails.toString());
-                                    SAuthorizationUtils.sendAuthornMails(oSession, toMails.toString(), "", "", ((int[]) pk));
+                                    SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_PEND, toMails.toString(), "", "", ((int[]) pk));
                                 }
                             }
                         }

@@ -17,6 +17,7 @@ import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
+import erp.siieapp.SAuthorizationsAPI;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -90,6 +91,13 @@ public abstract class SAuthorizationUtils {
      */
     public static final int AUTH_ACTION_AUTHORIZE = 1;
     public static final int AUTH_ACTION_REJECT = 2;
+    
+    /**
+     * Constantes para el envío de correos de autorización
+     */
+    public static final int AUTH_MAIL_AUTH_PEND = 1;
+    public static final int AUTH_MAIL_AUTH_DONE = 2;
+    public static final int AUTH_MAIL_AUTH_REJ = 3;
     
     /**
      * Determina si un recurso está autorizado o no.
@@ -825,25 +833,25 @@ public abstract class SAuthorizationUtils {
      * @param session
      * @param paths recibe ya las rutas de autorizacón
      * @param authorizationType
-     * @param pk
+     * @param pkDps
      * @param reset determina si los pasos previos de autorización tienen que borrarse
      * 
      * @throws Exception 
      */
-    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pk, final boolean reset) throws Exception {
+    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
         if (reset) {
-            SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pk);
+            SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pkDps);
         }
         
         // Si el recurso ya tiene pasos de autorización no se determinan nuevamente
-        if (!reset && SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pk)) {
+        if (!reset && SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pkDps)) {
             return;
         }
         
         // Lectura de path de configuración
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         for (SDbAuthorizationPath oCfg : paths) {
-            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps));
             
             for (SDbAuthorizationStep oStep : lSteps) {
                 if (! SAuthorizationUtils.stepExists(session, oStep)) {
@@ -851,6 +859,7 @@ public abstract class SAuthorizationUtils {
                 }
             }
         }
+        processAuthornMails(session, authorizationType, (int[])pkDps);
     }
     
     /**
@@ -1575,12 +1584,50 @@ public abstract class SAuthorizationUtils {
         return true;
     }
     
-    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, String to, String cc, String bcc, int[] pkDps) throws Exception {
+    /**
+    * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
+     * @param session
+     * @param authorizationType
+     * @param pkDps
+    */
+    public static void processAuthornMails(final SGuiSession session, final int authorizationType, int[] pkDps) {
+        ArrayList<Integer> lUsers;
+        try {
+            lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps);
+            if (! lUsers.isEmpty()) {
+                ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), lUsers);
+                if (! lMails.isEmpty()) {
+                    StringBuilder toMails = new StringBuilder("");
+                    for (int i = 0; i < lMails.size(); i++) {
+                        toMails.append(lMails.get(i));
+                        if (i < lMails.size() - 1) {
+                            toMails.append("; ");
+                        }
+                    }
+                    System.out.println("Enviando mail a: " + toMails.toString());
+                    SAuthorizationUtils.sendAuthornMails(session, AUTH_MAIL_AUTH_PEND, toMails.toString(), "", "", pkDps);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc, String bcc, int[] pkDps) throws Exception {
         SDataDps dps = new SDataDps();
         dps.read(pkDps, session.getStatement().getConnection().createStatement());
         SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_MAIL_REPS);
-        
-        String subject = "[SIIE] Autorización pendiente del pedido de compras " + dps.getNumber();
+        String subject;
+        if (mailType == AUTH_MAIL_AUTH_PEND) {
+            subject = "[SIIE] Autorizacion pendiente del pedido de compras " + dps.getNumber();
+        }
+        else {
+            subject = "[SIIE] Autorizacion concluida del pedido de compras " + dps.getNumber();
+        }
         String body = "<html>";
         body += "<head>";
         body += "<style>"
@@ -1607,11 +1654,26 @@ public abstract class SAuthorizationUtils {
         body += "</head>";
         body += "<body>";
         body += "<h2>Estimado usuario:</h2>";
-        body += "<p>Tienes un pedido pendiente de autorización</p>";
-        body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
-        body += "<p>Te invitamos a ingresar a nuestra plataforma y autorizar este pedido de compras, gracias por tu atención.</p>";
+        switch (mailType) {
+            case AUTH_MAIL_AUTH_PEND:
+                body += "<p>"+ SLibUtils.textToHtml("Tienes un pedido pendiente de autorización")+ "</p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>Te invitamos a ingresar a nuestra plataforma y autorizar este pedido de compras, gracias por tu atención.</p>";
+                break;
+            case AUTH_MAIL_AUTH_DONE:
+                body += "<p>El siguiente pedido ha sido <span style='color: green;'>AUTORIZADO</span> exitosamente</p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>¡Gracias por utilizar nuestra plataforma!</p>";
+                break;
+            case AUTH_MAIL_AUTH_REJ:
+                body += "<p>El siguiente pedido ha sido <span style='color: red;'>RECHAZADO</span></p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>¡Gracias por utilizar nuestra plataforma!</p>";
+                break;
+        } 
         
-        body += STrnUtilities.composeMailFooter("");
+        body += "<p>Acceso a la plataforma: <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
+        body += "<span style='font-size:10px'>" + STrnUtilities.composeMailFooter("") + "</span>";
         
         body += "</body>";
         
@@ -1624,7 +1686,7 @@ public abstract class SAuthorizationUtils {
         ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
         ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
      
-        SMail mail = new SMail(moMailSender, subject, SLibUtils.textToHtml(body), toRecipients, toCcRecipients, toBccRecipients);
+        SMail mail = new SMail(moMailSender, subject, body, toRecipients, toCcRecipients, toBccRecipients);
         mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
         mail.send();
     }
