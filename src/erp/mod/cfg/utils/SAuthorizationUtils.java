@@ -1672,7 +1672,7 @@ public abstract class SAuthorizationUtils {
                 break;
         } 
         
-        body += "<p>Acceso a la plataforma: <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
+        body += "<p>Acceso a la plataforma: <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> (Tu usuario y contraseña son los mismos que usas al ingresar a SIIE)</p>";
         body += "<span style='font-size:10px'>" + STrnUtilities.composeMailFooter("") + "</span>";
         
         body += "</body>";
