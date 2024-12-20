@@ -17,7 +17,9 @@ public class SAuthorizationsData {
     String dataTypeName;
     String userCreator;
     String userUpdator;
+    String authorizationUser;
     String consumeEntity;
+    String subConsumeEntity;
     String supplierEntity;
     String requisitionStatus;
     String date;
@@ -25,9 +27,19 @@ public class SAuthorizationsData {
     int fkUserCreator;
     int fkUserUpdator;
     int authorizationStatus;
+    int fkPriority;
+    String priority;
     String dateInsert;
     String dateUpdate;
 
+    public void setFkPriority(int fkPriority) {
+        this.fkPriority = fkPriority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+    
     public void setIdData(int[] idData) {
         this.idData = idData;
     }
@@ -140,12 +152,28 @@ public class SAuthorizationsData {
         this.userUpdator = userUpdator;
     }
 
+    public String getAuthorizationUser() {
+        return authorizationUser;
+    }
+
+    public void setAuthorizationUser(String authorizationUser) {
+        this.authorizationUser = authorizationUser;
+    }
+
     public String getConsumeEntity() {
         return consumeEntity;
+    }
+    
+    public String getSubConsumeEntity() {
+        return subConsumeEntity;
     }
 
     public void setConsumeEntity(String consumeEntity) {
         this.consumeEntity = consumeEntity;
+    }
+    
+    public void setSubConsumeEntity(String subConsumeEntity) {
+        this.subConsumeEntity = subConsumeEntity;
     }
 
     public String getSupplierEntity() {
@@ -171,6 +199,12 @@ public class SAuthorizationsData {
     public void setFkDataType(int fkDataType) {
         this.fkDataType = fkDataType;
     }
-    
-    
+
+    public int getFkPriority() {
+        return fkPriority;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
 }
