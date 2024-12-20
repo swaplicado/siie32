@@ -77,6 +77,35 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+                    else {
+                        /**
+                         * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
+                         */
+                        ArrayList<Integer> lUsers;
+                        try {
+                            lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk));
+                            if (! lUsers.isEmpty()) {
+                                ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
+                                if (! lMails.isEmpty()) {
+                                    StringBuilder toMails = new StringBuilder("");
+                                    for (int i = 0; i < lMails.size(); i++) {
+                                        toMails.append(lMails.get(i));
+                                        if (i < lMails.size() - 1) {
+                                            toMails.append("; ");
+                                        }
+                                    }
+                                    System.out.println("Enviando mail a: " + toMails.toString());
+                                    SAuthorizationUtils.sendAuthornMails(oSession, toMails.toString(), "", "", ((int[]) pk));
+                                }
+                            }
+                        }
+                        catch (SQLException ex) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     break;
             }
         }
@@ -123,18 +152,19 @@ public class SAuthorizationsAPI {
     }
     
     private void updateDpsAuthStatus(Object pk, final int authAction, final int userId) {
-        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " " +
-                    "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
-                    + "fid_st_dps_authorn = " + authAction + ", "
-                    + "fid_usr_authorn = " + userId + ", "
-                    + "ts_authorn = NOW() " +
-                    "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + ";";
-        
+        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
+                + "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
+                + "fid_st_dps_authorn = " + authAction + ", "
+                + "fid_usr_authorn = " + userId + ", "
+                + "ts_authorn = NOW() "
+                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + ";";
+
         try {
             System.out.println(sql);
             int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
             System.out.println("res: " + res);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
