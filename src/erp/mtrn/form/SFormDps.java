@@ -12470,7 +12470,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     if (!moDps.getDbmsDataDpsCfd().getExportation().isEmpty()) {
                         moFieldCfdCceExportation.setFieldValue(moDps.getDbmsDataDpsCfd().getExportation());
                     } else {
-                        moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);
+                        if ((!(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && !mbIsDpsInvoice)){
+                           moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica); // xxx123 12826
+
+                        } else {
+                           moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionDefinitivaA1);                            
+                        }
                     }
                 }
                 else if (!moDps.getIsRegistryNew() && isCfdCfdiRelatedRequired()) {
@@ -12869,7 +12874,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
 //                    moDps.setDbmsDataDpsCfd(dpsCfd);
                 }
+                if (( !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && !mbIsDpsInvoice)){
+                dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionNoAplica); // xxx123 12826
+   
+                }
+                else{
                 dpsCfd.setExportation(moFieldCfdCceExportation.getFieldValue().toString()); // xxx123 12826
+                }
                 moDps.setDbmsDataDpsCfd(dpsCfd);
             }
 
