@@ -1,14 +1,20 @@
 ================================================================================
+SIIE 3.2 258.13/ 2025-01-10
+Jhonathan Claudio PEÑA HERNÁNDEZ/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Preparacióm de release con opción de cambiar el tipo de exportación en la captura de CFDI de facturas de ventas.
+
+================================================================================
 SIIE 3.2 258.12/ 2025-01-08
 Jhonathan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección creación de notas de crédito desde nuevas
+1) Corrección creación de notas de crédito desde nuevas.
 
 ================================================================================
 SIIE 3.2 258.11/ 2024-12-17
 Jhonathan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Funcionalidad manual de uso de CFDI para facturas de exportación
+1) Funcionalidad manual de uso de CFDI para facturas de exportación.
 
 ================================================================================
 SIIE 3.2 258.10/ 2024-11-29
