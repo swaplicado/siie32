@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 260.0/ 2025-01-13
+Isabel Danae GARCÍA SERVÍN/ Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Creación del nuevo sistema de autorización de pedidos de compras desde una plataforma externa, funcionando en conjunto con el sistema de autorización convencional.
+
+================================================================================
 SIIE 3.2 258.13/ 2025-01-10
 Jhonathan Claudio PEÑA HERNÁNDEZ/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

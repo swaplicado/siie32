@@ -2355,6 +2355,34 @@ public abstract class STrnUtilities {
 
         return mms;
     }
+    
+    /**
+     * Obtain configuration of Mail Messaging Service the type specific.
+     * @param session
+     * @param mmsType Type of Mail Messaging Service.
+     * @return Configuration registry.
+     */
+    public static SDbMms getMms(final sa.lib.gui.SGuiSession session, final int mmsType) {
+        String sql = "";
+        ResultSet resultSet = null;
+        SDbMms mms = null;
+
+        try {
+            mms = new SDbMms();
+
+            sql = "SELECT id_mms FROM cfg_mms WHERE fk_tp_mms = " + mmsType + " and b_del = 0 ORDER BY id_mms DESC ";
+
+            resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                mms.read(session, new int[] { resultSet.getInt("id_mms") });
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+        }
+
+        return mms;
+    }
 
     public static boolean insertDpsSendLog(final SClientInterface client, final SDataDps dps, final String sendTo, final boolean isSend) throws Exception {
         String sql = "";
@@ -2535,6 +2563,7 @@ public abstract class STrnUtilities {
             map.put("nBizPartnerCategory", isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
             map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
+            map.put("bAuthorn", hasAuthornSteps(client, dps.getPkYearId(), dps.getPkDocId()));
 
             jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             
@@ -4376,5 +4405,20 @@ public abstract class STrnUtilities {
        }
         
        return dpsDoc;
+    }
+
+    private static boolean hasAuthornSteps(SClientInterface client, int pkYearId, int pkDocId) {
+        try {
+            ResultSet resultSet;
+            String sql = "SELECT * FROM cfgu_authorn_step WHERE res_pk_n1_n = " + pkYearId + " AND res_pk_n2_n = " + pkDocId + " AND NOT b_del;";
+            resultSet = client.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+        catch (Exception e) {
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return false;
     }
 }

@@ -14,13 +14,13 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
+import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +60,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbReject;
     private JButton jbSegregate;
     private JButton jbDocsCardex;
-    private JButton mjbToNew;
+    private JButton jbToNew;
+    private JButton jbAuthComments;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
@@ -109,7 +110,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
-        mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
+        jbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
+        jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización pedido de compra", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
@@ -120,7 +122,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbHardAuthorize);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSegregate);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToNew);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbToNew);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthComments);
         
         jbNewSupReq.setEnabled(true);
         jbPrint.setEnabled(true);
@@ -131,7 +134,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbHardAuthorize.setEnabled(false);
         jbSegregate.setEnabled(false);
         jbDocsCardex.setEnabled(true);
-        mjbToNew.setEnabled(hasMatReqPurRight || hasMatReqProvRight || hasMatReqAdmorRight);
+        jbToNew.setEnabled(hasMatReqPurRight || hasMatReqProvRight || hasMatReqAdmorRight);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -183,7 +186,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         
         if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_RECLASS) {
             jbRowEdit.setEnabled(hasMatReqReclassRight);
-            mjbToNew.setEnabled(false);
+            jbToNew.setEnabled(false);
         }
         
         if (mnGridSubtype == SModConsts.TRNX_MAT_REQ_ALL) {
@@ -191,7 +194,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbAuthorize.setEnabled(false);
             jbReject.setEnabled(false);
             jbReject.setEnabled(false);
-            mjbToNew.setEnabled(false);
+            jbToNew.setEnabled(false);
         }
         
         jbRowDisable.setToolTipText("Cancelar");
@@ -227,7 +230,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
                 else {
                     try {
-                        createParamsMap(gridRow.getRowPrimaryKey()[0]);
+                        HashMap<String, Object> params = SMaterialRequestUtils.createMatReqParamsMapPdf(miClient, gridRow.getRowPrimaryKey()[0]);
+                        miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -480,31 +484,30 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         }
     }
     
-    private void createParamsMap(int idMatReq) throws Exception {
-        String aut = "";
-        String rec = "";
-        String sql = "SELECT ua.usr autorizo, ur.usr rechazo, comments comentario " +
-                "FROM cfgu_authorn_step AS a " +
-                "LEFT JOIN erp.usru_usr AS ua ON a.fk_usr_authorn_n = ua.id_usr " +
-                "LEFT JOIN erp.usru_usr AS ur ON a.fk_usr_reject_n = ur.id_usr " + 
-                "WHERE a.res_pk_n1_n = " + idMatReq + " AND fk_tp_authorn = 1";
-        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            aut += resultSet.getString("autorizo") + "; ";
-            String com = resultSet.getString("comentario");
-            rec += resultSet.getString("rechazo") != null ? resultSet.getString("rechazo") + (com.isEmpty() ? "; " : "(" + com + "); ") : "";
+    public void actionAuthComments() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
-        
-        HashMap<String, Object> params;
-        
-        params = miClient.createReportParams();
-        params.put("nMatReqId", idMatReq);
-        params.put("sMatReqAut", aut);
-        params.put("sMatReqRec", rec);
-        
-        miClient.getSession().printReport(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, null, params);
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                SDialogDocumentAuthornComments dialog = new SDialogDocumentAuthornComments((SGuiClient) miClient, "Comentarios de autorización");
+                dialog.setValue(SModConsts.TRN_MAT_REQ, gridRow.getRowPrimaryKey()[0]);
+                dialog.setVisible(true);
+            }
+        }
     }
-    
+        
     @Override
     public void actionRowDisable() {
         if (jtTable.getSelectedRowCount() != 1) {
@@ -909,8 +912,11 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             else if (button == jbDocsCardex) {
                 actionDocsKardex();
             }
-            else if (button == mjbToNew) {
+            else if (button == jbToNew) {
                 actionToNew();
+            }
+            else if (button == jbAuthComments) {
+                actionAuthComments();
             }
         }
     }

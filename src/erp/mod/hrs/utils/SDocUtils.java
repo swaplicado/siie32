@@ -15,6 +15,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -22,6 +23,9 @@ import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbDocument;
 import erp.mod.hrs.db.SRowPreceptSubsection;
 import erp.mod.hrs.form.SDialogDocImage;
+import erp.mod.trn.db.SDbSupplierFile;
+import erp.mod.trn.db.SDbSupplierFileProcess;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +33,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -40,7 +45,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SDocUtils {
     
@@ -50,6 +55,7 @@ public abstract class SDocUtils {
     
     public static final String BUCKET_DOC_BREACH = "docBreach";
     public static final String BUCKET_DOC_ADM_REC = "docAdminRecord";
+    public static final String BUCKET_DOC_DPS_SUPPLIER = "docDpsSupplier";
     
     public static final String FILE_TYPE_IMG = "IMG";
     public static final String FILE_TYPE_PDF = "PDF";
@@ -207,10 +213,11 @@ public abstract class SDocUtils {
      * @param bucketName Name of Mongo GridFS bucket.
      * @param filevaultId ObjectId of file to download.
      * @param location Location to save the downloaded file.
+     * @param returnPath
      * @return Filename of file downloaded, if found.
      * @throws IOException, Exception
      */
-    public static String downloadFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+    public static String downloadFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location, final boolean returnPath) throws IOException, Exception {
         if (!location.isDirectory()) {
             throw new Exception("El parámetro File '" + location.getPath() + "' no es un directorio.");
         }
@@ -247,7 +254,71 @@ public abstract class SDocUtils {
             }
         }
         
+        if (returnPath) {
+            return location.getPath() + File.separator + filenameFound;
+        }
+        
         return filenameFound;
+    }
+    
+    /**
+     * Download file from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @param location Location to save the downloaded file.
+     * @return File object file downloaded, if was found.
+     * @throws IOException, Exception
+     */
+    public static File downloadAndGetFile(final SGuiSession session, final String bucketName, final String filevaultId, final File location) throws IOException, Exception {
+        boolean returnPath = true;
+        String filePath = SDocUtils.downloadFile(session, bucketName, filevaultId, location, returnPath);
+        File downloadedFile = new File(filePath);
+        return downloadedFile;
+    }
+    
+    /**
+     * Download file from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @return Bytes of file downloaded, if was found.
+     * @throws IOException, Exception
+     */
+    public static byte[] getFileBytes(final SGuiSession session, final String bucketName, final String filevaultId) throws IOException, Exception {
+        String filenameFound = "";
+        String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
+        String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
+
+        byte[] fileData;
+
+        // Conexión a MongoDB y descarga del archivo en memoria
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoDatabase database = client.getDatabase(db);
+            GridFSBucket bucket = GridFSBuckets.create(database, bucketName);
+
+            ObjectId objectId = new ObjectId(filevaultId);
+            Bson query = Filters.eq("_id", objectId);
+            Bson sort = Sorts.descending("uploadDate");
+
+            GridFSFile file = bucket.find(query).sort(sort).limit(1).first();
+            if (file == null) {
+                throw new Exception("No se encontró ningún archivo con el ObjectId '" + filevaultId + "'!");
+            }
+
+            filenameFound = file.getFilename();
+            System.out.println("Descargando archivo '" + filenameFound + "', ObjectId '" + filevaultId + "'...");
+
+            // Descargar el archivo en un flujo de salida en memoria
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                bucket.downloadToStream(objectId, outputStream);
+                fileData = outputStream.toByteArray();
+            }
+        }
+
+        System.out.println("Archivo descargado en memoria: '" + filenameFound + "'.");
+        
+        return fileData;
     }
     
     /**
@@ -374,6 +445,41 @@ public abstract class SDocUtils {
     }
     
     /**
+     * Get file name from MongoDB vault.
+     * @param session GUI session.
+     * @param bucketName Name of Mongo GridFS bucket.
+     * @param filevaultId ObjectId of file to download.
+     * @return GridFSfile, if found.
+     * @throws java.io.IOException
+     * @throws Exception
+     */
+    public static String getFileName(final SGuiSession session, final String bucketName, final String filevaultId) throws IOException, Exception {
+        String filenameFound = "";
+        String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
+        String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
+        
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoDatabase database = client.getDatabase(db);
+            GridFSBucket bucket = GridFSBuckets.create(database, bucketName);
+            
+            ObjectId objectId = new ObjectId(filevaultId);
+            Bson query = Filters.eq("_id", objectId);
+            Bson sort = Sorts.descending("uploadDate");
+            
+            for (GridFSFile file : bucket.find(query).sort(sort).limit(1)) {
+                filenameFound = file.getFilename();
+                break;
+            }
+            
+            if (filenameFound.isEmpty()) {
+                throw new Exception("No se encontró ningún archivo con el ObjectId '" + filevaultId + "'!");
+            }
+        }
+        
+        return filenameFound;
+    }
+    
+    /**
      * Get file image icon from MongoDB vault.
      * @param session GUI session.
      * @param bucketName Name of Mongo GridFS bucket.
@@ -425,7 +531,8 @@ public abstract class SDocUtils {
                             if (file.exists()) {
                                 file.delete();
                             }
-                            String fileDownloaded = downloadFile(client.getSession(), bucketName, filevaultId, new File(tempLocation));
+                            boolean returnPath = false;
+                            String fileDownloaded = downloadFile(client.getSession(), bucketName, filevaultId, new File(tempLocation), returnPath);
                             System.out.println("Abriendo PDF '" + fileDownloaded + "' desde '" + filePdf + "'...");
                             SLibUtils.launchFile(filePdf);
                             break;
@@ -444,5 +551,76 @@ public abstract class SDocUtils {
      */
     public static boolean isPdf(final File file) {
         return file.getName().toLowerCase().endsWith(FILE_TYPE_PDF.toLowerCase());
+    }
+    
+    public static String getExtensionFile (final File file) {
+        String name = file.getName();
+        int index = name.lastIndexOf(".");
+        
+        if (index > 0 && index < name.length() - 1) {
+            return name.substring(index + 1);
+        }
+        else {
+            return "";
+        }
+    }
+    
+    /**
+     * 
+     * @param dbCom
+     * @param idYear
+     * @param idDoc
+     * @param idSupFile
+     * @param extension
+     * @return 
+     */
+    public static String generateFileName(String dbCom, int idYear, int idDoc, int idSupFile, String extension) {
+        String fileName = "";
+        
+        fileName += dbCom + "-" + idYear + "-" + idDoc + "-" + idSupFile + "." + extension;
+        
+        return fileName;
+    }
+    
+    /**
+     * Eliminar archivos de cloud storage
+     * @param session
+     * @param fileProcess
+     * @throws java.lang.Exception
+     */
+    public static void deleteFilesToCloud(SGuiSession session, SDbSupplierFileProcess fileProcess) throws Exception {
+        // 1. Eliminar archivos existentes en la nube
+        ArrayList<SDbSupplierFile> lFilesToDelete = new ArrayList<>();
+
+        // Agregar archivos actuales con nombre de almacenamiento para eliminar
+        for (SDbSupplierFile oFile : fileProcess.getSuppFiles()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Agregar archivos marcados como eliminados
+        for (SDbSupplierFile oFile : fileProcess.getSuppFilesDeleted()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Crear lista de nombres de archivos a eliminar y llamar al gestor de almacenamiento
+        ArrayList<String> lNames = lFilesToDelete.stream()
+                .map(SDbSupplierFile::getFileStorageName) // Extraer nombres de archivo
+                .collect(Collectors.toCollection(ArrayList::new));
+        try {
+            String resultDeleted = CloudStorageManager.deleteFiles(lNames);
+        }
+        catch(Exception e) {
+            System.err.println("Error al eliminar archivos en el cloud storage");
+        }
+
+        // Actualizar los archivos locales eliminados
+        for (SDbSupplierFile oFile : lFilesToDelete) {
+            oFile.setFileStorageName("");
+            oFile.save(session);
+        }
     }
 }

@@ -62,7 +62,7 @@ public class SViewAuthorizations extends SGridPaneView implements ActionListener
                     try {
                         String response = "Error";
                         if (iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                            response = SAuthorizationUtils.authorizeById(miClient.getSession(), gridRow.getRowPrimaryKey()[0]);
+                            response = SAuthorizationUtils.authorizeById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");
                         }
                         else {
                             response = SAuthorizationUtils.rejectById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");

@@ -5,13 +5,24 @@
  */
 package erp.mod.cfg.utils;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
+import erp.mod.cfg.db.SDbMms;
+import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.form.SDialogSelectAuthornPath;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SProcDpsSendAuthornWeb;
+import erp.mtrn.data.STrnUtilities;
+import erp.siieapp.SAuthorizationsAPI;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -20,12 +31,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
+import sa.lib.mail.SMail;
+import sa.lib.mail.SMailConsts;
+import sa.lib.mail.SMailSender;
 
 /**
  * Clase de utilería de autorizaciones
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SAuthorizationUtils {
     
@@ -77,6 +93,13 @@ public abstract class SAuthorizationUtils {
     public static final int AUTH_ACTION_REJECT = 2;
     
     /**
+     * Constantes para el envío de correos de autorización
+     */
+    public static final int AUTH_MAIL_AUTH_PEND = 1;
+    public static final int AUTH_MAIL_AUTH_DONE = 2;
+    public static final int AUTH_MAIL_AUTH_REJ = 3;
+    
+    /**
      * Determina si un recurso está autorizado o no.
      * Si lo está devuelve true, si devuelve false NO significa que esté rechazado.
      * 
@@ -117,6 +140,105 @@ public abstract class SAuthorizationUtils {
         }
         
         return false;
+    }
+    
+    /**
+     * Obtiene los usuarios que están en turno de autorización del recurso.
+     * 
+     * @param statement
+     * @param authorizationType
+     * @param pk
+     * @return 
+     */
+    public static ArrayList<Integer> getUsersInTurnAuth(java.sql.Statement statement, final int authorizationType, final Object pk) {
+        String condPk1 = "";
+        String condPk2 = "";
+        String condTableName = "";
+        switch(authorizationType) {
+            case AUTH_TYPE_MAT_REQUEST:
+                condPk1 = "step1.res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                condPk2 = "step2.res_pk_n1_n = " + ((int[]) pk)[0] + " ";
+                condTableName = "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "'";
+                break;
+                
+            case AUTH_TYPE_DPS:
+                condPk1 = "step1.res_pk_n1_n = " + ((int[]) pk)[0] + " AND step1.res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                condPk2 = "step2.res_pk_n1_n = " + ((int[]) pk)[0] + " AND step2.res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                condTableName = "'" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "'";
+                break;
+        }
+        
+        String sql = "SELECT  " +
+                    "    step1.fk_usr_step " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step1 " +
+                    "WHERE " +
+                    "    NOT step1.b_del " +
+                    "        AND step1.res_tab_name_n = " + condTableName + " " +
+                    "        AND " + condPk1 +
+                    "        AND NOT step1.b_authorn " +
+                    "        AND NOT step1.b_reject " +
+                    "        AND step1.lev = (SELECT  " +
+                    "            step2.lev " +
+                    "        FROM " +
+                    "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
+                    "        WHERE " +
+                    "            NOT step2.b_del " +
+                    "                AND step2.res_tab_name_n = " + condTableName + " " +
+                    "                AND " + condPk2 +
+                    "                AND NOT step2.b_authorn " +
+                    "                AND NOT step2.b_reject " +
+                    "        ORDER BY step2.lev ASC " +
+                    "        LIMIT 1);";
+        try {
+            System.out.println(sql);
+            ResultSet res = statement.executeQuery(sql);
+            ArrayList<Integer> lUsers = new ArrayList<>();
+            while(res.next()) {
+                lUsers.add(res.getInt("step1.fk_usr_step"));
+            }
+            
+            return lUsers;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    
+    public static ArrayList<String> getMailsOfUsers(java.sql.Statement statement, ArrayList<Integer> userIds) {
+        StringBuilder userIn = new StringBuilder("(");
+        for (int i = 0; i < userIds.size(); i++) {
+            userIn.append(userIds.get(i));
+            if (i < userIds.size() - 1) {
+                userIn.append(", ");
+            }
+        }
+        userIn.append(")");
+        
+        String sql = "SELECT " +
+                    "    email " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " " +
+                    "WHERE " +
+                    "    email IS NOT NULL AND LENGTH(email) > 0 " +
+                    "    AND id_usr IN " + userIn + ";";
+        try {
+            ResultSet res = statement.executeQuery(sql);
+            ArrayList<String> lMails = new ArrayList<>();
+            while(res.next()) {
+                lMails.add(res.getString("email"));
+            }
+            
+            return lMails;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
     }
     
     /**
@@ -387,7 +509,7 @@ public abstract class SAuthorizationUtils {
     
     /**
      * Petición de autorización o rechazo de recurso.
-     * Si el proceso ha sido exitoso devuelve un Strin vacío, si ha ocurrido un error el 
+     * Si el proceso ha sido exitoso devuelve un String vacío, si ha ocurrido un error el 
      * String explicará lo que ha sucedido
      * 
      * @param session
@@ -420,11 +542,12 @@ public abstract class SAuthorizationUtils {
                     + condPk + ";";
         
         try {
+            System.out.println("Obtención de Step: " + sql);
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
             
             if (res.next()) {
                 if (action == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"));
+                    return SAuthorizationUtils.authorizeById(session, res.getInt("id_authorn_step"), reasonRej);
                 }
                 else {
                     return SAuthorizationUtils.rejectById(session, res.getInt("id_authorn_step"), reasonRej);
@@ -463,10 +586,11 @@ public abstract class SAuthorizationUtils {
      * 
      * @param session
      * @param idAuthStep
+     * @param comments
      * 
      * @return 
      */
-    public static String authorizeById(SGuiSession session, final int idAuthStep) {
+    public static String authorizeById(SGuiSession session, final int idAuthStep, String comments) {
         SDbAuthorizationStep oStep = new SDbAuthorizationStep();
         try {
             oStep.read(session, new int[] { idAuthStep });
@@ -522,7 +646,7 @@ public abstract class SAuthorizationUtils {
                 oStep.setDateTimeRejected_n(null);
                 oStep.setFkUserRejectId_n(0);
                 oStep.setRejected(false);
-                oStep.setComments("");
+                oStep.setComments(comments);
                 
                 oStep.save(session);
                 
@@ -574,6 +698,7 @@ public abstract class SAuthorizationUtils {
                 
                 ArrayList<SAuthStatus> lStatus = new ArrayList<>();
                 ResultSet resRows = session.getDatabase().getConnection().createStatement().executeQuery(rowsQuery);
+                System.out.println("rechazar por ID (" +  idAuthStep + "): " + rowsQuery);
                 while (resRows.next()) {
                     if (resRows.getBoolean("b_authorn")) {
                         lStatus.add(new SAuthStatus(AUTH_STATUS_AUTHORIZED, resRows.getString("auth_user")));
@@ -581,14 +706,18 @@ public abstract class SAuthorizationUtils {
                 }
                 
                 if (lStatus.size() > 0) {
-                    String resp = "";
-                    for (SAuthStatus oStatus : lStatus) {
-                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
-                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
-                        }
-                    }
-                    
-                    return resp;
+                    /**
+                     * Se comenta la funcionalidad para permitir el rechazo aún cuando alguien ya haya autorizado.
+                     * Edwin Carmona. 2024-12-12
+                     */
+//                    String resp = "";
+//                    for (SAuthStatus oStatus : lStatus) {
+////                        if (oStatus.getStatus() == AUTH_STATUS_AUTHORIZED) {
+////                            resp += "No se puede rechazar, el usuario " + oStatus.getUser() + " ya autorizó este documento.\n";
+////                        }
+//                    }
+//                    
+//                    return resp;
                 }
                 
                 oStep.setDateTimeAuthorized_n(null);
@@ -698,6 +827,42 @@ public abstract class SAuthorizationUtils {
     }
     
     /**
+     * Procesa la configuración especificamente de un DPS y guarda en la base de datos la ruta de autorizaciones con los
+     * usuarios correspondientes.
+     * 
+     * @param session
+     * @param paths recibe ya las rutas de autorizacón
+     * @param authorizationType
+     * @param pkDps
+     * @param reset determina si los pasos previos de autorización tienen que borrarse
+     * 
+     * @throws Exception 
+     */
+    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
+        if (reset) {
+            SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pkDps);
+        }
+        
+        // Si el recurso ya tiene pasos de autorización no se determinan nuevamente
+        if (!reset && SAuthorizationUtils.hasStepsOfAuthorization(session, authorizationType, pkDps)) {
+            return;
+        }
+        
+        // Lectura de path de configuración
+        ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
+        for (SDbAuthorizationPath oCfg : paths) {
+            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps));
+            
+            for (SDbAuthorizationStep oStep : lSteps) {
+                if (! SAuthorizationUtils.stepExists(session, oStep)) {
+                    oStep.save(session);
+                }
+            }
+        }
+        processAuthornMails(session, authorizationType, (int[])pkDps);
+    }
+    
+    /**
      * Devuelve todas las configuraciones asociadas a un tipo de autorización.
      * 
      * @param session
@@ -722,6 +887,60 @@ public abstract class SAuthorizationUtils {
                 cfgItem = new SDbAuthorizationPath();
                 cfgItem.read(session, new int[]{ res.getInt("id_authorn_path") });
                 lCfgs.add(cfgItem);
+            }
+            
+            return lCfgs;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Devuelve todas las configuraciones asociadas a un tipo de autorización y DPS.
+     * 
+     * @param session
+     * @param dpsType
+     * 
+     * @return 
+     */
+    public static ArrayList<SDbAuthorizationPath> getConfigurationsDps(SGuiSession session, final HashMap<String, Integer> dpsType) {
+        String sql = "SELECT id_authorn_path "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_PATH) + " "
+                + "WHERE NOT b_del AND fk_tp_authorn = 2 "
+                + "AND (('" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' BETWEEN dt_sta AND dt_end_n) OR "
+                + "(dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' AND dt_end_n IS NULL)) "
+                + "ORDER BY sort, name, lev;";
+        
+        try {
+            ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+            ArrayList<SDbAuthorizationPath> lCfgs = new ArrayList<>();
+            SDbAuthorizationPath cfgItem;
+            while(res.next()) {
+                boolean add = true;
+                cfgItem = new SDbAuthorizationPath();
+                cfgItem.read(session, new int[]{ res.getInt("id_authorn_path") });
+                forConditions:
+                for (SCondition cond : cfgItem.getAuthorizationConfigObject().getConditions()) {
+                    switch (cond.getOperator()) {
+                        case "=" :
+                            int dpsTypeCond = dpsType.get(cond.getKeyName()) == null ? 0 : dpsType.get(cond.getKeyName());
+                            if (SLibUtils.parseInt(cond.getStrValue()) != dpsTypeCond) {
+                                add = false;
+                                break forConditions;
+                            }
+                        break;
+                        default: break forConditions;
+                    }
+                }
+                if (add) {
+                    lCfgs.add(cfgItem);
+                }
             }
             
             return lCfgs;
@@ -1343,6 +1562,133 @@ public abstract class SAuthorizationUtils {
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) throws Exception {
+        SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+        fileProcess.read(client.getSession(), pk);
+        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
+            SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
+            dialog.setVisible(true);
+            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getAuthornNotes()).start();
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+    * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
+     * @param session
+     * @param authorizationType
+     * @param pkDps
+    */
+    public static void processAuthornMails(final SGuiSession session, final int authorizationType, int[] pkDps) {
+        ArrayList<Integer> lUsers;
+        try {
+            lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps);
+            if (! lUsers.isEmpty()) {
+                ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), lUsers);
+                if (! lMails.isEmpty()) {
+                    StringBuilder toMails = new StringBuilder("");
+                    for (int i = 0; i < lMails.size(); i++) {
+                        toMails.append(lMails.get(i));
+                        if (i < lMails.size() - 1) {
+                            toMails.append("; ");
+                        }
+                    }
+                    System.out.println("Enviando mail a: " + toMails.toString());
+                    SAuthorizationUtils.sendAuthornMails(session, AUTH_MAIL_AUTH_PEND, toMails.toString(), "", "", pkDps);
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc, String bcc, int[] pkDps) throws Exception {
+        SDataDps dps = new SDataDps();
+        dps.read(pkDps, session.getStatement().getConnection().createStatement());
+        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_MAIL_REPS);
+        String subject;
+        if (mailType == AUTH_MAIL_AUTH_PEND) {
+            subject = "[SIIE] Autorizacion pendiente del pedido de compras " + dps.getNumber();
+        }
+        else {
+            subject = "[SIIE] Autorizacion concluida del pedido de compras " + dps.getNumber();
+        }
+        String body = "<html>";
+        body += "<head>";
+        body += "<style>"
+                + "body {"
+                + " font-size: 100%;"
+                + "} "
+                + "h1 {"
+                + " font-size: 2.00em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h2 {"
+                + " font-size: 1.75em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h3 {"
+                + " font-size: 1.50em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "h4 {"
+                + " font-size: 1.25em;"
+                + " font-family: sans-serif;"
+                + "} "
+                + "</style>";
+        body += "</head>";
+        body += "<body>";
+        body += "<h2>Estimado usuario:</h2>";
+        switch (mailType) {
+            case AUTH_MAIL_AUTH_PEND:
+                body += "<p>"+ SLibUtils.textToHtml("Tienes un pedido pendiente de autorización")+ "</p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>Te invitamos a ingresar a nuestra plataforma y autorizar este pedido de compras, gracias por tu atención.</p>";
+                break;
+            case AUTH_MAIL_AUTH_DONE:
+                body += "<p>El siguiente pedido ha sido <span style='color: green;'>AUTORIZADO</span> exitosamente</p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>¡Gracias por utilizar nuestra plataforma!</p>";
+                break;
+            case AUTH_MAIL_AUTH_REJ:
+                body += "<p>El siguiente pedido ha sido <span style='color: red;'>RECHAZADO</span></p>";
+                body += "<p><b>Folio: " + dps.getNumber() + "</b></p>";
+                body += "<p>¡Gracias por utilizar nuestra plataforma!</p>";
+                break;
+        } 
+        
+        body += "<p>Acceso a la plataforma: <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> (Tu usuario y contraseña son los mismos que usas al ingresar a SIIE)</p>";
+        body += "<span style='font-size:10px'>" + STrnUtilities.composeMailFooter("") + "</span>";
+        
+        body += "</body>";
+        
+        body += "</html>";
+
+        SMailSender moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+        moMailSender.setMailReplyTo(mms.getXtaMailReplyTo());
+
+        ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")));
+        ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
+        ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
+     
+        SMail mail = new SMail(moMailSender, subject, body, toRecipients, toCcRecipients, toBccRecipients);
+        mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
+        mail.send();
     }
     
     /**

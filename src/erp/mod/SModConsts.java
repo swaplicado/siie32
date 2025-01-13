@@ -104,6 +104,8 @@ public abstract class SModConsts {
     public static final int CFG_PARAM_CO = 1013502;
     public static final int CFG_CUSTOM_REP = 1013531;
     
+    public static final int CFGX_AUTHORN_COMMENTS = 1014001;
+    
     /*
      * Users
      */
@@ -427,6 +429,9 @@ public abstract class SModConsts {
     public static final int TRN_DPS_IOG_CHG = 2023026;
     public static final int TRN_DPS_IOG_WAR = 2023027;
     public static final int TRN_DPS_REC = 2023028;
+    public static final int TRN_SUP_FILE = 2023506;
+    public static final int TRN_SUP_FILE_DPS = 2023507;
+    public static final int TRN_SUP_FILE_DPS_ETY = 2023508;
     public static final int TRN_SCA_TIC_DPS = 2023390;
     public static final int TRN_SCA_TIC_DPS_ETY = 2023391;
     public static final int TRN_DIOG = 2023029;
@@ -506,12 +511,14 @@ public abstract class SModConsts {
     public static final int TRN_MAT_REQ_ETY_NTS = 2023347;
     public static final int TRN_MAT_REQ_ETY_ITEM_CHG = 2023348;
     public static final int TRN_MAT_REQ_ST_LOG = 2023349;
+    public static final int TRN_MAT_REQ_EXT_STO_LOG = 2023360;
     public static final int TRN_EST_REQ = 2023352;
     public static final int TRN_EST_REQ_ETY = 2023353;
     public static final int TRN_EST_REQ_REC = 2023354;
     public static final int TRN_DPS_CFD_PAY = 2023096;
     public static final int TRN_DPS_CFD_PAY_DONE = 2023097;
     public static final int TRN_CFD_PAY = 2023091;
+    public static final int TRN_DPS_AUTHORN = 2023505;
     
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -571,6 +578,7 @@ public abstract class SModConsts {
     public static final int TRNX_INV_VAL_PRC_CALC = 1; // inventory valuation: process calculation
     public static final int TRNX_INV_VAL_UPD_COST = 2; // inventory valuation: update costs (from file)
     public static final int TRNX_TP_VAL_MVT = 2024092;
+    public static final int TRNX_SUP_FILE_DPS_PROC = 2024093; //DPS support file process
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1254,6 +1262,9 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
         TablesMap.put(TRN_DPS_REC, "trn_dps_rec");
+        TablesMap.put(TRN_SUP_FILE, "trn_sup_file");
+        TablesMap.put(TRN_SUP_FILE_DPS, "trn_sup_file_dps");
+        TablesMap.put(TRN_SUP_FILE_DPS_ETY, "trn_sup_file_dps_ety");
         TablesMap.put(TRN_SCA_TIC_DPS, "trn_sca_tic_dps");
         TablesMap.put(TRN_SCA_TIC_DPS_ETY, "trn_sca_tic_dps_ety");
         TablesMap.put(TRN_DIOG, "trn_diog");
@@ -1332,11 +1343,13 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAT_REQ_ETY_NTS, "trn_mat_req_ety_nts");
         TablesMap.put(TRN_MAT_REQ_ETY_ITEM_CHG, "trn_mat_req_ety_item_chg");
         TablesMap.put(TRN_MAT_REQ_ST_LOG, "trn_mat_req_st_log");
+        TablesMap.put(TRN_MAT_REQ_EXT_STO_LOG, "trn_mat_req_ext_sto_log");
         TablesMap.put(TRN_EST_REQ, "trn_est_req");
         TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
         TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
         TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
         TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
+        TablesMap.put(TRN_DPS_AUTHORN, "trn_dps_authorn");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

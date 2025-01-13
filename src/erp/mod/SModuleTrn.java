@@ -41,6 +41,7 @@ import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.SDbStockValuation;
+import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
 import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
@@ -68,6 +69,7 @@ import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.form.SFormScaleTicket;
 import erp.mod.trn.form.SFormStockValuation;
+import erp.mod.trn.form.SFormSupplierFileProcess;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewConfEmployeeVsEntity;
 import erp.mod.trn.view.SViewConfEmployeeVsEntityDetail;
@@ -121,12 +123,15 @@ import erp.mod.trn.view.SViewStockValuation;
 import erp.mod.trn.view.SViewStockValuationDetail;
 import erp.mod.trn.view.SViewValCost;
 import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
+import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistrySysFly;
+import sa.lib.grid.SGridColumnForm;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiCatalogueSettings;
 import sa.lib.gui.SGuiClient;
@@ -134,8 +139,10 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiForm;
 import sa.lib.gui.SGuiModule;
 import sa.lib.gui.SGuiOptionPicker;
+import sa.lib.gui.SGuiOptionPickerSettings;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiReport;
+import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
@@ -143,6 +150,8 @@ import sa.lib.gui.SGuiReport;
  */
 public class SModuleTrn extends SGuiModule {
 
+    private SBeanOptionPicker moPickerSuppFile;
+    
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
     private SFormMaterialCostCenterGroup moFormMaterialCostCenterGroup;
     private SFormMaterialConsumptionEntity moFormMaterialConsumptionEntity;
@@ -174,6 +183,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
     private SFormStockValuation moFormStockValuation;
     private SFormScaleTicket moFormScaleTicket;
+    private SFormSupplierFileProcess moFormSupplierFileProcess;
     
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -325,6 +335,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
                 registry = new SDbConfCostCenterGroupVsUser();
+                break;
+            case SModConsts.TRNX_SUP_FILE_DPS_PROC:
+                registry = new SDbSupplierFileProcess();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -838,7 +851,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
                 break;
-            default:
+                    default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
@@ -847,7 +860,32 @@ public class SModuleTrn extends SGuiModule {
 
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String sql;
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
+        SGuiOptionPickerSettings settings;
+        SGuiOptionPicker picker = null;
+        
+        switch (type) {
+            case SModConsts.TRN_SUP_FILE:
+                sql = "SELECT f.id_sup_file AS " + SDbConsts.FIELD_ID + "1, "
+                        + "num AS " + SDbConsts.FIELD_PICK + "1, b.bp AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "FROM trn_sup_file f " 
+                        + "LEFT JOIN erp.bpsu_bp b ON f.fid_bp_n = b.id_bp " 
+                        + "WHERE f.fid_bp_n = " + params.getKey()[0] + " "
+                        + "ORDER BY f.sup_file_type, f.num DESC, f.id_sup_file DESC;";
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Asociado de negocios"));
+                settings = new SGuiOptionPickerSettings("Selecciona archivo de soporte", sql, gridColumns, 1);
+                moPickerSuppFile = new SBeanOptionPicker();
+                moPickerSuppFile.setPickerSettings(miClient, type, SModConsts.TRNX_SUP_FILE_DPS_PROC, settings);
+                picker = moPickerSuppFile;
+                break;
+                
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        return picker;
     }
 
     @Override
@@ -1010,6 +1048,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_CONF_CC_GRP_VS_USR:
                 if (moFormConfMatCostCenterGroupVsUser == null) moFormConfMatCostCenterGroupVsUser = new SFormConfMatCostCenterGroupVsUser(miClient, "Configuración grupo de centro de costo vs. usuarios/empleados");
                 form = moFormConfMatCostCenterGroupVsUser;
+                break;
+            case SModConsts.TRNX_SUP_FILE_DPS_PROC:
+                if (moFormSupplierFileProcess == null) moFormSupplierFileProcess = new SFormSupplierFileProcess(miClient, "Archivos de soporte");
+                form = moFormSupplierFileProcess;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

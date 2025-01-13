@@ -523,6 +523,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_UPD_DT_LOG = 207093;
     public static final int TRN_DPS_CFD_PAY = 207196;
     public static final int TRN_DPS_CFD_PAY_DONE = 207197;
+    public static final int TRN_DPS_AUTHORN = 207198;
     public static final int TRN_CFD_PAY = 207191;
 
     public static final int TRNX_DPS_RO_STK = 207504;
@@ -650,6 +651,8 @@ public abstract class SDataConstants {
     public static final int TRNX_MFG_ORD_FINISH_PEND_ETY = 207635;
     public static final int TRNX_MFG_ORD_FINISHED = 207636;
     public static final int TRNX_MFG_ORD_FINISHED_ETY = 207637;
+    
+    public static final int TRNX_DPS_AUTH_APP = 207638;
 
     public static final int TRNR_ACCOUNT_CASH_PDAY = 207640;
     public static final int TRNR_ACCOUNT_BANK_PDAY = 207641;
@@ -1092,6 +1095,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DNC_DIOG_DNS, "trn_dnc_diog_dns");
         TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
         TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_DPS_AUTHORN, "trn_dps_authorn");
         TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
 
         TablesMap.put(MKT_CFG_CUS, "mkt_cfg_cus");

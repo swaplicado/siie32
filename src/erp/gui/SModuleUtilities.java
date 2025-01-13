@@ -15,6 +15,7 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.form.SDialogShowRecordCfd;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.form.SDialogShowSendsAuthAppWebLog;
 import erp.mtrn.form.SDialogShowDocumentLinks;
 import erp.mtrn.form.SDialogShowDocumentNotes;
 import java.awt.Cursor;
@@ -109,6 +110,37 @@ public abstract class SModuleUtilities {
     }
     
     /**
+     * Shows document authorn app web log.
+     * @param client GUI Client.
+     * @param dpsKey Primary key of desired document.
+     */
+    public static void showSendsAuthAppWebLog(final SClientInterface client, final Object dpsKey) {
+        int authorn = 0;
+        
+        SDataDps dps;
+        SDialogShowSendsAuthAppWebLog dialog;
+
+        if (dpsKey == null) {
+            client.showMsgBoxInformation(SGuiConsts.ERR_MSG_UNDEF_REG);
+        }
+        else {
+            dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
+
+            dialog = new SDialogShowSendsAuthAppWebLog(client);
+            dialog.formReset();
+            dialog.setValue(SDataConstants.TRN_DPS, dps);
+            authorn = dialog.readSendsAuthAppWeb();
+
+            if (authorn == 0) {
+                client.showMsgBoxInformation("El documento no ha sido enviado a autorización vía app wep");
+            }
+            else {
+                dialog.setFormVisible(true);
+            }
+        }
+    }
+    
+    /**
      * Shows document processing links.
      * @param client GUI Client.
      * @param tableRow View's selected table row.
@@ -119,6 +151,20 @@ public abstract class SModuleUtilities {
         }
         else {
             showDocumentLinks(client, tableRow.getPrimaryKey());
+        }
+    }
+    
+    /**
+     * Shows document sends authorn app web log.
+     * @param client GUI Client.
+     * @param tableRow View's selected table row.
+     */
+    public static void showSendsAuthAppWebLog(final SClientInterface client, final STableRow tableRow) {
+        if (tableRow == null) {
+            client.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+        }
+        else {
+            showSendsAuthAppWebLog(client, tableRow.getPrimaryKey());
         }
     }
     

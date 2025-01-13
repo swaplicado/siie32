@@ -41,6 +41,7 @@ import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
@@ -368,31 +369,43 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     }
 
     private void actionAuthorizeDoc() {
-        if (mjbAuthorize.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_AUTHORIZE) == JOptionPane.YES_OPTION) {
-                    Vector<Object> params = new Vector<Object>();
-
-                    params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
-                    params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                    params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
-                    params.add(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN);
-                    params.add(miClient.getSession().getUser().getPkUserId());
-                    params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
-
-                    if (params.isEmpty()) {
-                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
+        try {
+            if (mjbAuthorize.isEnabled()) {
+                if (moTablePane.getSelectedTableRow() != null) {
+                    String message = SLibConstants.MSG_CNF_DOC_AUTHORIZE;
+                    String sql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " "
+                            + "AND id_doc = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + " AND NOT b_del";
+                    ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                    if (resultSet.next()) {
+                        message += "\nEl documento tiene pendiente la autorización vía web.";
                     }
-                    else {
-                        if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
-                            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
+                    if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
+                        Vector<Object> params = new Vector<Object>();
+
+                        params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
+                        params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
+                        params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
+                        params.add(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN);
+                        params.add(miClient.getSession().getUser().getPkUserId());
+                        params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
+
+                        if (params.isEmpty()) {
+                            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
                         }
                         else {
-                            miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                            if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
+                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
+                            }
+                            else {
+                                miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                            }
                         }
                     }
                 }
             }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
 
@@ -400,50 +413,62 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         boolean reject = true;
         SDataDps dps = null;
         
-        if (mjbReject.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_REJECT) == JOptionPane.YES_OPTION) {
-                    try {
-                        dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+        try {
+            if (mjbReject.isEnabled()) {
+                if (moTablePane.getSelectedTableRow() != null) {
+                    String message = SLibConstants.MSG_CNF_DOC_REJECT;
+                    String sql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0] + " "
+                            + "AND id_doc = " + ((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1] + " AND NOT b_del";
+                    ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                    if (resultSet.next()) {
+                        message += "\nEl documento tiene pendiente la autorización vía web.";
+                    }
+                    if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
+                        try {
+                            dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                        if (mbHasRightRejectOwn) {
-                            if (miClient.getSession().getUser().getPkUserId() == dps.getFkUserNewId()) {
-                                reject = isOrderPur() || isOrderSal();
-                            }
-                            else {
-                                reject = false;
-                                miClient.showMsgBoxWarning("El documento no puede ser rechado porque:\n -El usuario '" + miClient.getSessionXXX().getUser().getName() + "' es distinto al usuario de creación.");
-                            }
-                        }
-
-                        if (reject) {
-                            Vector<Object> params = new Vector<>();
-
-                            params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
-                            params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                            params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
-                            params.add(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT);
-                            params.add(miClient.getSession().getUser().getPkUserId());
-                            params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
-
-                            if (params.isEmpty()) {
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
-                            }
-                            else {
-                                if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
-                                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
+                            if (mbHasRightRejectOwn) {
+                                if (miClient.getSession().getUser().getPkUserId() == dps.getFkUserNewId()) {
+                                    reject = isOrderPur() || isOrderSal();
                                 }
                                 else {
-                                    miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                    reject = false;
+                                    miClient.showMsgBoxWarning("El documento no puede ser rechado porque:\n -El usuario '" + miClient.getSessionXXX().getUser().getName() + "' es distinto al usuario de creación.");
+                                }
+                            }
+
+                            if (reject) {
+                                Vector<Object> params = new Vector<>();
+
+                                params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
+                                params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
+                                params.add(SDataConstantsSys.UPD_DPS_FL_AUTHORN);
+                                params.add(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT);
+                                params.add(miClient.getSession().getUser().getPkUserId());
+                                params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
+
+                                if (params.isEmpty()) {
+                                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
+                                }
+                                else {
+                                    if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
+                                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
+                                    }
+                                    else {
+                                        miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (Exception e) {
-                        SLibUtilities.printOutException(this, e);
+                        catch (Exception e) {
+                            SLibUtilities.printOutException(this, e);
+                        }
                     }
                 }
             }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
 

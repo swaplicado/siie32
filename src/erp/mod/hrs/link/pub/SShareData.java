@@ -28,8 +28,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
+import erp.mod.trn.api.data.SWebAuthorization;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import erp.mod.trn.api.db.STrnDBCore;
+import erp.mod.trn.api.data.SWebDps;
+import erp.mod.trn.api.data.SWebDpsEty;
+import erp.mod.trn.api.data.SWebDpsFile;
+import erp.mod.trn.api.data.SWebDpsNote;
+import erp.mod.trn.api.data.SWebDpsRow;
+import erp.mod.trn.api.db.STrnDBDocuments;
 
 /**
  *
@@ -105,6 +113,19 @@ public class SShareData {
         return SUtilsJSON.getData(sLastSyncDate);
     }
     
+    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+        try {
+            //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //formatterd.parse(sLastSyncDate);
+
+            return SUtilsJSON.getDataPGH(sJSon);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
+    }
+    
     /**
      * Obtiene las fotos de los empleados subordinados del empleado que corresponde al id recibido.
      * 
@@ -142,12 +163,14 @@ public class SShareData {
     
     /**
      * 
+     * @param sURL
      * @param tStartDate
      * @param tEndDate
      * @param lEmployees
      * @param payType
      * @param dataType Policy for requesting information from external time clock: 1 = all; 2 = official; 3 = non-official
      * @param companyKey
+     * 
      * @return 
      */
     public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
@@ -207,5 +230,100 @@ public class SShareData {
         }
         
         return null;
+    }
+    
+    /**
+     * 
+     * @param sJsonInc
+     * @return 
+     */
+    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.insertData(sJsonInc);
+    }
+    
+    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        return SUtilsJSON.cancelData(sJsonInc);
+    }
+    
+    /**
+     * 
+     * @param employees
+     * @return 
+     */
+    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        
+        try {
+            return SUtilsJSON.missingPhotos(employees);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.earningData(sJsonInc);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+      try {
+            return SUtilsJSON.personalData(idEmp);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer statusFilter) {
+        STrnDBCore oTrnCore = new STrnDBCore();
+        ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, statusFilter);
+
+        return lDocs;
+    }
+    
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser) {
+        SWebDps oWebDocument = new SWebDps(idYear, idDoc);
+        STrnDBCore oTrnCore = new STrnDBCore();
+        /**
+         * Se obtiene el DPS
+         */
+        SWebDpsRow oDps = oTrnCore.getDocumentByPk(idYear, idDoc);
+        oWebDocument.setoDpsHeader(oDps);
+        
+        /**
+         * Entries del DPS
+         */
+        ArrayList<SWebDpsEty> lEties = oTrnCore.getWebDpsEties(idYear, idDoc);
+        oWebDocument.getlEtys().clear();
+        oWebDocument.getlEtys().addAll(lEties);
+
+        /**
+         * Notas del DPS
+         */
+        ArrayList<SWebDpsNote> lNotes = oTrnCore.getWebDpsNotes(idYear, idDoc);
+        oWebDocument.getlNotes().clear();
+        oWebDocument.getlNotes().addAll(lNotes);
+        
+        STrnDBDocuments oDocCore = new STrnDBDocuments();
+        /**
+         * Documentos
+         */
+        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc);
+        oWebDocument.getlFiles().clear();
+        oWebDocument.getlFiles().addAll(lDpsFiles);
+        
+        /**
+         * Autorización
+         */
+        SWebAuthorization oAuthorization = oTrnCore.getDpsAuthorization(idYear, idDoc);
+        oWebDocument.setoWebAuthorization(oAuthorization);
+        
+        return oWebDocument;
     }
 }
