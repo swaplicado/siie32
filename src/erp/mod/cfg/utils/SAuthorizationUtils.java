@@ -1620,7 +1620,7 @@ public abstract class SAuthorizationUtils {
     public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc, String bcc, int[] pkDps) throws Exception {
         SDataDps dps = new SDataDps();
         dps.read(pkDps, session.getStatement().getConnection().createStatement());
-        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_MAIL_REPS);
+        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_MAIL_ORD_PUR_AUTHS);
         String subject;
         if (mailType == AUTH_MAIL_AUTH_PEND) {
             subject = "[SIIE] Autorizacion pendiente del pedido de compras " + dps.getNumber();
@@ -1685,7 +1685,15 @@ public abstract class SAuthorizationUtils {
         ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")));
         ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
         ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
-     
+        
+        if (! mms.getRecipientCarbonCopy().isEmpty()) {
+            toCcRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";"))));
+        }
+        
+        if (! mms.getRecipientBlindCarbonCopy().isEmpty()) {
+            toBccRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";"))));
+        }
+        
         SMail mail = new SMail(moMailSender, subject, body, toRecipients, toCcRecipients, toBccRecipients);
         mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
         mail.send();

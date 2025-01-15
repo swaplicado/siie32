@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 260.2/ 2025-01-15
+Edwin CARMONA
+--------------------------------------------------------------------------------
+1) Obtención de configuración específica para el envío de mails de autorización de pedidos de compra.
+2) Corrección del campo dt_tp_pay para nóminas de un cambio descartado hace tiempo.
+
+================================================================================
 SIIE 3.2 260.1/ 2025-01-15
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

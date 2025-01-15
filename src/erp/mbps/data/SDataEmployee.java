@@ -556,7 +556,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateSalary = resultSet.getDate("dt_sal");
                 mtDateWage = resultSet.getDate("dt_wage");
                 mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
-                mtDatePaymentType = resultSet.getDate("dt_tp_pay");
+//                mtDatePaymentType = resultSet.getDate("dt_tp_pay");
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
                 mtContractExpiration_n = resultSet.getDate("con_exp_n");
                 mnOvertimePolicy = resultSet.getInt("overtime");
@@ -775,7 +775,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_sal = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " +
                         "dt_wage = '" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " +
                         "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
-                        "dt_tp_pay = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePaymentType) + "', " +
+//                        "dt_tp_pay = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePaymentType) + "', " +
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                         "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                         "overtime = " + mnOvertimePolicy + ", " +
