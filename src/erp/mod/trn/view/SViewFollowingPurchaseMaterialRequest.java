@@ -172,7 +172,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, "Cen. Suministro"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio RM"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha RM"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "solicitante", "Solicitante"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_requerida", "Fecha requerida"));
@@ -182,12 +182,12 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "f_cot", "Fecha cotización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "prov_name", "Proveedor"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CO, "cot_code", "Tipo doc."));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_cot", "Folio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_cot", "Folio cotización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "ref_cot", "Referencia cotización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_cot_siie", "Fecha cotización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp_cot", "Asociado de negocio"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CO, "ped_code", "Tipo doc."));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_ped", "Folio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_ped", "Folio pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_ped_siie", "Fecha pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "ped_gasto", "Concepto/gasto pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "f_ped_auth", "Fecha autorizado"));
@@ -197,7 +197,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_new", "Fecha añadido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CO, "fac_code", "Tipo doc."));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_fac", "Folio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_fac", "Folio factura"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_fac", "Fecha factura"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_stot", "Monto mon $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "f_cur", "Moneda"));
