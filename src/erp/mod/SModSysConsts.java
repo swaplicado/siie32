@@ -45,7 +45,7 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_MMS_PAYROLL = 6;
     public static final int CFGS_TP_MMS_TRN_EST_REQ = 7;
     public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;
-    public static final int CFGS_TP_MMS_MAIL_ORD_PUR_AUTHS = 21;
+    public static final int CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP = 21;
     public static final int CFGS_TP_MMS_MAIL_REPS = 99;
     
     public static final int CFGS_ST_AUTHORN_NA = 1; // not applicable

@@ -1620,7 +1620,7 @@ public abstract class SAuthorizationUtils {
     public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc, String bcc, int[] pkDps) throws Exception {
         SDataDps dps = new SDataDps();
         dps.read(pkDps, session.getStatement().getConnection().createStatement());
-        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_MAIL_ORD_PUR_AUTHS);
+        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
         String subject;
         if (mailType == AUTH_MAIL_AUTH_PEND) {
             subject = "[SIIE] Autorizacion pendiente del pedido de compras " + dps.getNumber();
