@@ -381,11 +381,12 @@ public class STrnInventoryValuation {
         
         // save stock movements of prorated values:
         
+        boolean withCost = false;
         for (STrnStockMove stockMove : stockMoves) {
             Vector<STrnStockMove> moves = new Vector<>();
             moves.add(stockMove);
             SDataDiog diog = STrnUtilities.createDataDiogSystem((SClientInterface) moSession.getClient(), 
-                    mnYear, mtPeriodEnd, stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), SModSysConsts.TRNS_TP_IOG_IN_CST_RM, SERIES_CST_RM, moves);
+                    mnYear, mtPeriodEnd, stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), SModSysConsts.TRNS_TP_IOG_IN_CST_RM, SERIES_CST_RM, moves, withCost);
                         
             // Update unitary value in diog entry:
             

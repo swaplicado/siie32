@@ -148,7 +148,7 @@ public class STrnCostsUpdate {
 
         mnCsvLines = 0;
         mnCostsUpdates = 0;
-
+        boolean withCost = false;
         for (CsvLine csvLine : csvLines) {
             System.out.println(++mnCsvLines + ". Procesando ítem '" + csvLine.ItemName + " - " + csvLine.ItemCode + "', unidad '" + csvLine.UnitCode + "'...");
 
@@ -361,7 +361,7 @@ public class STrnCostsUpdate {
                         SDataDiog diog = diogs.get(mapKey);
 
                         if (diog == null) {
-                            diog = STrnUtilities.createDataDiogSystem((SClientInterface) moSession.getClient(), mnYear, cutOff, csvLine.WarehouseCompanyBranchId, csvLine.WarehouseEntityId, diogTypeKey, SERIES, new Vector<>());
+                            diog = STrnUtilities.createDataDiogSystem((SClientInterface) moSession.getClient(), mnYear, cutOff, csvLine.WarehouseCompanyBranchId, csvLine.WarehouseEntityId, diogTypeKey, SERIES, new Vector<>(), withCost);
                             diog.setExternalBookkeepingNumber(bookkeepingNumber.getPkYearId(), bookkeepingNumber.getPkNumberId());
                             diogs.put(mapKey, diog);
                         }

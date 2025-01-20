@@ -22,6 +22,7 @@ public class STrnStockMove implements java.io.Serializable {
     protected int mnPkWarehouseId;
     protected ArrayList<Integer> mlPkWarehouseIds;
     protected double mdQuantity;
+    protected double mdUnitaryCost;
     protected double mdValue;
     protected String msSerialNumber;
     protected int mnMaintUserId_n;
@@ -126,6 +127,7 @@ public class STrnStockMove implements java.io.Serializable {
     public void setPkCompanyBranchId(int n) { mnPkCompanyBranchId = n; }
     public void setPkWarehouseId(int n) { mnPkWarehouseId = n; }
     public void setQuantity(double f) { mdQuantity = f; }
+    public void setUnitaryCost(double f) { mdUnitaryCost = f; }
     public void setValue(double f) { mdValue = f; }
     public void setSerialNumber(String s) { msSerialNumber = s; }
     public void setFkMaintUserId_n(int n) { mnMaintUserId_n = n; }
@@ -150,6 +152,7 @@ public class STrnStockMove implements java.io.Serializable {
     public int getPkWarehouseId() { return mnPkWarehouseId; }
     public ArrayList<Integer> getLWarehouseIds() { return mlPkWarehouseIds; }
     public double getQuantity() { return mdQuantity; }
+    public double getUnitaryCost() { return mdUnitaryCost; }
     public double getValue() { return mdValue; }
     public String getSerialNumber() { return msSerialNumber; }
     public int getMaintUserId_n() { return mnMaintUserId_n; }
@@ -184,6 +187,7 @@ public class STrnStockMove implements java.io.Serializable {
     public STrnStockMove clone() throws CloneNotSupportedException {
         STrnStockMove move = new STrnStockMove(this.getStockMoveKey(), this.getQuantity(), this.getValue(), this.getSerialNumber(), this.getMaintUserId_n(), this.getMaintUserSupervisorId());
 
+        move.setUnitaryCost(this.getUnitaryCost());
         move.setAuxRowNumber(this.getAuxRowNumber());
         move.setAuxLot(this.getAuxLot());
         move.setAuxLotDateExpiration(this.getAuxLotDateExpiration());

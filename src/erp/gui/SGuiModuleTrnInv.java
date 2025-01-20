@@ -31,6 +31,7 @@ import erp.mtrn.form.SDialogRepStockMovesSumSum;
 import erp.mtrn.form.SDialogRepStockPeriod;
 import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogUtilStockClosing;
+import erp.mtrn.form.SDialogUtilStockClosingCost;
 import erp.mtrn.form.SFormDiog;
 import erp.mtrn.form.SFormDiogAdjustmentType;
 import erp.mtrn.form.SFormMaintDiog;
@@ -218,6 +219,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockValuationDetail;
     private javax.swing.JMenuItem jmiStkStockItemHistoric;
     private javax.swing.JMenuItem jmiStkStockClosing;
+    private javax.swing.JMenuItem jmiStkStockClosingCost;
     
     private javax.swing.JMenu jmMenuRep;
     private javax.swing.JMenuItem jmiReportStock;
@@ -252,6 +254,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SFormStockConfigItem moFormStockConfigItem;
     private erp.mtrn.form.SFormStockConfigDns moFormStockConfigDns;
     private erp.mtrn.form.SDialogUtilStockClosing moDialogUtilStockClosing;
+    private erp.mtrn.form.SDialogUtilStockClosingCost moDialogUtilStockClosingCost;
 
     public SGuiModuleTrnInv(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_INV);
@@ -790,6 +793,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
         jmiStkStockItemHistoric = new JMenuItem("Movimientos de inventarios históricos");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
+        jmiStkStockClosingCost = new JMenuItem("Generación de inventarios iniciales por costo...");
         
         jmMenuStk.add(jmiStkStock);
         jmMenuStk.add(jmiStkStockLot);
@@ -813,6 +817,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.add(jmiStkStockItemHistoric);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockClosing);
+        jmMenuStk.add(jmiStkStockClosingCost);
         
         jmiStkStock.addActionListener(this);
         jmiStkStockLot.addActionListener(this);
@@ -829,6 +834,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockValuationDetail.addActionListener(this);
         jmiStkStockItemHistoric.addActionListener(this);
         jmiStkStockClosing.addActionListener(this);
+        jmiStkStockClosingCost.addActionListener(this);
 
         jmMenuRep = new JMenu("Reportes");
         jmiReportStock = new JMenuItem("Reporte de existencias...");
@@ -1047,12 +1053,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockValuation.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
         jmiStkStockValuationDetail.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiStkStockClosingCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
 
         moDialogDiogSaved = new SDialogDiogSaved(miClient);
         moDialogUtilStockClosing = new SDialogUtilStockClosing(miClient);
+        moDialogUtilStockClosingCost = new SDialogUtilStockClosingCost(miClient);
     }
 
     private void menuRepStock() {
@@ -2179,6 +2187,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiStkStockClosing) {
                 moDialogUtilStockClosing.resetForm();
                 moDialogUtilStockClosing.setVisible(true);
+            }
+            else if (item == jmiStkStockClosingCost) {
+                moDialogUtilStockClosingCost.resetForm();
+                moDialogUtilStockClosingCost.setVisible(true);
             }
             else if (item == jmiReportStock) {
                 menuRepStock();

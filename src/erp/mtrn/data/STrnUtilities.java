@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -244,6 +245,256 @@ public abstract class STrnUtilities {
         }
 
         return stockMoves;
+    }
+    
+    public static String obtainStockWarehouseQuery(final SClientInterface client, final int year, final Date dateCutOff_n, final int[] warehouseKey) throws Exception {
+        boolean tool = false;
+        
+        String sql = "SELECT fid_ct_ent, fid_tp_ent FROM erp.cfgu_cob_ent WHERE id_cob = " + warehouseKey[0] + " AND id_ent = " + warehouseKey[1];
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (SLibUtils.compareKeys(SDataConstantsSys.CFGS_TP_ENT_WH_TL, new int[] { resultSet.getInt(1), resultSet.getInt(2) })) {
+                    tool = true;
+                }
+            }
+        }
+
+        sql = "SELECT s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
+                (tool ? "s.fid_maint_user_n, s.fid_maint_user_supv, " : "") +
+                "SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                "SUM(s.debit - s.credit) AS f_bal " +
+                "FROM trn_stk AS s " +
+                "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
+                "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
+                "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot " +
+                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND " +
+                "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff_n) + "' AND " +
+                "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
+                "GROUP BY s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block " +
+                (tool ? ", s.fid_maint_user_n, s.fid_maint_user_supv " : "" ) +
+                "HAVING f_stk <> 0 OR f_bal <> 0 " +
+                "ORDER BY " + (client.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
+                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot " +
+                (tool ? ", s.fid_maint_user_n, s.fid_maint_user_supv " : "");
+
+        return sql;
+    }
+    
+    /**
+     * Obtains available stock in warehouse on a certain year up to cut off date.
+     * @param client ERP Client interface.
+     * @param year Stock year.
+     * @param dateCutOff_n Cut off date.
+     * @param warehouseKey Warehouse ID (primary key).
+     * @return Available stock for provided params.
+     * @throws java.lang.Exception
+     */
+    @SuppressWarnings("unchecked")
+    public static ArrayList<STrnStockMove> obtainStockWarehouseCost(final SClientInterface client, final int year, final Date dateCutOff_n, final int[] warehouseKey) throws Exception {
+        STrnStockMove stockMove = null;
+        ArrayList<STrnStockMove> stockMoves = new ArrayList<>();
+        boolean tool = false;
+        
+        String sql = "SELECT fid_ct_ent, fid_tp_ent FROM erp.cfgu_cob_ent WHERE id_cob = " + warehouseKey[0] + " AND id_ent = " + warehouseKey[1];
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (SLibUtils.compareKeys(SDataConstantsSys.CFGS_TP_ENT_WH_TL, new int[] { resultSet.getInt(1), resultSet.getInt(2) })) {
+                    tool = true;
+                }
+            }
+        }
+        
+        sql = "SELECT " +
+                "    s.id_item, " +
+                "    s.id_unit, " +
+                "    s.id_lot, " +
+                "    i.item_key, " +
+                "    i.item, " +
+                "    u.symbol, " +
+                "    l.lot, " +
+                "    l.dt_exp_n, " +
+                "    l.b_block, " +
+                (tool ? "s.fid_maint_user_n, s.fid_maint_user_supv, " : "") +
+                "    s.cost_u, " +
+                "    SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                "    SUM(s.debit - s.credit) AS f_bal " +
+                "FROM " +
+                "    trn_stk AS s " +
+                "        INNER JOIN " +
+                "    erp.itmu_item AS i ON s.id_item = i.id_item " +
+                "        INNER JOIN " +
+                "    erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
+                "        INNER JOIN " +
+                "    trn_lot AS l ON s.id_item = l.id_item " +
+                "        AND s.id_unit = l.id_unit " +
+                "        AND s.id_lot = l.id_lot " +
+                "WHERE " +
+                "    s.b_del = 0 AND s.id_year = " + year + " " +
+                "        AND s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff_n) + "' " +
+                "        AND s.id_cob = " + warehouseKey[0] + " " +
+                "        AND s.id_wh = " + warehouseKey[1] + " " +
+                "        AND s.id_item IN (SELECT DISTINCT " +
+                "            id_item " +
+                "        FROM " +
+                "            (" + STrnUtilities.obtainStockWarehouseQuery(client, year, dateCutOff_n, warehouseKey) + ") AS ss) " +
+                "GROUP BY s.id_item , s.id_unit , s.id_lot , s.cost_u, l.b_block " +
+                (tool ? ", s.fid_maint_user_n, s.fid_maint_user_supv " : "" ) +
+                "HAVING f_stk <> 0 OR f_bal <> 0 " +
+                "ORDER BY s.id_item , s.id_unit , s.id_lot, f_stk ASC, s.dt ASC ;";
+
+        try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resulSet.next()) {
+                stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
+                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"), resulSet.getDouble("f_bal"), 
+                        tool ? resulSet.getInt("s.fid_maint_user_n") : 0,  tool ? resulSet.getInt("s.fid_maint_user_supv") : 0);
+                
+                stockMove.setUnitaryCost(resulSet.getDouble("s.cost_u"));
+                stockMove.setAuxLot(resulSet.getString("l.lot"));
+                stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));
+                stockMove.setAuxIsLotBlocked(resulSet.getBoolean("l.b_block"));
+                
+                stockMoves.add(stockMove);
+            }
+        }
+         
+        ArrayList<STrnStockMove> lMoves = STrnUtilities.processStockWithCost(stockMoves);
+
+        return lMoves;
+    }
+    
+    /**
+     * Se comenta este código por si hubiera necesidad de cambiar el funcionamiento.
+     * Edwin Carmona 20-01-2025
+     * 
+     * @param vStock
+     * @return 
+     */
+//    private static ArrayList<STrnStockMove> processStock(ArrayList<STrnStockMove> vStock) {
+//        ArrayList<STrnStockMove> lMoves = new ArrayList<>();
+//
+//        // Variables para el seguimiento del estado actual
+//        int idItem = 0;
+//        int idUnit = 0; 
+//        int idLot = 0;
+//        double dCostU = 0d;
+//        double dStock = 0d;
+//
+//        // Retorna directamente si la lista de stock está vacía
+//        if (vStock.isEmpty()) {
+//            return lMoves;
+//        }
+//
+//        STrnStockMove previousMove = null;
+//        boolean isPositive = false;
+//
+//        for (STrnStockMove move : vStock) {
+//            // Verificar si cambia el identificador del lote, unidad o ítem
+//            if (idItem != move.getPkItemId() || idUnit != move.getPkUnitId() || idLot != move.getPkLotId()) {
+//
+//                // Si ya hay datos acumulados, agregar el movimiento procesado
+//                if (idItem != 0 && !isPositive) {
+//                    lMoves.add(STrnUtilities.createStockMove(previousMove, dStock, dCostU));
+//                }
+//
+//                // Actualizar las variables para el nuevo ítem/lote/unidad
+//                idItem = move.getPkItemId();
+//                idUnit = move.getPkUnitId();
+//                idLot = move.getPkLotId();
+//                dCostU = move.getUnitaryCost();
+//                dStock = move.getQuantity();
+//
+//                isPositive = move.getQuantity() > 0d;
+//                previousMove = move;
+//
+//                // Si es un movimiento positivo, agregar directamente
+//                if (isPositive) {
+//                    move.setValue(SLibUtils.roundAmount(move.getQuantity() * move.getUnitaryCost()));
+//                    lMoves.add(move);
+//                }
+//            }
+//            else {
+//                // Procesar movimientos con el mismo ítem/lote/unidad
+//                if (isPositive) {
+//                    move.setValue(SLibUtils.roundAmount(move.getQuantity() * move.getUnitaryCost()));
+//                    lMoves.add(move);
+//                }
+//                else {
+//                    dStock += move.getQuantity();
+//                    dCostU = move.getUnitaryCost();
+//                }
+//            }
+//        }
+//
+//        // Agregar el último movimiento acumulado si no es positivo
+//        if (!isPositive && previousMove != null) {
+//            lMoves.add(STrnUtilities.createStockMove(previousMove, dStock, dCostU));
+//        }
+//
+//        return lMoves;
+//    }
+    
+    private static ArrayList<STrnStockMove> processStockWithCost(ArrayList<STrnStockMove> vStock) {
+        ArrayList<STrnStockMove> lMoves = new ArrayList<>();
+
+        // Retorna directamente si la lista de stock está vacía
+        if (vStock.isEmpty()) {
+            return lMoves;
+        }
+
+        Set<SItemUnitLotAux> lKeys = StockProcessor.getUniqueItemUnitLot(vStock);
+        for (SItemUnitLotAux key : lKeys) {
+            ArrayList<STrnStockMove> lStock = StockProcessor.getStockByItemUnitLot(vStock, key);
+            // Hay algún movimiento negativo?
+            boolean isNegative = false;
+            for (STrnStockMove move : lStock) {
+                if (move.getQuantity() < 0d) {
+                    isNegative = true;
+                    break;
+                }
+            }
+            // Si hay movimientos negativos, procesarlos
+            if (isNegative) {
+                double dStockAux = 0d;
+                double dCostUAux = 0d;
+                for (STrnStockMove move : lStock) {
+                    dStockAux += move.getQuantity();
+                    dCostUAux = move.getUnitaryCost();
+                }
+                lMoves.add(STrnUtilities.createStockMove(lStock.get(0), dStockAux, dCostUAux));
+            }
+            // Si no hay movimientos negativos, agregar los movimientos tal cual
+            else {
+                for (STrnStockMove move : lStock) {
+                    move.setValue(SLibUtils.roundAmount(move.getQuantity() * move.getUnitaryCost()));
+                    lMoves.add(move);
+                }
+            }
+        }
+
+        return lMoves;
+    }
+
+    /**
+     * Crea un nuevo movimiento de stock basado en un movimiento existente.
+     *
+     * @param baseMove Movimiento base para clonar.
+     * @param quantity Cantidad acumulada.
+     * @param unitaryCost Costo unitario acumulado.
+     * @return Nuevo movimiento de stock.
+     */
+    private static STrnStockMove createStockMove(STrnStockMove baseMove, double quantity, double unitaryCost) {
+        try {
+            STrnStockMove newMove = baseMove.clone();
+            newMove.setQuantity(quantity);
+            newMove.setUnitaryCost(unitaryCost);
+            newMove.setValue(SLibUtils.roundAmount(quantity * unitaryCost));
+            return newMove;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Error al clonar el movimiento de stock", e);
+        }
     }
 
     /**
@@ -3602,7 +3853,7 @@ public abstract class STrnUtilities {
      * @return object SDataDiogEntry type
      * @throws java.lang.Exception 
      */
-    private static SDataDiogEntry processStockEntries(final SClientInterface client, STrnStockMove stockMove) throws java.lang.Exception {
+    private static SDataDiogEntry processStockEntries(final SClientInterface client, STrnStockMove stockMove, boolean withCost) throws java.lang.Exception {
         SDataDiogEntry diogEntry = null;
         SDataItem item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
 
@@ -3611,8 +3862,14 @@ public abstract class STrnUtilities {
         diogEntry.setPkDocId(SLibConstants.UNDEFINED);
         diogEntry.setPkEntryId(SLibConstants.UNDEFINED);
         diogEntry.setQuantity(stockMove.getQuantity());
-        diogEntry.setValueUnitary(0);
-        diogEntry.setValue(0);
+        if (! withCost) {
+            diogEntry.setValueUnitary(0);
+            diogEntry.setValue(0);
+        }
+        else {
+            diogEntry.setValueUnitary(stockMove.getUnitaryCost());
+            diogEntry.setValue(stockMove.getValue());
+        }
         diogEntry.setOriginalQuantity(stockMove.getQuantity());
         diogEntry.setOriginalValueUnitary(0);
         diogEntry.setSortingPosition(0);
@@ -3658,15 +3915,19 @@ public abstract class STrnUtilities {
      * @param diogtype Diog type SModSysConsts.TRNS_TP_IOG_IN_ ...
      * @param numberSeries number serie for Diog
      * @param stockMoves array list stock moves to process
+     * @param withCost
      * @return object SDataDiog type
      * @throws java.lang.Exception 
      */
-    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSeries, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
+    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSeries, final Vector<STrnStockMove> stockMoves, final boolean withCost) throws java.lang.Exception {
         Vector<SDataDiogEntry> iogEntries = new Vector<>();
         SDataDiog iog = null;
-        
+        SDataDiogEntry ety = null;
+        double dTotalValue = 0d;
         for (STrnStockMove stockMove : stockMoves) {
-            iogEntries.add(processStockEntries(client, stockMove));
+            ety = processStockEntries(client, stockMove, withCost);
+            iogEntries.add(ety);
+            dTotalValue = SLibUtils.roundAmount(dTotalValue + ety.getValue());
         }
         
         iog = new SDataDiog();
@@ -3676,8 +3937,14 @@ public abstract class STrnUtilities {
         iog.setDate(date);
         iog.setNumberSeries(numberSeries);
         iog.setNumber("");
-        iog.setValue_r(0d);
-        iog.setCostAsigned(0);
+        if (! withCost) {
+            iog.setValue_r(0d);
+            iog.setCostAsigned(0);
+        }
+        else {
+            iog.setValue_r(dTotalValue);
+            iog.setCostAsigned(0);
+        }
         iog.setCostTransferred(0);
         iog.setIsShipmentRequired(false);
         iog.setIsShipped(false);

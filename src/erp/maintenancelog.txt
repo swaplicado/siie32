@@ -1,6 +1,13 @@
 ================================================================================
+SIIE 3.2 260.3/ 2025-01-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega funcionalidad de traspaso de inventarios con costo para valuación de consumos.
+
+================================================================================
+
 SIIE 3.2 260.2/ 2025-01-15
-Edwin CARMONA
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Obtención de configuración específica para el envío de mails de autorización de pedidos de compra.
 2) Corrección del campo dt_tp_pay para nóminas de un cambio descartado hace tiempo.

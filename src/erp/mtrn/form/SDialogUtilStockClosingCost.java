@@ -20,16 +20,18 @@ import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Edwin Carmona
  */
-public class SDialogUtilStockClosing extends javax.swing.JDialog {
+public class SDialogUtilStockClosingCost extends javax.swing.JDialog {
 
     private int mnFormResult;
     private boolean mbFirstTime;
+    private boolean mbWithCost;
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -43,7 +45,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
     private Vector<SDataDiog> mvDbmsDiogs;
 
     /** Creates new form SDialogUtilStockClosing */
-    public SDialogUtilStockClosing(erp.client.SClientInterface client) {
+    public SDialogUtilStockClosingCost(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         initComponents();
@@ -69,12 +71,13 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Generación de inventarios iniciales");
+        setTitle("Generación de inventarios iniciales con costo");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -82,14 +85,14 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
             }
         });
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de generación de inventarios iniciales:"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de generación de inventarios iniciales $:"));
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
+        jPanel4.setLayout(new java.awt.GridLayout(7, 1, 0, 1));
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlYear.setText("Ejercicio para el que se generan inventarios iniciales: *");
+        jlYear.setText("Ejercicio para el que se generan inventarios iniciales $: *");
         jlYear.setPreferredSize(new java.awt.Dimension(275, 23));
         jPanel1.add(jlYear);
 
@@ -119,9 +122,15 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         jLabel5.setText("El proceso puede demorar varios segundos.");
         jPanel4.add(jLabel5);
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(204, 0, 0));
+        jLabel6.setText("Esta funcionalidad agrupa los inventarios iniciales por costo para las valuaciones.");
+        jPanel4.add(jLabel6);
+
         jPanel3.add(jPanel4, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
+        jPanel3.getAccessibleContext().setAccessibleName("Parámetros de generación de inventarios iniciales $:");
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -146,8 +155,8 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-422)/2, (screenSize.height-300)/2, 422, 300);
+        setSize(new java.awt.Dimension(422, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -192,7 +201,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         String sql = "";
         Statement statement = null;
         ResultSet resulSet = null;
-        Vector<STrnStockMove> stockMoves = null;
+        ArrayList<STrnStockMove> stockMoves = null;
         SDataDiog iog = null;
 
         try {
@@ -204,12 +213,12 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
                     "ORDER BY id_cob, id_wh ";
 
             resulSet = statement.executeQuery(sql);
-            boolean withCost = false;
+            boolean withCost = true;
             while (resulSet.next()) {
                 mnFkCompanyBranchId = resulSet.getInt("id_cob");
                 mnFkWarehouseId = resulSet.getInt("id_wh");
-                    stockMoves = STrnUtilities.obtainStockWarehouse(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
-                    iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", stockMoves, withCost);
+                    stockMoves = STrnUtilities.obtainStockWarehouseCost(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
+                    iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", new Vector<>(stockMoves), withCost);
                     mvDbmsDiogs.add(iog);                                
             }
         }
@@ -269,6 +278,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -284,6 +294,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
 
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
+        mbWithCost = false;
 
         mnPkYearId = 0;
         mnPkDocId = 0;
@@ -297,5 +308,13 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
 
     public int getFormResult() {
         return mnFormResult;
+    }
+
+    public boolean isWithCost() {
+        return mbWithCost;
+    }
+
+    public void setWithCost(boolean mbWithCost) {
+        this.mbWithCost = mbWithCost;
     }
 }
