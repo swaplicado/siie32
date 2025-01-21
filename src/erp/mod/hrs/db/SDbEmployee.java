@@ -638,7 +638,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDatePaymentType) + "', " + 
+//                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDatePaymentType) + "', " + 
                     mnWorkingHoursDay + ", " + 
                     (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                     mnOvertimePolicy + ", " + 
