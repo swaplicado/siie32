@@ -5,7 +5,6 @@ Edwin Omar CARMONA FIGUEROA
 1) Se agrega funcionalidad de traspaso de inventarios con costo para valuación de consumos.
 
 ================================================================================
-
 SIIE 3.2 260.2/ 2025-01-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
