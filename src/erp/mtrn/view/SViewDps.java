@@ -1477,6 +1477,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     }
                 }
                 else {
+                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
                     SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                     SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                     SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -1484,29 +1485,35 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     SDataBizPartnerBranchContact bprBranchContact = null;
                     SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
-                    int addressFormatType = 0;
-                    boolean addCountry = false;
+                    int comAddressFormat = 0; // standard or US style
+                    int bprAddressFormat = 0; // standard or US style
+                    boolean includeCountry = false;
                     
-                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
-                        addressFormatType = bprBranch.getFkAddressFormatTypeId_n();
+                    if (comBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        comAddressFormat = comBranch.getFkAddressFormatTypeId_n();
                     }
                     else {
-                        addressFormatType = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                        comAddressFormat = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                    }
+                    
+                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        bprAddressFormat = bprBranch.getFkAddressFormatTypeId_n();
+                    }
+                    else {
+                        bprAddressFormat = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
                     }
                     
                     if (bprBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
-                        addCountry = false;
+                        includeCountry = false;
                     }
                     else {
-                        addCountry = true;
+                        includeCountry = true;
                     }
 
-                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
-                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(comAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
+                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
+                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
 
-                    Cursor cursor = getCursor();
                     Map<String, Object> map = null;
                     JasperPrint jasperPrint = null;
                     JasperViewer jasperViewer = null;
@@ -1527,7 +1534,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 SLibUtilities.renderException(this, e);
                             }
                             finally {
-                                setCursor(cursor);
+                                setCursor(Cursor.getDefaultCursor());
                             }
                         }
                     }
@@ -1540,30 +1547,52 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             if (company.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)) {
                                 // international company:
                                 
-                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
-                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
-                                dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(comAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
+                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
+                                dvyAddressTexts = bprBranchAddress.obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
                                 
                                 SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0);
                                 bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
                                 map.put("nDpsYearId", dps.getPkYearId());
-                                map.put("nDpsDocId", dps.getPkDocId());
+                                map.put("nDpsDocId", (long) dps.getPkDocId());
                                 map.put("sDpsNumber", dps.getDpsNumber());
                                 map.put("tDpsDate", dps.getDate());
                                 map.put("nDpsDueDays", dps.getDaysOfCredit());
                                 
-                                map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
-                                map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER</b></p>"
-                                        + "<p>BANK OF AMERICA</p>"
-                                        + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
-                                        + "<p>ACCOUNT NUMBER: 325143301493</p>"
-                                        + "<p>ROUTING NUMBER: 121000358</p>"
-                                        + "<p>WIRE: 026009593</p>"
-                                        + "<br>"
-                                        + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
-                                        + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>");
+                                switch (company.getFiscalFrgId()) {
+                                    case "32089791613":
+                                        // Tron USA, Inc.:
+                                        map.put("sDpsNote1", "");
+                                        map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER:</b></p>"
+                                                + "<p>BANK OF AMERICA</p>"
+                                                + "<p>ACCOUNT NAME: TRON USA INC</p>"
+                                                + "<p>ACCOUNT NUMBER: 4881 2043 2992</p>"
+                                                + "<p>ROUTING NUMBER: 113000023 / 111000025</p>"
+                                                + "<p>WIRE: 026009593</p>"
+                                                /* Set additional info if required:
+                                                + "<br>"
+                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
+                                                */
+                                        );
+                                        break;
+                                        
+                                    default:
+                                        // Saporis International, Inc.:
+                                        map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
+                                        map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER:</b></p>"
+                                                + "<p>BANK OF AMERICA</p>"
+                                                + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
+                                                + "<p>ACCOUNT NUMBER: 325143301493</p>"
+                                                + "<p>ROUTING NUMBER: 121000358</p>"
+                                                + "<p>WIRE: 026009593</p>"
+                                                + "<br>"
+                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
+                                        );
+                                }
                                 
                                 map.put("sPONumber", dps.getNumberReference());
                                 map.put("sONumber", "");
@@ -1632,7 +1661,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
@@ -1668,7 +1697,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_CON, SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
@@ -1694,7 +1723,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             }
                             else {
-                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
                                 map.put("sAddressLine1", comBranchAddressTexts[0] == null || comBranchAddressTexts[0].isEmpty() ? "": comBranchAddressTexts[0]);
                                 map.put("sAddressLine2", comBranchAddressTexts[1] == null || comBranchAddressTexts[1].isEmpty() ? "": comBranchAddressTexts[1]);
                                 map.put("sAddressLine3", comBranchAddressTexts[2] == null || comBranchAddressTexts[2].isEmpty() ? "": comBranchAddressTexts[2]);
@@ -1869,7 +1898,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST)) {
@@ -1889,7 +1918,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             for (int i = 0; i < company.getDbmsBizPartnerBranches().size(); i++ ) {
                                 if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
-                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
                                     map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
                                     map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
                                     map.put("sAddressLine3", comAddressTexts[2].toUpperCase() == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2].toUpperCase());
@@ -1988,7 +2017,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                 }
@@ -2010,6 +2039,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     }
                 }
                 else {
+                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
                     SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                     SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
                     SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -2017,29 +2047,35 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     SDataBizPartnerBranchContact bprBranchContact = null;
                     SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
-                    int addressFormatType = 0;
-                    boolean addCountry = false;
+                    int comAddressFormat = 0; // standard or US style
+                    int bprAddressFormat = 0; // standard or US style
+                    boolean includeCountry = false;
                     
-                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
-                        addressFormatType = bprBranch.getFkAddressFormatTypeId_n();
+                    if (comBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        comAddressFormat = comBranch.getFkAddressFormatTypeId_n();
                     }
                     else {
-                        addressFormatType = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                        comAddressFormat = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                    }
+                    
+                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        bprAddressFormat = bprBranch.getFkAddressFormatTypeId_n();
+                    }
+                    else {
+                        bprAddressFormat = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
                     }
                     
                     if (bprBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
-                        addCountry = false;
+                        includeCountry = false;
                     }
                     else {
-                        addCountry = true;
+                        includeCountry = true;
                     }
 
-                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
-                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(comAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
+                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
+                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
 
-                    Cursor cursor = getCursor();
                     Map<String, Object> map = null;
                     JasperPrint jasperPrint = null;
                     JasperViewer jasperViewer = null;
@@ -2060,7 +2096,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 SLibUtilities.renderException(this, e);
                             }
                             finally {
-                                setCursor(cursor);
+                                setCursor(Cursor.getDefaultCursor());
                             }
                         }
                     }
@@ -2073,30 +2109,52 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             if (company.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)) {
                                 // international company:
                                 
-                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
-                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
-                                dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(comAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
+                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
+                                dvyAddressTexts = bprBranchAddress.obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, includeCountry);
                                 
                                 SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchContacts().get(0);
                                 bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
                                 map.put("nDpsYearId", dps.getPkYearId());
-                                map.put("nDpsDocId", dps.getPkDocId());
+                                map.put("nDpsDocId", (long) dps.getPkDocId());
                                 map.put("sDpsNumber", dps.getDpsNumber());
                                 map.put("tDpsDate", dps.getDate());
                                 map.put("nDpsDueDays", dps.getDaysOfCredit());
                                 
-                                map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
-                                map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER</b></p>"
-                                        + "<p>BANK OF AMERICA</p>"
-                                        + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
-                                        + "<p>ACCOUNT NUMBER: 325143301493</p>"
-                                        + "<p>ROUTING NUMBER: 121000358</p>"
-                                        + "<p>WIRE: 026009593</p>"
-                                        + "<br>"
-                                        + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
-                                        + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>");
+                                switch (company.getFiscalFrgId()) {
+                                    case "32089791613":
+                                        // Tron USA, Inc.:
+                                        map.put("sDpsNote1", "");
+                                        map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER:</b></p>"
+                                                + "<p>BANK OF AMERICA</p>"
+                                                + "<p>ACCOUNT NAME: TRON USA INC</p>"
+                                                + "<p>ACCOUNT NUMBER: 4881 2043 2992</p>"
+                                                + "<p>ROUTING NUMBER: 113000023 / 111000025</p>"
+                                                + "<p>WIRE: 026009593</p>"
+                                                /* Set additional info if required:
+                                                + "<br>"
+                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
+                                                */
+                                        );
+                                        break;
+                                        
+                                    default:
+                                        // Saporis International, Inc.:
+                                        map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
+                                        map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER:</b></p>"
+                                                + "<p>BANK OF AMERICA</p>"
+                                                + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
+                                                + "<p>ACCOUNT NUMBER: 325143301493</p>"
+                                                + "<p>ROUTING NUMBER: 121000358</p>"
+                                                + "<p>WIRE: 026009593</p>"
+                                                + "<br>"
+                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
+                                        );
+                                }
                                 
                                 map.put("sPONumber", dps.getNumberReference());
                                 map.put("sONumber", "");
@@ -2165,7 +2223,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
@@ -2201,7 +2259,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_CON, SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
@@ -2227,7 +2285,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             }
                             else {
-                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
                                 map.put("sAddressLine1", comBranchAddressTexts[0] == null || comBranchAddressTexts[0].isEmpty() ? "": comBranchAddressTexts[0]);
                                 map.put("sAddressLine2", comBranchAddressTexts[1] == null || comBranchAddressTexts[1].isEmpty() ? "": comBranchAddressTexts[1]);
                                 map.put("sAddressLine3", comBranchAddressTexts[2] == null || comBranchAddressTexts[2].isEmpty() ? "": comBranchAddressTexts[2]);
@@ -2371,7 +2429,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                     else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST)) {
@@ -2391,7 +2449,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             for (int i = 0; i < company.getDbmsBizPartnerBranches().size(); i++ ) {
                                 if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
-                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(bprAddressFormat, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, includeCountry);
                                     map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
                                     map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
                                     map.put("sAddressLine3", comAddressTexts[2].toUpperCase() == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2].toUpperCase());
@@ -2490,7 +2548,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             SLibUtilities.renderException(this, e);
                         }
                         finally {
-                            setCursor(cursor);
+                            setCursor(Cursor.getDefaultCursor());
                         }
                     }
                 }

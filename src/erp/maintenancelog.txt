@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 260.5/ 2025-01-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoras al formato de impresión de facturas que no son CFDI, para incorporar notas del documento y de las partidas del documento.
+2) Mejoras a la impresión de facturas emitidas por empresas en el extranjero; al día de hoy son Tron USA y Saporis International.
+3) Mejoras a la impresión del domicilio de empresas en el extranjero, tanto en calidad de emisor como de receptor en una factura.
+4) Corrección a la condición de habilitación del campo Tipo de Exportación en la forma de captura de documentos.
+
+================================================================================
+SIIE 3.2 260.4/ 2025-01-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Restablecimiento de la depuración previamente realizada, pero parcialmente revertida, de la columna "Date Payment Type" (dt_tp_pay) de las clases erp.mod.hrs.db.SDbEmployee y erp.mbps.data.SDataEmployee.
+
+================================================================================
 SIIE 3.2 260.3/ 2025-01-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
