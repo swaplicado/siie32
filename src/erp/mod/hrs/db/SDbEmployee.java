@@ -31,7 +31,7 @@ import sa.lib.gui.SGuiSession;
  */
 
 /**
- * Used mainly in re-hiring and dismissal operations.
+ * Used mainly in re-hiring and dismissal operations. The base class used in CRUD operations is SDataEmployee.
  * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
