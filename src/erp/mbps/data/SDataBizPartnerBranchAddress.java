@@ -366,19 +366,19 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                     case ADDRESS_2ROWS:
                         address = new String[2];
                         address[0] = SLibUtilities.textTrim(msStreet + " " + msStreetNumberExt + " " + msStreetNumberInt + " " + msNeighborhood + " " + msReference);
-                        address[1] = msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan());
+                        address[1] = SLibUtilities.textTrim(msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan()));
                         break;
                     case ADDRESS_3ROWS:
                         address = new String[3];
                         address[0] = SLibUtilities.textTrim(msStreet + " " + msStreetNumberExt + " " + msStreetNumberInt);
-                        address[1] = msNeighborhood + " " + msReference;
-                        address[2] = msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan());
+                        address[1] = SLibUtilities.textTrim(msNeighborhood + " " + msReference);
+                        address[2] = SLibUtilities.textTrim(msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan()));
                         break;
                     case ADDRESS_4ROWS:
                         address = new String[4];
                         address[0] = SLibUtilities.textTrim(msStreet + " " + msStreetNumberExt + " " + msStreetNumberInt);
-                        address[1] = msNeighborhood + " " + msReference;
-                        address[2] = msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState;
+                        address[1] = SLibUtilities.textTrim(msNeighborhood + " " + msReference);
+                        address[2] = SLibUtilities.textTrim(msZipCode + " " + msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState);
                         address[3] = (!includeCountry ? "" : moDbmsDataCountry.getCountryLan());
                         break;
                     default:
@@ -386,22 +386,33 @@ public class SDataBizPartnerBranchAddress extends erp.lib.data.SDataRegistry imp
                 break;
 
             case SDataConstantsSys.BPSS_TP_ADD_FMT_US:
+                String state = "";
+                String stateAbbr = "";
+                
+                if (mnFkStateId_n != SLibConstants.UNDEFINED && moDbmsDataState != null && !moDbmsDataState.getIsRegistryNew()) {
+                    stateAbbr = moDbmsDataState.getStateAbbr();
+                    state = (stateAbbr.length() > 0 ? ", " : "") + stateAbbr + " ";
+                }
+                else {
+                    state = (msState.length() > 0 ? ", " : "") + msState + " ";
+                }
+                
                 switch (addressStyle) {
                     case ADDRESS_2ROWS:
                         address = new String[2];
                         address[0] = SLibUtilities.textTrim(msStreetNumberExt + " " + msStreetNumberInt + " "  + msStreet + " " + msNeighborhood);
-                        address[1] =  msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + " " + msZipCode + " " + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan()) + " " + msZipCode;
+                        address[1] = SLibUtilities.textTrim(msLocality + state + msZipCode + " " + (!includeCountry ? "" : ", " + moDbmsDataCountry.getCountryLan()));
                         break;
                     case ADDRESS_3ROWS:
                         address = new String[3];
                         address[0] = SLibUtilities.textTrim(msStreetNumberExt + " " + msStreetNumberInt  + " " + msStreet + " " + msNeighborhood);
-                        address[1] = msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + " " + msZipCode;
+                        address[1] = SLibUtilities.textTrim(msLocality + state + msZipCode);
                         address[2] = !includeCountry ? "" : moDbmsDataCountry.getCountryLan();
                         break;
                     case ADDRESS_4ROWS:
                         address = new String[4];
                         address[0] = SLibUtilities.textTrim(msStreetNumberExt  + " " + msStreetNumberInt + " " + msStreet + " " + msNeighborhood);
-                        address[1] = msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + (msState.length() > 0 ? ", " : "") + msState + " " + msZipCode;
+                        address[1] = SLibUtilities.textTrim(msLocality + (msCounty.length() > 0 ? ", " : "") + msCounty + state + msZipCode);
                         address[2] = !includeCountry ? "" : moDbmsDataCountry.getCountryLan();
                         address[3] = "";
                         break;

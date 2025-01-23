@@ -4260,7 +4260,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //jcbCfdCceMoveReason.setEnabled(enableFields); // field stays disabled, required only for CFDI "T", but not supported yet!
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceRequestKey.setEnabled(enableFields);
-        jcbExportation.setEnabled((enable && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice));
+        jcbExportation.setEnabled((enableFields && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice));
         jtfCfdCceCertificateOrigin.setEnabled(enableFields);
         jtfCfdCceCertificateOrigin.setFocusable(enableFields);
         jtfCfdCceNumberCertificateOrigin.setEnabled(enableFields);

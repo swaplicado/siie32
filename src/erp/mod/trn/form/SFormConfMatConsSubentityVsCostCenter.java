@@ -181,7 +181,11 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
     private void readCostCenters() {
         try {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT pk_cc, id_cc FROM fin_cc WHERE (lev = (SELECT MAX(lev) FROM fin_cc) AND NOT b_del) OR pk_cc = 1 ORDER BY id_cc";
+            String sql = "SELECT mc.id_cc AS cuenta_mayor, mc.deep AS max_prof, c.pk_cc, c.id_cc AS cuenta, c.lev AS nivel " +
+                    "FROM fin_cc AS mc " +
+                    "INNER JOIN fin_cc AS c on LEFT(mc.id_cc, 3) = LEFT(c.id_cc, 3) AND c.lev = mc.deep " +
+                    "WHERE mc.deep <> 0 AND NOT c.b_del AND c.b_act " +
+                    "ORDER BY c.id_cc";
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     boolean found = false;
@@ -192,7 +196,7 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
                         }
                     }
                     SRowMatCostCenter row = new SRowMatCostCenter();
-                    row.readDataCostCenter(resultSet.getString("id_cc"), miClient.getSession());
+                    row.readDataCostCenter(resultSet.getString("cuenta"), miClient.getSession());
                     row.setSelected(found);
                     maMatCostCenter.add(row);
                 }

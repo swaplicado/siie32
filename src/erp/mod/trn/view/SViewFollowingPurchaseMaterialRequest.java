@@ -67,7 +67,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
             where += "NOT r.b_clo_pur ";
         }
         
-        msSql = "SELECT " 
+        msSql = "SELECT DISTINCT " 
                 + "re.id_mat_req AS " + SDbConsts.FIELD_ID + "1, " 
                 + "re.id_ety AS " + SDbConsts.FIELD_ID + "2, "  
                 + "pe.name AS " + SDbConsts.FIELD_CODE +", "
@@ -76,7 +76,8 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
                 + "ur.usr AS solicitante, " 
                 + "re.dt_req_n AS f_requerida, " 
                 + "mp.name AS req_pty, " 
-                + "sl.ts AS f_compras, " 
+                + "sl.ts AS f_compras, "
+                + "ireq.item AS item_req, " 
                 + "ir.item AS req_gasto, " 
                 + "er.ts_usr AS f_cot, " 
                 + "err.prov_name, " 
@@ -107,6 +108,8 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
                 + "r.id_mat_req = re.id_mat_req "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
                 + "r.fk_mat_prov_ent = pe.id_mat_prov_ent "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS ireq ON "
+                + "re.fk_item = ireq.id_item "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
                 + "r.fk_usr_req = ur.id_usr " 
                 + "INNER JOIN ("
@@ -127,20 +130,20 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
                 + "LEFT JOIN (" 
                 + "  SELECT dr.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dr "
                 + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
-                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND "
+                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND NOT d.b_del AND "
                 + "  d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ") " 
                 + "AS cot ON re.id_mat_req = cot.fid_mat_req AND re.id_ety = cot.fid_mat_req_ety "
                 + "LEFT JOIN (" 
                 + "  SELECT dr.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dr " 
                 + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
-                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND "
-                + "  d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + ") " 
+                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND NOT d.b_del AND "
+                + "  d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ") " 
                 + "AS ped ON re.id_mat_req = ped.fid_mat_req AND re.id_ety = ped.fid_mat_req_ety " 
                 + "LEFT JOIN (" 
                 + "  SELECT dr.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dr " 
                 + "  INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
-                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND "
-                + "  d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + ") " 
+                + "  dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc AND NOT d.b_del AND "
+                + "  d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + ") " 
                 + "AS fac ON re.id_mat_req = fac.fid_mat_req AND re.id_ety = fac.fid_mat_req_ety " 
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dc ON "
                 + "cot.fid_dps_year = dc.id_year AND cot.fid_dps_doc = dc.id_doc " 
@@ -164,7 +167,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
                 + "fac.fid_dps_year = dfe.id_year AND fac.fid_dps_doc = dfe.id_doc AND fac.fid_dps_ety = dfe.id_ety "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON "
                 + "df.fid_cur = c.id_cur "
-                + "WHERE " + where;       
+                + "WHERE " + where + " AND NOT r.b_del AND NOT re.b_del ";       
     }
 
     @Override
@@ -178,9 +181,10 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_requerida", "Fecha requerida"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_pty", "Prioridad RM"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "f_compras", "Ult. fecha compras"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "item_req", "Item RM"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "req_gasto", "Concepto/gasto RM"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "f_cot", "Fecha cotización"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "prov_name", "Proveedor"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "prov_name", "Proveedor cotizado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CO, "cot_code", "Tipo doc."));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_cot", "Folio cotización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "ref_cot", "Referencia cotización"));
@@ -192,10 +196,10 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "ped_gasto", "Concepto/gasto pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "f_ped_auth", "Fecha autorizado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_ped_entrega", "Fecha entrega"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Item"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Item pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "qty", "Cantidad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_new", "Fecha añadido"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_new", "Fecha añadido al pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CO, "fac_code", "Tipo doc."));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio_fac", "Folio factura"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_fac", "Fecha factura"));
