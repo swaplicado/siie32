@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 260.6/ 2025-01-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Mejora a la vista de seguimientos de RM de compras.
+2) Cambio a la consulta en la ventana de subentidades de consumo vs. centros de costo para mostrar solo los centros de costo de mas bajo nivel en su categoría.
+
+================================================================================
 SIIE 3.2 260.5/ 2025-01-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
