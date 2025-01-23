@@ -24,7 +24,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Néstor Ávalos, Cesar Orozco  
+ * @author Néstor Ávalos, César Orozco  
  */
 public class SViewBom extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 

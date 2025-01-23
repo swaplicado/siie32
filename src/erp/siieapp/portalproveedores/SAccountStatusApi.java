@@ -22,7 +22,7 @@ import erp.siieapp.portalproveedores.*;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SAccountStatusApi {
     private SGuiSession oSession;

@@ -22,7 +22,7 @@ import sa.lib.SLibUtils;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Sergio Flores
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 

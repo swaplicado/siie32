@@ -27,7 +27,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores, Cesar Orozco, Sergio Flores
+ * @author Alfonso Flores, César Orozco, Sergio Flores
  */
 public class SFormBizPartnerBranchContact extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 

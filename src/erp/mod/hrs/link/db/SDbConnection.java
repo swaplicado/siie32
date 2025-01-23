@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SDbConnection {
+    
     private String dbHost;
     private String dbName;
     private String dbPort;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author swaplicado
  */
 public class SPlanVacations {
+    
     public static final int BIWEEK = 2; 
     public static final int WEEK = 1;
     public static final int BOTH = 0;

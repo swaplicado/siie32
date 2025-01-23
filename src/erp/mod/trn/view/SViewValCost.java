@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SViewValCost extends SGridPaneView {
     

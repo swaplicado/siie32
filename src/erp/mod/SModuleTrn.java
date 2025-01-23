@@ -146,7 +146,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Isabel Servín
  */
 public class SModuleTrn extends SGuiModule {
 

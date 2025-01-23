@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SFirstDayYear {
+    
     protected int year;
     protected String dt_date;
     protected boolean is_deleted;

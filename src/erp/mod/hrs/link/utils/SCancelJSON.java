@@ -12,6 +12,7 @@ import erp.mod.hrs.link.db.SCancelResponse;
  * @author swaplicado
  */
 public class SCancelJSON {
+    
     public SCancelResponse response;
     
     public SCancelJSON() {

@@ -13,5 +13,6 @@ import java.util.ArrayList;
  * @author Edwin Carmona
  */
 public class SPhotosResponse {
+    
    ArrayList<SPhoto> photos;
 }

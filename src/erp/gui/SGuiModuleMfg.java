@@ -47,7 +47,7 @@ import javax.swing.JSeparator;
 
 /**
  *
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, César Orozco
  */
 public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 

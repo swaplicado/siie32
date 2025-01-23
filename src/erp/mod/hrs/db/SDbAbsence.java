@@ -457,16 +457,16 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         
         // Read absence type:
             
-//        SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
-//        msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
-//        msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
+        SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
+        msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
+        msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
 
-//        if (absenceType != null) {
-//            mbXtaAbsenceTypePayable = absenceType.isPayable();
-//        }
-//            
-//        mbRegistryNew = false;
-//        mnQueryResultId = SDbConsts.SAVE_OK;
+        if (absenceType != null) {
+            mbXtaAbsenceTypePayable = absenceType.isPayable();
+        }
+
+        mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override

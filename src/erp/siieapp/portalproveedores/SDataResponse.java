@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SDataResponse {
     ArrayList<SPurcharseOrdersData> lPOData;

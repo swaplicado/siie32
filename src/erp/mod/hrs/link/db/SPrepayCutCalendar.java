@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SPrepayCutCalendar {
+    
     protected int id_cal;
     protected int year;
     protected int num;

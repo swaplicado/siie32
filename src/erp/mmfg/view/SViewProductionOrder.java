@@ -43,7 +43,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Edwin Carmona, Cesar Orozco, Isabel Servín
+ * @author Néstor Ávalos, Edwin Carmona, César Orozco, Isabel Servín
  */
 
 public class SViewProductionOrder extends erp.lib.table.STableTab implements java.awt.event.ActionListener {

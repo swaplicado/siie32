@@ -7,7 +7,7 @@ package erp.siieapp.portalproveedores;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEstimateRequestData {
     int idEstimateRequest;

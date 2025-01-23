@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Claudio Peña
  */
 public class SDataEmployee {
+    
     int id_employee;
     String name;
     String rfc;
@@ -22,8 +23,6 @@ public class SDataEmployee {
     String rfcCompany;
     String rgg_fiscal;
     int company_id;
-
-    
 
     public int getId_employee() {
         return id_employee;

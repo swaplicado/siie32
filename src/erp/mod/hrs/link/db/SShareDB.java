@@ -24,7 +24,6 @@ import sun.misc.BASE64Encoder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import erp.mod.SModConsts;
-import static erp.mod.SModConsts.CFGU_CO;
 import erp.mod.SModSysConsts;
 import erp.mod.SModUtils;
 import erp.mod.SModuleHrs;
@@ -36,7 +35,6 @@ import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
-import erp.mod.hrs.link.utils.SIncidentsJSON;
 import erp.musr.data.SDataUser;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -62,7 +60,7 @@ import sa.lib.gui.SGuiYearPicker;
 
 /**
  *
- * @author Edwin Carmona, Cesar Orozco
+ * @author Edwin Carmona, César Orozco
  */
 public class SShareDB {
 

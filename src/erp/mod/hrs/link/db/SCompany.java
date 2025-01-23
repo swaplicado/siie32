@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SCompany {
+    
     protected int id_company;
     protected String company;
     protected String database_nm;

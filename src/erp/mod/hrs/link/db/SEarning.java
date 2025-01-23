@@ -7,9 +7,10 @@ package erp.mod.hrs.link.db;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEarning {
+    
     protected int id_ear;
     protected double unit_ear;
 

@@ -38,5 +38,4 @@ public class SRepBreachesTo {
     public void setBcc(String bcc) {
         this.bcc = bcc;
     }
-    
 }

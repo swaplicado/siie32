@@ -47,7 +47,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 

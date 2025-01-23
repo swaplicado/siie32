@@ -11,6 +11,7 @@ import erp.mod.hrs.link.db.SIncidentResponse;
  * @author swaplicado
  */
 public class SIncidentsJSON {
+    
    public SIncidentResponse response;
 
     public SIncidentsJSON() {

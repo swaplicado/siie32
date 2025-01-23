@@ -64,7 +64,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 

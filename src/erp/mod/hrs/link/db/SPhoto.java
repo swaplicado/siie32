@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SPhoto {
+    
     protected String photo;
     protected int idEmployee;
     protected int numEmployee;

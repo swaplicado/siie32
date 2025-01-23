@@ -6,11 +6,10 @@
 package erp.mod.hrs.link.utils;
 
 import erp.mod.hrs.link.db.SEarningResponse;
-import erp.mod.hrs.link.db.SIncidentResponse;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEarningJSON {
     public SEarningResponse response;

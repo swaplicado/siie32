@@ -21,7 +21,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEstimateRequestAPI {
     private SGuiSession oSession;
