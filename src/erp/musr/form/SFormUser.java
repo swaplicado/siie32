@@ -21,6 +21,7 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.lib.table.STableRowCustom;
 import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompany;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mod.SModSysConsts;
@@ -4199,18 +4200,22 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public SLibMethod getPostSaveMethod(SDataRegistry registry) {
         SLibMethod method = null;
-        SDataUser oDataUser = (SDataUser) SDataUtilities.readRegistry(miClient, SDataConstants.USRU_USR, registry.getPrimaryKey(), SLibConstants.EXEC_MODE_STEALTH);
         
-        if(!moUser.getIsActive() || moUser.getIsDeleted()){
-            SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
-            boolean res = false;
-            try {
-                res = oExport.unactiveUser(moUser.getPkUserId(), moUser.getIsActive(), moUser.getIsDeleted());
-            } catch (SQLException ex) {
-                Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP).isEmpty()) {
+                if(!moUser.getIsActive() || moUser.getIsDeleted()){
+                    SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
+                    try {
+                        oExport.unactiveUser(moUser.getPkUserId(), moUser.getIsActive(), moUser.getIsDeleted());
+                    } catch (SQLException ex) {
+                        Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
+        } catch (Exception ex) {
+            Logger.getLogger(SFormUser.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return method;

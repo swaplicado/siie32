@@ -22,6 +22,9 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiConsts;
 import java.util.Vector;
 import sa.lib.gui.SGuiClient;
+import erp.mcfg.data.SCfgUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -62,9 +65,16 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         jbSync.setPreferredSize(new Dimension(23, 23));
         jbSync.addActionListener(this);
         jbSync.setToolTipText("Sincronizar con sistemas externos");
-
-        addTaskBarUpperComponent(jbExport);
-        addTaskBarUpperComponent(jbSync);
+        
+        try {
+            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP).isEmpty()) {
+                addTaskBarUpperComponent(jbExport);
+                addTaskBarUpperComponent(jbSync);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
