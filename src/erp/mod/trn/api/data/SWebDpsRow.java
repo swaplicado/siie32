@@ -30,6 +30,8 @@ public class SWebDpsRow {
     private int currencyId;
     private String currency;
     private double exchangeRate;
+    private boolean authorized;
+    private String authText;
     private String matReqFolio;
     private String matReqDt;
     private int dpsUserId;
@@ -188,6 +190,22 @@ public class SWebDpsRow {
 
     public void setExchangeRate(double exchangeRate) {
         this.exchangeRate = exchangeRate;
+    }
+
+    public boolean isAuthorized() {
+        return authorized;
+    }
+
+    public void setIsAuthorized(boolean isAuthorized) {
+        this.authorized = isAuthorized;
+    }
+
+    public String getAuthText() {
+        return authText;
+    }
+
+    public void setAuthText(String authText) {
+        this.authText = authText;
     }
 
     public String getMatReqFolio() {

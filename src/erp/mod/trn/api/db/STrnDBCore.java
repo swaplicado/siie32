@@ -95,7 +95,12 @@ public class STrnDBCore {
             + "    dusr.usr AS dps_user, "
             + "    dusr.id_usr AS dps_user_id,"
             + "    aust.id_st_authorn, "
-            + "    COALESCE(aust.name, 'NA') AS auth_st_name,"
+            + "    dps.b_authorn, "
+            + "    IF(dps.b_authorn, "
+            + "        'AUTORIZADO', "
+            + "        (IF(dps.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
+            + "            'RECHAZADO', "
+            + "            COALESCE(aust.name, 'NA')))) AS auth_st_name, "
             + "    tda.id_authorn, "
             + "    tda.nts AS dta_notes, "
             + "    tda.fid_st_authorn AS tda_st, "
@@ -109,6 +114,8 @@ public class STrnDBCore {
             + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS tcur ON dps.fid_cur = tcur.id_cur "
             + "        INNER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS dusr ON dps.fid_usr_new = dusr.id_usr "
+//            + "        INNER JOIN "
+//            + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS_AUTHORN) + " AS dpsauth ON dps.fid_st_dps_authorn = dpsauth.id_st_dps_authorn "
             + "        LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dps_mr ON dps.id_year = dps_mr.fid_dps_year "
             + "        AND dps.id_doc = dps_mr.fid_dps_doc "
@@ -146,12 +153,17 @@ public class STrnDBCore {
                     + "        AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                     + "        AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' "
                     + "        AND mr.id_mat_req IS NOT NULL ";
+            
+            // Cuando están pendientes
             if (statusFilter == -1) {
-                query += "AND tda.fid_st_authorn IN (2, 3) ";
+                query += "AND tda.fid_st_authorn IN (2, 3) "
+                        + "AND NOT dps.b_authorn ";
             }
+            // Todas las OC
             else if (statusFilter == 0) {
                 query += "AND tda.fid_st_authorn IN (11, 2, 3, 4, 5) ";
             }
+            // Estatus específico
             else if (statusFilter > 0) {
                 query += "AND tda.fid_st_authorn = " + statusFilter + " ";
             }
@@ -277,6 +289,8 @@ public class STrnDBCore {
             oDoc.setTotalCur(res.getDouble("tot_cur_r"));
             oDoc.setTaxChargedCur(res.getDouble("tax_charged_cur_r"));
             oDoc.setTaxRetainedCur(res.getDouble("tax_retained_cur_r"));
+            oDoc.setIsAuthorized(res.getBoolean("b_authorn"));
+            oDoc.setAuthText(res.getString("auth_st_name"));
             oDoc.setDpsUser(res.getString("dps_user"));
             oDoc.setDpsUserId(res.getInt("dps_user_id"));
             oDoc.setNotesAuth(res.getString("dta_notes"));
