@@ -67,7 +67,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         jbSync.setToolTipText("Sincronizar con sistemas externos");
         
         try {
-            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP).isEmpty()) {
+            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS).isEmpty()) {
                 addTaskBarUpperComponent(jbExport);
                 addTaskBarUpperComponent(jbSync);
             }

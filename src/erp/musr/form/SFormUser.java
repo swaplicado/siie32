@@ -4202,7 +4202,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         SLibMethod method = null;
         
         try {
-            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_SIIEAPP).isEmpty()) {
+            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS).isEmpty()) {
                 if(!moUser.getIsActive() || moUser.getIsDeleted()){
                     SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
                     try {
