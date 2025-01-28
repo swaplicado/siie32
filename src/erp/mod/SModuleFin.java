@@ -50,6 +50,7 @@ import erp.mod.fin.view.SViewAccountItemLink;
 import erp.mod.fin.view.SViewAccoutingCustomizableReport;
 import erp.mod.fin.view.SViewBankLayout;
 import erp.mod.fin.view.SViewBankLayoutPayments;
+import erp.mod.fin.view.SViewDpsPayment;
 import erp.mod.fin.view.SViewImportFile;
 import erp.mod.fin.view.SViewReportAccountingCustomizableReport;
 import erp.mod.fin.view.SViewTaxItemLink;
@@ -562,6 +563,9 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FINX_REP_CUS_ACC:
                 view = new SViewReportAccountingCustomizableReport(miClient, subtype, "Aux. contables: " + (String) params.getParamsMap().get(subtype));
+                break;
+            case SModConsts.TRNX_DPS_PAYS:
+                view = new SViewDpsPayment(miClient, "Pagos periodo x parcialidad (detalle)");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

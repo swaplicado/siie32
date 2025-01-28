@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 261.1/ 2025-01-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en la edición de ordenes de compra que fueron envíadas a autorización vía web.
+2) Cambio en las consultas de las vistas de ordenes de compra para darle prioridad al status de autorización del DPS. 
+
+================================================================================
 SIIE 3.2 261.0/ 2025-01-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

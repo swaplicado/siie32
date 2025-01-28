@@ -116,9 +116,9 @@ public class SViewDpsPayment extends erp.lib.table.STableTab implements java.awt
                                     + "' AND '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' ";
             }
         }
-
+        
 //        renderTableColumns();
-
+        
         msSql = "SELECT b.id_bp, b.bp, b.fiscal_id, bc.bp_key, bpb.bpb, re.ref, SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, dt.code, cb.code, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.num_ref, d.dt, SUM(d.stot_r) AS f_stot, SUM(d.tax_charged_r) AS f_tax_charged, SUM(d.tax_retained_r) AS f_tax_retained, SUM(d.tot_r) AS f_tot, " +
                 "agt.id_bp, agt.bp, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, re.concept, bkc.code, cob.code, " +

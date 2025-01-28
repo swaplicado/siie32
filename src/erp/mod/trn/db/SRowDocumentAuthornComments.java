@@ -20,6 +20,7 @@ public class SRowDocumentAuthornComments implements SGridRow {
     private String msUser;
     private boolean mbAuthorn;
     private boolean mbReject;
+    private boolean mbDeleted;
     
     public void setDateMov(Date t) { mtDateMov = t; }
     public void setNum(String s) { msNum = s; }
@@ -27,6 +28,7 @@ public class SRowDocumentAuthornComments implements SGridRow {
     public void setUser(String s) { msUser = s; }
     public void setAuthorn(boolean b) { mbAuthorn = b; }
     public void setReject(boolean b) { mbReject = b; }
+    public void setDeleted(boolean b) { mbDeleted = b; }
     
     @Override
     public int[] getRowPrimaryKey() {
@@ -74,6 +76,7 @@ public class SRowDocumentAuthornComments implements SGridRow {
             case 3: value = msUser; break;
             case 4: value = mbAuthorn; break;
             case 5: value = mbReject; break;
+            case 6: value = mbDeleted; break;
         }
         
         return value;

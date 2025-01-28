@@ -244,8 +244,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         ArrayList<STableField> paQueryFields = queryRequest.getQueryFields();
         ArrayList<STableField> paQueryAdditionalFields = queryRequest.getQueryAdditionalFields();
         ArrayList<SLibRpnArgument>[] paaRpnArguments = queryRequest.getRpnArguments();
+        ArrayList<String> paQueryPrevious = queryRequest.getQueryPrevious();
         String[] paQuerySentences = queryRequest.getQuerySentences();
-
+        
         int i;
         int nColsPrimaryKey = paPrimaryKeyFields.size();
         int nColsView = paQueryFields.size();
@@ -285,6 +286,12 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         }
 
         // Execute local variable declarations, if any:
+        
+        if (paQueryPrevious != null) {
+            for (String query : paQueryPrevious) {
+                getStatement().execute(query);
+            }
+        }
 
         for (i = 0; i < paQuerySentences.length - 1; i++) {
             getStatement().execute(paQuerySentences[i]);

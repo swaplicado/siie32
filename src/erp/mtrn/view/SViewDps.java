@@ -3225,7 +3225,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
                 (mbHasCompAuthWeb ? "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, " +
-                "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SAL + ", 0) AS send, sah.name AS stat_auth, " : "") +
+                "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SAL + ", 0) AS send, " +
+                "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " +
+                "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " +
+                "ELSE sah.name END, '') AS stat_auth, " : "") +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +

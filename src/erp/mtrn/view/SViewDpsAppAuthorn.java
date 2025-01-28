@@ -183,14 +183,15 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         
         if (mnTabTypeAux01 == SDataConstantsSys.CFGS_ST_AUTHORN_PROC) {
             where += (where.isEmpty() ? "" : "AND ") + "a.fid_st_authorn IN(" + SModSysConsts.CFGS_ST_AUTHORN_PEND + ", " + SModSysConsts.CFGS_ST_AUTHORN_PROC + ") "
-                    + "AND d.fid_st_dps_authorn <> " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " ";
+                    + "AND d.fid_st_dps_authorn NOT IN (" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ", " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ") ";
         }
         else {
             if (mnShow != SDataConstantsSys.CFGS_ST_AUTHORN_NA) {
                 where += (where.isEmpty() ? "" : "AND ") + "a.fid_st_authorn = " + mnShow + " ";
             }
             else {
-                where += (where.isEmpty() ? "" : "AND ") + "a.fid_st_authorn IN(" + SModSysConsts.CFGS_ST_AUTHORN_AUTH + ", " + SModSysConsts.CFGS_ST_AUTHORN_REJ + ") ";
+                where += (where.isEmpty() ? "" : "AND ") + "(a.fid_st_authorn IN(" + SModSysConsts.CFGS_ST_AUTHORN_AUTH + ", " + SModSysConsts.CFGS_ST_AUTHORN_REJ + ") OR "
+                        + " d.fid_st_dps_authorn IN(" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ", " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ")) ";
             }
         }
         
@@ -206,7 +207,10 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                 + "bp.bp, " 
                 + "bpc.bp_key, " 
                 + "bpb.bpb, " 
-                + "sah.name AS auth_sta, " 
+                + "CASE d.fid_st_dps_authorn " 
+                + "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " 
+                + "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " 
+                + "ELSE sah.name END AS auth_sta, " 
                 + "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, "
                 + "CASE d.fid_st_dps_authorn "
                 + "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + " THEN " + STableConstants.ICON_ST_WAIT + " "

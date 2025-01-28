@@ -114,6 +114,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Autorizado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Rechazado"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Eliminado"));
 
                 return columns;
             }
@@ -144,14 +145,14 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                     "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) folio, " +
                     "IF(s.comments = '', 'SIN COMENTARIOS', s.comments) comments, " +
                     "IF(s.b_authorn, ua.usr, ur.usr) usr, " +
-                    "s.b_authorn, s.b_reject " +
+                    "s.b_authorn, s.b_reject, s.b_del " +
                     "FROM cfgu_authorn_step s " +
                     "INNER JOIN trn_dps AS d ON s.res_pk_n1_n = d.id_year AND s.res_pk_n2_n = d.id_doc " +
                     "LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
                     "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
                     "WHERE s.res_tab_name_n = 'trn_dps' " +
                     "AND s.res_pk_n1_n = " + dpsPk[0] + " AND s.res_pk_n2_n = " + dpsPk[1] + " " +
-                    "AND (s.b_authorn OR s.b_reject) AND NOT s.b_del) AS a " +
+                    "AND (s.b_authorn OR s.b_reject)) AS a " +
                     "ORDER BY dt_mov DESC;";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -162,6 +163,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                 row.setUser(resultSet.getString("usr"));
                 row.setAuthorn(resultSet.getBoolean("b_authorn"));
                 row.setReject(resultSet.getBoolean("b_reject"));
+                row.setDeleted(resultSet.getBoolean("b_del"));
                 maRowsAuthComm.add(row);
             }
         }
