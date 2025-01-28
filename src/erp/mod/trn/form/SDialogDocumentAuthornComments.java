@@ -110,11 +110,12 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha movimiento"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio pedido", 75));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 400));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 400));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Autorizado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Rechazado"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Eliminado"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario autorizado/rechazado"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Eliminado"));   
 
                 return columns;
             }
@@ -141,28 +142,32 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
             String sql = "SELECT * FROM( " +
                     "SELECT " +
+                    "us.usr AS usr_step, " + 
                     "IF(s.b_authorn, s.dt_time_authorn_n, s.dt_time_reject_n) dt_mov, " +
                     "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) folio, " +
-                    "IF(s.comments = '', 'SIN COMENTARIOS', s.comments) comments, " +
-                    "IF(s.b_authorn, ua.usr, ur.usr) usr, " +
-                    "s.b_authorn, s.b_reject, s.b_del " +
+                    "IF(s.comments = '', " +
+                    "IF(NOT s.b_authorn AND NOT s.b_reject, 'AUTORIZACIÓN PENDIENTE', 'SIN COMENTARIOS'), s.comments) comments, " +
+                    "IF(s.b_authorn, ua.usr, ur.usr) usr_auth, " +
+                    "s.b_authorn, s.b_reject, s.b_del, s.ts_usr_ins, s.lev " +
                     "FROM cfgu_authorn_step s " +
                     "INNER JOIN trn_dps AS d ON s.res_pk_n1_n = d.id_year AND s.res_pk_n2_n = d.id_doc " +
+                    "INNER JOIN erp.usru_usr AS us ON s.fk_usr_step = us.id_usr " +
                     "LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
                     "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
                     "WHERE s.res_tab_name_n = 'trn_dps' " +
                     "AND s.res_pk_n1_n = " + dpsPk[0] + " AND s.res_pk_n2_n = " + dpsPk[1] + " " +
-                    "AND (s.b_authorn OR s.b_reject)) AS a " +
-                    "ORDER BY dt_mov DESC;";
+                    ") AS a " +
+                    "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
                 row.setDateMov(resultSet.getTimestamp("dt_mov"));
                 row.setNum(resultSet.getString("folio"));
+                row.setUserStep(resultSet.getString("usr_step"));
                 row.setComments(resultSet.getString("comments"));
-                row.setUser(resultSet.getString("usr"));
                 row.setAuthorn(resultSet.getBoolean("b_authorn"));
                 row.setReject(resultSet.getBoolean("b_reject"));
+                row.setUserAuth(resultSet.getString("usr_auth"));
                 row.setDeleted(resultSet.getBoolean("b_del"));
                 maRowsAuthComm.add(row);
             }
