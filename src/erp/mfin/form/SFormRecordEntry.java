@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
@@ -1722,6 +1723,23 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 SLibUtilities.compareKeys(moRecord.getDbmsDataAccountCash().getPrimaryKey(), moFieldFkEntityId_n.getKey()) &&
                 moRecord.getDbmsDataAccountCash().getFkCurrencyId() == moFieldFkCurrencyId.getKeyAsIntArray()[0];
     }
+    
+    private ArrayList<BizPartner> getBizPartnersByFiscalId(final String fiscalId) {
+        ArrayList<BizPartner> bizPartners = new ArrayList<>();
+        
+        try {
+            String sql = "SELECT id_bp, bp FROM erp.bpsu_bp WHERE NOT b_del AND fiscal_id = '" + fiscalId + "' ORDER BY bp;";
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                bizPartners.add(new BizPartner(resultSet.getInt("id_bp"), resultSet.getString("bp")));
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        
+        return bizPartners;
+    }
 
     private void itemStateFkEntityId_n() {
         if (enableExchangeRateAccountCash()) {
@@ -1778,7 +1796,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         //jtfDebitCy.requestFocus();
     }
     
-    public void updateFilesXmlInfo() {
+    private void updateFilesXmlInfo() {
         int countFilesXml = 0;
         String nameXml = "";
         
@@ -2428,12 +2446,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
             }
             else {
+                // retrieve tax and check if filled account applies for DIOT:
+                
                 SDataTax tax = null;
-                if (jcbFkTaxId_n.getSelectedIndex() > 0) {
+                boolean isDiotAccount = false;
+                
+                if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
                     tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
                 }
 
-                boolean isDiotAccount = false;
                 try {
                     isDiotAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                             SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
@@ -2442,209 +2463,256 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     SLibUtils.showException(this, e);
                 }
                 
-                boolean isNotDefinedBizPartner = jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty();
-                boolean mustBeDefinedItem = mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }); // convenience variable
-                boolean isDefinedItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0;
-                boolean isDefinedUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d;
+                // check if filled occasional fiscal ID does not match with existing business partners:
+
+                boolean filledFieldOccasionalFiscalId = jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty(); // convenience variable
+                ArrayList<BizPartner> occasionalFiscalIdMatchingBizPartners = null;
                 
-                if (mbIsBizPartnerRequired && jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
-                else if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0 && jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no para ambos.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
-                else if (isNotDefinedBizPartner && isDiotAccount && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
-                else if (isNotDefinedBizPartner && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
-                else if (mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
-                    validation.setComponent(jcbFkTaxId_n);
-                }
-                else if (isDiotAccount && tax != null && tax.getVatType().isEmpty()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'.");
-                    validation.setComponent(jcbFkTaxId_n);
-                }
-                else if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() <= 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkEntityId_n.getText() + "'.");
-                    validation.setComponent(jcbFkEntityId_n);
-                }
-                else if ((jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0) && (mustBeDefinedItem || isDefinedItemAux || isDefinedUnits)) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
-                    validation.setComponent(jcbFkItemId_n);
-                }
-                else if (isDefinedItemAux && isDefinedUnits) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jtfUnits.getToolTipText() + "'.");
-                    validation.setComponent(jtfUnits);
-                }
-                else if (jtfFkYearId_n.isEnabled() && !moFieldFkYearId_n.validateFieldForcing()) {
-                    validation.setIsError(true);
-                    validation.setComponent(jtfFkYearId_n);
-                }
-                else if (jckIsCheckApplying.isSelected() && jcbFkCheckId_n.getSelectedIndex() <= 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsCheckApplying.getText() + "'.");
-                    validation.setComponent(jcbFkCheckId_n);
-                }
-                else {
-                    boolean isCompany = moFieldFkBizPartnerId_nr.getKeyAsIntArray() != null && moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0] == miClient.getSessionXXX().getCurrentCompany().getPkCompanyId();
-                    
-                    if (moEntryDps == null && moEntryDpsAdj != null) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
-                        validation.setComponent(jbFkDps);
+                if (filledFieldOccasionalFiscalId) {
+                    if (moFieldOccasionalFiscalId.getString().equals(DCfdConsts.RFC_GEN_NAC) && miClient.showMsgBoxConfirm("¿Está seguro desea que el valor del campo '" + jlOccasionalFiscalId.getText() + "' sea el RFC genérico " + DCfdConsts.RFC_GEN_NAC + "?") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
+                        validation.setComponent(jcbOccasionalFiscalId);
                     }
-                    else if (moEntryDps == null && isDiotAccount && !isCompany && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkDps.getText() + "'?") != JOptionPane.YES_OPTION) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
-                        validation.setComponent(jbFkDps);
-                    }
-                    else if (moEntryDps != null && moFieldFkCurrencyId.getKeyAsIntArray()[0] != moEntryDps.getFkCurrencyId()) {
-                        validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + moEntryDps.getDbmsCurrency() + "'.");
-                        validation.setComponent(jcbFkCurrencyId);
-                    }
-                    else if (moEntryDps != null && moEntryDpsAdj != null && moEntryDps.getFkCurrencyId() != moEntryDpsAdj.getFkCurrencyId()) {
-                        validation.setMessage("La moneda de los campos '" + jlFkDps.getText() + "' y '" + jlFkDpsAdj.getText() + "' debe ser la misma.");
-                        validation.setComponent(jbFkDps);
+                    else if (moFieldOccasionalFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT) && miClient.showMsgBoxConfirm("¿Está seguro desea que el valor del campo '" + jlOccasionalFiscalId.getText() + "' sea el RFC genérico " + DCfdConsts.RFC_GEN_INT + "?") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
+                        validation.setComponent(jcbOccasionalFiscalId);
                     }
                     else {
-                        if (moFieldDebitCy.getDouble() == 0d && moFieldCreditCy.getDouble() == 0d && !jckIsExchangeDifference.isSelected()) {
-                            if (miClient.showMsgBoxConfirm("No se ha especificado un valor para los campos '" + jlDebitCy.getText() + "' o '" + jlCreditCy.getText() + "'.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDebitCy.getText() + "' o '" + jlCreditCy.getText() + "'.");
-                                validation.setComponent(jtfDebitCy);
+                        occasionalFiscalIdMatchingBizPartners = getBizPartnersByFiscalId(moFieldOccasionalFiscalId.getString());
+
+                        if (!occasionalFiscalIdMatchingBizPartners.isEmpty()) {
+                            message = "Hay " + SLibUtils.DecimalFormatInteger.format(occasionalFiscalIdMatchingBizPartners.size()) + " "
+                                    + (occasionalFiscalIdMatchingBizPartners.size() == 1 ? "asociado" : "asociados") + " de negocio "
+                                    + "con el mismo RFC capturado en el campo '" + jlOccasionalFiscalId.getText() + "', " + moFieldOccasionalFiscalId.getString() + ":";
+
+                            for (int i = 0; i < occasionalFiscalIdMatchingBizPartners.size(); i++) {
+                                message += "\n" + (i + 1) + ". " + occasionalFiscalIdMatchingBizPartners.get(i).Name;
+                            }
+
+                            message += "\n¿Desea limpiar el valor del campo '" + jlOccasionalFiscalId.getText() + "' y seleccionar a '" + occasionalFiscalIdMatchingBizPartners.get(0).Name + "' en el campo '" + jlFkBizPartnerId_nr.getText() + "'?";
+
+                            if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
+                                filledFieldOccasionalFiscalId = false;
+                                moFieldOccasionalFiscalId.resetField();
+                                moFieldFkBizPartnerId_nr.setFieldValue(new int[] { occasionalFiscalIdMatchingBizPartners.get(0).Id });
+                            }
+                            else {
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
+                                validation.setComponent(jcbOccasionalFiscalId);
                             }
                         }
+                    }
+                }
+                
+                if (!validation.getIsError()) {
+                    // further inpút validations:
 
-                        if (!validation.getIsError()) {
-                            if (jckIsExchangeDifference.isSelected() && moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
-                                validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser diferente de: '" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency() + "',\n" +
-                                        " debido a que está seleccionado el campo '" + jckIsExchangeDifference.getText() + "'.");
-                                validation.setComponent(jcbFkCurrencyId);
-                            }
+                    boolean missingFieldsBizPartnerAndOccasionalFiscalId = jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty(); // convenience variable
+                    boolean missingFieldItem = mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }); // convenience variable
+                    boolean filledFieldItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0; // convenience variable
+                    boolean filledFieldUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d; // convenience variable
 
-                            if (moFieldDebit.getDouble() == 0d && moFieldCredit.getDouble() == 0d) {
-                               if (miClient.showMsgBoxConfirm("No se ha especificado un valor para los campos '" + jlDebit.getText() + "' o '" + jlCredit.getText() + "'.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDebit.getText() + "' o '" + jlCredit.getText() + "'.");
-                                    validation.setComponent(jtfDebit);
+                    if (mbIsBizPartnerRequired && jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
+                        validation.setComponent(jcbFkBizPartnerId_nr);
+                    }
+                    else if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0 && filledFieldOccasionalFiscalId) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no para ambos al mismo tiempo.");
+                        validation.setComponent(jcbFkBizPartnerId_nr);
+                    }
+                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && isDiotAccount && miClient.showMsgBoxConfirm("¿Está seguro desea dejar sin valor los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
+                            + "(La cuenta contable '" + moPanelFkAccountId.getFieldAccount().getString() + "' aplica para la DIOT.)") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
+                        validation.setComponent(jcbFkBizPartnerId_nr);
+                    }
+                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && tax != null && miClient.showMsgBoxConfirm("¿Está seguro desea dejar sin valor los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
+                            + "(Se seleccionó el valor '" + tax.getTax() + "' para el campo '" + jlFkTaxId_n.getText() + "'.)") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
+                        validation.setComponent(jcbFkBizPartnerId_nr);
+                    }
+                    else if (mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
+                        validation.setComponent(jcbFkTaxId_n);
+                    }
+                    else if (isDiotAccount && tax != null && tax.getVatType().isEmpty()) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'.");
+                        validation.setComponent(jcbFkTaxId_n);
+                    }
+                    else if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() <= 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkEntityId_n.getText() + "'.");
+                        validation.setComponent(jcbFkEntityId_n);
+                    }
+                    else if ((jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0) && (missingFieldItem || filledFieldItemAux || filledFieldUnits)) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
+                        validation.setComponent(jcbFkItemId_n);
+                    }
+                    else if (filledFieldItemAux && filledFieldUnits) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jtfUnits.getToolTipText() + "'.");
+                        validation.setComponent(jtfUnits);
+                    }
+                    else if (jtfFkYearId_n.isEnabled() && !moFieldFkYearId_n.validateFieldForcing()) {
+                        validation.setIsError(true);
+                        validation.setComponent(jtfFkYearId_n);
+                    }
+                    else if (jckIsCheckApplying.isSelected() && jcbFkCheckId_n.getSelectedIndex() <= 0) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckIsCheckApplying.getText() + "'.");
+                        validation.setComponent(jcbFkCheckId_n);
+                    }
+                    else {
+                        boolean isCompany = moFieldFkBizPartnerId_nr.getKeyAsIntArray() != null && moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0] == miClient.getSessionXXX().getCurrentCompany().getPkCompanyId();
+
+                        if (moEntryDps == null && moEntryDpsAdj != null) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
+                            validation.setComponent(jbFkDps);
+                        }
+                        else if (moEntryDps == null && isDiotAccount && !isCompany && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkDps.getText() + "'?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
+                            validation.setComponent(jbFkDps);
+                        }
+                        else if (moEntryDps != null && moFieldFkCurrencyId.getKeyAsIntArray()[0] != moEntryDps.getFkCurrencyId()) {
+                            validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + moEntryDps.getDbmsCurrency() + "'.");
+                            validation.setComponent(jcbFkCurrencyId);
+                        }
+                        else if (moEntryDps != null && moEntryDpsAdj != null && moEntryDps.getFkCurrencyId() != moEntryDpsAdj.getFkCurrencyId()) {
+                            validation.setMessage("La moneda de los campos '" + jlFkDps.getText() + "' y '" + jlFkDpsAdj.getText() + "' debe ser la misma.");
+                            validation.setComponent(jbFkDps);
+                        }
+                        else {
+                            if (moFieldDebitCy.getDouble() == 0d && moFieldCreditCy.getDouble() == 0d && !jckIsExchangeDifference.isSelected()) {
+                                if (miClient.showMsgBoxConfirm("No se ha especificado un valor para los campos '" + jlDebitCy.getText() + "' o '" + jlCreditCy.getText() + "'.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDebitCy.getText() + "' o '" + jlCreditCy.getText() + "'.");
+                                    validation.setComponent(jtfDebitCy);
                                 }
                             }
 
                             if (!validation.getIsError()) {
-                                if (moFieldExchangeRate.getDouble() == 0d && !jckIsExchangeDifference.isSelected()) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlExchangeRate.getText() + "'.");
-                                    validation.setComponent(jtfExchangeRate);
+                                if (jckIsExchangeDifference.isSelected() && moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+                                    validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser diferente de: '" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency() + "',\n" +
+                                            " debido a que está seleccionado el campo '" + jckIsExchangeDifference.getText() + "'.");
+                                    validation.setComponent(jcbFkCurrencyId);
                                 }
-                                else if (moPanelFkCostCenterId_n.isEmptyAccountId() && (
-                                        moPanelFkAccountId.getDataAccountMajor().getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES ||
-                                        moPanelFkAccountId.getDataAccountMajor().getDbmsIsRequiredCostCenter() ||
-                                        moPanelFkAccountId.getCurrentInputAccount().getDbmsIsRequiredCostCenter())) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
-                                    validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
-                                }
-                                else {
-                                    if (!moPanelFkCostCenterId_n.isEmptyAccountId()) {
-                                        // Cost center has been specified and must be validated:
 
-                                        message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moRecord.getDate());
-
-                                        if (message.length() > 0) {
-                                            validation.setMessage(message);
-                                            validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
-                                        }
+                                if (moFieldDebit.getDouble() == 0d && moFieldCredit.getDouble() == 0d) {
+                                   if (miClient.showMsgBoxConfirm("No se ha especificado un valor para los campos '" + jlDebit.getText() + "' o '" + jlCredit.getText() + "'.\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDebit.getText() + "' o '" + jlCredit.getText() + "'.");
+                                        validation.setComponent(jtfDebit);
                                     }
+                                }
 
-                                    if (!validation.getIsError()) {
-                                        if (moRecord.getDbmsDataAccountCash() != null) {
-                                            // Record has a cash account, validate record entry currency:
+                                if (!validation.getIsError()) {
+                                    if (moFieldExchangeRate.getDouble() == 0d && !jckIsExchangeDifference.isSelected()) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlExchangeRate.getText() + "'.");
+                                        validation.setComponent(jtfExchangeRate);
+                                    }
+                                    else if (moPanelFkCostCenterId_n.isEmptyAccountId() && (
+                                            moPanelFkAccountId.getDataAccountMajor().getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES ||
+                                            moPanelFkAccountId.getDataAccountMajor().getDbmsIsRequiredCostCenter() ||
+                                            moPanelFkAccountId.getCurrentInputAccount().getDbmsIsRequiredCostCenter())) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
+                                        validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                                    }
+                                    else {
+                                        if (!moPanelFkCostCenterId_n.isEmptyAccountId()) {
+                                            // Cost center has been specified and must be validated:
 
-                                            if (moRecord.getDbmsDataAccountCash().getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
-                                                currency = SDataReadDescriptions.getCatalogueDescription(miClient,
-                                                        SDataConstants.CFGU_CUR, new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
-                                                if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
-                                                        "la moneda de la cuenta de efectivo de la póliza contable (" + currency + ").\n" +
-                                                        "¿Desea continuar?") != JOptionPane.YES_OPTION) {
-                                                    validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + currency + "'.");
-                                                    validation.setComponent(jcbFkCurrencyId);
-                                                }
+                                            message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moRecord.getDate());
+
+                                            if (message.length() > 0) {
+                                                validation.setMessage(message);
+                                                validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
                                             }
                                         }
 
                                         if (!validation.getIsError()) {
-                                            if (moEntryAccountCash != null) {
-                                                // Record entry has a cash account:
+                                            if (moRecord.getDbmsDataAccountCash() != null) {
+                                                // Record has a cash account, validate record entry currency:
 
-                                                // Validate bookeeping account:
-
-                                                if (moEntryAccountCash.getFkAccountId().compareTo(moPanelFkAccountId.getCurrentInputAccount().getPkAccountIdXXX()) != 0) {
-                                                    if (miClient.showMsgBoxConfirm("La cuenta contable de esta partida no coincide con " +
-                                                            "la cuenta contable de la cuenta de efectivo de la partida (" + moEntryAccountCash.getFkAccountId() + ").\n" +
+                                                if (moRecord.getDbmsDataAccountCash().getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
+                                                    currency = SDataReadDescriptions.getCatalogueDescription(miClient,
+                                                            SDataConstants.CFGU_CUR, new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
+                                                    if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
+                                                            "la moneda de la cuenta de efectivo de la póliza contable (" + currency + ").\n" +
                                                             "¿Desea continuar?") != JOptionPane.YES_OPTION) {
-                                                        validation.setMessage("El valor para el campo '" + moPanelFkAccountId.getFieldAccountLabel().getText() + "' debe ser: '" + moEntryAccountCash.getFkAccountId() + "'.");
-                                                        validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
+                                                        validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + currency + "'.");
+                                                        validation.setComponent(jcbFkCurrencyId);
                                                     }
                                                 }
+                                            }
 
-                                                if (!validation.getIsError()) {
-                                                    // Validate record entry currency:
+                                            if (!validation.getIsError()) {
+                                                if (moEntryAccountCash != null) {
+                                                    // Record entry has a cash account:
 
-                                                    if (moEntryAccountCash.getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
-                                                        currency = SDataReadDescriptions.getCatalogueDescription(miClient,
-                                                                SDataConstants.CFGU_CUR, new int[] { moEntryAccountCash.getFkCurrencyId() });
-                                                        if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
-                                                                "la moneda de la cuenta de efectivo de la partida (" + currency + ").\n" +
+                                                    // Validate bookeeping account:
+
+                                                    if (moEntryAccountCash.getFkAccountId().compareTo(moPanelFkAccountId.getCurrentInputAccount().getPkAccountIdXXX()) != 0) {
+                                                        if (miClient.showMsgBoxConfirm("La cuenta contable de esta partida no coincide con " +
+                                                                "la cuenta contable de la cuenta de efectivo de la partida (" + moEntryAccountCash.getFkAccountId() + ").\n" +
                                                                 "¿Desea continuar?") != JOptionPane.YES_OPTION) {
-                                                            validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + currency + "'.");
-                                                            validation.setComponent(jcbFkCurrencyId);
+                                                            validation.setMessage("El valor para el campo '" + moPanelFkAccountId.getFieldAccountLabel().getText() + "' debe ser: '" + moEntryAccountCash.getFkAccountId() + "'.");
+                                                            validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
+                                                        }
+                                                    }
+
+                                                    if (!validation.getIsError()) {
+                                                        // Validate record entry currency:
+
+                                                        if (moEntryAccountCash.getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
+                                                            currency = SDataReadDescriptions.getCatalogueDescription(miClient,
+                                                                    SDataConstants.CFGU_CUR, new int[] { moEntryAccountCash.getFkCurrencyId() });
+                                                            if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
+                                                                    "la moneda de la cuenta de efectivo de la partida (" + currency + ").\n" +
+                                                                    "¿Desea continuar?") != JOptionPane.YES_OPTION) {
+                                                                validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser: '" + currency + "'.");
+                                                                validation.setComponent(jcbFkCurrencyId);
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
 
-                                    if (!validation.getIsError()) {
-                                        // Validate than amounts in domestic and original currencies are correct:
+                                        if (!validation.getIsError()) {
+                                            // Validate than amounts in domestic and original currencies are correct:
 
-                                        if (moFieldDebitCy.getDouble() != 0d) {
-                                            // Validate debit amount:
-                                            message = SDataUtilities.validateExchangeRate(miClient, moFieldDebitCy.getDouble(), moFieldExchangeRate.getDouble(), moFieldDebit.getDouble(), jlExchangeRate.getText());
-                                            if (message.length() > 0) {
-                                                if (miClient.showMsgBoxConfirm(message + "\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDebitCy.getText() + "'.");
-                                                    validation.setComponent(jtfDebitCy);
+                                            if (moFieldDebitCy.getDouble() != 0d) {
+                                                // Validate debit amount:
+                                                message = SDataUtilities.validateExchangeRate(miClient, moFieldDebitCy.getDouble(), moFieldExchangeRate.getDouble(), moFieldDebit.getDouble(), jlExchangeRate.getText());
+                                                if (message.length() > 0) {
+                                                    if (miClient.showMsgBoxConfirm(message + "\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDebitCy.getText() + "'.");
+                                                        validation.setComponent(jtfDebitCy);
+                                                    }
                                                 }
                                             }
-                                        }
-                                        else {
-                                            // Validate credit amount:
-                                            message = SDataUtilities.validateExchangeRate(miClient, moFieldCreditCy.getDouble(), moFieldExchangeRate.getDouble(), moFieldCredit.getDouble(), jlExchangeRate.getText());
-                                            if (message.length() > 0) {
-                                                if (miClient.showMsgBoxConfirm(message + "\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDebitCy.getText() + "'.");
-                                                    validation.setComponent(jtfDebitCy);
+                                            else {
+                                                // Validate credit amount:
+                                                message = SDataUtilities.validateExchangeRate(miClient, moFieldCreditCy.getDouble(), moFieldExchangeRate.getDouble(), moFieldCredit.getDouble(), jlExchangeRate.getText());
+                                                if (message.length() > 0) {
+                                                    if (miClient.showMsgBoxConfirm(message + "\n" + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDebitCy.getText() + "'.");
+                                                        validation.setComponent(jtfDebitCy);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        
-                        if (!validation.getIsError()) {
-                            if (moEntryDps != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
-                                if (moEntryDps.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
-                                    validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento seleccionado.");
-                                    validation.setComponent(jcbFkBizPartnerId_nr);
+
+                            if (!validation.getIsError()) {
+                                if (moEntryDps != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
+                                    if (moEntryDps.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
+                                        validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento seleccionado.");
+                                        validation.setComponent(jcbFkBizPartnerId_nr);
+                                    }
                                 }
-                            }
-                            
-                            if (!validation.getIsError() && moEntryDpsAdj != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
-                                if (moEntryDpsAdj.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
-                                    validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento de ajuste seleccionado.");
-                                    validation.setComponent(jcbFkBizPartnerId_nr);
+
+                                if (!validation.getIsError() && moEntryDpsAdj != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
+                                    if (moEntryDpsAdj.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
+                                        validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento de ajuste seleccionado.");
+                                        validation.setComponent(jcbFkBizPartnerId_nr);
+                                    }
                                 }
                             }
                         }
@@ -3259,6 +3327,16 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     itemStateIsExchangeDifference();
                 }
             }
+        }
+    }
+    
+    private class BizPartner {
+        public int Id;
+        public String Name;
+        
+        public BizPartner(final int id, final String name) {
+            Id = id;
+            Name = name;
         }
     }
 }

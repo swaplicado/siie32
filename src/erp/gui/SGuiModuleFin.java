@@ -725,7 +725,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
         
         jmRepFiscal = new JMenu("Reportes fiscales");
-        jmiRepFiscalDiotLayout = new JMenuItem("Layout DIOT...");
+        jmiRepFiscalDiotLayout = new JMenuItem("Layout de la DIOT...");
         jmiRepFiscalTaxPendSal = new JMenuItem("Impuestos pendientes de ingresos...");
         jmiRepFiscalTaxPendPur = new JMenuItem("Impuestos pendientes de egresos...");
         jmiRepFiscalXmlFiles = new JMenuItem("Archivos de contabilidad electrónica...");

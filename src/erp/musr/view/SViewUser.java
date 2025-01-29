@@ -13,18 +13,17 @@ import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
+import erp.mcfg.data.SCfgUtils;
 import erp.musr.form.SFormExportUser;
 import erp.siieapp.SUserExportUtils;
 import java.awt.Dimension;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
-import sa.lib.gui.SGuiConsts;
-import java.util.Vector;
 import sa.lib.gui.SGuiClient;
-import erp.mcfg.data.SCfgUtils;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -81,7 +80,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         //jbDelete.setEnabled(false);
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[14];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[15];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -93,6 +92,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.email", "Correo-e", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Empleado", 250);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo (empleado)", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_univ", "Acceso universal", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_edit", "Modificable", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_del", "Eliminable", STableConstants.WIDTH_BOOLEAN_2X);
@@ -202,7 +202,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
 
         msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
-                "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, b.bp " +
+                "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, b.bp, e.b_act " +
                 "FROM erp.usru_usr AS u " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "u.fid_usr_new = un.id_usr " +
@@ -212,6 +212,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 "u.fid_usr_del =  ud.id_usr " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS b ON " +
                 "b.id_bp = u.fid_bp_n " +
+                "LEFT OUTER JOIN erp.hrsu_emp AS e ON " +
+                "b.id_bp = e.id_emp " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY u.usr, u.id_usr ";
     }
