@@ -60,6 +60,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
     protected int mnTabTypeAux02;
 
     protected boolean mbFirstTime;
+    protected ArrayList<java.lang.String> maSqlPrevious;
     protected java.lang.String msSql;
     protected boolean mbIsSummaryApplying;
     protected java.text.DecimalFormat moIntegerFormat;
@@ -269,6 +270,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
 
     private void initComponentsCustom() {
         mbFirstTime = true;
+        maSqlPrevious = null;
         msSql = "";
         mbIsSummaryApplying = false;
         moIntegerFormat = new DecimalFormat("#,##0;-#,##0");
@@ -571,7 +573,8 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
                     new ArrayList<STableField>(moTablePane.getTableModel().getTableColumns()),
                     new ArrayList<STableField>(moTablePane.getAditionalFields()),
                     aaRpnArguments,
-                    new String[] { msSql });
+                    new String[] { msSql },
+                    maSqlPrevious);
             oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY, oQueryRequest);
             oResponse = miClient.getSessionXXX().request(oRequest);
 
@@ -703,6 +706,7 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
     public void setIntegerFormat(java.text.DecimalFormat o) { moIntegerFormat = o; }
     public void setTablePane(erp.lib.table.STablePane o) { moTablePane = o; }
 
+    public ArrayList<java.lang.String> getSqlPrevious() { return maSqlPrevious; }
     public java.lang.String getSql() { return msSql; }
     public boolean getIsSummaryApplying() { return mbIsSummaryApplying; }
     public java.text.DecimalFormat getIntegerFormat() { return moIntegerFormat; }

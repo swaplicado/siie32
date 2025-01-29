@@ -151,7 +151,6 @@ public class STrnDBCore {
                     + "    NOT dps.b_del AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                     + "        AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                     + "        AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                    + "        AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' "
                     + "        AND mr.id_mat_req IS NOT NULL ";
             
             // Cuando están pendientes
@@ -161,11 +160,13 @@ public class STrnDBCore {
             }
             // Todas las OC
             else if (statusFilter == 0) {
-                query += "AND tda.fid_st_authorn IN (11, 2, 3, 4, 5) ";
+                query += "AND tda.fid_st_authorn IN (11, 2, 3, 4, 5) "
+                        + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";
             }
             // Estatus específico
             else if (statusFilter > 0) {
-                query += "AND tda.fid_st_authorn = " + statusFilter + " ";
+                query += "AND tda.fid_st_authorn = " + statusFilter + " "
+                        + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";;
             }
             
             if (idUser > 0) {
@@ -423,6 +424,7 @@ public class STrnDBCore {
                     "    s.comments, " +
                     "    s.fk_usr_step, " +
                     "    s.b_req, " +
+                    "    s.b_del, " +
                     "    s.lev, " +
                     "    s.b_authorn, " +
                     "    s.b_reject, " +
@@ -434,10 +436,11 @@ public class STrnDBCore {
                     "        INNER JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u ON s.fk_usr_step = u.id_usr " +
                     "WHERE " +
-                    "    NOT s.b_del " +
-                    "        AND s.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+                    "        s.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' " +
+//                    "        AND NOT s.b_del " +
                     "        AND s.res_pk_n1_n = " + idYear + " " +
-                    "        AND s.res_pk_n2_n = " + idDoc + ";";
+                    "        AND s.res_pk_n2_n = " + idDoc + " " +
+                    "ORDER BY ts_usr_ins ASC, s.lev ASC, s.id_authorn_step ASC;";
             
             Statement st = conn.createStatement();
             System.out.println(query);
@@ -461,6 +464,7 @@ public class STrnDBCore {
                 else {
                     oStep.setStatusName("PENDIENTE");
                 }
+                oStep.setDeleted(res.getBoolean("s.b_del"));
                 lSteps.add(oStep);
             }
             oAuth.setlSteps(lSteps);
