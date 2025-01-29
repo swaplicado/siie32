@@ -43,6 +43,7 @@ public class SViewDpsPayment extends SGridPaneView {
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
     }
     
     @Override
@@ -77,7 +78,7 @@ public class SViewDpsPayment extends SGridPaneView {
                     }
                 }
                 row.getRowValueAt(10);
-                row.setRowValueAt(10, count + 1);
+                row.setRowValueAt(count + 1, 10);
                 row.getRowValueAt(10);
                 count++;
             }
