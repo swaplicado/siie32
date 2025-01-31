@@ -19,6 +19,7 @@ public class SWebDpsRow {
     private String dpsNumRef;
     private String provider;
     private String providerFiscalId;
+    private String costCenters;
     private double subTotal;
     private double taxCharged;
     private double taxRetained;
@@ -39,6 +40,7 @@ public class SWebDpsRow {
     private String dpsUser;
     private String matReqUser;
     private String notesAuth;
+    private String userInTurn;
 
     public int getIdYear() {
         return idYear;
@@ -102,6 +104,14 @@ public class SWebDpsRow {
 
     public void setProviderFiscalId(String providerFiscalId) {
         this.providerFiscalId = providerFiscalId;
+    }
+
+    public String getCostCenters() {
+        return costCenters;
+    }
+
+    public void setCostCenters(String costCenters) {
+        this.costCenters = costCenters;
     }
 
     public double getSubTotal() {
@@ -262,6 +272,14 @@ public class SWebDpsRow {
 
     public void setNotesAuth(String notesAuth) {
         this.notesAuth = notesAuth;
+    }
+
+    public String getUserInTurn() {
+        return userInTurn;
+    }
+
+    public void setUserInTurn(String userInTurn) {
+        this.userInTurn = userInTurn;
     }
     
 }
