@@ -17,11 +17,10 @@ import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartner;
 import erp.musr.data.SDataUser;
 import erp.musr.data.SDataUserAppRow;
+import erp.musr.data.SUserUtils;
 import erp.siieapp.SUserExportUtils;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -29,30 +28,26 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import sa.lib.gui.SGuiClient;
 
-
 /**
  *
- * @author SW
+ * @author SW, Edwin Carmona
  */
 public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
-    
+
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldEmail;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private ArrayList<SDataUserAppRow> lApps;
-    private JCheckBox[] checkboxes;
     private int mnUserId;
     private STablePane moUserPane;
     private SDataUser user;
     private SDataBizPartner moBizPartner;
-    
+    private int mnFormResult;
+
     /**
      * Creates new form SFormRedisSessionLocks
      */
@@ -72,12 +67,12 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
     private void initComponentsExtra() throws SQLException, ParseException {
         mvFields = new Vector<>();
         mvFields.add(moFieldEmail);
-        
+
         erp.lib.table.STableColumnForm tableColumnsUserRoles[];
-        
+
         moUserPane = new STablePane(miClient);
         jpUserApps.add(moUserPane, BorderLayout.CENTER);
-        
+
         int i = 0;
         tableColumnsUserRoles = new STableColumnForm[3];
         tableColumnsUserRoles[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre", 200);
@@ -88,76 +83,46 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
         for (i = 0; i < tableColumnsUserRoles.length; i++) {
             moUserPane.addTableColumn(tableColumnsUserRoles[i]);
         }
-        
+
         jbCancel.addActionListener(this);
         jbExport.addActionListener(this);
     }
-    
-    private void initCustom() throws SQLException, ParseException{
-        user = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[] { mnUserId }, SLibConstants.EXEC_MODE_SILENT);
-        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { user.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT);
+
+    private void initCustom() throws SQLException, ParseException {
+        user = (SDataUser) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.USRU_USR, new int[]{mnUserId}, SLibConstants.EXEC_MODE_SILENT);
+        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[]{user.getFkBizPartnerId_n()}, SLibConstants.EXEC_MODE_SILENT);
         if (user.getFkBizPartnerId_n() == 0) {
             if (miClient.showMsgBoxConfirm("Este usuario no tiene un asociado de negocios, ¿Deseas continuar?") != JOptionPane.YES_OPTION) {
                 return;
             }
         }
-        
+
         SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
         String token = oExport.loginSiieApp();
-        if( token.isEmpty() ){
+        if (token.isEmpty()) {
             return;
         }
         lApps = oExport.getUserApps(mnUserId, token);
-        if(lApps == null){
+        if (lApps == null) {
             return;
         }
         jtfUser.setText(user.getUser());
         jtfEmail.setText(user.getEmail());
         moFieldEmail = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
         moFieldEmail.setAutoCaseType(SLibConstants.CASE_LOWER);
-        
+
         moUserPane.createTable();
         moUserPane.clearTableRows();
-        
+
         for (SDataUserAppRow oAppRow : lApps) {
             moUserPane.addTableRow(oAppRow);
         }
         moUserPane.renderTableRows();
     }
-    
-    private void agregarCheckboxesDinamicamente() {
-        // Crea un arreglo de strings con los textos de los checkboxes
-        int numFilas = (int) Math.ceil(lApps.size() / 3.0);
-        int numColumnas = 3;
 
-        // Crea un arreglo de checkboxes
-        checkboxes = new JCheckBox[lApps.size()];
-
-        // Configura el layout del JPanel
-        jpUserApps.setLayout(new GridLayout(numFilas, numColumnas));
-
-        // Obtener las claves del JSONObject
-        int i = 0;
-        for (Object obj : lApps) {
-            JSONObject app = (JSONObject) obj;
-            checkboxes[i] = new JCheckBox(app.get("name").toString());
-            checkboxes[i].setName(app.get("id_app").toString());
-            boolean assigned = app.get("assigned").toString().equals("1");
-            checkboxes[i].setSelected(assigned);
-            jpUserApps.add(checkboxes[i]);
-            i++;
-        }
-    }
-    
     @SuppressWarnings("unchecked")
-    private void actionExport(){
-//        ArrayList<SDataUserAppRow> arrApps = new ArrayList<>();
+    private void actionExport() {
         int i;
-//        for (i = 0; i < moUserPane.getTableGuiRowCount(); i++) {
-//            SDataUserAppRow role = (SDataUserAppRow) moUserPane.getTableRow(i);
-//            arrApps.add(role);
-//        }
-        
         ArrayList<Vector> VecApps = new ArrayList<>();
         Vector<Object> vec = null;
         i = 0;
@@ -168,13 +133,13 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
             VecApps.add(vec);
             i++;
         }
-        
+
         Statement statement = miClient.getSession().getStatement();
-            
+
         String sql = "UPDATE erp.usru_usr as u"
-                    + " SET u.email = " + "'" + moFieldEmail.getString() + "'"
-                    + " WHERE u.id_usr = " + "'" + mnUserId + "'" + ";";
-        
+                + " SET u.email = " + "'" + moFieldEmail.getString() + "'"
+                + " WHERE u.id_usr = " + "'" + mnUserId + "'" + ";";
+
         try {
             statement.executeUpdate(sql);
             user.setEmail(moFieldEmail.getString());
@@ -185,8 +150,10 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
         try {
             SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
             boolean res = oExport.exportUser(user, moBizPartner, VecApps);
-            if(res){
+            if (res) {
                 miClient.showMsgBoxInformation("Usuario exportado con éxito");
+                SUserUtils.updateLastSyncDate(miClient.getSession(), mnUserId);
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
                 this.setVisible(false);
             }
         } catch (Exception e) {
@@ -348,7 +315,6 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfUser;
     // End of variables declaration//GEN-END:variables
 
-    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -358,6 +324,7 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
     public void formReset() {
         moUserPane.createTable(null);
         moUserPane.clearTableRows();
+        mnFormResult = SLibConstants.UNDEFINED;
     }
 
     @Override
@@ -403,7 +370,7 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
     @Override
     public void setValue(int id, Object value) {
         this.mnUserId = id;
-        
+
         try {
             initCustom();
         } catch (SQLException ex) {
@@ -430,7 +397,8 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
 
             if (button == jbCancel) {
                 setVisible(false);
-            } else if (button == jbExport) {
+            }
+            else if (button == jbExport) {
                 actionExport();
             }
         }

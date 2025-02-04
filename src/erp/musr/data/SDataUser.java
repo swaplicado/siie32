@@ -50,9 +50,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
+    protected int mnFkUserExportId;
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
+    protected java.util.Date mtUserExportTs;
     
     // members for management of data registry:
 
@@ -120,6 +122,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
+    public void setUserExportTs(java.util.Date t) { mtUserExportTs = t; }
 
     public int getPkUserId() { return mnPkUserId; }
     public java.lang.String getUser() { return msUser; }
@@ -138,6 +141,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
+    public java.util.Date getUserExportTs() { return mtUserExportTs; }
 
     public java.util.Vector<SDataTypeModule> getDbmsTypeModules() { return mvDbmsTypeModules; }
     public java.util.Vector<SDataUserPrivilegeUser> getDbmsUserPrivilegesUser() { return mvDbmsUserPrivilegesUser; }
