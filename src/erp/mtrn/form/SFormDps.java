@@ -4235,6 +4235,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdiTaxRegimeReceptor.setEnabled(enableFields && isCfdi33or40);
         jcbCfdiCfdiUsage.setEnabled(enableFields && isCfdi33or40);
         jcbExportation.setEnabled(enableFields && isCfdi33or40);
+        if (!jcbExportation.isEnabled()) {
+            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
+        }
         jtfCfdiConfirmation.setEnabled(enableFields && isCfdi33or40);
         jtfCfdiConfirmation.setFocusable(enableFields && isCfdi33or40);
         jbCfdiRelatedDocs.setEnabled(enableFields && isCfdi33or40);
@@ -4261,6 +4264,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceRequestKey.setEnabled(enableFields);
         jcbExportation.setEnabled((enableFields && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice));
+        if (!jcbExportation.isEnabled()) {
+            moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
+        }
         jtfCfdCceCertificateOrigin.setEnabled(enableFields);
         jtfCfdCceCertificateOrigin.setFocusable(enableFields);
         jtfCfdCceNumberCertificateOrigin.setEnabled(enableFields);
