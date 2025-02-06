@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiUser;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores, Claudio Peña
+ * @author Sergio Flores, Alfonso Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     
@@ -47,14 +47,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected boolean mbIsDeleted;
     protected int mnFkUserTypeId;
     protected int mnFkBizPartnerId_n;
+    protected int mnFkUserLastSyncId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
-    protected int mnFkUserExportId;
+    protected java.util.Date mtUserLastSyncTs_n;
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
-    protected java.util.Date mtUserExportTs;
     
     // members for management of data registry:
 
@@ -116,13 +116,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserTypeId(int n) { mnFkUserTypeId = n; }
     public void setFkBizPartnerId_n(int n) { mnFkBizPartnerId_n = n; }
+    public void setFkUserLastSyncId_n(int n) { mnFkUserLastSyncId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
+    public void setUserLastSyncTs_n(java.util.Date t) { mtUserLastSyncTs_n = t; }
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
-    public void setUserExportTs(java.util.Date t) { mtUserExportTs = t; }
 
     public int getPkUserId() { return mnPkUserId; }
     public java.lang.String getUser() { return msUser; }
@@ -135,13 +136,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserTypeId() { return mnFkUserTypeId; }
     public int getFkBizPartnerId_n() { return mnFkBizPartnerId_n; }
+    public int getFkUserLastSyncId_n() { return mnFkUserLastSyncId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
+    public java.util.Date getUserLastSyncTs_n() { return mtUserLastSyncTs_n; }
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
-    public java.util.Date getUserExportTs() { return mtUserExportTs; }
 
     public java.util.Vector<SDataTypeModule> getDbmsTypeModules() { return mvDbmsTypeModules; }
     public java.util.Vector<SDataUserPrivilegeUser> getDbmsUserPrivilegesUser() { return mvDbmsUserPrivilegesUser; }
@@ -188,9 +190,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         mbIsDeleted = false;
         mnFkUserTypeId = 0;
         mnFkBizPartnerId_n = 0;
+        mnFkUserLastSyncId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
+        mtUserLastSyncTs_n = null;
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
@@ -248,9 +252,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUserTypeId = resultSet.getInt("fid_tp_usr");
                 mnFkBizPartnerId_n = resultSet.getInt("fid_bp_n");
+                mnFkUserLastSyncId_n = resultSet.getInt("fid_usr_last_sync_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
+                mtUserLastSyncTs_n = resultSet.getTimestamp("ts_last_sync_n");
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");

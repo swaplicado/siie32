@@ -21,8 +21,8 @@ public class SUserUtils {
         Statement statement = oSession.getStatement();
             
         String sql = "UPDATE erp.usru_usr as u "
-                    + "SET u.ts_last_sync = NOW(), "
-                    + "fid_usr_sync = " + oSession.getUser().getPkUserId() + " "
+                    + "SET u.ts_last_sync_n = NOW(), "
+                    + "fid_usr_last_sync_n = " + oSession.getUser().getPkUserId() + " "
                     + "WHERE u.id_usr = " + userId + ";";
         
         try {

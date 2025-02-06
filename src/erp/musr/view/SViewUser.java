@@ -103,7 +103,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uls.usr", "Usr. sincronización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_last_sync", "Sincronización", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_last_sync_n", "Sincronización", STableConstants.WIDTH_DATE_TIME);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
@@ -205,7 +205,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
 
         msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
-                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync, un.usr, ue.usr, ud.usr, uls.usr, b.bp, e.b_act "
+                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, e.b_act "
                 + "FROM erp.usru_usr AS u "
                 + "INNER JOIN erp.usru_usr AS un ON "
                 + "u.fid_usr_new = un.id_usr "
@@ -214,7 +214,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "INNER JOIN erp.usru_usr AS ud ON "
                 + "u.fid_usr_del =  ud.id_usr "
                 + "LEFT JOIN erp.usru_usr AS uls ON "
-                + "u.fid_usr_sync =  uls.id_usr "
+                + "u.fid_usr_last_sync_n =  uls.id_usr "
                 + "LEFT OUTER JOIN erp.bpsu_bp AS b ON "
                 + "b.id_bp = u.fid_bp_n "
                 + "LEFT OUTER JOIN erp.hrsu_emp AS e ON "

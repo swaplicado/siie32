@@ -354,7 +354,7 @@ public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form
 
     @Override
     public int getFormResult() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return mnFormResult;
     }
 
     @Override
