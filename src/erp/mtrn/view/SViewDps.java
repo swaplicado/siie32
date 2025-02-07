@@ -93,7 +93,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -178,6 +178,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightLogistics;
     private boolean mbHasCompAuthWeb;
     private int mnModule;
+    private int idBpGOM = 1995; //id bp GOM
     
     /**
      * View to audit documents.
@@ -1861,7 +1862,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sSuprAgt", supr == null ? null : SLibUtils.textToAscii(supr.getFirstname() + " " + supr.getLastname()));
                             map.put("sAgt", agt == null ? null : SLibUtils.textToAscii(agt.getFirstname() + " " + agt.getLastname()));
                             map.put("sAcro", acro);
-                            if (agt.getPkBizPartnerId() == 1995 ) {
+                            if (agt.getPkBizPartnerId() == idBpGOM ) {
                                 map.put("printAcro", false);
                             } else {
                                 map.put("printAcro", true);
@@ -2400,7 +2401,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sAgt", agt == null ? null : SLibUtils.textToAscii(agt.getFirstname() + " " + agt.getLastname()));
                             map.put("lan", SLibConstants.LAN_ENGLISH);
                             map.put("sAcro", acro);
-                            if (agt.getPkBizPartnerId() == 1995 ) {
+                            if (agt.getPkBizPartnerId() == idBpGOM ) {
                                 map.put("printAcro", false);
                             } else {
                                 map.put("printAcro", true);

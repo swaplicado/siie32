@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 262.4/ 2025-02-07 Jhonatan Claudio PEÑA HERNÁNDEZ
+
+1) Corrección del reporte de contratos en ingles con ítem
+2) Adición de de columna cantidad entregada y tabla de condiciones de entrega al reporte de ordenes de producción
+3) Nuevo reporte de Axilares contables para la función CLIRepBanlenceAge
+4) Corrección del reporte de auxiliares contables con ítem y CC
+5) Corrección del asociado de negocios GOM para contratos
+6) Vista de impuestos rústicos APSA
+7) Adición de la función CLIRepBanlenceAge
+
+================================================================================
 SIIE 3.2 262.3/ 2025-02-06
 Edwin Omar CARMONA FIGUEROA
 

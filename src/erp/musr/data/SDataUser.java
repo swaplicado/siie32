@@ -252,11 +252,11 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkUserTypeId = resultSet.getInt("fid_tp_usr");
                 mnFkBizPartnerId_n = resultSet.getInt("fid_bp_n");
-                mnFkUserLastSyncId_n = resultSet.getInt("fid_usr_last_sync_n");
+//                mnFkUserLastSyncId_n = resultSet.getInt("fid_usr_last_sync_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
-                mtUserLastSyncTs_n = resultSet.getTimestamp("ts_last_sync_n");
+//                mtUserLastSyncTs_n = resultSet.getTimestamp("ts_last_sync_n");
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");

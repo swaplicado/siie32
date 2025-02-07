@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
  * 
  */
 public abstract class SDataConstantsSys {
@@ -141,6 +141,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_CFG = "TRN_MAIL_REP_SCA_TIC_CFG";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_GRP = "TRN_MAIL_REP_SCA_TIC_GRP";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_TO = "TRN_MAIL_REP_SCA_TIC_TO";
+    public static final String CFG_PARAM_TRN_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
