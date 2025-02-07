@@ -10,10 +10,10 @@ package erp.mod.hrs.link.db;
  * @author Claudio Peña
  */
 class SDataCompany {
+    
     String nameCompany;
     String rfcCompany;
     String reg_ss;
-    
     
     public String getNameCompany() {
         return nameCompany;

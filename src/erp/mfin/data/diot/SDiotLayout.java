@@ -8,6 +8,7 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataTax;
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -139,10 +140,12 @@ public class SDiotLayout {
         HashSet<String> taxFiscalIds = new HashSet<>();
         ResultSet resultSet;
         
+        // RFC ocasionales capturados en el período:
+        
         String sql = "SELECT DISTINCT re.occ_fiscal_id " +
             "FROM " +
             "fin_rec AS r " +
-            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
             "WHERE " +
             "NOT r.b_del AND NOT re.b_del AND " +
             "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
@@ -153,24 +156,32 @@ public class SDiotLayout {
             occFiscalIds.add(resultSet.getString(1));
         }
         
+        // RFC de facturas del período:
+        
+        String diotAccounts = "";
+        
+        for (String accountCode : masDiotAccountsCodes) {
+            diotAccounts += (!diotAccounts.isEmpty() ? " OR " : "") + "re.fid_acc LIKE '" + accountCode + "%'";
+        }
+        
         sql = "SELECT DISTINCT b.fiscal_id " +
             "FROM " +
             "fin_rec AS r " +
-            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
-            "INNER JOIN trn_dps AS d ON d.id_year=re.fid_dps_year_n AND d.id_doc=re.fid_dps_doc_n " +
-            "INNER JOIN erp.bpsu_bp AS b ON b.id_bp=d.fid_bp_r " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+            "INNER JOIN trn_dps AS d ON d.id_year = re.fid_dps_year_n AND d.id_doc = re.fid_dps_doc_n " +
+            "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_bp_r " +
             "WHERE " +
             "NOT r.b_del AND NOT re.b_del AND " +
             "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
-            "d.fid_ct_dps=1 AND re.fid_acc = '1160-0002-0000' " +
+            "d.fid_ct_dps = " + SModSysConsts.TRNS_CT_DPS_PUR + " " + (diotAccounts.isEmpty() ? "" : "AND (" + diotAccounts + ") ") +
             "ORDER BY b.fiscal_id;";
         resultSet = miClient.getSession().getStatement().executeQuery(sql);
         while (resultSet.next()) {
             taxFiscalIds.add(resultSet.getString(1));
         }
         
-        occFiscalIds.stream().filter((occFiscalId) -> (taxFiscalIds.contains(occFiscalId))).forEach((occFiscalId) -> {
-            moRepeatedFiscalId.add(occFiscalId);
+        occFiscalIds.stream().filter((fiscalId) -> (taxFiscalIds.contains(fiscalId))).forEach((repeatedFiscalId) -> {
+            moRepeatedFiscalId.add(repeatedFiscalId);
         });
     }
     
@@ -218,8 +229,8 @@ public class SDiotLayout {
         
         ArrayList<SDiotAccount> diotAccounts = new ArrayList<>();
         
-        for (String diotAccountCode : masDiotAccountsCodes) {
-            diotAccounts.add(new SDiotAccount(diotAccountCode, true));
+        for (String accountCode : masDiotAccountsCodes) {
+            diotAccounts.add(new SDiotAccount(accountCode, true));
         }
         
         diotAccounts.add(new SDiotAccount("", false)); // special element to trigger search in non configuration parameter accounts
@@ -245,7 +256,7 @@ public class SDiotLayout {
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "CUENTA CONTABLE: [" + diotAccount.AccountCode + "]") + " ***");
+                System.out.println("*** " + (section = "CUENTA CONTABLE CONFIGURADA PARA DIOT: [" + diotAccount.AccountCode + "]") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             else {
@@ -262,12 +273,12 @@ public class SDiotLayout {
                         + "WHERE NOT r.b_del AND NOT re.b_del AND "
                         + "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND "
                         + "al.fid_tp_acc_sys IN (" + SDataConstantsSys.FINS_TP_ACC_SYS_PUR + ", " + SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ + ") AND "
-                        + "(re.fid_tax_bas_n IS NOT NULL AND re.fid_tax_bas_n = " + manVatDefaultKey[0] + ") " // exclude taxes that are not VAT
+                        + "(re.fid_tax_bas_n IS NOT NULL AND re.fid_tax_bas_n = " + manVatDefaultKey[0] + ") " // include only VAT entries
                         + "ORDER BY r.dt, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety;";
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES") + " ***");
+                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES PARA DIOT") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             

@@ -348,6 +348,8 @@ public abstract class SModConsts {
     public static final int FINR_MAS_PRI = 2015002;
     public static final int FINR_DPS_TAX_PEND = 2015011;
     public static final int FINR_LAY_BANK = 2015021;
+    
+    public static final int TRNX_DPS_PAYS = 2015022;
 
     /*
      * Transactions

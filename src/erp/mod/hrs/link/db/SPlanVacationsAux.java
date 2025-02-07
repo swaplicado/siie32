@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author swaplicado
  */
 public class SPlanVacationsAux {
+    
     int year = 0;
     int days = 0;
     

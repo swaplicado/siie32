@@ -18,6 +18,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataTax;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -43,6 +44,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    private SDataTax moConfigDiotTax;
+    private String[] msConfigDiotAccounts;
 
     /** Creates new form SDialogDiotLayout
      * @param client GUI client.
@@ -70,31 +73,35 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlDateStart = new javax.swing.JLabel();
         jftDateStart = new javax.swing.JFormattedTextField();
         jbPickDateStart = new javax.swing.JButton();
+        jlDummy = new javax.swing.JLabel();
+        jckExcludeTotallyZero = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbPickDateEnd = new javax.swing.JButton();
-        jPanel15 = new javax.swing.JPanel();
-        jckExcludeTotallyZero = new javax.swing.JCheckBox();
-        jLabel1 = new javax.swing.JLabel();
+        jlFormat = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jrbFormatCsv = new javax.swing.JRadioButton();
         jPanel13 = new javax.swing.JPanel();
         jrbFormatPipe = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jPanel7 = new javax.swing.JPanel();
+        jspDiotConfig = new javax.swing.JScrollPane();
+        jtaDiotConfig = new javax.swing.JTextArea();
+        jPanel5 = new javax.swing.JPanel();
+        jspWarnings = new javax.swing.JScrollPane();
+        jtaWarnings = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jbSave = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Layout DIOT");
+        setTitle("Layout de la DIOT");
         setResizable(false);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del layout DIOT:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT:"));
         jPanel6.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -112,6 +119,13 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateStart.setFocusable(false);
         jbPickDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel3.add(jbPickDateStart);
+
+        jlDummy.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(jlDummy);
+
+        jckExcludeTotallyZero.setText("Excluir del layout a terceros totalmente en cero");
+        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel3.add(jckExcludeTotallyZero);
 
         jPanel6.add(jPanel3);
 
@@ -133,16 +147,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel6.add(jPanel8);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jckExcludeTotallyZero.setText("Excluir terceros totalmente en cero");
-        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel15.add(jckExcludeTotallyZero);
-
-        jPanel6.add(jPanel15);
-
-        jLabel1.setText("Formato del archivo:");
-        jPanel6.add(jLabel1);
+        jlFormat.setText("Formato del archivo:");
+        jPanel6.add(jlFormat);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -164,23 +170,48 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("ADVERTENCIAS:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para la DIOT:"));
+        jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setBackground(java.awt.SystemColor.control);
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setText("1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, p. ej., a tasa general, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, serán por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.\n\n2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas simultáneamente en el mismo asiento contable con operaciones a otras tasas de IVA, p. ej., a tasa general, serán por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT.");
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane1.setViewportView(jTextArea1);
+        jspDiotConfig.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jspDiotConfig.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jspDiotConfig.setPreferredSize(new java.awt.Dimension(100, 65));
 
-        jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jtaDiotConfig.setEditable(false);
+        jtaDiotConfig.setBackground(java.awt.SystemColor.control);
+        jtaDiotConfig.setColumns(20);
+        jtaDiotConfig.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jtaDiotConfig.setLineWrap(true);
+        jtaDiotConfig.setRows(5);
+        jtaDiotConfig.setText("1) IVA predeterminado para la DIOT: ...\n\n2) Cuentas contables para la DIOT: ...");
+        jtaDiotConfig.setWrapStyleWord(true);
+        jspDiotConfig.setViewportView(jtaDiotConfig);
+
+        jPanel7.add(jspDiotConfig, java.awt.BorderLayout.CENTER);
+
+        jPanel4.add(jPanel7, java.awt.BorderLayout.NORTH);
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Advertencias en la generación del layout de la DIOT:"));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jspWarnings.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jspWarnings.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        jtaWarnings.setEditable(false);
+        jtaWarnings.setBackground(java.awt.SystemColor.control);
+        jtaWarnings.setColumns(20);
+        jtaWarnings.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jtaWarnings.setLineWrap(true);
+        jtaWarnings.setRows(5);
+        jtaWarnings.setText("1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, p. ej., a tasa general, pero intencionalmente manipuladas para que el monto del IVA fuera igual a cero, serán por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout de la DIOT.\n\n2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas simultáneamente en el mismo asiento contable con operaciones a otras tasas de IVA, p. ej., a tasa general, serán por defecto clasificados como operaciones de IVA exento en el archivo del layout de la DIOT.");
+        jtaWarnings.setWrapStyleWord(true);
+        jspWarnings.setViewportView(jtaWarnings);
+
+        jPanel5.add(jspWarnings, java.awt.BorderLayout.CENTER);
+
+        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -199,7 +230,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(656, 439));
+        setSize(new java.awt.Dimension(736, 489));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -222,9 +253,51 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         jckExcludeTotallyZero.setSelected(true);
         jrbFormatCsv.setSelected(true);
+        
+        processConfigDiot();
                 
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
+    }
+    
+    private void processConfigDiot() {
+        
+        moConfigDiotTax = null;
+        msConfigDiotAccounts = null;
+
+        String diotConfig = "";
+        
+        try {
+            // process DIOT tax:
+            
+            moConfigDiotTax = SDiotUtils.getDiotVatDefault(miClient);
+            
+            diotConfig = "1) IVA predeterminado para la DIOT: " + (moConfigDiotTax != null ? moConfigDiotTax.getTax() + " (PK: " + SLibUtils.textKey((int[]) moConfigDiotTax.getPrimaryKey()) + ")" : "ND");
+            
+            // process DIOT accounts:
+            
+            String accounts = "";
+            
+            msConfigDiotAccounts = SDiotUtils.getDiotAccounts(miClient.getSession().getStatement());
+            
+            if (msConfigDiotAccounts.length == 1 && msConfigDiotAccounts[0].isEmpty()) {
+                msConfigDiotAccounts = null;
+            }
+            else {
+                for (int i = 0; i < msConfigDiotAccounts.length; i++) {
+                    if (!msConfigDiotAccounts[i].isEmpty()) {
+                        accounts += (accounts.isEmpty() ? "" : (i + 1 < msConfigDiotAccounts.length ? ", " : " y ")) + msConfigDiotAccounts[i];
+                    }
+                }
+            }
+            
+            diotConfig += "\n\n2) Cuentas contables para la DIOT: " + (!accounts.isEmpty() ? accounts : "ND");
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        
+        jtaDiotConfig.setText(!diotConfig.isEmpty() ? diotConfig : "ND");
     }
     
     private void computeLayout() {
@@ -301,18 +374,16 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFormat;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbPickDateEnd;
     private javax.swing.JButton jbPickDateStart;
@@ -322,28 +393,44 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlDummy;
+    private javax.swing.JLabel jlFormat;
     private javax.swing.JRadioButton jrbFormatCsv;
     private javax.swing.JRadioButton jrbFormatPipe;
+    private javax.swing.JScrollPane jspDiotConfig;
+    private javax.swing.JScrollPane jspWarnings;
+    private javax.swing.JTextArea jtaDiotConfig;
+    private javax.swing.JTextArea jtaWarnings;
     // End of variables declaration//GEN-END:variables
 
 
     public SFormValidation validateDialog() {
         SFormValidation validation = new SFormValidation();
         
-        for (SFormField field : mvFields) {
-            if (!field.validateField()) {
-                validation.setIsError(true);
-                validation.setComponent(field.getComponent());
-                break;
-            }
+        if (moConfigDiotTax == null) {
+            validation.setMessage("¡No se puede generar la DIOT!:\n"
+                    + "No se ha definido en la configuración de la empresa el IVA predeterminado para la DIOT.");
         }
+        else if (msConfigDiotAccounts == null) {
+            validation.setMessage("¡No se puede generar la DIOT!:\n"
+                    + "No se han definido en la configuración de la empresa las cuentas contables para la DIOT.");
+        }
+        else {
+            for (SFormField field : mvFields) {
+                if (!field.validateField()) {
+                    validation.setIsError(true);
+                    validation.setComponent(field.getComponent());
+                    break;
+                }
+            }
 
-        if (!validation.getIsError()) {
-            String message = SGuiUtilities.validateDateRange(moFieldDateStart.getDate(), moFieldDateEnd.getDate());
-            
-            if (!message.isEmpty()) {
-                validation.setMessage(message);
-                validation.setComponent(jftDateEnd);
+            if (!validation.getIsError()) {
+                String message = SGuiUtilities.validateDateRange(moFieldDateStart.getDate(), moFieldDateEnd.getDate());
+
+                if (!message.isEmpty()) {
+                    validation.setMessage(message);
+                    validation.setComponent(jftDateEnd);
+                }
             }
         }
         

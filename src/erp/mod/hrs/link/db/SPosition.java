@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SPosition {
+    
     int id_position;
     String code;
     String name;

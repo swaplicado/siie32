@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author swaplicado
  */
 public class SEmployeeVacations {
+    
     private int employee_id = 0;
     private int employee_number = 0;
     private ArrayList<SDataVacations> rows;

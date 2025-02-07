@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEmployeeEar {
+    
     private int id_emp;
     private int id_company;
     private String dt_ini;

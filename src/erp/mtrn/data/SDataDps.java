@@ -2833,7 +2833,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     mbXtaHasSuppFiles = true;
                 }
                 
-                sSql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+                sSql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND NOT b_del";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     mbXtaHasAuthWeb = true;

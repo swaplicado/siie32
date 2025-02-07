@@ -72,6 +72,7 @@ public class SAuthorizationsAPI {
                             updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN, 
                                         userId);
+                            SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk));
                         }
                         catch (Exception ex) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -141,6 +142,7 @@ public class SAuthorizationsAPI {
                         updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT, 
                                         userId);
+                        SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk));
                     }
                     catch (Exception ex) {
                         Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -158,11 +160,21 @@ public class SAuthorizationsAPI {
                 + "fid_usr_authorn = " + userId + ", "
                 + "ts_authorn = NOW() "
                 + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + ";";
+        
+        String sqlDpsAuth = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
+                + "SET fid_st_authorn = " + 
+                (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN ? SDataConstantsSys.CFGS_ST_AUTHORN_AUTH : SDataConstantsSys.CFGS_ST_AUTHORN_REJ) + ",  "
+                + "fid_usr_edit = " + userId + ", "
+                + "ts_edit = NOW() "
+                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
 
         try {
             System.out.println(sql);
             int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
             System.out.println("res: " + res);
+            System.out.println(sqlDpsAuth);
+            int resAuth = oSession.getDatabase().getConnection().createStatement().executeUpdate(sqlDpsAuth);
+            System.out.println("resAuth: " + resAuth);
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);

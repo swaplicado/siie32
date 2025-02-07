@@ -20,6 +20,7 @@ public class SWebAuthStep {
     private boolean isRejected;
     private String rejectedAt;
     private String comments;
+    private boolean deleted;
 
     public SWebAuthStep() {
         this.userName = "";
@@ -102,4 +103,11 @@ public class SWebAuthStep {
         this.comments = comments;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

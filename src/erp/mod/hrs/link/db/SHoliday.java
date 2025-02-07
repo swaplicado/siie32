@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SHoliday {
+    
     protected int year;
     protected int id_holiday;
     protected String code;

@@ -10,9 +10,10 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SIncidentResponse {
+    
     public static final int RESPONSE_OK_AVA = 200;
     public static final int RESPONSE_OK_INS = 300;
     public static final int RESPONSE_ERROR = 500;

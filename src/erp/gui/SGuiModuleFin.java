@@ -296,6 +296,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiQryCashFlowPaysCusDet;
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupSum;
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupDet;
+    private javax.swing.JMenuItem jmiQryCashFlowPaysSupPayDet;
     private javax.swing.JMenuItem jmiRepCashFlowExpected;
     private javax.swing.JMenu jmRepAccIncExp;
     private javax.swing.JMenuItem jmiRepAccIncNet;
@@ -703,6 +704,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysCusDet = new JMenuItem("Consulta de cobros por periodo a detalle");
         jmiQryCashFlowPaysSupSum = new JMenuItem("Consulta de pagos por periodo");
         jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por periodo a detalle");
+        jmiQryCashFlowPaysSupPayDet = new JMenuItem("Consulta de pagos por periodo por parcialidad a detalle");
         jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
         
         jmRepAccIncExp = new JMenu("Reportes de ingresos y egresos contables");
@@ -725,7 +727,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
         
         jmRepFiscal = new JMenu("Reportes fiscales");
-        jmiRepFiscalDiotLayout = new JMenuItem("Layout DIOT...");
+        jmiRepFiscalDiotLayout = new JMenuItem("Layout de la DIOT...");
         jmiRepFiscalTaxPendSal = new JMenuItem("Impuestos pendientes de ingresos...");
         jmiRepFiscalTaxPendPur = new JMenuItem("Impuestos pendientes de egresos...");
         jmiRepFiscalXmlFiles = new JMenuItem("Archivos de contabilidad electrónica...");
@@ -815,6 +817,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepCashFlow.add(jmiQryCashFlowPaysCusDet);
         jmRepCashFlow.add(jmiQryCashFlowPaysSupSum);
         jmRepCashFlow.add(jmiQryCashFlowPaysSupDet);
+        //jmRepCashFlow.add(jmiQryCashFlowPaysSupPayDet);
         jmRep.add(jmRepCashFlow);
         
         jmRepAccIncExp.add(jmiRepAccIncNet);
@@ -995,6 +998,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysCusDet.addActionListener(this);
         jmiQryCashFlowPaysSupSum.addActionListener(this);
         jmiQryCashFlowPaysSupDet.addActionListener(this);
+        jmiQryCashFlowPaysSupPayDet.addActionListener(this);
         jmiRepCashFlowExpected.addActionListener(this);
         jmiRepAccIncNet.addActionListener(this);
         jmiRepAccIncNetAdj.addActionListener(this);
@@ -2324,6 +2328,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiQryCashFlowPaysSupDet) {
                 showView(SDataConstants.TRNX_DPS_PAYS, SDataConstantsSys.TRNS_CT_DPS_PUR, SUtilConsts.QRY_DET);
+            }
+            else if (item == jmiQryCashFlowPaysSupPayDet) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_PAYS, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiRepCashFlowExpected) {
                 new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);

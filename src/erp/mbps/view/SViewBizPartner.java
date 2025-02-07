@@ -186,30 +186,30 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         switch(mnTabTypeAux01) {
             case SDataConstants.BPSX_BP_CO:
-                aoTableColumns = new STableColumn[34];
-                break;
-                
-            case SDataConstants.BPSX_BP_SUP:
                 aoTableColumns = new STableColumn[35];
                 break;
                 
+            case SDataConstants.BPSX_BP_SUP:
+                aoTableColumns = new STableColumn[36];
+                break;
+                
             case SDataConstants.BPSX_BP_CUS:
-                aoTableColumns = new STableColumn[38];
+                aoTableColumns = new STableColumn[39];
                 break;
                 
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
-                aoTableColumns = new STableColumn[29];
+                aoTableColumns = new STableColumn[30];
                 break;
                 
             case SDataConstants.BPSU_BP:
             case SDataConstants.BPSX_BP_ATT_CARR:
             case SDataConstants.BPSX_BP_ATT_SAL_AGT:
-                aoTableColumns = new STableColumn[24];
+                aoTableColumns = new STableColumn[25];
                 break;
                 
             case SDataConstants.BPSX_BP_ATT_BANK:
-                aoTableColumns = new STableColumn[26];
+                aoTableColumns = new STableColumn[27];
                 break;
                 
             case SDataConstants.BPSX_BP_EMP:
@@ -360,10 +360,17 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             default:
         }
 
-        // for all, except employees with expirable contracts:
+        // fiscal IDs:
         
-        if (mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP_CON_EXP) {
+        if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
+            // for employees:
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.alt_id", "CURP", 150);
+        }
+        else if (mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP_CON_EXP) {
+            // for all, except employees with expirable contracts:
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_frg_id", "ID fiscal", 75);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.alt_id", "CURP", 150);
         }
         
@@ -856,7 +863,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             default:
         }
         
-        msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
+        msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
                 "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
                 (mbIsViewBizPartnersSimple ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.num_exporter, bp_ct.diot_oper, bp_ct.cfdi_pay_way, bp_ct.cfdi_cfd_use, bp_ct.tax_regime, bp_ct.dt_start, bp_ct.dt_end_n, " +
                 "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, ") +

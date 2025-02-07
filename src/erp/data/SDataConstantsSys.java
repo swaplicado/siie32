@@ -94,6 +94,10 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_ST_AUTHORN_SND = 11; // sending
     public static final int CFGS_ST_AUTHORN_SNDF = 12; // send failure
 
+    
+    
+    
+    
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
@@ -103,33 +107,34 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_EMP = "E";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP = "D";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
-    public static final String CFG_PARAM_HRS_SIIEAPP = "HRS_SIIEAPP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
     public static final String CFG_PARAM_FIN_BANK_LAYOUT_CFD_REQ = "FIN_BANK_LAYOUT_CFD_REQ";
-    public static final String CFG_PARAM_FIN_AP_PAY_CFD_REQ = "FIN_AP_PAY_CFD_REQ";
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_TO = "QLT_DPS_ANALYSIS_TO";
+    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_CC = "QLT_DPS_ANALYSIS_CC";
     public static final String CFG_PARAM_TRN_MAT_REQ_PTY_DEFAULT = "TRN_MAT_REQ_PTY_DEFAULT";
     public static final String CFG_PARAM_TRN_MAT_REQ_ETY_ITEM_NEW = "TRN_MAT_REQ_ETY_ITEM_NEW";
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_SUBJECT = "TRN_MAT_REQ_EST_SUBJECT";
     public static final String CFG_PARAM_TRN_MAT_REQ_EST_BODY = "TRN_MAT_REQ_EST_BODY";
     public static final String CFG_PARAM_TRN_DPS_REP = "TRN_DPS_REP";
     public static final String CFG_PARAM_TRN_STK_MAT_VAL = "TRN_STK_MAT_VAL";
+    public static final String CFG_PARAM_TRN_DIOG_OUT_DEF_CC = "TRN_DIOG_OUT_DEF_CC";
+    public static final String CFG_PARAM_TRN_DIOG_CL_AUTHORN = "TRN_DIOG_CL_AUTHORN";
     public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
     public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
     public static final String CFG_PARAM_TRN_STK_SUPP_ZERO = "TRN_STK_SUPP_ZERO";
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
+    public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
     public static final String CFG_PARAM_DOC_HRS_REP_COM = "DOC_HRS_REP_COM";
     public static final String CFG_PARAM_DOC_HRS_REP_UNI = "DOC_HRS_REP_UNI";
-    public static final String CFG_PARAM_TRN_DIOG_OUT_DEF_CC = "TRN_DIOG_OUT_DEF_CC";
-    public static final String CFG_PARAM_TRN_DIOG_CL_AUTHORN = "TRN_DIOG_CL_AUTHORN";
     public static final String CFG_PARAM_DOC_HRS_NTS_BREACH = "DOC_HRS_NTS_BREACH";
     public static final String CFG_PARAM_DOC_HRS_NTS_ADM_REC = "DOC_HRS_NTS_ADM_REC";
     public static final String CFG_PARAM_DOC_HRS_MAIL_BREACH_TO = "DOC_HRS_MAIL_BREACH_TO";
@@ -140,8 +145,6 @@ public abstract class SDataConstantsSys {
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
     public static final int CFG_PARAM_CFD_ORG_NAMES_RECEPTOR_CHOICE = 13;
-    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_TO = "QLT_DPS_ANALYSIS_TO";
-    public static final String CFG_PARAM_QLT_DPS_ANALYSIS_CC = "QLT_DPS_ANALYSIS_CC";
     
     public static final int USD_XRT_POLICY_BANXICO = 1;
     public static final int USD_XRT_POLICY_INFORMAL = 2;

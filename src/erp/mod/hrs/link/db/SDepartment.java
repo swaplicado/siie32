@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SDepartment {
+    
     int id_department;
     String dept_code;
     String dept_name;

@@ -5,7 +5,14 @@
  */
 package erp.mod.hrs.link.utils;
 
-import erp.mod.hrs.link.db.*;
+import erp.mod.hrs.link.db.SAbsence;
+import erp.mod.hrs.link.db.SDepartment;
+import erp.mod.hrs.link.db.SEmployee;
+import erp.mod.hrs.link.db.SEmployeeVacations;
+import erp.mod.hrs.link.db.SFirstDayYear;
+import erp.mod.hrs.link.db.SHoliday;
+import erp.mod.hrs.link.db.SPosition;
+import erp.mod.hrs.link.db.SPrepayCutCalendar;
 import java.util.ArrayList;
 
 /**
@@ -13,6 +20,7 @@ import java.util.ArrayList;
  * @author Edwin Carmona
  */
 public class SRootJSON {
+    
     String last_sync_date;
     ArrayList<SDepartment> departments;
     ArrayList<SPosition> positions;

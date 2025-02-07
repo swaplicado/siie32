@@ -23,7 +23,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores, Cesar Orozco, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, César Orozco, Claudio Peña, Sergio Flores
  */
 public class SViewItem extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 

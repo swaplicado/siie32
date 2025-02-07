@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SDataEstimateRequestEtyResponse {
     ArrayList<SEstimateRequestEtyData> lEREData;

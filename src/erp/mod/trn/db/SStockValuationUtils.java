@@ -632,8 +632,8 @@ public class SStockValuationUtils {
                     + "(d.id_year = de.id_year AND d.id_doc = de.id_doc) " 
                     + "WHERE d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(oVal.getDateStart()) + "' AND "
                     + "'" + SLibUtils.DbmsDateFormatDate.format(oVal.getDateEnd()) + "' " 
-                    + "        AND (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDate.format(oVal.getTsUserUpdate()) + "' " 
-                    + "        OR de.ts_edit >= '" + SLibUtils.DbmsDateFormatDate.format(oVal.getTsUserUpdate()) + "')"
+                    + "        AND (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oVal.getTsUserUpdate()) + "' " 
+                    + "        OR de.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oVal.getTsUserUpdate()) + "')"
                     + "AND NOT d.b_del AND NOT de.b_del;";
             
         ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
@@ -692,15 +692,17 @@ public class SStockValuationUtils {
                                                                 final int idWh, 
                                                                 final int idMov, 
                                                                 final double dCost,
-                                                                final double dQty,
                                                                 final int opType) throws SQLException {
-        double dTotal = SLibUtils.roundAmount(dCost * dQty);
         String sql = "UPDATE "
                 + "" + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " SET "
-                + "cost_u = " + SLibUtils.roundAmount(dCost) + ", "
-                + "cost = " + SLibUtils.roundAmount(dTotal) + ", ";
+                + "cost_u = " + SLibUtils.roundAmount(dCost) + ", ";
         
-        sql += (DEBIT == opType ? "debit = " : "credit = ") + SLibUtils.roundAmount(dTotal) + " ";
+        if (DEBIT == opType) {
+            sql += "debit = ROUND((" + SLibUtils.roundAmount(dCost) + " * mov_in), 2) ";
+        }
+        else {
+            sql += "credit = ROUND((" + SLibUtils.roundAmount(dCost) + " * mov_out), 2) ";
+        }
 
         sql += "WHERE (id_year = " + idYear + ") and "
                 + "(id_item = " + idItem + ") and "
@@ -738,7 +740,6 @@ public class SStockValuationUtils {
                                                             final int idDiogDoc, 
                                                             final int idDiogEty, 
                                                             final double dCost,
-                                                            final double dQty,
                                                             final int opType) throws SQLException {
         String sql = "SELECT id_year, id_item, id_unit, id_lot, id_cob, id_wh, id_mov "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " "
@@ -757,7 +758,6 @@ public class SStockValuationUtils {
                             res.getInt("id_wh"), 
                             res.getInt("id_mov"),
                             dCost,
-                            dQty,
                             opType);
         }
     }

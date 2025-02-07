@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author swaplicado
  */
 public class SIncident {
+    
     String name = "";
     String ini = "";
     String fin = "";

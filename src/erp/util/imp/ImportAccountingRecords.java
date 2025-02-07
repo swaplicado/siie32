@@ -176,7 +176,7 @@ public class ImportAccountingRecords extends javax.swing.JFrame {
 
     /*
      * Method lookUpBp is obsolete.
-     * Business Partner mapping is done using SIIE 2 Business Partner previously imported.
+     * Business Partner mapping is done using SIIE 2.0 Business Partner previously imported.
      * A last validation is done to check if business partner is duplicated, so
      * SIIE 1 customer or supplier key is updated with the correct one.
      */

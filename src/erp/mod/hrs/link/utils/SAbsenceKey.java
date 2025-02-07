@@ -10,6 +10,7 @@ package erp.mod.hrs.link.utils;
  * @author Edwin Carmona
  */
 public class SAbsenceKey {
+    
     private int id_emp;
     private int id_abs;
     private String nts;

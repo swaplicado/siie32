@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SEarningResponse {
+    
     public static final int RESPONSE_OK = 200;
     public static final int RESPONSE_ERROR = 500;
     

@@ -1,4 +1,52 @@
 ================================================================================
+SIIE 3.2 262.3/ 2025-02-06
+Edwin Omar CARMONA FIGUEROA
+
+1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios.
+
+================================================================================
+SIIE 3.2 262.2/ 2025-02-06
+Edwin Omar CARMONA FIGUEROA
+
+1) Corrección a la valuación de consumos por la actualización de costo y valor de salidas de stock
+
+================================================================================
+SIIE 3.2 262.1/ 2025-02-05 Jhonatan Claudio PEÑA HERNANDEZ
+1)Corrección facturas de anticipo por campo tipo de exportación
+
+================================================================================
+SIIE 3.2 262.0/ 2025-02-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios..
+
+================================================================================
+SIIE 3.2 261.3/ 2025-01-29
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección al hacer envíos de ordenes de compra sin documentos de soporte a la app web.
+
+================================================================================
+SIIE 3.2 261.2/ 2025-01-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correcciones en la edición de ordenes de compra que fueron envíadas a autorización vía web.
+2) Cambio en las consultas de las vistas de ordenes de compra para darle prioridad al status de autorización del DPS. 
+3) Se agregan los pasos de autorización en la ventana de comentarios de autorizaciones.
+
+================================================================================
+SIIE 3.2 261.0/ 2025-01-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión general y restablecimiento de las constantes de los parámetros de configuración del sistema.
+
+================================================================================
+SIIE 3.2 260.7/ 2025-01-24
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Correcciones en la funcionalidad para exportar y sincronizar usuarios entre siie y siieapp.
+
+================================================================================
 SIIE 3.2 260.6/ 2025-01-23
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

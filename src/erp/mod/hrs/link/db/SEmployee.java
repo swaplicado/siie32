@@ -10,6 +10,7 @@ package erp.mod.hrs.link.db;
  * @author Edwin Carmona
  */
 public class SEmployee {
+    
     int id_employee;
     int num_employee;
     String lastname1;

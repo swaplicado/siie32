@@ -10,8 +10,9 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SVactionsJSON {
+    
     ArrayList<SEmployeeVacations> vacations;
 }

@@ -19,6 +19,7 @@ public class SWebDpsRow {
     private String dpsNumRef;
     private String provider;
     private String providerFiscalId;
+    private String costCenters;
     private double subTotal;
     private double taxCharged;
     private double taxRetained;
@@ -30,6 +31,8 @@ public class SWebDpsRow {
     private int currencyId;
     private String currency;
     private double exchangeRate;
+    private boolean authorized;
+    private String authText;
     private String matReqFolio;
     private String matReqDt;
     private int dpsUserId;
@@ -37,6 +40,7 @@ public class SWebDpsRow {
     private String dpsUser;
     private String matReqUser;
     private String notesAuth;
+    private String userInTurn;
 
     public int getIdYear() {
         return idYear;
@@ -100,6 +104,14 @@ public class SWebDpsRow {
 
     public void setProviderFiscalId(String providerFiscalId) {
         this.providerFiscalId = providerFiscalId;
+    }
+
+    public String getCostCenters() {
+        return costCenters;
+    }
+
+    public void setCostCenters(String costCenters) {
+        this.costCenters = costCenters;
     }
 
     public double getSubTotal() {
@@ -190,6 +202,22 @@ public class SWebDpsRow {
         this.exchangeRate = exchangeRate;
     }
 
+    public boolean isAuthorized() {
+        return authorized;
+    }
+
+    public void setIsAuthorized(boolean isAuthorized) {
+        this.authorized = isAuthorized;
+    }
+
+    public String getAuthText() {
+        return authText;
+    }
+
+    public void setAuthText(String authText) {
+        this.authText = authText;
+    }
+
     public String getMatReqFolio() {
         return matReqFolio;
     }
@@ -244,6 +272,14 @@ public class SWebDpsRow {
 
     public void setNotesAuth(String notesAuth) {
         this.notesAuth = notesAuth;
+    }
+
+    public String getUserInTurn() {
+        return userInTurn;
+    }
+
+    public void setUserInTurn(String userInTurn) {
+        this.userInTurn = userInTurn;
     }
     
 }

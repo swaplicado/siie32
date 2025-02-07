@@ -27,16 +27,25 @@ public abstract class SDiotUtils {
         if (DiotAccounts == null) {
             DiotAccounts = getDiotAccounts(statement);
         }
+        
         return account.getFkAccountLedgerTypeId() == SDataConstantsSys.FINU_TP_ACC_LEDGER_VAT_CREDITABLE || SLibUtils.belongsTo(account.getCode(), DiotAccounts);
     }
     
     public static int[] getDiotVatDefaultPk(final Statement statement) throws Exception {
-        String[] pk = SLibUtils.textsTrim(SLibUtils.textExplode(SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_DIOT_VAT_DEFAULT), ";"));
-        return new int[] { SLibUtils.parseInt(pk[0]), SLibUtils.parseInt(pk[1]) };
+        int[] vatDefaultPk = null;
+        String param = SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_DIOT_VAT_DEFAULT);
+        
+        if (!param.isEmpty()) {
+            String[] pk = SLibUtils.textsTrim(SLibUtils.textExplode(param, ";"));
+            vatDefaultPk = new int[] { SLibUtils.parseInt(pk[0]), SLibUtils.parseInt(pk[1]) };
+        }
+        
+        return vatDefaultPk;
     }
     
     public static SDataTax getDiotVatDefault(final SClientInterface client) throws Exception {
-        int[] pk = getDiotVatDefaultPk(client.getSession().getStatement());
-        return (SDataTax) SDataUtilities.readRegistry(client, SDataConstants.FINU_TAX, pk, SLibConstants.EXEC_MODE_STEALTH);
+        int[] vatDefaultPk = getDiotVatDefaultPk(client.getSession().getStatement());
+        
+        return vatDefaultPk == null ? null : (SDataTax) SDataUtilities.readRegistry(client, SDataConstants.FINU_TAX, vatDefaultPk, SLibConstants.EXEC_MODE_STEALTH);
     }
 }
