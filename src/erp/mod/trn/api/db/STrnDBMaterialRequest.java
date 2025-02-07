@@ -5,6 +5,7 @@ import com.swaplicado.data.StorageManagerException;
 import erp.mod.SModConsts;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebMatReqEtyNote;
 import erp.mod.trn.api.data.SWebMatReqNote;
 import erp.mod.trn.api.data.SWebMaterialRequest;
 import java.sql.Connection;
@@ -160,6 +161,32 @@ public class STrnDBMaterialRequest {
             // Agregar las notas a la requisición.
             oMatReq.getlNotes().clear();
             oMatReq.getlNotes().addAll(lNotes);
+
+            // Obtener las notas de las partidas de la requisición.
+            String matReqEntriesQuery = "SELECT " +
+                    "id_mat_req, id_ety, id_nts, notes " +
+                    "FROM " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_NTS) + " " +
+                    "WHERE " +
+                    "    id_mat_req = " + oMatReq.getIdMaterialRequest() + ";";
+
+            Statement stEtyNts = conn.createStatement();
+            ResultSet resEtyNts = stEtyNts.executeQuery(matReqEntriesQuery);
+
+            ArrayList<SWebMatReqEtyNote> lEtyNotes = new ArrayList<>();
+
+            while (resEtyNts.next()) {
+                SWebMatReqEtyNote oNote = new SWebMatReqEtyNote(
+                        resEtyNts.getInt("id_mat_req"),
+                        resEtyNts.getInt("id_ety"),
+                        resEtyNts.getInt("id_nts"),
+                        resEtyNts.getString("notes")
+                );
+                lEtyNotes.add(oNote);
+            }
+
+            oMatReq.getlEtyNotes().clear();
+            oMatReq.getlEtyNotes().addAll(lEtyNotes);
             
             lMaterialRequests.add(oMatReq);
 

@@ -32,6 +32,7 @@ public class SWebDpsRow {
     private String currency;
     private double exchangeRate;
     private boolean authorized;
+    private boolean returned;
     private String authText;
     private String matReqFolio;
     private String matReqDt;
@@ -210,6 +211,14 @@ public class SWebDpsRow {
         this.authorized = isAuthorized;
     }
 
+    public boolean isReturned() {
+        return returned;
+    }
+
+    public void setReturned(boolean returned) {
+        this.returned = returned;
+    }
+    
     public String getAuthText() {
         return authText;
     }
