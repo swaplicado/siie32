@@ -42,6 +42,7 @@ public class SWebDpsRow {
     private String matReqUser;
     private String notesAuth;
     private String userInTurn;
+    private int authorizationPriority;
 
     public int getIdYear() {
         return idYear;
@@ -289,6 +290,14 @@ public class SWebDpsRow {
 
     public void setUserInTurn(String userInTurn) {
         this.userInTurn = userInTurn;
+    }
+
+    public int getAuthorizationPriority() {
+        return authorizationPriority;
+    }
+
+    public void setAuthorizationPriority(int authorizationPriority) {
+        this.authorizationPriority = authorizationPriority;
     }
     
 }

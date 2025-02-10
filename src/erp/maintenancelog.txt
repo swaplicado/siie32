@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 263.1/ 2025-02-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+
+1) Se toma el usuario de la tabla de dps cuando el documento está autorizado (AppLink)
+2) Se agrega columna de usuario en turno en vista de pedidos cuando está activo el complemento de autorizaciones web.
+3) Se agrega prioridad en obtención de documentos para su autorización.
+
+================================================================================
 SIIE 3.2 263.0/ 2025-02-10
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

@@ -648,7 +648,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         else if (mbIsOrd) {
             if (mbHasCompAuthWeb) {
-                aoTableColumns = new STableColumn[46];
+                aoTableColumns = new STableColumn[47];
             }
             else {
                 aoTableColumns = new STableColumn[43];
@@ -748,6 +748,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "send", "Enviado aut. app web", STableConstants.WIDTH_ICON);
                     aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "stat_auth", "Autorización app web.", STableConstants.WIDTH_ITEM);
+                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_in_turn", "Usr. turno", STableConstants.WIDTH_USER);
                 }
                 aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "Autorización", STableConstants.WIDTH_ICON);
                 aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
@@ -3230,8 +3231,70 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " +
-                "ELSE sah.name END, '') AS stat_auth, " : "") +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                "ELSE sah.name END, '') AS stat_auth, " : "");
+        if (mbHasCompAuthWeb) {
+            msSql += "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
+                    + "        COALESCE((SELECT  "
+                    + "                        GROUP_CONCAT(usr "
+                    + "                                SEPARATOR ',') "
+                    + "                    FROM "
+                    + "                        cfgu_authorn_step AS steps1 "
+                    + "                            INNER JOIN "
+                    + "                        erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
+                    + "                    WHERE "
+                    + "                        NOT steps1.b_del "
+                    + "                            AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                            AND steps1.res_pk_n1_n = d.id_year "
+                    + "                            AND steps1.res_pk_n2_n = d.id_doc "
+                    + "                            AND NOT steps1.b_authorn "
+                    + "                            AND steps1.b_reject "
+                    + "                            AND steps1.lev = (SELECT  "
+                    + "                                step2.lev "
+                    + "                            FROM "
+                    + "                                cfgu_authorn_step AS step2 "
+                    + "                            WHERE "
+                    + "                                NOT step2.b_del "
+                    + "                                    AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                                    AND step2.res_pk_n1_n = d.id_year "
+                    + "                                    AND step2.res_pk_n2_n = d.id_doc "
+                    + "                                    AND NOT step2.b_authorn "
+                    + "                                    AND step2.b_reject "
+                    + "                            ORDER BY step2.lev DESC "
+                    + "                            LIMIT 1)), "
+                    + "                ''), "
+                    + "        IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ", "
+                    + "            (SELECT usr FROM erp.usru_usr AS u WHERE u.id_usr = d.fid_usr_authorn), "
+                    + "            COALESCE((SELECT  "
+                    + "                            GROUP_CONCAT(usr "
+                    + "                                    SEPARATOR ',') "
+                    + "                        FROM "
+                    + "                            cfgu_authorn_step AS steps1 "
+                    + "                                INNER JOIN "
+                    + "                            erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
+                    + "                        WHERE "
+                    + "                            NOT steps1.b_del "
+                    + "                                AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                                AND steps1.res_pk_n1_n = d.id_year "
+                    + "                                AND steps1.res_pk_n2_n = d.id_doc "
+                    + "                                AND NOT steps1.b_authorn "
+                    + "                                AND NOT steps1.b_reject "
+                    + "                                AND steps1.lev = (SELECT  "
+                    + "                                    step2.lev "
+                    + "                                FROM "
+                    + "                                    cfgu_authorn_step AS step2 "
+                    + "                                WHERE "
+                    + "                                    NOT step2.b_del "
+                    + "                                        AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                                        AND step2.res_pk_n1_n = d.id_year "
+                    + "                                        AND step2.res_pk_n2_n = d.id_doc "
+                    + "                                        AND NOT step2.b_authorn "
+                    + "                                        AND NOT step2.b_reject "
+                    + "                                ORDER BY step2.lev ASC "
+                    + "                                LIMIT 1)), "
+                    + "                    '')))) AS user_in_turn, ";
+        }
+        
+        msSql += "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
                 "(SELECT CONCAT(dps_src.num_ser, IF(length(dps_src.num_ser) = 0, '', '-'), dps_src.num) " +

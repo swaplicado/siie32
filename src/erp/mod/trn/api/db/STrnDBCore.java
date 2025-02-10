@@ -138,61 +138,7 @@ public class STrnDBCore {
             + "                            LIMIT 1)), "
             + "                ''), "
             + "        IF(dps.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ", "
-            + "            COALESCE((SELECT  "
-            + "                            GROUP_CONCAT(usr "
-            + "                                    SEPARATOR ',') "
-            + "                        FROM "
-            + "                            cfgu_authorn_step AS steps1 "
-            + "                                INNER JOIN "
-            + "                            erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
-            + "                        WHERE "
-            + "                            NOT steps1.b_del "
-            + "                                AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-            + "                                AND steps1.res_pk_n1_n = dps.id_year "
-            + "                                AND steps1.res_pk_n2_n = dps.id_doc "
-            + "                                AND steps1.b_authorn "
-            + "                                AND NOT steps1.b_reject "
-            + "                                AND steps1.lev = (SELECT  "
-            + "                                    step2.lev "
-            + "                                FROM "
-            + "                                    cfgu_authorn_step AS step2 "
-            + "                                WHERE "
-            + "                                    NOT step2.b_del "
-            + "                                        AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-            + "                                        AND step2.res_pk_n1_n = dps.id_year "
-            + "                                        AND step2.res_pk_n2_n = dps.id_doc "
-            + "                                        AND step2.b_authorn "
-            + "                                        AND NOT step2.b_reject "
-            + "                                ORDER BY step2.lev DESC "
-            + "                                LIMIT 1)), "
-            + "                    COALESCE((SELECT  "
-            + "                                    GROUP_CONCAT(usr "
-            + "                                            SEPARATOR ',') "
-            + "                                FROM "
-            + "                                    cfgu_authorn_step AS steps1 "
-            + "                                        INNER JOIN "
-            + "                                    erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
-            + "                                WHERE "
-            + "                                    NOT steps1.b_del "
-            + "                                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-            + "                                        AND steps1.res_pk_n1_n = dps.id_year "
-            + "                                        AND steps1.res_pk_n2_n = dps.id_doc "
-            + "                                        AND NOT steps1.b_authorn "
-            + "                                        AND NOT steps1.b_reject "
-            + "                                        AND steps1.lev = (SELECT  "
-            + "                                            step2.lev "
-            + "                                        FROM "
-            + "                                            cfgu_authorn_step AS step2 "
-            + "                                        WHERE "
-            + "                                            NOT step2.b_del "
-            + "                                                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-            + "                                                AND step2.res_pk_n1_n = dps.id_year "
-            + "                                                AND step2.res_pk_n2_n = dps.id_doc "
-            + "                                                AND NOT step2.b_authorn "
-            + "                                                AND NOT step2.b_reject "
-            + "                                        ORDER BY step2.lev ASC "
-            + "                                        LIMIT 1)), "
-            + "                            '')), "
+            + "            (SELECT usr FROM erp.usru_usr AS u WHERE u.id_usr = dps.fid_usr_authorn), "
             + "            COALESCE((SELECT  "
             + "                            GROUP_CONCAT(usr "
             + "                                    SEPARATOR ',') "
@@ -230,6 +176,15 @@ public class STrnDBCore {
             + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
             + "                        AND steps1.res_pk_n1_n = dps.id_year "
             + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
+            + "    COALESCE((SELECT  "
+            + "                    priority "
+            + "                FROM "
+            + "                    cfgu_authorn_step AS steps1 "
+            + "                WHERE "
+            + "                    NOT steps1.b_del "
+            + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+            + "                        AND steps1.res_pk_n1_n = dps.id_year "
+            + "                        AND steps1.res_pk_n2_n = dps.id_doc LIMIT 1), 0) AS auth_priority, "
             + "    dps.b_authorn, "
             + "    IF(dps.b_authorn, "
             + "        'AUTORIZADO', "
@@ -331,7 +286,7 @@ public class STrnDBCore {
                     + "ORDER BY dps.dt ASC;";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
 
             ArrayList<SWebDpsRow> lDocuments = new ArrayList<>();
@@ -371,7 +326,7 @@ public class STrnDBCore {
                     + "GROUP BY id_year , id_doc;";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
 
             if (res.next()) {
@@ -431,6 +386,7 @@ public class STrnDBCore {
             oDoc.setDpsUserId(res.getInt("dps_user_id"));
             oDoc.setNotesAuth(res.getString("dta_notes"));
             oDoc.setUserInTurn(res.getString("user_in_turn"));
+            oDoc.setAuthorizationPriority(res.getInt("auth_priority"));
 
             return oDoc;
         } catch (SQLException ex) {
@@ -473,7 +429,7 @@ public class STrnDBCore {
                     + "   AND dps.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsEty> lEties = new ArrayList<>();
             while (res.next()) {
@@ -531,7 +487,7 @@ public class STrnDBCore {
                     + "    AND nts.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsNote> lNotes = new ArrayList<>();
             while (res.next()) {
@@ -583,7 +539,7 @@ public class STrnDBCore {
                     + "ORDER BY ts_usr_ins ASC, s.lev ASC, s.id_authorn_step ASC;";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebAuthStep> lSteps = new ArrayList<>();
             while (res.next()) {
@@ -665,7 +621,7 @@ public class STrnDBCore {
                     + "        LIMIT 1);";
 
             Statement stUsersInTurn = conn.createStatement();
-            System.out.println(queryUsersInTurn);
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryUsersInTurn);
             ArrayList<Integer> lUsersInTurn = new ArrayList<>();
             ResultSet resUsersInTurn = stUsersInTurn.executeQuery(queryUsersInTurn);
             while (resUsersInTurn.next()) {
