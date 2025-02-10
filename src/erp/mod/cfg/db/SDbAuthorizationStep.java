@@ -9,19 +9,19 @@ import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
-import sa.lib.gui.SGuiSession;
-import java.util.Date;
-import sa.gui.util.SUtilConsts;
-import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
 
@@ -39,6 +39,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     protected String msComments;
     protected int mnAuthorizationGrouper_n;
     protected int mnUserAuthorizationsNode_n;
+    protected int mnPriority;
     protected boolean mbAllUsers;
     protected boolean mbAuthorized;
     protected boolean mbRejected;
@@ -78,6 +79,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public void setComments(String s) { msComments = s; }
     public void setAuthorizationGrouper_n(int n) { mnAuthorizationGrouper_n = n; }
     public void setUserAuthorizationsNode_n(int n) { mnUserAuthorizationsNode_n = n; }
+    public void setPriority(int n) { mnPriority = n; }
     public void setAllUsers(boolean b) { mbAllUsers = b; }
     public void setAuthorized(boolean b) { mbAuthorized = b; }
     public void setRejected(boolean b) { mbRejected = b; }
@@ -109,6 +111,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
     public String getComments() { return msComments; }
     public int getAuthorizationGrouper_n() { return mnAuthorizationGrouper_n; }
     public int getUserAuthorizationsNode_n() { return mnUserAuthorizationsNode_n; }
+    public int getPriority() { return mnPriority; }
     public boolean isAllUsers() { return mbAllUsers; }
     public boolean isAuthorized() { return mbAuthorized; }
     public boolean isRejected() { return mbRejected; }
@@ -159,6 +162,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         msComments = "";
         mnAuthorizationGrouper_n = 0;
         mnUserAuthorizationsNode_n = 0;
+        mnPriority = 0;
         mbAllUsers = false;
         mbAuthorized = false;
         mbRejected = false;
@@ -237,6 +241,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
             msComments = resultSet.getString("comments");
             mnAuthorizationGrouper_n = resultSet.getInt("authorn_grouper_n");
             mnUserAuthorizationsNode_n = resultSet.getInt("usrs_authorn_node_n");
+            mnPriority = resultSet.getInt("priority");
             mbAllUsers = resultSet.getBoolean("b_all");
             mbAuthorized = resultSet.getBoolean("b_authorn");
             mbRejected = resultSet.getBoolean("b_reject");
@@ -323,6 +328,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                     "'" + msComments + "', " + 
                     (mnAuthorizationGrouper_n == 0 ? "null" : ("'" + mnAuthorizationGrouper_n + "'")) + ", " + 
                     (mnUserAuthorizationsNode_n == 0 ? "null" : mnUserAuthorizationsNode_n) + ", " + 
+                    mnPriority + ", " + 
                     (mbAllUsers ? 1 : 0) + ", " + 
                     (mbAuthorized ? 1 : 0) + ", " + 
                     (mbRejected ? 1 : 0) + ", " + 
@@ -359,6 +365,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
                         "comments = '" + msComments + "', " +
                         "authorn_grouper_n = " + (mnAuthorizationGrouper_n > 0 ? mnAuthorizationGrouper_n : "NULL") + ", " +
                         "usrs_authorn_node_n = " + (mnUserAuthorizationsNode_n > 0 ? mnUserAuthorizationsNode_n : "NULL") + ", " +
+                        "priority = " + mnPriority + ", " +
                         "b_all = " + (mbAllUsers ? 1 : 0) + ", " +
                         "b_authorn = " + (mbAuthorized ? 1 : 0) + ", " +
                         "b_reject = " + (mbRejected ? 1 : 0) + ", " +
@@ -402,6 +409,7 @@ public class SDbAuthorizationStep extends SDbRegistryUser implements SGridRow {
         registry.setAllUsers(this.isAllUsers());
         registry.setAuthorizationGrouper_n(this.getAuthorizationGrouper_n());
         registry.setUserAuthorizationsNode_n(this.getUserAuthorizationsNode_n());
+        registry.setPriority(this.getPriority());
         registry.setAuthorized(this.isAuthorized());
         registry.setRejected(this.isRejected());
         registry.setRequired(this.isRequired());

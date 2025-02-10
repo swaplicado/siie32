@@ -6,7 +6,9 @@ package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.form.SFormCapturingNotes;
 import erp.gui.session.SSessionCustom;
+import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
@@ -88,11 +90,16 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private SGridPaneForm moGridMatReqList;
     
     private SFormMaterialRequestCostCenter moFormMatReqCC;
+    private SFormCapturingNotes moFormCapturingNotesReq;
+    private SFormCapturingNotes moFormCapturingNotesEty;
     
     private SDialogItemPicker moDialogPickerItem;
     private SDialogItemPicker moDialogPickerItemRef;
     private SDialogItemPicker moDialogPickerItemRefEty;
     private SDialogUnitPicker moDialogPickerUnit;
+    
+    private String msReqNotes;
+    private String msEtyNotes;
     
     private JLabel jlKeyWhs;
     private SBeanFieldKey moKeyWhs;
@@ -196,6 +203,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jPanel2 = new javax.swing.JPanel();
         jlReqNotes = new javax.swing.JLabel();
         moTextReqNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jbReqNotes = new javax.swing.JButton();
         jlAsign = new javax.swing.JLabel();
         moDecAsign = new sa.lib.gui.bean.SBeanFieldDecimal();
         jpTableCC = new javax.swing.JPanel();
@@ -253,6 +261,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jPanel48 = new javax.swing.JPanel();
         jlEtyNotes = new javax.swing.JLabel();
         moTextEtyNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jbEtyNotes = new javax.swing.JButton();
         jlCostCenterEty = new javax.swing.JLabel();
         moKeyCostCenterEty = new sa.lib.gui.bean.SBeanFieldKey();
         jpButtons = new javax.swing.JPanel();
@@ -464,8 +473,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlReqNotes.setPreferredSize(new java.awt.Dimension(100, 16));
         jPanel2.add(jlReqNotes);
 
-        moTextReqNotes.setPreferredSize(new java.awt.Dimension(671, 23));
+        moTextReqNotes.setPreferredSize(new java.awt.Dimension(645, 23));
         jPanel2.add(moTextReqNotes);
+
+        jbReqNotes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbReqNotes.setToolTipText("Agregar comentario");
+        jbReqNotes.setFocusable(false);
+        jbReqNotes.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel2.add(jbReqNotes);
 
         jlAsign.setText("Total asignación:");
         jlAsign.setPreferredSize(new java.awt.Dimension(105, 23));
@@ -674,8 +689,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlEtyNotes.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel48.add(jlEtyNotes);
 
-        moTextEtyNotes.setPreferredSize(new java.awt.Dimension(445, 23));
+        moTextEtyNotes.setPreferredSize(new java.awt.Dimension(417, 23));
         jPanel48.add(moTextEtyNotes);
+
+        jbEtyNotes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEtyNotes.setToolTipText("Agregar comentario");
+        jbEtyNotes.setFocusable(false);
+        jbEtyNotes.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel48.add(jbEtyNotes);
 
         jlCostCenterEty.setText("Centro costo:");
         jlCostCenterEty.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -908,6 +929,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JButton jbCancelEty;
     private javax.swing.JButton jbDeleteEty;
     private javax.swing.JButton jbEditEty;
+    private javax.swing.JButton jbEtyNotes;
     private javax.swing.JButton jbImport;
     private javax.swing.JButton jbItemStk;
     private javax.swing.JButton jbNewEty;
@@ -917,6 +939,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JButton jbPickUnitUsr;
     private javax.swing.JButton jbRegisterEty;
     private javax.swing.JButton jbReject;
+    private javax.swing.JButton jbReqNotes;
     private javax.swing.JLabel jlAsign;
     private javax.swing.JLabel jlAuthStatus;
     private javax.swing.JLabel jlConsDays;
@@ -1034,7 +1057,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moTextReqStatus.setTextSettings(SGuiUtils.getLabelName("Estatus"), 100, 0);
         moDecTotal.setDecimalSettings(SGuiUtils.getLabelName(jlTotal), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecAsign.setDecimalSettings(SGuiUtils.getLabelName(jlAsign), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
-        moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 500, 0);
+        moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 1000, 0);
         moTextTypeReq.setTextSettings(SGuiUtils.getLabelName("Tipo"), 1, 0);
         
         moTextItemKey.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
@@ -1201,6 +1224,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moDialogPickerItemRefEty = null;
         moDialogPickerUnit = null;
         
+        moFormCapturingNotesReq = null;
+        moFormCapturingNotesEty = null;
+        
         jlKeyWhs = new JLabel("Almacén: ");
         moKeyWhs = new SBeanFieldKey();
         moKeyWhs.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -1315,6 +1341,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moDateReq.setEnabled(false);
             moKeyPriReq.setEnabled(false);
             moTextReqNotes.setEnabled(false);
+            jbReqNotes.setEnabled(false);
             jbItemStk.setEnabled(false && getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP);
 
             jbNewEty.setEnabled(false);
@@ -1335,7 +1362,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             jbPickItemRef.setEnabled(enable);
             moDateReq.setEnabled(enable);
             moKeyPriReq.setEnabled(enable);
-            moTextReqNotes.setEnabled(enable);
+            moTextReqNotes.setEnabled(enable ? !msReqNotes.isEmpty() ? !(msReqNotes.contains("\n") || msReqNotes.contains("\r\n")) : enable : false);
+            jbReqNotes.setEnabled(enable);
             jbItemStk.setEnabled(enable && getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP);
 
             jbNewEty.setEnabled(enable);
@@ -1368,6 +1396,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moDateDeliveryEty.setValue(null);
         moKeyPriEty.setSelectedIndex(0);
         moTextEtyNotes.setValue("");
+        msEtyNotes = "";
         moKeyItemRefEty.setSelectedIndex(0);
         moItemRefEty = null;
     }
@@ -1392,6 +1421,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moDateDeliveryEty.setEnabled(false);
             moKeyPriEty.setEnabled(false);
             moTextEtyNotes.setEnabled(false);
+            jbEtyNotes.setEnabled(false);
 
             moKeyConsSubentEty.setEnabled(moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
             moKeyCostCenterEty.setEnabled(moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
@@ -1419,7 +1449,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moDateReqEty.setEnabled(enable);
             moDateDeliveryEty.setEnabled(false);
             moKeyPriEty.setEnabled(enable);
-            moTextEtyNotes.setEnabled(enable);
+            moTextEtyNotes.setEnabled(enable ? !msEtyNotes.isEmpty() ? !(msEtyNotes.contains("\n") || msEtyNotes.contains("\r\n")) : enable : false);
+            jbEtyNotes.setEnabled(enable);
 
             moKeyConsSubentEty.setEnabled(isCapturingData && moKeyConsEntEty.isEnabled() && moKeyConsEntEty.getSelectedIndex() > 0);
             moKeyCostCenterEty.setEnabled(isCapturingData && moKeyConsSubentEty.isEnabled() && moKeyConsSubentEty.getSelectedIndex() > 0);
@@ -1507,6 +1538,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moKeyPriEty.setValue(new int[] { ety.getFkMatRequestPriorityId_n() });
             moTextItemDescription.setValue("");
             moTextEtyNotes.setValue("");
+            msEtyNotes = "";
             //moKeyItemRefEty.setValue(new int[] { ety.getFkItemReferenceId_n() });
             
             moKeyItemRefEty.removeAllItems();
@@ -1524,6 +1556,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 }
                 else {
                     moTextEtyNotes.setValue(note.getNotes());
+                    msEtyNotes = note.getNotes();
+                    moTextEtyNotes.setEnabled(!(msEtyNotes.contains("\n") || msEtyNotes.contains("\r\n")));
                 }
             }
         }
@@ -1549,6 +1583,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moKeyPriEty.setSelectedIndex(0);
             moTextItemDescription.setValue("");
             moTextEtyNotes.setValue("");
+            msEtyNotes = "";
             moKeyItemRefEty.setSelectedIndex(0);
             moTextItemRefEty.setText("");
         }
@@ -1599,7 +1634,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         if (!moTextEtyNotes.getValue().isEmpty()) {
             SDbMaterialRequestEntryNote note = new SDbMaterialRequestEntryNote();
-            note.setNotes(moTextEtyNotes.getValue());
+            note.setNotes(msEtyNotes);
             note.setIsDescription(false);
             ety.getChildNotes().add(note);
         }
@@ -2208,6 +2243,44 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             SLibUtils.showException(this, e);
         }
     }
+    
+    private void actionReqNotes() {
+        if (moFormCapturingNotesReq == null) {
+            moFormCapturingNotesReq = new SFormCapturingNotes((SClientInterface) miClient);
+        }
+        if (moTextReqNotes.isEnabled()) {
+            moFormCapturingNotesReq.setValue(SFormCapturingNotes.NOTE_TEXT, moTextReqNotes.getValue());
+        }
+        else {
+            moFormCapturingNotesReq.setValue(SFormCapturingNotes.NOTE_TEXT, msReqNotes);
+        }
+        moFormCapturingNotesReq.setValue(SFormCapturingNotes.NOTE_LEN, 1000);
+        moFormCapturingNotesReq.setVisible(true);
+        if (moFormCapturingNotesReq.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            msReqNotes = (String) moFormCapturingNotesReq.getValue(SFormCapturingNotes.NOTE_TEXT);
+            moTextReqNotes.setValue(msReqNotes);
+            moTextReqNotes.setEnabled(!(msReqNotes.contains("\n") || msReqNotes.contains("\r\n")));
+        }
+    }
+    
+    private void actionEtyNotes() {
+        if (moFormCapturingNotesEty == null) {
+            moFormCapturingNotesEty = new SFormCapturingNotes((SClientInterface) miClient);
+        }
+        if (moTextEtyNotes.isEnabled()) {
+            moFormCapturingNotesEty.setValue(SFormCapturingNotes.NOTE_TEXT, moTextEtyNotes.getValue());
+        }
+        else {
+            moFormCapturingNotesEty.setValue(SFormCapturingNotes.NOTE_TEXT, msEtyNotes);
+        }
+        moFormCapturingNotesEty.setValue(SFormCapturingNotes.NOTE_LEN, 1000);
+        moFormCapturingNotesEty.setVisible(true);
+        if (moFormCapturingNotesEty.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            msEtyNotes = (String) moFormCapturingNotesEty.getValue(SFormCapturingNotes.NOTE_TEXT);
+            moTextEtyNotes.setValue(msEtyNotes);
+            moTextEtyNotes.setEnabled(!(msEtyNotes.contains("\n") || msEtyNotes.contains("\r\n")));
+        }
+    }
 
     @Override
     public void addAllListeners() {
@@ -2220,7 +2293,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbCancelEty.addActionListener(this);
         jbAuthorize.addActionListener(this);
         jbReject.addActionListener(this);
+        jbReqNotes.addActionListener(this);
+        jbEtyNotes.addActionListener(this);
         jbItemStk.addActionListener(this);
+        moTextReqNotes.addFocusListener(this);
+        moTextEtyNotes.addFocusListener(this);
         jbSave.addActionListener(this);
         jbSaveAndSend.addActionListener(this);
         moBoolNewItem.addItemListener(this);
@@ -2245,7 +2322,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbCancelEty.removeActionListener(this);
         jbAuthorize.removeActionListener(this);
         jbReject.removeActionListener(this);
+        jbReqNotes.removeActionListener(this);
+        jbEtyNotes.removeActionListener(this);
         jbItemStk.removeActionListener(this);
+        moTextReqNotes.removeFocusListener(this);
+        moTextEtyNotes.removeFocusListener(this);
         jbSave.removeActionListener(this);
         jbSaveAndSend.removeActionListener(this);
         moBoolNewItem.removeItemListener(this);
@@ -2294,6 +2375,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         mnItemRefPickerSeccSelectedEty = 0;
         isReqInv = false;
         mbCcChanged = false;
+        
+        msReqNotes = "";
+        msEtyNotes = "";
     }
 
     @Override
@@ -2372,9 +2456,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         if (maMatReqNotes.size() > 0) {
             moTextReqNotes.setValue(maMatReqNotes.get(0).getNotes());
+            msReqNotes = maMatReqNotes.get(0).getNotes();
         }
         else {
             moTextReqNotes.setValue("");
+            msReqNotes = "";
         }
         
         setFormEditable(true);
@@ -2481,7 +2567,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         registry.getChildNotes().clear();
         if (!moTextReqNotes.getValue().isEmpty()) {
             SDbMaterialRequestNote note = new SDbMaterialRequestNote();
-            note.setNotes(moTextReqNotes.getValue());
+            note.setNotes(msReqNotes);
             registry.getChildNotes().add(note);
         }
         
@@ -2566,6 +2652,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else if (button == jbReject) {
                 actionAuthorizeOrRejectResource(SAuthorizationUtils.AUTH_ACTION_REJECT);
             }
+            else if (button == jbReqNotes) {
+                actionReqNotes();
+            }
+            else if (button == jbEtyNotes) {
+                actionEtyNotes();
+            }
         }
     }
 
@@ -2640,6 +2732,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             }
             else if (textField == moTextItemDescription) {
                 actionItemDesc();
+            }
+            else if (textField == moTextReqNotes) {
+                msReqNotes = moTextReqNotes.getValue();
+            }
+            else if (textField == moTextEtyNotes) {
+                msEtyNotes = moTextEtyNotes.getValue();
             }
         }
     }

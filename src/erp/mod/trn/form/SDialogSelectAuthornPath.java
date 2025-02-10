@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFields;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 
@@ -59,6 +60,10 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
         jScrollPane1 = new javax.swing.JScrollPane();
         jListAuthornPath = new javax.swing.JList();
         jPanel5 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jlTextPriority = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        moKeyPriority = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel6 = new javax.swing.JPanel();
         jlTextComent = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
@@ -87,11 +92,26 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel5.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTextPriority.setText("Prioridad:");
+        jlTextPriority.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel8.add(jlTextPriority);
+
+        jPanel5.add(jPanel8);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moKeyPriority.setPreferredSize(new java.awt.Dimension(360, 23));
+        jPanel9.add(moKeyPriority);
+
+        jPanel5.add(jPanel9);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTextComent.setText("Comentarios del envío a autorización del pedido:");
+        jlTextComent.setText("Comentarios para iniciar proceso de autorización:");
         jlTextComent.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel6.add(jlTextComent);
 
@@ -99,7 +119,7 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moTextComent.setPreferredSize(new java.awt.Dimension(625, 23));
+        moTextComent.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel7.add(moTextComent);
 
         jPanel5.add(jPanel7);
@@ -138,20 +158,25 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbSelect;
     private javax.swing.JLabel jlTextComent;
+    private javax.swing.JLabel jlTextPriority;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPriority;
     private sa.lib.gui.bean.SBeanFieldText moTextComent;
     // End of variables declaration//GEN-END:variables
 
     @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
         
         moFields = new SGuiFields();
         
         moTextComent.setTextSettings(SGuiUtils.getLabelName(jlTextComent), 255, 0);
+        moKeyPriority.setKeySettings(miClient, SGuiUtils.getLabelName(jlTextPriority), true);
         
         moFields.addField(moTextComent);
         
@@ -174,6 +199,13 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
         modeloLista.stream().filter((pathName) -> (!aux.contains(pathName))).forEach((pathName) -> {
             aux.add(pathName);
         });
+        
+        SGuiItem standard = new SGuiItem(new int[] {0}, "NORMAL");
+        SGuiItem urgent = new SGuiItem(new int[] {1}, "URGENTE");
+        moKeyPriority.removeAllItems();
+        moKeyPriority.addItem(standard);
+        moKeyPriority.addItem(urgent);
+        moKeyPriority.setSelectedIndex(0);
         
         jListAuthornPath.setListData(aux);
         
@@ -233,6 +265,10 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
     
     public ArrayList<SDbAuthorizationPath> getSelectedAuthPaths() {
         return maSelectedAuthPaths;
+    }
+    
+    public int getSelectedPriority() {
+        return moKeyPriority.getValue()[0];
     }
 
     @Override
