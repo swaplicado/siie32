@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 263.0/ 2025-02-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la pantalla para redactar comentarios en formas de captura, por el momento sólo implementada en RM.
+2) Se agrega validación para guardar la pantalla de archivos de soporte sólo cuando no haya un archivo pendiente por guardar.
+3) Se agrega un sistema de prioridad al enviar ordenes de compra a autorización vía app web.
+
+================================================================================
 SIIE 3.2 262.3/ 2025-02-06
 Edwin Omar CARMONA FIGUEROA
 
