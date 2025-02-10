@@ -794,13 +794,13 @@ public abstract class SAuthorizationUtils {
                         String res = SMatRequestAuthorizationUtils.applyCfg(session, ((int[]) pk)[0], oCfg);
                         if (res.isEmpty()) {
                             // Agregar los pasos de autorización generados por la ruta
-                            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                         }
                     }
                     // Si está basada en la condición de la tabla
                     else if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
-                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                     }
                     
                     for (SDbAuthorizationStep oStep : lSteps) {
@@ -815,7 +815,7 @@ public abstract class SAuthorizationUtils {
                 for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglones de autorización
-                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                     }
                     
                     for (SDbAuthorizationStep oStep : lSteps) {
@@ -834,13 +834,14 @@ public abstract class SAuthorizationUtils {
      * 
      * @param session
      * @param paths recibe ya las rutas de autorizacón
+     * @param priority
      * @param authorizationType
      * @param pkDps
      * @param reset determina si los pasos previos de autorización tienen que borrarse
      * 
      * @throws Exception 
      */
-    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
+    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int priority, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
         if (reset) {
             SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pkDps);
         }
@@ -853,7 +854,7 @@ public abstract class SAuthorizationUtils {
         // Lectura de path de configuración
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         for (SDbAuthorizationPath oCfg : paths) {
-            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps));
+            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps, priority));
             
             for (SDbAuthorizationStep oStep : lSteps) {
                 if (! SAuthorizationUtils.stepExists(session, oStep)) {
@@ -1029,7 +1030,7 @@ public abstract class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static ArrayList<SDbAuthorizationStep> createStepFromCfg(Connection connection, SDbAuthorizationPath oCfg, final Object pk) {
+    private static ArrayList<SDbAuthorizationStep> createStepFromCfg(Connection connection, SDbAuthorizationPath oCfg, final Object pk, final int priority) {
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         ArrayList<Integer> lUsers = SAuthorizationUtils.getUsersOfAutorizationNode(connection, oCfg.getFkNodeAuthorizationId());
         int nGroup = 0;
@@ -1068,6 +1069,7 @@ public abstract class SAuthorizationUtils {
             oStep.setComments("");
             oStep.setAuthorizationGrouper_n(nGroup);
             oStep.setUserAuthorizationsNode_n(oCfg.getNodeAuthorizationUsers());
+            oStep.setPriority(priority);
             oStep.setAllUsers(oCfg.isNodeAll());
             oStep.setAuthorized(false);
             oStep.setRejected(false);
@@ -1573,7 +1575,7 @@ public abstract class SAuthorizationUtils {
             SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
             dialog.setVisible(true);
             if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getAuthornNotes()).start();
+                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
             }
             else {
                 return false;

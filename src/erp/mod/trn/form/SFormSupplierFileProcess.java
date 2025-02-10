@@ -1710,7 +1710,12 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     public SGuiValidation validateForm() {
         SGuiValidation validation = new SGuiValidation();
         
-        if (moGridSuppFiles.getModel().getRowCount() == 0) {
+        if (jbAddRow.isEnabled()) {
+            validation.setMessage("Tiene un archivo de soporte en captura, debe agregarlo antes de guardar.");
+            validation.setComponent(jbAddRow);
+        }
+        
+        if (validation.isValid() && moGridSuppFiles.getModel().getRowCount() == 0) {
             validation.setMessage("Debe agregar al menos un archivo de soporte.");
             validation.setComponent(jbPickedQ);
         } 

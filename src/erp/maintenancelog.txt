@@ -1,13 +1,10 @@
 ================================================================================
-SIIE 3.2 262.4/ 2025-02-07 Jhonatan Claudio PEÑA HERNÁNDEZ
-
-1) Corrección del reporte de contratos en ingles con ítem
-2) Adición de de columna cantidad entregada y tabla de condiciones de entrega al reporte de ordenes de producción
-3) Nuevo reporte de Axilares contables para la función CLIRepBanlenceAge
-4) Corrección del reporte de auxiliares contables con ítem y CC
-5) Corrección del asociado de negocios GOM para contratos
-6) Vista de impuestos rústicos APSA
-7) Adición de la función CLIRepBanlenceAge
+SIIE 3.2 263.0/ 2025-02-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la pantalla para redactar comentarios en formas de captura, por el momento sólo implementada en RM.
+2) Se agrega validación para guardar la pantalla de archivos de soporte sólo cuando no haya un archivo pendiente por guardar.
+3) Se agrega un sistema de prioridad al enviar ordenes de compra a autorización vía app web.
 
 ================================================================================
 SIIE 3.2 262.3/ 2025-02-06
