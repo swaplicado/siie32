@@ -84,7 +84,8 @@ public class SAuthorizationsAPI {
                          */
                         ArrayList<Integer> lUsers;
                         try {
-                            lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk));
+                            boolean toNotification = true;
+                            lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
                             if (! lUsers.isEmpty()) {
                                 ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
                                 if (! lMails.isEmpty()) {

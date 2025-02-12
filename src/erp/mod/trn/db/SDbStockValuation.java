@@ -375,8 +375,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                      SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
                                             oRow.getFkDiogDocOutId_n(), 
                                             oRow.getFkDiogEntryOutId_n(), 
-                                            oRow.getCostUnitary(), 
-                                            1d, 
+                                            oRow.getCostUnitary(),
                                             SStockValuationUtils.CREDIT);
                 }
                 System.out.println("Generando pólizas...");

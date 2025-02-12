@@ -1,4 +1,43 @@
 ================================================================================
+SIIE 3.2 263.1/ 2025-02-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+
+1) Se toma el usuario de la tabla de dps cuando el documento está autorizado (AppLink)
+2) Se agrega columna de usuario en turno en vista de pedidos cuando está activo el complemento de autorizaciones web.
+3) Se agrega prioridad en obtención de documentos para su autorización.
+
+================================================================================
+SIIE 3.2 263.0/ 2025-02-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la pantalla para redactar comentarios en formas de captura, por el momento sólo implementada en RM.
+2) Se agrega validación para guardar la pantalla de archivos de soporte sólo cuando no haya un archivo pendiente por guardar.
+3) Se agrega un sistema de prioridad al enviar ordenes de compra a autorización vía app web.
+
+================================================================================
+SIIE 3.2 262.3/ 2025-02-06
+Edwin Omar CARMONA FIGUEROA
+
+1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios.
+
+================================================================================
+SIIE 3.2 262.2/ 2025-02-06
+Edwin Omar CARMONA FIGUEROA
+
+1) Corrección a la valuación de consumos por la actualización de costo y valor de salidas de stock
+
+================================================================================
+SIIE 3.2 262.1/ 2025-02-05 Jhonatan Claudio PEÑA HERNANDEZ
+1)Corrección facturas de anticipo por campo tipo de exportación
+
+================================================================================
+SIIE 3.2 262.0/ 2025-02-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios..
+
+================================================================================
 SIIE 3.2 261.3/ 2025-01-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -53,7 +92,6 @@ Edwin Omar CARMONA FIGUEROA
 1) Se agrega funcionalidad de traspaso de inventarios con costo para valuación de consumos.
 
 ================================================================================
-
 SIIE 3.2 260.2/ 2025-01-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

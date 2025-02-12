@@ -150,9 +150,11 @@ public abstract class SAuthorizationUtils {
      * @param statement
      * @param authorizationType
      * @param pk
+     * @param toNotification Este parámetro se envia cuando el método es utilizado para enviar una notificación a los usuarios
+     *                          Por ende, filtra solo los usuarios que tengan activada esta bandera en las tablas pivote de nodos.
      * @return 
      */
-    public static ArrayList<Integer> getUsersInTurnAuth(java.sql.Statement statement, final int authorizationType, final Object pk) {
+    public static ArrayList<Integer> getUsersInTurnAuth(java.sql.Statement statement, final int authorizationType, final Object pk, final boolean toNotification) {
         String condPk1 = "";
         String condPk2 = "";
         String condTableName = "";
@@ -170,34 +172,68 @@ public abstract class SAuthorizationUtils {
                 break;
         }
         
-        String sql = "SELECT  " +
-                    "    step1.fk_usr_step " +
-                    "FROM " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step1 " +
-                    "WHERE " +
-                    "    NOT step1.b_del " +
-                    "        AND step1.res_tab_name_n = " + condTableName + " " +
-                    "        AND " + condPk1 +
-                    "        AND NOT step1.b_authorn " +
-                    "        AND NOT step1.b_reject " +
-                    "        AND step1.lev = (SELECT  " +
-                    "            step2.lev " +
-                    "        FROM " +
-                    "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
-                    "        WHERE " +
-                    "            NOT step2.b_del " +
-                    "                AND step2.res_tab_name_n = " + condTableName + " " +
-                    "                AND " + condPk2 +
-                    "                AND NOT step2.b_authorn " +
-                    "                AND NOT step2.b_reject " +
-                    "        ORDER BY step2.lev ASC " +
-                    "        LIMIT 1);";
         try {
-            System.out.println(sql);
-            ResultSet res = statement.executeQuery(sql);
+            String sql;
             ArrayList<Integer> lUsers = new ArrayList<>();
-            while(res.next()) {
-                lUsers.add(res.getInt("step1.fk_usr_step"));
+            if (! toNotification) {
+                sql = "SELECT  " +
+                            "    step1.fk_usr_step " +
+                            "FROM " +
+                            "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step1 " +
+                            "WHERE " +
+                            "    NOT step1.b_del " +
+                            "        AND step1.res_tab_name_n = " + condTableName + " " +
+                            "        AND " + condPk1 +
+                            "        AND NOT step1.b_authorn " +
+                            "        AND NOT step1.b_reject " +
+                            "        AND step1.lev = (SELECT  " +
+                            "            step2.lev " +
+                            "        FROM " +
+                            "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
+                            "        WHERE " +
+                            "            NOT step2.b_del " +
+                            "                AND step2.res_tab_name_n = " + condTableName + " " +
+                            "                AND " + condPk2 +
+                            "                AND NOT step2.b_authorn " +
+                            "                AND NOT step2.b_reject " +
+                            "        ORDER BY step2.lev ASC " +
+                            "        LIMIT 1);";
+                
+                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
+                ResultSet res = statement.executeQuery(sql);
+                while(res.next()) {
+                    lUsers.add(res.getInt("step1.fk_usr_step"));
+                }
+            }
+            else {
+                sql = "SELECT DISTINCT " +
+                            "    step1.fk_node_step_n " +
+                            "FROM " +
+                            "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step1 " +
+                            "WHERE " +
+                            "    NOT step1.b_del " +
+                            "        AND step1.res_tab_name_n = " + condTableName + " " +
+                            "        AND " + condPk1 +
+                            "        AND NOT step1.b_authorn " +
+                            "        AND NOT step1.b_reject " +
+                            "        AND step1.lev = (SELECT  " +
+                            "            step2.lev " +
+                            "        FROM " +
+                            "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
+                            "        WHERE " +
+                            "            NOT step2.b_del " +
+                            "                AND step2.res_tab_name_n = " + condTableName + " " +
+                            "                AND " + condPk2 +
+                            "                AND NOT step2.b_authorn " +
+                            "                AND NOT step2.b_reject " +
+                            "        ORDER BY step2.lev ASC " +
+                            "        LIMIT 1);";
+               
+                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
+                ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
+                while(res.next()) {
+                    lUsers.addAll(SAuthorizationUtils.getUsersOfAutorizationNode(statement.getConnection(), res.getInt("step1.fk_node_step_n"), toNotification));
+                }
             }
             
             return lUsers;
@@ -794,13 +830,13 @@ public abstract class SAuthorizationUtils {
                         String res = SMatRequestAuthorizationUtils.applyCfg(session, ((int[]) pk)[0], oCfg);
                         if (res.isEmpty()) {
                             // Agregar los pasos de autorización generados por la ruta
-                            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                         }
                     }
                     // Si está basada en la condición de la tabla
                     else if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglón de autorización
-                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                     }
                     
                     for (SDbAuthorizationStep oStep : lSteps) {
@@ -815,7 +851,7 @@ public abstract class SAuthorizationUtils {
                 for (SDbAuthorizationPath oCfg : lCfgs) {
                     if (SAuthorizationUtils.applyCfg(session, oCfg, condPk)) {
                         // Crear renglones de autorización
-                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk));
+                        lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pk, 0));
                     }
                     
                     for (SDbAuthorizationStep oStep : lSteps) {
@@ -834,13 +870,14 @@ public abstract class SAuthorizationUtils {
      * 
      * @param session
      * @param paths recibe ya las rutas de autorizacón
+     * @param priority
      * @param authorizationType
      * @param pkDps
      * @param reset determina si los pasos previos de autorización tienen que borrarse
      * 
      * @throws Exception 
      */
-    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
+    public static void processAuthorizationsDps(SGuiSession session, final ArrayList<SDbAuthorizationPath> paths, final int priority, final int authorizationType, final Object pkDps, final boolean reset) throws Exception {
         if (reset) {
             SAuthorizationUtils.deleteStepsOfAuthorization(session, authorizationType, pkDps);
         }
@@ -853,7 +890,7 @@ public abstract class SAuthorizationUtils {
         // Lectura de path de configuración
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
         for (SDbAuthorizationPath oCfg : paths) {
-            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps));
+            lSteps.addAll(SAuthorizationUtils.createStepFromCfg(session.getDatabase().getConnection(), oCfg, pkDps, priority));
             
             for (SDbAuthorizationStep oStep : lSteps) {
                 if (! SAuthorizationUtils.stepExists(session, oStep)) {
@@ -1029,9 +1066,10 @@ public abstract class SAuthorizationUtils {
      * 
      * @return 
      */
-    private static ArrayList<SDbAuthorizationStep> createStepFromCfg(Connection connection, SDbAuthorizationPath oCfg, final Object pk) {
+    private static ArrayList<SDbAuthorizationStep> createStepFromCfg(Connection connection, SDbAuthorizationPath oCfg, final Object pk, final int priority) {
         ArrayList<SDbAuthorizationStep> lSteps = new ArrayList<>();
-        ArrayList<Integer> lUsers = SAuthorizationUtils.getUsersOfAutorizationNode(connection, oCfg.getFkNodeAuthorizationId());
+        boolean bNotifications = false;
+        ArrayList<Integer> lUsers = SAuthorizationUtils.getUsersOfAutorizationNode(connection, oCfg.getFkNodeAuthorizationId(), bNotifications);
         int nGroup = 0;
         if (oCfg.isNodeAll() || lUsers.size() > 1) {
             nGroup = SAuthorizationUtils.getNewAuthorizationGrouper(connection);
@@ -1068,6 +1106,7 @@ public abstract class SAuthorizationUtils {
             oStep.setComments("");
             oStep.setAuthorizationGrouper_n(nGroup);
             oStep.setUserAuthorizationsNode_n(oCfg.getNodeAuthorizationUsers());
+            oStep.setPriority(priority);
             oStep.setAllUsers(oCfg.isNodeAll());
             oStep.setAuthorized(false);
             oStep.setRejected(false);
@@ -1183,14 +1222,16 @@ public abstract class SAuthorizationUtils {
      * 
      * @param connection
      * @param idNode
+     * @param bNotification
      * 
      * @return 
      */
-    public static ArrayList<Integer> getUsersOfAutorizationNode(Connection connection, final int idNode) {
+    public static ArrayList<Integer> getUsersOfAutorizationNode(Connection connection, final int idNode, boolean bNotification) {
         String sql = "SELECT canu.id_authorn_user AS id_user "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_USR) + " AS canu "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " uu ON canu.id_authorn_user = uu.id_usr "
                 + "WHERE canu.id_authorn_node = " + idNode + " AND NOT canu.b_del AND NOT uu.b_del AND uu.b_act "
+                + (bNotification ? "AND canu.b_email_notifs " : "")
                 + "UNION "
                 + "SELECT  usr.id_usr AS id_user "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_NODE_POS) + " AS apos "
@@ -1199,6 +1240,7 @@ public abstract class SAuthorizationUtils {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS usr ON emp.id_emp = usr.fid_bp_n "
                 + "WHERE "
                 + "NOT apos.b_del AND NOT emp.b_del "
+                + (bNotification ? "AND apos.b_email_notifs " : "")
                 + "AND NOT usr.b_del "
                 + "AND usr.b_act "
                 + "AND apos.id_authorn_node = " + idNode + ";";
@@ -1573,7 +1615,7 @@ public abstract class SAuthorizationUtils {
             SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
             dialog.setVisible(true);
             if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getAuthornNotes()).start();
+                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
             }
             else {
                 return false;
@@ -1588,14 +1630,16 @@ public abstract class SAuthorizationUtils {
     
     /**
     * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
-     * @param session
-     * @param authorizationType
-     * @param pkDps
+    * 
+    * @param session
+    * @param authorizationType
+    * @param pkDps
     */
     public static void processAuthornMails(final SGuiSession session, final int authorizationType, int[] pkDps) {
         ArrayList<Integer> lUsers;
         try {
-            lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps);
+            boolean toNotification = true;
+            lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps, toNotification);
             if (! lUsers.isEmpty()) {
                 ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), lUsers);
                 if (! lMails.isEmpty()) {

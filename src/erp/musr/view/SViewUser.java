@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.musr.view;
 
 import erp.client.SClientInterface;
@@ -27,14 +26,14 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SViewUser extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbExport;
     private javax.swing.JButton jbSync;
-    
+
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
     public SViewUser(erp.client.SClientInterface client, java.lang.String tabTitle) {
@@ -54,17 +53,17 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         jbCopy.setToolTipText("Copiar usuario");
 
         addTaskBarUpperComponent(jbCopy);
-        
+
         jbExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
         jbExport.setPreferredSize(new Dimension(23, 23));
         jbExport.addActionListener(this);
         jbExport.setToolTipText("Exportar usuario");
-        
+
         jbSync = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
         jbSync.setPreferredSize(new Dimension(23, 23));
         jbSync.addActionListener(this);
         jbSync.setToolTipText("Sincronizar con sistemas externos");
-        
+
         try {
             if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS).isEmpty()) {
                 addTaskBarUpperComponent(jbExport);
@@ -73,14 +72,13 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         } catch (Exception ex) {
             Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
         //jbDelete.setEnabled(false);
-
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[15];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[17];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -104,14 +102,16 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uls.usr", "Usr. sincronización", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_last_sync_n", "Sincronización", STableConstants.WIDTH_DATE_TIME);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_USR).Level;
 
-        jbNew.setEnabled(levelRightEdit >=  SUtilConsts.LEV_AUTHOR);
-        jbEdit.setEnabled(levelRightEdit >=  SUtilConsts.LEV_AUTHOR);
+        jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.USRX_RIGHT);
@@ -163,29 +163,32 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
         }
     }
-    
+
     public int showMsgBoxConfirm(String msg) {
         return JOptionPane.showConfirmDialog(this, msg, SGuiConsts.MSG_BOX_CONFIRM, JOptionPane.YES_NO_OPTION);
     }
-    
+
     private void actionExport() {
         if (jbExport.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
-                int[] oUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                int[] pkUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                 SFormExportUser moSFormExportUser = new SFormExportUser((SClientInterface) miClient);
-                moSFormExportUser.setValue(oUser[0], null);
+                moSFormExportUser.setValue(pkUser[0], null);
                 moSFormExportUser.setVisible(true);
+                if (moSFormExportUser.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+                }
             }
         }
     }
-    
-    private void actionSynchronizeExternal(){
+
+    private void actionSynchronizeExternal() {
         if (jbSync.isEnabled()) {
             SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
-            boolean res = oExport.SynchronizeExternal();
+            oExport.SynchronizeExternal();
         }
     }
 
@@ -201,21 +204,23 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
         }
 
-        msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", " +
-                "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, b.bp, e.b_act " +
-                "FROM erp.usru_usr AS u " +
-                "INNER JOIN erp.usru_usr AS un ON " +
-                "u.fid_usr_new = un.id_usr " +
-                "INNER JOIN erp.usru_usr AS ue ON " +
-                "u.fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON " +
-                "u.fid_usr_del =  ud.id_usr " +
-                "LEFT OUTER JOIN erp.bpsu_bp AS b ON " +
-                "b.id_bp = u.fid_bp_n " +
-                "LEFT OUTER JOIN erp.hrsu_emp AS e ON " +
-                "b.id_bp = e.id_emp " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY u.usr, u.id_usr ";
+        msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
+                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, e.b_act "
+                + "FROM erp.usru_usr AS u "
+                + "INNER JOIN erp.usru_usr AS un ON "
+                + "u.fid_usr_new = un.id_usr "
+                + "INNER JOIN erp.usru_usr AS ue ON "
+                + "u.fid_usr_edit = ue.id_usr "
+                + "INNER JOIN erp.usru_usr AS ud ON "
+                + "u.fid_usr_del =  ud.id_usr "
+                + "LEFT JOIN erp.usru_usr AS uls ON "
+                + "u.fid_usr_last_sync_n =  uls.id_usr "
+                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON "
+                + "b.id_bp = u.fid_bp_n "
+                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON "
+                + "b.id_bp = e.id_emp "
+                + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere)
+                + "ORDER BY u.usr, u.id_usr ";
     }
 
     @Override
@@ -224,7 +229,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
-            
+
             if (button == jbCopy) {
                 actionCopy();
             }

@@ -44,14 +44,16 @@ public class SProcDpsSendAuthornWeb extends Thread {
     private final SClientInterface miClient;
     private final SDbSupplierFileProcess moSuppFileProc;
     private final ArrayList<SDbAuthorizationPath> maAuthPaths;
+    private final int mnPriority;
     private final String msAuthNotes;
     
     private String msError;
 
-    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, ArrayList<SDbAuthorizationPath> paths, String notes) {
+    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, ArrayList<SDbAuthorizationPath> paths, int priority, String notes) {
         miClient = client;
         moSuppFileProc = proc;
         maAuthPaths = paths;
+        mnPriority = priority;
         msAuthNotes = notes;
         setDaemon(true);
     }
@@ -110,7 +112,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
             return false;
         }
 
-        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
+        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, mnPriority, SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
 
         System.out.println("Documento enviado a autorización con éxito.");
         return true;

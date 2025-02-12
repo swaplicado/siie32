@@ -19,6 +19,7 @@ public class SWebDpsRow {
     private String dpsNumRef;
     private String provider;
     private String providerFiscalId;
+    private String costCenters;
     private double subTotal;
     private double taxCharged;
     private double taxRetained;
@@ -31,6 +32,7 @@ public class SWebDpsRow {
     private String currency;
     private double exchangeRate;
     private boolean authorized;
+    private boolean returned;
     private String authText;
     private String matReqFolio;
     private String matReqDt;
@@ -39,6 +41,8 @@ public class SWebDpsRow {
     private String dpsUser;
     private String matReqUser;
     private String notesAuth;
+    private String userInTurn;
+    private int authorizationPriority;
 
     public int getIdYear() {
         return idYear;
@@ -102,6 +106,14 @@ public class SWebDpsRow {
 
     public void setProviderFiscalId(String providerFiscalId) {
         this.providerFiscalId = providerFiscalId;
+    }
+
+    public String getCostCenters() {
+        return costCenters;
+    }
+
+    public void setCostCenters(String costCenters) {
+        this.costCenters = costCenters;
     }
 
     public double getSubTotal() {
@@ -200,6 +212,14 @@ public class SWebDpsRow {
         this.authorized = isAuthorized;
     }
 
+    public boolean isReturned() {
+        return returned;
+    }
+
+    public void setReturned(boolean returned) {
+        this.returned = returned;
+    }
+    
     public String getAuthText() {
         return authText;
     }
@@ -262,6 +282,22 @@ public class SWebDpsRow {
 
     public void setNotesAuth(String notesAuth) {
         this.notesAuth = notesAuth;
+    }
+
+    public String getUserInTurn() {
+        return userInTurn;
+    }
+
+    public void setUserInTurn(String userInTurn) {
+        this.userInTurn = userInTurn;
+    }
+
+    public int getAuthorizationPriority() {
+        return authorizationPriority;
+    }
+
+    public void setAuthorizationPriority(int authorizationPriority) {
+        this.authorizationPriority = authorizationPriority;
     }
     
 }
