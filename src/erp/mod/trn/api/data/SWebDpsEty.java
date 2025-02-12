@@ -5,6 +5,8 @@
  */
 package erp.mod.trn.api.data;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Edwin Carmona
@@ -23,11 +25,17 @@ public class SWebDpsEty {
     String costCenter;
     double quantity;
     double price;
+    double priceCur;
     double subtotal;
     double taxCharged;
     double taxRetained;
     double total;
+    ArrayList<SWebItemHistory> lItemHistory;
     SWebMaterialRequest oMaterialRequest;
+
+    public SWebDpsEty() {
+        this.lItemHistory = new ArrayList<>();
+    }
 
     /**
      * getters y setters
@@ -110,6 +118,12 @@ public class SWebDpsEty {
     public void setPrice(double price) {
         this.price = price;
     }
+    public double getPriceCur() {
+        return priceCur;
+    }
+    public void setPriceCur(double priceCur) {
+        this.priceCur = priceCur;
+    }
     public double getSubtotal() {
         return subtotal;
     }
@@ -133,6 +147,18 @@ public class SWebDpsEty {
     }
     public void setTotal(double total) {
         this.total = total;
+    }
+    public String getPartNumber() {
+        return partNumber;
+    }
+    public void setPartNumber(String partNumber) {
+        this.partNumber = partNumber;
+    }
+    public ArrayList<SWebItemHistory> getlItemHistory() {
+        return lItemHistory;
+    }
+    public void setlItemHistory(ArrayList<SWebItemHistory> lItemHistory) {
+        this.lItemHistory = lItemHistory;
     }
     public SWebMaterialRequest getoMaterialRequest() {
         return oMaterialRequest;

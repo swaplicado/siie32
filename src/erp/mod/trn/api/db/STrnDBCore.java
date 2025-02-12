@@ -14,6 +14,8 @@ import erp.mod.trn.api.data.SWebAuthorization;
 import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
+import erp.mod.trn.api.data.SWebItemHistory;
+import sa.lib.SLibUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -396,7 +398,7 @@ public class STrnDBCore {
         return null;
     }
 
-    public ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc) {
+    public ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc, String dpsDate) {
         try {
             Connection conn = this.getConnection();
 
@@ -416,10 +418,10 @@ public class STrnDBCore {
                     + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
                     + "        INNER JOIN "
                     + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety ON dps.id_year = ety.id_year "
-                    + "        AND dps.id_doc = ety.id_doc " + //
-                    "        INNER JOIN " + //
+                    + "        AND dps.id_doc = ety.id_doc " + 
+                    "        INNER JOIN " + 
                     "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ety.fid_item = i.id_item "
-                    + "        INNER JOIN " + //
+                    + "        INNER JOIN " + 
                     "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
                     + "        LEFT JOIN " + 
                     "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
@@ -447,6 +449,7 @@ public class STrnDBCore {
                 oEty.setCostCenter(res.getString("ceco"));
                 oEty.setQuantity(res.getDouble("qty"));
                 oEty.setPrice(res.getDouble("price_u"));
+                oEty.setPriceCur(res.getDouble("price_u_cur"));
                 oEty.setSubtotal(res.getDouble("stot_r"));
                 oEty.setTaxCharged(res.getDouble("tax_charged_r"));
                 oEty.setTaxRetained(res.getDouble("tax_retained_r"));
@@ -458,6 +461,7 @@ public class STrnDBCore {
             STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
             for (SWebDpsEty oEty : lEties) {
                 oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
+                oEty.getlItemHistory().addAll(this.getDpsItemHistory(dpsDate, oEty.getIdItem(), oEty.getPrice(), oEty.getPriceCur(), 1));
             }
 
             return lEties;
@@ -497,6 +501,90 @@ public class STrnDBCore {
 
             return lNotes;
         } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return new ArrayList<>();
+    }
+
+    public ArrayList<SWebItemHistory> getDpsItemHistory(String dateDoc, int idItem, double currentPrice, double currentPriceCurrency, int queryLimit) {
+        try {
+            Connection conn = this.getConnection();
+
+            if (conn == null) {
+                return null;
+            }
+
+            if (queryLimit <= 0) {
+                queryLimit = 1;
+            }
+
+            String query = "SELECT  " + 
+                                "    de.fid_item, " + 
+                                "    d.dt, " + 
+                                "    bp.bp_comm, " + 
+                                "    de.concept_key, " + 
+                                "    de.concept, " + 
+                                "    de.qty, " + 
+                                "    de.price_u, " + 
+                                "    de.price_u_cur, " + 
+                                "    u.unit, " + 
+                                "    u.symbol, " + 
+                                "    cur.cur, " + 
+                                "    cur.cur_key " + 
+                                "FROM " + 
+                                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " + 
+                                "        INNER JOIN " + 
+                                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " de ON (d.id_year = de.id_year " + 
+                                "        AND d.id_doc = de.id_doc) " + 
+                                "        INNER JOIN " + 
+                                "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON (d.fid_bp_r = bp.id_bp) " + 
+                                "        INNER JOIN " + 
+                                "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON (de.fid_unit = u.id_unit) " + 
+                                "        INNER JOIN " + 
+                                "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON (d.fid_cur = cur.id_cur) " + 
+                                "WHERE " + 
+                                "    de.fid_item = " + idItem + " " + 
+                                "        AND d.dt < '" + dateDoc + "' " + 
+                                "        AND NOT d.b_del " + 
+                                "        AND NOT de.b_del " + 
+                                "        AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " " + 
+                                "        AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " " + 
+                                "        AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " " + 
+                                "ORDER BY d.dt DESC " +
+                                "LIMIT " + queryLimit + ";";
+            
+            Statement st = conn.createStatement();
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+            ResultSet res = st.executeQuery(query);
+            ArrayList<SWebItemHistory> lHistory = new ArrayList<>();
+            while (res.next()) {
+                SWebItemHistory oHistory = new SWebItemHistory();
+                oHistory.setIdItem(res.getInt("de.fid_item"));
+                oHistory.setLastPurchaseDate(res.getDate("dt"));
+                oHistory.setLastProvider(res.getString("bp.bp_comm"));
+                oHistory.setConceptKey(res.getString("de.concept_key"));
+                oHistory.setConcept(res.getString("de.concept"));
+                oHistory.setQuantity(res.getDouble("de.qty"));
+                oHistory.setPriceUnitary(res.getDouble("de.price_u"));
+                oHistory.setPriceUnitaryCur(res.getDouble("de.price_u_cur"));
+                oHistory.setUnitName(res.getString("u.unit"));
+                oHistory.setUnitSymbol(res.getString("u.symbol"));
+                oHistory.setCurrencyName(res.getString("cur.cur"));
+                oHistory.setCurrencySymbol(res.getString("cur.cur_key"));
+                oHistory.setCurrentPriceUnitary(currentPrice);
+                oHistory.setCurrentPriceUnitaryCur(currentPriceCurrency);
+                if (oHistory.getPriceUnitary() > 0) {
+                    oHistory.setPercentage(SLibUtils.round(((currentPrice - oHistory.getPriceUnitary()) * 100) / currentPrice, 4));
+                }
+
+                lHistory.add(oHistory);
+            }
+
+            return lHistory;
+
+        }
+        catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
