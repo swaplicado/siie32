@@ -1,8 +1,14 @@
 ================================================================================
+SIIE 3.2 263.2/ 2025-02-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión general de generación de layouts de la DIOT.
+2) Implementación y revisión de validaciones de captura de pólizas contables en relación a la DIOT.
+
+================================================================================
 SIIE 3.2 263.1/ 2025-02-10
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-
 1) Se toma el usuario de la tabla de dps cuando el documento está autorizado (AppLink)
 2) Se agrega columna de usuario en turno en vista de pedidos cuando está activo el complemento de autorizaciones web.
 3) Se agrega prioridad en obtención de documentos para su autorización.
@@ -18,18 +24,19 @@ Isabel Danae GARCÍA SERVÍN
 ================================================================================
 SIIE 3.2 262.3/ 2025-02-06
 Edwin Omar CARMONA FIGUEROA
-
+--------------------------------------------------------------------------------
 1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios.
 
 ================================================================================
 SIIE 3.2 262.2/ 2025-02-06
 Edwin Omar CARMONA FIGUEROA
-
+--------------------------------------------------------------------------------
 1) Corrección a la valuación de consumos por la actualización de costo y valor de salidas de stock
 
 ================================================================================
 SIIE 3.2 262.1/ 2025-02-05 Jhonatan Claudio PEÑA HERNANDEZ
-1)Corrección facturas de anticipo por campo tipo de exportación
+--------------------------------------------------------------------------------
+1) Corrección facturas de anticipo por campo tipo de exportación
 
 ================================================================================
 SIIE 3.2 262.0/ 2025-02-04
