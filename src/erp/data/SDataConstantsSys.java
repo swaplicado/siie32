@@ -93,13 +93,10 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_ST_AUTHORN_REJ = 5; // rejected
     public static final int CFGS_ST_AUTHORN_SND = 11; // sending
     public static final int CFGS_ST_AUTHORN_SNDF = 12; // send failure
-
-    
-    
-    
     
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
+    public static final String CFG_PARAM_DIOT_TAX_REGS_IGNORED = "DIOT_TAX_REGS_IGNORED";
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
@@ -126,7 +123,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_ACC_FA_DPS_NAT = "TRN_ACC_FA_DPS_NAT";
     public static final String CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT = "TRN_PUR_EXP_TP_ADM_CPT";
     public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
-    public static final String CFG_PARAM_TRN_STK_SUPP_ZERO = "TRN_STK_SUPP_ZERO";
+    public static final String CFG_PARAM_TRN_STK_SUP_ZERO = "TRN_STK_SUP_ZERO";
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";

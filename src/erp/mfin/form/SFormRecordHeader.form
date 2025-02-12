@@ -66,7 +66,7 @@
             <Property name="columns" type="int" value="1"/>
             <Property name="horizontalGap" type="int" value="5"/>
             <Property name="rows" type="int" value="11"/>
-            <Property name="verticalGap" type="int" value="1"/>
+            <Property name="verticalGap" type="int" value="2"/>
           </Layout>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="jPanel11">
@@ -260,7 +260,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="CONCEPT"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[425, 23]"/>
+                      <Dimension value="[300, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

@@ -525,7 +525,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                     sqlDatePeriod = setting.getSetting() == null ? "" : "AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
                 }
             }
-             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {

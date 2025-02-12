@@ -1350,7 +1350,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                             oAccountingRowParent.setIsDeleted(oDataAccount.getIsDeleted());
                             oAccountingRowParent.setFkCurrencyId(oAccountingRow.getFkCurrencyId());
                             oAccountingRowParent.setCurrencyKey(oAccountingRow.getCurrencyKey());
-                            oAccountingRowParent.setStyle(oDataAccount.getLevel() == 1 ? STableConstants.STYLE_BOLD : oDataAccount.getLevel() < oDataAccount.getDbmsMajorDeep() ? STableConstants.STYLE_ITALIC : STableConstants.UNDEFINED);
+                            oAccountingRowParent.setStyle(oDataAccount.getLevel() == 1 ? STableConstants.STYLE_BOLD : oDataAccount.getLevel() < oDataAccount.getDbmsLedgerAccountDeep() ? STableConstants.STYLE_ITALIC : STableConstants.UNDEFINED);
 
                             vParentRows.add(oAccountingRowParent);
                         }

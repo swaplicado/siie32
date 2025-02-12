@@ -65,8 +65,8 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
     protected boolean mbDbmsIsRequiredEntity;
     protected boolean mbDbmsIsRequiredBizPartner;
     protected boolean mbDbmsIsRequiredItem;
-    protected int mnDbmsMajorDeep;
-    protected java.lang.String msDbmsPkAccountMajorIdXXX;
+    protected int mnDbmsLedgerAccountDeep;
+    protected java.lang.String msDbmsPkLedgerAccountIdXXX;
 
     public SDataAccount() {
         super(SDataConstants.FIN_ACC);
@@ -152,8 +152,8 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
     public boolean getDbmsIsRequiredCostCenter() { return mbDbmsIsRequiredCostCenter; }
-    public int getDbmsMajorDeep() { return mnDbmsMajorDeep; }
-    public java.lang.String getDbmsPkAccountMajorIdXXX() { return msDbmsPkAccountMajorIdXXX; }
+    public int getDbmsLedgerAccountDeep() { return mnDbmsLedgerAccountDeep; }
+    public java.lang.String getDbmsPkLedgerAccountIdXXX() { return msDbmsPkLedgerAccountIdXXX; }
     
     public int[] getAccountClassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r }; }
     public int[] getAccountSubclassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r, mnFkAccountSubclassId_r }; }
@@ -211,9 +211,9 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        mnDbmsMajorDeep = 0;
         mbDbmsIsRequiredCostCenter = false;
-        msDbmsPkAccountMajorIdXXX = "";
+        mnDbmsLedgerAccountDeep = 0;
+        msDbmsPkLedgerAccountIdXXX = "";
     }
 
     @Override
@@ -273,13 +273,13 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
 
-                // Read aswell major account's settings:
+                // Read as well ledger account's settings:
 
                 if (mnDeep != 0) {
-                    // This account is allready a major account:
+                    // This account is allready a ledger account:
 
-                    msDbmsPkAccountMajorIdXXX = msPkAccountIdXXX;
-                    mnDbmsMajorDeep = mnDeep;
+                    msDbmsPkLedgerAccountIdXXX = msPkAccountIdXXX;
+                    mnDbmsLedgerAccountDeep = mnDeep;
                     mbDbmsIsRequiredCostCenter = mbIsRequiredCostCenter;
                 }
                 else {
@@ -289,18 +289,18 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        // Major account's deep:
+                        // Ledger account's deep:
 
                         accountFormat = resultSet.getString(1).replace('9', '0');
-                        msDbmsPkAccountMajorIdXXX = msPkAccountIdXXX.substring(0, msPkAccountIdXXX.indexOf('-')) + accountFormat.substring(msPkAccountIdXXX.indexOf('-'));
+                        msDbmsPkLedgerAccountIdXXX = msPkAccountIdXXX.substring(0, msPkAccountIdXXX.indexOf('-')) + accountFormat.substring(msPkAccountIdXXX.indexOf('-'));
 
-                        sql = "SELECT deep FROM fin_acc WHERE id_acc = '" + msDbmsPkAccountMajorIdXXX + "' ";
+                        sql = "SELECT deep FROM fin_acc WHERE id_acc = '" + msDbmsPkLedgerAccountIdXXX + "' ";
                         resultSet = statement.executeQuery(sql);
                         if (!resultSet.next()) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                         else {
-                            mnDbmsMajorDeep = resultSet.getInt("deep");
+                            mnDbmsLedgerAccountDeep = resultSet.getInt("deep");
                         }
 
                         // Check if center cost and system subaccounts are required in parent account:

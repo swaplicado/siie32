@@ -1728,7 +1728,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                         try {
                             // Configuración de los ítems que deben ser ingresados al almacén en cero
-                            String sSuppZeroCfg = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_STK_SUPP_ZERO);
+                            String sSuppZeroCfg = SCfgUtils.getParamValue(miClient.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_STK_SUP_ZERO);
                             ObjectMapper mapper = new ObjectMapper();
                             oCfg = mapper.readValue(sSuppZeroCfg, SSupplyZeroConfiguration.class);
                         }

@@ -187,7 +187,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldIsInventoriable;
     private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldFkTaxRegionId;
-    private erp.lib.form.SFormField moFieldFkThirdTaxCausingId_n;
+    private erp.lib.form.SFormField moFieldFkThirdTaxpayerId_n;
     private erp.lib.form.SFormField moFieldFkItemReferenceId_n;
     private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldOperationsType;
@@ -425,10 +425,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbEditTaxRegion = new javax.swing.JButton();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
         jPanel34 = new javax.swing.JPanel();
-        jlFkThirdTaxCausingId_n = new javax.swing.JLabel();
-        jcbFkThirdTaxCausingId_n = new javax.swing.JComboBox();
-        jbFkThirdTaxCausingId_n = new javax.swing.JButton();
-        jbEditFkThirdTaxCausingId_n = new javax.swing.JButton();
+        jlFkThirdTaxpayerId_n = new javax.swing.JLabel();
+        jcbFkThirdTaxpayerId_n = new javax.swing.JComboBox();
+        jbFkThirdTaxpayerId_n = new javax.swing.JButton();
+        jbEditFkThirdTaxpayerId_n = new javax.swing.JButton();
         jpCommissions = new javax.swing.JPanel();
         jpPricesData = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
@@ -1364,24 +1364,24 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkThirdTaxCausingId_n.setText("Tercero causante:");
-        jlFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel34.add(jlFkThirdTaxCausingId_n);
+        jlFkThirdTaxpayerId_n.setText("Tercero causante:");
+        jlFkThirdTaxpayerId_n.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel34.add(jlFkThirdTaxpayerId_n);
 
-        jcbFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel34.add(jcbFkThirdTaxCausingId_n);
+        jcbFkThirdTaxpayerId_n.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel34.add(jcbFkThirdTaxpayerId_n);
 
-        jbFkThirdTaxCausingId_n.setText("...");
-        jbFkThirdTaxCausingId_n.setToolTipText("Seleccionar tercero causante");
-        jbFkThirdTaxCausingId_n.setFocusable(false);
-        jbFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel34.add(jbFkThirdTaxCausingId_n);
+        jbFkThirdTaxpayerId_n.setText("...");
+        jbFkThirdTaxpayerId_n.setToolTipText("Seleccionar tercero causante");
+        jbFkThirdTaxpayerId_n.setFocusable(false);
+        jbFkThirdTaxpayerId_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel34.add(jbFkThirdTaxpayerId_n);
 
-        jbEditFkThirdTaxCausingId_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEditFkThirdTaxCausingId_n.setToolTipText("Habilitar tercero causante");
-        jbEditFkThirdTaxCausingId_n.setFocusable(false);
-        jbEditFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel34.add(jbEditFkThirdTaxCausingId_n);
+        jbEditFkThirdTaxpayerId_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditFkThirdTaxpayerId_n.setToolTipText("Habilitar tercero causante");
+        jbEditFkThirdTaxpayerId_n.setFocusable(false);
+        jbEditFkThirdTaxpayerId_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel34.add(jbEditFkThirdTaxpayerId_n);
 
         jPanel33.add(jPanel34);
 
@@ -2590,8 +2590,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
         moFieldFkTaxRegionId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxRegionId, jlFkTaxRegionId);
         moFieldFkTaxRegionId.setPickerButton(jbFkTaxRegionId);
-        moFieldFkThirdTaxCausingId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkThirdTaxCausingId_n, jlFkThirdTaxCausingId_n);
-        moFieldFkThirdTaxCausingId_n.setPickerButton(jbFkThirdTaxCausingId_n);
+        moFieldFkThirdTaxpayerId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkThirdTaxpayerId_n, jlFkThirdTaxpayerId_n);
+        moFieldFkThirdTaxpayerId_n.setPickerButton(jbFkThirdTaxpayerId_n);
         moFieldFkItemReferenceId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemReferenceId_n, jlFkItemReferenceId_n);
         moFieldFkItemReferenceId_n.setPickerButton(jbFkItemReferenceId_n);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
@@ -2718,7 +2718,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldIsInventoriable);
         mvFields.add(moFieldIsDeleted);
         mvFields.add(moFieldFkTaxRegionId);
-        mvFields.add(moFieldFkThirdTaxCausingId_n);
+        mvFields.add(moFieldFkThirdTaxpayerId_n);
         mvFields.add(moFieldFkItemReferenceId_n);
         mvFields.add(moFieldReference);
         mvFields.add(moFieldOperationsType);
@@ -2919,8 +2919,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkItemReferenceId_n.addActionListener(this);
         jbFkTaxRegionId.addActionListener(this);
         jbEditTaxRegion.addActionListener(this);
-        jbFkThirdTaxCausingId_n.addActionListener(this);
-        jbEditFkThirdTaxCausingId_n.addActionListener(this);
+        jbFkThirdTaxpayerId_n.addActionListener(this);
+        jbEditFkThirdTaxpayerId_n.addActionListener(this);
         jbEditLogistics.addActionListener(this);
         jbNotesNew.addActionListener(this);
         jbNotesEdit.addActionListener(this);
@@ -3164,7 +3164,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkUnitId(0);
             moDpsEntry.setFkOriginalUnitId(0);
             moDpsEntry.setFkTaxRegionId(0);
-            moDpsEntry.setFkThirdTaxCausingId_n(0);
+            moDpsEntry.setFkThirdTaxpayerId_n(0);
 
             moDpsEntry.setDbmsFkItemGenericId(0);
 
@@ -3179,7 +3179,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkUnitId(moItem.getFkUnitId());
             moDpsEntry.setFkOriginalUnitId(moFieldFkOriginalUnitId.getKeyAsIntArray()[0]);
             moDpsEntry.setFkTaxRegionId(moFieldFkTaxRegionId.getKeyAsIntArray()[0]);
-            moDpsEntry.setFkThirdTaxCausingId_n(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0]);
+            moDpsEntry.setFkThirdTaxpayerId_n(moFieldFkThirdTaxpayerId_n.getKeyAsIntArray()[0]);
             moDpsEntry.setIsPrepayment(moItem.getIsPrepayment());
 
             moDpsEntry.setDbmsFkItemGenericId(moItem.getFkItemGenericId());
@@ -4261,9 +4261,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbFkTaxRegionId.setEnabled(false);
             jbEditTaxRegion.setEnabled(false);
             jckIsTaxesAutomaticApplying.setEnabled(false);
-            jcbFkThirdTaxCausingId_n.setEnabled(false);
-            jbFkThirdTaxCausingId_n.setEnabled(false);
-            jbEditFkThirdTaxCausingId_n.setEnabled(false);
+            jcbFkThirdTaxpayerId_n.setEnabled(false);
+            jbFkThirdTaxpayerId_n.setEnabled(false);
+            jbEditFkThirdTaxpayerId_n.setEnabled(false);
 
             jtfLength.setEnabled(false);
             jtfSurface.setEnabled(false);
@@ -4356,9 +4356,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbFkTaxRegionId.setEnabled(false);
             jbEditTaxRegion.setEnabled(true);
             jckIsTaxesAutomaticApplying.setEnabled(true);
-            jcbFkThirdTaxCausingId_n.setEnabled(false);
-            jbFkThirdTaxCausingId_n.setEnabled(false);
-            jbEditFkThirdTaxCausingId_n.setEnabled(true);
+            jcbFkThirdTaxpayerId_n.setEnabled(false);
+            jbFkThirdTaxpayerId_n.setEnabled(false);
+            jbEditFkThirdTaxpayerId_n.setEnabled(true);
 
             jcbFkVehicleTypeId_n.setEnabled(true);
 //            jtfDriver.setEditable(true);
@@ -4722,15 +4722,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
     
-    private void actionFkThirdTaxCausingId_n() {
-        miClient.pickOption(moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP, moFieldFkThirdTaxCausingId_n, null);
+    private void actionFkThirdTaxpayerId_n() {
+        miClient.pickOption(moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP, moFieldFkThirdTaxpayerId_n, null);
     }
 
-    private void actionEditFkThirdTaxCausingId_n() {
-        jbEditFkThirdTaxCausingId_n.setEnabled(false);
-        jbFkThirdTaxCausingId_n.setEnabled(true);
-        jcbFkThirdTaxCausingId_n.setEnabled(true);
-        jcbFkThirdTaxCausingId_n.requestFocusInWindow();
+    private void actionEditFkThirdTaxpayerId_n() {
+        jbEditFkThirdTaxpayerId_n.setEnabled(false);
+        jbFkThirdTaxpayerId_n.setEnabled(true);
+        jcbFkThirdTaxpayerId_n.setEnabled(true);
+        jcbFkThirdTaxpayerId_n.requestFocusInWindow();
     }
 
     private void actionEditLogistics() {
@@ -5414,7 +5414,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbConcept;
     private javax.swing.JButton jbConceptKey;
     private javax.swing.JButton jbDateQuantityChg;
-    private javax.swing.JButton jbEditFkThirdTaxCausingId_n;
+    private javax.swing.JButton jbEditFkThirdTaxpayerId_n;
     private javax.swing.JButton jbEditLogistics;
     private javax.swing.JButton jbEditNotes;
     private javax.swing.JButton jbEditTaxRegion;
@@ -5422,7 +5422,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbFkItemReferenceId_n;
     private javax.swing.JButton jbFkOriginalUnitId;
     private javax.swing.JButton jbFkTaxRegionId;
-    private javax.swing.JButton jbFkThirdTaxCausingId_n;
+    private javax.swing.JButton jbFkThirdTaxpayerId_n;
     private javax.swing.JButton jbGridPriceDelete;
     private javax.swing.JButton jbGridPriceEdit;
     private javax.swing.JButton jbGridPriceNew;
@@ -5446,7 +5446,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemReferenceId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkOriginalUnitId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxRegionId;
-    private javax.swing.JComboBox jcbFkThirdTaxCausingId_n;
+    private javax.swing.JComboBox jcbFkThirdTaxpayerId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbItemComposition;
     private javax.swing.JComboBox jcbOperationsType;
@@ -5517,7 +5517,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlFkItemReferenceId_n;
     private javax.swing.JLabel jlFkOriginalUnitId;
     private javax.swing.JLabel jlFkTaxRegionId;
-    private javax.swing.JLabel jlFkThirdTaxCausingId_n;
+    private javax.swing.JLabel jlFkThirdTaxpayerId_n;
     private javax.swing.JLabel jlFkVehicleTypeId_n;
     private javax.swing.JLabel jlIsPriceVariable;
     private javax.swing.JLabel jlItemComposition;
@@ -6224,9 +6224,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDiscountDoc.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
                     validation.setComponent(jtfDiscountDocCy);
                 }
-                else if (jcbFkThirdTaxCausingId_n.getSelectedIndex() > 0 && SLibUtils.belongsTo(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0], new int[] { moParamDps.getFkBizPartnerId_r(), miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() })) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkThirdTaxCausingId_n.getText() + "'."); // third party cannot be the owner of this document nor the company itself
-                    validation.setComponent(jcbFkThirdTaxCausingId_n);
+                else if (jcbFkThirdTaxpayerId_n.getSelectedIndex() > 0 && SLibUtils.belongsTo(moFieldFkThirdTaxpayerId_n.getKeyAsIntArray()[0], new int[] { moParamDps.getFkBizPartnerId_r(), miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() })) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkThirdTaxpayerId_n.getText() + "'."); // third party cannot be the owner of this document nor the company itself
+                    validation.setComponent(jcbFkThirdTaxpayerId_n);
                 }
                 else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
@@ -6582,7 +6582,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldIsInventoriable.setFieldValue(moDpsEntry.getIsInventoriable());
         moFieldIsDeleted.setFieldValue(moDpsEntry.getIsDeleted());
         moFieldFkTaxRegionId.setFieldValue(new int[] { moDpsEntry.getFkTaxRegionId() });
-        moFieldFkThirdTaxCausingId_n.setFieldValue(new int[] { moDpsEntry.getFkThirdTaxCausingId_n() });
+        moFieldFkThirdTaxpayerId_n.setFieldValue(new int[] { moDpsEntry.getFkThirdTaxpayerId_n() });
         moFieldFkItemReferenceId_n.setFieldValue(new int[] { moDpsEntry.getFkItemRefId_n() });
         moFieldReference.setFieldValue(moDpsEntry.getReference());
         moFieldOperationsType.setFieldValue(new int[] { moDpsEntry.getOperationsType() });
@@ -6887,7 +6887,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     }
                     
                     SFormUtilities.populateComboBox(miClient, jcbFkCashAccountId_n, SDataConstants.FIN_ACC_CASH, new int[] { moParamDps.getFkCompanyBranchId() });
-                    SFormUtilities.populateComboBox(miClient, jcbFkThirdTaxCausingId_n, moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP);
+                    SFormUtilities.populateComboBox(miClient, jcbFkThirdTaxpayerId_n, moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP);
                     
                     jcbOperationsType.removeAllItems();
                     jcbOperationsType.addItem(new SFormComponentItem(null, "(Seleccionar tipo operación)"));
@@ -7048,11 +7048,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbEditTaxRegion) {
                 actionEditTaxRegion();
             }
-            else if (button == jbFkThirdTaxCausingId_n) {
-                actionFkThirdTaxCausingId_n();
+            else if (button == jbFkThirdTaxpayerId_n) {
+                actionFkThirdTaxpayerId_n();
             }
-            else if (button == jbEditFkThirdTaxCausingId_n) {
-                actionEditFkThirdTaxCausingId_n();
+            else if (button == jbEditFkThirdTaxpayerId_n) {
+                actionEditFkThirdTaxpayerId_n();
             }
             else if(button == jbEditLogistics){
                 actionEditLogistics();

@@ -376,7 +376,6 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        SDataAccount accountMajor = null;
         SFormValidation validation = new SFormValidation();
         String message = "";
 
@@ -400,9 +399,9 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                 validation.setComponent(moPanelAccountNewId.getFieldAccount().getComponent());
             }
             else {
-                accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+                SDataAccount ledgerAccount = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                 
-                if (accountMajor.getIsRequiredCostCenter() && moCostCenterNew == null) {
+                if (ledgerAccount.getIsRequiredCostCenter() && moCostCenterNew == null) {
                     validation.setMessage("La cuenta contable ('" + moAccountNew.getAccount() + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
                     validation.setComponent(moPanelCostCenterNewId_n.getFieldAccount().getComponent());
                 }

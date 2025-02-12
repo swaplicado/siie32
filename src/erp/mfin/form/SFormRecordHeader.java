@@ -114,7 +114,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel3.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel4.setLayout(new java.awt.GridLayout(11, 1, 5, 1));
+        jPanel4.setLayout(new java.awt.GridLayout(11, 1, 5, 2));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -208,7 +208,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jPanel7.add(jlConcept);
 
         jtfConcept.setText("CONCEPT");
-        jtfConcept.setPreferredSize(new java.awt.Dimension(425, 23));
+        jtfConcept.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel7.add(jtfConcept);
 
         jPanel4.add(jPanel7);
@@ -311,14 +311,14 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionOk(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedOk(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionCancel = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) { actionPerformedCancel(); }
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
@@ -330,7 +330,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
             if (miClient.getSessionXXX().getCurrentCompanyBranchId() == 0) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
-                actionCancel();
+                actionPerformedCancel();
             }
             else {
                 jftDate.requestFocus();
@@ -355,7 +355,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jtfCompanyBranch.setCaretPosition(0);
     }
 
-    private void itemStatePkRecordTypeId() {
+    private void itemStateChangedPkRecordTypeId() {
         boolean enable = false;
 
         if (jcbPkRecordTypeId.getSelectedIndex() > 0) {
@@ -374,15 +374,15 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         jckShowRecordAdjAudit.setSelected(false);
     }
 
-    private void actionDate() {
+    private void actionPerformedDate() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
     }
 
-    private void actionPkRecordTypeId() {
+    private void actionPerformedPkRecordTypeId() {
         miClient.pickOption(SDataConstants.FINX_TP_REC_USER, moFieldPkRecordTypeId, null);
     }
 
-    private void actionFkAccountCashId_n() {
+    private void actionPerformedFkAccountCashId_n() {
         miClient.pickOption(SDataConstants.FIN_ACC_CASH, moFieldFkAccountCashId_n, new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() });
     }
 
@@ -390,7 +390,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
     }
 
-    private void actionOk() {
+    private void actionPerformedOk() {
         SFormValidation validation = formValidate();
 
         if (validation.getIsError()) {
@@ -407,7 +407,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
         }
     }
 
-    private void actionCancel() {
+    private void actionPerformedCancel() {
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
@@ -486,7 +486,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         renderPeriod();
         renderCompanyBranch();
-        itemStatePkRecordTypeId();
+        itemStateChangedPkRecordTypeId();
 
         mbResetingForm = false;
     }
@@ -565,7 +565,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
 
         renderPeriod();
         renderCompanyBranch();
-        itemStatePkRecordTypeId();
+        itemStateChangedPkRecordTypeId();
 
         mbResetingForm = false;
     }
@@ -647,19 +647,19 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
             JButton button = (JButton) e.getSource();
 
             if (button == jbOk) {
-                actionOk();
+                actionPerformedOk();
             }
             else if (button == jbCancel) {
-                actionCancel();
+                actionPerformedCancel();
             }
             else if (button == jbDate) {
-                actionDate();
+                actionPerformedDate();
             }
             else if (button == jbPkRecordTypeId) {
-                actionPkRecordTypeId();
+                actionPerformedPkRecordTypeId();
             }
             else if (button == jbFkAccountCashId_n) {
-                actionFkAccountCashId_n();
+                actionPerformedFkAccountCashId_n();
             }
         }
     }
@@ -672,7 +672,7 @@ public class SFormRecordHeader extends javax.swing.JDialog implements erp.lib.fo
                     JComboBox comboBox = (JComboBox) e.getSource();
 
                     if (comboBox == jcbPkRecordTypeId) {
-                        itemStatePkRecordTypeId();
+                        itemStateChangedPkRecordTypeId();
                     }
                 }
             }

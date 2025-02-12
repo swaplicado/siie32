@@ -232,7 +232,7 @@ public abstract class SDataRegistry implements java.io.Serializable {
 
             File tempFile = new File(tempFileName);
             if (tempFile.delete()) {
-                System.out.println("El archivo temporal '" + tempFileName + "' sí fue eliminado.");
+                System.out.println("El archivo temporal '" + tempFileName + "' ha sido eliminado.");
             }
             else {
                 System.out.println("El archivo temporal '" + tempFileName + "' no fue eliminado.");

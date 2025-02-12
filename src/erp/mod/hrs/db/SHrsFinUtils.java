@@ -836,7 +836,7 @@ public abstract class SHrsFinUtils {
      * @return 
      */
     public static SDataAccount getAccountLedger(final SGuiSession session, SDataAccount account) {
-        return account.getLevel() == 1 ? account : (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+        return account.getLevel() == 1 ? account : (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
     }
     
     /**

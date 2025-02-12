@@ -26,7 +26,7 @@ public class SDiotAccountingTxn {
     private SDataDps moDps; 
     private int[] manDpsKey;
     private ArrayList<Entry> maEntries;
-    private ArrayList<ThirdTax> maThirdTaxes;
+    private ArrayList<ThirdTaxpayerTax> maThirdTaxpayerTaxes;
     
     /**
      * Create the representation of an accounting transaction, at the document level, if applicable.
@@ -50,7 +50,7 @@ public class SDiotAccountingTxn {
     
     private void createChildren() throws Exception {
         createEntries();
-        createThirdTaxes();
+        createThirdTaxpayerTaxes();
     }
     
     /**
@@ -96,12 +96,12 @@ public class SDiotAccountingTxn {
     }
     
     /**
-     * Create individual sumarized taxes of causing third parties by tax type.
+     * Create individual sumarized taxes of third taxpayers by tax type.
      * Should be called only by private method <code>createChildren()</code>.
      * @throws Exception 
      */
-    private void createThirdTaxes() throws Exception {
-        maThirdTaxes = new ArrayList<>();
+    private void createThirdTaxpayerTaxes() throws Exception {
+        maThirdTaxpayerTaxes = new ArrayList<>();
         
         if (manDpsKey[0] != 0 && manDpsKey[1] != 0) {
             String sql = "SELECT de.fid_third_tax_n, de.stot_r, det.id_tax_bas, det.id_tax, SUM(det.tax) AS _tax "
@@ -115,7 +115,7 @@ public class SDiotAccountingTxn {
             
             try (ResultSet resultSet = miStatement.executeQuery(sql)) {
                 while (resultSet.next()) {
-                    maThirdTaxes.add(new ThirdTax(
+                    maThirdTaxpayerTaxes.add(new ThirdTaxpayerTax(
                             resultSet.getInt("de.fid_third_tax_n"), 
                             resultSet.getDouble("de.stot_r"), 
                             new int[] { resultSet.getInt("det.id_tax_bas"), resultSet.getInt("det.id_tax") },
@@ -128,15 +128,15 @@ public class SDiotAccountingTxn {
     
     /**
      * Get Entry according to type of system movement and VAT.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @param vatKey Key of required VAT. Can be null.
      * @return Found entry, otherwise <code>null</code>.
      */
-    private Entry getEntry(int[] sysMovTypeXxx, final int[] vatKey) {
+    private Entry getEntry(int[] sysMovTypeXxxKey, final int[] vatKey) {
         Entry entry = null;
         
         for (Entry e : maEntries) {
-            if (SLibUtils.compareKeys(e.SysMovTypeXxx, sysMovTypeXxx) && SLibUtils.compareKeys(e.VatKey, vatKey)) {
+            if (SLibUtils.compareKeys(e.SysMovTypeXxxKey, sysMovTypeXxxKey) && SLibUtils.compareKeys(e.VatKey, vatKey)) {
                 entry = e;
                 break;
             }
@@ -147,21 +147,21 @@ public class SDiotAccountingTxn {
     
     /**
      * Get sum of debit or credit of entries, according to type of system movement.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @return Debit or credit of entry.
      */
-    private double getEntriesAmountSum(int[] sysMovTypeXxx) {
+    private double getEntriesAmountSum(int[] sysMovTypeXxxKey) {
         double amount = 0;
         
         for (Entry entry : maEntries) {
-            if (SLibUtils.compareKeys(entry.SysMovTypeXxx, sysMovTypeXxx)) {
-                if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP)) {
+            if (SLibUtils.compareKeys(entry.SysMovTypeXxxKey, sysMovTypeXxxKey)) {
+                if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP)) {
                     amount = SLibUtils.roundAmount(amount + entry.getAmountAsDebit());
                 }
-                else if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
+                else if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
                     amount = SLibUtils.roundAmount(amount + entry.getAmountAsDebit());
                 }
-                else if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
+                else if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
                     amount = SLibUtils.roundAmount(amount + entry.getAmountAsCredit());
                 }
             }
@@ -172,22 +172,22 @@ public class SDiotAccountingTxn {
     
     /**
      * Get debit or credit of entry according to type of system movement and VAT.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @param vatKey Key of required VAT. Can be null.
      * @return Debit or credit of entry.
      */
-    private double getEntryAmount(int[] sysMovTypeXxx, final int[] vatKey) {
+    private double getEntryAmount(int[] sysMovTypeXxxKey, final int[] vatKey) {
         double amount = 0;
-        Entry entry = getEntry(sysMovTypeXxx, vatKey);
+        Entry entry = getEntry(sysMovTypeXxxKey, vatKey);
         
         if (entry != null) {
-            if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP)) {
+            if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP)) {
                 amount = entry.getAmountAsDebit();
             }
-            else if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
+            else if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
                 amount = entry.getAmountAsDebit();
             }
-            else if (SLibUtils.compareKeys(sysMovTypeXxx, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
+            else if (SLibUtils.compareKeys(sysMovTypeXxxKey, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
                 amount = entry.getAmountAsCredit();
             }
         }
@@ -221,13 +221,13 @@ public class SDiotAccountingTxn {
     
     /**
      * Get DPS original tax according to type of system movement and VAT.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @param vatKey Key of required VAT. Can be null.
      * @return DPS original tax.
      */
-    public double getEntryDpsTax(int[] sysMovTypeXxx, final int[] vatKey) {
+    public double getEntryDpsTax(int[] sysMovTypeXxxKey, final int[] vatKey) {
         double dpsTax = 0;
-        Entry entry = getEntry(sysMovTypeXxx, vatKey);
+        Entry entry = getEntry(sysMovTypeXxxKey, vatKey);
         
         if (entry != null) {
             dpsTax = entry.DpsTax;
@@ -238,13 +238,13 @@ public class SDiotAccountingTxn {
     
     /**
      * Get DPS original subtotal according to type of system movement and VAT.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @param vatKey Key of required VAT. Can be null.
      * @return DPS original tax.
      */
-    public double getEntryDpsSubtotal(int[] sysMovTypeXxx, final int[] vatKey) {
+    public double getEntryDpsSubtotal(int[] sysMovTypeXxxKey, final int[] vatKey) {
         double dpsSubtotal = 0;
-        Entry entry = getEntry(sysMovTypeXxx, vatKey);
+        Entry entry = getEntry(sysMovTypeXxxKey, vatKey);
         
         if (entry != null) {
             dpsSubtotal = entry.DpsSubtotal;
@@ -255,13 +255,13 @@ public class SDiotAccountingTxn {
     
     /**
      * Get DPS original subtotal according to type of system movement and VAT.
-     * @param sysMovTypeXxx Key of type of system movement
+     * @param sysMovTypeXxxKey Key of type of system movement
      * @param vatKey Key of required VAT. Can be null.
      * @return DPS original tax.
      */
-    public double getEntryDpsSubtotalRatio(int[] sysMovTypeXxx, final int[] vatKey) {
+    public double getEntryDpsSubtotalRatio(int[] sysMovTypeXxxKey, final int[] vatKey) {
         double dpsSubtotalRatio = 0;
-        Entry entry = getEntry(sysMovTypeXxx, vatKey);
+        Entry entry = getEntry(sysMovTypeXxxKey, vatKey);
         
         if (entry != null) {
             dpsSubtotalRatio = moDps == null || moDps.getTotal_r() == 0 ? 0 : entry.DpsSubtotal / moDps.getTotal_r();
@@ -271,14 +271,14 @@ public class SDiotAccountingTxn {
     }
     
     /**
-     * Get set of causing third-party business partners for supplied VAT.
+     * Get set of IDs of business partners of third taxpayers for supplied VAT.
      * @param vatKey Primary key of VAT. Can be null.
      * @return 
      */
-    public HashSet<Integer> getThirdTaxCausings(final int[] vatKey) {
+    public HashSet<Integer> getThirdTaxpayerIds(final int[] vatKey) {
         HashSet<Integer> causings = new HashSet<>();
         
-        for (ThirdTax thirdTax : maThirdTaxes) {
+        for (ThirdTaxpayerTax thirdTax : maThirdTaxpayerTaxes) {
             if (vatKey == null || SLibUtils.compareKeys(vatKey, thirdTax.VatKey)) {
                 causings.add(thirdTax.BizPartnerId);
             }
@@ -288,16 +288,16 @@ public class SDiotAccountingTxn {
     }
     
     /**
-     * Get tax caused only by requested third party.
-     * @param bizPartnerId ID of third party.
+     * Get tax caused only by requested third taxpayer.
+     * @param thirdTaxpayerId ID of third taxpayer.
      * @param vatKey PK of tax.
      * @return 
      */
-    public double getThirdTax(final int bizPartnerId, final int[] vatKey) {
+    public double getThirdTaxpayerTax(final int thirdTaxpayerId, final int[] vatKey) {
         double tax = 0;
         
-        for (ThirdTax thirdTax : maThirdTaxes) {
-            if (thirdTax.BizPartnerId == bizPartnerId && SLibUtils.compareKeys(thirdTax.VatKey, vatKey)) {
+        for (ThirdTaxpayerTax thirdTax : maThirdTaxpayerTaxes) {
+            if (thirdTax.BizPartnerId == thirdTaxpayerId && SLibUtils.compareKeys(thirdTax.VatKey, vatKey)) {
                 tax = SLibUtils.roundAmount(tax + thirdTax.Tax);
                 break;
             }
@@ -307,16 +307,16 @@ public class SDiotAccountingTxn {
     }
     
     /**
-     * Get subtotal of tax caused only by requested third party.
-     * @param bizPartnerId ID of third party.
+     * Get subtotal of tax caused only by requested third taxpayer.
+     * @param thirdTaxpayerId ID of third taxpayer.
      * @param vatKey PK of tax.
      * @return 
      */
-    public double getThirdTaxSubtotal(final int bizPartnerId, final int[] vatKey) {
+    public double getThirdTaxpayerTaxSubtotal(final int thirdTaxpayerId, final int[] vatKey) {
         double taxSubtotal = 0;
         
-        for (ThirdTax thirdTax : maThirdTaxes) {
-            if (thirdTax.BizPartnerId == bizPartnerId && SLibUtils.compareKeys(thirdTax.VatKey, vatKey)) {
+        for (ThirdTaxpayerTax thirdTax : maThirdTaxpayerTaxes) {
+            if (thirdTax.BizPartnerId == thirdTaxpayerId && SLibUtils.compareKeys(thirdTax.VatKey, vatKey)) {
                 taxSubtotal = SLibUtils.roundAmount(taxSubtotal + thirdTax.Subtotal);
                 break;
             }
@@ -325,16 +325,16 @@ public class SDiotAccountingTxn {
         return taxSubtotal;
     }
     
-    public class Entry {
-        public int[] SysMovTypeXxx;
+    private class Entry {
+        public int[] SysMovTypeXxxKey;
         public int[] VatKey;
         public double Debit;
         public double Credit;
         public double DpsTax;
         public double DpsSubtotal;
         
-        public Entry(final int[] sysMovTypeXxx, final int[] vatKey, final double debit, final double credit, final double dpsTax, final double dpsSubtotal) {
-            SysMovTypeXxx = sysMovTypeXxx;
+        public Entry(final int[] sysMovTypeXxxKey, final int[] vatKey, final double debit, final double credit, final double dpsTax, final double dpsSubtotal) {
+            SysMovTypeXxxKey = sysMovTypeXxxKey;
             VatKey = vatKey == null ? null : (vatKey[0] == 0 && vatKey[1] == 0 ? null : vatKey);
             Debit = debit;
             Credit = credit;
@@ -369,13 +369,13 @@ public class SDiotAccountingTxn {
         }
     }
     
-    public class ThirdTax {
+    private class ThirdTaxpayerTax {
         public int BizPartnerId;
         public double Subtotal;
         public int[] VatKey;
         public double Tax;
         
-        public ThirdTax(final int bizPartnerId, final double subtotal, final int[] vatKey, final double tax) {
+        public ThirdTaxpayerTax(final int bizPartnerId, final double subtotal, final int[] vatKey, final double tax) {
             BizPartnerId = bizPartnerId;
             Subtotal = subtotal;
             VatKey = vatKey;

@@ -934,7 +934,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         SDataRecord oRecord = null;
         SDataFormerPayrollMove oPayrollMove = null;
         SDataAccount oAccount = null;
-        SDataAccount oAccountMajor = null;
+        SDataAccount oLedgerAccount = null;
         SDataCostCenter oCostCenter = null;
         SDataBizPartner oBizPartner = null;
         SDataTax oTax = null;
@@ -1115,7 +1115,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                             throw new Exception(sMsg + "'cuenta contable' ('" + sMap_acc + "') tiene un inconveniente:\n" + sVal);
                         }
 
-                        oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        oLedgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                     }
 
                     // Validate cost center:
@@ -1214,7 +1214,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                     dDebit_r += debit;
                     dCredit_r += credit;
 
-                    switch (oAccountMajor.getFkAccountSystemTypeId()) {
+                    switch (oLedgerAccount.getFkAccountSystemTypeId()) {
                         case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
                             anSysAccountTypeKey = SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL;
                             anSysMoveTypeKey = debit >= 0 ? SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_DEC_ADJ : SModSysConsts.FINS_TP_SYS_MOV_SUP_BAL_INC_ADJ;

@@ -1475,7 +1475,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlFkThirdTaxCausingId_n">
+                            <Component class="javax.swing.JLabel" name="jlFkThirdTaxpayerId_n">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Tercero causante:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -1483,14 +1483,14 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JComboBox" name="jcbFkThirdTaxCausingId_n">
+                            <Component class="javax.swing.JComboBox" name="jcbFkThirdTaxpayerId_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[400, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbFkThirdTaxCausingId_n">
+                            <Component class="javax.swing.JButton" name="jbFkThirdTaxpayerId_n">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="..."/>
                                 <Property name="toolTipText" type="java.lang.String" value="Seleccionar tercero causante"/>
@@ -1500,7 +1500,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbEditFkThirdTaxCausingId_n">
+                            <Component class="javax.swing.JButton" name="jbEditFkThirdTaxpayerId_n">
                               <Properties>
                                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                                   <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>

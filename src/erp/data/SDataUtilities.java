@@ -3375,8 +3375,8 @@ public abstract class SDataUtilities {
         else if (!validatingLedger) {
             usedLevels = getAccountUsedLevelsCount(account.getPkAccountIdXXX(), getAccountLevels(account.getPkAccountIdXXX()));
 
-            if (usedLevels != account.getDbmsMajorDeep()) {
-                msg = "La profundidad de captura de la cuenta contable, según su cuenta de mayor, es " + account.getDbmsMajorDeep() + ",\ny el nivel de la cuenta capturada es " + usedLevels + ".";
+            if (usedLevels != account.getDbmsLedgerAccountDeep()) {
+                msg = "La profundidad de captura de la cuenta contable, según su cuenta de mayor, es " + account.getDbmsLedgerAccountDeep() + ",\ny el nivel de la cuenta capturada es " + usedLevels + ".";
             }
         }
 

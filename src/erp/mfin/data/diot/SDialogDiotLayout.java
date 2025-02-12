@@ -11,6 +11,8 @@
 
 package erp.mfin.data.diot;
 
+import erp.data.SDataConstants;
+import erp.data.SDataReadDescriptions;
 import erp.gui.SGuiUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -46,6 +48,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private SDataTax moConfigDiotTax;
     private String[] msConfigDiotAccounts;
+    private int[] manConfigDiotTaxRegionsIgnored;
 
     /** Creates new form SDialogDiotLayout
      * @param client GUI client.
@@ -102,7 +105,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT:"));
-        jPanel6.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -162,7 +165,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatPipe);
-        jrbFormatPipe.setText("Valores redondeados, separados por barra vertical, el caracter \"pipe\" |");
+        jrbFormatPipe.setText("Valores redondeados, separados por el carácter '|', conocido como \"barra vertical\" o \"pipe\"");
         jrbFormatPipe.setPreferredSize(new java.awt.Dimension(600, 23));
         jPanel13.add(jrbFormatPipe);
 
@@ -172,12 +175,12 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para la DIOT:"));
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración actual para la DIOT:"));
         jPanel7.setLayout(new java.awt.BorderLayout());
 
         jspDiotConfig.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jspDiotConfig.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jspDiotConfig.setPreferredSize(new java.awt.Dimension(100, 65));
+        jspDiotConfig.setPreferredSize(new java.awt.Dimension(100, 100));
 
         jtaDiotConfig.setEditable(false);
         jtaDiotConfig.setBackground(java.awt.SystemColor.control);
@@ -185,7 +188,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jtaDiotConfig.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jtaDiotConfig.setLineWrap(true);
         jtaDiotConfig.setRows(5);
-        jtaDiotConfig.setText("1) IVA predeterminado para la DIOT: ...\n\n2) Cuentas contables para la DIOT: ...");
+        jtaDiotConfig.setText("1) IVA predeterminado para la DIOT: ...\n\n2) Cuentas contables para la DIOT: ...\n\n3) Regiones de impuestos ignoradas para la DIOT:...");
         jtaDiotConfig.setWrapStyleWord(true);
         jspDiotConfig.setViewportView(jtaDiotConfig);
 
@@ -261,9 +264,9 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     }
     
     private void processConfigDiot() {
-        
         moConfigDiotTax = null;
         msConfigDiotAccounts = null;
+        manConfigDiotTaxRegionsIgnored = null;
 
         String diotConfig = "";
         
@@ -272,7 +275,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             
             moConfigDiotTax = SDiotUtils.getDiotVatDefault(miClient);
             
-            diotConfig = "1) IVA predeterminado para la DIOT: " + (moConfigDiotTax != null ? moConfigDiotTax.getTax() + " (PK: " + SLibUtils.textKey((int[]) moConfigDiotTax.getPrimaryKey()) + ")" : "ND");
+            diotConfig = "1) IVA predeterminado para la DIOT: " + (moConfigDiotTax != null ? moConfigDiotTax.getTax() + " "
+                    + "(PK: " + SLibUtils.textKey((int[]) moConfigDiotTax.getPrimaryKey()) + ")" : "ND");
             
             // process DIOT accounts:
             
@@ -292,12 +296,28 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             }
             
             diotConfig += "\n\n2) Cuentas contables para la DIOT: " + (!accounts.isEmpty() ? accounts : "ND");
+            
+            // process DIOT tax regions ignored:
+            
+            String taxRegionsIgnored = "";
+            
+            manConfigDiotTaxRegionsIgnored = SDiotUtils.getDiotTaxRegionsIgnored(miClient.getSession().getStatement());
+            
+            if (manConfigDiotTaxRegionsIgnored != null) {
+                for (int i = 0; i < manConfigDiotTaxRegionsIgnored.length; i++) {
+                    taxRegionsIgnored += (taxRegionsIgnored.isEmpty() ? "" : (i + 1 < manConfigDiotTaxRegionsIgnored.length ? ", " : " y ")) + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_REG, new int[] { manConfigDiotTaxRegionsIgnored[i] }) + " "
+                            + "(PK: " + manConfigDiotTaxRegionsIgnored[i] + ")";
+                }
+            }
+            
+            diotConfig += "\n\n3) Regiones de impuestos ignoradas para la DIOT: " + (!taxRegionsIgnored.isEmpty() ? taxRegionsIgnored : "ND");
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
         
         jtaDiotConfig.setText(!diotConfig.isEmpty() ? diotConfig : "ND");
+        jtaDiotConfig.setCaretPosition(0);
     }
     
     private void computeLayout() {

@@ -9,6 +9,7 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataTax;
 import java.sql.Statement;
+import java.util.ArrayList;
 import sa.lib.SLibUtils;
 
 /**
@@ -31,7 +32,7 @@ public abstract class SDiotUtils {
         return account.getFkAccountLedgerTypeId() == SDataConstantsSys.FINU_TP_ACC_LEDGER_VAT_CREDITABLE || SLibUtils.belongsTo(account.getCode(), DiotAccounts);
     }
     
-    public static int[] getDiotVatDefaultPk(final Statement statement) throws Exception {
+    public static int[] getDiotVatDefaultKey(final Statement statement) throws Exception {
         int[] vatDefaultPk = null;
         String param = SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_DIOT_VAT_DEFAULT);
         
@@ -44,8 +45,45 @@ public abstract class SDiotUtils {
     }
     
     public static SDataTax getDiotVatDefault(final SClientInterface client) throws Exception {
-        int[] vatDefaultPk = getDiotVatDefaultPk(client.getSession().getStatement());
+        int[] vatDefaultPk = getDiotVatDefaultKey(client.getSession().getStatement());
         
         return vatDefaultPk == null ? null : (SDataTax) SDataUtilities.readRegistry(client, SDataConstants.FINU_TAX, vatDefaultPk, SLibConstants.EXEC_MODE_STEALTH);
+    }
+    
+    public static int[] getDiotTaxRegionsIgnored(final Statement statement) throws Exception {
+        int[] keys = null;
+        String[] values = SLibUtils.textsTrim(SLibUtils.textExplode(SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_DIOT_TAX_REGS_IGNORED), ";"));
+        
+        if (values != null && values.length > 0) {
+            keys = new int[values.length];
+            
+            for (int i = 0; i < values.length; i++) {
+                keys[i] = SLibUtils.parseInt(values[i]);
+            }
+        }
+        
+        return keys;
+    }
+    
+    /**
+     * Ascending bubble sort affecting provided parameter list.
+     * @param terceros List to sort.
+     */
+    public static void sortDiotTerceros(final ArrayList<SDiotTercero> terceros) {
+        int size = terceros.size();
+        boolean changes = true;
+        
+        for (int iterations = 0; (iterations + 1) < size && changes; iterations++) {
+            changes = false; // asume that no more changes are needed!
+            
+            for (int index = 0; (index + 1) < (size - iterations); index++) {
+                if (terceros.get(index).getComparableKey().compareTo(terceros.get(index + 1).getComparableKey()) > 0) {
+                    SDiotTercero greater = terceros.get(index).clone();
+                    terceros.set(index, terceros.get(index + 1));
+                    terceros.set(index + 1, greater);
+                    changes = true; // at least one change in current iteration!
+                }
+            }
+        }
     }
 }

@@ -55,7 +55,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
-            <Property name="rows" type="int" value="6"/>
+            <Property name="rows" type="int" value="5"/>
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
@@ -185,7 +185,7 @@
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="bgFormat"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Valores redondeados, separados por barra vertical, el caracter &quot;pipe&quot; |"/>
+                    <Property name="text" type="java.lang.String" value="Valores redondeados, separados por el car&#xe1;cter &apos;|&apos;, conocido como &quot;barra vertical&quot; o &quot;pipe&quot;"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[600, 23]"/>
                     </Property>
@@ -208,7 +208,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Configuraci&#xf3;n para la DIOT:"/>
+                    <TitledBorder title="Configuraci&#xf3;n actual para la DIOT:"/>
                   </Border>
                 </Property>
               </Properties>
@@ -225,7 +225,7 @@
                     <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
                     <Property name="verticalScrollBarPolicy" type="int" value="22"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 65]"/>
+                      <Dimension value="[100, 100]"/>
                     </Property>
                   </Properties>
                   <AuxValues>
@@ -251,7 +251,7 @@
                         </Property>
                         <Property name="lineWrap" type="boolean" value="true"/>
                         <Property name="rows" type="int" value="5"/>
-                        <Property name="text" type="java.lang.String" value="1) IVA predeterminado para la DIOT: ...&#xa;&#xa;2) Cuentas contables para la DIOT: ..."/>
+                        <Property name="text" type="java.lang.String" value="1) IVA predeterminado para la DIOT: ...&#xa;&#xa;2) Cuentas contables para la DIOT: ...&#xa;&#xa;3) Regiones de impuestos ignoradas para la DIOT:..."/>
                         <Property name="wrapStyleWord" type="boolean" value="true"/>
                       </Properties>
                     </Component>

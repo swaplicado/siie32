@@ -863,11 +863,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
     
     private SDataAccount getLedgerAccount(final SDataAccount account) {
-        SDataAccount ledgerAccount = account.getDeep() == 1 ? account : moLedgerAccountsMap.get(account.getDbmsPkAccountMajorIdXXX());
+        SDataAccount ledgerAccount = account.getDeep() == 1 ? account : moLedgerAccountsMap.get(account.getDbmsPkLedgerAccountIdXXX());
         
         if (ledgerAccount == null) {
-            ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
-            moLedgerAccountsMap.put(account.getDbmsPkAccountMajorIdXXX(), ledgerAccount);
+            ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
+            moLedgerAccountsMap.put(account.getDbmsPkLedgerAccountIdXXX(), ledgerAccount);
         }
         
         return ledgerAccount;

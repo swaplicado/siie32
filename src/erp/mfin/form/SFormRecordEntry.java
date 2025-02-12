@@ -6,6 +6,7 @@
 package erp.mfin.form;
 
 import cfd.DCfdConsts;
+import cfd.DCfdUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -63,7 +64,7 @@ import sa.lib.xml.SXmlUtils;
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
     
-    private static final String LABEL_BIZ_PARTNER = "Asoc. negocios";
+    private static final String LABEL_BIZ_PARTNER = "Asociado negocios";
 
     private int mnFormType;
     private int mnFormResult;
@@ -110,7 +111,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private int[] manLastCurrencyKey;
     private int[] manDpsClassKey;
     private int[] manDpsAdjClassKey;
-    private java.lang.String msCurrentFkAccountId;
+    boolean mbIsCurrentAccountDiogAccount;
+    private java.lang.String msCurrentAccountId;
     private erp.mfin.data.SDataAccountCash moEntryAccountCash;
     private erp.mtrn.data.SDataDps moEntryDps;
     private erp.mtrn.data.SDataDps moEntryDpsAdj;
@@ -154,6 +156,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkBizPartnerId_nr = new javax.swing.JButton();
         jlOccasionalFiscalId = new javax.swing.JLabel();
         jcbOccasionalFiscalId = new javax.swing.JComboBox();
+        jlOccasionalFiscalIdDiotHint = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         jtfReference = new javax.swing.JTextField();
@@ -165,6 +168,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkTaxId_n = new javax.swing.JButton();
         jrbTaxCash = new javax.swing.JRadioButton();
         jrbTaxPend = new javax.swing.JRadioButton();
+        jlFkTaxId_nDiotHint = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jlFkEntityId_n = new javax.swing.JLabel();
         jcbFkEntityId_n = new javax.swing.JComboBox<SFormComponentItem>();
@@ -190,6 +194,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfFkDpsAdj = new javax.swing.JTextField();
         jbFkDpsAdj = new javax.swing.JButton();
         jbFkDpsAdjRemove = new javax.swing.JButton();
+        jlFkDpsAdj1 = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jlFileXml = new javax.swing.JLabel();
         jtfFileXml = new javax.swing.JTextField();
@@ -205,42 +210,47 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jckIsCheckApplying = new javax.swing.JCheckBox();
         jcbFkCheckId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jpValue = new javax.swing.JPanel();
+        jpValue1 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
         jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCurrencyId = new javax.swing.JButton();
+        jlFkCurrencyIdHint = new javax.swing.JLabel();
         jlDummy11 = new javax.swing.JLabel();
         jckIsExchangeDifference = new javax.swing.JCheckBox();
+        jpValue2 = new javax.swing.JPanel();
         jlDebitCy = new javax.swing.JLabel();
-        jPanel22 = new javax.swing.JPanel();
         jtfDebitCy = new javax.swing.JTextField();
+        jtfDebitCyCur = new javax.swing.JTextField();
         jbDebitCy = new javax.swing.JButton();
+        jlDebitCyHint = new javax.swing.JLabel();
         jlExchangeRateSystem = new javax.swing.JLabel();
-        jPanel9 = new javax.swing.JPanel();
         jtfExchangeRateSystem = new javax.swing.JTextField();
-        jPanel3 = new javax.swing.JPanel();
         jbExchangeRateSystem = new javax.swing.JButton();
         jbExchangeRateAccountCashView = new javax.swing.JButton();
+        jpValue3 = new javax.swing.JPanel();
         jlCreditCy = new javax.swing.JLabel();
-        jPanel23 = new javax.swing.JPanel();
         jtfCreditCy = new javax.swing.JTextField();
+        jtfCreditCyCur = new javax.swing.JTextField();
         jbCreditCy = new javax.swing.JButton();
+        jlCreditCyHInt = new javax.swing.JLabel();
         jlExchangeRate = new javax.swing.JLabel();
-        jPanel12 = new javax.swing.JPanel();
         jtfExchangeRate = new javax.swing.JTextField();
-        jPanel15 = new javax.swing.JPanel();
         jbExchangeRate = new javax.swing.JButton();
         jbExchangeRateAccountCashSet = new javax.swing.JButton();
+        jpValue4 = new javax.swing.JPanel();
         jlDebit = new javax.swing.JLabel();
-        jPanel25 = new javax.swing.JPanel();
         jtfDebit = new javax.swing.JTextField();
+        jtfDebitCur = new javax.swing.JTextField();
         jbDebit = new javax.swing.JButton();
+        jlDebitHint = new javax.swing.JLabel();
         jlDummy13 = new javax.swing.JLabel();
         jckIsSystem = new javax.swing.JCheckBox();
+        jpValue5 = new javax.swing.JPanel();
         jlCredit = new javax.swing.JLabel();
-        jPanel26 = new javax.swing.JPanel();
         jtfCredit = new javax.swing.JTextField();
+        jtfCreditCur = new javax.swing.JTextField();
         jbCredit = new javax.swing.JButton();
+        jlCreditHint = new javax.swing.JLabel();
         jlDummy15 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
         jlDummyCostCenter = new javax.swing.JLabel();
@@ -276,19 +286,19 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlConcept.setText("Concepto partida: *");
-        jlConcept.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlConcept.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel2.add(jlConcept);
 
-        jtfConcept.setText("ACCOUNT");
-        jtfConcept.setPreferredSize(new java.awt.Dimension(600, 23));
+        jtfConcept.setText("TEXT");
+        jtfConcept.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel2.add(jtfConcept);
 
         jpSettings.add(jPanel2);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkBizPartnerId_nr.setText("Asoc. negocios:");
-        jlFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkBizPartnerId_nr.setText("Asociado negocios: *");
+        jlFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(jlFkBizPartnerId_nr);
 
         jcbFkBizPartnerId_nr.setMaximumRowCount(16);
@@ -307,18 +317,23 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel4.add(jlOccasionalFiscalId);
 
         jcbOccasionalFiscalId.setEditable(true);
-        jcbOccasionalFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbOccasionalFiscalId.setPreferredSize(new java.awt.Dimension(121, 23));
         jPanel4.add(jcbOccasionalFiscalId);
+
+        jlOccasionalFiscalIdDiotHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlOccasionalFiscalIdDiotHint.setText("(para DIOT)");
+        jlOccasionalFiscalIdDiotHint.setPreferredSize(new java.awt.Dimension(65, 23));
+        jPanel4.add(jlOccasionalFiscalIdDiotHint);
 
         jpSettings.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlReference.setText("Reposit. contable:");
-        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlReference.setText("Repositorio contable:");
+        jlReference.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlReference);
 
-        jtfReference.setText("REF");
+        jtfReference.setText("TEXT");
         jtfReference.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jtfReference);
 
@@ -329,7 +344,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel5.add(jbReference);
 
         jckIsReferenceTax.setText("Aplican impuestos");
-        jckIsReferenceTax.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jckIsReferenceTax.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jckIsReferenceTax);
 
@@ -338,7 +352,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkTaxId_n.setText("Impuesto: *");
-        jlFkTaxId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkTaxId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlFkTaxId_n);
 
         jcbFkTaxId_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -353,20 +367,25 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         bgTax.add(jrbTaxCash);
         jrbTaxCash.setSelected(true);
         jrbTaxCash.setText("Efectivamente pagado");
-        jrbTaxCash.setPreferredSize(new java.awt.Dimension(150, 23));
+        jrbTaxCash.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel6.add(jrbTaxCash);
 
         bgTax.add(jrbTaxPend);
         jrbTaxPend.setText("Pendiente de pago");
-        jrbTaxPend.setPreferredSize(new java.awt.Dimension(125, 23));
+        jrbTaxPend.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel6.add(jrbTaxPend);
+
+        jlFkTaxId_nDiotHint.setForeground(java.awt.Color.blue);
+        jlFkTaxId_nDiotHint.setText("(HINT TEXT)");
+        jlFkTaxId_nDiotHint.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel6.add(jlFkTaxId_nDiotHint);
 
         jpSettings.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkEntityId_n.setText("Entidad: *");
-        jlFkEntityId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkEntityId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlFkEntityId_n);
 
         jcbFkEntityId_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -390,7 +409,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkItemId_n.setText("Ítem: *");
-        jlFkItemId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkItemId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlFkItemId_n);
 
         jcbFkItemId_n.setMaximumRowCount(16);
@@ -421,7 +440,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkItemAuxId_n.setText("Ítem auxiliar:");
-        jlFkItemAuxId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkItemAuxId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel14.add(jlFkItemAuxId_n);
 
         jcbFkItemAuxId_n.setMaximumRowCount(16);
@@ -438,8 +457,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkDps.setText("Docto. (factura):");
-        jlFkDps.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkDps.setText("Documento (factura):");
+        jlFkDps.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlFkDps);
 
         jtfFkDps.setEditable(false);
@@ -462,7 +481,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jlDummy02.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel10.add(jlDummy02);
 
-        jlFkDpsAdj.setText("Docto. ajuste (nota crédito):");
+        jlFkDpsAdj.setText("Documento ajuste (NC):");
         jlFkDpsAdj.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlFkDpsAdj);
 
@@ -483,16 +502,22 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkDpsAdjRemove.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkDpsAdjRemove);
 
+        jlFkDpsAdj1.setForeground(java.awt.SystemColor.textInactiveText);
+        jlFkDpsAdj1.setText("(nota de crédito)");
+        jlFkDpsAdj1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jlFkDpsAdj1);
+
         jpSettings.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFileXml.setText("Archivo XML CFD:");
-        jlFileXml.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFileXml.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlFileXml);
 
         jtfFileXml.setEditable(false);
         jtfFileXml.setText("XML");
+        jtfFileXml.setFocusable(false);
         jtfFileXml.setOpaque(false);
         jtfFileXml.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jtfFileXml);
@@ -512,6 +537,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfXmlFilesNumber.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfXmlFilesNumber.setText("100");
         jtfXmlFilesNumber.setToolTipText("Número de archivos XML de CFD");
+        jtfXmlFilesNumber.setFocusable(false);
         jtfXmlFilesNumber.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel11.add(jtfXmlFilesNumber);
 
@@ -532,7 +558,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkYearId_n.setText("Ejercicio contable:");
-        jlFkYearId_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFkYearId_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jlFkYearId_n);
 
         jtfFkYearId_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -543,7 +569,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jlDummy03.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel13.add(jlDummy03);
 
-        jckIsCheckApplying.setText("Cheque del movimiento:");
+        jckIsCheckApplying.setText("Cheque de la partida:");
         jckIsCheckApplying.setFocusable(false);
         jckIsCheckApplying.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel13.add(jckIsCheckApplying);
@@ -556,160 +582,213 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jpRegistryCenterNorth.add(jpSettings, java.awt.BorderLayout.PAGE_START);
 
         jpValue.setBorder(javax.swing.BorderFactory.createTitledBorder("Valor de la partida:"));
-        jpValue.setLayout(new java.awt.GridLayout(5, 4, 5, 1));
+        jpValue.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
 
-        jlFkCurrencyId.setText("Moneda de la partida: *");
-        jpValue.add(jlFkCurrencyId);
+        jpValue1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jPanel1.setLayout(new java.awt.BorderLayout(2, 0));
-        jPanel1.add(jcbFkCurrencyId, java.awt.BorderLayout.CENTER);
+        jlFkCurrencyId.setText("Moneda: *");
+        jlFkCurrencyId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue1.add(jlFkCurrencyId);
+
+        jcbFkCurrencyId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue1.add(jcbFkCurrencyId);
 
         jbFkCurrencyId.setText("...");
         jbFkCurrencyId.setToolTipText("Seleccionar moneda");
         jbFkCurrencyId.setFocusable(false);
         jbFkCurrencyId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel1.add(jbFkCurrencyId, java.awt.BorderLayout.EAST);
+        jpValue1.add(jbFkCurrencyId);
 
-        jpValue.add(jPanel1);
-        jpValue.add(jlDummy11);
+        jlFkCurrencyIdHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlFkCurrencyIdHint.setText("(moneda de la partida)");
+        jlFkCurrencyIdHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue1.add(jlFkCurrencyIdHint);
+
+        jlDummy11.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue1.add(jlDummy11);
 
         jckIsExchangeDifference.setText("Diferencia cambiaria");
         jckIsExchangeDifference.setFocusable(false);
-        jpValue.add(jckIsExchangeDifference);
+        jckIsExchangeDifference.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue1.add(jckIsExchangeDifference);
 
-        jlDebitCy.setText("Cargo: *");
-        jpValue.add(jlDebitCy);
+        jpValue.add(jpValue1);
 
-        jPanel22.setLayout(new java.awt.BorderLayout(2, 0));
+        jpValue2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlDebitCy.setText("Cargo moneda: *");
+        jlDebitCy.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue2.add(jlDebitCy);
 
         jtfDebitCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDebitCy.setText("0.00");
-        jPanel22.add(jtfDebitCy, java.awt.BorderLayout.CENTER);
+        jtfDebitCy.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue2.add(jtfDebitCy);
+
+        jtfDebitCyCur.setEditable(false);
+        jtfDebitCyCur.setText("CUR");
+        jtfDebitCyCur.setFocusable(false);
+        jtfDebitCyCur.setPreferredSize(new java.awt.Dimension(33, 23));
+        jpValue2.add(jtfDebitCyCur);
 
         jbDebitCy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbDebitCy.setToolTipText("Calcular");
         jbDebitCy.setFocusable(false);
         jbDebitCy.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel22.add(jbDebitCy, java.awt.BorderLayout.EAST);
+        jpValue2.add(jbDebitCy);
 
-        jpValue.add(jPanel22);
+        jlDebitCyHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDebitCyHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue2.add(jlDebitCyHint);
 
         jlExchangeRateSystem.setText("Tipo de cambio sistema:");
-        jpValue.add(jlExchangeRateSystem);
-
-        jPanel9.setLayout(new java.awt.BorderLayout());
+        jlExchangeRateSystem.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue2.add(jlExchangeRateSystem);
 
         jtfExchangeRateSystem.setEditable(false);
         jtfExchangeRateSystem.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfExchangeRateSystem.setText("0.0000");
         jtfExchangeRateSystem.setFocusable(false);
-        jPanel9.add(jtfExchangeRateSystem, java.awt.BorderLayout.CENTER);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jtfExchangeRateSystem.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue2.add(jtfExchangeRateSystem);
 
         jbExchangeRateSystem.setText("...");
         jbExchangeRateSystem.setToolTipText("Seleccionar tipo de cambio");
         jbExchangeRateSystem.setFocusable(false);
         jbExchangeRateSystem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel3.add(jbExchangeRateSystem);
+        jpValue2.add(jbExchangeRateSystem);
 
         jbExchangeRateAccountCashView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbExchangeRateAccountCashView.setToolTipText("Ver tipo de cambio acumulado");
         jbExchangeRateAccountCashView.setFocusable(false);
         jbExchangeRateAccountCashView.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel3.add(jbExchangeRateAccountCashView);
+        jpValue2.add(jbExchangeRateAccountCashView);
 
-        jPanel9.add(jPanel3, java.awt.BorderLayout.EAST);
+        jpValue.add(jpValue2);
 
-        jpValue.add(jPanel9);
+        jpValue3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlCreditCy.setText("Abono: *");
-        jpValue.add(jlCreditCy);
-
-        jPanel23.setLayout(new java.awt.BorderLayout(2, 0));
+        jlCreditCy.setText("Abono moneda: *");
+        jlCreditCy.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue3.add(jlCreditCy);
 
         jtfCreditCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfCreditCy.setText("0.00");
-        jPanel23.add(jtfCreditCy, java.awt.BorderLayout.CENTER);
+        jtfCreditCy.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue3.add(jtfCreditCy);
+
+        jtfCreditCyCur.setEditable(false);
+        jtfCreditCyCur.setText("CUR");
+        jtfCreditCyCur.setFocusable(false);
+        jtfCreditCyCur.setPreferredSize(new java.awt.Dimension(33, 23));
+        jpValue3.add(jtfCreditCyCur);
 
         jbCreditCy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbCreditCy.setToolTipText("Calcular");
         jbCreditCy.setFocusable(false);
         jbCreditCy.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel23.add(jbCreditCy, java.awt.BorderLayout.EAST);
+        jpValue3.add(jbCreditCy);
 
-        jpValue.add(jPanel23);
+        jlCreditCyHInt.setForeground(java.awt.SystemColor.textInactiveText);
+        jlCreditCyHInt.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue3.add(jlCreditCyHInt);
 
-        jlExchangeRate.setText("Tipo de cambio: *");
-        jpValue.add(jlExchangeRate);
-
-        jPanel12.setLayout(new java.awt.BorderLayout());
+        jlExchangeRate.setText("Tipo de cambio (TC): *");
+        jlExchangeRate.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue3.add(jlExchangeRate);
 
         jtfExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfExchangeRate.setText("0.0000");
-        jPanel12.add(jtfExchangeRate, java.awt.BorderLayout.CENTER);
-
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+        jtfExchangeRate.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue3.add(jtfExchangeRate);
 
         jbExchangeRate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
-        jbExchangeRate.setToolTipText("Calcular");
+        jbExchangeRate.setToolTipText("Calcular tipo de cambio");
         jbExchangeRate.setFocusable(false);
         jbExchangeRate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel15.add(jbExchangeRate);
+        jpValue3.add(jbExchangeRate);
 
         jbExchangeRateAccountCashSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif"))); // NOI18N
         jbExchangeRateAccountCashSet.setToolTipText("Asignar tipo de cambio acumulado");
         jbExchangeRateAccountCashSet.setFocusable(false);
         jbExchangeRateAccountCashSet.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel15.add(jbExchangeRateAccountCashSet);
+        jpValue3.add(jbExchangeRateAccountCashSet);
 
-        jPanel12.add(jPanel15, java.awt.BorderLayout.EAST);
+        jpValue.add(jpValue3);
 
-        jpValue.add(jPanel12);
+        jpValue4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlDebit.setText("Cargo en moneda local (ML): *");
-        jpValue.add(jlDebit);
-
-        jPanel25.setLayout(new java.awt.BorderLayout(2, 0));
+        jlDebit.setText("Cargo: *");
+        jlDebit.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue4.add(jlDebit);
 
         jtfDebit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDebit.setText("0.00");
-        jPanel25.add(jtfDebit, java.awt.BorderLayout.CENTER);
+        jtfDebit.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue4.add(jtfDebit);
+
+        jtfDebitCur.setEditable(false);
+        jtfDebitCur.setText("CUR");
+        jtfDebitCur.setFocusable(false);
+        jtfDebitCur.setPreferredSize(new java.awt.Dimension(33, 23));
+        jpValue4.add(jtfDebitCur);
 
         jbDebit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbDebit.setToolTipText("Calcular");
         jbDebit.setFocusable(false);
         jbDebit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel25.add(jbDebit, java.awt.BorderLayout.EAST);
+        jpValue4.add(jbDebit);
 
-        jpValue.add(jPanel25);
-        jpValue.add(jlDummy13);
+        jlDebitHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDebitHint.setText("(en moneda local)");
+        jlDebitHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue4.add(jlDebitHint);
+
+        jlDummy13.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue4.add(jlDummy13);
 
         jckIsSystem.setText("Registro de sistema");
         jckIsSystem.setEnabled(false);
-        jpValue.add(jckIsSystem);
+        jpValue4.add(jckIsSystem);
 
-        jlCredit.setText("Abono en moneda local (ML): *");
-        jpValue.add(jlCredit);
+        jpValue.add(jpValue4);
 
-        jPanel26.setLayout(new java.awt.BorderLayout(2, 0));
+        jpValue5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCredit.setText("Abono: *");
+        jlCredit.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue5.add(jlCredit);
 
         jtfCredit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfCredit.setText("0.00");
-        jPanel26.add(jtfCredit, java.awt.BorderLayout.CENTER);
+        jtfCredit.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpValue5.add(jtfCredit);
+
+        jtfCreditCur.setEditable(false);
+        jtfCreditCur.setText("CUR");
+        jtfCreditCur.setFocusable(false);
+        jtfCreditCur.setPreferredSize(new java.awt.Dimension(33, 23));
+        jpValue5.add(jtfCreditCur);
 
         jbCredit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbCredit.setToolTipText("Calcular");
         jbCredit.setFocusable(false);
         jbCredit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel26.add(jbCredit, java.awt.BorderLayout.EAST);
+        jpValue5.add(jbCredit);
 
-        jpValue.add(jPanel26);
-        jpValue.add(jlDummy15);
+        jlCreditHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlCreditHint.setText("(en moneda local)");
+        jlCreditHint.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue5.add(jlCreditHint);
+
+        jlDummy15.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpValue5.add(jlDummy15);
 
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setFocusable(false);
-        jpValue.add(jckIsDeleted);
+        jpValue5.add(jckIsDeleted);
+
+        jpValue.add(jpValue5);
 
         jpRegistryCenterNorth.add(jpValue, java.awt.BorderLayout.CENTER);
 
@@ -737,7 +816,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(816, 639));
+        setSize(new java.awt.Dimension(916, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -766,6 +845,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jpRegistryCenter.remove(jlDummyCostCenter);
         jpRegistryCenter.add(moPanelFkCostCenterId_n, BorderLayout.SOUTH);
+        
+        jtfDebitCyCur.setText("");
+        jtfCreditCyCur.setText("");
+        jtfDebitCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+        jtfCreditCur.setText(jtfDebitCur.getText());
 
         // Create form fields:
 
@@ -927,6 +1011,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     private void renderAccountSettings() {
         mbResetingForm = true;
+        
+        mbIsCurrentAccountDiogAccount = false;
+        msCurrentAccountId = moPanelFkAccountId.getFieldAccount().getString();
 
         int[] anAuxBizParnerKey = (int[]) moFieldFkBizPartnerId_nr.getKey();
         int[] anAuxTaxKey = (int[]) moFieldFkTaxId_n.getKey();
@@ -944,6 +1031,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mnAccountSystemTypeId = SDataConstantsSys.UNDEFINED;
         manDpsClassKey = null;
         manDpsAdjClassKey = null;
+        
         moEntryAccountCash = null;
         moEntryDps = null;
         moEntryDpsAdj = null;
@@ -979,6 +1067,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jcbFkBizPartnerId_nr.setEnabled(false);
             jbFkBizPartnerId_nr.setEnabled(false);
             jlOccasionalFiscalId.setEnabled(false);
+            jlOccasionalFiscalIdDiotHint.setEnabled(false);
             jcbOccasionalFiscalId.setEnabled(false);
             jlReference.setEnabled(false);
             jtfReference.setEnabled(false);
@@ -1010,7 +1099,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jbFileXml.setEnabled(false);
             jbFileXmlRemove.setEnabled(false);
             jbFileXmlAdd.setEnabled(false);
-            jbGetXml.setEnabled(true); 
+            jbGetXml.setEnabled(false); 
             jlFkDpsAdj.setEnabled(false);
             jtfFkDpsAdj.setEnabled(false);
             jbFkDpsAdj.setEnabled(false);
@@ -1047,10 +1136,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             boolean isAccSysSales = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ });
             boolean isAccClsSales = SLibUtilities.belongsTo(anAccountSubclass, new int[][] {SDataConstantsSys.FINS_CLS_ACC_SAL, SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ });
             boolean isAccSysTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT });
-            boolean isDiotAccount = false;
             
             try {
-                isDiotAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
+                mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                         SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
             }
             catch (Exception e) {
@@ -1059,7 +1147,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
             // Check if it is necesary to enable business partner fields:
 
-            if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || isDiotAccount) {
+            if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || mbIsCurrentAccountDiogAccount) {
                 if (isAccSysBizPartnerAll || (isAccSysPurchases && isAccClsPurchases) || (isAccSysSales && isAccClsSales)) {
                     mbIsBizPartnerRequired = true;
                     jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ": *");
@@ -1069,9 +1157,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 jcbFkBizPartnerId_nr.setEnabled(true);
                 jbFkBizPartnerId_nr.setEnabled(true);
                 jlOccasionalFiscalId.setEnabled(true);
+                jlOccasionalFiscalIdDiotHint.setEnabled(true);
                 jcbOccasionalFiscalId.setEnabled(true);
 
-                if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || isDiotAccount) {
+                if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || mbIsCurrentAccountDiogAccount) {
                     mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
                 }
                 else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CUS || isAccSysSales) {
@@ -1113,6 +1202,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 jcbFkBizPartnerId_nr.setEnabled(false);
                 jbFkBizPartnerId_nr.setEnabled(false);
                 jlOccasionalFiscalId.setEnabled(false);
+                jlOccasionalFiscalIdDiotHint.setEnabled(false);
                 jcbOccasionalFiscalId.setEnabled(false);
             }
 
@@ -1256,7 +1346,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             boolean isTrnSupplierTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT });
             boolean isTrnCustomerTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT });
 
-            if (isAccSysBizPartnerSupCus || isAccSysPurchases || isAccSysSales || isAccSysTax || isDiotAccount) {
+            if (isAccSysBizPartnerSupCus || isAccSysPurchases || isAccSysSales || isAccSysTax || mbIsCurrentAccountDiogAccount) {
                 jlFkDps.setEnabled(true);
                 jtfFkDps.setEnabled(true);
                 jbFkDps.setEnabled(true);
@@ -1264,6 +1354,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 jlFileXml.setEnabled(true);
                 jtfFileXml.setEnabled(true);
                 jbFileXmlAdd.setEnabled(true);
+                jbGetXml.setEnabled(true); 
                 updateFilesXmlInfo();
 
                 moEntryDps = oAuxDps;
@@ -1285,6 +1376,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 jbFileXml.setEnabled(false);
                 jbFileXmlRemove.setEnabled(false);
                 jbFileXmlAdd.setEnabled(false);
+                jbGetXml.setEnabled(false); 
             }
 
             // Check if it is necesary to enable DPS adjustment fields:
@@ -1327,7 +1419,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jlFileXml.setEnabled(true);
             jtfFileXml.setEnabled(true);
             jbFileXmlAdd.setEnabled(true);
+            jbGetXml.setEnabled(true);
             updateFilesXmlInfo();
+        }
+        
+        if (mbIsCurrentAccountDiogAccount) {
+            jlFkTaxId_nDiotHint.setText("(cuenta contable DIOT)");
+        }
+        else {
+            jlFkTaxId_nDiotHint.setText("");
         }
 
         // Once current account settings are set, render documents, if applicable:
@@ -1378,7 +1478,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void renderCurrencySettings() {
-        if (jcbFkCurrencyId.getSelectedIndex() != -1)  {
+        jtfDebitCyCur.setText("");
+        jtfCreditCyCur.setText("");
+        
+        if (jcbFkCurrencyId.getSelectedIndex() > 0)  {
             if (moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
                 // Local currency:
 
@@ -1406,6 +1509,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
                 moFieldExchangeRateSystem.setFieldValue(jckIsExchangeDifference.isSelected() ? 0d : 1d);
                 moFieldExchangeRate.setFieldValue(jckIsExchangeDifference.isSelected() ? 0d : 1d);
+                
+                jtfDebitCyCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                jtfCreditCyCur.setText(jtfDebitCyCur.getText());
             }
             else {
                 // Foreign currency:
@@ -1436,19 +1542,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     moFieldExchangeRateSystem.setFieldValue(0d);
                     moFieldExchangeRate.setFieldValue(0d);
                 }
+                
+                jtfDebitCyCur.setText(miClient.getSession().getSessionCustom().getCurrencyCode(moFieldFkCurrencyId.getKeyAsIntArray()));
+                jtfCreditCyCur.setText(jtfDebitCyCur.getText());
             }
 
-            // Exchange difference:
-            /*
-            if (jckIsExchangeDifference.isSelected()) {
-                jcbFkCurrencyId.setEnabled(false);
-                jbFkCurrencyId.setEnabled(false);
-            }
-            else {
-                jcbFkCurrencyId.setEnabled(true);
-                jbFkCurrencyId.setEnabled(true);
-            }
-            */
             manLastCurrencyKey = moFieldFkCurrencyId.getKeyAsIntArray();
         }
     }
@@ -1814,15 +1912,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionFkAccountIdFocusGained() {
-        if (msCurrentFkAccountId.compareTo(moPanelFkAccountId.getFieldAccount().getString()) != 0) {
+        if (!msCurrentAccountId.equals(moPanelFkAccountId.getFieldAccount().getString())) {
             renderAccountSettings();
         }
-
-        msCurrentFkAccountId = moPanelFkAccountId.getFieldAccount().getString();
     }
 
     private void actionFkAccountIdFocusLost() {
-        if (msCurrentFkAccountId.compareTo(moPanelFkAccountId.getFieldAccount().getString()) != 0) {
+        if (!msCurrentAccountId.equals(moPanelFkAccountId.getFieldAccount().getString())) {
             renderAccountSettings();
         }
     }
@@ -2249,25 +2345,16 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgTax;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbCredit;
     private javax.swing.JButton jbCreditCy;
@@ -2309,8 +2396,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlCredit;
     private javax.swing.JLabel jlCreditCy;
+    private javax.swing.JLabel jlCreditCyHInt;
+    private javax.swing.JLabel jlCreditHint;
     private javax.swing.JLabel jlDebit;
     private javax.swing.JLabel jlDebitCy;
+    private javax.swing.JLabel jlDebitCyHint;
+    private javax.swing.JLabel jlDebitHint;
     private javax.swing.JLabel jlDummy02;
     private javax.swing.JLabel jlDummy03;
     private javax.swing.JLabel jlDummy11;
@@ -2323,14 +2414,18 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlFileXml;
     private javax.swing.JLabel jlFkBizPartnerId_nr;
     private javax.swing.JLabel jlFkCurrencyId;
+    private javax.swing.JLabel jlFkCurrencyIdHint;
     private javax.swing.JLabel jlFkDps;
     private javax.swing.JLabel jlFkDpsAdj;
+    private javax.swing.JLabel jlFkDpsAdj1;
     private javax.swing.JLabel jlFkEntityId_n;
     private javax.swing.JLabel jlFkItemAuxId_n;
     private javax.swing.JLabel jlFkItemId_n;
     private javax.swing.JLabel jlFkTaxId_n;
+    private javax.swing.JLabel jlFkTaxId_nDiotHint;
     private javax.swing.JLabel jlFkYearId_n;
     private javax.swing.JLabel jlOccasionalFiscalId;
+    private javax.swing.JLabel jlOccasionalFiscalIdDiotHint;
     private javax.swing.JLabel jlReference;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpRegistry;
@@ -2338,13 +2433,22 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jpRegistryCenterNorth;
     private javax.swing.JPanel jpSettings;
     private javax.swing.JPanel jpValue;
+    private javax.swing.JPanel jpValue1;
+    private javax.swing.JPanel jpValue2;
+    private javax.swing.JPanel jpValue3;
+    private javax.swing.JPanel jpValue4;
+    private javax.swing.JPanel jpValue5;
     private javax.swing.JRadioButton jrbTaxCash;
     private javax.swing.JRadioButton jrbTaxPend;
     private javax.swing.JTextField jtfConcept;
     private javax.swing.JTextField jtfCredit;
+    private javax.swing.JTextField jtfCreditCur;
     private javax.swing.JTextField jtfCreditCy;
+    private javax.swing.JTextField jtfCreditCyCur;
     private javax.swing.JTextField jtfDebit;
+    private javax.swing.JTextField jtfDebitCur;
     private javax.swing.JTextField jtfDebitCy;
+    private javax.swing.JTextField jtfDebitCyCur;
     private javax.swing.JTextField jtfEntityCurrencyKey;
     private javax.swing.JTextField jtfExchangeRate;
     private javax.swing.JTextField jtfExchangeRateSystem;
@@ -2374,7 +2478,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moRecordEntry = null;
         moRecord = null;
 
-        msCurrentFkAccountId = "";
+        msCurrentAccountId = "";
         manCurrentEntityKey_n = null;
         manLastCurrencyKey = null;
 
@@ -2425,7 +2529,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         String message = "";
-        String currency = "";
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -2449,57 +2552,38 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 // retrieve tax and check if filled account applies for DIOT:
                 
                 SDataTax tax = null;
-                boolean isDiotAccount = false;
                 
                 if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
                     tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
                 }
 
-                try {
-                    isDiotAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
-                            SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-                
                 // check if filled occasional fiscal ID does not match with existing business partners:
 
                 boolean filledFieldOccasionalFiscalId = jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty(); // convenience variable
                 ArrayList<BizPartner> occasionalFiscalIdMatchingBizPartners = null;
                 
-                if (filledFieldOccasionalFiscalId) {
-                    if (moFieldOccasionalFiscalId.getString().equals(DCfdConsts.RFC_GEN_NAC) && miClient.showMsgBoxConfirm("¿Está seguro desea que el valor del campo '" + jlOccasionalFiscalId.getText() + "' sea el RFC genérico " + DCfdConsts.RFC_GEN_NAC + "?") != JOptionPane.YES_OPTION) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
-                        validation.setComponent(jcbOccasionalFiscalId);
-                    }
-                    else if (moFieldOccasionalFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT) && miClient.showMsgBoxConfirm("¿Está seguro desea que el valor del campo '" + jlOccasionalFiscalId.getText() + "' sea el RFC genérico " + DCfdConsts.RFC_GEN_INT + "?") != JOptionPane.YES_OPTION) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
-                        validation.setComponent(jcbOccasionalFiscalId);
-                    }
-                    else {
-                        occasionalFiscalIdMatchingBizPartners = getBizPartnersByFiscalId(moFieldOccasionalFiscalId.getString());
+                if (filledFieldOccasionalFiscalId && !DCfdUtils.isRfcGeneric(moFieldOccasionalFiscalId.getString())) {
+                    occasionalFiscalIdMatchingBizPartners = getBizPartnersByFiscalId(moFieldOccasionalFiscalId.getString());
 
-                        if (!occasionalFiscalIdMatchingBizPartners.isEmpty()) {
-                            message = "Hay " + SLibUtils.DecimalFormatInteger.format(occasionalFiscalIdMatchingBizPartners.size()) + " "
-                                    + (occasionalFiscalIdMatchingBizPartners.size() == 1 ? "asociado" : "asociados") + " de negocio "
-                                    + "con el mismo RFC capturado en el campo '" + jlOccasionalFiscalId.getText() + "', " + moFieldOccasionalFiscalId.getString() + ":";
+                    if (!occasionalFiscalIdMatchingBizPartners.isEmpty()) {
+                        message = "Hay " + SLibUtils.DecimalFormatInteger.format(occasionalFiscalIdMatchingBizPartners.size()) + " "
+                                + (occasionalFiscalIdMatchingBizPartners.size() == 1 ? "asociado" : "asociados") + " de negocio "
+                                + "con el mismo RFC capturado en el campo '" + jlOccasionalFiscalId.getText() + "', " + moFieldOccasionalFiscalId.getString() + ":";
 
-                            for (int i = 0; i < occasionalFiscalIdMatchingBizPartners.size(); i++) {
-                                message += "\n" + (i + 1) + ". " + occasionalFiscalIdMatchingBizPartners.get(i).Name;
-                            }
+                        for (int i = 0; i < occasionalFiscalIdMatchingBizPartners.size(); i++) {
+                            message += "\n" + (i + 1) + ". " + occasionalFiscalIdMatchingBizPartners.get(i).Name;
+                        }
 
-                            message += "\n¿Desea limpiar el valor del campo '" + jlOccasionalFiscalId.getText() + "' y seleccionar a '" + occasionalFiscalIdMatchingBizPartners.get(0).Name + "' en el campo '" + jlFkBizPartnerId_nr.getText() + "'?";
+                        message += "\n¿Desea limpiar el valor del campo '" + jlOccasionalFiscalId.getText() + "', y seleccionar a '" + occasionalFiscalIdMatchingBizPartners.get(0).Name + "' en el campo '" + jlFkBizPartnerId_nr.getText() + "'?";
 
-                            if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
-                                filledFieldOccasionalFiscalId = false;
-                                moFieldOccasionalFiscalId.resetField();
-                                moFieldFkBizPartnerId_nr.setFieldValue(new int[] { occasionalFiscalIdMatchingBizPartners.get(0).Id });
-                            }
-                            else {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
-                                validation.setComponent(jcbOccasionalFiscalId);
-                            }
+                        if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
+                            filledFieldOccasionalFiscalId = false;
+                            moFieldOccasionalFiscalId.resetField();
+                            moFieldFkBizPartnerId_nr.setFieldValue(new int[] { occasionalFiscalIdMatchingBizPartners.get(0).Id });
+                        }
+                        else {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOccasionalFiscalId.getText() + "'.");
+                            validation.setComponent(jcbOccasionalFiscalId);
                         }
                     }
                 }
@@ -2520,13 +2604,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no para ambos al mismo tiempo.");
                         validation.setComponent(jcbFkBizPartnerId_nr);
                     }
-                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && isDiotAccount && miClient.showMsgBoxConfirm("¿Está seguro desea dejar sin valor los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
-                            + "(La cuenta contable '" + moPanelFkAccountId.getFieldAccount().getString() + "' aplica para la DIOT.)") != JOptionPane.YES_OPTION) {
+                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && tax != null && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor a los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
+                            + "(Se seleccionó el valor '" + tax.getTax() + "' para el campo '" + jlFkTaxId_n.getText() + "'.)") != JOptionPane.YES_OPTION) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                         validation.setComponent(jcbFkBizPartnerId_nr);
                     }
-                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && tax != null && miClient.showMsgBoxConfirm("¿Está seguro desea dejar sin valor los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
-                            + "(Se seleccionó el valor '" + tax.getTax() + "' para el campo '" + jlFkTaxId_n.getText() + "'.)") != JOptionPane.YES_OPTION) {
+                    else if (missingFieldsBizPartnerAndOccasionalFiscalId && mbIsCurrentAccountDiogAccount && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor a los campos '" + jlFkBizPartnerId_nr.getText() + "' y '" + jlOccasionalFiscalId.getText() + "'?\n"
+                            + "(La cuenta contable '" + moPanelFkAccountId.getFieldAccount().getString() + "' aplica para la DIOT, pero si deja sin valor a estos campos, esta partida será clasificada como público en general en la DIOT.)") != JOptionPane.YES_OPTION) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                         validation.setComponent(jcbFkBizPartnerId_nr);
                     }
@@ -2534,8 +2618,24 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
                         validation.setComponent(jcbFkTaxId_n);
                     }
-                    else if (isDiotAccount && tax != null && tax.getVatType().isEmpty()) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'.");
+                    else if (mbIsCurrentAccountDiogAccount && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0 && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlFkTaxId_n.getText() + "'?\n"
+                            + "(La cuenta contable '" + moPanelFkAccountId.getFieldAccount().getString() + "' aplica para la DIOT, pero si deja sin valor al campo '" + jlFkTaxId_n.getText() + "', esta partida será clasificada como IVA predeterminado en la DIOT.)") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
+                        validation.setComponent(jcbFkTaxId_n);
+                    }
+                    else if (!mbIsCurrentAccountDiogAccount && filledFieldOccasionalFiscalId && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0 && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlFkTaxId_n.getText() + "'?\n"
+                            + "(Se capturó un valor para el campo '" + jlOccasionalFiscalId.getText() + "', pero si deja sin valor al campo '" + jlFkTaxId_n.getText() + "', esta partida no será tomada en cuenta en la DIOT.)") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
+                        validation.setComponent(jcbFkTaxId_n);
+                    }
+                    else if (mbIsCurrentAccountDiogAccount && tax != null && tax.getVatType().isEmpty()) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n"
+                            + "(La cuenta contable '" + moPanelFkAccountId.getFieldAccount().getString() + "' aplica para la DIOT, pero el impuesto tiene un problema:\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "').");
+                        validation.setComponent(jcbFkTaxId_n);
+                    }
+                    else if (!mbIsCurrentAccountDiogAccount && filledFieldOccasionalFiscalId && tax != null && tax.getVatType().isEmpty() && miClient.showMsgBoxConfirm(SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'. ¿Está seguro que desea dejar este valor en al campo '" + jlFkTaxId_n.getText() + "'?\n"
+                            + "(Se capturó un valor para el campo '" + jlOccasionalFiscalId.getText() + "', pero si no cambia el valor del campo '" + jlFkTaxId_n.getText() + "', esta partida no será tomada en cuenta en la DIOT.)") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
                         validation.setComponent(jcbFkTaxId_n);
                     }
                     else if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() <= 0) {
@@ -2565,7 +2665,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
                             validation.setComponent(jbFkDps);
                         }
-                        else if (moEntryDps == null && isDiotAccount && !isCompany && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkDps.getText() + "'?") != JOptionPane.YES_OPTION) {
+                        else if (moEntryDps == null && mbIsCurrentAccountDiogAccount && !isCompany && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlFkDps.getText() + "'?") != JOptionPane.YES_OPTION) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
                             validation.setComponent(jbFkDps);
                         }
@@ -2587,7 +2687,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
                             if (!validation.getIsError()) {
                                 if (jckIsExchangeDifference.isSelected() && moFieldFkCurrencyId.getKeyAsIntArray()[0] == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
-                                    validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser diferente de: '" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency() + "',\n" +
+                                    validation.setMessage("El valor para el campo '" + jlFkCurrencyId.getText() + "' debe ser diferente de '" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency() + "',\n" +
                                             " debido a que está seleccionado el campo '" + jckIsExchangeDifference.getText() + "'.");
                                     validation.setComponent(jcbFkCurrencyId);
                                 }
@@ -2628,8 +2728,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                                                 // Record has a cash account, validate record entry currency:
 
                                                 if (moRecord.getDbmsDataAccountCash().getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
-                                                    currency = SDataReadDescriptions.getCatalogueDescription(miClient,
-                                                            SDataConstants.CFGU_CUR, new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
+                                                    String currency = miClient.getSession().getSessionCustom().getCurrency(new int[] { moRecord.getDbmsDataAccountCash().getFkCurrencyId() });
+                                                    
                                                     if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
                                                             "la moneda de la cuenta de efectivo de la póliza contable (" + currency + ").\n" +
                                                             "¿Desea continuar?") != JOptionPane.YES_OPTION) {
@@ -2658,8 +2758,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                                                         // Validate record entry currency:
 
                                                         if (moEntryAccountCash.getFkCurrencyId() != moFieldFkCurrencyId.getKeyAsIntArray()[0] && !jckIsExchangeDifference.isSelected()) {
-                                                            currency = SDataReadDescriptions.getCatalogueDescription(miClient,
-                                                                    SDataConstants.CFGU_CUR, new int[] { moEntryAccountCash.getFkCurrencyId() });
+                                                            String currency = miClient.getSession().getSessionCustom().getCurrency(new int[] { moEntryAccountCash.getFkCurrencyId() });
+                                                            
                                                             if (miClient.showMsgBoxConfirm("La moneda de esta partida no coincide con " +
                                                                     "la moneda de la cuenta de efectivo de la partida (" + currency + ").\n" +
                                                                     "¿Desea continuar?") != JOptionPane.YES_OPTION) {
@@ -2703,14 +2803,14 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                             if (!validation.getIsError()) {
                                 if (moEntryDps != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
                                     if (moEntryDps.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
-                                        validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento seleccionado.");
+                                        validation.setMessage("El asociado de negocios de la partida debe ser igual que el del documento seleccionado.");
                                         validation.setComponent(jcbFkBizPartnerId_nr);
                                     }
                                 }
 
                                 if (!validation.getIsError() && moEntryDpsAdj != null && (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0)) { 
                                     if (moEntryDpsAdj.getFkBizPartnerId_r() != moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]) {
-                                        validation.setMessage("El asociado de negocios de la partida debe ser igual al del documento de ajuste seleccionado.");
+                                        validation.setMessage("El asociado de negocios de la partida debe ser igual que el del documento de ajuste seleccionado.");
                                         validation.setComponent(jcbFkBizPartnerId_nr);
                                     }
                                 }
@@ -2763,8 +2863,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jckIsSystem.setSelected(moRecordEntry.getIsSystem());
         jckIsDeleted.setSelected(moRecordEntry.getIsDeleted());
 
-        msCurrentFkAccountId = moRecordEntry.getFkAccountIdXXX();
-        moPanelFkAccountId.getFieldAccount().setFieldValue(msCurrentFkAccountId);
+        msCurrentAccountId = moRecordEntry.getFkAccountIdXXX();
+        moPanelFkAccountId.getFieldAccount().setFieldValue(msCurrentAccountId);
         moPanelFkAccountId.refreshPanel();
 
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moRecordEntry.getFkCostCenterIdXXX_n().length() == 0 ? moPanelFkCostCenterId_n.getEmptyAccountId() : moRecordEntry.getFkCostCenterIdXXX_n());
