@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 263.3/ 2025-02-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Complementación de invocación de stored procedure de guardado de usuarios por adición de columnas de usuario de última sincronización.
+
+================================================================================
 SIIE 3.2 263.2/ 2025-02-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

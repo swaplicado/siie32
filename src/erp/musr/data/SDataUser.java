@@ -443,7 +443,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.usru_usr_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(param++, mnPkUserId);
             callableStatement.setString(param++, msUser);
             callableStatement.setString(param++, msUserPassword);
@@ -456,6 +456,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             callableStatement.setBoolean(param++, mbIsRegistryNew ? true : mbExtraIsPasswordUpdateRequired);
             callableStatement.setInt(param++, mnFkUserTypeId);
             if (mnFkBizPartnerId_n > 0) callableStatement.setInt(param++, mnFkBizPartnerId_n); else callableStatement.setNull(param++, java.sql.Types.INTEGER);
+            if (mnFkUserLastSyncId_n > 0) callableStatement.setInt(param++, mnFkUserLastSyncId_n); else callableStatement.setNull(param++, java.sql.Types.SMALLINT);
             callableStatement.setInt(param++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
