@@ -80,22 +80,40 @@ public class STrnDBDocuments {
                     "    f.file_storage_name, " +
                     "    f.file_type, " +
                     "    f.fk_cur_quot, " +
-                    "    IF(LENGTH(f.ext_bp_name) > 0, f.ext_bp_name, COALESCE(bp.bp, '')) AS bp_name " +
+                    "    IF(LENGTH(f.ext_bp_name) > 0, f.ext_bp_name, COALESCE(bp.bp, '')) AS bp_name, " +
+                    "    CASE " + 
+                    "        WHEN ety_count.count = 1 THEN CONCAT('Precio unitario: ', (SELECT ROUND(price_u, 2) "
+                                                                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " "
+                                                                                        + "WHERE id_year = " + idYear + " AND id_doc = " + idDoc + " AND id_ety = ety_count.id_ety), ' MXN') " +
+                    "        WHEN ety_count.count > 1 THEN CONCAT('Número partidas: ', ety_count.count) " +
+                    "        ELSE '' " + 
+                    "    END AS f_etys " + 
                     "FROM " +
                     "    " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
                     "        INNER JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE) + " AS f ON fdps.id_sup_file = f.id_sup_file " +
                     "        LEFT JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON f.fid_bp_n = bp.id_bp " +
+                    "        LEFT JOIN " +
+                    "    (SELECT  " +
+                    "        id_sup_file, COUNT(*) AS count, id_ety " +
+                    "     FROM " +
+                    "        " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS_ETY) + " " +
+                    "     WHERE " +
+                    "        id_year = " + idYear + " " +
+                    "        AND id_doc = " + idDoc + " " +
+                    "     GROUP BY " +
+                    "        id_sup_file) AS ety_count ON fdps.id_sup_file = ety_count.id_sup_file " +
                     "WHERE " +
                     "   NOT f.b_del " +
                     "   AND fdps.id_year = " + idYear + " " +
                     "   AND fdps.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
+            Logger.getLogger(STrnDBDocuments.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsFile> lWebDpsFiles = new ArrayList<>();
+            String sqlEty = "";
             while (res.next()) {
                 SWebDpsFile oWebDpsFile = new SWebDpsFile();
                 oWebDpsFile.setIdSupFile(res.getInt("id_sup_file"));
@@ -112,6 +130,7 @@ public class STrnDBDocuments {
                 oWebDpsFile.setExtTemp(res.getBoolean("fdps.b_extemp"));
                 oWebDpsFile.setFkDpsCurrency(res.getInt("fdps.fk_cur_dps"));
                 oWebDpsFile.setFkQuotCurrency(res.getInt("fdps.fk_cur_quot"));
+                oWebDpsFile.setTextEtys(res.getString("f_etys"));
 
                 SWebFile oFile = new SWebFile();
                 oFile.setIdSupFile(res.getInt("id_sup_file"));
@@ -124,7 +143,7 @@ public class STrnDBDocuments {
                 oFile.setExternalBpName(res.getString("bp_name"));
                 oFile.setFkCurQuot(res.getInt("f.fk_cur_quot"));
                 if (oFile.getCloudStorageName() != null && !oFile.getCloudStorageName().isEmpty()) {
-                    System.out.println("Storage name: " + oFile.getCloudStorageName());
+                    Logger.getLogger(STrnDBDocuments.class.getName()).log(Level.INFO, "Storage name: {0}", oFile.getCloudStorageName());
                     try {
                         oFile.setCloudFileUrl(CloudStorageManager.generatePresignedUrl(oFile.getCloudStorageName()));
                     } catch (StorageManagerException ex) {
@@ -134,7 +153,9 @@ public class STrnDBDocuments {
                 }
 
                 oWebDpsFile.setoWebFile(oFile);
-
+                
+                // agregar entries al archivo
+                
                 lWebDpsFiles.add(oWebDpsFile);
             }
 

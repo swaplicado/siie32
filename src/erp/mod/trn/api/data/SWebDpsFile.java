@@ -5,6 +5,8 @@
  */
 package erp.mod.trn.api.data;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Edwin Carmona
@@ -25,6 +27,7 @@ public class SWebDpsFile {
     private int fkDpsCurrency;
     private int fkQuotCurrency;
     private SWebFile oWebFile;
+    private String textEtys;
 
     public SWebDpsFile() {
         this.idSupFile = 0;
@@ -42,6 +45,7 @@ public class SWebDpsFile {
         this.fkDpsCurrency = 0;
         this.fkQuotCurrency = 0;
         this.oWebFile = new SWebFile();
+        this.textEtys = "";
     }
 
     public int getIdSupFile() {
@@ -163,4 +167,12 @@ public class SWebDpsFile {
     public void setoWebFile(SWebFile oWebFile) {
         this.oWebFile = oWebFile;
     }
+
+    public String getTextEtys() {
+        return textEtys;
+    }
+
+    public void setTextEtys(String textEtys) {
+        this.textEtys = textEtys;
+    }   
 }

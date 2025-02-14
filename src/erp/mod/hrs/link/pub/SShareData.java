@@ -299,7 +299,7 @@ public class SShareData {
         /**
          * Entries del DPS
          */
-        ArrayList<SWebDpsEty> lEties = oTrnCore.getWebDpsEties(idYear, idDoc, oWebDocument.getoDpsHeader().getDt());
+        ArrayList<SWebDpsEty> lEties = oTrnCore.getWebDpsEtiesFull(idYear, idDoc, oWebDocument.getoDpsHeader().getDt());
         oWebDocument.getlEtys().clear();
         oWebDocument.getlEtys().addAll(lEties);
 
