@@ -16,6 +16,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -77,6 +78,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     
     private SDbSupplierFileProcess moRegistry;
     private SDbSupplierFile moPickedSuppFile;
+    private SDbSupplierFile moSuppFileDeleted;
     private File moFile;
     
     private SDataDpsType moDpsType;
@@ -88,6 +90,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private ArrayList<SDbSupplierFile> maSuppFilesDeleted;
     private ArrayList<SRowSupplierFileDpsFiles> maSuppFilesRows;
     private ArrayList<SRowSupplierFileDpsEntry> maDpsEntriesRows;
+    private ArrayList<File> maFilesDeleted;
     
     private SGridPaneForm moGridSuppFiles;
     private SGridPaneForm moGridDpsEntries;
@@ -96,18 +99,21 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private JButton jbCancelRow;
     private JButton jbUpRow;
     private JButton jbDownRow;
+    private JButton jbEditRow;
     private JButton jbDeleteRow;
     private JButton jbSelectAll;
     private JButton jbDeselectAll;
     private JButton jbSaveAndSend;
     
     private int mnDpsStAuth;
+    private int mnEditingSelectedIndex;
     
     private boolean mbIsDocExtemp;
     private boolean mbIsCapturingFile;
     private boolean mbIsExistingFile;
     private boolean mbCanEdit;
     private boolean mbSendAuth;
+    private boolean mbIsEditingFile;
     
     private double mdExchangeRateDoc;
     private double mdExchangeRateLoc;
@@ -731,6 +737,10 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbDownRow.setText("Bajar");
         jbDownRow.setPreferredSize(new java.awt.Dimension(90, 23));
         
+        jbEditRow = new JButton();
+        jbEditRow.setText("Modificar");
+        jbEditRow.setPreferredSize(new java.awt.Dimension(90, 23));
+        
         jbDeleteRow = new JButton();
         jbDeleteRow.setText("Eliminar");
         jbDeleteRow.setPreferredSize(new java.awt.Dimension(90, 23));
@@ -847,6 +857,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moGridSuppFiles.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCancelRow);
         moGridSuppFiles.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbUpRow);
         moGridSuppFiles.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDownRow);
+        moGridSuppFiles.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbEditRow);
         moGridSuppFiles.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeleteRow);
         jpGridSuppFiles.add(moGridSuppFiles, BorderLayout.CENTER);
         
@@ -952,6 +963,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbCancelRow.setEnabled(enable);
         jbUpRow.setEnabled(!enable);
         jbDownRow.setEnabled(!enable);
+        jbEditRow.setEnabled(!enable);
         jbDeleteRow.setEnabled(!enable);
         jbSelectAll.setEnabled(false);
         jbDeselectAll.setEnabled(false);
@@ -1055,13 +1067,17 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         }
         
         try {
-            if (!mbIsExistingFile) {
-                if (moKeySuppBp.getSelectedIndex() > 0) {
-                    String sql = "SELECT * FROM trn_sup_file WHERE num = '" + moTextSuppNum.getValue() + "' AND fid_bp_n = " + moKeySuppBp.getValue()[0];
-                    try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-                        if (resultSet.next()) {
-                            validation.setMessage("Ya existe un registro para el folio del archivo de soporte del el asociado de negocios seleccionado.\nFavor de verificar.");
-                            validation.setComponent(moTextSuppNum);
+            if (!jbTechnical.isSelected()) {
+                if (!mbIsEditingFile) {
+                    if (!mbIsExistingFile) {
+                        if (moKeySuppBp.getSelectedIndex() > 0) {
+                            String sql = "SELECT * FROM trn_sup_file WHERE num = '" + moTextSuppNum.getValue() + "' AND fid_bp_n = " + moKeySuppBp.getValue()[0];
+                            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                                if (resultSet.next()) {
+                                    validation.setMessage("Ya existe un registro para el folio del archivo de soporte del el asociado de negocios seleccionado.\nFavor de verificar.");
+                                    validation.setComponent(moTextSuppNum);
+                                }
+                            }
                         }
                     }
                 }
@@ -1188,14 +1204,14 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             jbHiggerQ.setEnabled(false);
             jbLowerQ.setEnabled(false);
             enableSuppComponets(true);
-            moBoolNoRegSuppBp.setSelected(true);
-            moTextNoRegSuppBp.setEnabled(true);
+            moTextNoRegSuppBp.setEnabled(false);
             moBoolNoRegSuppBp.setEnabled(false);
             moKeySuppBp.setSelectedIndex(0);
             moKeySuppBp.setEnabled(false);
             moKeySuppCur.setValue(new int[] { 1 });
             moKeySuppCur.setEnabled(false);
             moDecSuppCurTotal.setEnabled(false);
+            jbSuppNumPicker.setEnabled(false);
             for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
                 row.setVinculed(false);
             }
@@ -1222,7 +1238,12 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     
     private void actionFilePicker() {
         if (jtfFile.isEnabled()) {
-            miClient.getFileChooser().setSelectedFile(moFile);
+            if (!mbIsEditingFile) {
+                miClient.getFileChooser().setSelectedFile(moFile);
+            }
+            else {
+                miClient.getFileChooser().setSelectedFile(new File(System.getProperty("user.home")));
+            }
             if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 if ( miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(" + FILE_EXT + ")$")) {
                     jtfFile.setText(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
@@ -1313,7 +1334,16 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                         fileDps.setNotes(moTextNotes.getValue());
                     }
                     file.setSuppFileDps(fileDps);
-                    maSuppFiles.add(file);
+                    if (!mbIsEditingFile) {
+                        maSuppFiles.add(file);
+                    }
+                    else {
+                        maSuppFiles.add(mnEditingSelectedIndex, file);
+                        int i = 1;
+                        for (SDbSupplierFile rowAux : maSuppFiles) {
+                            rowAux.getSuppFileDps().setSortingPos(i++);
+                        }
+                    }
 
                     cleanSuppComponets();
                     populateGridFiles();
@@ -1326,6 +1356,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                     jbPickedQ.requestFocus();
 
                     mbIsCapturingFile = false;
+                    mbIsEditingFile = false;
                 }
                 else {
                     miClient.showMsgBoxInformation(validation.getMessage());
@@ -1345,6 +1376,11 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbHiggerQ.setEnabled(true);
         jbLowerQ.setEnabled(true);
         jbTechnical.setEnabled(true);
+        mbIsCapturingFile = false;
+        if (mbIsEditingFile) {
+            maSuppFiles.add(mnEditingSelectedIndex, moSuppFileDeleted);
+        }
+        mbIsEditingFile = false;
         valueChanged(null);
     }
     
@@ -1403,6 +1439,73 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                     }
                     populateGridFiles();
                     moGridSuppFiles.setSelectedGridRow(index + 1);
+                }
+            }
+        }
+    }
+    
+    private void actionEditRow() {
+        if (moGridSuppFiles.getSelectedGridRow() == null) {
+            miClient.showMsgBoxInformation("Debe haber un renglón seleccionado.");
+        }
+        else {
+            boolean canEdit = true;
+            mnEditingSelectedIndex = moGridSuppFiles.getTable().getSelectedRow();
+            if (mbIsDocExtemp) {
+                SRowSupplierFileDpsFiles selectedRow = (SRowSupplierFileDpsFiles) moGridSuppFiles.getSelectedGridRow();
+                if (!selectedRow.getIsExtemp()){
+                    miClient.showMsgBoxInformation("No se puede modificar el renglón debido a que no es extemporaneo.");
+                    canEdit = false;
+                }
+            }
+            if (canEdit) {
+                try {
+                    mbIsCapturingFile = true;
+                    mbIsEditingFile = true;
+                    moSuppFileDeleted = maSuppFiles.get(mnEditingSelectedIndex);
+                    if (moSuppFileDeleted.isRegistryNew()){
+                        moFile = moSuppFileDeleted.getAuxFile();
+                        maSuppFiles.remove(mnEditingSelectedIndex);
+                    }
+                    else {
+                        if (!moSuppFileDeleted.getFilevaultId().isEmpty()) {
+                            moFile = new File(SDocUtils.downloadFile(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, moSuppFileDeleted.getFilevaultId(), 
+                                    new File(System.getProperty("java.io.tmpdir")), true));
+                            maFilesDeleted.add(new File(moFile.getAbsolutePath()));
+                        }
+                        maSuppFilesDeleted.add(maSuppFiles.remove(mnEditingSelectedIndex));
+                    }
+                    jbPickedQ.setEnabled(false);
+                    jbHiggerQ.setEnabled(false);
+                    jbLowerQ.setEnabled(false);
+                    jbTechnical.setEnabled(false);
+                    enableSuppComponets(true);
+                    switch (moSuppFileDeleted.getSuppFileDps().getSupplierFileDpsType()) {
+                        case "Q": 
+                            moKeySuppBp.setEnabled(false);
+                            jbPickedQ.setEnabled(true);
+                            moKeySuppCur.setEnabled(false);
+                            moDecSuppCurTotal.setEnabled(false);
+                            break;
+                        case "Q+": 
+                            jbHiggerQ.setEnabled(true); 
+                            break;
+                        case "Q-": 
+                            jbLowerQ.setEnabled(true); 
+                            break;
+                        case "T": 
+                            jbTechnical.setEnabled(true); 
+                            moKeySuppCur.setEnabled(false);
+                            moDecSuppCurTotal.setEnabled(false);
+                            moKeySuppBp.setEnabled(false);
+                            moBoolNoRegSuppBp.setEnabled(false);
+                            moTextNoRegSuppBp.setEnabled(true);
+                            break;
+                    }
+                    itemStateChangeNoRegSuppBp();
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxError(e.getMessage());
                 }
             }
         }
@@ -1563,6 +1666,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbCancelRow.addActionListener(this);
         jbUpRow.addActionListener(this);
         jbDownRow.addActionListener(this);
+        jbEditRow.addActionListener(this);
         jbDeleteRow.addActionListener(this);
         jbSelectAll.addActionListener(this);
         jbDeselectAll.addActionListener(this);
@@ -1587,6 +1691,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbCancelRow.removeActionListener(this);
         jbUpRow.removeActionListener(this);
         jbDownRow.removeActionListener(this);
+        jbEditRow.removeActionListener(this);
         jbDeleteRow.removeActionListener(this);
         jbSelectAll.removeActionListener(this);
         jbDeselectAll.removeActionListener(this);
@@ -1663,6 +1768,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         });
         
         maSuppFilesDeleted = new ArrayList<>();
+        maFilesDeleted = new ArrayList<>();
         
         populateGridFiles();
         populateGridDpsEntries();
@@ -1672,12 +1778,14 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         valueChanged(null);
         
         mbIsCapturingFile = false;
+        mbIsEditingFile = false;
         jbPickedQ.setEnabled(mbCanEdit);
         jbHiggerQ.setEnabled(mbCanEdit);
         jbLowerQ.setEnabled(mbCanEdit);
         jbTechnical.setEnabled(mbCanEdit);
         jbUpRow.setEnabled(mbCanEdit);
         jbDownRow.setEnabled(mbCanEdit);
+        jbEditRow.setEnabled(mbCanEdit);
         jbDeleteRow.setEnabled(mbCanEdit);
         jbSave.setEnabled(mbCanEdit);
         jbSaveAndSend.setEnabled(mbCanEdit && mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
@@ -1692,6 +1800,11 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         registry.getSuppFilesDeleted().clear();
         for (SDbSupplierFile file : maSuppFilesDeleted) {
             registry.getSuppFilesDeleted().add(file);
+        }
+        
+        registry.getFilesDeleted().clear();
+        for (File file : maFilesDeleted){
+            registry.getFilesDeleted().add(file);
         }
         
         registry.getSuppFiles().clear();
@@ -1757,6 +1870,9 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             }
             else if (button == jbDownRow) {
                 actionDownRow();
+            }
+            else if (button == jbEditRow) {
+                actionEditRow();
             }
             else if (button == jbDeleteRow) {
                 actionDeleteRow();
@@ -1832,6 +1948,9 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                     }
                 }
                 populateGridDpsEntries();
+            }
+            if (mbIsEditingFile) {
+                moGridSuppFiles.setSelectedGridRow(mnEditingSelectedIndex);
             }
         }
     }
