@@ -1,15 +1,15 @@
 ================================================================================
-SIIE 3.2 263.4/ 2025-02-17
-Jhonatan Claudio PEÑA HERNANDEZ
---------------------------------------------------------------------------------
-1) Corrección impresión de contratos cuando este tiene varias partidas eliminadas
-
-================================================================================
 SIIE 3.2 263.5/ 2025-02-17
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de la edición de archivos de soporte.
 2) Se inhabilita el campo de asociado de negocio externo para las fichas técnicas.
+
+================================================================================
+SIIE 3.2 263.4/ 2025-02-17
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección impresión de contratos cuando este tiene varias partidas eliminadas
 
 ================================================================================
 SIIE 3.2 263.3/ 2025-02-13
