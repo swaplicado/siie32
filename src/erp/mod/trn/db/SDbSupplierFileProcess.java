@@ -8,6 +8,7 @@ package erp.mod.trn.db;
 import erp.client.SClientInterface;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,6 +31,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     protected String msDpsStatus;
     protected ArrayList<SDbSupplierFile> maSuppFiles;
     protected ArrayList<SDbSupplierFile> maSuppFilesDeleted;
+    protected ArrayList<File> maFilesDeleted;
     protected ArrayList<SDbMaterialRequest> maMaterialRequests;
     
     protected SGuiClient miClient;
@@ -53,6 +55,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
     public String getDpsStatus() { return msDpsStatus; }
     public ArrayList<SDbSupplierFile> getSuppFiles() { return maSuppFiles; }
     public ArrayList<SDbSupplierFile> getSuppFilesDeleted() { return maSuppFilesDeleted; }
+    public ArrayList<File> getFilesDeleted() { return maFilesDeleted; }
     public ArrayList<SDbMaterialRequest> getMaterialRequests() { return maMaterialRequests; }
         
     public void updateDpsStatus(SGuiSession session, int stAuth) throws Exception {
@@ -93,6 +96,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         moDps = null;
         maSuppFiles = new ArrayList<>();
         maSuppFilesDeleted = new ArrayList<>();
+        maFilesDeleted = new ArrayList<>();
         maMaterialRequests = new ArrayList<>();
         
         miClient = null;
@@ -172,6 +176,10 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         
         for (SDbSupplierFile file : maSuppFilesDeleted) {
             file.delete(session);
+        }
+        
+        for (File file : maFilesDeleted) {
+            file.delete();
         }
         
         if (miClient != null) {
