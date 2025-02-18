@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
  */
 public interface SServerRemote extends Remote {
 
+    public String getVersion() throws RemoteException;
     public SLoginResponse login(SLoginRequest request) throws RemoteException;
     public void logout(int sessionId) throws RemoteException;
 }

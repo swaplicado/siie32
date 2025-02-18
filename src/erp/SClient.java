@@ -781,7 +781,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moParamsApp = new SParamsApp();
         if (!moParamsApp.read()) {
             showMsgBoxError(ERR_PARAMS_APP_READING);
-            System.exit(-1);    // there is no way of connecting to an ERP Server
+            System.exit(-1); // there is no way of connecting to the ERP Server
         }
         
         TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone(moParamsApp.getTimeZone()));
@@ -807,7 +807,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         if (result != SDbConsts.CONNECTION_OK) {
             showMsgBoxError(SDbConsts.ERR_MSG_DB_CONNECTION);
-            System.exit(-1);    // there is no way of connecting to an ERP Server
+            System.exit(-1); // there is no way of connecting to the ERP Server
         }
         else {
             moSysDatabaseMonitor = new SDbDatabaseMonitor(moSysDatabase);
@@ -818,7 +818,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             }
             catch (SQLException e) {
                 showMsgBoxError(e.toString());
-                System.exit(-1);    // there is no way of connecting to an ERP Server
+                System.exit(-1); // there is no way of connecting to the ERP Server
             }
         }
         
@@ -1336,6 +1336,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
             moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
+            
+            String serverVersion = moServer.getVersion();
+            
+            if (!APP_RELEASE.equals(serverVersion)) {
+                String incompatibility = "¡Las versiones de este cliente SIIE (" + APP_RELEASE + ") y del servidor SIIE (" + serverVersion + ") no son compatibles!\n"
+                        + "De favor actualiza tu cliente SIIE local, u opta por ejecutarlo directamente desde el servidor.";
+                showMsgBoxError(incompatibility);
+                System.exit(-1); // there is no way of connecting to the ERP Server
+            }
 
             moLogin.setCompanies(readCompanies());
 
@@ -1413,11 +1422,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
             if (!lookup) {
                 showMsgBoxWarning("No se pudo establecer conexión con el ERP Server: '" + moParamsApp.getErpInstance() + "',\nen el host: '" + moParamsApp.getErpHost() + "'.");
-                System.exit(-1);
+                System.exit(-1); // there is no way of connecting to the ERP Server
             }
 
             if (!mbLoggedIn) {
-                System.exit(-1);
+                System.exit(-1); // there is no way of connecting to the ERP Server
             }
             else {
                 moGlobalCataloguesUsr = new SGuiGlobalCataloguesUsr(this);

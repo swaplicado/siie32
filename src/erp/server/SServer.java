@@ -29,17 +29,23 @@ import sa.lib.srv.SSrvConsts;
 /**
  *
  * @author Sergio Flores
- * To generate stub:
- * 1) build project;
- * 2) create stub for this class, like this:
- *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
- *    OR
- *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;dist\lib\sa-lib-10.jar erp.server.SServer
- * 3) build project again to add stub to project's JAR.
  * 
- * Do not forget to generate stubs for:
- * erp.server.SServer
- * erp.server.SSessionServer
+ * IMPORTANT NOTICE:
+ * Each time this class, SServer, is changed, the corresponding stub must be created and included in JAR.
+ * 
+ * Follow these instructions to generate the stubs with current JDK:
+ * 
+ * 1) Build project.
+ * 
+ * 2) Create stub for this class, just like this:
+ *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ * 
+ * 3) Build project once again to add stubs to project's JAR, into its own "lib" folder.
+ * 
+ * WARNING:
+ * Do not forget to generate and maintain up to the date all stubs for:
+ * - erp.server.SServer
+ * - erp.server.SSessionServer
  */
 public class SServer extends UnicastRemoteObject implements SServerRemote, Runnable {
 
@@ -584,6 +590,12 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
     public SParamsApp getParamsApp() { return moParamsApp; }
     public SServiceSessions getServiceSessions() { return moServiceSessions; }
     public SServiceDataLocks getServiceDataLocks() { return moServiceDataLocks; }
+    
+    @Override
+    public String getVersion() throws RemoteException {
+        renderMessageLn("Calling getVersion()...");
+        return SClient.APP_RELEASE;
+    }
 
     @Override
     public SLoginResponse login(final SLoginRequest request) throws RemoteException {

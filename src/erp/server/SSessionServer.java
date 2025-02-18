@@ -69,13 +69,23 @@ import sa.lib.srv.SSrvResponse;
 /**
  *
  * @author Sergio Flores, Isabel Servín, Adrián Avilés
- * To generate stub:
- * 1) build project;
- * 2) create stub for this class, like this:
+ * 
+ * IMPORTANT NOTICE:
+ * Each time this class, SSessionServer, is changed, the corresponding stub must be created and included in JAR.
+ * 
+ * Follow these instructions to generate the stubs with current JDK:
+ * 
+ * 1) Build project.
+ * 
+ * 2) Create stub for this class, just like this:
  *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
- *    OR
- *    [siie32_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;dist\lib\sa-lib-10.jar erp.server.SSessionServer
- * 3) build project again to add stub to project's JAR.
+ * 
+ * 3) Build project once again to add stubs to project's JAR, into its own "lib" folder.
+ * 
+ * WARNING:
+ * Do not forget to generate and maintain up to the date all stubs for:
+ * - erp.server.SServer
+ * - erp.server.SSessionServer
  */
 public class SSessionServer implements SSessionServerRemote, Serializable {
 
