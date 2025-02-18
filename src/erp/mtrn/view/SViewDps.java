@@ -146,6 +146,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthComments;
     private javax.swing.JButton jbDownFileSupp;
     private javax.swing.JButton jbDeleteFileSupp;
+    private javax.swing.JButton jbAnullAuth;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -484,6 +485,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbDeleteFileSupp.addActionListener(this);
         jbDeleteFileSupp.setToolTipText("Eliminar todos los archivos de soporte anexados al documento");
         
+        jbAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
+        jbAnullAuth.setPreferredSize(new Dimension(23, 23));
+        jbAnullAuth.addActionListener(this);
+        jbAnullAuth.setToolTipText("Anular autorización");
+        
         moFileChooserDownload = new JFileChooser();
         moFileChooserDownload.setAcceptAllFileFilterUsed(false);
         moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -560,6 +566,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthComments);
             addTaskBarUpperComponent(jbDownFileSupp);
             addTaskBarUpperComponent(jbDeleteFileSupp);
+            addTaskBarUpperComponent(jbAnullAuth);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -638,6 +645,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbAuthComments.setEnabled(mbIsCategoryPur && mbIsOrd);
         jbDownFileSupp.setEnabled(mbIsCategoryPur && mbIsOrd);
         jbDeleteFileSupp.setEnabled(mbIsCategoryPur && mbIsOrd);
+        jbAnullAuth.setEnabled(mbIsCategoryPur && mbIsOrd);
         moTabFilterDnsDps.setVisible(mbIsOrd);
 
         STableField[] aoKeyFields = new STableField[2];
@@ -3122,6 +3130,42 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionRestartAuth() {
+         try {
+            if (jbAnullAuth.isEnabled()) {
+                if (isRowSelected()) {
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING
+                            && fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                        miClient.showMsgBoxInformation("No se puede anular la autorización porque el estatus del documento es " + fileProcess.getDpsStatus() + ".");
+                    }
+                    else {
+                        if (miClient.showMsgBoxConfirm("El documento regresara a estatus de autorización \"N/A\".\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
+                            // Eliminar archivos de la nube
+                            SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
+                            
+                            // Eliminar pasos de autorización
+                            SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+                            
+                            // Actualizar estatus de autorización
+                            String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
+                            miClient.getSession().getStatement().execute(sql);
+                            
+                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+                            
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
     private void actionSendAuth() {
         try {
             if (jbSendAuth.isEnabled()) {
@@ -3582,6 +3626,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbDeleteFileSupp) {
                     actionDeleteFileSupp();
+                }
+                else if (button == jbAnullAuth) {
+                    actionRestartAuth();
                 }
             }
         }

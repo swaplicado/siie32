@@ -398,6 +398,25 @@ public class STrnDBCore {
         return null;
     }
 
+    /**
+     * Obtiene las partidas de un documento.
+     * Incluyendo requisiciones de materiales
+     * @param idYear Año del documento.
+     * @param idDoc ID del documento.
+     * @param dpsDate Fecha del documento.
+     */
+    public ArrayList<SWebDpsEty> getWebDpsEtiesFull(int idYear, int idDoc, String dpsDate) {
+        ArrayList<SWebDpsEty> lEties = this.getWebDpsEties(idYear, idDoc, dpsDate);
+
+        STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
+        for (SWebDpsEty oEty : lEties) {
+            oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
+            oEty.getlItemHistory().addAll(this.getDpsItemHistory(dpsDate, oEty.getIdItem(), oEty.getPrice(), oEty.getPriceCur(), 1));
+        }
+
+        return lEties;
+    }
+
     public ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc, String dpsDate) {
         try {
             Connection conn = this.getConnection();
@@ -456,12 +475,6 @@ public class STrnDBCore {
                 oEty.setTotal(res.getDouble("tot_r"));
 
                 lEties.add(oEty);
-            }
-
-            STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
-            for (SWebDpsEty oEty : lEties) {
-                oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
-                oEty.getlItemHistory().addAll(this.getDpsItemHistory(dpsDate, oEty.getIdItem(), oEty.getPrice(), oEty.getPriceCur(), 1));
             }
 
             return lEties;
