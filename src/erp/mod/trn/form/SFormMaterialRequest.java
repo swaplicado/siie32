@@ -1057,7 +1057,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moTextReqStatus.setTextSettings(SGuiUtils.getLabelName("Estatus"), 100, 0);
         moDecTotal.setDecimalSettings(SGuiUtils.getLabelName(jlTotal), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecAsign.setDecimalSettings(SGuiUtils.getLabelName(jlAsign), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
-        moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 1000, 0);
+        moTextReqNotes.setTextSettings(SGuiUtils.getLabelName(jlReqNotes), 1000, 1);
         moTextTypeReq.setTextSettings(SGuiUtils.getLabelName("Tipo"), 1, 0);
         
         moTextItemKey.setTextSettings(SGuiUtils.getLabelName(jlItem), 500, 1);
