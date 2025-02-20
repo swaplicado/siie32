@@ -17,7 +17,6 @@ import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
-import erp.siieapp.SAuthorizationsAPI;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.internet.AddressException;
@@ -245,8 +245,14 @@ public abstract class SAuthorizationUtils {
         return new ArrayList<>();
     }
     
-    
-    public static ArrayList<String> getMailsOfUsers(java.sql.Statement statement, ArrayList<Integer> userIds) {
+    /**
+     * Obtiene el nombre de usuario y correo de los implicados en turno de autorización del recurso.
+     * 
+     * @param statement
+     * @param userIds
+     * @return 
+     */
+    public static HashMap<String, String> getMailsOfUsers(java.sql.Statement statement, ArrayList<Integer> userIds) {
         StringBuilder userIn = new StringBuilder("(");
         for (int i = 0; i < userIds.size(); i++) {
             userIn.append(userIds.get(i));
@@ -257,7 +263,7 @@ public abstract class SAuthorizationUtils {
         userIn.append(")");
         
         String sql = "SELECT " +
-                    "    email " +
+                    "   usr, email " +
                     "FROM " +
                     "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " " +
                     "WHERE " +
@@ -265,9 +271,9 @@ public abstract class SAuthorizationUtils {
                     "    AND id_usr IN " + userIn + ";";
         try {
             ResultSet res = statement.executeQuery(sql);
-            ArrayList<String> lMails = new ArrayList<>();
+            HashMap<String, String> lMails = new HashMap<>();
             while(res.next()) {
-                lMails.add(res.getString("email"));
+                lMails.put(res.getString("usr"), res.getString("email"));
             }
             
             return lMails;
@@ -276,7 +282,59 @@ public abstract class SAuthorizationUtils {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return new ArrayList<>();
+        return new HashMap<>();
+    }
+    
+    
+    /**
+     * Obtiene el folio del documento de acuerdo a su llave primaria
+     * 
+     * @param statement
+     * @param pk
+     * 
+     * @return 
+     */
+    public static String getDpsFolio(java.sql.Statement statement, int[] pk) {
+        String sql = "SELECT CONCAT(td.code, ' ', CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS td ON d.fid_ct_dps = td.id_ct_dps AND d.fid_cl_dps = td.id_cl_dps AND d.fid_tp_dps = td.id_tp_dps "
+                + "WHERE id_year = " + ((int[]) pk)[0] +" AND id_doc = " + ((int[]) pk)[1] + " ";
+        try {
+            ResultSet res = statement.executeQuery(sql);
+            if (res.next()) {
+                return res.getString("descrip");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return "";
+    }
+
+    /**
+     * Obtiene el nombre de usuario de acuerdo a su id
+     * 
+     * @param statement
+     * @param userId
+     * 
+     * @return 
+     */
+    public static String getUserName(java.sql.Statement statement, int userId) {
+        String sql = "SELECT usr "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " "
+                + "WHERE id_usr = " + userId + ";";
+        try {
+            ResultSet res = statement.executeQuery(sql);
+            if (res.next()) {
+                return res.getString("usr");
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return "";
     }
     
     /**
@@ -898,7 +956,8 @@ public abstract class SAuthorizationUtils {
                 }
             }
         }
-        processAuthornMails(session, authorizationType, (int[])pkDps);
+        
+        processAuthornMails(session, authorizationType, (int[])pkDps, "");
     }
     
     /**
@@ -1634,50 +1693,45 @@ public abstract class SAuthorizationUtils {
     * @param session
     * @param authorizationType
     * @param pkDps
+     * @param comments
     */
-    public static void processAuthornMails(final SGuiSession session, final int authorizationType, int[] pkDps) {
+    public static void processAuthornMails(final SGuiSession session, final int authorizationType, int[] pkDps, String comments) {
         ArrayList<Integer> lUsers;
         try {
             boolean toNotification = true;
             lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps, toNotification);
             if (! lUsers.isEmpty()) {
-                ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), lUsers);
+                HashMap<String, String> lMails = SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), lUsers);
                 if (! lMails.isEmpty()) {
-                    StringBuilder toMails = new StringBuilder("");
-                    for (int i = 0; i < lMails.size(); i++) {
-                        toMails.append(lMails.get(i));
-                        if (i < lMails.size() - 1) {
-                            toMails.append("; ");
-                        }
+                    for (Map.Entry<String, String> oRow : lMails.entrySet()) {
+                        String userName = oRow.getKey();
+                        String userMail = oRow.getValue();
+                        
+                        SAuthorizationUtils.sendAuthornMails(session, AUTH_MAIL_AUTH_PEND, userMail, "", "", pkDps, userName, comments);
                     }
-                    SAuthorizationUtils.sendAuthornMails(session, AUTH_MAIL_AUTH_PEND, toMails.toString(), "", "", pkDps);
                 }
             }
         }
         catch (SQLException ex) {
-            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (Exception ex) {
-            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc, String bcc, int[] pkDps) throws Exception {
+    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc,
+            String bcc, int[] pkDps, final String actionUserName, final String comment) throws Exception {
         SDataDps dps = new SDataDps();
         dps.read(pkDps, session.getStatement().getConnection().createStatement());
         SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
-        
+
         ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")));
-        ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
-        ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
-        
-        String subject;
-        if (mailType == AUTH_MAIL_AUTH_PEND) {
-            subject = "[SIIE] Autorizacion pendiente de orden de compra " + dps.getNumber();
-        }
-        else {
-            subject = "[SIIE] Autorizacion concluida de orden de compra " + dps.getNumber();
-        }
+        ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>()
+                : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
+        ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>()
+                : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
+
         String body = "<html>";
         body += "<head>";
         body += "<style>"
@@ -1703,51 +1757,75 @@ public abstract class SAuthorizationUtils {
                 + "</style>";
         body += "</head>";
         body += "<body>";
-        body += "<h2>"+ SLibUtils.textToHtml("¡Hola!")+ "</h2>";
+        body += "<h2>" + SLibUtils.textToHtml("¡Hola!") + "</h2>";
+        String subject = "";
         switch (mailType) {
             case AUTH_MAIL_AUTH_PEND:
-                body += "<p>"+ SLibUtils.textToHtml("Tienes una orden de compra por autorizar")+ "</p>";
+                subject = "[SIIE] Autorizacion pendiente de orden de compra "
+                        + dps.getNumber();
+                body += "<p>" + SLibUtils.textToHtml("Tienes una orden de compra por autorizar") + "</p>";
                 body += "<b>Folio: " + dps.getNumber() + "</b>";
-                body += "<p>Ingresa aquí al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>";
+                if (comment != null && !comment.isEmpty()) {
+                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
+                }
+                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
+                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>";
                 break;
             case AUTH_MAIL_AUTH_DONE:
-                body += "<p>La siguiente orden de compra ha sido <span style='color: green;'>AUTORIZADA</span> exitosamente</p>";
+                subject = "[SIIE] OC " + dps.getNumber() + " autorizada";
+                body += "<p>La siguiente orden de compra ha sido <span style='color: green;'>AUTORIZADA</span> por: <b>" + actionUserName + "</b></p>";
                 body += "<b>Folio: " + dps.getNumber() + "</b>";
-                body += "<p>Ingresa aquí al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
-                if (! mms.getRecipientTo().isEmpty()) {
-                    toRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
+                if (comment != null && !comment.isEmpty()) {
+                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
+                }
+                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
+                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
+                if (!mms.getRecipientTo().isEmpty()) {
+                    toRecipients
+                            .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
                 }
                 break;
             case AUTH_MAIL_AUTH_REJ:
-                body += "<p>La siguiente orden de compra ha sido <span style='color: red;'>RECHAZADA</span></p>";
+                subject = "[SIIE] OC " + dps.getNumber() + " rechazada";
+                body += "<p>La siguiente orden de compra ha sido <span style='color: red;'>RECHAZADA</span> por: <b>" + actionUserName + "</b></p>";
                 body += "<b>Folio: " + dps.getNumber() + "</b>";
-                body += "<p>Ingresa aquí al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
-                if (! mms.getRecipientTo().isEmpty()) {
-                    toRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
+                if (comment != null && !comment.isEmpty()) {
+                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
+                }
+                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
+                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
+                if (!mms.getRecipientTo().isEmpty()) {
+                    toRecipients
+                            .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
                 }
                 break;
-        } 
-        
-        body += "<p>También puedes accesar al portal introduciendo esta dirección en tu navegador:</p>";
+        }
+
+        body += "<p>" + SLibUtils.textToHtml("También") + " puedes accesar al portal introduciendo esta "
+                + SLibUtils.textToHtml("dirección") + " en tu navegador:</p>";
         body += "<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">https://aeth.siieapp.com/portal-autorizaciones/public/dps</a>";
-        body += "<p>Recuerda: tu usuario y contraseña del portal son los mismos que tu cuenta SIIE.</p>";
+        body += "<p>Recuerda: tu usuario y " + SLibUtils.textToHtml("contraseña")
+                + " del portal son los mismos que tu cuenta SIIE.</p>";
         body += "<span style='font-size:10px'>" + STrnUtilities.composeMailFooter("") + "</span>";
-        
+
         body += "</body>";
-        
+
         body += "</html>";
 
-        SMailSender moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+        SMailSender moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(),
+                mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
         moMailSender.setMailReplyTo(mms.getXtaMailReplyTo());
-        
-        if (! mms.getRecipientCarbonCopy().isEmpty()) {
-            toCcRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";"))));
+
+        if (!mms.getRecipientCarbonCopy().isEmpty()) {
+            toCcRecipients
+                    .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";"))));
         }
-        
-        if (! mms.getRecipientBlindCarbonCopy().isEmpty()) {
-            toBccRecipients.addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";"))));
+
+        if (!mms.getRecipientBlindCarbonCopy().isEmpty()) {
+            toBccRecipients.addAll(
+                    new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";"))));
         }
-        
+
         ArrayList<String> toRecipientsCleaned = new ArrayList<>();
         if (toRecipients.isEmpty()) {
             throw new Exception("No hay destinatarios configurados para la notificación de correo");
@@ -1759,7 +1837,8 @@ public abstract class SAuthorizationUtils {
                 }
             }
         }
-        System.out.println("Enviando mail a: " + toRecipientsCleaned.toString());
+        
+        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, "Enviando mail a: {0}", toRecipientsCleaned.toString());
         SMail mail = new SMail(moMailSender, subject, body, toRecipientsCleaned, toCcRecipients, toBccRecipients);
         mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
         mail.send();
