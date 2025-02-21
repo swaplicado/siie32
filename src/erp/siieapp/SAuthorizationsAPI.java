@@ -14,6 +14,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_MAIL_AUTH_PEND;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_DPS;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -22,6 +23,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -32,7 +35,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author AdrianAviles
+ * @author AdrianAviles, Edwin Carmona
  */
 public class SAuthorizationsAPI {
 
@@ -51,67 +54,80 @@ public class SAuthorizationsAPI {
      * @param comments
      * @return 
      */
-    public String approbeResource(int typeResource, Object pk, int userId, String comments) {
-        String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments);
-        if (res != null && res.isEmpty()) {
-            switch(typeResource) {
-                case AUTH_TYPE_MAT_REQUEST:
-                    try {
-                        SDbMaterialRequest req = new SDbMaterialRequest();
-                        req.read(oSession, (int[]) pk);
-                        req.save(oSession);
-                    }
-                    catch (Exception ex) {
-                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
-                case AUTH_TYPE_DPS:
-                    if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
-                        System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] autorizado");
+    public SAppLinkResponse approbeResource(int typeResource, Object pk, int userId, String comments) {
+        SAppLinkResponse oResponse = new SAppLinkResponse();
+        try {
+            oResponse.setMessage(SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments));
+            String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
+            if (oResponse.getMessage() != null && oResponse.getMessage().isEmpty()) {
+                switch(typeResource) {
+                    case AUTH_TYPE_MAT_REQUEST:
                         try {
-                            updateDpsAuthStatus(pk,
-                                        SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN, 
-                                        userId);
-                            SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk));
+                            SDbMaterialRequest req = new SDbMaterialRequest();
+                            req.read(oSession, (int[]) pk);
+                            req.save(oSession);
                         }
                         catch (Exception ex) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    }
-                    else {
-                        /**
-                         * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
-                         */
-                        ArrayList<Integer> lUsers;
-                        try {
-                            boolean toNotification = true;
-                            lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
-                            if (! lUsers.isEmpty()) {
-                                ArrayList<String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
-                                if (! lMails.isEmpty()) {
-                                    StringBuilder toMails = new StringBuilder("");
-                                    for (int i = 0; i < lMails.size(); i++) {
-                                        toMails.append(lMails.get(i));
-                                        if (i < lMails.size() - 1) {
-                                            toMails.append("; ");
-                                        }
-                                    }
-                                    System.out.println("Enviando mail a: " + toMails.toString());
-                                    SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_PEND, toMails.toString(), "", "", ((int[]) pk));
-                                }
+                        break;
+                    case AUTH_TYPE_DPS:
+                        if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
+                            try {
+                                updateDpsAuthStatus(pk,
+                                        SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
+                                        userId);
+                                SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk), actionUserName, comments);
+                            }
+                            catch (Exception ex) {
+                                Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        catch (SQLException ex) {
-                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        else {
+                            /**
+                             * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
+                             */
+                            ArrayList<Integer> lUsers;
+                            ArrayList<Integer> lUsersNotified;
+                            try {
+                                boolean toNotification = true;
+                                lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
+                                if (! lUsers.isEmpty()) {
+                                    HashMap<String, String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
+                                    if (! lMails.isEmpty()) {
+                                        for (Map.Entry<String, String> oRow : lMails.entrySet()) {
+                                            String userMail = oRow.getValue();
+                                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "Enviando mail a: {0}", userMail);
+                                            SAuthorizationUtils.sendAuthornMails(oSession, AUTH_MAIL_AUTH_PEND, userMail, "", "", ((int[]) pk), "", "");
+                                        }
+                                    }
+                                }
+                                
+                                boolean toNotificationPush = false;
+                                lUsersNotified = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotificationPush);
+                                oResponse.getNextUsers().addAll(lUsersNotified);
+                                
+                                String folio = SAuthorizationUtils.getDpsFolio(oSession.getStatement().getConnection().createStatement(), ((int[]) pk));
+                                oResponse.setFolio(folio);
+                            }
+                            catch (SQLException ex) {
+                                Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            catch (Exception ex) {
+                                Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
-                        catch (Exception ex) {
-                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    break;
+                        break;
+                }
             }
+            
         }
-        return res;
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return oResponse;
     }
     
     /**
@@ -124,33 +140,44 @@ public class SAuthorizationsAPI {
      * @return 
      */
     public String rejectResource(int typeResource, Object pk, int userId, String comment) {
-        String res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
-        if (res != null && res.isEmpty()) {
-            switch(typeResource) {
-                case AUTH_TYPE_MAT_REQUEST:
-                    try {
-                        SDbMaterialRequest req = new SDbMaterialRequest();
-                        req.read(oSession, (int[]) pk);
-                        req.save(oSession);
-                    }
-                    catch (Exception ex) {
-                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
-                case AUTH_TYPE_DPS:
-                    try {
-                        System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
-                        updateDpsAuthStatus(pk,
-                                        SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT, 
-                                        userId);
-                        SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk));
-                    }
-                    catch (Exception ex) {
-                        Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
+        String res = "";
+        try {
+            String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
+            res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
+            if (res != null && res.isEmpty()) {
+                switch(typeResource) {
+                    case AUTH_TYPE_MAT_REQUEST:
+                        try {
+                            SDbMaterialRequest req = new SDbMaterialRequest();
+                            req.read(oSession, (int[]) pk);
+                            req.save(oSession);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                    case AUTH_TYPE_DPS:
+                        try {
+                            System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
+                            updateDpsAuthStatus(pk,
+                                    SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT,
+                                    userId);
+                            SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                }
             }
+            
+            return res;
         }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
+            res = ex.getMessage();
+        }
+        
         return res;
     }
     
@@ -170,12 +197,8 @@ public class SAuthorizationsAPI {
                 + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
 
         try {
-            System.out.println(sql);
             int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
-            System.out.println("res: " + res);
-            System.out.println(sqlDpsAuth);
             int resAuth = oSession.getDatabase().getConnection().createStatement().executeUpdate(sqlDpsAuth);
-            System.out.println("resAuth: " + resAuth);
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -496,7 +519,6 @@ public class SAuthorizationsAPI {
 
     // Clase para manejar parámetros de salida
     public static class OutputHolder<T> {
-
         private T value;
 
         public T getValue() {
