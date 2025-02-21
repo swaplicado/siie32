@@ -72,6 +72,8 @@ import java.rmi.RemoteException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -125,12 +127,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public static final String VENDOR_MAIL = "contacto@swaplicado.com.mx";
     
     public static final String ERR_PARAMS_APP_READING = "No fue posible leer los parámetros de configuración del sistema.";
+    
+    public static final String ARG_DEV = "dev";
 
-    private SLockManager moSLockManager;
-    private Jedis moJedis;
     private boolean mbFirstActivation;
     private boolean mbLoggedIn;
     private SParamsApp moParamsApp;
+    private String msCompany;
     private SLogin moLogin;
     private SLoginSession moLoginSession;
     private SServerRemote moServer;
@@ -162,7 +165,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private SDbDatabase moSysDatabase;
     private SDbDatabaseMonitor moSysDatabaseMonitor;
     private Statement miSysStatement;
-    private String msCompany;
+
     private sa.lib.gui.SGuiDatePicker moDatePicker;
     private sa.lib.gui.SGuiDateRangePicker moDateRangePicker;
     private SGuiYearPicker moYearPicker;
@@ -236,10 +239,23 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconCloseInactive;
     private ImageIcon moIconCloseBright;
     private ImageIcon moIconCloseDark;
+    
+    private Jedis moJedis;
+    private SLockManager moSLockManager;
+    
+    private static boolean IsDevMode;
+    private static long DevStartControlPoint;
+    private static long DevLastControlPoint;
+    private static final SimpleDateFormat DevDatetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS Z");
+    private static final DecimalFormat DevMillisecsFormat = new DecimalFormat("#,##0");
+    private static final DecimalFormat DevSecsAndMillisecsFormat = new DecimalFormat("#,##0.000");
 
     /** Creates new form SClient */
     public SClient() {
+        markDevControlPoint("Calling method initComponents()...");
         initComponents();
+        
+        markDevControlPoint("Calling method initComponentsCustom()...");
         initComponentsCustom();
     }
 
@@ -709,6 +725,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         SBeanOptionPicker.OwnerFrame = this;
         SBeanDialogReport.OwnerFrame = this;
 
+        markDevControlPoint("Initializating icons...");
+        
         moIcon = new ImageIcon(getClass().getResource("/erp/img/logo21.gif"));
         moIconNew = new ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"));
         moIconNewMain = new ImageIcon(getClass().getResource("/erp/img/icon_std_new_main.gif"));
@@ -778,29 +796,44 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconCloseBright = new ImageIcon(getClass().getResource("/sa/lib/img/gui_close_bri.png"));
         moIconCloseDark = new ImageIcon(getClass().getResource("/sa/lib/img/gui_close_dar.png"));
 
+        markDevControlPoint("Reading app params...");
+        
         moParamsApp = new SParamsApp();
         if (!moParamsApp.read()) {
             showMsgBoxError(ERR_PARAMS_APP_READING);
             System.exit(-1); // there is no way of connecting to the ERP Server
         }
         
+        markDevControlPoint("Setting time zone...");
+        
         TimeZone zone = SLibUtils.createTimeZone(TimeZone.getDefault(), TimeZone.getTimeZone(moParamsApp.getTimeZone()));
         SLibUtils.restoreDateFormats(zone);
         TimeZone.setDefault(zone);
         
-        moLogin = new SLogin(this);
-
+        markDevControlPoint("Creating login dialogs and attributes...");
+        
         msCompany = "";
+        moLogin = new SLogin(this);
+        
+        markDevControlPoint("Creating custom dialogs...");
+        
         moDatePicker = new sa.lib.gui.SGuiDatePicker(this, SGuiConsts.DATE_PICKER_DATE);
         moDateRangePicker = new sa.lib.gui.SGuiDateRangePicker(this);
         moYearPicker = new SGuiYearPicker(this);
         moYearMonthPicker = new SGuiYearMonthPicker(this);
-        moFileChooser = new JFileChooser();
+        
+        markDevControlPoint("Creating system dialogs...");
+        
+        //moFileChooser = new JFileChooser(); // delay instantiation untll needed
 
+        markDevControlPoint("Setting frame icon...");
+        
         setIconImage(moIcon.getImage());
         
         // Prepare SIIE client own DB connection:
 
+        markDevControlPoint("Connecting to database...");
+        
         moSysDatabase = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         result = moSysDatabase.connect(moParamsApp.getDatabaseHostClt(), moParamsApp.getDatabasePortClt(),
                 moParamsApp.getDatabaseName(), moParamsApp.getDatabaseUser(), moParamsApp.getDatabasePswd());
@@ -823,6 +856,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         }
         
         // Get XML configuration:
+        
+        markDevControlPoint("Reading XML configuration...");
         
         try {
             moXmlConfig = new SXmlConfig(SXmlModConsts.CONFIG_VER);
@@ -869,12 +904,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jlAppRelease.setText(APP_RELEASE);
 
+        markDevControlPoint("Creating action map...");
+        
         SFormUtilities.createActionMap(getRootPane(), this, "closeCurrentTab", "closeCurrentTab", KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK);
+        
+        markDevControlPoint("Calling method initComponentsCustom() done!");
     }
 
     private void windowActivated() {
         if (mbFirstActivation) {
             mbFirstActivation = false;
+            
+            markDevControlPoint("Calling method login()...");
             login();
         }
     }
@@ -884,7 +925,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             logout();
         }
     }
-
+    
     private ArrayList<SSrvCompany> readCompanies() {
         String sql = "";
         ResultSet resultSet = null;
@@ -1334,6 +1375,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         try {
             getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+            markDevControlPoint("Looking up server...");
             moServer = (SServerRemote) Naming.lookup("rmi://" + moParamsApp.getErpHost() + ":" + moParamsApp.getErpRmiRegistryPort() + "/" + moParamsApp.getErpInstance());
             lookup = true;
             
@@ -1346,8 +1388,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 System.exit(-1); // there is no way of connecting to the ERP Server
             }
 
+            markDevControlPoint("Reading companies...");
             moLogin.setCompanies(readCompanies());
 
+            markDevControlPoint("Showing login dialog...");
             while (!mbLoggedIn) {
                 moLogin.reset();
                 moLogin.setVisible(true);
@@ -1356,6 +1400,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                     break;
                 }
                 else {
+                    markDevControlPoint("Processing login request...");
+                    
                     SLoginRequest request = moLogin.getLoginRequest();
                     response = moServer.login(request);
 
@@ -1379,6 +1425,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                             // login concedido
                             // IMPORTANTE: ¡Favor de no cambiar el orden de las instrucciones de esta sección!
                             
+                            markDevControlPoint("Creating session...");
+                    
                             mbLoggedIn = true;
                             moSessionXXX = response.getSession();
                             moSessionXXX.getFormatters().redefineTableCellRenderers();
@@ -1429,6 +1477,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 System.exit(-1); // there is no way of connecting to the ERP Server
             }
             else {
+                markDevControlPoint("Initializing modules...");
+                    
                 moGlobalCataloguesUsr = new SGuiGlobalCataloguesUsr(this);
                 moGlobalCataloguesLoc = new SGuiGlobalCataloguesLoc(this);
                 moGlobalCataloguesBps = new SGuiGlobalCataloguesBps(this);
@@ -1447,12 +1497,15 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 
                 try {
                     // check if there are temporal data to recover:
+                    markDevControlPoint("Recovering temporal data...");
                     recoverTempData();
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
                 }
             }
+            
+            markDevControlPoint("Calling method login() done!");
         }
     }
 
@@ -1662,6 +1715,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+                SClient.IsDevMode = checkIsDevMode(args);
+                SClient.markDevControlPoint("run()...");
                 new SClient().setVisible(true);
             }
         });
@@ -2125,6 +2180,10 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     @Override
     public JFileChooser getFileChooser() {
+        if (moFileChooser == null) {
+            moFileChooser = new JFileChooser();
+        }
+        
         return moFileChooser;
     }
 
@@ -2483,5 +2542,46 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public Object getLockManager() {
         moSLockManager = new SLockManager();
         return moSLockManager;
+    }
+    
+    public static boolean checkIsDevMode(final String[] args) {
+        boolean isDevMode = false;
+        
+        if (args.length > 0) {
+            for (String arg : args) {
+                if (arg.startsWith(ARG_DEV)) {
+                    String[] tokens = arg.split("=");
+                    if (tokens.length == 1 || (tokens.length == 2 && tokens[1].equals("1"))) {
+                        isDevMode = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return isDevMode;
+    }
+    
+    public static void markDevControlPoint(final String label) {
+        if (IsDevMode) {
+            String output = "";
+            long curr = System.currentTimeMillis();
+            
+            if (DevStartControlPoint == 0 || DevLastControlPoint == 0) {
+                DevLastControlPoint = DevStartControlPoint = curr;
+                output = "Start control point (" + DevDatetimeFormat.format(new Date()) + "): " + DevMillisecsFormat.format(curr) + " ms";
+            }
+            else {
+                output = "Current control point (" + DevDatetimeFormat.format(new Date()) + "): " + DevMillisecsFormat.format(curr) + " ms; "
+                        + "elapsed time since last: " + DevSecsAndMillisecsFormat.format((curr - DevLastControlPoint) / 1000.0) + " s; "
+                        + "elapsed time since start: " + DevSecsAndMillisecsFormat.format((curr - DevStartControlPoint) / 1000.0) + " s";
+                
+                DevLastControlPoint = curr;
+            }
+            
+            output += "; at \"" + label + "\"";
+            
+            System.out.println(output);
+        }
     }
 }
