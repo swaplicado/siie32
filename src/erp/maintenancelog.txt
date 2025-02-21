@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 263.9/ 2025-02-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Optimización de inicio del Cliente SIIE e implementación del monitoreo de tiempos de inicialización del Cliente SIIE en modo development (argument dev=1).
+
+================================================================================
 SIIE 3.2 263.8/ 2025-02-20
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
