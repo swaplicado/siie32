@@ -1382,8 +1382,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             String serverVersion = moServer.getVersion();
             
             if (!APP_RELEASE.equals(serverVersion)) {
-                String incompatibility = "¡Las versiones de este cliente SIIE (" + APP_RELEASE + ") y del servidor SIIE (" + serverVersion + ") no son compatibles!\n"
-                        + "De favor actualiza tu cliente SIIE local, u opta por ejecutarlo directamente desde el servidor.";
+                String incompatibility = "¡Las versiones de este Cliente SIIE (" + APP_RELEASE + ") y del Servidor SIIE (" + serverVersion + ") son incompatibles!\n"
+                        + "Actualiza tu copia local del Cliente SIIE o inicia el Cliente SIIE que depende de la unidad de red al servidor remoto.";
                 showMsgBoxError(incompatibility);
                 System.exit(-1); // there is no way of connecting to the ERP Server
             }
