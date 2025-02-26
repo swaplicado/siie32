@@ -6,6 +6,7 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.form.SFormCapturingNotes;
 import erp.gui.grid.SGridFilterPanelMatReqStatus;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
@@ -21,6 +22,7 @@ import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +64,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbDocsCardex;
     private JButton jbToNew;
     private JButton jbAuthComments;
+    private JButton jbEditNotes;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
@@ -112,6 +115,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
         jbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización pedido de compra", this);
+        jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas de la RM en compras", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
@@ -124,6 +128,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbToNew);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthComments);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbEditNotes);
         
         jbNewSupReq.setEnabled(true);
         jbPrint.setEnabled(true);
@@ -135,6 +140,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbSegregate.setEnabled(false);
         jbDocsCardex.setEnabled(true);
         jbToNew.setEnabled(hasMatReqPurRight || hasMatReqProvRight || hasMatReqAdmorRight);
+        jbEditNotes.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PET);
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -504,6 +510,81 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 SDialogDocumentAuthornComments dialog = new SDialogDocumentAuthornComments((SGuiClient) miClient, "Comentarios de autorización");
                 dialog.setValue(SModConsts.TRN_MAT_REQ, gridRow.getRowPrimaryKey()[0]);
                 dialog.setVisible(true);
+            }
+        }
+    }
+    
+    public void actionEditNotes() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    SDbMaterialRequest req = new SDbMaterialRequest();
+                    req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
+                    if (req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+                        String message = "No se puede modificar las notas de la RM debido a:\n";
+                        boolean canEdit = true;
+                        String sql = "SELECT DISTINCT " +
+                                "IF(d.num_ser = '', d.num, CONCAT(d.num_ser, '-', d.num)) folio, " +
+                                "IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + ", 'PENDIENTE DE AUTORIZACIÓN', 'AUTORIZADO') stat " +
+                                "FROM trn_dps_mat_req AS dr " +
+                                "INNER JOIN trn_mat_req AS r on dr.fid_mat_req = r.id_mat_req " +
+                                "INNER JOIN trn_dps AS d ON dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc " +
+                                "WHERE d.fid_ct_dps = 1 AND d.fid_cl_dps = 2 AND d.fid_tp_dps = 1 " +
+                                "AND (d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + " " +
+                                "OR d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ")" + 
+                                "AND r.id_mat_req = " + req.getPkMatRequestId() + ";";
+                        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                        while (resultSet.next()) {
+                            canEdit = false;
+                            message += "- El estatus del pedido de compras asociado con folio " + resultSet.getString("folio") + " es " + resultSet.getString("stat") + ".\n";
+                        }
+                        if (canEdit) {
+                            SFormCapturingNotes form = new SFormCapturingNotes((SClientInterface) miClient);
+                            form.setValue(SFormCapturingNotes.NOTE_LEN, 1000);
+                            form.setValue(SFormCapturingNotes.NUMBER, req.getNumber() + "");
+                            if (req.getChildNotes() != null && req.getChildNotes().size() > 0) {
+                                form.setValue(SFormCapturingNotes.NOTE_TEXT, req.getChildNotes().get(0).getNotes());
+                                form.setFormVisible(true);
+                                if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    sql = "UPDATE trn_mat_req_nts SET nts = '" + (String) form.getValue(SFormCapturingNotes.NOTE_TEXT) + "' " +
+                                            "WHERE id_mat_req = " + req.getPkMatRequestId() + " AND id_nts = 1;";
+                                    miClient.getSession().getStatement().execute(sql);
+                                }
+                            }
+                            else {
+                                form.setFormVisible(true);
+                                if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                    sql = "INSERT INTO trn_mat_req_nts (id_mat_req, id_nts, nts) " +
+                                            "VALUES (" + req.getPkMatRequestId() + ", 1, '" + (String) form.getValue(SFormCapturingNotes.NOTE_TEXT) + "')";
+                                    miClient.getSession().getStatement().execute(sql);
+                                }
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxInformation(message);
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("La RM seleccionada no esta en compras");
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
             }
         }
     }
@@ -917,6 +998,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             else if (button == jbAuthComments) {
                 actionAuthComments();
+            }
+            else if (button == jbEditNotes) {
+                actionEditNotes();
             }
         }
     }

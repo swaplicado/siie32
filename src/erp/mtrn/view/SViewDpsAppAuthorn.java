@@ -47,6 +47,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     private JButton jbAll;
     private JButton jbAuth;
     private JButton jbRej;
+    private JButton jbPriorityQuit;
+    private JButton jbPriorityAdd;
     private JTextField tfStatus;
     private int mnShow;
 
@@ -93,6 +95,16 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         jbRej.addActionListener(this);
         jbRej.setToolTipText("Mostrar rechazados");
         
+        jbPriorityQuit = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")));
+        jbPriorityQuit.setPreferredSize(new Dimension(23, 23));
+        jbPriorityQuit.addActionListener(this);
+        jbPriorityQuit.setToolTipText("Quitar urgente");
+        
+        jbPriorityAdd = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
+        jbPriorityAdd.setPreferredSize(new Dimension(23, 23));
+        jbPriorityAdd.addActionListener(this);
+        jbPriorityAdd.setToolTipText("Poner urgente");
+        
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
         addTaskBarUpperComponent(jbAnullAuth);
@@ -112,6 +124,10 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             addTaskBarUpperComponent(jbAuth);
             addTaskBarUpperComponent(jbRej); 
         }
+        if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_PROC) {
+            addTaskBarUpperComponent(jbPriorityQuit);
+            addTaskBarUpperComponent(jbPriorityAdd);
+        }
         
         mnShow = SDataConstantsSys.CFGS_ST_AUTHORN_NA;
         
@@ -120,7 +136,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         jbDelete.setEnabled(false);
         
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[17];
+        STableColumn[] aoTableColumns = new STableColumn[18];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
@@ -144,6 +160,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "auth_sta", "Autorización app web", 100);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "Autorización", STableConstants.WIDTH_ICON);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "priority", "Urgente", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "exc_rate", "T cambio", STableConstants.WIDTH_EXCHANGE_RATE);
@@ -221,7 +238,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                 + "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, "
                 + "d.exc_rate, "
                 + "d.tot_r, "
-                + "'MXN' AS f_cur_key_local " 
+                + "'MXN' AS f_cur_key_local, "
+                + "IF(ast.priority = 0, FALSE, TRUE) AS priority "
                 + "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_AUTHORN) + " AS a "
                 + "ON d.id_year = a.id_year AND d.id_doc = a.id_doc AND NOT a.b_del "
@@ -235,6 +253,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                 + "ON d.fid_bpb = bpb.id_bpb "
                 + "INNER JOIN erp.cfgs_st_authorn AS sah "
                 + "ON a.fid_st_authorn = sah.id_st_authorn "
+                + "INNER JOIN cfgu_authorn_step AS ast ON "
+                + "d.id_year = ast.res_pk_n1_n AND d.id_doc = ast.res_pk_n2_n AND NOT ast.b_del "
                 + "LEFT OUTER JOIN trn_sup_file_dps AS fl "
                 + "ON d.id_year = fl.id_year AND d.id_doc = fl.id_doc " 
                 + "WHERE d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] + " "
@@ -362,6 +382,38 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         this.actionReload();
     }
     
+    private void actionPriorityQuit() {
+        try {
+            if (jbPriorityQuit.isEnabled()) {
+                if (isRowSelected()) {
+                    int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                    String sql = "UPDATE cfgu_authorn_step SET priority = 0 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
+                    miClient.getSession().getStatement().execute(sql);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    private void actionPriorityAdd() {
+        try {
+            if (jbPriorityAdd.isEnabled()) {
+                if (isRowSelected()) {
+                    int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                    String sql = "UPDATE cfgu_authorn_step SET priority = 1 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
+                    miClient.getSession().getStatement().execute(sql);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
@@ -384,6 +436,12 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             }
             else if (button == jbRej) {
                 actionRej();
+            }
+            else if (button == jbPriorityQuit) {
+                actionPriorityQuit();
+            }
+            else if (button == jbPriorityAdd) {
+                actionPriorityAdd();
             }
         }
     }

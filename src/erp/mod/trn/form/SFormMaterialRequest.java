@@ -2255,7 +2255,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moFormCapturingNotesReq.setValue(SFormCapturingNotes.NOTE_TEXT, msReqNotes);
         }
         moFormCapturingNotesReq.setValue(SFormCapturingNotes.NOTE_LEN, 1000);
-        moFormCapturingNotesReq.setVisible(true);
+        moFormCapturingNotesReq.setFormVisible(true);
         if (moFormCapturingNotesReq.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             msReqNotes = (String) moFormCapturingNotesReq.getValue(SFormCapturingNotes.NOTE_TEXT);
             moTextReqNotes.setValue(msReqNotes);

@@ -24,6 +24,7 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
 
     public static final int NOTE_TEXT = 1;
     public static final int NOTE_LEN = 2;
+    public static final int NUMBER = 3;
     
     private final erp.client.SClientInterface miClient;
     private int mnFormResult;
@@ -49,12 +50,15 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        jpData = new javax.swing.JPanel();
+        jlNum = new javax.swing.JLabel();
+        moTextNum = new sa.lib.gui.bean.SBeanFieldText();
+        jpNotes = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtaNotes = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         jlTextLength = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        jpOk = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -69,14 +73,26 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Comentarios:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpData.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro"));
+        jpData.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlNum.setText("Folio:");
+        jlNum.setPreferredSize(new java.awt.Dimension(50, 23));
+        jpData.add(jlNum);
+
+        moTextNum.setEnabled(false);
+        jpData.add(moTextNum);
+
+        getContentPane().add(jpData, java.awt.BorderLayout.NORTH);
+
+        jpNotes.setBorder(javax.swing.BorderFactory.createTitledBorder("Comentarios:"));
+        jpNotes.setLayout(new java.awt.BorderLayout());
 
         jtaNotes.setColumns(20);
         jtaNotes.setRows(5);
         jScrollPane1.setViewportView(jtaNotes);
 
-        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jpNotes.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -84,11 +100,11 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
         jlTextLength.setPreferredSize(new java.awt.Dimension(200, 16));
         jPanel3.add(jlTextLength);
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.SOUTH);
+        jpNotes.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpNotes, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpOk.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl+Enter]");
@@ -98,7 +114,7 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
                 jbOkActionPerformed(evt);
             }
         });
-        jPanel2.add(jbOk);
+        jpOk.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
@@ -108,9 +124,9 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
                 jbCancelActionPerformed(evt);
             }
         });
-        jPanel2.add(jbCancel);
+        jpOk.add(jbCancel);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(jpOk, java.awt.BorderLayout.SOUTH);
 
         pack();
         setLocationRelativeTo(null);
@@ -135,6 +151,8 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
         
         jtaNotes.getDocument().addDocumentListener(this);
+        
+        mnMaxLen = 1000;
     }
     
     private void windowActivated() {
@@ -149,14 +167,17 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JLabel jlNum;
     private javax.swing.JLabel jlTextLength;
+    private javax.swing.JPanel jpData;
+    private javax.swing.JPanel jpNotes;
+    private javax.swing.JPanel jpOk;
     private javax.swing.JTextArea jtaNotes;
+    private sa.lib.gui.bean.SBeanFieldText moTextNum;
     // End of variables declaration//GEN-END:variables
 
     public void actionOk() {
@@ -212,6 +233,7 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
 
     @Override
     public void setFormVisible(boolean visible) {
+        jpData.setVisible(!moTextNum.getText().isEmpty());
         setVisible(visible);
     }
 
@@ -240,10 +262,14 @@ public class SFormCapturingNotes extends javax.swing.JDialog implements erp.lib.
         switch (type) {
             case NOTE_TEXT:
                 jtaNotes.setText((String) value);
+                updateCount();
                 break;
             case NOTE_LEN:
                 mnMaxLen = (int) value;
                 updateCount();
+                break;
+            case NUMBER:
+                moTextNum.setValue((String) value);
                 break;
             default:
         }
