@@ -13,6 +13,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestNote;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.form.SDialogAuthorizationCardex;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
@@ -112,10 +113,10 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbHardAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up_c.gif")), "Autorización forzada", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados", this);
         jbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
-        jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización pedido de compra", this);
-        jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas de la RM en compras", this);
+        jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización de pedidos de compras", this);
+        jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
@@ -534,12 +535,14 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 try {
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
+                    String message = "No se puede modificar las notas de la RM seleccionada debido a:";
                     if (req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
-                        String message = "No se puede modificar las notas de la RM debido a:\n";
                         boolean canEdit = true;
                         String sql = "SELECT DISTINCT " +
-                                "IF(d.num_ser = '', d.num, CONCAT(d.num_ser, '-', d.num)) folio, " +
-                                "IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + ", 'PENDIENTE DE AUTORIZACIÓN', 'AUTORIZADO') stat " +
+                                "IF(d.num_ser = '', d.num, CONCAT(d.num_ser, '-', d.num)) invoice, " +
+                                "IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + ", " +
+                                "'" + SDataConstantsSys.StatusDpsAuthorn.get(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING) + "', " +
+                                "'" + SDataConstantsSys.StatusDpsAuthorn.get(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + "') stat " +
                                 "FROM trn_dps_mat_req AS dr " +
                                 "INNER JOIN trn_mat_req AS r on dr.fid_mat_req = r.id_mat_req " +
                                 "INNER JOIN trn_dps AS d ON dr.fid_dps_year = d.id_year AND dr.fid_dps_doc = d.id_doc " +
@@ -550,7 +553,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                         while (resultSet.next()) {
                             canEdit = false;
-                            message += "- El estatus del pedido de compras asociado con folio " + resultSet.getString("folio") + " es " + resultSet.getString("stat") + ".\n";
+                            message += "\n- El estatus de autorización del pedido de compras con folio " + resultSet.getString("invoice") + ", relacionado con la RM, es " + resultSet.getString("stat") + ".";
                         }
                         if (canEdit) {
                             SFormCapturingNotes form = new SFormCapturingNotes((SClientInterface) miClient);
@@ -560,17 +563,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                                 form.setValue(SFormCapturingNotes.NOTE_TEXT, req.getChildNotes().get(0).getNotes());
                                 form.setFormVisible(true);
                                 if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                    sql = "UPDATE trn_mat_req_nts SET nts = '" + (String) form.getValue(SFormCapturingNotes.NOTE_TEXT) + "' " +
-                                            "WHERE id_mat_req = " + req.getPkMatRequestId() + " AND id_nts = 1;";
-                                    miClient.getSession().getStatement().execute(sql);
+                                    req.getChildNotes().get(0).setNotes((String) form.getValue(SFormCapturingNotes.NOTE_TEXT));
+                                    req.getChildNotes().get(0).save(miClient.getSession());
                                 }
                             }
                             else {
                                 form.setFormVisible(true);
                                 if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                    sql = "INSERT INTO trn_mat_req_nts (id_mat_req, id_nts, nts) " +
-                                            "VALUES (" + req.getPkMatRequestId() + ", 1, '" + (String) form.getValue(SFormCapturingNotes.NOTE_TEXT) + "')";
-                                    miClient.getSession().getStatement().execute(sql);
+                                    SDbMaterialRequestNote note = new SDbMaterialRequestNote();
+                                    note.setPkMatRequestId(req.getPkMatRequestId());
+                                    note.setPkNotesId(1);
+                                    note.setNotes((String) form.getValue(SFormCapturingNotes.NOTE_TEXT));
+                                    note.save(miClient.getSession());
                                 }
                             }
                         }
@@ -579,7 +583,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         }
                     }
                     else {
-                        miClient.showMsgBoxInformation("La RM seleccionada no esta en compras");
+                        miClient.showMsgBoxInformation(message + "\n- La RM no está en Compras.");
                     }
                 }
                 catch (Exception e) {

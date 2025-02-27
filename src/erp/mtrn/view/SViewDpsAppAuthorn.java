@@ -22,6 +22,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mtrn.data.SDataDps;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
@@ -73,12 +74,12 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         jbAddFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
         jbAddFileSupp.setPreferredSize(new Dimension(23, 23));
         jbAddFileSupp.addActionListener(this);
-        jbAddFileSupp.setToolTipText("Anexar archivos de soporte al documento");
+        jbAddFileSupp.setToolTipText("Anexar archivos de soporte");
         
         jbDownFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
         jbDownFileSupp.setPreferredSize(new Dimension(23, 23));
         jbDownFileSupp.addActionListener(this);
-        jbDownFileSupp.setToolTipText("Descargar archivos de soporte anexados al documento");
+        jbDownFileSupp.setToolTipText("Descargar archivos de soporte");
         
         jbAll = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")));
         jbAll.setPreferredSize(new Dimension(23, 23));
@@ -94,16 +95,16 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         jbRej.setPreferredSize(new Dimension(23, 23));
         jbRej.addActionListener(this);
         jbRej.setToolTipText("Mostrar rechazados");
+                
+        jbPriorityAdd = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
+        jbPriorityAdd.setPreferredSize(new Dimension(23, 23));
+        jbPriorityAdd.addActionListener(this);
+        jbPriorityAdd.setToolTipText("Marcar como urgente");
         
         jbPriorityQuit = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")));
         jbPriorityQuit.setPreferredSize(new Dimension(23, 23));
         jbPriorityQuit.addActionListener(this);
-        jbPriorityQuit.setToolTipText("Quitar urgente");
-        
-        jbPriorityAdd = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
-        jbPriorityAdd.setPreferredSize(new Dimension(23, 23));
-        jbPriorityAdd.addActionListener(this);
-        jbPriorityAdd.setToolTipText("Poner urgente");
+        jbPriorityQuit.setToolTipText("Desmarcar como urgente");
         
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
@@ -125,8 +126,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             addTaskBarUpperComponent(jbRej); 
         }
         if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_PROC) {
-            addTaskBarUpperComponent(jbPriorityQuit);
             addTaskBarUpperComponent(jbPriorityAdd);
+            addTaskBarUpperComponent(jbPriorityQuit);
         }
         
         mnShow = SDataConstantsSys.CFGS_ST_AUTHORN_NA;
@@ -386,10 +387,14 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         try {
             if (jbPriorityQuit.isEnabled()) {
                 if (isRowSelected()) {
+                    SDataDps dps = new SDataDps();
                     int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
-                    String sql = "UPDATE cfgu_authorn_step SET priority = 0 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
-                    miClient.getSession().getStatement().execute(sql);
-                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    dps.read(key, miClient.getSession().getStatement());
+                    if (miClient.showMsgBoxConfirm("¿Desea desmarcar como urgente el pedido de compras con folio " + dps.getNumber() + "?") == JOptionPane.OK_OPTION) {
+                        String sql = "UPDATE cfgu_authorn_step SET priority = 0 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
+                        miClient.getSession().getStatement().execute(sql);
+                        miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    }
                 }
             }
         }
@@ -403,9 +408,13 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             if (jbPriorityAdd.isEnabled()) {
                 if (isRowSelected()) {
                     int[] key = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
-                    String sql = "UPDATE cfgu_authorn_step SET priority = 1 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
-                    miClient.getSession().getStatement().execute(sql);
-                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    SDataDps dps = new SDataDps();
+                    dps.read(key, miClient.getSession().getStatement());
+                    if (miClient.showMsgBoxConfirm("¿Desea marcar como urgente el pedido de compras con folio " + dps.getNumber() + "?") == JOptionPane.OK_OPTION) {
+                        String sql = "UPDATE cfgu_authorn_step SET priority = 1 WHERE res_pk_n1_n = " + key[0] + " AND res_pk_n2_n = " + key[1] + " AND NOT b_del;";
+                        miClient.getSession().getStatement().execute(sql);
+                        miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    }
                 }
             }
         }

@@ -1466,6 +1466,7 @@ public abstract class SDataConstantsSys {
     
     public static final HashMap<Integer, String> OperationsTypesOpsMap = new HashMap<>();
     public static final HashMap<Integer, String> OperationsTypesAdjMap = new HashMap<>();
+    public static final HashMap<Integer, String> StatusDpsAuthorn = new HashMap<>();
     
     static {
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS, "Operación");
@@ -1476,6 +1477,11 @@ public abstract class SDataConstantsSys {
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY, "Ajuste operación con aplicación anticipo facturado");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY, "Ajuste facturación de anticipo");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_APP_PREPAY, "Aplicación anticipo facturado");
+        
+        StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_NA, "(N/A)");
+        StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_PENDING, "PENDIENTE");
+        StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_REJECT, "RECHAZADO");
+        StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_AUTHORN, "AUTORIZADO");
     }
 
     /*
