@@ -1,11 +1,5 @@
 ================================================================================
-SIIE 3.2 263.11/ 2025-02-27
-Isabel Danae GARCÍA SERVÍN
---------------------------------------------------------------------------------
-1) Refactorización de código.
-
-================================================================================
-SIIE 3.2 263.10/ 2025-02-26
+SIIE 3.2 263.10/ 2025-02-27
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Creación de la funcionalidad para que los solicitantes puedan modificar los comentarios de una RM siempre y cuando está este en compras 
