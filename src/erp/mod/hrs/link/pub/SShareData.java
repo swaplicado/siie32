@@ -280,9 +280,18 @@ public class SShareData {
         }
     }
     
-    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer statusFilter) {
+    /**
+     * 
+     * @param startDate
+     * @param endDate
+     * @param idUser
+     * @param idSessionUser
+     * @param statusFilter
+     * @return 
+     */
+    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter) {
         STrnDBCore oTrnCore = new STrnDBCore();
-        ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, statusFilter);
+        ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, idSessionUser, statusFilter);
 
         return lDocs;
     }

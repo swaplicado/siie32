@@ -60,7 +60,7 @@ public class STrnDBCore {
     }
 
     // Consulta base para la obtención de un DPS
-    final static String BASE_QUERY = "SELECT  "
+    final static String BASE_QUERY_FIRST = "SELECT  "
             + "    dps.id_year, "
             + "    dps.id_doc, "
             + "    dps.dt, "
@@ -170,15 +170,6 @@ public class STrnDBCore {
             + "                                LIMIT 1)), "
             + "                    '')))) AS user_in_turn, "
             + "    COALESCE((SELECT  "
-            + "                    COUNT(*) "
-            + "                FROM "
-            + "                    cfgu_authorn_step AS steps1 "
-            + "                WHERE "
-            + "                    steps1.b_del "
-            + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-            + "                        AND steps1.res_pk_n1_n = dps.id_year "
-            + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
-            + "    COALESCE((SELECT  "
             + "                    priority "
             + "                FROM "
             + "                    cfgu_authorn_step AS steps1 "
@@ -193,8 +184,9 @@ public class STrnDBCore {
             + "        (IF(dps.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
             + "            'RECHAZADO', "
             + "            COALESCE(aust.name, 'NA')))) AS auth_st_name, "
-            + "    tda.id_authorn, "
-            + "    tda.nts AS dta_notes, "
+            + "    tda.id_authorn, ";
+    
+    final static String BASE_QUERY = "    tda.nts AS dta_notes, "
             + "    tda.fid_st_authorn AS tda_st, "
             + "    tda.fid_usr_new AS tda_usr_new, "
             + "    tda.fid_usr_edit AS tda_usr_edit "
@@ -226,11 +218,12 @@ public class STrnDBCore {
      *
      * @param startDate Fecha inicial (YYYY-MM-DD).
      * @param endDate Fecha final (YYYY-MM-DD).
-     * @param idUser ID del usuario para filtrar.
+     * @param idUser ID del usuario del filtro.
+     * @param idSessionUser ID del usuario del filtro.
      * @param statusFilter
      * @return Lista de objetos {@code SWebDpsRow} con los datos obtenidos.
      */
-    public ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser, int statusFilter) {
+    public ArrayList<SWebDpsRow> getDocuments(String startDate, String endDate, int idUser, int idSessionUser, int statusFilter) {
         try {
             Connection conn = this.getConnection();
 
@@ -238,7 +231,19 @@ public class STrnDBCore {
                 return null;
             }
 
-            String query = BASE_QUERY
+            String query = BASE_QUERY_FIRST 
+                    + "    COALESCE((SELECT  "
+                    + "                    COUNT(*) "
+                    + "                FROM "
+                    + "                    cfgu_authorn_step AS steps1 "
+                    + "                WHERE "
+                    + "                    steps1.b_del "
+                    + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                        AND steps1.fk_usr_step = " + idSessionUser + " "
+                    + "                        AND (steps1.b_authorn OR steps1.b_reject) "
+                    + "                        AND steps1.res_pk_n1_n = dps.id_year "
+                    + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
+                    + BASE_QUERY
                     + "WHERE "
                     + "    NOT dps.b_del AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                     + "        AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
@@ -321,7 +326,17 @@ public class STrnDBCore {
                 return null;
             }
 
-            String query = BASE_QUERY
+            String query = BASE_QUERY_FIRST
+                    + "    COALESCE((SELECT  "
+                    + "                    COUNT(*) "
+                    + "                FROM "
+                    + "                    cfgu_authorn_step AS steps1 "
+                    + "                WHERE "
+                    + "                    steps1.b_del "
+                    + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                        AND steps1.res_pk_n1_n = dps.id_year "
+                    + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
+                    + BASE_QUERY
                     + "WHERE "
                     + "    dps.id_year = " + idYear + " "
                     + "    AND dps.id_doc = " + idDoc + " "
