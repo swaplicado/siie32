@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SDataResponse {
     ArrayList<SAuthorizationsData> lAuthData;

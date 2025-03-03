@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiYearPicker;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SClientUtils {
 

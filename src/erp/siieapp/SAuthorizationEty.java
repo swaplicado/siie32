@@ -7,7 +7,7 @@ package erp.siieapp;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SAuthorizationEty {
     int idEty;

@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SUserExportUtils {
     private SGuiClient miClient;

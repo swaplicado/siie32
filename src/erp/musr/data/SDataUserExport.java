@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SDataUserExport {
     protected int userId;

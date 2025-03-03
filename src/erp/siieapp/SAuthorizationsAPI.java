@@ -35,7 +35,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author AdrianAviles, Edwin Carmona
+ * @author Adrián Avilés, Edwin Carmona
  */
 public class SAuthorizationsAPI {
 

@@ -15,7 +15,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author AdrianAviles
+ * @author Adrián Avilés
  */
 public class SConectionUtils {
 
