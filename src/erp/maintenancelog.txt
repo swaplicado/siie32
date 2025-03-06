@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 265.0/ 2025-03-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de configuración JSON de reportes personalizados.
+2) Implementación de funcionalidad de eliminación de preferencias de vistas de usuario.
+3) Implementación de reportes de gastos de producción, por período y mensuales por año.
+4) Refactorización de menús del módulo de producción, para aplicar puntualmente los permisos de usuario del módulo.
+5) Restricción de longitud de lotes al capturarlos en movimientos de almacén y en asignación de lotes de productos en órdenes de producción.
+6) Refactorización de constantes y depuración de clases obsoletas de consultas de inventarios.
+7) Refactorización de vista de inventarios.
+8) Incorporación de funcionalidad de adición de configuraciones de máximos y mínimos de ítems sin movimientos de almacén en la vista de inventarios, en su modalidad de existencias por almacén.
+
+================================================================================
 SIIE 3.2 263.13/ 2025-03-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
