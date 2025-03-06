@@ -23,7 +23,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SDiotLayout {
     

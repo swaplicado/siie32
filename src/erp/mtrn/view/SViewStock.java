@@ -461,6 +461,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         String segregSqlJoinOn = "";
         String segregSqlColumns = "";
         
+        // process filters:
+        
         for (int i = 0; i < mvTableSettings.size(); i++) {
             STableSetting setting = (STableSetting) mvTableSettings.get(i);
 
@@ -510,6 +512,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         if (mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_VALUE_ACC) {
             mainSqlHaving += (mainSqlHaving.isEmpty() ? "HAVING " : "OR ") + "_acc_val <> 0.0 ";
         }
+        
+        // generate boilerplate expressions and subqueries as tables for joins in main query:
         
         String tableSegr = "";
         String tablePrice = "";
@@ -593,6 +597,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                     (!showingStockLots() ? "" : ", l.lot, l.dt_exp_n, l.b_block, s.id_lot ");
         }
         
+        // generate main query:
+        
         msSql = "SELECT s.id_item, s.id_unit, " +
                 (!showingStockLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
                 (!showingWarehouses() ? "" : "s.id_cob, s.id_wh, cob.code AS _cob_code, ent.code AS _ent_code, ") +
@@ -618,7 +624,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showingStockLots() ? "" : "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot ") +
                 (!showingWarehouses() ? "" : "INNER JOIN erp.bpsu_bpb AS cob ON s.id_cob = cob.id_bpb INNER JOIN erp.cfgu_cob_ent AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent ") +
                 (!showingStockConfigs()? "" : "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = cob.id_bpb AND sc.id_wh = ent.id_ent ") +
-                (!showingSegregations()? "" : "LEFT JOIN " + tableSegr + " AS tsg ON i.id_item = tsg.fid_item AND u.id_unit = tsg.fid_unit" + (segregSqlJoinOn.isEmpty() ? " " : "AND " + segregSqlJoinOn)) +
+                (!showingSegregations()? "" : "LEFT JOIN " + tableSegr + " AS tsg ON i.id_item = tsg.fid_item AND u.id_unit = tsg.fid_unit " + (segregSqlJoinOn.isEmpty() ? "" : "AND " + segregSqlJoinOn)) +
                 (!showingValueCommercial() ? "" : "LEFT JOIN " + tablePrice + " AS tpc ON i.id_item = tpc.id_item AND u.id_unit = tpc.id_unit ") +
                 "\n" +
                 "WHERE NOT s.b_del " + (mainSqlWhere.isEmpty() ? "" : "AND " + mainSqlWhere) +

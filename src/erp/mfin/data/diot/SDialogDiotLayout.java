@@ -38,7 +38,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
