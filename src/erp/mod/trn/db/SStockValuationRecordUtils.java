@@ -428,7 +428,7 @@ public class SStockValuationRecordUtils {
         }
         oRecordEntry.setExchangeRate(1d);
         oRecordEntry.setExchangeRateSystem(1d);
-        oRecordEntry.setUnits(0d);
+        oRecordEntry.setUnits(dQuantity);
         oRecordEntry.setUserId(0);
         oRecordEntry.setSortingPosition(0);
         oRecordEntry.setOccasionalFiscalId("");
@@ -482,7 +482,7 @@ public class SStockValuationRecordUtils {
         oRecordEntry.setFkPayrollId_n(0);
         oRecordEntry.setFkItemId_n(nItemRef);
         oRecordEntry.setFkItemAuxId_n(oItem.getPkItemId());
-        oRecordEntry.setFkUnitId_n(1);
+        oRecordEntry.setFkUnitId_n(oUnit.getPkUnitId());
         oRecordEntry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
         oRecordEntry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
         oRecordEntry.setFkUserNewId(session.getUser().getPkUserId());

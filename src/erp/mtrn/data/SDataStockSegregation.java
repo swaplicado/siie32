@@ -97,6 +97,41 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
         }
     }
 
+    /**
+     * Determina si la segregación tiene partidas vivas en base a incrementos y decrementos
+     * 
+     * @param connection Conexión a la base de datos
+     * @param idSegregation Identificador de la segregación
+     * @return Verdadero si la segregación tiene partidas vivas, falso en caso contrario
+     */
+    private boolean hasSegregationsByDifference(Connection connection, final int idSegregation) {
+        String sql;
+        ResultSet resultSet = null;
+
+        sql = "SELECT  " +
+                "    SUM(qty_inc) AS _inc, " +
+                "    SUM(qty_dec) AS _dec, " +
+                "    (SUM(qty_inc) - SUM(qty_dec)) AS _seg " +
+                "FROM " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK_SEG_WHS_ETY) + " AS ety " +
+                "WHERE " +
+                "    id_stk_seg = " + idSegregation + " " +
+                "GROUP BY id_cob , id_whs , fid_year , fid_item , fid_unit , fid_mat_req_n , fid_mat_req_ety_n " +
+                "HAVING _seg > 0;";
+
+        try {
+            resultSet = connection.createStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+        catch (SQLException e) {
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return false;
+    }
+
     public String getSqlWhere() {
         return "WHERE id_stk_seg = " + mnPkStockSegregationId + " ";
     }
@@ -255,6 +290,17 @@ public class SDataStockSegregation extends erp.lib.data.SDataRegistry implements
                     child.setPkStockSegregationId(mnPkStockSegregationId);
                     child.setIsRegistryNew(true);
                     child.save(connection);
+                }
+            }
+
+            // Determinar si es necesario eliminar el registro cuando las partidas sumen cero           
+            if (! mbDeleted) {
+                /**
+                 * Si no hay partidas con diferencias, se elimina el registro
+                 */
+                if (! hasSegregationsByDifference(connection, mnPkStockSegregationId)) {
+                    this.mbDeleted = true;
+                    this.save(connection);
                 }
             }
 
