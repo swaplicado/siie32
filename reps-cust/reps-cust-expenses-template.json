@@ -1,0 +1,22 @@
+{
+    "reports" : [{
+        "id" : 1,
+        "report" : "the report name, to be used in GUI",
+        "config" : {
+            "acc" : "SQL where condition with column aaa as account code",
+            "cc" : "SQL where condition with column cc as cost center code",
+            "item" : "SQL where condition with column item as item code",
+            "itemMask" : "SQL where condition with column item as item code"
+        },
+        "users" : [{
+            "id" : 1,
+            "user" : "the user name, just for reference in this file",
+            "config" : {
+                "acc" : "SQL where condition with column aaa as account code",
+                "cc" : "SQL where condition with column cc as cost center code",
+                "item" : "SQL where condition with column item as item code",
+                "itemMask" : "SQL where condition with column item as item code"
+            }
+        }]
+    }]
+}

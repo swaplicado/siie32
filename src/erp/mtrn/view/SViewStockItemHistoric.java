@@ -35,8 +35,8 @@ public class SViewStockItemHistoric extends erp.lib.table.STableTab implements j
     private javax.swing.JButton jbStockCardex;
     private erp.mtrn.form.SDialogStockCardexHistoric moDialogStockCardexHistoric;
 
-    public SViewStockItemHistoric(erp.client.SClientInterface client, java.lang.String tabTitle,  int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_STK_ITEM_HIST, auxType01);
+    public SViewStockItemHistoric(erp.client.SClientInterface client, java.lang.String tabTitle) {
+        super(client, tabTitle, SDataConstants.TRNX_STK_ITEM_HIST);
 
         initComponents();
     }

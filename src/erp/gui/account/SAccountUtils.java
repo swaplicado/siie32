@@ -242,12 +242,78 @@ public abstract class SAccountUtils {
         int levels = getLevels(mask);
         String codeStd = "";
 
-
         for (int i = 1; i <= SAccountConsts.LEVELS; i++) {
             codeStd += LevelFormat.format(i > levels ? 0 : SLibUtils.parseInt(SLibUtils.textRepeat("9", getDigits(mask, i))));
         }
 
         return codeStd;
+    }
+
+    /**
+     * Composes default zero-filled account code on user-format.
+     * <p>
+     * <i>Account mask</i> defines user-format guidelines for accounts. SIIE<sup>®</sup> accounts are divided into levels, maximum 8 levels, the latters defined by 6 digits each at the most.
+     * <p>
+     * <strong>Example:</strong>
+     * <pre>
+     * Let <i>m</i> be an account mask.
+     * <code><i>m</i> = 43210000</code>
+     * Defined total number of levels: 4
+     * Digits on level 1: 4
+     * Digits on level 2: 3
+     * Digits on level 3: 2
+     * Digits on level 4: 1
+     * </pre>
+     * Given <i>m</i>, the composed default zero-filled account code on user-format is:
+     * <code>"0000-000-00-0"</code>
+     * <p>
+     * @param mask Account mask.
+     * @return Composed default zero-filled account code on user-format (<code>String</code> of variable length).
+     */
+    public static String composeCodeUsrZeros(final int mask) {
+        int levels = getLevels(mask);
+        String codeUserZeros = "";
+
+        for (int i = 1; i <= levels; i++) {
+            codeUserZeros += (!codeUserZeros.isEmpty() ? "-" : "") + SLibUtils.textRepeat("0", getDigits(mask, i));
+        }
+
+        return codeUserZeros;
+    }
+
+    /**
+     * Get length of account code on user-format up to given level.
+     * <p>
+     * <i>Account mask</i> defines user-format guidelines for accounts. SIIE<sup>®</sup> accounts are divided into levels, maximum 8 levels, the latters defined by 6 digits each at the most.
+     * <p>
+     * <strong>Example:</strong>
+     * <pre>
+     * Let <i>m</i> be an account mask.
+     * <code><i>m</i> = 43210000</code>
+     * Defined total number of levels: 4
+     * Digits on level 1: 4
+     * Digits on level 2: 3
+     * Digits on level 3: 2
+     * Digits on level 4: 1
+     * </pre>
+     * Given <i>m</i>, and the composed default zero-filled account code on user-format as:
+     * <code>"0000-000-00-0"</code>
+     * The length of account code on user-format up to 4 level would be 13.
+     * <p>
+     * @param mask Account mask.
+     * @param level Required level.
+     * @return Length of account code on user-format up to given level.
+     */
+    public static int getLengthCodeUsr(final int mask, final int level) {
+        int levels = getLevels(mask);
+        int levelRequired = level <= levels ? level : levels;
+        String codeUserZeros = "";
+
+        for (int i = 1; i <= levelRequired; i++) {
+            codeUserZeros += (!codeUserZeros.isEmpty() ? "-" : "") + SLibUtils.textRepeat("0", getDigits(mask, i));
+        }
+
+        return codeUserZeros.length();
     }
 
     /**

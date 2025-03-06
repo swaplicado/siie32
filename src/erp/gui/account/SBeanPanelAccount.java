@@ -237,7 +237,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         manDigits = new int[SAccountConsts.LEVELS];
         maoDecimalFormats = new DecimalFormat[SAccountConsts.LEVELS];
         maoAccounts = null;
-        maAccountLedgers = new ArrayList<SAccountLedger>();
+        maAccountLedgers = new ArrayList<>();
 
         maoTextCodeLevelStds[0] = moTextCodeLevel1;
         maoTextCodeLevelStds[1] = moTextCodeLevel2;

@@ -210,7 +210,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockWarehouseLot;
     private javax.swing.JMenuItem jmiStkStockValueComm;
     private javax.swing.JMenuItem jmiStkStockValueAcc;
-    //private javax.swing.JMenuItem jmiStkStockValueCost; // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
     private javax.swing.JMenuItem jmiStkStockMovements;
     private javax.swing.JMenuItem jmiStkStockMovementsEntry;
     private javax.swing.JMenuItem jmiStkStockRotation;
@@ -784,7 +783,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockWarehouseLot = new JMenuItem("Existencias por almacén por lote");
         jmiStkStockValueComm = new JMenuItem("Existencias a valor comercial");
         jmiStkStockValueAcc = new JMenuItem("Existencias a valor contable");
-        //jmiStkStockValueCost = new JMenuItem("Existencias valor mov. almacén"); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements = new JMenuItem("Movimientos de inventarios");
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
@@ -803,7 +801,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockValueComm);
         jmMenuStk.add(jmiStkStockValueAcc);
-        //jmMenuStk.add(jmiStkStockValueCost); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockMovements);
         jmMenuStk.add(jmiStkStockMovementsEntry);
@@ -825,7 +822,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockWarehouseLot.addActionListener(this);
         jmiStkStockValueComm.addActionListener(this);
         jmiStkStockValueAcc.addActionListener(this);
-        //jmiStkStockValueCost.addActionListener(this); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements.addActionListener(this);
         jmiStkStockMovementsEntry.addActionListener(this);
         jmiStkStockRotation.addActionListener(this);
@@ -1045,7 +1041,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockWarehouseLot.setEnabled(hasRightStock);
         jmiStkStockValueComm.setEnabled(hasRightStkCommPrice);
         jmiStkStockValueAcc.setEnabled(hasRightStkCommPrice);
-        //jmiStkStockValueCost.setEnabled(hasRightInAdj || hasRightOutAdj); // 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
         jmiStkStockMovements.setEnabled(hasRightStock);
         jmiStkStockMovementsEntry.setEnabled(hasRightStock);
         jmiStkStockRotation.setEnabled(hasRightStock);
@@ -1329,25 +1324,21 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstants.TRNX_STK_STK_WH:
                             title = "Existencias x almacén";
                             break;
-                        case SDataConstants.TRNX_STK_LOT:
+                        case SDataConstants.TRNX_STK_STK_LOT:
                             title = "Existencias x lote";
                             break;
-                        case SDataConstants.TRNX_STK_LOT_WH:
+                        case SDataConstants.TRNX_STK_STK_LOT_WH:
                             title = "Existencias x almacén x lote";
                             break;
-                        case SDataConstants.TRNX_STK_VALUE_COMM:
+                        case SDataConstants.TRNX_STK_STK_VALUE_COMM:
                             title = "Existencias valor comercial";
                             break;
-                        case SDataConstants.TRNX_STK_VALUE_ACC:
+                        case SDataConstants.TRNX_STK_STK_VALUE_ACC:
                             title = "Existencias valor contable";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
-                    break;
-                case SDataConstants.TRNX_STK_ITEM:
-                    viewClass = erp.mtrn.view.SViewStockCostUnit.class;
-                    title = "Existencias valor mov. alm.";
                     break;
                 case SDataConstants.TRNX_STK_MOVES:
                     viewClass = erp.mtrn.view.SViewStockMoves.class;
@@ -1363,7 +1354,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstants.TRNX_STK_STK:
                             title = "Rotación";
                             break;
-                        case SDataConstants.TRNX_STK_LOT:
+                        case SDataConstants.TRNX_STK_STK_LOT:
                             title = "Rotación x lote";
                             break;
                         default:
@@ -2144,25 +2135,20 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
             }
             else if (item == jmiStkStockLot) {
-                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_LOT);
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_LOT);
             }
             else if (item == jmiStkStockWarehouse) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_WH);
             }
             else if (item == jmiStkStockWarehouseLot) {
-                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_LOT_WH);
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_LOT_WH);
             }
             else if (item == jmiStkStockValueComm) {
-                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_VALUE_COMM);
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_VALUE_COMM);
             }
             else if (item == jmiStkStockValueAcc) {
-                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_VALUE_ACC);
+                showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK_VALUE_ACC);
             }
-            /* 2024-11-26 Sergio Flores: Vista obsoleta. Se usaba para generar archivos para exportar existencias para MP Software.
-            else if (item == jmiStkStockValueCost) {
-                showView(SDataConstants.TRNX_STK_ITEM, SDataConstants.TRNX_STK_ITEM);
-            }
-            */
             else if (item == jmiStkStockMovements) {
                 showView(SDataConstants.TRNX_STK_MOVES);
             }
@@ -2173,7 +2159,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_STK_ROTATION, SDataConstants.TRNX_STK_STK); 
             }
             else if (item == jmiStkStockRotationLot) {
-                showView(SDataConstants.TRNX_STK_ROTATION, SDataConstants.TRNX_STK_LOT);
+                showView(SDataConstants.TRNX_STK_ROTATION, SDataConstants.TRNX_STK_STK_LOT);
             }
             else if (item == jmiStkStockValuation) {
                 miClient.getSession().showView(SModConsts.TRN_STK_VAL, SLibConstants.UNDEFINED, null);
@@ -2182,7 +2168,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRNX_STK_VAL_DET, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStockItemHistoric) {
-                showView(SDataConstants.TRNX_STK_ITEM_HIST, SDataConstants.TRNX_STK_STK); // poner las de la nueva clse
+                showView(SDataConstants.TRNX_STK_ITEM_HIST);
             }
             else if (item == jmiStkStockClosing) {
                 moDialogUtilStockClosing.resetForm();

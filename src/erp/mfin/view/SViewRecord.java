@@ -34,7 +34,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Isabel Servín
+ * @author Sergio Flores, Edwin Carmona, Isabel Servín, Sergio Flores
  */
 public class SViewRecord extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -435,8 +435,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 "r.dt, r.concept, r.b_adj_year, r.b_adj_audit, r.b_audit, r.b_authorn, r.b_sys, r.b_del, " +
                 "r.ts_audit, r.ts_authorn, r.ts_new, r.ts_edit, r.ts_del, " +
                 "bkc.code, cob.code, e.ent, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, " +
-                "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, " +
-                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_num, " +
+                "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) AS f_per, " +
+                "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) AS f_num, " +
                 "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, SUM(re.debit) - SUM(re.credit) AS f_balance, " +
                 "((SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_fin_rec_year_n AND r.id_per = c.fid_fin_rec_per_n AND r.id_bkc = c.fid_fin_rec_bkc_n AND r.id_tp_rec = c.fid_fin_rec_tp_rec_n AND r.id_num = c.fid_fin_rec_num_n) + " +
                 "(SELECT COUNT(*) FROM trn_cfd AS c WHERE re.id_year = c.fid_rec_year_n AND re.id_per = c.fid_rec_per_n AND re.id_bkc = c.fid_rec_bkc_n AND re.id_tp_rec = c.fid_rec_tp_rec_n AND re.id_num = c.fid_rec_num_n) " +

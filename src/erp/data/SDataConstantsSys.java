@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -396,11 +396,12 @@ public abstract class SDataConstantsSys {
     public static final int PRV_MFG_ASG_LOT = 108010;
     public static final int PRV_MFG_EXP = 108011;
     public static final int PRV_MFG_LT = 108012;
-    public static final int PRV_MFG_REQ = 108013;
+    public static final int PRV_MFG_REQ = 108013; // not supported yet
     public static final int PRV_MFG_ASG_REW = 108014;
     public static final int PRV_MFG_ASG_DATE = 108015;
     public static final int PRV_MFG_REP = 108901;
-
+    public static final int PRV_MFG_QRY = 108902;
+    
     public static final int PRV_HRS_IMP = 109001;
     public static final int PRV_HRS_CFG = 109002;
     public static final int PRV_HRS_CAT = 109003;

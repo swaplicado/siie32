@@ -5,19 +5,20 @@
 
 package erp.mtrn.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.Types;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.Types;
 
 /**
  *
  * @author Sergio Flores
  */
 public class SDataStockLot extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final int LEN_LOT = 50;
 
     protected int mnPkItemId;
     protected int mnPkUnitId;

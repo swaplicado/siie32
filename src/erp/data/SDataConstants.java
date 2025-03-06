@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public abstract class SDataConstants {
 
@@ -497,7 +497,7 @@ public abstract class SDataConstants {
     public static final int TRN_STK_SEG = 207101;
     public static final int TRN_STK_SEG_WHS = 207102;
     public static final int TRN_STK_SEG_WHS_ETY = 207103;
-    public static final int TRN_STK_VAL = 207107;
+    public static final int TRN_STK_VAL = 207107; // stock valuation
     public static final int TRN_PDF = 207094;
     public static final int TRN_CFD = 207095;
     public static final int TRN_CFD_SIGN_LOG = 207100;
@@ -590,15 +590,17 @@ public abstract class SDataConstants {
 
     public static final int TRNX_STK_STK = 207581;
     public static final int TRNX_STK_STK_WH = 207582;
-    public static final int TRNX_STK_LOT = 207583;
-    public static final int TRNX_STK_LOT_WH = 207584;
-    public static final int TRNX_STK_MOVES = 207585;
-    public static final int TRNX_STK_MOVES_ETY = 207586;
-    public static final int TRNX_STK_ROTATION = 207587;
-    public static final int TRNX_STK_COMSUME = 207588;
-    public static final int TRNX_STK_VALUE_COMM = 207610;
-    public static final int TRNX_STK_VALUE_ACC = 207616;
-    public static final int TRNX_STK_VAL_DET = 207613;
+    public static final int TRNX_STK_STK_LOT = 207583;
+    public static final int TRNX_STK_STK_LOT_WH = 207584;
+    public static final int TRNX_STK_STK_VALUE_COMM = 207585;
+    public static final int TRNX_STK_STK_VALUE_ACC = 207586;
+    public static final int TRNX_STK_ITEM_HIST = 207587;
+    public static final int TRNX_STK_MOVES = 207611;
+    public static final int TRNX_STK_MOVES_ETY = 207612;
+    public static final int TRNX_STK_ROTATION = 207616;
+    public static final int TRNX_STK_COMSUME = 207617;
+    public static final int TRNX_STK_VAL_DET = 207619; // stock valuation detail
+    
     public static final int TRNX_DIOG_MFG = 207589;
     public static final int TRNX_DIOG_MFG_RM = 207590;
     public static final int TRNX_DIOG_MFG_WP = 207591;
@@ -608,22 +610,18 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_OUT = 207595;
     public static final int TRNX_DIOG_MFG_MOVE_ASG = 207596;
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
-    public static final int TRNX_STK_PERIOD = 207598;
-    public static final int TRNX_STK_ITEM = 207601;
-    public static final int TRNX_STK_ITEM_HIST = 207602;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
     public static final int TRNX_DIOG_AUTH_PEND = 207654;
     public static final int TRNX_DIOG_AUTHORIZED = 207655;
-    public static final int TRNX_CFD_PAY_REC = 207611;
-    public static final int TRNX_CFD_PAY_REC_EXT = 207612;
-    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
+    public static final int TRNX_CFD_PAY_REC = 207661;
+    public static final int TRNX_CFD_PAY_REC_EXT = 207662;
+    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207671;
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;
     public static final int TRNX_MAINT_MOV = 207653;
 
-    // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;
     public static final int TRNX_DSM_ETY_DESTINY = 207602;
     public static final int TRNX_DPS_SRC = 207603;
@@ -633,7 +631,6 @@ public abstract class SDataConstants {
     public static final int TRNX_SAL_PUR_TOT = 207607;
     public static final int TRNX_SAL_PUR_GLB = 207608;
     public static final int TRNX_OPE_TYPE = 207609;
-    // XXX
 
     public static final int TRNX_MFG_ORD = 207620;
     public static final int TRNX_MFG_ORD_ASSIGN_PEND = 207621;

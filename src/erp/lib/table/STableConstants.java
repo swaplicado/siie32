@@ -9,7 +9,7 @@ import java.awt.Color;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public abstract class STableConstants {
 
@@ -89,6 +89,7 @@ public abstract class STableConstants {
     public static final int ICON_ST_THUMBS_UP = 1003;
     public static final int ICON_ST_WAIT = 1004;
     public static final int ICON_WARN = 1051;
+    public static final int ICON_INFO = 1052;
     public static final int ICON_XML = 1101;
     public static final int ICON_XML_PEND = 1102;
     public static final int ICON_XML_SIGN = 1103;
@@ -112,7 +113,7 @@ public abstract class STableConstants {
     public static final int ICON_VIEW_REJECTED = 1212;
     public static final int ICON_VIEW_FOLDER = 1213;
     public static final int ICON_VIEW_FOLDER_ALERT = 1214;
-    public static final int ICON_VIEW_SAL = 1215;
+    public static final int ICON_VIEW_SALES = 1215;
 
     public static final int STYLE_BOLD = 1;
     public static final int STYLE_ITALIC = 2;

@@ -41,24 +41,26 @@ import erp.mmfg.form.SFormManufacturingLineConfigItem;
 import erp.mmfg.form.SFormProductionOrder;
 import erp.mmfg.form.SFormProductionOrderCharge;
 import erp.mmfg.form.SFormRequisition;
+import erp.mod.SModConsts;
+import erp.mod.fin.view.SViewCustomReportsExpenses;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 /**
  *
- * @author Sergio Flores, César Orozco
+ * @author Sergio Flores, César Orozco, Sergio Flores
  */
 public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
     private javax.swing.JMenu jmCatalogs;
-    private javax.swing.JMenuItem jmiBom;
-    private javax.swing.JMenuItem jmiManufacturingLine;
-    private javax.swing.JMenuItem jmiManufacturingLineConfigItem;
-    private javax.swing.JMenuItem jmiLeadtimeCo;
-    private javax.swing.JMenuItem jmiLeadtimeCob;
-    private javax.swing.JMenuItem jmiGang;
-    private javax.swing.JMenuItem jmiGangEmployee;
+    private javax.swing.JMenuItem jmiCatBom;
+    private javax.swing.JMenuItem jmiCatManufacturingLine;
+    private javax.swing.JMenuItem jmiCatManufacturingLineConfig;
+    private javax.swing.JMenuItem jmiCatLeadtimeCo;
+    private javax.swing.JMenuItem jmiCatLeadtimeCob;
+    private javax.swing.JMenuItem jmiCatGang;
+    private javax.swing.JMenuItem jmiCatGangEmployee;
     private javax.swing.JMenu jmProductionOrders;
     private javax.swing.JMenuItem jmiProductionOrderAll;
     private javax.swing.JMenuItem jmiProductionOrderNew;
@@ -71,38 +73,43 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiProductionOrderForecast;
     private javax.swing.JMenuItem jmiProductionOrderPerformance;
     private javax.swing.JMenuItem jmiProductionOrderFatherSon;
+    private javax.swing.JMenuItem jmiProductionOrderProgramMonitoring;
     private javax.swing.JMenu jmExplotionMaterials;
-    private javax.swing.JMenuItem jmiExplotionMaterialsDialog;
     private javax.swing.JMenuItem jmiExplotionMaterials;
-    private javax.swing.JMenuItem jmiExplotionMaterialsForecast;
     private javax.swing.JMenuItem jmiExplotionMaterialsProductionOrder;
+    private javax.swing.JMenuItem jmiExplotionMaterialsDialog;
+    private javax.swing.JMenuItem jmiExplotionMaterialsForecast;
     private javax.swing.JMenuItem jmiExplotionMaterialsForecastProductionOrder;
     private javax.swing.JMenuItem jmiExplotionMaterialsForecastDialog;
-    private javax.swing.JMenu jmAssignLots;
+    private javax.swing.JMenu jmAssignLotsAndRequirements;
     private javax.swing.JMenuItem jmiAssingLotsFinishedGood;
-    private javax.swing.JMenuItem jmiDocumentsRequeriments;
-    private javax.swing.JMenuItem jmiDocumentsPurchasesOrder;
+    private javax.swing.JMenuItem jmiRequeriments;
+    private javax.swing.JMenuItem jmiRequerimentsPurchasesOrder;
     private javax.swing.JMenu jmManufacturingCost;
     private javax.swing.JMenuItem jmiManufacturingCost;
-    private javax.swing.JMenuItem jmiManufacturingCostEmployees;
     private javax.swing.JMenuItem jmiManufacturingClosePeriod;
+    private javax.swing.JMenuItem jmiManufacturingCostEmployees;
+    /* 2025-03-05, Sergio Flores: Maintenance is not supported yet.
     private javax.swing.JMenu jmMaintenance;
     private javax.swing.JMenuItem jmiMaintenanceWorkOrder;
     private javax.swing.JMenuItem jmiMaintenanceEquipment;
-    private javax.swing.JMenuItem jmiStatiticts;
+    private javax.swing.JMenuItem jmiMaintenanceStatiticts;
     private javax.swing.JMenu jmMaintenanceReport;
     private javax.swing.JMenuItem jmiMaintenanceReportGlobal;
     private javax.swing.JMenuItem jmiMaintenanceReportByEquipment;
     private javax.swing.JMenuItem jmiMaintenanceReportByArea;
+    */
+    private javax.swing.JMenu jmQryCustReps;
+    private javax.swing.JMenuItem jmiQryCustRepsExpenses;
+    private javax.swing.JMenuItem jmiQryCustRepsExpensesMonths;
+    private javax.swing.JMenu jmReports;
     private javax.swing.JMenu jmReportsStatiticsManufacturing;
     private javax.swing.JMenuItem jmiReportProductionByItem;
     private javax.swing.JMenuItem jmiReportProductionByItemGeneric;
     private javax.swing.JMenuItem jmiReportProductionByBizPartnetItem;
     private javax.swing.JMenuItem jmiReportProductionByItemBizPartner;
-    private javax.swing.JMenu jmReports;
-    private javax.swing.JMenuItem jmiReportProductionOrderProgramMonitoring;
     private javax.swing.JMenuItem jmiReportBomItems;
-    private javax.swing.JMenuItem jmiBomCost;
+    private javax.swing.JMenuItem jmiReportBomCost;
     private javax.swing.JMenuItem jmiReportProductionOrderPerformance;
     private javax.swing.JMenuItem jmiReportFinishedGoodsEfficiency;
     private javax.swing.JMenuItem jmiReportRawMaterialsEfficiency;
@@ -136,30 +143,25 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     }
 
     private void initComponents() {
-        boolean hasRightBom = false;
-        boolean hasRightExplotionMaterials = false;
-        boolean hasRightAssignLot = false;
-        boolean hasRightReports = false;
-
         jmCatalogs = new JMenu("Catálogos");
-        jmiBom = new JMenuItem("Fórmulas");
-        jmiManufacturingLine = new JMenuItem("Líneas de producción");
-        jmiManufacturingLineConfigItem = new JMenuItem("Configuración de líneas de producción");
-        jmiLeadtimeCo = new JMenuItem("Leadtime empresa");
-        jmiLeadtimeCob = new JMenuItem("Leadtime sucursal");
-        jmiGang = new JMenuItem("Cuadrillas");
-        jmiGangEmployee = new JMenuItem("Cuadrillas vs. empleados (resumen)");
+        jmiCatBom = new JMenuItem("Fórmulas");
+        jmiCatManufacturingLine = new JMenuItem("Líneas de producción");
+        jmiCatManufacturingLineConfig = new JMenuItem("Configuración de líneas de producción");
+        jmiCatLeadtimeCo = new JMenuItem("Leadtime empresa");
+        jmiCatLeadtimeCob = new JMenuItem("Leadtime sucursal");
+        jmiCatGang = new JMenuItem("Cuadrillas");
+        jmiCatGangEmployee = new JMenuItem("Cuadrillas vs. empleados (resumen)");
 
-        jmCatalogs.add(jmiBom);
+        jmCatalogs.add(jmiCatBom);
         jmCatalogs.add(new JSeparator());
-        jmCatalogs.add(jmiManufacturingLine);
-        jmCatalogs.add(jmiManufacturingLineConfigItem);
+        jmCatalogs.add(jmiCatManufacturingLine);
+        jmCatalogs.add(jmiCatManufacturingLineConfig);
         jmCatalogs.add(new JSeparator());
-        jmCatalogs.add(jmiLeadtimeCo);
-        jmCatalogs.add(jmiLeadtimeCob);
+        jmCatalogs.add(jmiCatLeadtimeCo);
+        jmCatalogs.add(jmiCatLeadtimeCob);
         jmCatalogs.add(new JSeparator());
-        jmCatalogs.add(jmiGang);
-        jmCatalogs.add(jmiGangEmployee);
+        jmCatalogs.add(jmiCatGang);
+        jmCatalogs.add(jmiCatGangEmployee);
 
         jmProductionOrders = new JMenu("Órdenes prod.");
         jmiProductionOrderAll = new JMenuItem("Órdenes prod. todas");
@@ -173,6 +175,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiProductionOrderForecast = new JMenuItem("Órdenes prod. pronósticos");
         jmiProductionOrderPerformance = new JMenuItem("Órdenes prod. rendimiento");
         jmiProductionOrderFatherSon = new JMenuItem("Órdenes prod. padre vs. hijo(s)");
+        jmiProductionOrderProgramMonitoring = new JMenuItem("Órdenes prod. seguimiento programa");
 
         jmProductionOrders.add(jmiProductionOrderAll);
         jmProductionOrders.add(jmiProductionOrderNew);
@@ -189,6 +192,9 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmProductionOrders.add(jmiProductionOrderPerformance);
         jmProductionOrders.add(new JSeparator());
         jmProductionOrders.add(jmiProductionOrderFatherSon);
+        JSeparator sepProductionOrderProgramMonitoring = new JSeparator();
+        jmProductionOrders.add(sepProductionOrderProgramMonitoring);
+        jmProductionOrders.add(jmiProductionOrderProgramMonitoring);
 
         jmExplotionMaterials = new JMenu("Explosiones materiales");
         jmiExplotionMaterials = new JMenuItem("Docs. explosiones de materiales");
@@ -206,15 +212,15 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmExplotionMaterials.add(jmiExplotionMaterialsForecastProductionOrder);
         jmExplotionMaterials.add(jmiExplotionMaterialsForecastDialog);
 
-        jmAssignLots = new JMenu("Producto/materia prima");
+        jmAssignLotsAndRequirements = new JMenu("Producto/ materia prima");
         jmiAssingLotsFinishedGood = new JMenuItem("Asignación de lotes producto");
-        jmiDocumentsRequeriments = new JMenuItem("Docs. requisiciones de materiales");
-        jmiDocumentsPurchasesOrder = new JMenuItem("Docs. pedidos de compras");
+        jmiRequeriments = new JMenuItem("Docs. requisiciones de materiales");
+        jmiRequerimentsPurchasesOrder = new JMenuItem("Docs. pedidos de compras");
 
-        jmAssignLots.add(jmiAssingLotsFinishedGood);
-        jmAssignLots.add(new JSeparator());
-        jmAssignLots.add(jmiDocumentsRequeriments);
-        jmAssignLots.add(jmiDocumentsPurchasesOrder);
+        jmAssignLotsAndRequirements.add(jmiAssingLotsFinishedGood);
+        jmAssignLotsAndRequirements.add(new JSeparator());
+        jmAssignLotsAndRequirements.add(jmiRequeriments);
+        jmAssignLotsAndRequirements.add(jmiRequerimentsPurchasesOrder);
 
         jmManufacturingCost = new JMenu("Control horas trabajadas");
         jmiManufacturingCost = new JMenuItem("Docs. control horas trabajadas");
@@ -226,37 +232,40 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmManufacturingCost.add(new JSeparator());
         jmManufacturingCost.add(jmiManufacturingCostEmployees);
 
+        /* 2025-03-05, Sergio Flores: Maintenance not supported yet.
         jmMaintenance = new JMenu("Mantenimiento");
         jmiMaintenanceWorkOrder = new JMenuItem("Órdenes de trabajo");
         jmiMaintenanceEquipment = new JMenuItem("Lista de equipos");
-        jmiStatiticts = new JMenuItem("Estadísticas");
+        jmiMaintenanceStatiticts = new JMenuItem("Estadísticas");
         jmMaintenanceReport = new JMenu("Reportes");
         jmiMaintenanceReportGlobal = new JMenuItem("Reporte de paro global");
         jmiMaintenanceReportByEquipment = new JMenuItem("Reporte por equipo");
         jmiMaintenanceReportByArea = new JMenuItem("Reporte por área");
 
+        jmMaintenance.add(jmiMaintenanceWorkOrder);
+        jmMaintenance.add(jmiMaintenanceEquipment);
+        jmMaintenance.add(jmiMaintenanceStatiticts);
         jmMaintenanceReport.add(jmiMaintenanceReportGlobal);
         jmMaintenanceReport.add(jmiMaintenanceReportByEquipment);
         jmMaintenanceReport.add(jmiMaintenanceReportByArea);
-        jmMaintenance.add(jmiMaintenanceWorkOrder);
-        jmMaintenance.add(jmiMaintenanceEquipment);
-        jmMaintenance.add(jmiStatiticts);
         jmMaintenance.add(jmMaintenanceReport);
+        */
+        
+        jmQryCustReps = new JMenu("Consultas");
+        jmiQryCustRepsExpenses = new JMenuItem("Gastos por período");
+        jmiQryCustRepsExpensesMonths = new JMenuItem("Gastos mensuales por año");
+        
+        jmQryCustReps.add(jmiQryCustRepsExpenses);
+        jmQryCustReps.add(jmiQryCustRepsExpensesMonths);
 
-        // Disabled maintenance options, module for next version:
-
-        jmMaintenance.setEnabled(false);
-
+        jmReports = new JMenu("Reportes");
         jmReportsStatiticsManufacturing = new JMenu("Estadísticas prod.");
         jmiReportProductionByItem = new JMenuItem("Producción por ítem");
         jmiReportProductionByItemGeneric = new JMenuItem("Producción por ítem genérico");
         jmiReportProductionByBizPartnetItem = new JMenuItem("Producción por operador-ítem");
         jmiReportProductionByItemBizPartner = new JMenuItem("Producción por ítem-operador");
-
-        jmReports = new JMenu("Reportes");
-        jmiReportProductionOrderProgramMonitoring = new JMenuItem("Órdenes prod. seguimiento programa");
         jmiReportBomItems = new JMenuItem("Productos por insumo");
-        jmiBomCost = new JMenuItem("Costo teórico de fórmulas");
+        jmiReportBomCost = new JMenuItem("Costo teórico de fórmulas");
         jmiReportProductionOrderPerformance = new JMenuItem("Rendimiento de órdenes prod.");
         jmiReportFinishedGoodsEfficiency = new JMenuItem("Eficiencia global de productos terminados");
         jmiReportRawMaterialsEfficiency = new JMenuItem("Eficiencia global de insumos");
@@ -270,28 +279,19 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmReports.add(new JSeparator());
         jmReports.add(jmiReportBomItems);
         jmReports.add(new JSeparator());
-        jmReports.add(jmiBomCost);
+        jmReports.add(jmiReportBomCost);
         jmReports.add(new JSeparator());
         jmReports.add(jmiReportProductionOrderPerformance);
         jmReports.add(jmiReportFinishedGoodsEfficiency);
         jmReports.add(jmiReportRawMaterialsEfficiency);
 
-        jmiBom.addActionListener(this);
-        jmiManufacturingLine.addActionListener(this);
-        jmiManufacturingLineConfigItem.addActionListener(this);
-        jmiExplotionMaterials.addActionListener(this);
-        jmiExplotionMaterialsDialog.addActionListener(this);
-        jmiExplotionMaterialsProductionOrder.addActionListener(this);
-        jmiExplotionMaterialsForecast.addActionListener(this);
-        jmiExplotionMaterialsForecastDialog.addActionListener(this);
-        jmiExplotionMaterialsForecastProductionOrder.addActionListener(this);
-        jmiAssingLotsFinishedGood.addActionListener(this);
-        jmiDocumentsRequeriments.addActionListener(this);
-        jmiDocumentsPurchasesOrder.addActionListener(this);
-        jmiLeadtimeCo.addActionListener(this);
-        jmiLeadtimeCob.addActionListener(this);
-        jmiGang.addActionListener(this);
-        jmiGangEmployee.addActionListener(this);
+        jmiCatBom.addActionListener(this);
+        jmiCatManufacturingLine.addActionListener(this);
+        jmiCatManufacturingLineConfig.addActionListener(this);
+        jmiCatLeadtimeCo.addActionListener(this);
+        jmiCatLeadtimeCob.addActionListener(this);
+        jmiCatGang.addActionListener(this);
+        jmiCatGangEmployee.addActionListener(this);
         jmiProductionOrderAll.addActionListener(this);
         jmiProductionOrderNew.addActionListener(this);
         jmiProductionOrderLot.addActionListener(this);
@@ -303,41 +303,121 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiProductionOrderForecast.addActionListener(this);
         jmiProductionOrderPerformance.addActionListener(this);
         jmiProductionOrderFatherSon.addActionListener(this);
+        jmiProductionOrderProgramMonitoring.addActionListener(this);
+        jmiExplotionMaterials.addActionListener(this);
+        jmiExplotionMaterialsProductionOrder.addActionListener(this);
+        jmiExplotionMaterialsDialog.addActionListener(this);
+        jmiExplotionMaterialsForecast.addActionListener(this);
+        jmiExplotionMaterialsForecastProductionOrder.addActionListener(this);
+        jmiExplotionMaterialsForecastDialog.addActionListener(this);
+        jmiAssingLotsFinishedGood.addActionListener(this);
+        jmiRequeriments.addActionListener(this);
+        jmiRequerimentsPurchasesOrder.addActionListener(this);
         jmiManufacturingCost.addActionListener(this);
-        jmiManufacturingCostEmployees.addActionListener(this);
         jmiManufacturingClosePeriod.addActionListener(this);
-        jmiReportProductionOrderProgramMonitoring.addActionListener(this);
-        jmiReportBomItems.addActionListener(this);
-        jmiBomCost.addActionListener(this);
-        jmiReportProductionOrderPerformance.addActionListener(this);
-        jmiReportFinishedGoodsEfficiency.addActionListener(this);
-        jmiReportRawMaterialsEfficiency.addActionListener(this);
+        jmiManufacturingCostEmployees.addActionListener(this);
+        jmiQryCustRepsExpenses.addActionListener(this);
+        jmiQryCustRepsExpensesMonths.addActionListener(this);
         jmiReportProductionByItem.addActionListener(this);
         jmiReportProductionByItemGeneric.addActionListener(this);
         jmiReportProductionByBizPartnetItem.addActionListener(this);
         jmiReportProductionByItemBizPartner.addActionListener(this);
+        jmiReportBomItems.addActionListener(this);
+        jmiReportBomCost.addActionListener(this);
+        jmiReportProductionOrderPerformance.addActionListener(this);
+        jmiReportFinishedGoodsEfficiency.addActionListener(this);
+        jmiReportRawMaterialsEfficiency.addActionListener(this);
 
         moDialogExplotionMaterials = new SDialogExplotionMaterials(miClient);        
         moDialogProductionOrderSaved = new SDialogProductionOrderSaved(miClient);
 
-        hasRightBom = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_BOM).HasRight;
-        hasRightExplotionMaterials = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_EXP).HasRight;
-        hasRightAssignLot = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_LOT).HasRight;
-        hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_REP).HasRight;
+        // user rights for catalogs:
 
-        jmiBom.setVisible(hasRightBom);
-        jmiManufacturingLine.setVisible(hasRightBom);
-        jmiManufacturingLineConfigItem.setVisible(hasRightBom);
-        jmiExplotionMaterialsDialog.setEnabled(hasRightExplotionMaterials);
-        jmiAssingLotsFinishedGood.setEnabled(hasRightAssignLot);
-        jmReports.setEnabled(hasRightReports);
+        boolean hasAccessMenuCatalogs = miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_MISC, SDataConstantsSys.PRV_MFG_BOM, SDataConstantsSys.PRV_MFG_LT });
+        boolean hasRightBom = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_BOM).HasRight;
+        boolean hasRightLeadtime = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_LT).HasRight;
+        
+        jmCatalogs.setEnabled(hasAccessMenuCatalogs);
+        jmiCatBom.setEnabled(hasRightBom);
+        jmiCatManufacturingLine.setEnabled(hasRightBom);
+        jmiCatManufacturingLineConfig.setEnabled(hasRightBom);
+        jmiCatLeadtimeCo.setEnabled(hasRightLeadtime);
+        jmiCatLeadtimeCob.setEnabled(hasRightLeadtime);
 
+        // user rights for MFG orders:
+
+        int[] privilegesProductionOrders = {
+            SDataConstantsSys.PRV_MFG_ORD_NEW, // used in view of MFG orders
+            SDataConstantsSys.PRV_MFG_ASG_REW, // used in view of MFG orders
+            SDataConstantsSys.PRV_MFG_ASG_DATE, // used in view of MFG orders
+            SDataConstantsSys.PRV_MFG_ORD_REOPEN, // used in view of MFG orders
+            SDataConstantsSys.PRV_MFG_ORD_ST_NEW,
+            SDataConstantsSys.PRV_MFG_ORD_ST_LOT,
+            SDataConstantsSys.PRV_MFG_ORD_ST_LOT_ASG,
+            SDataConstantsSys.PRV_MFG_ORD_ST_PROC,
+            SDataConstantsSys.PRV_MFG_ORD_ST_END,
+            SDataConstantsSys.PRV_MFG_ORD_ST_CLS };
+        
+        boolean hasAccessMenuProductionOrders = miClient.getSessionXXX().getUser().hasPrivilege(privilegesProductionOrders);
+        
+        jmProductionOrders.setEnabled(hasAccessMenuProductionOrders);
+        jmiProductionOrderNew.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ORD_ST_NEW, SDataConstantsSys.PRV_MFG_ORD_NEW }));
+        jmiProductionOrderLot.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ORD_ST_LOT, SDataConstantsSys.PRV_MFG_ASG_LOT }));
+        jmiProductionOrderLotAssigned.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ORD_ST_LOT_ASG, SDataConstantsSys.PRV_MFG_ASG_LOT }));
+        jmiProductionOrderProcess.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_MFG_ORD_ST_PROC));
+        jmiProductionOrderEnd.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_MFG_ORD_ST_END));
+        jmiProductionOrderClose.setEnabled(miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ORD_ST_CLS, SDataConstantsSys.PRV_MFG_ORD_REOPEN }));
+
+        // hide not supported status of manufacturing orders:
         jmiProductionOrderNew.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_NEW }, SLibConstants.FIELD_DELETED));
         jmiProductionOrderLot.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT }, SLibConstants.FIELD_DELETED));
         jmiProductionOrderLotAssigned.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_LOT_ASIG }, SLibConstants.FIELD_DELETED));
         jmiProductionOrderProcess.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_PROC }, SLibConstants.FIELD_DELETED));
         jmiProductionOrderEnd.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_END }, SLibConstants.FIELD_DELETED));
         jmiProductionOrderClose.setVisible(!(Boolean) SDataReadDescriptions.getField(miClient, SDataConstants.MFGS_ST_ORD, new int[] { SDataConstantsSys.MFGS_ST_ORD_CLS }, SLibConstants.FIELD_DELETED));
+        
+        /* 2025-03-05, Sergio Flores: Program monitoring is not supported yet.
+        sepProductionOrderProgramMonitoring.setVisible(false);
+        jmiProductionOrderProgramMonitoring.setVisible(false);
+        */
+        
+        // user rights for explotion of materials:
+
+        boolean hasAccessMenuExplotionMaterials = miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_MFG_EXP);
+        boolean hasRightExplotionMaterials = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_EXP).HasRight;
+        
+        jmExplotionMaterials.setEnabled(hasAccessMenuExplotionMaterials);
+        jmiExplotionMaterialsDialog.setEnabled(hasRightExplotionMaterials);
+        jmiExplotionMaterialsForecastDialog.setEnabled(hasRightExplotionMaterials);
+        
+        // user rights for assignment of lots and requirements:
+
+        boolean hasAccessMenuAssignLots = miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ASG_LOT, SDataConstantsSys.PRV_MFG_REQ });
+        boolean hasRightAssignLots = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_ASG_LOT).HasRight;
+        boolean hasRightRequirements = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_REQ).HasRight;
+        
+        jmAssignLotsAndRequirements.setEnabled(hasAccessMenuAssignLots);
+        jmiAssingLotsFinishedGood.setEnabled(hasRightAssignLots);
+        jmiRequeriments.setEnabled(hasRightRequirements);
+        jmiRequerimentsPurchasesOrder.setEnabled(hasRightRequirements);
+        
+        // user rights for MFG costs:
+        
+        boolean hasAccessMenuManufacturingCost = miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_ORD_NEW });
+        
+        jmManufacturingCost.setEnabled(hasAccessMenuManufacturingCost);
+        
+        // user rights for queries:
+        
+        boolean hasAccessMenuQueries = miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_MFG_QRY);
+        
+        jmQryCustReps.setEnabled(hasAccessMenuQueries);
+        
+        // user rights for reports:
+        
+        boolean hasAccessMenuReports = miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_MFG_REP);
+
+        jmReports.setEnabled(hasAccessMenuReports);
         
         // GUI configuration:
         
@@ -782,7 +862,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCatalogs, jmProductionOrders, jmExplotionMaterials, jmAssignLots, jmManufacturingCost, jmReports };
+        return new JMenu[] { jmCatalogs, jmProductionOrders, jmExplotionMaterials, jmAssignLotsAndRequirements, jmManufacturingCost, jmQryCustReps, jmReports };
     }
 
     @Override
@@ -791,7 +871,7 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         switch (moduleType) {
             case SDataConstants.MOD_MFG:
-                menues = new JMenu[] { jmCatalogs, jmProductionOrders, jmExplotionMaterials, jmAssignLots, jmManufacturingCost, jmReports };
+                menues = new JMenu[] { jmCatalogs, jmProductionOrders, jmExplotionMaterials, jmAssignLotsAndRequirements, jmManufacturingCost, jmQryCustReps, jmReports };
                 break;
             default:
                 break;
@@ -805,13 +885,13 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
-            if (item == jmiBom) {
+            if (item == jmiCatBom) {
                 showView(SDataConstants.MFG_BOM);
             }
-            else if (item == jmiManufacturingLine) {
+            else if (item == jmiCatManufacturingLine) {
                 showView(SDataConstants.MFGU_LINE);
             }
-            else if (item == jmiManufacturingLineConfigItem) {
+            else if (item == jmiCatManufacturingLineConfig) {
                 showView(SDataConstants.MFGU_LINE_CFG_ITEM);
             }
             else if (item == jmiExplotionMaterialsDialog) {
@@ -826,16 +906,16 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 moDialogExplotionMaterials.formReset();
                 moDialogExplotionMaterials.setFormVisible(true);
             }
-            else if (item == jmiLeadtimeCo) {
+            else if (item == jmiCatLeadtimeCo) {
                 showView(SDataConstants.MFGX_LT, SDataConstants.TRN_SUP_LT_CO);
             }
-            else if (item == jmiLeadtimeCob) {
+            else if (item == jmiCatLeadtimeCob) {
                 showView(SDataConstants.MFGX_LT, SDataConstants.TRN_SUP_LT_COB);
             }
-            else if (item == jmiGang) {
+            else if (item == jmiCatGang) {
                 showView(SDataConstants.MFGU_GANG);
             }
-            else if (item == jmiGangEmployee) {
+            else if (item == jmiCatGangEmployee) {
                 showView(SDataConstants.MFGX_GANG_EMP);
             }
             else if (item == jmiProductionOrderAll) {
@@ -886,10 +966,10 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiExplotionMaterialsForecastProductionOrder) {
                 showView(SDataConstants.MFG_EXP_ORD, SDataConstants.MFGX_ORD_FOR);
             }
-            else if (item == jmiDocumentsRequeriments) {
+            else if (item == jmiRequeriments) {
                 showView(SDataConstants.MFG_REQ);
             }
-            else if (item == jmiDocumentsPurchasesOrder) {
+            else if (item == jmiRequerimentsPurchasesOrder) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
             }
             else if (item == jmiManufacturingCost) {
@@ -902,13 +982,31 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 //showView(SDataConstants.MFGX_COST_EMP);
                 showView(SDataConstants.MFG_COST, SDataConstants.MFGX_COST_EMP);
             }
-            else if (item == jmiReportProductionOrderProgramMonitoring) {
+            else if (item == jmiQryCustRepsExpenses) {
+                miClient.getSession().showView(SModConsts.FINX_CUST_REPS_EXPS, SViewCustomReportsExpenses.SUBTYPE_PERIOD, null);
+            }
+            else if (item == jmiQryCustRepsExpensesMonths) {
+                miClient.getSession().showView(SModConsts.FINX_CUST_REPS_EXPS, SViewCustomReportsExpenses.SUBTYPE_MONTHS, null);
+            }
+            else if (item == jmiReportProductionByItem) {
+                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_ITM);
+            }
+            else if (item == jmiReportProductionByItemGeneric) {
+                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_IGEN);
+            }
+            else if (item == jmiReportProductionByBizPartnetItem) {
+                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_BIZ_ITM);
+            }
+            else if (item == jmiReportProductionByItemBizPartner) {
+                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_ITM_BIZ);
+            }
+            else if (item == jmiProductionOrderProgramMonitoring) {
                 showView(SDataConstantsSys.REP_MFG_PROG_MON);
             }
             else if (item == jmiReportBomItems) {
                 showView(SDataConstants.MFGX_BOM_ITEMS);
             }
-            else if (item == jmiBomCost) {
+            else if (item == jmiReportBomCost) {
                 showView(SDataConstants.MFGX_BOM_COST);
             }
             else if (item == jmiReportProductionOrderPerformance) {
@@ -925,18 +1023,6 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                 moDialogRepProductionOrderPerformance = new SDialogRepProductionOrder(miClient, "Eficiencia global de insumos", SDataConstantsSys.REP_MFG_RAW_MATERIALS_EFFICIENCY);
                 moDialogRepProductionOrderPerformance.formReset();
                 moDialogRepProductionOrderPerformance.setFormVisible(true);
-            }
-            else if (item == jmiReportProductionByItem) {
-                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_ITM);
-            }
-            else if (item == jmiReportProductionByItemGeneric) {
-                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_IGEN);
-            }
-            else if (item == jmiReportProductionByBizPartnetItem) {
-                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_BIZ_ITM);
-            }
-            else if (item == jmiReportProductionByItemBizPartner) {
-                showView(SDataConstants.MFGX_PROD, SDataConstants.MFGX_PROD_BY_ITM_BIZ);
             }
         }
     }

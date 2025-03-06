@@ -5,12 +5,10 @@
 
 package erp.mod.fin.view;
 
-import erp.client.SClientInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
-import erp.redis.SRedisLockUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
 import sa.lib.gui.SGuiParams;
-import sa.lib.srv.redis.SRedisLock;
 
 /**
  *

@@ -6,27 +6,26 @@
 package erp.mmfg.data;
 
 import erp.client.SClientInterface;
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.Vector;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mtrn.data.SDataStockLot;
-import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SStockException;
+import erp.mtrn.data.STrnStockSegregationUtils;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Vector;
 import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Edwin Carmona
+ * @author Néstor Ávalos, Edwin Carmona, Sergio Flores
  */
 public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -584,7 +583,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                 msDbmsLotUnit = resultSet.getString("f_lot_unit");
                 if (resultSet.wasNull()) msDbmsLotUnit = "";
                 msDbmsLot = resultSet.getString("l.lot");
-                if (resultSet.wasNull()) msDbmsLot= "";
+                if (resultSet.wasNull()) msDbmsLot = "";
                 mtDbmsLotDateExpired = resultSet.getDate("l.dt_exp_n");
                 if (resultSet.wasNull()) mtDbmsLotDateExpired = null;
 

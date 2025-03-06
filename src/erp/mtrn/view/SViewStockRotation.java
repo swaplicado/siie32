@@ -131,7 +131,7 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
     }
 
     private boolean showLots() {
-        return mnTabTypeAux01 == SDataConstants.TRNX_STK_LOT || mnTabTypeAux01 == SDataConstants.TRNX_STK_LOT_WH;
+        return mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_LOT || mnTabTypeAux01 == SDataConstants.TRNX_STK_STK_LOT_WH;
     }
 
     @Override

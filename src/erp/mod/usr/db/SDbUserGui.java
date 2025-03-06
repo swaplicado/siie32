@@ -218,6 +218,20 @@ public class SDbUserGui extends SDbRegistryUser implements SGuiUserGui {
     }
 
     @Override
+    public void delete(final SGuiSession session) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        initRegistry();
+        
+        msSql = "DELETE FROM " + getSqlTable() + " " +
+                getSqlWhere();
+
+        session.getStatement().execute(msSql);
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
+    @Override
     public SDbUserGui clone() throws CloneNotSupportedException {
         SDbUserGui registry = new SDbUserGui();
 

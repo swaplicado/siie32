@@ -29,6 +29,7 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.qlt.db.SQltUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnStockLotRow;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnUtilities;
@@ -48,7 +49,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores
  */
 public class SDialogStockLots extends javax.swing.JDialog implements ActionListener, CellEditorListener {
 
@@ -364,7 +365,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
             stockMove = (STrnStockMove) row.getData();
 
             stockMove.setQuantity(row.getValues().get(COL_QTY) == null ? 0 : (Double) row.getValues().get(COL_QTY));
-            stockMove.setAuxLot(row.getValues().get(COL_LOT) == null ? "" : (String) row.getValues().get(COL_LOT));
+            stockMove.setAuxLot(row.getValues().get(COL_LOT) == null ? "" : SLibUtils.textLeft((String) row.getValues().get(COL_LOT), SDataStockLot.LEN_LOT));
             stockMove.setAuxLotDateExpiration((Date) row.getValues().get(COL_DATE_EXP));
         }
     }
@@ -784,17 +785,23 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
             stockMove.setPkItemId(moParamItem.getPkItemId());
             stockMove.setPkUnitId(moParamUnit.getPkUnitId());
             
-            if (stockMove.getQuantity() == 0 && stockMove.getAuxLot().length() > 0) {
+            if (stockMove.getQuantity() == 0 && !stockMove.getAuxLot().isEmpty()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_QTY).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
-            else if (stockMove.getQuantity() != 0 && stockMove.getAuxLot().length() == 0) {
+            else if (stockMove.getQuantity() != 0 && stockMove.getAuxLot().isEmpty()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
-            else if (stockMove.getAuxLotDateExpiration() == null && stockMove.getAuxLot().length() > 0 && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
+            else if (stockMove.getAuxLotDateExpiration() == null && !stockMove.getAuxLot().isEmpty() && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_DATE_EXP).getColumnTitle() + "' en la fila " + (i + 1) + ".");
             }
-            else if (stockMove.getAuxLotDateExpiration() != null && stockMove.getAuxLot().length() == 0) {
+            else if (stockMove.getAuxLotDateExpiration() != null && stockMove.getAuxLot().isEmpty()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
+            }
+            else if (stockMove.getAuxLotDateExpiration() != null && stockMove.getAuxLot().isEmpty()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ".");
+            }
+            else if (!stockMove.getAuxLot().isEmpty() && stockMove.getAuxLot().length() > SDataStockLot.LEN_LOT) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moPaneLots.getTableColumn(COL_LOT).getColumnTitle() + "' en la fila " + (i + 1) + ", no puede tener más de " + SDataStockLot.LEN_LOT + " carácteres.");
             }
             else if (stockMove.getQuantity() != 0 && !qualityValidationAprove(stockMove)) {
                 validation.setMessage("El lote de la fila " + (i + 1) + " no está aprobado.");
@@ -833,7 +840,7 @@ public class SDialogStockLots extends javax.swing.JDialog implements ActionListe
                 for (i = 0; i < ROWS - 1; i++) {
                     lot = ((STrnStockMove) moPaneLots.getTableRow(i).getData()).getAuxLot();
 
-                    if (lot.length() == 0) {
+                    if (lot.isEmpty()) {
                         continue;
                     }
 

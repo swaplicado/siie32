@@ -89,7 +89,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -3167,6 +3167,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 while (line != null) {
                                     moStockMoveEntry = null;
                                     String[] fields = line.split(separador);
+                                    
                                     if (!fields[0].toLowerCase().equals("clave")) {
                                         if (SLibUtilities.parseDouble(fields[2]) == 0.0) {
                                             exc++;
@@ -3207,7 +3208,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                                                 moWarehouseSource.getPkEntityId()
                                                             };
                                                             moStockMoveEntry = new STrnStockMove(moveKey, SLibUtilities.parseDouble(fields[2]));
-                                                            moStockMoveEntry.setAuxLot(fields[4].toUpperCase());
+                                                            moStockMoveEntry.setAuxLot(SLibUtils.textLeft(fields[4].toUpperCase(), SDataStockLot.LEN_LOT));
                                                             if (!fields[5].isEmpty()) {
                                                                 String[] date = fields[5].split("/");
                                                                 moStockMoveEntry.setAuxLotDateExpiration(SLibTimeUtilities.createDate(SLibUtils.parseInt(date[2]), SLibUtils.parseInt(date[1]), SLibUtils.parseInt(date[0])));

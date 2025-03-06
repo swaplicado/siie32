@@ -12,7 +12,6 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataItem;
@@ -27,7 +26,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author  Néstor Ávalos, Uriel Castañeda
+ * @author  Néstor Ávalos, Uriel Castañeda, Sergio Flores
  */
 public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -331,10 +330,11 @@ public class SDialogMfgCreateLot extends javax.swing.JDialog implements erp.lib.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jtfDate, jlDate);
         moFieldLot = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLot, jlLot);
+        moFieldLot.setLengthMax(SDataStockLot.LEN_LOT);
         moFieldDateLotExpired = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfLotDateExpired, jlDate);
         moFieldDateLotExpired.setPickerButton(jbDateLotExpired);
         moFieldQuantity = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfQuantity, jlQuantity);

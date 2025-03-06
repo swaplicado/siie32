@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRenderer {
 
@@ -22,6 +22,7 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
     public static final javax.swing.ImageIcon moIconStatusThumbsUp = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_st_thumbs_up.png"));
     public static final javax.swing.ImageIcon moIconStatusWait = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_st_wait.png"));
     public static final javax.swing.ImageIcon moIconWarn = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_warn.png"));
+    public static final javax.swing.ImageIcon moIconInfo = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_info.png"));
     public static final javax.swing.ImageIcon moIconXml = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml.png"));
     public static final javax.swing.ImageIcon moIconXmlPend = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_pend.png"));
     public static final javax.swing.ImageIcon moIconXmlSign = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_sign.png"));
@@ -44,7 +45,7 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
     public static final javax.swing.ImageIcon moIconViewFolderAlert = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_folder_alert.png"));
     public static final javax.swing.ImageIcon moIconViewOkGreen = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_ok_green.png"));
     public static final javax.swing.ImageIcon moIconViewRejected = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_rejected.png"));
-    public static final javax.swing.ImageIcon moIconViewSal = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_mod_sal.png"));
+    public static final javax.swing.ImageIcon moIconViewSales = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_mod_sal.png"));
 
     public STableCellRendererIcon() {
         moLabel = new JLabel();
@@ -82,6 +83,9 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
                 break;
             case STableConstants.ICON_WARN:
                 moLabel.setIcon(moIconWarn);
+                break;
+            case STableConstants.ICON_INFO:
+                moLabel.setIcon(moIconInfo);
                 break;
             case STableConstants.ICON_XML:
                 moLabel.setIcon(moIconXml);
@@ -149,8 +153,8 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
             case STableConstants.ICON_VIEW_FOLDER_ALERT:
                 moLabel.setIcon(moIconViewFolderAlert);
                 break;
-            case STableConstants.ICON_VIEW_SAL:
-                moLabel.setIcon(moIconViewSal);
+            case STableConstants.ICON_VIEW_SALES:
+                moLabel.setIcon(moIconViewSales);
                 break;
             default:
                 moLabel.setIcon(moIconNull);

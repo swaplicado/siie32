@@ -54,7 +54,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
      * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
      */
     public SViewMaintStock(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_STK_ITEM, auxType01);
+        super(client, tabTitle, SDataConstants.TRNX_MAINT_STK, auxType01);
         initComponents();
     }
 

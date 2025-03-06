@@ -83,17 +83,17 @@ public abstract class STableTab extends javax.swing.JPanel implements erp.lib.ta
     }
 
     /** Creates new form STableTab */
-    public STableTab(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int auxType01) {
-        this(client, tabTitle, tabType, auxType01, 0);
+    public STableTab(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int tabTypeAux01) {
+        this(client, tabTitle, tabType, tabTypeAux01, 0);
     }
 
     /** Creates new form STableTab */
-    public STableTab(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int auxType01, int auxType02) {
+    public STableTab(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int tabTypeAux01, int tabTypeAux02) {
         miClient = client;
         msTabTitle = tabTitle;
         mnTabType = tabType;
-        mnTabTypeAux01 = auxType01;
-        mnTabTypeAux02 = auxType02;
+        mnTabTypeAux01 = tabTypeAux01;
+        mnTabTypeAux02 = tabTypeAux02;
 
         initComponents();
         initComponentsCustom();

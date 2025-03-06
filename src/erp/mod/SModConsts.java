@@ -343,6 +343,7 @@ public abstract class SModConsts {
     public static final int FINX_REC_CASH = 2014001;
     public static final int FINX_ACC_CASH_BANK = 2014002;
     public static final int FINX_REP_CUS_ACC = 2014003;
+    public static final int FINX_CUST_REPS_EXPS = 2014100; // custom reports expenses
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
     public static final int FINR_MAS_PRI = 2015002;

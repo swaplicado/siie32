@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  * 
  * View of commissions of sales agents by money flow
  */
@@ -43,7 +43,7 @@ public class SViewComissionsMoneyFlow extends SGridPaneView {
         jtbFilterDeleted.setEnabled(false);
         
         moFilterDateRange = new SGridFilterDateRange(miClient, this);
-        moFilterDateRange.initFilter(new Date[] {new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime()), new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime())});
+        moFilterDateRange.initFilter(new Date[] { new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime()), new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime()) });
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
         
         moFilterSalesAgent = new SGridFilterPanelSalesAgent(miClient, this, SModConsts.BPSX_BP_X_SAL_AGT);

@@ -38,7 +38,7 @@ public class SAccount {
         mbDeleted = deleted;
         mnLevel = level;
         mnDigits = digits;
-        maChildren = new ArrayList<SAccount>();
+        maChildren = new ArrayList<>();
     }
 
     public int getAccountId() {
