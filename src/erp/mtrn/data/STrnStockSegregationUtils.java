@@ -559,6 +559,7 @@ public abstract class STrnStockSegregationUtils {
         }
         else {
             oSeg.read(new int[] { nIdSegregation }, session.getDatabase().getConnection().createStatement());
+            oSeg.setDeleted(false);
         }
         
         SDataStockSegregationWarehouse oWhsEntryCur = null;
@@ -587,7 +588,7 @@ public abstract class STrnStockSegregationUtils {
         
         oSeg.save(session.getDatabase().getConnection());
             
-        if (oSeg.getLastDbActionResult() ==SLibConstants.DB_ACTION_SAVE_OK) {
+        if (oSeg.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_OK) {
             nIdSegregation = oSeg.getPkStockSegregationId();
 
             return nIdSegregation;

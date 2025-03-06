@@ -21,6 +21,7 @@ import erp.mod.trn.form.SDialogMaterialRequestDocsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import erp.mod.trn.form.SDialogMaterialRequestSegregation;
 import erp.mod.trn.form.SFormMaterialRequest;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -41,6 +42,7 @@ import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRow;
 import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
@@ -588,6 +590,50 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void actionRowDelete() {
+        if (jbRowDelete.isEnabled()) {
+            if (jtTable.getSelectedRowCount() == 0) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
+            } else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
+                boolean updates = false;
+                SGridRow[] gridRows = getSelectedGridRows();
+
+                for (SGridRow gridRow : gridRows) {
+                    if (((SGridRowView) gridRow).getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    } else if (((SGridRowView) gridRow).isRowSystem()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                    } else if (!((SGridRowView) gridRow).isDeletable()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
+                    } else {
+                        try {
+                            int[] key = (int[]) gridRow.getRowPrimaryKey();
+
+                            SDbMaterialRequest mr = new SDbMaterialRequest();
+                            mr.read(miClient.getSession(), key);
+
+                            boolean hasRefs = STrnStockSegregationUtils.hasSegregationsRefs(miClient.getSession().getStatement().getConnection(), 
+                                                                                            mr.getChildEntries());
+                            if (hasRefs) {
+                                throw new Exception("No se puede eliminar la RM, tiene apartados en almacén");
+                            }
+                            if (miClient.getSession().getModule(mnModuleType, mnModuleSubtype).deleteRegistry(mnGridType, gridRow.getRowPrimaryKey()) == SDbConsts.SAVE_OK) {
+                                updates = true;
+                            }
+                        } catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                }
+
+                if (updates) {
+                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
             }
         }

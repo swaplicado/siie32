@@ -1,5 +1,12 @@
 ================================================================================
-SIIE 3.2 263.13/ 2025-03-04
+SIIE 3.2 263.13/ 2025-03-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de segregaciones en eliminación de RM
+2) Eliminación de encabezado de segregaciones cuando la suma de los renglones da 0
+
+================================================================================
+SIIE 3.2 263.12/ 2025-03-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Ajuste de unidades y llave foránea de unidad en valuación de consumos
