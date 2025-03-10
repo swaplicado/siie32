@@ -9,7 +9,7 @@
  * Created on 29/06/2010, 05:02:26 PM
  */
 
-package erp.mfin.data.diot;
+package erp.mfin.data.diot.ver2;
 
 import erp.data.SDataConstants;
 import erp.data.SDataReadDescriptions;
@@ -21,6 +21,8 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mfin.data.SDataTax;
+import erp.mfin.data.diot.SDiotConsts;
+import erp.mfin.data.diot.SDiotUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -37,8 +39,8 @@ import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 
 /**
- *
- * @author Sergio Flores, Isabel Servín, Sergio Flores
+ * For DIOT layout valid since 2025-01-01.
+ * @author Sergio Flores
  */
 public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
@@ -83,10 +85,10 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbPickDateEnd = new javax.swing.JButton();
         jlFormat = new javax.swing.JLabel();
-        jPanel14 = new javax.swing.JPanel();
-        jrbFormatCsv = new javax.swing.JRadioButton();
         jPanel13 = new javax.swing.JPanel();
         jrbFormatPipe = new javax.swing.JRadioButton();
+        jPanel14 = new javax.swing.JPanel();
+        jrbFormatCsv = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jspDiotConfig = new javax.swing.JScrollPane();
@@ -99,12 +101,12 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Layout de la DIOT");
+        setTitle("Layout de la DIOT 2025");
         setResizable(false);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT 2025:"));
         jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -153,29 +155,29 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlFormat.setText("Formato del archivo:");
         jPanel6.add(jlFormat);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgFormat.add(jrbFormatCsv);
-        jrbFormatCsv.setText("Valores sin redondear, separados por coma (CSV), incluye resumen informativo y lista de excepciones");
-        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(600, 23));
-        jPanel14.add(jrbFormatCsv);
-
-        jPanel6.add(jPanel14);
-
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatPipe);
-        jrbFormatPipe.setText("Valores redondeados, separados por el carácter '|', conocido como \"barra vertical\" o \"pipe\"");
+        jrbFormatPipe.setText("Valores redondeados como enteros, separados por el carácter | (conocido como \"pipe\" o barra vertical)");
         jrbFormatPipe.setPreferredSize(new java.awt.Dimension(600, 23));
         jPanel13.add(jrbFormatPipe);
 
         jPanel6.add(jPanel13);
 
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgFormat.add(jrbFormatCsv);
+        jrbFormatCsv.setText("Valores decimales, a dos decimales, separados por coma (CSV), incluye resumen informativo y lista de excepciones");
+        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(600, 23));
+        jPanel14.add(jrbFormatCsv);
+
+        jPanel6.add(jPanel14);
+
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración actual para la DIOT:"));
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración actual para la DIOT 2025:"));
         jPanel7.setLayout(new java.awt.BorderLayout());
 
         jspDiotConfig.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -196,7 +198,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Advertencias en la generación del layout de la DIOT:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Advertencias en la generación del layout de la DIOT 2025:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jspWarnings.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -255,7 +257,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         jckExcludeTotallyZero.setSelected(true);
-        jrbFormatCsv.setSelected(true);
+        jrbFormatPipe.setSelected(true);
         
         processConfigDiot();
                 
@@ -328,7 +330,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             
             String layout = new SDiotLayout(miClient, 
                     moFieldDateStart.getDate(), 
-                    moFieldDateEnd.getDate()).getLayout(jrbFormatPipe.isSelected() ? SDiotLayout.FORMAT_PIPE : SDiotLayout.FORMAT_CSV,
+                    moFieldDateEnd.getDate()).getLayout(jrbFormatPipe.isSelected() ? SDiotConsts.FORMAT_PIPE : SDiotConsts.FORMAT_CSV,
                     jckExcludeTotallyZero.isSelected());
             
             String fileExt = jrbFormatPipe.isSelected() ? ".txt" : ".csv";

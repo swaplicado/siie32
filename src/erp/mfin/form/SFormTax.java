@@ -230,11 +230,12 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         jcbVatType.removeAllItems();
         jcbVatType.addItem(new SFormComponentItem("", "(Seleccionar tipo IVA)"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_EXEMPT, "IVA exento"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_RATE_0, "IVA tasa 0"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_GENERAL, "IVA general"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER, "IVA región fronteriza"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_NORTH_INC, "IVA estímulo región fronteriza norte"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_EXEMPT, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_EXEMPT)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_RATE_0, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_RATE_0)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_GENERAL, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_GENERAL)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_NORTH, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_NORTH)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_SOUTH, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_SOUTH)));
 
         AbstractAction actionOk = new AbstractAction() {
             @Override

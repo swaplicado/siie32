@@ -44,10 +44,11 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
     public static final int SUBTYPE_PERIOD = 1;
     public static final int SUBTYPE_MONTHS = 2;
 
-    protected SCustomReportsParser moCustomReportsParser;
-    protected SCustomReportsParser.Report moCustomReport;
-    protected SCustomReportsParser.User moCustomReportUser;
-    protected SCustomReportsParser.Config[] maoCustomReportConfigs;
+    protected SCustomReportsParser moReportsParser;
+    protected SCustomReportsParser.Report moReport;
+    protected SCustomReportsParser.Access moReportAccess;
+    protected SCustomReportsParser.User moReportUser;
+    protected SCustomReportsParser.Config[] maoReportConfigs; // index 0: Config of Report; index 1: Config of Access to wich the User belongs
 
     protected SGridFilterDateRange moFilterDateRange;
     protected SGridFilterYear moFilterYear;
@@ -76,27 +77,28 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
         try {
             // get custom report settings:
             
-            moCustomReportsParser = new SCustomReportsParser();
-            moCustomReportsParser.readCustomReports(SCustomReportsParser.CUST_REPS_EXPENSES);
+            moReportsParser = new SCustomReportsParser();
+            moReportsParser.readCustomReports(SCustomReportsParser.CUST_REPS_EXPENSES);
             
             ArrayList<SCustomReportsParser.Report> reports;
             
             if (miClient.getSession().getUser().isSupervisor()) {
-                reports = moCustomReportsParser.getCustomReports();
+                reports = moReportsParser.getCustomReports();
             }
             else {
-                reports = moCustomReportsParser.getCustomReports(miClient.getSession().getUser().getPkUserId());
+                reports = moReportsParser.getUserCustomReports(miClient.getSession().getUser().getPkUserId());
             }
             
-            moCustomReport = null;
-            moCustomReportUser = null;
-            maoCustomReportConfigs = null;
+            moReport = null;
+            moReportAccess = null;
+            moReportUser = null;
+            maoReportConfigs = null;
             
             if (reports.isEmpty()) {
                 throw new Exception("No hay reportes para el usuario '" + miClient.getSession().getUser().getName() + "'.");
             }
             else if (reports.size() == 1) {
-                moCustomReport = reports.get(0);
+                moReport = reports.get(0);
             }
             else {
                 SDialogCustomReportPicker picker = new SDialogCustomReportPicker(miClient, mnGridType, "Seleccionar reporte", reports);
@@ -104,18 +106,19 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
                 picker.setVisible(true);
                 
                 if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                    moCustomReport = moCustomReportsParser.getCustomReport((int) picker.getValue(SModConsts.FINX_CUST_REPS_EXPS));
+                    moReport = moReportsParser.getCustomReport((int) picker.getValue(SModConsts.FINX_CUST_REPS_EXPS));
                 }
                 else {
                     miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
             }
             
-            boolean isReportAvailable = moCustomReport != null;
+            boolean isReportAvailable = moReport != null;
             
             if (isReportAvailable) {
-                moCustomReportUser = moCustomReport.getUser(miClient.getSession().getUser().getPkUserId());
-                maoCustomReportConfigs = new SCustomReportsParser.Config[] { moCustomReport.Config, (moCustomReportUser != null ? moCustomReportUser.Config : null) };
+                moReportUser = moReport.getUser(miClient.getSession().getUser().getPkUserId());
+                moReportAccess = moReport.getUserAccess(miClient.getSession().getUser().getPkUserId());
+                maoReportConfigs = new SCustomReportsParser.Config[] { moReport.Config, (moReportAccess != null ? moReportAccess.Config : null) };
             }
             
             switch (mnGridSubtype) {
@@ -154,7 +157,7 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
             moButtonShowConfig.addActionListener(this);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moButtonShowConfig);
             
-            String report = moCustomReport != null ? moCustomReport.Report : SLibConsts.ERR_MSG_UNKNOWN;
+            String report = moReport != null ? moReport.Report : SLibConsts.ERR_MSG_UNKNOWN;
             JTextField textReport = new JTextField(report);
             textReport.setCaretPosition(0);
             textReport.setPreferredSize(new Dimension(100, 23));
@@ -198,12 +201,17 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
     }
     
     private void actionPerformedShowConfig() {
-        String message = "Configuración del reporte:\n" +
-                SCustomReportsParser.humanizeConfigJson(moCustomReport.Config.toString());
+        String message = "REPORTE:\n" +
+                SCustomReportsParser.humanizeConfigJson(moReport.Config.toString());
         
-        if (moCustomReportUser != null) {
-            message += "Configuración del usuariio:\n" +
-                SCustomReportsParser.humanizeConfigJson(moCustomReportUser.toString());
+        if (moReportUser != null) {
+            message += "\nUSUARIO:\n" +
+                SCustomReportsParser.humanizeConfigJson(moReportUser.toString());
+        }
+        
+        if (moReportAccess != null) {
+            message += "\nACCESO:\n" +
+                SCustomReportsParser.humanizeConfigJson(moReportAccess.Config.toString());
         }
         
         miClient.showMsgBoxInformation(message);
@@ -309,23 +317,25 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
             sqlQueryFilters += "AND r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(filterDates[0]) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(filterDates[1]) + "' ";
         }
         
-        for (SCustomReportsParser.Config config : maoCustomReportConfigs) {
+        for (SCustomReportsParser.Config config : maoReportConfigs) { // index 0: Config of Report; index 1: Config of Access to wich the User belongs
             if (config != null) {
-                if (!config.Accounts.isEmpty()) {
-                    sqlQueryFilters += "AND (" + config.Accounts.replaceAll(SCustomReportsParser.JSON_ACC, "re.fid_acc") + ") ";
+                if (!config.Filter.isEmpty()) {
+                    String jsonFilter = config.Filter;
+                    jsonFilter = jsonFilter.replaceAll(SCustomReportsParser.CODE_ACC, "re.fid_acc");
+                    jsonFilter = jsonFilter.replaceAll(SCustomReportsParser.CODE_CC, "re.fid_cc_n");
+                    jsonFilter = jsonFilter.replaceAll(SCustomReportsParser.CODE_ITEM, "i.item_key");
+                    
+                    sqlQueryFilters += "AND (" + jsonFilter + ") ";
                 }
 
-                if (!config.CostCenters.isEmpty()) {
-                    sqlQueryFilters += "AND (" + config.CostCenters.replaceAll(SCustomReportsParser.JSON_CC, "re.fid_cc_n") + ") ";
-                }
-
-                if (!config.Items.isEmpty()) {
-                    sqlQueryFilters += "AND (" + config.Items.replaceAll(SCustomReportsParser.JSON_ITEM, "i.item_key") + ") ";
-                }
-
-                if (!config.ItemsMask.isEmpty()) {
-                    sqlWhereItemsMaskExcl += "AND NOT (" + config.ItemsMask.replaceAll(SCustomReportsParser.JSON_ITEM, "i.item_key") + ") ";
-                    sqlWhereItemsMaskIncl += "AND (" + config.ItemsMask.replaceAll(SCustomReportsParser.JSON_ITEM, "i.item_key") + ") ";
+                if (!config.Mask.isEmpty()) {
+                    String jsonMask = config.Mask;
+                    jsonMask = jsonMask.replaceAll(SCustomReportsParser.CODE_ACC, "re.fid_acc");
+                    jsonMask = jsonMask.replaceAll(SCustomReportsParser.CODE_CC, "re.fid_cc_n");
+                    jsonMask = jsonMask.replaceAll(SCustomReportsParser.CODE_ITEM, "i.item_key");
+                    
+                    sqlWhereItemsMaskExcl += "AND NOT (" + jsonMask + ") ";
+                    sqlWhereItemsMaskIncl += "AND (" + jsonMask + ") ";
                 }
             }
         }
@@ -457,12 +467,12 @@ public class SViewCustomReportsExpenses extends SGridPaneView implements ActionL
         
         if (moCheckShowItemAux.isSelected()) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "_item_key_aux", "Clave ítem aux."));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "_item_aux", "Ítem aux."));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "_item_aux", "Ítem aux."));
         }
         
         if (moCheckShowConcept.isSelected()) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt", "Fecha"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_concept", "Concepto"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "_concept", "Concepto"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_fin_rec", "Póliza contable"));
         }
         

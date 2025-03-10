@@ -9,7 +9,6 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataTax;
 import java.sql.Statement;
-import java.util.ArrayList;
 import sa.lib.SLibUtils;
 
 /**
@@ -63,27 +62,5 @@ public abstract class SDiotUtils {
         }
         
         return keys;
-    }
-    
-    /**
-     * Ascending bubble sort affecting provided parameter list.
-     * @param terceros List to sort.
-     */
-    public static void sortDiotTerceros(final ArrayList<SDiotTercero> terceros) {
-        int size = terceros.size();
-        boolean changes = true;
-        
-        for (int iterations = 0; (iterations + 1) < size && changes; iterations++) {
-            changes = false; // asume that no more changes are needed!
-            
-            for (int index = 0; (index + 1) < (size - iterations); index++) {
-                if (terceros.get(index).getComparableKey().compareTo(terceros.get(index + 1).getComparableKey()) > 0) {
-                    SDiotTercero greater = terceros.get(index).clone();
-                    terceros.set(index, terceros.get(index + 1));
-                    terceros.set(index + 1, greater);
-                    changes = true; // at least one change in current iteration!
-                }
-            }
-        }
     }
 }

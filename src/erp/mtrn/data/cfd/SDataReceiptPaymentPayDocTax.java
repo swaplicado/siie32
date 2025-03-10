@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataTax;
+import erp.mfin.data.diot.SDiotConsts;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -46,15 +47,18 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
             mnFkCfdTaxId = moDbmsTax.getDbmsCfdTaxId();
             mnFkTaxTypeId = moDbmsTax.getFkTaxTypeId();
             switch (moDbmsTax.getVatType().toLowerCase()) {
-                case "exent" : 
+                case SDiotConsts.VAT_TYPE_EXEMPT:
                     msFactorCode = SDataConstantsSys.FINX_TAX_FACT_EX; 
                     break;
-                case "tcero":
-                case "tgral":
-                case "tfron":
-                case "efron":
+                    
+                case SDiotConsts.VAT_TYPE_RATE_0:
+                case SDiotConsts.VAT_TYPE_GENERAL:
+                case SDiotConsts.VAT_TYPE_BORDER:
+                case SDiotConsts.VAT_TYPE_BORDER_NORTH:
+                case SDiotConsts.VAT_TYPE_BORDER_SOUTH:
                     msFactorCode = SDataConstantsSys.FINX_TAX_FACT_TA;
                     break;
+                    
                 default:
                     throw new Exception("El impuesto no tiene configurado un tipo de impuesto.");
             }

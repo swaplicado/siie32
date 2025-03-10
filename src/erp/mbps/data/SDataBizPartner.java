@@ -221,7 +221,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
     }
 
     public String getDiotTipoTercero(SClientInterface client) {
-        return isDomestic(client) ? SDiotConsts.THIRD_DOMESTIC : SDiotConsts.THIRD_INTERNATIONAL;
+        return isDomestic(client) ? SDiotConsts.THIRD_DOMESTIC : SDiotConsts.THIRD_INTERNAT;
     }
     
     public String getDiotTipoOperación() {

@@ -3,19 +3,16 @@
         "id" : 1,
         "report" : "the report name, to be used in GUI",
         "config" : {
-            "acc" : "SQL where condition with column aaa as account code",
-            "cc" : "SQL where condition with column cc as cost center code",
-            "item" : "SQL where condition with column item as item code",
-            "itemMask" : "SQL where condition with column item as item code"
+            "filter" : "SQL WHERE condition to filter data, being 'acc': account code; 'cc': cost center code; 'item': item code",
+            "mask" : "SQL WHERE condition to mask details, being 'acc': account code; 'cc': cost center code; 'item': item code",
         },
-        "users" : [{
-            "id" : 1,
-            "user" : "the user name, just for reference in this file",
+        "accesses" : [{
+            "users" : [{
+                "id" : 1, "user" : "the user name, just for reference in this file"
+            }],
             "config" : {
-                "acc" : "SQL where condition with column aaa as account code",
-                "cc" : "SQL where condition with column cc as cost center code",
-                "item" : "SQL where condition with column item as item code",
-                "itemMask" : "SQL where condition with column item as item code"
+                "filter" : "SQL WHERE condition to filter data, being 'acc': account code; 'cc': cost center code; 'item': item code",
+                "mask" : "SQL WHERE condition to mask details, being 'acc': account code; 'cc': cost center code; 'item': item code",
             }
         }]
     }]

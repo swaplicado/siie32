@@ -1735,9 +1735,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         
         jcbDiotOperation.removeAllItems();
         jcbDiotOperation.addItem(new SFormComponentItem("", "(Seleccionar tipo operación DIOT)"));
-        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_SERVICES, SDiotConsts.OPER_SERVICES + " - Prestación de Servicios Profesionales"));
-        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_LEASING, SDiotConsts.OPER_LEASING + " - Arrendamiento de Inmuebles"));
-        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_OTHER, SDiotConsts.OPER_OTHER + " - Otros"));
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_GOODS, SDiotConsts.Operations.get(SDiotConsts.OPER_GOODS))); // since DIOT 2025
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_SERVS, SDiotConsts.Operations.get(SDiotConsts.OPER_SERVS)));
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_RENTS, SDiotConsts.Operations.get(SDiotConsts.OPER_RENTS)));
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_IMP_INT, SDiotConsts.Operations.get(SDiotConsts.OPER_IMP_INT))); // since DIOT 2025
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_IMP_NAC, SDiotConsts.Operations.get(SDiotConsts.OPER_IMP_NAC))); // since DIOT 2025
+        jcbDiotOperation.addItem(new SFormComponentItem(SDiotConsts.OPER_OTHER, SDiotConsts.Operations.get(SDiotConsts.OPER_OTHER)));
 
         int i = 0;
         tableColumnsBizPartnerBranch = new STableColumnForm[10];

@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 265.2/ 2025-03-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Permitir asignar la configuración de filtros de las consultas personalizadas a más de un usuario a la vez.
+2) Permitir combinaciones de filtros más complejas para satisfacer necesidedes más específicas de consultas personalizadas.
+
+================================================================================
 SIIE 3.2 265.1/ 2025-03-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

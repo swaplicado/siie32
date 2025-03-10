@@ -23,23 +23,20 @@ public class SCustomReportsParser {
     public static final String CUST_REPS = "reps-cust";
     public static final String CUST_REPS_EXPENSES = CUST_REPS + "\\" + CUST_REPS + "-expenses.json";
     
-    public static final String JSON_ACC = "acc"; // JSON element for accounts
-    public static final String JSON_CC = "cc"; // JSON element for cost centers
-    public static final String JSON_ITEM = "item"; // JSON element for items
+    public static final String CODE_ACC = "'acc'"; // [acc], placeholder fo code of accounts
+    public static final String CODE_CC = "'cc'"; // [cc], placeholder fo code of cost centers
+    public static final String CODE_ITEM = "'item'"; // [item], placeholder fo code of items
     
     private static final String REPORTS = "reports";
-    private static final String REPORT_ID = "id";
-    private static final String REPORT_REPORT = "report";
+    private static final String REPORTS_ID = "id";
+    private static final String REPORTS_REPORT = "report";
     private static final String CONFIG = "config";
-    
-    private static final String CONFIG_ACC = "acc"; // accounts SQL filter
-    private static final String CONFIG_CC = "cc"; // cost centers SQL filter
-    private static final String CONFIG_ITEM = "item"; // items SQL filter
-    private static final String CONFIG_ITEM_MASK = "itemMask"; // items masked SQL filter
-    
+    private static final String CONFIG_FILTER = "filter";
+    private static final String CONFIG_MASK = "mask";
+    private static final String ACCESSES = "accesses";
     private static final String USERS = "users";
-    private static final String USER_ID = "id";
-    private static final String USER_USER = "user";
+    private static final String USERS_ID = "id";
+    private static final String USERS_USER = "user";
     
     protected ArrayList<Report> maCustomReports;
     
@@ -51,27 +48,40 @@ public class SCustomReportsParser {
     }
     
     private Config createConfig(final JSONObject jsonObject) {
-        String accounts = (String) jsonObject.get(CONFIG_ACC);
-        String costCenters = (String) jsonObject.get(CONFIG_CC);
-        String items = (String) jsonObject.get(CONFIG_ITEM);
-        String itemsSumm = (String) jsonObject.get(CONFIG_ITEM_MASK);
+        String filter = (String) jsonObject.get(CONFIG_FILTER);
+        String mask = (String) jsonObject.get(CONFIG_MASK);
 
-        return new Config(accounts, costCenters, items, itemsSumm);
+        return new Config(filter, mask);
     }
     
-    private ArrayList<User> createUsers(final JSONArray jsonUsers) {
+    private ArrayList<User> createUsers(final JSONArray jsonArray) {
         ArrayList<User> users = new ArrayList<>();
         
-        for (Object object : jsonUsers.toArray()) {
+        for (Object object : jsonArray.toArray()) {
             JSONObject jsonUser = (JSONObject) object;
             
-            int id = new Long((long) jsonUser.get(USER_ID)).intValue();
-            String user = (String) jsonUser.get(USER_USER);
+            int id = new Long((long) jsonUser.get(USERS_ID)).intValue();
+            String user = (String) jsonUser.get(USERS_USER);
             
-            users.add(new User(id, user, createConfig((JSONObject) jsonUser.get(CONFIG))));
+            users.add(new User(id, user));
         }
 
         return users;
+    }
+    
+    private ArrayList<Access> createAccesses(final JSONArray jsonArray) {
+        ArrayList<Access> accesses = new ArrayList<>();
+        
+        for (Object object : jsonArray.toArray()) {
+            JSONObject jsonAccess = (JSONObject) object;
+            
+            JSONArray jsonUsers = (JSONArray) jsonAccess.get(USERS);
+            JSONObject jsonConfig = (JSONObject) jsonAccess.get(CONFIG);
+            
+            accesses.add(new Access(createUsers(jsonUsers), createConfig(jsonConfig)));
+        }
+
+        return accesses;
     }
     
     /**
@@ -89,10 +99,12 @@ public class SCustomReportsParser {
         for (Object object : jsonArray.toArray()) {
             JSONObject jsonReport = (JSONObject) object;
             
-            int id = new Long((long) jsonReport.get(REPORT_ID)).intValue();
-            String report = (String) jsonReport.get(REPORT_REPORT);
+            int id = new Long((long) jsonReport.get(REPORTS_ID)).intValue();
+            String report = (String) jsonReport.get(REPORTS_REPORT);
+            JSONObject jsonConfig = (JSONObject) jsonReport.get(CONFIG);
+            JSONArray jsonAccesses = (JSONArray) jsonReport.get(ACCESSES);
             
-            maCustomReports.add(new Report(id, report, createConfig((JSONObject) jsonReport.get(CONFIG)), createUsers((JSONArray) jsonReport.get(USERS))));
+            maCustomReports.add(new Report(id, report, createConfig(jsonConfig), createAccesses(jsonAccesses)));
         }
     }
     
@@ -109,7 +121,7 @@ public class SCustomReportsParser {
      * @param userId User ID.
      * @return 
      */
-    public ArrayList<Report> getCustomReports(final int userId) {
+    public ArrayList<Report> getUserCustomReports(final int userId) {
         ArrayList<Report> filteredReports = new ArrayList<>();
         
         for (Report report : maCustomReports) {
@@ -122,7 +134,7 @@ public class SCustomReportsParser {
     }
     
     /**
-     * Get read custom report by ID.
+     * Get custom report by ID.
      * @param reportId Report ID.
      * @return 
      */
@@ -140,25 +152,20 @@ public class SCustomReportsParser {
     
     public class Config {
         
-        public String Accounts;
-        public String CostCenters;
-        public String Items;
-        public String ItemsMask;
+        public String Filter;
+        public String Mask;
         
-        public Config(final String accounts, final String costCenters, final String items, final String itemsMask) {
-            Accounts = accounts;
-            CostCenters = costCenters;
-            Items = items;
-            ItemsMask = itemsMask;
+        public Config(final String filter, final String mask) {
+            Filter = filter;
+            Mask = mask;
         }
         
         @Override
         public String toString() {
             return getClass().getSimpleName() + " = {\n" +
-                    CONFIG_ACC + " : \"" + Accounts + "\",\n" +
-                    CONFIG_CC + " : \"" + CostCenters + "\",\n" +
-                    CONFIG_ITEM + " : \"" + Items + "\",\n" +
-                    CONFIG_ITEM_MASK + " : \"" + ItemsMask + "\" }";
+                    CONFIG_FILTER + " : \"" + Filter + "\",\n" +
+                    CONFIG_MASK + " : \"" + Mask + "\"\n" +
+                    "}";
         }
     }
     
@@ -166,61 +173,29 @@ public class SCustomReportsParser {
         
         public Integer Id;
         public String User;
-        public Config Config;
         
-        public User(final Integer id, final String user, final Config config) {
-            Id = id;
+        public User(final Integer userId, final String user) {
+            Id = userId;
             User = user;
-            Config = config;
         }
         
         @Override
         public String toString() {
             return getClass().getSimpleName() + " = {\n" +
-                    USER_ID + " : " + Id + ",\n" +
-                    USER_USER + ": \"" + USER_USER + "\",\n" +
-                    CONFIG + " : " + Config + " }";
+                    USERS_ID + " : " + Id + ",\n" +
+                    USERS_USER + ": \"" + User + "\"\n" +
+                    "}";
         }
     }
     
-    public class Report {
+    public class Access {
         
-        public Integer Id;
-        public String Report;
-        public Config Config;
         public ArrayList<User> Users;
+        public Config Config;
         
-        public Report(final Integer id, final String report, final Config config, final ArrayList<User> users) {
-            Id = id;
-            Report = report;
-            Config = config;
+        public Access(final ArrayList<User> users, final Config config) {
             Users = users;
-        }
-        
-        public boolean appliesToUser(final int userId) {
-            boolean applies = false;
-            
-            for (User user : Users) {
-                if (userId == user.Id) {
-                    applies = true;
-                    break;
-                }
-            }
-            
-            return applies;
-        }
-        
-        public User getUser(final int userId) {
-            User requiredUser = null;
-            
-            for (User user : Users) {
-                if (userId == user.Id) {
-                    requiredUser = user;
-                    break;
-                }
-            }
-            
-            return requiredUser;
+            Config = config;
         }
         
         @Override
@@ -232,9 +207,88 @@ public class SCustomReportsParser {
             }
             
             return getClass().getSimpleName() + " = {\n" +
-                    REPORT_REPORT + " : \"" + Report + "\",\n" +
+                    USERS + " : [" + users + "],\n" +
+                    CONFIG + ": " + Config + "\n" +
+                    "}";
+        }
+    }
+    
+    public class Report {
+        
+        public Integer Id;
+        public String Report;
+        public Config Config;
+        public ArrayList<Access> Accesses;
+        
+        public Report(final Integer reportId, final String report, final Config config, final ArrayList<Access> accesses) {
+            Id = reportId;
+            Report = report;
+            Config = config;
+            Accesses = accesses;
+        }
+        
+        public boolean appliesToUser(final int userId) {
+            boolean applies = false;
+            
+            accesses:
+            for (Access a : Accesses) {
+                for (User u : a.Users) {
+                    if (userId == u.Id) {
+                        applies = true;
+                        break accesses;
+                    }
+                }
+            }
+            
+            return applies;
+        }
+        
+        public User getUser(final int userId) {
+            User user = null;
+            
+            accesses:
+            for (Access a : Accesses) {
+                for (User u : a.Users) {
+                    if (userId == u.Id) {
+                        user = u;
+                        break accesses;
+                    }
+                }
+            }
+            
+            return user;
+        }
+        
+        public Access getUserAccess(final int userId) {
+            Access access = null;
+            
+            accesses:
+            for (Access a : Accesses) {
+                for (User u : a.Users) {
+                    if (userId == u.Id) {
+                        access = a;
+                        break accesses;
+                    }
+                }
+            }
+            
+            return access;
+        }
+        
+        @Override
+        public String toString() {
+            String accesses = "";
+            
+            for (Access a : Accesses) {
+                accesses += (accesses.isEmpty() ? "" : ",\n") + a;
+            }
+            
+            return getClass().getSimpleName() + " = {\n" +
+                    REPORTS_ID + " : " + Id + ",\n" +
+                    REPORTS_REPORT + " : \"" + Report + "\",\n" +
                     CONFIG + " : " + Config + ",\n" +
-                    USERS + " : [" + users + "] }";
+                    ACCESSES + " : [" + accesses + "]\n" +
+                    "}";
         }
     }
     
@@ -246,6 +300,8 @@ public class SCustomReportsParser {
         humanizedConfig = humanizedConfig.replaceAll("LIKE ", "parecido a ");
         humanizedConfig = humanizedConfig.replaceAll("IN ", "en ");
         humanizedConfig = humanizedConfig.replaceAll("NOT ", "no ");
+        humanizedConfig = humanizedConfig.replaceAll(CONFIG_FILTER, "filtrar");
+        humanizedConfig = humanizedConfig.replaceAll(CONFIG_MASK, "enmascarar");
         
         return humanizedConfig;
     }

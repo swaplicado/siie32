@@ -40,7 +40,7 @@ import erp.mfin.data.SDataTaxIdentity;
 import erp.mfin.data.SDataTaxRegion;
 import erp.mfin.data.SDataTaxableConceptType;
 import erp.mfin.data.SDataYear;
-import erp.mfin.data.diot.SDialogDiotLayout;
+import erp.mfin.data.diot.ver1.SDialogDiotLayout;
 import erp.mfin.form.SDialogRepAccount;
 import erp.mfin.form.SDialogRepAccountCashBalance;
 import erp.mfin.form.SDialogRepAccountConcept;
@@ -1927,7 +1927,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     picker = moPickerTax = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerTax);
                     break;
                 case SDataConstants.FIN_YEAR:
-                    picker = moPickerYear = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerTax);
+                    picker = moPickerYear = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerYear);
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);

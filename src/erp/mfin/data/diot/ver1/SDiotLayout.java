@@ -1,4 +1,4 @@
-package erp.mfin.data.diot;
+package erp.mfin.data.diot.ver1;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -8,6 +8,10 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataTax;
+import erp.mfin.data.diot.SDiotAccount;
+import erp.mfin.data.diot.SDiotAccountingTxn;
+import erp.mfin.data.diot.SDiotConsts;
+import erp.mfin.data.diot.SDiotUtils;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import java.sql.ResultSet;
@@ -22,13 +26,11 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 
 /**
- *
+ * For DIOT layout valid until 2024-12-31.
  * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
+@Deprecated
 public class SDiotLayout {
-    
-    public static final int FORMAT_PIPE = 1; // pipe separated values
-    public static final int FORMAT_CSV = 2; // comma separated values
     
     private static final double AMOUNT_DIFF_ALLOWANCE = 0.1;
     private static final double FIXED_SUBTOT_VAT_THIRD_TAXPAYER = 0.01; // fixed subtotal of VAT of third-taxpayer
@@ -717,7 +719,7 @@ public class SDiotLayout {
                                         case SDiotConsts.VAT_TYPE_RATE_0:
                                         case SDiotConsts.VAT_TYPE_GENERAL:          // VAT deliberately manipulated to be zero
                                         case SDiotConsts.VAT_TYPE_BORDER:           // VAT deliberately manipulated to be zero
-                                        case SDiotConsts.VAT_TYPE_BORDER_NORTH_INC: // VAT deliberately manipulated to be zero
+                                        case SDiotConsts.VAT_TYPE_BORDER_NORTH: // VAT deliberately manipulated to be zero
                                             tercero.ValorPagosNacIva0 = SLibUtils.roundAmount(tercero.ValorPagosNacIva0 + transactionAmount);
                                             break;
 
@@ -866,7 +868,7 @@ public class SDiotLayout {
                                                     }
                                                     break;
 
-                                                case SDiotConsts.VAT_TYPE_BORDER_NORTH_INC:
+                                                case SDiotConsts.VAT_TYPE_BORDER_NORTH:
                                                     terceroToProcess.ValorPagosNacIvaEstFront = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIvaEstFront + netSubtotalCalc);
                                                     break;
 
@@ -1030,7 +1032,7 @@ public class SDiotLayout {
         SDiotTercero terceroTotal = null;
         SDiotTercero terceroCompany = null;
         
-        if (format == FORMAT_CSV) {
+        if (format == SDiotConsts.FORMAT_CSV) {
             terceroTotal = new SDiotTercero();
             
             layout += "\"" + miClient.getSessionXXX().getCurrentCompanyName() + "\"\n";
@@ -1042,7 +1044,7 @@ public class SDiotLayout {
         // suppliers:
         
         for (SDiotTercero tercero : terceros) {
-            if (format == FORMAT_CSV) {
+            if (format == SDiotConsts.FORMAT_CSV) {
                 terceroTotal.addTercero(tercero);
             }
             
@@ -1071,7 +1073,7 @@ public class SDiotLayout {
             layout += terceroCompany.getLayoutRow(format) + "\n";
         }
         
-        if (format == FORMAT_CSV) {
+        if (format == SDiotConsts.FORMAT_CSV) {
             DecimalFormat amountFormat = new DecimalFormat("#0.00");
             
             layout += "\n";

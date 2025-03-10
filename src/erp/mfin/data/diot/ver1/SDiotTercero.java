@@ -1,16 +1,18 @@
-package erp.mfin.data.diot;
+package erp.mfin.data.diot.ver1;
 
 import cfd.DCfdConsts;
 import erp.client.SClientInterface;
 import erp.mbps.data.SDataBizPartner;
+import erp.mfin.data.diot.SDiotConsts;
 import java.text.DecimalFormat;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
 /**
- *
+ * For DIOT layout valid until 2024-12-31.
  * @author Sergio Flores
  */
+@Deprecated
 public class SDiotTercero implements Comparable<SDiotTercero> {
 
     /** Supplier's business partner ID for an undefined one + '-' + code of DIOT other operations. */
@@ -19,6 +21,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     public boolean IsGlobal;
     public boolean IsDomestic;
     public int BizPartnerId;
+    
     public String TipoTercero; // 1
     public String TipoOperación; // 2
     public String Rfc; // 3
@@ -43,6 +46,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     public double ValorPagosNacIvaExento; // 22
     public double IvaRetenido; // 23
     public double IvaNotasCréditoCompras; // 24
+    
     public String OccasionalBizPartnerRfc; // fiscal ID (RFC) of occasional business partners that are not in catalog
     
     protected static final DecimalFormat FormatPipe;
@@ -96,6 +100,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         IsGlobal = isGlobal;
         IsDomestic = isDomestic;
         BizPartnerId = bizPartnerId;
+        
         TipoTercero = tipoTercero; // 1
         TipoOperación = tipoOperación; // 2
         Rfc = rfc; // 3
@@ -103,6 +108,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         ExtNombre = ""; // 5
         ExtPaísResidencia = ""; // 6
         ExtNacionalidad = ""; // 7
+        
         OccasionalBizPartnerRfc = occasionalBizPartnerRfc;
     }
     
@@ -180,7 +186,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         DecimalFormat decimalFormat = null;
         
         switch (format) {
-            case SDiotLayout.FORMAT_PIPE:
+            case SDiotConsts.FORMAT_PIPE:
                 separator = "|";
                 decimalFormat = FormatPipe;
                 row = TipoTercero + separator +
@@ -192,7 +198,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
                         ExtNacionalidad + separator;
                 break;
                 
-            case SDiotLayout.FORMAT_CSV:
+            case SDiotConsts.FORMAT_CSV:
                 separator = ",";
                 decimalFormat = FormatCsv;
                 row = "\"" + TipoTercero + "\"" + separator +
