@@ -113,7 +113,7 @@ public class STrnDBCore {
             + "    (IF(dps.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
             + "        COALESCE((SELECT  "
             + "                        GROUP_CONCAT(usr "
-            + "                                SEPARATOR ',') "
+            + "                                SEPARATOR ', ') "
             + "                    FROM "
             + "                        cfgu_authorn_step AS steps1 "
             + "                            INNER JOIN "
@@ -143,7 +143,7 @@ public class STrnDBCore {
             + "            (SELECT usr FROM erp.usru_usr AS u WHERE u.id_usr = dps.fid_usr_authorn), "
             + "            COALESCE((SELECT  "
             + "                            GROUP_CONCAT(usr "
-            + "                                    SEPARATOR ',') "
+            + "                                    SEPARATOR ', ') "
             + "                        FROM "
             + "                            cfgu_authorn_step AS steps1 "
             + "                                INNER JOIN "
@@ -548,7 +548,8 @@ public class STrnDBCore {
             }
 
             String query = "SELECT  " + 
-                                "    de.fid_item, " + 
+                                "    de.fid_item, " +
+                                "    d.num, " + 
                                 "    d.dt, " + 
                                 "    bp.bp_comm, " + 
                                 "    de.concept_key, " + 
@@ -590,6 +591,7 @@ public class STrnDBCore {
                 SWebItemHistory oHistory = new SWebItemHistory();
                 oHistory.setIdItem(res.getInt("de.fid_item"));
                 oHistory.setLastPurchaseDate(res.getDate("dt"));
+                oHistory.setNumFact(res.getString("d.num"));
                 oHistory.setLastProvider(res.getString("bp.bp_comm"));
                 oHistory.setConceptKey(res.getString("de.concept_key"));
                 oHistory.setConcept(res.getString("de.concept"));

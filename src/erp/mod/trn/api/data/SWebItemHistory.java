@@ -14,6 +14,7 @@ import java.util.Date;
 public class SWebItemHistory {
     private int idItem;
     private Date lastPurchaseDate;
+    private String numFact;
     private String lastProvider;
     private String conceptKey;
     private String concept;
@@ -34,6 +35,14 @@ public class SWebItemHistory {
 
     public void setIdItem(int idItem) {
         this.idItem = idItem;
+    }
+
+    public String getNumFact() {
+        return numFact;
+    }
+
+    public void setNumFact(String numFact) {
+        this.numFact = numFact;
     }
 
     public Date getLastPurchaseDate() {
