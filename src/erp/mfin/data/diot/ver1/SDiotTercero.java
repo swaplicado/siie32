@@ -10,17 +10,28 @@ import sa.lib.SLibUtils;
 
 /**
  * For DIOT layout valid until 2024-12-31.
+ * There are four types of tercero:
+ * 1. "empty tercero". Only for subtotals and totals in CSV DIOT. Not linked to any business partner. Type of third party: undefined. Type of operations: undefined.
+ * 2. "global tercero". Not linked to any business partner. Type of third party: domestic. Type of operations: other.
+ * 3. "standard tercero" for current company: Linked to current company. Type of third party: undefined. Type of operations: undefined.
+ * 4. "standard tercero" for third party: Linked to some business partner. Type of third party: according to the business partner. Type of operations: according to the business partner.
  * @author Sergio Flores
  */
 @Deprecated
 public class SDiotTercero implements Comparable<SDiotTercero> {
 
-    /** Supplier's business partner ID for an undefined one + '-' + code of DIOT other operations. */
+    /**
+     * Supplier's business partner ID for an undefined one + '-' + code of DIOT other operations.
+     */
     public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.OPER_OTHER;
     
-    public boolean IsGlobal;
-    public boolean IsDomestic;
+    public boolean IsCurrentCompany;
+    public String Clave;
+    
+    public Boolean IsGlobal;
+    public Boolean IsDomestic;
     public int BizPartnerId;
+    public String OccasionalRfc; // RFC of occasional business partners that are not in catalog
     
     public String TipoTercero; // 1
     public String TipoOperación; // 2
@@ -47,81 +58,132 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     public double IvaRetenido; // 23
     public double IvaNotasCréditoCompras; // 24
     
-    public String OccasionalBizPartnerRfc; // fiscal ID (RFC) of occasional business partners that are not in catalog
-    
-    protected static final DecimalFormat FormatPipe;
-    protected static final DecimalFormat FormatCsv;
-    
-    static {
-        FormatPipe = new DecimalFormat("#0");
-        FormatCsv = new DecimalFormat("#0.00");
-    }
+    protected static final DecimalFormat FormatPipe = new DecimalFormat("#0");
+    protected static final DecimalFormat FormatCsv = new DecimalFormat("#0.00");
     
     /**
-     * Create an empty tercero.
+     * Creates an "empty tercero".
      */
     public SDiotTercero() {
-        initTercero(false, true, 0, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, "", "", "");
+        initTerceroAsEmpty();
     }
     
     /**
-     * Create an occasional tercero.
-     * @param occasionalBizPartnerRfc 
-     */
-    public SDiotTercero(final String occasionalBizPartnerRfc) {
-        initTercero(false, true, 0, SDiotConsts.THIRD_DOMESTIC, SDiotConsts.OPER_OTHER, occasionalBizPartnerRfc, "", occasionalBizPartnerRfc);
-    }
-    
-    /**
-     * Create a tercero from a business partener.
-     * @param client
-     * @param bizPartner 
+     * Creates a "standard tercero" in normal conditions, or a "global tercero".
+     * @param client GUI client.
+     * @param bizPartner Business partner. When <code>null</code>, a "global tercero" is instantiated. When is current company, a "standard tercero" for current company is instantiated.
      */
     public SDiotTercero(final SClientInterface client, final SDataBizPartner bizPartner) {
-        if (bizPartner == null || isBizPartnerThisCompany(client, bizPartner.getPkBizPartnerId())) {
-            initTercero(true, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
-        }
-        else {
-            boolean isDomestic = bizPartner.isDomestic(client);
-
-            initTercero(false, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
-            
-            if (!isDomestic) {
-                String countryDiotCode = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+        if (bizPartner != null) {
+            if (!bizPartner.isCurrentCompany(client)) {
+                // "standard tercero"...
                 
-                ExtNombre = bizPartner.getBizPartner();
-                ExtPaísResidencia = countryDiotCode;
-                ExtNacionalidad = countryDiotCode;
+                boolean isDomestic = bizPartner.isDomestic(client);
+                
+                initTercero(false, Boolean.FALSE, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
+                
+                if (!isDomestic) {
+                    String countryDiotCode = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+
+                    ExtNombre = bizPartner.getBizPartner();
+                    ExtPaísResidencia = countryDiotCode;
+                    ExtNacionalidad = countryDiotCode;
+                }
+            }
+            else {
+                // "standard tercero" for current company...
+                initTerceroAsCurrentCompany(bizPartner.getPkBizPartnerId(), bizPartner.getFiscalId());
             }
         }
-    }
-    
-    private void initTercero(final boolean isGlobal, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal, final String occasionalBizPartnerRfc) {
-        IsGlobal = isGlobal;
-        IsDomestic = isDomestic;
-        BizPartnerId = bizPartnerId;
-        
-        TipoTercero = tipoTercero; // 1
-        TipoOperación = tipoOperación; // 2
-        Rfc = rfc; // 3
-        ExtIdFiscal = extIdFiscal; // 4
-        ExtNombre = ""; // 5
-        ExtPaísResidencia = ""; // 6
-        ExtNacionalidad = ""; // 7
-        
-        OccasionalBizPartnerRfc = occasionalBizPartnerRfc;
+        else {
+            // "global tercero"...
+            initTerceroAsGlobal();
+        }
     }
     
     /**
-     * Get Clave of Tercero.
-     * @return When tercero is temporal: OccasionalBizPartnerRfc + '-' + TipoOperación; otherwise: BizPartnerId + '-' + TipoOperación.
+     * Creates an "occasional tercero" in normal conditions, or a "standard tercero" or a "global tercero".
+     * @param client GUI client.
+     * @param occasionalRfc Occasional RFC. When <code>null</code> or empty, a "global tercero" is instantiated. When corresponds to current company, a "standard tercero" for current company is instantiated.
      */
-    public String getTerceroClave() {
-        return IsGlobal ? GLOBAL_CLAVE : ((isOccasional() ? OccasionalBizPartnerRfc : BizPartnerId) + "-" + TipoOperación);
+    public SDiotTercero(final SClientInterface client, final String occasionalRfc) {
+        if (occasionalRfc != null && !occasionalRfc.isEmpty() && (occasionalRfc.length() == DCfdConsts.LEN_RFC_ORG || occasionalRfc.length() == DCfdConsts.LEN_RFC_PER)) {
+            SDataBizPartner bizPartner = client.getSessionXXX().getCurrentCompany().getDbmsDataCompany();
+            
+            if (!bizPartner.getFiscalId().equals(occasionalRfc)) {
+                // "occasional tercero"...
+                
+                boolean isDomestic = !occasionalRfc.equals(DCfdConsts.RFC_GEN_INT);
+                String tipoTercero = isDomestic ? SDiotConsts.THIRD_DOMESTIC : SDiotConsts.THIRD_INTERNAT;
+                
+                initTercero(false, Boolean.FALSE, isDomestic, 0, tipoTercero, SDiotConsts.OPER_OTHER, occasionalRfc, "", occasionalRfc);
+            }
+            else {
+                // "standard tercero" for current company...
+                initTerceroAsCurrentCompany(bizPartner.getPkBizPartnerId(), bizPartner.getFiscalId());
+            }
+        }
+        else {
+            // "global tercero"...
+            initTerceroAsGlobal();
+        }
+    }
+    
+    private void initTerceroAsEmpty() {
+        initTercero(false, null, null, 0, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, "", "", "");
+    }
+    
+    private void initTerceroAsGlobal() {
+        initTercero(false, Boolean.TRUE, Boolean.TRUE, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
+    }
+    
+    private void initTerceroAsCurrentCompany(final int bizPartnerId, final String rfc) {
+        initTercero(true, Boolean.FALSE, Boolean.TRUE, bizPartnerId, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, rfc, "", "");
+    }
+    
+    private void initTercero(final boolean isCurrentCompany, final Boolean isGlobal, final Boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal, final String occasionalRfc) {
+        IsCurrentCompany = isCurrentCompany;
+        
+        if (IsCurrentCompany) {
+            IsGlobal = false;
+            IsDomestic = true;
+            BizPartnerId = bizPartnerId;
+            OccasionalRfc = "";
+
+            TipoTercero = SDiotConsts.THIRD_UNDEF; // 1
+            TipoOperación = SDiotConsts.OPER_UNDEF; // 2
+            Rfc = rfc; // 3
+            ExtIdFiscal = ""; // 4
+            ExtNombre = ""; // 5
+            ExtPaísResidencia = ""; // 6
+            ExtNacionalidad = ""; // 7
+        }
+        else {
+            IsGlobal = isGlobal;
+            IsDomestic = isDomestic;
+            BizPartnerId = bizPartnerId;
+            OccasionalRfc = occasionalRfc;
+
+            TipoTercero = tipoTercero; // 1
+            TipoOperación = tipoOperación; // 2
+            Rfc = rfc; // 3
+            ExtIdFiscal = extIdFiscal; // 4
+            ExtNombre = ""; // 5
+            ExtPaísResidencia = ""; // 6
+            ExtNacionalidad = ""; // 7
+        }
+        
+        if (IsGlobal != null) {
+            Clave = IsGlobal ? GLOBAL_CLAVE : ((isOccasional() ? OccasionalRfc : BizPartnerId) + "-" + TipoOperación);
+        }
+        else {
+            Clave = ""; // no need for any "clave"
+        }
     }
     
     public String getComparableKey() {
-        return TipoTercero + "-" + // 1
+        return
+                TipoTercero + "-" + // 1
                 TipoOperación + "-" + // 2
                 Rfc + "-" + // 3
                 ExtIdFiscal + "-" + // 4
@@ -131,11 +193,12 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     }
     
     public boolean isOccasional() {
-        return !OccasionalBizPartnerRfc.isEmpty();
+        return !OccasionalRfc.isEmpty();
     }
     
     public boolean isTotallyZero() {
-        return ValorPagosNacIva1516 == 0 &&
+        return
+                ValorPagosNacIva1516 == 0 &&
                 ValorPagosNacIva15 == 0 &&
                 IvaPagadoNoAcredNac1516 == 0 &&
                 ValorPagosNacIva1011 == 0 &&
@@ -176,19 +239,21 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     
     /**
      * Get DIOT layout row.
-     * @param format Format of DIOT layout row. Options defined in <code>SDiotLayout</code>.
+     * @param formatType Format of DIOT layout row. Options defined in <code>SDiotLayout</code>.
      * @return DIOT layout row.
      * @throws java.lang.Exception
      */
-    public String getLayoutRow(int format) throws Exception {
+    public String getLayoutRow(int formatType) throws Exception {
         String row = "";
         String separator = "";
-        DecimalFormat decimalFormat = null;
+        DecimalFormat format = null;
         
-        switch (format) {
+        // compose layout row:
+                
+        switch (formatType) {
             case SDiotConsts.FORMAT_PIPE:
                 separator = "|";
-                decimalFormat = FormatPipe;
+                format = FormatPipe;
                 row = TipoTercero + separator +
                         TipoOperación + separator +
                         Rfc + separator +
@@ -200,7 +265,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
                 
             case SDiotConsts.FORMAT_CSV:
                 separator = ",";
-                decimalFormat = FormatCsv;
+                format = FormatCsv;
                 row = "\"" + TipoTercero + "\"" + separator +
                         "\"" + TipoOperación + "\"" + separator +
                         "\"" + Rfc + "\"" + separator +
@@ -215,23 +280,28 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         }
         
         return row +
-                (ValorPagosNacIva1516 == 0 ? "" : decimalFormat.format(ValorPagosNacIva1516)) + separator +
-                (ValorPagosNacIva15 == 0 ? "" : decimalFormat.format(ValorPagosNacIva15)) + separator +
-                (IvaPagadoNoAcredNac1516 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNac1516)) + separator +
-                (ValorPagosNacIva1011 == 0 ? "" : decimalFormat.format(ValorPagosNacIva1011)) + separator +
-                (ValorPagosNacIva10 == 0 ? "" : decimalFormat.format(ValorPagosNacIva10)) + separator +
-                (ValorPagosNacIvaEstFront == 0 ? "" : decimalFormat.format(ValorPagosNacIvaEstFront)) + separator +
-                (IvaPagadoNoAcredNac1011 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNac1011)) + separator +
-                (IvaPagadoNoAcredNacEstFront == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNacEstFront)) + separator +
-                (ValorPagosImpIva1516 == 0 ? "" : decimalFormat.format(ValorPagosImpIva1516)) + separator +
-                (IvaPagadoNoAcredImp1516 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredImp1516)) + separator +
-                (ValorPagosImpIva1011 == 0 ? "" : decimalFormat.format(ValorPagosImpIva1011)) + separator +
-                (IvaPagadoNoAcredImp1011 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredImp1011)) + separator +
-                (ValorPagosImpIvaExento == 0 ? "" : decimalFormat.format(ValorPagosImpIvaExento)) + separator +
-                (ValorPagosNacIva0 == 0 ? "" : decimalFormat.format(ValorPagosNacIva0)) + separator +
-                (ValorPagosNacIvaExento == 0 ? "" : decimalFormat.format(ValorPagosNacIvaExento)) + separator +
-                (IvaRetenido == 0 ? "" : decimalFormat.format(IvaRetenido)) + separator +
-                (IvaNotasCréditoCompras == 0 ? "" : decimalFormat.format(IvaNotasCréditoCompras));
+                (ValorPagosNacIva1516 == 0 ? "" : format.format(ValorPagosNacIva1516)) + separator +
+                (ValorPagosNacIva15 == 0 ? "" : format.format(ValorPagosNacIva15)) + separator +
+                (IvaPagadoNoAcredNac1516 == 0 ? "" : format.format(IvaPagadoNoAcredNac1516)) + separator +
+                (ValorPagosNacIva1011 == 0 ? "" : format.format(ValorPagosNacIva1011)) + separator +
+                (ValorPagosNacIva10 == 0 ? "" : format.format(ValorPagosNacIva10)) + separator +
+                (ValorPagosNacIvaEstFront == 0 ? "" : format.format(ValorPagosNacIvaEstFront)) + separator +
+                (IvaPagadoNoAcredNac1011 == 0 ? "" : format.format(IvaPagadoNoAcredNac1011)) + separator +
+                (IvaPagadoNoAcredNacEstFront == 0 ? "" : format.format(IvaPagadoNoAcredNacEstFront)) + separator +
+                (ValorPagosImpIva1516 == 0 ? "" : format.format(ValorPagosImpIva1516)) + separator +
+                (IvaPagadoNoAcredImp1516 == 0 ? "" : format.format(IvaPagadoNoAcredImp1516)) + separator +
+                (ValorPagosImpIva1011 == 0 ? "" : format.format(ValorPagosImpIva1011)) + separator +
+                (IvaPagadoNoAcredImp1011 == 0 ? "" : format.format(IvaPagadoNoAcredImp1011)) + separator +
+                (ValorPagosImpIvaExento == 0 ? "" : format.format(ValorPagosImpIvaExento)) + separator +
+                (ValorPagosNacIva0 == 0 ? "" : format.format(ValorPagosNacIva0)) + separator +
+                (ValorPagosNacIvaExento == 0 ? "" : format.format(ValorPagosNacIvaExento)) + separator +
+                (IvaRetenido == 0 ? "" : format.format(IvaRetenido)) + separator +
+                (IvaNotasCréditoCompras == 0 ? "" : format.format(IvaNotasCréditoCompras));
+    }
+    
+    @Override
+    public int compareTo(SDiotTercero other) {
+        return this.getComparableKey().compareTo(other.getComparableKey());
     }
     
     @Override
@@ -258,8 +328,43 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         
         return string;
     }
+
+    @Override
+    public SDiotTercero clone() {
+        SDiotTercero cloned = new SDiotTercero();
+        
+        cloned.initTercero(this.IsCurrentCompany, this.IsGlobal, this.IsDomestic, this.BizPartnerId, this.TipoTercero, this.TipoOperación, this.Rfc, this.ExtIdFiscal, this.OccasionalRfc);
+
+        cloned.ExtNombre = this.ExtNombre; // 5
+        cloned.ExtPaísResidencia = this.ExtPaísResidencia; // 6
+        cloned.ExtNacionalidad = this.ExtNacionalidad; // 7
+        
+        cloned.ValorPagosNacIva1516 = this.ValorPagosNacIva1516; // 8
+        cloned.ValorPagosNacIva15 = this.ValorPagosNacIva15; // 9
+        cloned.IvaPagadoNoAcredNac1516 = this.IvaPagadoNoAcredNac1516; // 10
+        cloned.ValorPagosNacIva1011 = this.ValorPagosNacIva1011; // 11
+        cloned.ValorPagosNacIva10 = this.ValorPagosNacIva10; // 12
+        cloned.ValorPagosNacIvaEstFront = this.ValorPagosNacIvaEstFront; // 13
+        cloned.IvaPagadoNoAcredNac1011 = this.IvaPagadoNoAcredNac1011; // 14
+        cloned.IvaPagadoNoAcredNacEstFront = this.IvaPagadoNoAcredNacEstFront; // 15
+        cloned.ValorPagosImpIva1516 = this.ValorPagosImpIva1516; // 16
+        cloned.IvaPagadoNoAcredImp1516 = this.IvaPagadoNoAcredImp1516; // 17
+        cloned.ValorPagosImpIva1011 = this.ValorPagosImpIva1011; // 18
+        cloned.IvaPagadoNoAcredImp1011 = this.IvaPagadoNoAcredImp1011; // 19
+        cloned.ValorPagosImpIvaExento = this.ValorPagosImpIvaExento; // 20
+        cloned.ValorPagosNacIva0 = this.ValorPagosNacIva0; // 21
+        cloned.ValorPagosNacIvaExento = this.ValorPagosNacIvaExento; // 22
+        cloned.IvaRetenido = this.IvaRetenido; // 23
+        cloned.IvaNotasCréditoCompras = this.IvaNotasCréditoCompras; // 24
+        
+        return cloned;
+    }
     
-    public static String getLayoutRowHeadings() {
+    public static String composeOccasionalClave(final String occasionalBizPartnerRfc) {
+        return occasionalBizPartnerRfc + "-" + SDiotConsts.OPER_OTHER;
+    }
+    
+    public static String getLayoutCsvHeadings() {
         return "\"1. Tipo de tercero\"," +
                 "\"2. Tipo de operación\"," +
                 "\"3. Registro Federal de Contribuyentes\"," +
@@ -284,45 +389,5 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
                 "\"22. Valor de los actos o actividades pagados por los que no se pagará el IVA (Exentos)\"," +
                 "\"23. IVA Retenido por el contribuyente\"," +
                 "\"24. IVA correspondiente a las devoluciones, descuentos y bonificaciones sobre compras\"";
-    }
-    
-    public static boolean isBizPartnerThisCompany(final SClientInterface client, final int bizPartnerId) {
-        return bizPartnerId == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
-    }
-    
-    public static String composeOccasionalClave(final String occasionalBizPartnerRfc) {
-        return occasionalBizPartnerRfc + "-" + SDiotConsts.OPER_OTHER;
-    }
-
-    @Override
-    public int compareTo(SDiotTercero other) {
-        return this.getComparableKey().compareTo(other.getComparableKey());
-    }
-    
-    @Override
-    public SDiotTercero clone() {
-        SDiotTercero cloned = new SDiotTercero();
-        
-        cloned.initTercero(this.IsGlobal, this.IsDomestic, this.BizPartnerId, this.TipoTercero, this.TipoOperación, this.Rfc, this.ExtIdFiscal, this.OccasionalBizPartnerRfc);
-
-        cloned.ValorPagosNacIva1516 = this.ValorPagosNacIva1516; // 8
-        cloned.ValorPagosNacIva15 = this.ValorPagosNacIva15; // 9
-        cloned.IvaPagadoNoAcredNac1516 = this.IvaPagadoNoAcredNac1516; // 10
-        cloned.ValorPagosNacIva1011 = this.ValorPagosNacIva1011; // 11
-        cloned.ValorPagosNacIva10 = this.ValorPagosNacIva10; // 12
-        cloned.ValorPagosNacIvaEstFront = this.ValorPagosNacIvaEstFront; // 13
-        cloned.IvaPagadoNoAcredNac1011 = this.IvaPagadoNoAcredNac1011; // 14
-        cloned.IvaPagadoNoAcredNacEstFront = this.IvaPagadoNoAcredNacEstFront; // 15
-        cloned.ValorPagosImpIva1516 = this.ValorPagosImpIva1516; // 16
-        cloned.IvaPagadoNoAcredImp1516 = this.IvaPagadoNoAcredImp1516; // 17
-        cloned.ValorPagosImpIva1011 = this.ValorPagosImpIva1011; // 18
-        cloned.IvaPagadoNoAcredImp1011 = this.IvaPagadoNoAcredImp1011; // 19
-        cloned.ValorPagosImpIvaExento = this.ValorPagosImpIvaExento; // 20
-        cloned.ValorPagosNacIva0 = this.ValorPagosNacIva0; // 21
-        cloned.ValorPagosNacIvaExento = this.ValorPagosNacIvaExento; // 22
-        cloned.IvaRetenido = this.IvaRetenido; // 23
-        cloned.IvaNotasCréditoCompras = this.IvaNotasCréditoCompras; // 24
-        
-        return cloned;
     }
 }

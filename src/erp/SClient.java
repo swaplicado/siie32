@@ -257,9 +257,11 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public SClient() {
         markDevControlPoint("Calling method initComponents()...");
         initComponents();
+        markDevControlPoint("Method initComponents() returned!");
         
         markDevControlPoint("Calling method initComponentsCustom()...");
         initComponentsCustom();
+        markDevControlPoint("Method initComponentsCustom() returned!");
     }
 
     /** This method is called from within the constructor to
@@ -920,6 +922,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             
             markDevControlPoint("Calling method login()...");
             login();
+            markDevControlPoint("Method login() returned!");
         }
     }
 
@@ -1343,15 +1346,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             moSessionXXX = null;
             moSession = null;
             moCfgProcessor = null;
+            
             moGlobalCataloguesUsr = null;
             moGlobalCataloguesLoc = null;
             moGlobalCataloguesBps = null;
             moGlobalCataloguesItm = null;
             moGlobalCataloguesTrn = null;
+            
             moModuleCfg = null;
             moModuleFin = null;
             moModulePur = null;
             moModuleSal = null;
+            
             moModuleInv = null;
             moModuleMkt = null;
             moModuleLog = null;
@@ -1487,16 +1493,30 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 moGlobalCataloguesBps = new SGuiGlobalCataloguesBps(this);
                 moGlobalCataloguesItm = new SGuiGlobalCataloguesItm(this);
                 moGlobalCataloguesTrn = new SGuiGlobalCataloguesTrn(this);
+                
                 moModuleCfg = new SGuiModuleCfg(this);
                 moModuleFin = new SGuiModuleFin(this);
                 moModulePur = new SGuiModuleTrnPur(this);
                 moModuleSal = new SGuiModuleTrnSal(this);
-                moModuleInv = new SGuiModuleTrnInv(this);
-                moModuleMkt = new SGuiModuleMkt(this);
-                moModuleLog = new SGuiModuleLog(this);
-                moModuleMfg = new SGuiModuleMfg(this);
-                moModuleHrs = new SGuiModuleHrs(this);
-                moModuleQlt = new SGuiModuleQlt(this);
+                
+                if (jmiViewModuleInv.isEnabled()) {
+                    moModuleInv = new SGuiModuleTrnInv(this);
+                }
+                if (jmiViewModuleMkt.isEnabled()) {
+                    moModuleMkt = new SGuiModuleMkt(this);
+                }
+                if (jmiViewModuleLog.isEnabled()) {
+                    moModuleLog = new SGuiModuleLog(this);
+                }
+                if (jmiViewModuleMfg.isEnabled()) {
+                    moModuleMfg = new SGuiModuleMfg(this);
+                }
+                if (jmiViewModuleHrs.isEnabled()) {
+                    moModuleHrs = new SGuiModuleHrs(this);
+                }
+                if (jmiViewModuleQlt.isEnabled()) {
+                    moModuleQlt = new SGuiModuleQlt(this);
+                }
                 
                 try {
                     // check if there are temporal data to recover:

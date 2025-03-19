@@ -53,7 +53,7 @@ public abstract class SDiotUtils {
         int[] keys = null;
         String[] values = SLibUtils.textsTrim(SLibUtils.textExplode(SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_DIOT_TAX_REGS_IGNORED), ";"));
         
-        if (values != null && values.length > 0) {
+        if (values != null && values.length > 0 && !values[0].isEmpty()) {
             keys = new int[values.length];
             
             for (int i = 0; i < values.length; i++) {

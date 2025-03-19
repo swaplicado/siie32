@@ -5,7 +5,7 @@
 
 package erp.mbps.data;
 
-import erp.mitm.data.SDataItemConfigBizPartnerItems;
+import cfd.DCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -13,6 +13,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.diot.SDiotConsts;
 import erp.mitm.data.SDataItemConfigBizPartner;
+import erp.mitm.data.SDataItemConfigBizPartnerItems;
 import erp.mmkt.data.SDataConfigurationSalesAgent;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mmkt.data.SDataCustomerConfig;
@@ -210,10 +211,26 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         return SLibUtilities.textTrim(isPerson() ? msFirstname + " " + msLastname : msBizPartner);
     }
     
-    public boolean isDomestic(SClientInterface client) {
-        int country = getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
+    public boolean isCurrentCompany(final SClientInterface client) {
+        return client.getSessionXXX().getCurrentCompany().getPkCompanyId() == mnPkBizPartnerId;
+    }
+    
+    public boolean isDomestic(final SClientInterface client) {
+        Boolean isDomestic = null;
         
-        return country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
+        if (msFiscalId.equals(DCfdConsts.RFC_GEN_NAC)) {
+            isDomestic = true;
+        }
+        else if (msFiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
+            isDomestic = false;
+        }
+        
+        if (isDomestic == null) {
+            int country = getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
+            isDomestic = country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
+        }
+        
+        return isDomestic;
     }
     
     public String getDiotTerceroClave() {

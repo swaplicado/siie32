@@ -230,16 +230,17 @@ public class SDiotLayout {
     /**
      * Get DIOT layout in requested format.
      * @param format Requested format: PIPE separated values or CSV.
-     * @param excludeTotallyZero Exclude suppliers totally in zero.
+     * @param excludeTercerosTotallyZero Exclude terceros totally in zero.
      * @return DIOT layout as <code>String</code>.
      * @throws Exception 
      */
-    public String getLayout(final int format, final boolean excludeTotallyZero) throws Exception {
+    @SuppressWarnings("deprecation")
+    public String getLayout(final int format, final boolean excludeTercerosTotallyZero) throws Exception {
         int accounts = 0;
         int entries = 0;
         int entriesWithoutVat = 0;
-        int entriesWithoutBizPartner = 0;
-        int entriesForThisCompany = 0;
+        int entriesWithoutCatalogBizPartner = 0;
+        int entriesForThisCompany = 0; // there should not be any entry for this company!
         int entriesVatZeroUndefined = 0;
         int entriesVatNonZeroUndefined = 0;
         int year = SLibTimeUtils.digestYear(mtStart)[0];
@@ -283,9 +284,9 @@ public class SDiotLayout {
         for (SDiotAccount diotAccount : diotAccounts) {
             String sql = "";
             String section = "";
-            double netSubtotalCalcAcum = 0;
-            double netSubtotalCalcDiffAcumPos = 0; // positive
-            double netSubtotalCalcDiffAcumNeg = 0; // negative
+            double subtotalCalcAcum = 0;
+            double subtotalCalcAcumDiffPos = 0; // positive
+            double subtotalCalcAcumDiffNeg = 0; // negative
             
             if (diotAccount.IsConfigParamAccount) {
                 // prepare query to scan accounts, one at a time, set up by configuration:
@@ -296,11 +297,13 @@ public class SDiotLayout {
                         + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                         + "WHERE NOT r.b_del AND NOT re.b_del "
                         + "AND r.id_year = " + year + " AND r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' "
+                        + "AND (re.fid_bp_nr IS NULL OR re.fid_bp_nr <> " + miClient.getSession().getConfigCompany().getCompanyId() + ") "
                         + "AND re.fid_acc LIKE '" + diotAccount.AccountCode + "%' "
 
                 /////  TESTING SOURCE CODE BLOCK - START ///////////////////////
 
-                //            + "AND re.fid_bp_nr IN (1570, 6700) "
+                //        + "AND re.fid_bp_nr IN (1570, 6700) "
+                //        + "AND re.occ_fiscal_id = 'XEXX010101000' "
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
@@ -332,13 +335,15 @@ public class SDiotLayout {
                         + "f_acc_std_ldg(a.code) = al.code "
                         + "WHERE NOT r.b_del AND NOT re.b_del "
                         + "AND r.id_year = " + year + " AND r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' "
+                        + "AND (re.fid_bp_nr IS NULL OR re.fid_bp_nr <> " + miClient.getSession().getConfigCompany().getCompanyId() + ") "
                         + "AND NOT (" + sqlDiotAccounts + ") AND re.fid_tax_bas_n = " + manConfigDefaultVatKey[0] + " AND (" // only VAT entries
                         + "(re.occ_fiscal_id <> '') OR "
                         + "(al.fid_tp_acc_sys IN (" + SDataConstantsSys.FINS_TP_ACC_SYS_PUR + ", " + SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ + "))) "
 
                 /////  TESTING SOURCE CODE BLOCK - START ///////////////////////
 
-                //                        + "AND re.fid_bp_nr IN (1570, 6700) "
+                //        + "AND re.fid_bp_nr IN (1570, 6700) "
+                //        + "AND re.occ_fiscal_id = 'XEXX010101000' "
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
@@ -359,7 +364,7 @@ public class SDiotLayout {
                     entries++;
                     
                     /*
-                     * 1.2. Start processing of current entry.
+                     * 1.2. Start processing of current journal voucher entry.
                      */
 
                     double entryDebit = resultSet.getDouble("re.debit");
@@ -368,7 +373,7 @@ public class SDiotLayout {
                     ArrayList<DiotEntry> diotEntries = new ArrayList<>();
 
                     /*
-                     * 1.3. Get account and ledger account of current entry.
+                     * 1.3. Get account and ledger account of current journal voucher entry.
                      */
 
                     SDataAccount account = getAccount(resultSet.getString("re.fid_acc"));
@@ -392,7 +397,7 @@ public class SDiotLayout {
                     }
 
                     /*
-                     * 1.4. Identify the typoe of VAT of current entry.
+                     * 1.4. Identify the typoe of VAT of current journal voucher entry.
                      */
 
                     int[] vatKey = null;
@@ -413,7 +418,7 @@ public class SDiotLayout {
                     }
 
                     /*
-                     * 1.5. Identify the third parties (known in DIOT layout as "el tercero") of current entry.
+                     * 1.5. Identify the third parties (known in DIOT layout as "el tercero") of current journal voucher entry.
                      */
 
                     SDataBizPartner entryBizPartner = null;
@@ -464,12 +469,12 @@ public class SDiotLayout {
                         if (dpsSubtotal == 0) {
                             warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, dpsBizPartner) + ":\n"
                                     + " En el documento '" + dps.getDpsNumber() + "' la totalidad del importe gravado con IVA '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "', será excluido de la DIOT porque es cero:\n"
-                                    + " subtotal: $" + SLibUtils.getDecimalFormatAmount().format(dpsSubtotal) + ";\n"
-                                    + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(dpsVatAmount) + "."; 
+                                    + " - subtotal: $" + SLibUtils.getDecimalFormatAmount().format(dpsSubtotal) + ";\n"
+                                    + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(dpsVatAmount) + ".";
                             warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
-                            System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
+                            System.out.println(warning);
 
-                            continue; // skip current entry, must be ignored!
+                            continue; // skip current journal voucher entry, must be ignored!
                         }
 
                         // process tax regions to be ignored, when applicable:
@@ -479,7 +484,7 @@ public class SDiotLayout {
                         if (manConfigTaxRegionsIgnored != null) {
                             for (int taxRegionIgnored : manConfigTaxRegionsIgnored) {
                                 for (DpsVatSetting dpsVatSetting : dpsVatSettings) {
-                                    if (dpsVatSetting.TaxRegion == taxRegionIgnored) {
+                                    if (dpsVatSetting.TaxRegionId == taxRegionIgnored) {
                                         // sum subtotal to be ignored:
                                         
                                         dpsVatSetting.IsIgnored = true;
@@ -491,12 +496,12 @@ public class SDiotLayout {
                             if (SLibUtils.compareAmount(dpsSubtotal, dpsSubtotalIgnored)) {
                                 warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, dpsBizPartner) + ":\n"
                                         + " En el documento '" + dps.getDpsNumber() + "' la totalidad del importe gravado con IVA '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "', será excluido de la DIOT por su(s) región(es) de impuestos:\n"
-                                        + " subtotal: $" + SLibUtils.getDecimalFormatAmount().format(dpsSubtotal) + ";\n"
-                                        + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(dpsVatAmount) + "."; 
+                                        + " - subtotal: $" + SLibUtils.getDecimalFormatAmount().format(dpsSubtotal) + ";\n"
+                                        + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(dpsVatAmount) + ".";
                                 warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
-                                System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
+                                System.out.println(warning);
                                 
-                                continue; // skip current entry, must be ignored!
+                                continue; // skip current journal voucher entry, must be ignored!
                             }
                         }
 
@@ -506,7 +511,7 @@ public class SDiotLayout {
 
                         for (DpsVatSetting dpsVatSetting : dpsVatSettings) {
                             if (!dpsVatSetting.IsIgnored) {
-                                if (dpsVatSetting.ThirdTaxpayer != 0 && dpsVatSetting.ThirdTaxpayer != dpsBizPartner.getPkBizPartnerId() && SDiotTercero.isBizPartnerThisCompany(miClient, dpsVatSetting.ThirdTaxpayer)) {
+                                if (dpsVatSetting.ThirdTaxpayerId != 0 && dpsVatSetting.ThirdTaxpayerId != dpsBizPartner.getPkBizPartnerId()) {
                                     // sum subtotal of third parties:
                                     
                                     dpsVatSetting.IsThirdTaxpayer = true;
@@ -514,10 +519,10 @@ public class SDiotLayout {
                                     
                                     // process current third taxpayer:
                                     
-                                    SDataBizPartner thirdTaxpayer = getBizPartner(dpsVatSetting.ThirdTaxpayer);
+                                    SDataBizPartner thirdTaxpayer = getBizPartner(dpsVatSetting.ThirdTaxpayerId);
 
                                     if (thirdTaxpayer == null) {
-                                        thirdTaxpayer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dpsVatSetting.ThirdTaxpayer }, SLibConstants.EXEC_MODE_VERBOSE);
+                                        thirdTaxpayer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dpsVatSetting.ThirdTaxpayerId }, SLibConstants.EXEC_MODE_VERBOSE);
                                         addBizPartner(thirdTaxpayer);
                                     }
 
@@ -561,7 +566,7 @@ public class SDiotLayout {
                             diotEntries.add(new DiotEntry(dpsBizPartner, false, false, 0, SLibUtils.roundAmount(entryDebit - debits), SLibUtils.roundAmount(entryCredit - credits)));
                         }
                         
-                        entryBizPartner = dpsBizPartner;
+                        entryBizPartner = dpsBizPartner; // business partner from DPS taken as the very best, even if there are other third parties
                         isEntryBizPartnerFromDps = true;
                     }
 
@@ -584,7 +589,7 @@ public class SDiotLayout {
                         }
                     }
                     
-                    // 1.5.3. Gget business partner directly from the current entry, if available:
+                    // 1.5.3. Get business partner directly from the current journal voucher entry, if available:
 
                     if (entryBizPartner == null && resultSet.getInt("re.fid_bp_nr") != 0) {
                         entryBizPartner = getBizPartner(resultSet.getInt("re.fid_bp_nr"));
@@ -599,57 +604,8 @@ public class SDiotLayout {
                         diotEntries.add(new DiotEntry(entryBizPartner, false, false, 0, entryDebit, entryCredit));
                     }
                     
-                    // process out business partner:
-
-                    boolean isThisCompany = false;
-
-                    if (entryBizPartner == null) {
-                        entriesWithoutBizPartner++;
-                    }
-                    else {
-                        isThisCompany = SDiotTercero.isBizPartnerThisCompany(miClient, entryBizPartner.getPkBizPartnerId());
-                        if (isThisCompany) {
-                            entriesForThisCompany++;
-                        }
-                    }
-
-                    // get DIOT Tercero:
-
-                    String terceroClave;
-                    String occasionalFiscalId = resultSet.getString("re.occ_fiscal_id");
-
-                    if (entryBizPartner == null) {
-                        if (occasionalFiscalId.isEmpty()) {
-                            terceroClave = SDiotTercero.GLOBAL_CLAVE; // business partner is undefined, the global third
-                        }
-                        else {
-                            terceroClave = SDiotTercero.composeOccasionalClave(occasionalFiscalId);
-                        }
-                    }
-                    else {
-                        if (isThisCompany) {
-                            terceroClave = SDiotTercero.GLOBAL_CLAVE; // when business partner in current entry is the company itself, then third is treated as the global one
-                        }
-                        else {
-                            terceroClave = entryBizPartner.getDiotTerceroClave(); // this is the nominal case!
-                        }
-                    }
-
-                    SDiotTercero tercero = tercerosMap.get(terceroClave);
-
-                    if (tercero == null) {
-                        if (!occasionalFiscalId.isEmpty()) {
-                            tercero = new SDiotTercero(occasionalFiscalId);
-                        }
-                        else {
-                            tercero = new SDiotTercero(miClient, entryBizPartner);
-                        }
-
-                        tercerosMap.put(tercero.getTerceroClave(), tercero);
-                    }
-
                     /*
-                     * 1.2. Compute the amount of current DIOT transcation.
+                     * 1.6. Sum amount of current DIOT transcation.
                      */
 
                     totalDebit = SLibUtils.roundAmount(totalDebit + entryDebit);
@@ -667,21 +623,62 @@ public class SDiotLayout {
                         journalEntry.add(entryDebit, entryCredit);
                     }
 
-                    boolean isDebit = SLibUtils.belongsTo(ledgerAccount.getAccountClassKey(), new int[][] { SDataConstantsSys.FINS_CL_ACC_ASSET, SDataConstantsSys.FINS_CL_ACC_RES_DBT });
-                    boolean isCredit = SLibUtils.belongsTo(ledgerAccount.getAccountClassKey(), new int[][] { SDataConstantsSys.FINS_CL_ACC_LIABTY, SDataConstantsSys.FINS_CL_ACC_RES_CDT });
+                    boolean isAccountForDebits = SLibUtils.belongsTo(ledgerAccount.getAccountClassKey(), new int[][] { SDataConstantsSys.FINS_CL_ACC_ASSET, SDataConstantsSys.FINS_CL_ACC_RES_DBT });
+                    boolean isAccountForCredits = SLibUtils.belongsTo(ledgerAccount.getAccountClassKey(), new int[][] { SDataConstantsSys.FINS_CL_ACC_LIABTY, SDataConstantsSys.FINS_CL_ACC_RES_CDT });
+                    
+                    /*
+                     * 1.7. Proces DIOT entries of current journal voucher entry.
+                     */
+                    
+                    String occasionalFiscalId = resultSet.getString("re.occ_fiscal_id");
                     
                     for (DiotEntry diotEntry : diotEntries) {
                         double debit = diotEntry.Debit;
                         double credit = diotEntry.Credit;
                         SDataBizPartner bizPartner = diotEntry.BizPartner;
                         
-                        if (isDebit) {
+                        // process DIOT Tercero current business partner:
+
+                        String terceroClave;
+
+                        if (bizPartner != null) {
+                            terceroClave = bizPartner.getDiotTerceroClave(); // "standard tercero"
+                            
+                            if (bizPartner.isCurrentCompany(miClient)) {
+                                entriesForThisCompany++;
+                            }
+                        }
+                        else {
+                            entriesWithoutCatalogBizPartner++;
+                            
+                            if (occasionalFiscalId.isEmpty()) {
+                                terceroClave = SDiotTercero.GLOBAL_CLAVE; // "global tercero"
+                            }
+                            else {
+                                terceroClave = SDiotTercero.composeOccasionalClave(occasionalFiscalId); // "occasional tercero"
+                            }
+                        }
+
+                        SDiotTercero tercero = tercerosMap.get(terceroClave);
+
+                        if (tercero == null) {
+                            if (!occasionalFiscalId.isEmpty()) {
+                                tercero = new SDiotTercero(miClient, occasionalFiscalId);
+                            }
+                            else {
+                                tercero = new SDiotTercero(miClient, bizPartner);
+                            }
+
+                            tercerosMap.put(tercero.Clave, tercero);
+                        }
+
+                        if (isAccountForDebits) {
                             // VAT creditable:
 
                             if (debit > 0 || credit < 0 || (debit == 0 && credit == 0)) {
                                 double paymentAmount = 0;
                                 double paymentRatio = 0;
-                                double transactionAmount = 0;
+                                double txnAmount = 0;
                                 SDiotAccountingTxn diotAccountingTxn = null;
 
                                 if (diotAccount.IsConfigParamAccount) {
@@ -692,15 +689,15 @@ public class SDiotLayout {
                                             resultSet.getInt("re.usr_id"), 
                                             createFinRecordKey(resultSet, "re"), 
                                             new int[] { resultSet.getInt("re.fid_bkk_year_n"), resultSet.getInt("re.fid_bkk_num_n") },
-                                            dps
+                                            dps == null ? null : (int[]) dps.getPrimaryKey()
                                     );
 
                                     paymentAmount = diotAccountingTxn.getPaymentAmount();
                                     paymentRatio = dps == null || dps.getTotal_r() == 0 ? 1.0 : paymentAmount / dps.getTotal_r();
-                                    transactionAmount = SLibUtils.roundAmount(diotAccountingTxn.getEntryDpsSubtotal(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT, (int[]) vat.getPrimaryKey()) * paymentRatio);
+                                    txnAmount = SLibUtils.roundAmount(diotAccountingTxn.getEntryDpsSubtotal(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT, (int[]) vat.getPrimaryKey()) * paymentRatio);
                                 }
                                 else {
-                                    transactionAmount = vatAmount;
+                                    txnAmount = vatAmount;
                                 }
 
                                 // VAT creditable of payments of purchases:
@@ -709,18 +706,18 @@ public class SDiotLayout {
                                     switch (vat.getVatType()) {
                                         case SDiotConsts.VAT_TYPE_EXEMPT:
                                             if (tercero.IsDomestic) {
-                                                tercero.ValorPagosNacIvaExento = SLibUtils.roundAmount(tercero.ValorPagosNacIvaExento + transactionAmount);
+                                                tercero.ValorPagosNacIvaExento = SLibUtils.roundAmount(tercero.ValorPagosNacIvaExento + txnAmount);
                                             }
                                             else {
-                                                tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + transactionAmount);
+                                                tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + txnAmount);
                                             }
                                             break;
 
                                         case SDiotConsts.VAT_TYPE_RATE_0:
-                                        case SDiotConsts.VAT_TYPE_GENERAL:          // VAT deliberately manipulated to be zero
-                                        case SDiotConsts.VAT_TYPE_BORDER:           // VAT deliberately manipulated to be zero
-                                        case SDiotConsts.VAT_TYPE_BORDER_NORTH: // VAT deliberately manipulated to be zero
-                                            tercero.ValorPagosNacIva0 = SLibUtils.roundAmount(tercero.ValorPagosNacIva0 + transactionAmount);
+                                        case SDiotConsts.VAT_TYPE_GENERAL:      // VAT was manipulated to be zero
+                                        case SDiotConsts.VAT_TYPE_BORDER:       // VAT was manipulated to be zero
+                                        case SDiotConsts.VAT_TYPE_BORDER_NORTH: // VAT was manipulated to be zero
+                                            tercero.ValorPagosNacIva0 = SLibUtils.roundAmount(tercero.ValorPagosNacIva0 + txnAmount);
                                             break;
 
                                         default:
@@ -728,163 +725,98 @@ public class SDiotLayout {
 
                                             warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
                                                     + " TIPO IVA DESCONOCIDO EN '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
-                                                    + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
-                                                    + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "."; 
+                                                    + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
+                                                    + " - total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ".";
                                             warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                             System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
                                     }
                                 }
                                 else {
-                                    // check if current VAT is not asigned explicitly to other third taxpayers:
+                                    // VAT corresponds to supplier:
 
-                                    ArrayList<SDiotTercero> tercerosToProcess = new ArrayList<>();
-                                    HashSet<Integer> thirdTaxpayerIds = diotAccountingTxn != null ? diotAccountingTxn.getThirdTaxpayerIds((int[]) vat.getPrimaryKey()) : new HashSet<>();
+                                    double subtotalCalc = SLibUtils.roundAmount(vat.getPercentage() == 0 ? 0 : vatAmount / vat.getPercentage());
+                                    double subtotalCalcDiff = SLibUtils.roundAmount(txnAmount - subtotalCalc);
 
-                                    for (Integer taxpayerId : thirdTaxpayerIds) {
-                                        SDataBizPartner thirdTaxpayer = getBizPartner(taxpayerId);
+                                    if (subtotalCalcDiff < -AMOUNT_DIFF_ALLOWANCE) {
+                                        // suspicious situation: calculated net-total is greater than the real one:
 
-                                        if (thirdTaxpayer == null) {
-                                            thirdTaxpayer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { taxpayerId }, SLibConstants.EXEC_MODE_VERBOSE);
-                                            addBizPartner(thirdTaxpayer);
-                                        }
+                                        subtotalCalcAcumDiffNeg = SLibUtils.roundAmount(subtotalCalcAcumDiffNeg + subtotalCalcDiff);
 
-                                        SDiotTercero terceroCausing = tercerosMap.get(thirdTaxpayer.getDiotTerceroClave());
-
-                                        if (terceroCausing == null) {
-                                            terceroCausing = new SDiotTercero(miClient, thirdTaxpayer);
-                                            tercerosMap.put(terceroCausing.getTerceroClave(), terceroCausing);
-                                        }
-
-                                        tercerosToProcess.add(terceroCausing);
+                                        warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
+                                                + " Discrepancia NO corregible en impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
+                                                + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
+                                                + " - total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ";\n"
+                                                + " - subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(txnAmount) + " < "
+                                                + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(subtotalCalc) + " = "
+                                                + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(subtotalCalcDiff) + "."
+                                                + (diotEntry.IsCustomVatThirdTaxpayer ? " Puede tratarse meramente del IVA de un tercero causante." : "");
+                                        warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
+                                        System.out.println(warning);
                                     }
+                                    else if (subtotalCalcDiff > AMOUNT_DIFF_ALLOWANCE) {
+                                        // manageable situation: calculated net-total is less than the real one:
 
-                                    // process DIOT layout third taxpayers, including the directly current one:
+                                        subtotalCalcAcumDiffPos = SLibUtils.roundAmount(subtotalCalcAcumDiffPos + subtotalCalcDiff);
 
-                                    tercerosToProcess.add(tercero);
+                                        warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
+                                                + " Discrepancia SÍ corregible en impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
+                                                + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
+                                                + " - total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ";\n"
+                                                + "subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(txnAmount) + " > "
+                                                + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(subtotalCalc) + " = "
+                                                + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(subtotalCalcDiff) + ".";
+                                        warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
+                                        System.out.println(warning);
 
-                                    double vatProcessed = 0;
-                                    double terceroExempt = 0;
-
-                                    for (SDiotTercero terceroToProcess : tercerosToProcess) {
-                                        if (vatProcessed >= vatAmount) {
-                                            if (terceroExempt != 0) {
-                                                if (terceroToProcess.IsDomestic) {
-                                                    terceroToProcess.ValorPagosNacIvaExento = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIvaExento + terceroExempt);
-                                                }
-                                                else {
-                                                    terceroToProcess.ValorPagosImpIvaExento = SLibUtils.roundAmount(terceroToProcess.ValorPagosImpIvaExento + terceroExempt);
-                                                }
-                                            }
-                                            break; // no more VAT to be processed
+                                        if (tercero.IsDomestic) {
+                                            tercero.ValorPagosNacIvaExento = SLibUtils.roundAmount(tercero.ValorPagosNacIvaExento + subtotalCalcDiff);
                                         }
                                         else {
-                                            double vatToProcess;
+                                            tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + subtotalCalcDiff);
+                                        }
+                                    }
+                                    else if (subtotalCalcDiff != 0) {
+                                        // adjust calculated subtotal due to difference between real and calculated net-total:
+                                        subtotalCalc = SLibUtils.roundAmount(subtotalCalc + subtotalCalcDiff);
+                                    }
 
-                                            if (terceroToProcess == tercero) {
-                                                // VAT corresponds to supplier:
-                                                vatToProcess = SLibUtils.roundAmount(vatAmount - vatProcessed);
+                                    subtotalCalcAcum = SLibUtils.roundAmount(subtotalCalcAcum + subtotalCalc);
+                                    System.out.println("debit: " + SLibUtils.getDecimalFormatAmount().format(debit) + "; "
+                                            + "subtotal calc.: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalc) + "; "
+                                            + "subtotal calc. acum.: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalcAcum));
+
+                                    switch (vat.getVatType()) {
+                                        case SDiotConsts.VAT_TYPE_GENERAL:
+                                            if (tercero.IsDomestic) {
+                                                tercero.ValorPagosNacIva1516 = SLibUtils.roundAmount(tercero.ValorPagosNacIva1516 + subtotalCalc);
                                             }
                                             else {
-                                                // VAT corresponds to a third tax causing:
-                                                vatToProcess = SLibUtils.roundAmount(diotAccountingTxn.getThirdTaxpayerTax(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
-                                                terceroExempt = SLibUtils.roundAmount(diotAccountingTxn.getThirdTaxpayerTaxSubtotal(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
+                                                tercero.ValorPagosImpIva1516 = SLibUtils.roundAmount(tercero.ValorPagosImpIva1516 + subtotalCalc);
                                             }
+                                            break;
 
-                                            vatProcessed = SLibUtils.roundAmount(vatProcessed + vatToProcess);
-
-                                            double netSubtotalCalc = SLibUtils.roundAmount(vat.getPercentage() == 0 ? 0 : vatToProcess / vat.getPercentage());
-
-                                            if (terceroToProcess == tercero) {
-                                                double netSubtotalCalcDiff = SLibUtils.roundAmount(transactionAmount - netSubtotalCalc);
-
-                                                if (netSubtotalCalcDiff < -AMOUNT_DIFF_ALLOWANCE) {
-                                                    // suspicious situation: calculated net-total is greater than the real one:
-
-                                                    netSubtotalCalcDiffAcumNeg = SLibUtils.roundAmount(netSubtotalCalcDiffAcumNeg + netSubtotalCalcDiff);
-
-                                                    warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
-                                                            + " Discrepancia NO corregible en impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
-                                                            + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
-                                                            + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
-                                                            + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ";\n"
-                                                            + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "; "
-                                                            + "subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(transactionAmount) + " < "
-                                                            + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalc) + " = "
-                                                            + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalcDiff) + "."; 
-                                                    warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
-                                                    System.out.println(warning);
-                                                }
-                                                else if (netSubtotalCalcDiff > AMOUNT_DIFF_ALLOWANCE) {
-                                                    // manageable situation: calculated net-total is less than the real one:
-
-                                                    netSubtotalCalcDiffAcumPos = SLibUtils.roundAmount(netSubtotalCalcDiffAcumPos + netSubtotalCalcDiff);
-
-                                                    warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
-                                                            + " Discrepancia SÍ corregible en impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
-                                                            + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
-                                                            + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
-                                                            + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ":\n"
-                                                            + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "; "
-                                                            + "subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(transactionAmount) + " > "
-                                                            + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalc) + " = "
-                                                            + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalcDiff) + "."; 
-                                                    warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
-                                                    System.out.println(warning);
-
-                                                    if (terceroToProcess.IsDomestic) {
-                                                        terceroToProcess.ValorPagosNacIvaExento = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIvaExento + netSubtotalCalcDiff);
-                                                    }
-                                                    else {
-                                                        terceroToProcess.ValorPagosImpIvaExento = SLibUtils.roundAmount(terceroToProcess.ValorPagosImpIvaExento + netSubtotalCalcDiff);
-                                                    }
-                                                }
-                                                else if (netSubtotalCalcDiff != 0) {
-                                                    // adjust calculated subtotal due to difference between real and calculated net-total:
-                                                    netSubtotalCalc = SLibUtils.roundAmount(netSubtotalCalc + netSubtotalCalcDiff);
-                                                }
+                                        case SDiotConsts.VAT_TYPE_BORDER:
+                                            if (tercero.IsDomestic) {
+                                                tercero.ValorPagosNacIva1011 = SLibUtils.roundAmount(tercero.ValorPagosNacIva1011 + subtotalCalc);
                                             }
-
-                                            netSubtotalCalcAcum = SLibUtils.roundAmount(netSubtotalCalcAcum + netSubtotalCalc);
-                                            System.out.println("debit: " + SLibUtils.getDecimalFormatAmount().format(debit) + "; "
-                                                    + "subtotal calc.: " + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalc) + "; "
-                                                    + "subtotal calc. acum.: " + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalcAcum));
-
-                                            switch (vat.getVatType()) {
-                                                case SDiotConsts.VAT_TYPE_GENERAL:
-                                                    if (terceroToProcess.IsDomestic) {
-                                                        terceroToProcess.ValorPagosNacIva1516 = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIva1516 + netSubtotalCalc);
-                                                    }
-                                                    else {
-                                                        terceroToProcess.ValorPagosImpIva1516 = SLibUtils.roundAmount(terceroToProcess.ValorPagosImpIva1516 + netSubtotalCalc);
-                                                    }
-                                                    break;
-
-                                                case SDiotConsts.VAT_TYPE_BORDER:
-                                                    if (terceroToProcess.IsDomestic) {
-                                                        terceroToProcess.ValorPagosNacIva1011 = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIva1011 + netSubtotalCalc);
-                                                    }
-                                                    else {
-                                                        terceroToProcess.ValorPagosImpIva1011 = SLibUtils.roundAmount(terceroToProcess.ValorPagosImpIva1011 + netSubtotalCalc);
-                                                    }
-                                                    break;
-
-                                                case SDiotConsts.VAT_TYPE_BORDER_NORTH:
-                                                    terceroToProcess.ValorPagosNacIvaEstFront = SLibUtils.roundAmount(terceroToProcess.ValorPagosNacIvaEstFront + netSubtotalCalc);
-                                                    break;
-
-                                                default:
-                                                    entriesVatNonZeroUndefined++;
-
-                                                    warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
-                                                            + " TIPO IVA DESCONOCIDO EN '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
-                                                            + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
-                                                            + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
-                                                            + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ":\n"
-                                                            + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "."; 
-                                                    warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
-                                                    System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
+                                            else {
+                                                tercero.ValorPagosImpIva1011 = SLibUtils.roundAmount(tercero.ValorPagosImpIva1011 + subtotalCalc);
                                             }
-                                        }
+                                            break;
+
+                                        case SDiotConsts.VAT_TYPE_BORDER_NORTH:
+                                            tercero.ValorPagosNacIvaEstFront = SLibUtils.roundAmount(tercero.ValorPagosNacIvaEstFront + subtotalCalc);
+                                            break;
+
+                                        default:
+                                            entriesVatNonZeroUndefined++;
+
+                                            warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
+                                                    + " TIPO IVA DESCONOCIDO EN '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
+                                                    + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
+                                                    + " - total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ".";
+                                            warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
+                                            System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
                                     }
                                 }
                             }
@@ -910,7 +842,7 @@ public class SDiotLayout {
                                 }
                             }
                         }
-                        else if (isCredit) {
+                        else if (isAccountForCredits) {
                             // VAT creditable withheld:
 
                             if (debit < 0 || credit > 0 || (debit == 0 && credit == 0)) {
@@ -972,17 +904,18 @@ public class SDiotLayout {
             
             // print out subtotals for current account:
             
-            SDiotTercero subtotal = new SDiotTercero();
+            SDiotTercero terceroSubtotal = new SDiotTercero(); // "empty" tercero
+            
             for (SDiotTercero tercero : tercerosMap.values()) {
-                subtotal.addTercero(tercero);
+                terceroSubtotal.addTercero(tercero);
             }
             
             System.out.println(SLibUtils.textRepeat("-", 80));
             System.out.println("RESUMEN: " + section);
             System.out.println("SUBTOTALES:");
-            System.out.println(subtotal.toString());
-            System.out.println("Diferencia total (-) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalcDiffAcumNeg));
-            System.out.println("Diferencia total (+) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalcDiffAcumPos));
+            System.out.println(terceroSubtotal.toString());
+            System.out.println("Diferencia total (-) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalcAcumDiffNeg));
+            System.out.println("Diferencia total (+) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalcAcumDiffPos));
             
             for (String account : accountJournalEntryTotalsMap.keySet()) {
                 JournalEntry journalEntry = accountJournalEntryTotalsMap.get(account);
@@ -1028,9 +961,9 @@ public class SDiotLayout {
         // generate layout:
 
         String layout = "";
-        int totallyZero = 0;
+        int tercerosTotallyZero = 0;
+        SDiotTercero terceroGlobal = null;
         SDiotTercero terceroTotal = null;
-        SDiotTercero terceroCompany = null;
         
         if (format == SDiotConsts.FORMAT_CSV) {
             terceroTotal = new SDiotTercero();
@@ -1038,10 +971,10 @@ public class SDiotLayout {
             layout += "\"" + miClient.getSessionXXX().getCurrentCompanyName() + "\"\n";
             layout += "\"Layout DIOT\"\n";
             layout += "\"Del " + SLibUtils.DateFormatDate.format(mtStart) + " al " + SLibUtils.DateFormatDate.format(mtEnd) + "\"\n";
-            layout += SDiotTercero.getLayoutRowHeadings() + "\n";
+            layout += SDiotTercero.getLayoutCsvHeadings() + "\n";
         }
         
-        // suppliers:
+        // third parties:
         
         for (SDiotTercero tercero : terceros) {
             if (format == SDiotConsts.FORMAT_CSV) {
@@ -1049,29 +982,31 @@ public class SDiotLayout {
             }
             
             if (tercero.isTotallyZero()) {
-                totallyZero++;
+                tercerosTotallyZero++;
             }
             
             if (tercero.IsGlobal) {
-                if (terceroCompany == null) {
-                    terceroCompany = tercero;
+                if (terceroGlobal == null) {
+                    terceroGlobal = tercero;
                 }
                 else {
-                    throw new Exception("Al menos existen dos terceros que corresponden a esta empresa (" + tercero.Rfc + ").");
+                    throw new Exception("El tercero con RFC: '" + tercero.Rfc + "' (" + tercero.getComparableKey() + ") no puede ser el tercero 'Global', puesto que ya existe uno.");
                 }
             }
             else {
-                if (!excludeTotallyZero || !tercero.isTotallyZero()) {
+                if (!excludeTercerosTotallyZero || !tercero.isTotallyZero()) {
                     layout += tercero.getLayoutRow(format) + "\n";
                 }
             }
         }
         
-        // company itself:
+        // global third party:
         
-        if (terceroCompany != null) {
-            layout += terceroCompany.getLayoutRow(format) + "\n";
+        if (terceroGlobal != null && (!excludeTercerosTotallyZero || !terceroGlobal.isTotallyZero())) {
+            layout += terceroGlobal.getLayoutRow(format) + "\n";
         }
+        
+        // layout summary:
         
         if (format == SDiotConsts.FORMAT_CSV) {
             DecimalFormat amountFormat = new DecimalFormat("#0.00");
@@ -1101,11 +1036,11 @@ public class SDiotLayout {
             layout += "\"Resumen:\"\n";
             layout += "\"renglones pólizas contables procesados:\"," + entries + "\n";
             layout += "\"renglones pólizas contables sin impuesto:\"," + entriesWithoutVat + ",\"(asignadas el impuesto predeterminado para DIOT: " + vatDefault.getTax() + ")\"\n";
-            layout += "\"renglones pólizas contables sin asociado de negocios:\"," + entriesWithoutBizPartner + ",\"(asignados a " + SDiotConsts.THIRD_GLOBAL_NAME + ")\"\n";
+            layout += "\"renglones pólizas contables sin asociado de negocios de catálogo:\"," + entriesWithoutCatalogBizPartner + ",\"(asignados a " + SDiotConsts.THIRD_GLOBAL_NAME + ")\"\n";
             layout += "\"renglones pólizas contables de la empresa '" + miClient.getSessionXXX().getCurrentCompanyName() + "':\"," + entriesForThisCompany + ",\"(incluidos en este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto igual a cero, pero de tipo IVA desconocido:\"," + entriesVatZeroUndefined + ",\"(excluidos de este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto distinto a cero, pero de tipo IVA desconocido:\"," + entriesVatNonZeroUndefined + ",\"(excluidos de este layout)\"\n";
-            layout += "\"terceros totalmente en cero:\"," + totallyZero + ",\"" + (excludeTotallyZero ? "(excluídos de este layout)" : "(incluidos en este layout)") + "\"\n";
+            layout += "\"terceros totalmente en cero:\"," + tercerosTotallyZero + ",\"" + (excludeTercerosTotallyZero ? "(excluídos de este layout)" : "(incluidos en este layout)") + "\"\n";
 
             layout += "\n";
             layout += "\"Liquidación de impuestos:\"\n";
@@ -1130,7 +1065,7 @@ public class SDiotLayout {
 
             layout += "\n";
             layout += "\"Excepciones:\"\n";
-            layout += warnings.isEmpty() ? "\"¡No hay excepciones!\"\n" : warnings; 
+            layout += warnings.isEmpty() ? "\"¡No hay excepciones!\"\n" : warnings;
         }
         
         return SLibUtils.textToAscii(layout);
@@ -1138,16 +1073,16 @@ public class SDiotLayout {
     
     private class DpsVatSetting {
         
-        public int TaxRegion;
-        public int ThirdTaxpayer;
+        public int TaxRegionId;
+        public int ThirdTaxpayerId;
         public double Subtotal;
         public double Tax;
         public boolean IsIgnored;
         public boolean IsThirdTaxpayer;
         
-        public DpsVatSetting(final int taxRegion, final int thirdTaxpayer, final double subtotal, final double tax) {
-            TaxRegion = taxRegion;
-            ThirdTaxpayer = thirdTaxpayer;
+        public DpsVatSetting(final int taxRegionId, final int thirdTaxpayerId, final double subtotal, final double tax) {
+            TaxRegionId = taxRegionId;
+            ThirdTaxpayerId = thirdTaxpayerId;
             Subtotal = subtotal;
             Tax = tax;
             IsIgnored = false;

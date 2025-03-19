@@ -10,6 +10,11 @@ import sa.lib.SLibUtils;
 
 /**
  * For DIOT layout valid since 2025-01-01.
+ * There are four types of tercero:
+ * 1. "empty tercero". Only for subtotals and totals in CSV DIOT. Not linked to any business partner. Type of third party: undefined. Type of operations: undefined.
+ * 2. "global tercero". Not linked to any business partner. Type of third party: domestic. Type of operations: other.
+ * 3. "standard tercero" for current company: Linked to current company. Type of third party: undefined. Type of operations: undefined.
+ * 4. "standard tercero" for third party: Linked to some business partner. Type of third party: according to the business partner. Type of operations: according to the business partner.
  * @author Sergio Flores
  */
 public class SDiotTercero implements Comparable<SDiotTercero> {
@@ -19,20 +24,15 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
      */
     public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.OPER_OTHER;
     
-    public static final DecimalFormat DecimalFormatPipe;
-    public static final DecimalFormat DecimalFormatCsv;
-    
-    static {
-        DecimalFormatPipe = new DecimalFormat("#0");
-        DecimalFormatCsv = new DecimalFormat("#0.00");
-    }
+    public boolean IsCurrentCompany;
+    public String Clave;
     
     // Third party:
     
-    public boolean IsGlobal;
-    public boolean IsDomestic;
+    public Boolean IsGlobal;
+    public Boolean IsDomestic;
     public int BizPartnerId;
-    public String BizPartnerOccasionalRfc; // fiscal ID (RFC) of occasional business partners that are not in catalog
+    public String OccasionalRfc; // RFC of occasional business partners that are not in catalog
     
     // 1. Datos del tercero declarado:
     
@@ -103,77 +103,128 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     public double DatPagosNoObjInt; // 53
     public String DatEfectosFiscales; // 54
     
-    public double XValorPagosNacIva1516; // 8
-    public double XValorPagosNacIva15; // 9
-    public double XIvaPagadoNoAcredNac1516; // 10
-    public double XValorPagosNacIva1011; // 11
-    public double XValorPagosNacIva10; // 12
-    public double XValorPagosNacIvaEstFront; // 13
-    public double XIvaPagadoNoAcredNac1011; // 14
-    public double XIvaPagadoNoAcredNacEstFront; // 15
-    public double XValorPagosImpIva1516; // 16
-    public double XIvaPagadoNoAcredImp1516; // 17
-    public double XValorPagosImpIva1011; // 18
-    public double XIvaPagadoNoAcredImp1011; // 19
-    public double XValorPagosImpIvaExento; // 20
-    public double XValorPagosNacIva0; // 21
-    public double XValorPagosNacIvaExento; // 22
-    public double XIvaRetenido; // 23
-    public double XIvaNotasCréditoCompras; // 24
+    protected static final DecimalFormat FormatPipe = new DecimalFormat("#0");
+    protected static final DecimalFormat FormatCsv = new DecimalFormat("#0.00");
     
     /**
-     * Create an empty tercero.
+     * Creates an "empty tercero".
      */
     public SDiotTercero() {
-        initTercero(false, true, 0, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, "", "", "");
+        initTerceroAsEmpty();
     }
     
     /**
-     * Create an occasional tercero.
-     * @param bizPartnerOccasionalRfc 
-     */
-    public SDiotTercero(final String bizPartnerOccasionalRfc) {
-        initTercero(false, true, 0, SDiotConsts.THIRD_DOMESTIC, SDiotConsts.OPER_OTHER, bizPartnerOccasionalRfc, "", bizPartnerOccasionalRfc);
-    }
-    
-    /**
-     * Create a tercero from a business partener.
-     * @param client
-     * @param bizPartner 
+     * Creates a "standard tercero" in normal conditions, or a "global tercero".
+     * @param client GUI client.
+     * @param bizPartner Business partner. When <code>null</code>, a "global tercero" is instantiated. When is current company, a "standard tercero" for current company is instantiated.
      */
     public SDiotTercero(final SClientInterface client, final SDataBizPartner bizPartner) {
-        if (bizPartner == null || isBizPartnerThisCompany(client, bizPartner.getPkBizPartnerId())) {
-            initTercero(true, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
+        if (bizPartner != null) {
+            if (!bizPartner.isCurrentCompany(client)) {
+                // "standard tercero"...
+                
+                boolean isDomestic = bizPartner.isDomestic(client);
+                
+                initTercero(false, Boolean.FALSE, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
+                
+                if (!isDomestic) {
+                    String countryDiotCode = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+
+                    TerExtNombre = bizPartner.getBizPartner();
+                    TerExtPaísResidencia = countryDiotCode;
+                    TerExtJurisdicción = "";
+                }
+            }
+            else {
+                // "standard tercero" for current company...
+                initTerceroAsCurrentCompany(bizPartner.getPkBizPartnerId(), bizPartner.getFiscalId());
+            }
         }
         else {
-            boolean isDomestic = bizPartner.isDomestic(client);
-
-            initTercero(false, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
-            
-            if (!isDomestic) {
-                String countryDiotCode = bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
-                
-                TerExtNombre = bizPartner.getBizPartner();
-                TerExtPaísResidencia = countryDiotCode;
-                TerExtJurisdicción = "";
-            }
+            // "global tercero"...
+            initTerceroAsGlobal();
         }
     }
     
-    private void initTercero(final boolean isGlobal, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String idFiscal, final String bizPartnerOcassionalRfc) {
-        IsGlobal = isGlobal;
-        IsDomestic = isDomestic;
-        BizPartnerId = bizPartnerId;
-        BizPartnerOccasionalRfc = bizPartnerOcassionalRfc;
+    /**
+     * Creates an "occasional tercero" in normal conditions, or a "standard tercero" or a "global tercero".
+     * @param client GUI client.
+     * @param occasionalRfc Occasional RFC. When <code>null</code> or empty, a "global tercero" is instantiated. When corresponds to current company, a "standard tercero" for current company is instantiated.
+     */
+    public SDiotTercero(final SClientInterface client, final String occasionalRfc) {
+        if (occasionalRfc != null && !occasionalRfc.isEmpty() && (occasionalRfc.length() == DCfdConsts.LEN_RFC_ORG || occasionalRfc.length() == DCfdConsts.LEN_RFC_PER)) {
+            SDataBizPartner bizPartner = client.getSessionXXX().getCurrentCompany().getDbmsDataCompany();
+            
+            if (!bizPartner.getFiscalId().equals(occasionalRfc)) {
+                // "occasional tercero"...
+                
+                boolean isDomestic = !occasionalRfc.equals(DCfdConsts.RFC_GEN_INT);
+                String tipoTercero = isDomestic ? SDiotConsts.THIRD_DOMESTIC : SDiotConsts.THIRD_INTERNAT;
+                
+                initTercero(false, Boolean.FALSE, isDomestic, 0, tipoTercero, SDiotConsts.OPER_OTHER, occasionalRfc, "", occasionalRfc);
+            }
+            else {
+                // "standard tercero" for current company...
+                initTerceroAsCurrentCompany(bizPartner.getPkBizPartnerId(), bizPartner.getFiscalId());
+            }
+        }
+        else {
+            // "global tercero"...
+            initTerceroAsGlobal();
+        }
+    }
+    
+    private void initTerceroAsEmpty() {
+        initTercero(false, null, null, 0, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, "", "", "");
+    }
+    
+    private void initTerceroAsGlobal() {
+        initTercero(false, Boolean.TRUE, Boolean.TRUE, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
+    }
+    
+    private void initTerceroAsCurrentCompany(final int bizPartnerId, final String rfc) {
+        initTercero(true, Boolean.FALSE, Boolean.TRUE, bizPartnerId, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, rfc, "", "");
+    }
+    
+    private void initTercero(final boolean isCurrentCompany, final Boolean isGlobal, final Boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal, final String occasionalRfc) {
+        IsCurrentCompany = isCurrentCompany;
         
-        TerTipoTercero = tipoTercero; // 1
-        TerTipoOperación = tipoOperación; // 2
-        TerRfc = rfc; // 3
-        TerExtIdFiscal = idFiscal; // 4
-        TerExtNombre = ""; // 5
-        TerExtPaísResidencia = ""; // 6
-        TerExtJurisdicción = ""; // 7
+        if (IsCurrentCompany) {
+            IsGlobal = false;
+            IsDomestic = true;
+            BizPartnerId = bizPartnerId;
+            OccasionalRfc = "";
 
+            TerTipoTercero = SDiotConsts.THIRD_UNDEF; // 1
+            TerTipoOperación = SDiotConsts.OPER_UNDEF; // 2
+            TerRfc = rfc; // 3
+            TerExtIdFiscal = ""; // 4
+            TerExtNombre = ""; // 5
+            TerExtPaísResidencia = ""; // 6
+            TerExtJurisdicción = ""; // 7
+        }
+        else {
+            IsGlobal = isGlobal;
+            IsDomestic = isDomestic;
+            BizPartnerId = bizPartnerId;
+            OccasionalRfc = occasionalRfc;
+
+            TerTipoTercero = tipoTercero; // 1
+            TerTipoOperación = tipoOperación; // 2
+            TerRfc = rfc; // 3
+            TerExtIdFiscal = extIdFiscal; // 4
+            TerExtNombre = ""; // 5
+            TerExtPaísResidencia = ""; // 6
+            TerExtJurisdicción = ""; // 7
+        }
+        
+        if (IsGlobal != null) {
+            Clave = IsGlobal ? GLOBAL_CLAVE : ((isOccasional() ? OccasionalRfc : BizPartnerId) + "-" + TerTipoOperación);
+        }
+        else {
+            Clave = ""; // no need for any "clave"
+        }
+        
         ValFrontNtePagos = 0; // 8
         ValFrontNteReembs = 0; // 9
         ValFrontSurPagos = 0; // 10
@@ -226,14 +277,6 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         DatEfectosFiscales = SDiotConsts.TAX_EFFECT_YES; // 54
     }
     
-    /**
-     * Get clave of Tercero.
-     * @return When tercero is ocassional: BizPartnerOcassionalRfc + '-' + TipoOperación; otherwise: BizPartnerId + '-' + TipoOperación.
-     */
-    public String getTerceroClave() {
-        return IsGlobal ? GLOBAL_CLAVE : ((isOccasional() ? BizPartnerOccasionalRfc : BizPartnerId) + "-" + TerTipoOperación);
-    }
-    
     public String getComparableKey() {
         return
                 TerTipoTercero + "-" + // 1
@@ -242,11 +285,11 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
                 TerExtIdFiscal + "-" + // 4
                 TerExtNombre + "-" + // 5
                 TerExtPaísResidencia + "-" + // 6
-                TerExtJurisdicción;// 7
+                TerExtJurisdicción; // 7
     }
     
     public boolean isOccasional() {
-        return !BizPartnerOccasionalRfc.isEmpty();
+        return !OccasionalRfc.isEmpty();
     }
     
     public boolean isTotallyZero() {
@@ -363,31 +406,44 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     public String getLayoutRow(int formatType) throws Exception {
         String row = "";
         String separator = "";
+        String efectosFiscales = "";
         DecimalFormat format = null;
         
+        // calculate VAT creditable:
+
+        AcrFrontNteGravs = SLibUtils.roundAmount((ValFrontNtePagos - ValFrontNteReembs) * SDiotConsts.VatRates.get(SDiotConsts.VAT_TYPE_BORDER_N));
+        AcrFrontSurGravs = SLibUtils.roundAmount((ValFrontSurPagos - ValFrontSurReembs) * SDiotConsts.VatRates.get(SDiotConsts.VAT_TYPE_BORDER_S));
+        AcrTasaGralNacGravs = SLibUtils.roundAmount((ValTasaGralNacPagos - ValTasaGralNacReembs) * SDiotConsts.VatRates.get(SDiotConsts.VAT_TYPE_GENERAL));
+        AcrTasaGralIntProdsGravs = SLibUtils.roundAmount((ValTasaGralIntProdsPagos - ValTasaGralIntProdsReembs) * SDiotConsts.VatRates.get(SDiotConsts.VAT_TYPE_GENERAL));
+        AcrTasaGralIntServsGravs = SLibUtils.roundAmount((ValTasaGralIntServsPagos - ValTasaGralIntServsReembs) * SDiotConsts.VatRates.get(SDiotConsts.VAT_TYPE_GENERAL));
+                
+        // compose layout row:
+                
         switch (formatType) {
             case SDiotConsts.FORMAT_PIPE:
                 separator = "|";
-                format = DecimalFormatPipe;
-                row = TerTipoTercero + separator +
-                        TerTipoOperación + separator +
-                        TerRfc + separator +
-                        TerExtIdFiscal + separator +
-                        TerExtNombre + separator +
-                        TerExtPaísResidencia + separator +
-                        TerExtJurisdicción + separator;
+                format = FormatPipe;
+                row =   TerTipoTercero + separator + // 1
+                        TerTipoOperación + separator + // 2
+                        TerRfc + separator + // 3
+                        TerExtIdFiscal + separator + // 4
+                        TerExtNombre + separator + // 5
+                        TerExtPaísResidencia + separator + // 6
+                        TerExtJurisdicción + separator; // 7
+                efectosFiscales = DatEfectosFiscales;  // 54
                 break;
                 
             case SDiotConsts.FORMAT_CSV:
                 separator = ",";
-                format = DecimalFormatCsv;
-                row = "\"" + TerTipoTercero + "\"" + separator +
-                        "\"" + TerTipoOperación + "\"" + separator +
-                        "\"" + TerRfc + "\"" + separator +
-                        "\"" + TerExtIdFiscal + "\"" + separator +
-                        "\"" + TerExtNombre + "\"" + separator +
-                        "\"" + TerExtPaísResidencia + "\"" + separator +
-                        "\"" + TerExtJurisdicción + "\"" + separator;
+                format = FormatCsv;
+                row =   "\"" + TerTipoTercero + "\"" + separator + // 1
+                        "\"" + TerTipoOperación + "\"" + separator + // 2
+                        "\"" + TerRfc + "\"" + separator + // 3
+                        "\"" + TerExtIdFiscal + "\"" + separator + // 4
+                        "\"" + TerExtNombre + "\"" + separator + // 5
+                        "\"" + TerExtPaísResidencia + "\"" + separator + // 6
+                        "\"" + TerExtJurisdicción + "\"" + separator; // 7
+                efectosFiscales = "\"" + DatEfectosFiscales + "\""; // 54
                 break;
                 
             default:
@@ -396,163 +452,247 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
         
         return row +
                 (ValFrontNtePagos == 0 ? "" : format.format(ValFrontNtePagos)) + separator + // 8
-                (ValFrontNteReembs == 0) + separator + // 9
-                (ValFrontSurPagos == 0) + separator + // 10
-                (ValFrontSurReembs == 0) + separator + // 11
-                (ValTasaGralNacPagos == 0) + separator + // 12
-                (ValTasaGralNacReembs == 0) + separator + // 13
-                (ValTasaGralIntProdsPagos == 0) + separator + // 14
-                (ValTasaGralIntProdsReembs == 0) + separator + // 15
-                (ValTasaGralIntServsPagos == 0) + separator + // 16
-                (ValTasaGralIntServsReembs == 0) + separator + // 17
+                (ValFrontNteReembs == 0 && ValFrontNteReembs == 0 ? "" : format.format(ValFrontNteReembs)) + separator + // 9
+                (ValFrontSurPagos == 0 ? "" : format.format(ValFrontSurPagos)) + separator + // 10
+                (ValFrontSurReembs == 0 && ValFrontSurReembs == 0 ? "" : format.format(ValFrontSurReembs)) + separator + // 11
+                (ValTasaGralNacPagos == 0 ? "" : format.format(ValTasaGralNacPagos)) + separator + // 12
+                (ValTasaGralNacReembs == 0 && ValTasaGralNacReembs == 0 ? "" : format.format(ValTasaGralNacReembs)) + separator + // 13
+                (ValTasaGralIntProdsPagos == 0 ? "" : format.format(ValTasaGralIntProdsPagos)) + separator + // 14
+                (ValTasaGralIntProdsReembs == 0 && ValTasaGralIntProdsReembs == 0 ? "" : format.format(ValTasaGralIntProdsReembs)) + separator + // 15
+                (ValTasaGralIntServsPagos == 0 ? "" : format.format(ValTasaGralIntServsPagos)) + separator + // 16
+                (ValTasaGralIntServsReembs == 0 && ValTasaGralIntServsReembs == 0 ? "" : format.format(ValTasaGralIntServsReembs)) + separator + // 17
 
-                (AcrFrontNteGravs == 0) + separator + // 18
-                (AcrFrontNteProp == 0) + separator + // 19
-                (AcrFrontSurGravs == 0) + separator + // 20
-                (AcrFrontSurProp == 0) + separator + // 21
-                (AcrTasaGralNacGravs == 0) + separator + // 22
-                (AcrTasaGralNacProp == 0) + separator + // 23
-                (AcrTasaGralIntProdsGravs == 0) + separator + // 24
-                (AcrTasaGralIntProdsProp == 0) + separator + // 25
-                (AcrTasaGralIntServsGravs == 0) + separator + // 26
-                (AcrTasaGralIntServsProp == 0) + separator + // 27
+                (AcrFrontNteGravs == 0 && AcrFrontNteGravs == 0 ? "" : format.format(AcrFrontNteGravs)) + separator + // 18
+                (AcrFrontNteProp == 0 && AcrFrontNteProp == 0 ? "" : format.format(AcrFrontNteProp)) + separator + // 19
+                (AcrFrontSurGravs == 0 && AcrFrontSurGravs == 0 ? "" : format.format(AcrFrontSurGravs)) + separator + // 20
+                (AcrFrontSurProp == 0 && AcrFrontSurProp == 0 ? "" : format.format(AcrFrontSurProp)) + separator + // 21
+                (AcrTasaGralNacGravs == 0 && AcrTasaGralNacGravs == 0 ? "" : format.format(AcrTasaGralNacGravs)) + separator + // 22
+                (AcrTasaGralNacProp == 0 && AcrTasaGralNacProp == 0 ? "" : format.format(AcrTasaGralNacProp)) + separator + // 23
+                (AcrTasaGralIntProdsGravs == 0 && AcrTasaGralIntProdsGravs == 0 ? "" : format.format(AcrTasaGralIntProdsGravs)) + separator + // 24
+                (AcrTasaGralIntProdsProp == 0 && AcrTasaGralIntProdsProp == 0 ? "" : format.format(AcrTasaGralIntProdsProp)) + separator + // 25
+                (AcrTasaGralIntServsGravs == 0 && AcrTasaGralIntServsGravs == 0 ? "" : format.format(AcrTasaGralIntServsGravs)) + separator + // 26
+                (AcrTasaGralIntServsProp == 0 && AcrTasaGralIntServsProp == 0 ? "" : format.format(AcrTasaGralIntServsProp)) + separator + // 27
 
-                (NoAcrFrontNteProp == 0) + separator + // 28
-                (NoAcrFrontNteNoReq == 0) + separator + // 29
-                (NoAcrFrontNteExent == 0) + separator + // 30
-                (NoAcrFrontNteNoObj == 0) + separator + // 31
-                (NoAcrFrontSurProp == 0) + separator + // 32
-                (NoAcrFrontSurNoReq == 0) + separator + // 33
-                (NoAcrFrontSurExent == 0) + separator + // 34
-                (NoAcrFrontSurNoObj == 0) + separator + // 35
-                (NoAcrTasaGralNacProp == 0) + separator + // 36
-                (NoAcrTasaGralNacNoReq == 0) + separator + // 37
-                (NoAcrTasaGralNacExent == 0) + separator + // 38
-                (NoAcrTasaGralNacNoObj == 0) + separator + // 39
-                (NoAcrTasaGralIntProdsProp == 0) + separator + // 40
-                (NoAcrTasaGralIntProdsNoReq == 0) + separator + // 41
-                (NoAcrTasaGralIntProdsExent == 0) + separator + // 42
-                (NoAcrTasaGralIntProdsNoObj == 0) + separator + // 43
-                (NoAcrTasaGralIntServsProp == 0) + separator + // 44
-                (NoAcrTasaGralIntServsNoReq == 0) + separator + // 45
-                (NoAcrTasaGralIntServsExent == 0) + separator + // 46
-                (NoAcrTasaGralIntServsNoObj == 0) + separator + // 47
+                (NoAcrFrontNteProp == 0 ? "" : format.format(NoAcrFrontNteProp)) + separator + // 28
+                (NoAcrFrontNteNoReq == 0 ? "" : format.format(NoAcrFrontNteNoReq)) + separator + // 29
+                (NoAcrFrontNteExent == 0 ? "" : format.format(NoAcrFrontNteExent)) + separator + // 30
+                (NoAcrFrontNteNoObj == 0 ? "" : format.format(NoAcrFrontNteNoObj)) + separator + // 31
+                (NoAcrFrontSurProp == 0 ? "" : format.format(NoAcrFrontSurProp)) + separator + // 32
+                (NoAcrFrontSurNoReq == 0 ? "" : format.format(NoAcrFrontSurNoReq)) + separator + // 33
+                (NoAcrFrontSurExent == 0 ? "" : format.format(NoAcrFrontSurExent)) + separator + // 34
+                (NoAcrFrontSurNoObj == 0 ? "" : format.format(NoAcrFrontSurNoObj)) + separator + // 35
+                (NoAcrTasaGralNacProp == 0 ? "" : format.format(NoAcrTasaGralNacProp)) + separator + // 36
+                (NoAcrTasaGralNacNoReq == 0 ? "" : format.format(NoAcrTasaGralNacNoReq)) + separator + // 37
+                (NoAcrTasaGralNacExent == 0 ? "" : format.format(NoAcrTasaGralNacExent)) + separator + // 38
+                (NoAcrTasaGralNacNoObj == 0 ? "" : format.format(NoAcrTasaGralNacNoObj)) + separator + // 39
+                (NoAcrTasaGralIntProdsProp == 0 ? "" : format.format(NoAcrTasaGralIntProdsProp)) + separator + // 40
+                (NoAcrTasaGralIntProdsNoReq == 0 ? "" : format.format(NoAcrTasaGralIntProdsNoReq)) + separator + // 41
+                (NoAcrTasaGralIntProdsExent == 0 ? "" : format.format(NoAcrTasaGralIntProdsExent)) + separator + // 42
+                (NoAcrTasaGralIntProdsNoObj == 0 ? "" : format.format(NoAcrTasaGralIntProdsNoObj)) + separator + // 43
+                (NoAcrTasaGralIntServsProp == 0 ? "" : format.format(NoAcrTasaGralIntServsProp)) + separator + // 44
+                (NoAcrTasaGralIntServsNoReq == 0 ? "" : format.format(NoAcrTasaGralIntServsNoReq)) + separator + // 45
+                (NoAcrTasaGralIntServsExent == 0 ? "" : format.format(NoAcrTasaGralIntServsExent)) + separator + // 46
+                (NoAcrTasaGralIntServsNoObj == 0 ? "" : format.format(NoAcrTasaGralIntServsNoObj)) + separator + // 47
 
-                (DatIvaRetenido == 0) + separator + // 48
-                (DatPagosExentInt == 0) + separator + // 49
-                (DatPagosExentNac == 0) + separator + // 50
-                (DatPagosTasa0Nac == 0) + separator + // 51
-                (DatPagosNoObjNac == 0) + separator + // 52
-                (DatPagosNoObjInt == 0) + separator + // 53
-        
-                (XValorPagosNacIva1516 == 0 ? "" : format.format(XValorPagosNacIva1516)) + separator +
-                (XValorPagosNacIva15 == 0 ? "" : format.format(XValorPagosNacIva15)) + separator +
-                (XIvaPagadoNoAcredNac1516 == 0 ? "" : format.format(XIvaPagadoNoAcredNac1516)) + separator +
-                (XValorPagosNacIva1011 == 0 ? "" : format.format(XValorPagosNacIva1011)) + separator +
-                (XValorPagosNacIva10 == 0 ? "" : format.format(XValorPagosNacIva10)) + separator +
-                (XValorPagosNacIvaEstFront == 0 ? "" : format.format(XValorPagosNacIvaEstFront)) + separator +
-                (XIvaPagadoNoAcredNac1011 == 0 ? "" : format.format(XIvaPagadoNoAcredNac1011)) + separator +
-                (XIvaPagadoNoAcredNacEstFront == 0 ? "" : format.format(XIvaPagadoNoAcredNacEstFront)) + separator +
-                (XValorPagosImpIva1516 == 0 ? "" : format.format(XValorPagosImpIva1516)) + separator +
-                (XIvaPagadoNoAcredImp1516 == 0 ? "" : format.format(XIvaPagadoNoAcredImp1516)) + separator +
-                (XValorPagosImpIva1011 == 0 ? "" : format.format(XValorPagosImpIva1011)) + separator +
-                (XIvaPagadoNoAcredImp1011 == 0 ? "" : format.format(XIvaPagadoNoAcredImp1011)) + separator +
-                (XValorPagosImpIvaExento == 0 ? "" : format.format(XValorPagosImpIvaExento)) + separator +
-                (XValorPagosNacIva0 == 0 ? "" : format.format(XValorPagosNacIva0)) + separator +
-                (XValorPagosNacIvaExento == 0 ? "" : format.format(XValorPagosNacIvaExento)) + separator +
-                (XIvaRetenido == 0 ? "" : format.format(XIvaRetenido)) + separator +
-                (XIvaNotasCréditoCompras == 0 ? "" : format.format(XIvaNotasCréditoCompras));
+                (DatIvaRetenido == 0 ? "" : format.format(DatIvaRetenido)) + separator + // 48
+                (DatPagosExentInt == 0 ? "" : format.format(DatPagosExentInt)) + separator + // 49
+                (DatPagosExentNac == 0 ? "" : format.format(DatPagosExentNac)) + separator + // 50
+                (DatPagosTasa0Nac == 0 ? "" : format.format(DatPagosTasa0Nac)) + separator + // 51
+                (DatPagosNoObjNac == 0 ? "" : format.format(DatPagosNoObjNac)) + separator + // 52
+                (DatPagosNoObjInt == 0 ? "" : format.format(DatPagosNoObjInt)) + separator + // 53
+                efectosFiscales; // 54
     }
     
-    @Override
-    public String toString() {
-        String string = "";
-        
-        string += "ValorPagosNacIva1516: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIva1516) + "; "; // 8
-        string += "ValorPagosNacIva15: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIva15) + "; "; // 9
-        string += "IvaPagadoNoAcredNac1516: " + SLibUtils.getDecimalFormatAmount().format(XIvaPagadoNoAcredNac1516) + "; "; // 10
-        string += "ValorPagosNacIva1011: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIva1011) + "; "; // 11
-        string += "ValorPagosNacIva10: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIva10) + "; "; // 12
-        string += "ValorPagosNacIvaEstFront: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIvaEstFront) + "; "; // 13
-        string += "IvaPagadoNoAcredNac1011: " + SLibUtils.getDecimalFormatAmount().format(XIvaPagadoNoAcredNac1011) + "; "; // 14
-        string += "IvaPagadoNoAcredNacEstFront: " + SLibUtils.getDecimalFormatAmount().format(XIvaPagadoNoAcredNacEstFront) + "; "; // 15
-        string += "ValorPagosImpIva1516: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosImpIva1516) + "; "; // 16
-        string += "IvaPagadoNoAcredImp1516: " + SLibUtils.getDecimalFormatAmount().format(XIvaPagadoNoAcredImp1516) + "; "; // 17
-        string += "ValorPagosImpIva1011: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosImpIva1011) + "; "; // 18
-        string += "IvaPagadoNoAcredImp1011: " + SLibUtils.getDecimalFormatAmount().format(XIvaPagadoNoAcredImp1011) + "; "; // 19
-        string += "ValorPagosImpIvaExento: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosImpIvaExento) + "; "; // 20
-        string += "ValorPagosNacIva0: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIva0) + "; "; // 21
-        string += "ValorPagosNacIvaExento: " + SLibUtils.getDecimalFormatAmount().format(XValorPagosNacIvaExento) + "; "; // 22
-        string += "IvaRetenido: " + SLibUtils.getDecimalFormatAmount().format(XIvaRetenido) + "; "; // 23
-        string += "IvaNotasCréditoCompras: " + SLibUtils.getDecimalFormatAmount().format(XIvaNotasCréditoCompras); // 24
-        
-        return string;
-    }
-    
-    public static String getLayoutRowHeadings() {
-        return "\"1. Tipo de tercero\"," +
-                "\"2. Tipo de operación\"," +
-                "\"3. Registro Federal de Contribuyentes\"," +
-                "\"4. Número de ID fiscal\"," +
-                "\"5. Nombre del extranjero\"," +
-                "\"6. País de residencia\"," +
-                "\"7. Nacionalidad\"," +
-                "\"8. Valor de los actos o actividades pagados a la tasa del 15% ó 16% de IVA\"," +
-                "\"9. Valor de los actos o actividades pagados a la tasa del 15% de IVA\"," +
-                "\"10. Monto del IVA pagado no acreditable a la tasa del 15% ó 16% (correspondiente en la proporción de las deducciones autorizadas)\"," +
-                "\"11. Valor de los actos o actividades pagados a la tasa del 10% u 11% de IVA\"," +
-                "\"12. Valor de los actos o actividades pagados a la tasa del 10% de IVA\"," +
-                "\"13. Valor de los actos o actividades pagados sujeto al estimulo de la region fronteriza norte\"," +
-                "\"14. Monto del IVA pagado no acreditable a la tasa del 10% u 11% (correspondiente en la proporción de las deducciones autorizadas)\"," +
-                "\"15. Monto del IVA pagado no acreditable sujeto al estimulo de la region fronteriza norte (correspondiente en la proporcion de las deducciones autorizadas)\"," +
-                "\"16. Valor de los actos o actividades pagados en la importación de bienes y servicios a la tasa del 15% ó 16% de  IVA\"," +
-                "\"17. Monto del IVA pagado no acreditable por la importación  a la tasa del 15% ó 16% (correspondiente en la proporción de las deducciones autorizadas)\"," +
-                "\"18. Valor de los actos o actividades pagados en la importación de bienes y servicios a la tasa del 10% u 11% de IVA\"," +
-                "\"19. Monto del IVA pagado no acreditable por la importación a la tasa del 10% u 11% (correspondiente en la proporción de las deducciones autorizadas)\"," +
-                "\"20. Valor de los actos o actividades pagados en la importación de bienes y servicios por los que no se paragá el IVA (Exentos)\"," +
-                "\"21. Valor de los demás actos o actividades pagados a la tasa del 0% de IVA\"," +
-                "\"22. Valor de los actos o actividades pagados por los que no se pagará el IVA (Exentos)\"," +
-                "\"23. IVA Retenido por el contribuyente\"," +
-                "\"24. IVA correspondiente a las devoluciones, descuentos y bonificaciones sobre compras\"";
-    }
-    
-    public static boolean isBizPartnerThisCompany(final SClientInterface client, final int bizPartnerId) {
-        return bizPartnerId == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
-    }
-    
-    public static String composeOccasionalClave(final String occasionalBizPartnerRfc) {
-        return occasionalBizPartnerRfc + "-" + SDiotConsts.OPER_OTHER;
-    }
-
     @Override
     public int compareTo(SDiotTercero other) {
         return this.getComparableKey().compareTo(other.getComparableKey());
     }
     
     @Override
+    public String toString() {
+        String string = "";
+        
+        string += "ValFrontNtePagos: " + SLibUtils.getDecimalFormatAmount().format(ValFrontNtePagos) + "; "; // 8
+        string += "ValFrontNteReembs: " + SLibUtils.getDecimalFormatAmount().format(ValFrontNteReembs) + "; "; // 9
+        string += "ValFrontSurPagos: " + SLibUtils.getDecimalFormatAmount().format(ValFrontSurPagos) + "; "; // 10
+        string += "ValFrontSurReembs: " + SLibUtils.getDecimalFormatAmount().format(ValFrontSurReembs) + "; "; // 11
+        string += "ValTasaGralNacPagos: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralNacPagos) + "; "; // 12
+        string += "ValTasaGralNacReembs: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralNacReembs) + "; "; // 13
+        string += "ValTasaGralIntProdsPagos: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralIntProdsPagos) + "; "; // 14
+        string += "ValTasaGralIntProdsReembs: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralIntProdsReembs) + "; "; // 15
+        string += "ValTasaGralIntServsPagos: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralIntServsPagos) + "; "; // 16
+        string += "ValTasaGralIntServsReembs: " + SLibUtils.getDecimalFormatAmount().format(ValTasaGralIntServsReembs) + "; "; // 17
+
+        string += "AcrFrontNteGravs: " + SLibUtils.getDecimalFormatAmount().format(AcrFrontNteGravs) + "; "; // 18
+        string += "AcrFrontNteProp: " + SLibUtils.getDecimalFormatAmount().format(AcrFrontNteProp) + "; "; // 19
+        string += "AcrFrontSurGravs: " + SLibUtils.getDecimalFormatAmount().format(AcrFrontSurGravs) + "; "; // 20
+        string += "AcrFrontSurProp: " + SLibUtils.getDecimalFormatAmount().format(AcrFrontSurProp) + "; "; // 21
+        string += "AcrTasaGralNacGravs: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralNacGravs) + "; "; // 22
+        string += "AcrTasaGralNacProp: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralNacProp) + "; "; // 23
+        string += "AcrTasaGralIntProdsGravs: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralIntProdsGravs) + "; "; // 24
+        string += "AcrTasaGralIntProdsProp: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralIntProdsProp) + "; "; // 25
+        string += "AcrTasaGralIntServsGravs: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralIntServsGravs) + "; "; // 26
+        string += "AcrTasaGralIntServsProp: " + SLibUtils.getDecimalFormatAmount().format(AcrTasaGralIntServsProp) + "; "; // 27
+
+        string += "NoAcrFrontNteProp: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontNteProp) + "; "; // 28
+        string += "NoAcrFrontNteNoReq: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontNteNoReq) + "; "; // 29
+        string += "NoAcrFrontNteExent: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontNteExent) + "; "; // 30
+        string += "NoAcrFrontNteNoObj: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontNteNoObj) + "; "; // 31
+        string += "NoAcrFrontSurProp: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontSurProp) + "; "; // 32
+        string += "NoAcrFrontSurNoReq: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontSurNoReq) + "; "; // 33
+        string += "NoAcrFrontSurExent: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontSurExent) + "; "; // 34
+        string += "NoAcrFrontSurNoObj: " + SLibUtils.getDecimalFormatAmount().format(NoAcrFrontSurNoObj) + "; "; // 35
+        string += "NoAcrTasaGralNacProp: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralNacProp) + "; "; // 36
+        string += "NoAcrTasaGralNacNoReq: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralNacNoReq) + "; "; // 37
+        string += "NoAcrTasaGralNacExent: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralNacExent) + "; "; // 38
+        string += "NoAcrTasaGralNacNoObj: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralNacNoObj) + "; "; // 39
+        string += "NoAcrTasaGralIntProdsProp: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntProdsProp) + "; "; // 40
+        string += "NoAcrTasaGralIntProdsNoReq: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntProdsNoReq) + "; "; // 41
+        string += "NoAcrTasaGralIntProdsExent: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntProdsExent) + "; "; // 42
+        string += "NoAcrTasaGralIntProdsNoObj: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntProdsNoObj) + "; "; // 43
+        string += "NoAcrTasaGralIntServsProp: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntServsProp) + "; "; // 44
+        string += "NoAcrTasaGralIntServsNoReq: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntServsNoReq) + "; "; // 45
+        string += "NoAcrTasaGralIntServsExent: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntServsExent) + "; "; // 46
+        string += "NoAcrTasaGralIntServsNoObj: " + SLibUtils.getDecimalFormatAmount().format(NoAcrTasaGralIntServsNoObj) + "; "; // 47
+
+        string += "DatIvaRetenido: " + SLibUtils.getDecimalFormatAmount().format(DatIvaRetenido) + "; "; // 48
+        string += "DatPagosExentInt: " + SLibUtils.getDecimalFormatAmount().format(DatPagosExentInt) + "; "; // 49
+        string += "DatPagosExentNac: " + SLibUtils.getDecimalFormatAmount().format(DatPagosExentNac) + "; "; // 50
+        string += "DatPagosTasa0Nac: " + SLibUtils.getDecimalFormatAmount().format(DatPagosTasa0Nac) + "; "; // 51
+        string += "DatPagosNoObjNac: " + SLibUtils.getDecimalFormatAmount().format(DatPagosNoObjNac) + "; "; // 52
+        string += "DatPagosNoObjInt: " + SLibUtils.getDecimalFormatAmount().format(DatPagosNoObjInt) + "; "; // 53
+        string += "DatEfectosFiscales: " + DatEfectosFiscales; // 54
+        
+        return string;
+    }
+
+    @Override
     public SDiotTercero clone() {
         SDiotTercero cloned = new SDiotTercero();
         
-        cloned.initTercero(this.IsGlobal, this.IsDomestic, this.BizPartnerId, this.TerTipoTercero, this.TerTipoOperación, this.TerRfc, this.TerExtIdFiscal, this.BizPartnerOccasionalRfc);
+        cloned.initTercero(this.IsCurrentCompany, this.IsGlobal, this.IsDomestic, this.BizPartnerId, this.TerTipoTercero, this.TerTipoOperación, this.TerRfc, this.TerExtIdFiscal, this.OccasionalRfc);
+        
+        cloned.TerExtNombre = this.TerExtNombre; // 5
+        cloned.TerExtPaísResidencia = this.TerExtPaísResidencia; // 6
+        cloned.TerExtJurisdicción = this.TerExtJurisdicción; // 7
 
-        cloned.XValorPagosNacIva1516 = this.XValorPagosNacIva1516; // 8
-        cloned.XValorPagosNacIva15 = this.XValorPagosNacIva15; // 9
-        cloned.XIvaPagadoNoAcredNac1516 = this.XIvaPagadoNoAcredNac1516; // 10
-        cloned.XValorPagosNacIva1011 = this.XValorPagosNacIva1011; // 11
-        cloned.XValorPagosNacIva10 = this.XValorPagosNacIva10; // 12
-        cloned.XValorPagosNacIvaEstFront = this.XValorPagosNacIvaEstFront; // 13
-        cloned.XIvaPagadoNoAcredNac1011 = this.XIvaPagadoNoAcredNac1011; // 14
-        cloned.XIvaPagadoNoAcredNacEstFront = this.XIvaPagadoNoAcredNacEstFront; // 15
-        cloned.XValorPagosImpIva1516 = this.XValorPagosImpIva1516; // 16
-        cloned.XIvaPagadoNoAcredImp1516 = this.XIvaPagadoNoAcredImp1516; // 17
-        cloned.XValorPagosImpIva1011 = this.XValorPagosImpIva1011; // 18
-        cloned.XIvaPagadoNoAcredImp1011 = this.XIvaPagadoNoAcredImp1011; // 19
-        cloned.XValorPagosImpIvaExento = this.XValorPagosImpIvaExento; // 20
-        cloned.XValorPagosNacIva0 = this.XValorPagosNacIva0; // 21
-        cloned.XValorPagosNacIvaExento = this.XValorPagosNacIvaExento; // 22
-        cloned.XIvaRetenido = this.XIvaRetenido; // 23
-        cloned.XIvaNotasCréditoCompras = this.XIvaNotasCréditoCompras; // 24
+        cloned.ValFrontNtePagos = this.ValFrontNtePagos; // 8
+        cloned.ValFrontNteReembs = this.ValFrontNteReembs; // 9
+        cloned.ValFrontSurPagos = this.ValFrontSurPagos; // 10
+        cloned.ValFrontSurReembs = this.ValFrontSurReembs; // 11
+        cloned.ValTasaGralNacPagos = this.ValTasaGralNacPagos; // 12
+        cloned.ValTasaGralNacReembs = this.ValTasaGralNacReembs; // 13
+        cloned.ValTasaGralIntProdsPagos = this.ValTasaGralIntProdsPagos; // 14
+        cloned.ValTasaGralIntProdsReembs = this.ValTasaGralIntProdsReembs; // 15
+        cloned.ValTasaGralIntServsPagos = this.ValTasaGralIntServsPagos; // 16
+        cloned.ValTasaGralIntServsReembs = this.ValTasaGralIntServsReembs; // 17
+
+        cloned.AcrFrontNteGravs = this.AcrFrontNteGravs; // 18
+        cloned.AcrFrontNteProp = this.AcrFrontNteProp; // 19
+        cloned.AcrFrontSurGravs = this.AcrFrontSurGravs; // 20
+        cloned.AcrFrontSurProp = this.AcrFrontSurProp; // 21
+        cloned.AcrTasaGralNacGravs = this.AcrTasaGralNacGravs; // 22
+        cloned.AcrTasaGralNacProp = this.AcrTasaGralNacProp; // 23
+        cloned.AcrTasaGralIntProdsGravs = this.AcrTasaGralIntProdsGravs; // 24
+        cloned.AcrTasaGralIntProdsProp = this.AcrTasaGralIntProdsProp; // 25
+        cloned.AcrTasaGralIntServsGravs = this.AcrTasaGralIntServsGravs; // 26
+        cloned.AcrTasaGralIntServsProp = this.AcrTasaGralIntServsProp; // 27
+
+        cloned.NoAcrFrontNteProp = this.NoAcrFrontNteProp; // 28
+        cloned.NoAcrFrontNteNoReq = this.NoAcrFrontNteNoReq; // 29
+        cloned.NoAcrFrontNteExent = this.NoAcrFrontNteExent; // 30
+        cloned.NoAcrFrontNteNoObj = this.NoAcrFrontNteNoObj; // 31
+        cloned.NoAcrFrontSurProp = this.NoAcrFrontSurProp; // 32
+        cloned.NoAcrFrontSurNoReq = this.NoAcrFrontSurNoReq; // 33
+        cloned.NoAcrFrontSurExent = this.NoAcrFrontSurExent; // 34
+        cloned.NoAcrFrontSurNoObj = this.NoAcrFrontSurNoObj; // 35
+        cloned.NoAcrTasaGralNacProp = this.NoAcrTasaGralNacProp; // 36
+        cloned.NoAcrTasaGralNacNoReq = this.NoAcrTasaGralNacNoReq; // 37
+        cloned.NoAcrTasaGralNacExent = this.NoAcrTasaGralNacExent; // 38
+        cloned.NoAcrTasaGralNacNoObj = this.NoAcrTasaGralNacNoObj; // 39
+        cloned.NoAcrTasaGralIntProdsProp = this.NoAcrTasaGralIntProdsProp; // 40
+        cloned.NoAcrTasaGralIntProdsNoReq = this.NoAcrTasaGralIntProdsNoReq; // 41
+        cloned.NoAcrTasaGralIntProdsExent = this.NoAcrTasaGralIntProdsExent; // 42
+        cloned.NoAcrTasaGralIntProdsNoObj = this.NoAcrTasaGralIntProdsNoObj; // 43
+        cloned.NoAcrTasaGralIntServsProp = this.NoAcrTasaGralIntServsProp; // 44
+        cloned.NoAcrTasaGralIntServsNoReq = this.NoAcrTasaGralIntServsNoReq; // 45
+        cloned.NoAcrTasaGralIntServsExent = this.NoAcrTasaGralIntServsExent; // 46
+        cloned.NoAcrTasaGralIntServsNoObj = this.NoAcrTasaGralIntServsNoObj; // 47
+
+        cloned.DatIvaRetenido = this.DatIvaRetenido; // 48
+        cloned.DatPagosExentInt = this.DatPagosExentInt; // 49
+        cloned.DatPagosExentNac = this.DatPagosExentNac; // 50
+        cloned.DatPagosTasa0Nac = this.DatPagosTasa0Nac; // 51
+        cloned.DatPagosNoObjNac = this.DatPagosNoObjNac; // 52
+        cloned.DatPagosNoObjInt = this.DatPagosNoObjInt; // 53
+        cloned.DatEfectosFiscales = this.DatEfectosFiscales; // 54
         
         return cloned;
+    }
+    
+    public static String composeOccasionalClave(final String occasionalBizPartnerRfc) {
+        return occasionalBizPartnerRfc + "-" + SDiotConsts.OPER_OTHER;
+    }
+    
+    public static String getLayoutCsvHeadings() {
+        return
+                "\"1. Tipo de tercero\"," +
+                "\"2. Tipo de operación\"," +
+                "\"3. Registro Federal de Contribuyentes\"," +
+                "\"4. Número de identificación fiscal\"," +
+                "\"5. Nombre del extranjero\"," +
+                "\"6. País o jurisdicción de residencia fiscal\"," +
+                "\"7. Especificar lugar de jurisdicción fiscal\"," +
+                
+                "\"8. Valor total de actos o actividades pagadas/ Región fronteriza norte\"," +
+                "\"9. Devoluciones, descuentos y bonificaciones/ Región fronteriza norte\"," +
+                "\"10. Valor total de actos o actividades pagadas/ Región fronteriza sur\"," +
+                "\"11. Devoluciones, descuentos y bonificaciones/ Región fronteriza sur\"," +
+                "\"12. Valor total de actos o actividades pagadas/ Tasa del 16% de IVA\"," +
+                "\"13. Devoluciones, descuentos y bonificaciones/ Tasa del 16% de IVA\"," +
+                "\"14. Valor total de actos o actividades pagadas/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"15. Devoluciones, descuentos y bonificaciones/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"16. Valor total de actos o actividades pagadas/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                "\"17. Devoluciones, descuentos y bonificaciones/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                
+                "\"18. (IVA acr.) Exclusivamente de actividades gravadas/ Región fronteriza norte\"," +
+                "\"19. (IVA acr.) Asociado a actividades por las cuales se aplicó una proporción/ Región fronteriza norte\"," +
+                "\"20. (IVA acr.) Exclusivamente de actividades gravadas/ Región fronteriza sur\"," +
+                "\"21. (IVA acr.) Asociado a actividades por las cuales se aplicó una proporción/ Región fronteriza sur\"," +
+                "\"22. (IVA acr.) Exclusivamente de actividades gravadas/ Tasa del 16% de IVA\"," +
+                "\"23. (IVA acr.) Asociado a actividades por las cuales se aplicó una proporción/ Tasa del 16% de IVA\"," +
+                "\"24. (IVA acr.) Exclusivamente de actividades gravadas/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"25. (IVA acr.) Asociado a actividades por las cuales se aplicó una proporción/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"26. (IVA acr.) Exclusivamente de actividades gravadas/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                "\"27. (IVA acr.) Asociado a actividades por las cuales se aplicó una proporción/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                
+                "\"28. (IVA no acr.) Asociado a actividades por las cuales se aplicó una proporción/ Región fronteriza norte\"," +
+                "\"29. (IVA no acr.) Asociado a actividades que no cumple con requisitos/ Región fronteriza norte\"," +
+                "\"30. (IVA no acr.) Asociado a actividades exentas/ Región fronteriza norte\"," +
+                "\"31. (IVA no acr.) Asociado a actividades no objeto/ Región fronteriza norte\"," +
+                "\"32. (IVA no acr.) Asociado a actividades por las cuales se aplicó una proporción/ Región fronteriza sur\"," +
+                "\"33. (IVA no acr.) Asociado a actividades que no cumple con requisitos/ Región fronteriza sur\"," +
+                "\"34. (IVA no acr.) Asociado a actividades exentas/ Región fronteriza sur\"," +
+                "\"35. (IVA no acr.) Asociado a actividades no objeto/ Región fronteriza sur\"," +
+                "\"36. (IVA no acr.) Asociado a actividades por las cuales se aplicó una proporción\"," +
+                "\"37. (IVA no acr.) Asociado a actividades que no cumple con requisitos/ Tasa del 16% de IVA\"," +
+                "\"38. (IVA no acr.) Asociado a actividades exentas/ Tasa del 16% de IVA\"," +
+                "\"39. (IVA no acr.) Asociado a actividades no objeto/ Tasa del 16% de IVA\"," +
+                "\"40. (IVA no acr.) Asociado a actividades por las cuales se aplicó una proporción/ Tasa del 16% de IVA\"," +
+                "\"41. (IVA no acr.) Asociado a actividades que no cumple con requisitos/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"42. (IVA no acr.) Asociado a actividades exentas/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"43. (IVA no acr.) Asociado a actividades no objeto/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"44. (IVA no acr.) Asociado a actividades por las cuales se aplicó una proporción/ Importación por aduana de bienes tangibles a la tasa del 16% de IVA\"," +
+                "\"45. (IVA no acr.) Asociado a actividades que no cumple con requisitos/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                "\"46. (IVA no acr.) Asociado a actividades exentas/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                "\"47. (IVA no acr.) Asociado a actividades no objeto/ Importación por aduana de bienes intangibles y servicios a la tasa del 16% de IVA\"," +
+                
+                "\"48. IVA retenido por el contribuyente\"," +
+                "\"49. Actos o actividades pagados en la importación de bienes y servicios por los que no se pagará el IVA (Exentos)\"," +
+                "\"50. Actos o actividades pagados por los que no se pagará el IVA (Exentos)\"," +
+                "\"51. Demás actos o actividades pagados a la tasa del 0% de IVA\"," +
+                "\"52. Actos o actividades no objeto del IVA realizados en territorio nacional\"," +
+                "\"53. Actos o actividades no objeto del IVA por no contar con establecimiento en territorio nacional\"," +
+                "\"54. Manifiesto que se dio efectos fiscales a los comprobantes que amparan las operaciones realizadas con el proveedor\"";
     }
 }

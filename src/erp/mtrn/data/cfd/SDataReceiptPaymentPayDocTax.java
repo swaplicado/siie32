@@ -19,7 +19,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -41,12 +41,14 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
         reset();
     }
     
+    @SuppressWarnings("deprecation")
     private void assignTaxInfo() throws Exception {
         if (moDbmsTax != null) {
             mdRate = moDbmsTax.getPercentage();
             mnFkCfdTaxId = moDbmsTax.getDbmsCfdTaxId();
             mnFkTaxTypeId = moDbmsTax.getFkTaxTypeId();
-            switch (moDbmsTax.getVatType().toLowerCase()) {
+            
+            switch (moDbmsTax.getVatType()) {
                 case SDiotConsts.VAT_TYPE_EXEMPT:
                     msFactorCode = SDataConstantsSys.FINX_TAX_FACT_EX; 
                     break;
@@ -55,12 +57,14 @@ public final class SDataReceiptPaymentPayDocTax extends erp.lib.data.SDataRegist
                 case SDiotConsts.VAT_TYPE_GENERAL:
                 case SDiotConsts.VAT_TYPE_BORDER:
                 case SDiotConsts.VAT_TYPE_BORDER_NORTH:
-                case SDiotConsts.VAT_TYPE_BORDER_SOUTH:
+                case SDiotConsts.VAT_TYPE_BORDER_N:
+                case SDiotConsts.VAT_TYPE_BORDER_S:
                     msFactorCode = SDataConstantsSys.FINX_TAX_FACT_TA;
                     break;
                     
                 default:
-                    throw new Exception("El impuesto no tiene configurado un tipo de impuesto.");
+                    throw new Exception("El impuesto '" + moDbmsTax + "' (PK: " + SLibUtils.textKey((int[]) moDbmsTax.getPrimaryKey()) + ") " +
+                            (moDbmsTax.getVatType().isEmpty() ? "no tiene configurado el tipo de IVA" : "tiene un tipo de IVA desconocido: '" + moDbmsTax.getVatType().isEmpty() + "'") + ".");
             }
         }
     }

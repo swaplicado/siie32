@@ -40,7 +40,8 @@ import erp.mfin.data.SDataTaxIdentity;
 import erp.mfin.data.SDataTaxRegion;
 import erp.mfin.data.SDataTaxableConceptType;
 import erp.mfin.data.SDataYear;
-import erp.mfin.data.diot.ver1.SDialogDiotLayout;
+import erp.mfin.data.diot.SDialogDiotLayout;
+import erp.mfin.data.diot.SDiotConsts;
 import erp.mfin.form.SDialogRepAccount;
 import erp.mfin.form.SDialogRepAccountCashBalance;
 import erp.mfin.form.SDialogRepAccountConcept;
@@ -130,7 +131,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -727,7 +728,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
         
         jmRepFiscal = new JMenu("Reportes fiscales");
-        jmiRepFiscalDiotLayout = new JMenuItem("Layout de la DIOT...");
+        jmiRepFiscalDiotLayout = new JMenuItem("Layout de la DIOT 2025...");
         jmiRepFiscalTaxPendSal = new JMenuItem("Impuestos pendientes de ingresos...");
         jmiRepFiscalTaxPendPur = new JMenuItem("Impuestos pendientes de egresos...");
         jmiRepFiscalXmlFiles = new JMenuItem("Archivos de contabilidad electrónica...");
@@ -2381,7 +2382,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepTaxesByConcept(miClient).setVisible(true);
             }
             else if (item == jmiRepFiscalDiotLayout) {
-                new SDialogDiotLayout(miClient).setVisible(true);
+                new SDialogDiotLayout(miClient, SDiotConsts.VER_2).setVisible(true);
             }
             else if (item == jmiRepFiscalTaxPendSal) {
                 new SDialogRepTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, SDataRepConstants.REP_TAX_PND_SAL).setVisible(true);

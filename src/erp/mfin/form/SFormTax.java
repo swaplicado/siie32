@@ -198,6 +198,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }//GEN-LAST:event_jcbFkTaxCalculationTypeIdItemStateChanged
 
+    @SuppressWarnings("deprecation")
     private void initComponentsExtra() {
         moFieldTax = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfTax, jlTax);
         moFieldTax.setLengthMax(50);
@@ -235,7 +236,8 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_GENERAL, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_GENERAL)));
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER)));
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_NORTH, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_NORTH)));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_SOUTH, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_SOUTH)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_N, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_N)));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_S, SDiotConsts.Vats.get(SDiotConsts.VAT_TYPE_BORDER_S)));
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
