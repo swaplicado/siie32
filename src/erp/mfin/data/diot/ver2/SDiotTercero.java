@@ -179,7 +179,7 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
     }
     
     private void initTerceroAsGlobal() {
-        initTercero(false, Boolean.TRUE, Boolean.TRUE, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
+        initTercero(false, Boolean.TRUE, Boolean.TRUE, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_GLOBAL, DCfdConsts.RFC_GEN_NAC, "", ""); // "operaciones globales" since DIOT 2025
     }
     
     private void initTerceroAsCurrentCompany(final int bizPartnerId, final String rfc) {

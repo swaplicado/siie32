@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 265.4/ 2025-03-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Incorporación y aplicación del tipo de operación "operaciones globales" para el proveedor global en la generación del layout de la DIOT 2025.
+
+================================================================================
 SIIE 3.2 265.3/ 2025-03-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

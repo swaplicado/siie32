@@ -28,6 +28,7 @@ public abstract class SDiotConsts {
     public static final String OPER_IMP_INT = "07"; // since DIOT 2025
     public static final String OPER_IMP_NAC = "08"; // since DIOT 2025
     public static final String OPER_OTHER = "85";
+    public static final String OPER_GLOBAL = "87"; // since DIOT 2025
 
     public static final HashMap<String, String> Operations = new HashMap<>();
 
