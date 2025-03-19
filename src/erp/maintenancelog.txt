@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 265.3/ 2025-03-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de la generación del layout de la DIOT e implementación de la DIOT 2025.
+2) Actualización de tipos de IVA, tipos de proveedor y tipos de operación de acuerdo a la clasificación de la DIOT 2025.
+3) Corrección a la determinación del tipo de impuesto en el CFDI con complemento de recepción de pagos.
+4) Corrección de aplicación del filtro de áreas funcionales a la consulta de la vista de documentos anulados.
+5) Optimización del arranque del Cliente SIIE.
+
+================================================================================
 SIIE 3.2 265.2/ 2025-03-07
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
