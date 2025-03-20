@@ -1105,7 +1105,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewFirstDayYear(miClient, "Primer día año");
                 break;
             case SModConsts.HRS_HOL:
-                view = new SViewHoliday(miClient, "Días feriados");
+                view = new SViewHoliday(miClient, "Días festivos y feriados");
                 break;
             case SModConsts.HRS_WDS:
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
@@ -1114,7 +1114,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewConditionalEarning(miClient, "Percepciones condicionales");
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
-                view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
+                view = new SViewPrePayrollCutoffCalendar(miClient, "Fechas corte prenóminas");
                 break;
             case SModConsts.HRS_TAX:
                 view = new SViewTaxTable(miClient, "Tablas impuesto");
@@ -1518,7 +1518,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormFirstDayYear;
                 break;
             case SModConsts.HRS_HOL:
-                if (moFormHoliday == null) moFormHoliday = new SFormHoliday(miClient, "Día feriado");
+                if (moFormHoliday == null) moFormHoliday = new SFormHoliday(miClient, "Día festivo o feriado");
                 form = moFormHoliday;
                 break;
             case SModConsts.HRS_WDS:
@@ -1530,7 +1530,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormConditionalEarning;
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
-                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Calendario de cortes prenómina");
+                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Fecha de corte de prenómina");
                 form = moFormCutoffCalendar;
                 break;
             case SModConsts.HRS_TAX:

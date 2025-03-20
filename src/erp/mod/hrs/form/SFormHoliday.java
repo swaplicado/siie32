@@ -58,11 +58,15 @@ public class SFormHoliday extends SBeanForm {
         jPanel7 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel8 = new javax.swing.JPanel();
+        jlHint1 = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        jlHint2 = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -78,7 +82,7 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Día feriado:*");
+        jlDate.setText("Día:*");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlDate);
         jPanel5.add(moDateDate);
@@ -87,7 +91,7 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCode.setText("Código:*");
+        jlCode.setText("Código día:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCode);
 
@@ -98,15 +102,33 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlName.setText("Nombre:*");
+        jlName.setText("Nombre día:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlName);
 
         moTextName.setText("TEXT");
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel7.add(moTextName);
 
         jPanel2.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlHint1.setForeground(java.awt.SystemColor.textInactiveText);
+        jlHint1.setText("Día festivo: día no laborable, de descanso obligatorio.");
+        jlHint1.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel8.add(jlHint1);
+
+        jPanel2.add(jPanel8);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlHint2.setForeground(java.awt.SystemColor.textInactiveText);
+        jlHint2.setText("Día feriado: día no laborable, de descanso otorgado.");
+        jlHint2.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel9.add(jlHint2);
+
+        jPanel2.add(jPanel9);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -120,8 +142,12 @@ public class SFormHoliday extends SBeanForm {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlHint1;
+    private javax.swing.JLabel jlHint2;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlYear;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;

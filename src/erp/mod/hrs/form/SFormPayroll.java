@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Claudio Peña, Edwin Carmona
+ * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -322,7 +322,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Período de pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlPaymentType);
 

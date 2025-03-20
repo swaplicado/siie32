@@ -64,7 +64,7 @@
                 <Component class="javax.swing.JLabel" name="jlYear">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                      <Color blue="ff" green="0" red="0" type="rgb"/>
+                      <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="A&#xf1;o:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -73,6 +73,35 @@
                   </Properties>
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntYear">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[50, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel7">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlPaymentType">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Per&#xed;odo pago:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyPaymentType">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[200, 23]"/>
+                    </Property>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -97,6 +126,11 @@
                   </Properties>
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntNumber">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[50, 23]"/>
+                    </Property>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -107,39 +141,26 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDate">
+                <Component class="javax.swing.JLabel" name="jlCutoffDate">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="D&#xed;a feriado:*"/>
+                    <Property name="text" type="java.lang.String" value="Fecha corte:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moCutoffDate">
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateCutoffDate">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlCutoffDateHint">
                   <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="(de la pren&#xf3;mina en cuesti&#xf3;n)"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[128, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Container class="javax.swing.JPanel" name="jPanel7">
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                <Property name="alignment" type="int" value="0"/>
-                <Property name="verticalGap" type="int" value="0"/>
-              </Layout>
-              <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlName">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo de pago:*"/>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyPayType">
                 </Component>
               </SubComponents>
             </Container>

@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SViewPrePayrollCutoffCalendar extends SGridPaneView {
 
@@ -57,12 +57,13 @@ public class SViewPrePayrollCutoffCalendar extends SGridPaneView {
 
         msSql = "SELECT "
                 + "v.id_cal AS " + SDbConsts.FIELD_ID + "1, "
-                + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "'' AS " + SDbConsts.FIELD_NAME + ", "
-                + "v.dt_cut AS " + SDbConsts.FIELD_DATE + ", "
+                + "v.num AS " + SDbConsts.FIELD_CODE + ", "
+                + "v.dt_cut AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.year, "
                 + "v.num, "
+                + "v.dt_cut, "
                 + "v.fk_tp_pay, "
+                + "tp.name, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -71,12 +72,14 @@ public class SViewPrePayrollCutoffCalendar extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PRE_PAY_CUT_CAL) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON "
+                + "v.fk_tp_pay = tp.id_tp_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.year DESC, v.num DESC, v.dt_cut DESC ";
+                + "ORDER BY tp.name, v.fk_tp_pay, v.num ";
     }
 
     @Override
@@ -84,8 +87,9 @@ public class SViewPrePayrollCutoffCalendar extends SGridPaneView {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "v.year", "Año"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "v.num", "# Nómina"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha de corte"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp.name", "Período pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "v.num", "Núm nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_cut", "Fecha corte"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

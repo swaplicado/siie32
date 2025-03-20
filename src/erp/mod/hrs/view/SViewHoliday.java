@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
 public class SViewHoliday extends SGridPaneView implements ActionListener {
     private JButton jbCopyHolidays;
@@ -43,7 +43,7 @@ public class SViewHoliday extends SGridPaneView implements ActionListener {
         moFilterYear = new SGridFilterYear(miClient, this);
         moFilterYear.initFilter(new int[] { SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0] });
         
-        jbCopyHolidays = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")), "Copiar días feriados de años anteriores", this);
+        jbCopyHolidays = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")), "Copiar días de años anteriores", this);
 
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCopyHolidays);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
@@ -92,7 +92,7 @@ public class SViewHoliday extends SGridPaneView implements ActionListener {
     private void actionCopyHolidays() {
        if (jbCopyHolidays.isEnabled()) {
             try {
-                moFormCopyHolidays = new SFormCopyHolidays(miClient, "Copia de días feriados");
+                moFormCopyHolidays = new SFormCopyHolidays(miClient, "Copia de días festivos y feriados");
                 moFormCopyHolidays.setVisible(true);
                 prepareSqlQuery();
                 readGridData();
@@ -109,8 +109,8 @@ public class SViewHoliday extends SGridPaneView implements ActionListener {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "v.id_hdy", "Año"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Día feriado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Día"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

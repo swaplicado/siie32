@@ -227,8 +227,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBenefitTable = new JMenuItem("Tablas de prestaciones");
         jmiCfgBenefitTableRow = new JMenuItem("Tablas de prestaciones a detalle");
         jmiCfgFirstDayYear = new JMenuItem("Primer día del año");
-        jmiCfgHoliday = new JMenuItem("Días feriados");
-        jmiCfgCutoffCalendar = new JMenuItem("Calendario fechas de corte");
+        jmiCfgHoliday = new JMenuItem("Días festivos y feriados");
+        jmiCfgCutoffCalendar = new JMenuItem("Fechas de corte de prenóminas");
         jmiCfgWorkingDaySettings = new JMenuItem("Días laborables");
         jmiCfgPaysheetCustomType = new JMenuItem("Tipos de nómina de la empresa");
         jmiCfgEarnings = new JMenuItem("Percepciones");

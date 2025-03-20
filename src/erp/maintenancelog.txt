@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 265.5/ 2025-03-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Estandarización de funcionalidades, textos de conceptos y campos de los catálogos de días festivos y feriados y de las fechas de corte de prenóminas.
+
+================================================================================
 SIIE 3.2 265.4/ 2025-03-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

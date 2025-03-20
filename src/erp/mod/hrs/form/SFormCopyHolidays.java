@@ -22,7 +22,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SFormCopyHolidays extends SBeanForm {
 
@@ -68,7 +68,6 @@ public class SFormCopyHolidays extends SBeanForm {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlYear.setForeground(new java.awt.Color(0, 0, 255));
         jlYear.setText("Año a copiar:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlYear);
@@ -93,6 +92,8 @@ public class SFormCopyHolidays extends SBeanForm {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
         moIntYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
+        moIntYear.setValue(miClient.getSession().getCurrentYear() - 1);
+        jtfRegistryKey.setText("");
     
         moFields.addField(moIntYear);
 
@@ -100,7 +101,6 @@ public class SFormCopyHolidays extends SBeanForm {
         jbEdit.setEnabled(false);
         jbReadInfo.setEnabled(false);
         jtfRegistryKey.setEnabled(false);
-        
     }
 
     @Override
@@ -120,8 +120,6 @@ public class SFormCopyHolidays extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        int year = SLibConsts.UNDEFINED;
-        
         moRegistry = (SDbHoliday) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
@@ -130,15 +128,16 @@ public class SFormCopyHolidays extends SBeanForm {
         removeAllListeners();
         reloadCatalogues();
 
-        moIntYear.setValue(year);
+        moIntYear.setValue(miClient.getSession().getCurrentYear());
+        jtfRegistryKey.setText("");
 
         setFormEditable(true);
 
         if (moRegistry.isRegistryNew()) {
-            moIntYear.setEditable(true);
+            
         }
         else {
-            moIntYear.setEditable(false);
+            
         }
 
         addAllListeners();

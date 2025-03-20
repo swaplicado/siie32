@@ -6,6 +6,7 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
+import erp.mod.hrs.db.SHrsConsts;
 import java.util.Date;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -19,14 +20,14 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SFormCutoffCalendar extends SBeanForm {
 
     private SDbPrePayrollCutoffCalendar moRegistry;
 
     /**
-     * Creates new form SFormHoliday
+     * Creates new form SFormCutoffCalendar
      */
     public SFormCutoffCalendar(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_PRE_PAY_CUT_CAL, SLibConsts.UNDEFINED, title);
@@ -49,15 +50,16 @@ public class SFormCutoffCalendar extends SBeanForm {
         jPanel4 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         moIntYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        jPanel7 = new javax.swing.JPanel();
+        jlPaymentType = new javax.swing.JLabel();
+        moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel9 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel5 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        moCutoffDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel7 = new javax.swing.JPanel();
-        jlName = new javax.swing.JLabel();
-        moKeyPayType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlCutoffDate = new javax.swing.JLabel();
+        moDateCutoffDate = new sa.lib.gui.bean.SBeanFieldDate();
+        jlCutoffDateHint = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -66,13 +68,26 @@ public class SFormCutoffCalendar extends SBeanForm {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlYear.setForeground(new java.awt.Color(0, 0, 255));
+        jlYear.setForeground(java.awt.Color.blue);
         jlYear.setText("Año:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlYear);
+
+        moIntYear.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel4.add(moIntYear);
 
         jPanel2.add(jPanel4);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPaymentType.setText("Período pago:*");
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlPaymentType);
+
+        moKeyPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(moKeyPaymentType);
+
+        jPanel2.add(jPanel7);
 
         jPanel9.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -80,29 +95,25 @@ public class SFormCutoffCalendar extends SBeanForm {
         jlNumber.setText("Número nómina:*");
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlNumber);
+
+        moIntNumber.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(moIntNumber);
 
         jPanel2.add(jPanel9);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Día feriado:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jlDate);
+        jlCutoffDate.setText("Fecha corte:*");
+        jlCutoffDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlCutoffDate);
+        jPanel5.add(moDateCutoffDate);
 
-        moCutoffDate.setPreferredSize(new java.awt.Dimension(128, 23));
-        jPanel5.add(moCutoffDate);
+        jlCutoffDateHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlCutoffDateHint.setText("(de la prenómina en cuestión)");
+        jlCutoffDateHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel5.add(jlCutoffDateHint);
 
         jPanel2.add(jPanel5);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlName.setText("Tipo de pago:*");
-        jlName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlName);
-        jPanel7.add(moKeyPayType);
-
-        jPanel2.add(jPanel7);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -116,26 +127,30 @@ public class SFormCutoffCalendar extends SBeanForm {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JLabel jlDate;
-    private javax.swing.JLabel jlName;
+    private javax.swing.JLabel jlCutoffDate;
+    private javax.swing.JLabel jlCutoffDateHint;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlYear;
-    private sa.lib.gui.bean.SBeanFieldDate moCutoffDate;
+    private sa.lib.gui.bean.SBeanFieldDate moDateCutoffDate;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
     private sa.lib.gui.bean.SBeanFieldInteger moIntYear;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyPayType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
         moIntYear.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
-        moCutoffDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
-        moKeyPayType.setKeySettings(miClient, SGuiUtils.getLabelName(jlName), true);
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType), true);
+        moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlYear.getText()), SGuiConsts.GUI_TYPE_INT_RAW, true);
+        moIntNumber.setMaxInteger(SHrsConsts.YEAR_WEEKS_EXTENDED);
+        moDateCutoffDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlCutoffDate.getText()), true);
 
         moFields.addField(moIntYear);
-        moFields.addField(moCutoffDate);
-        moFields.addField(moKeyPayType);
+        moFields.addField(moKeyPaymentType);
+        moFields.addField(moIntNumber);
+        moFields.addField(moDateCutoffDate);
 
         moFields.setFormButton(jbSave);
     }
@@ -152,7 +167,7 @@ public class SFormCutoffCalendar extends SBeanForm {
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyPayType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
     }
 
     @Override
@@ -178,10 +193,9 @@ public class SFormCutoffCalendar extends SBeanForm {
         }
 
         moIntYear.setValue(year);
-        moCutoffDate.setValue(moRegistry.getDateCutoff());
+        moKeyPaymentType.setValue(new int[] { moRegistry.getFkPaymentTypeId() });
         moIntNumber.setValue(moRegistry.getNumber());
-        
-        moKeyPayType.setValue(new int[] { moRegistry.getFkPaymentTypeId() });
+        moDateCutoffDate.setValue(moRegistry.getDateCutoff());
 
         setFormEditable(true);
 
@@ -200,10 +214,9 @@ public class SFormCutoffCalendar extends SBeanForm {
         SDbPrePayrollCutoffCalendar registry = moRegistry.clone();
         
         registry.setYear(moIntYear.getValue());
-        registry.setDateCutoff(moCutoffDate.getValue());
         registry.setNumber(moIntNumber.getValue());
-        
-        registry.setFkPaymentTypeId(moKeyPayType.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyPayType.getValue()[0]);
+        registry.setDateCutoff(moDateCutoffDate.getValue());
+        registry.setFkPaymentTypeId(moKeyPaymentType.getValue()[0]);
 
         return registry;
     }
@@ -225,11 +238,11 @@ public class SFormCutoffCalendar extends SBeanForm {
                 min = SLibTimeUtils.createDate(moIntYear.getValue(), 1, 1);
                 max = SLibTimeUtils.createDate(moIntYear.getValue(), 12, 31);
 
-                if (moCutoffDate.getValue().before(min) || moCutoffDate.getValue().after(max)) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDate) + "'" +
+                if (moDateCutoffDate.getValue().before(min) || moDateCutoffDate.getValue().after(max)) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlCutoffDate) + "'" +
                             SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + SLibUtils.DateFormatDate.format(min) + " y" +
                             SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + SLibUtils.DateFormatDate.format(max) + ".");
-                    validation.setComponent(moCutoffDate);
+                    validation.setComponent(moDateCutoffDate);
                 }
             }
         }
