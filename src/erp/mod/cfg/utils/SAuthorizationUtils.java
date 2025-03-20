@@ -7,6 +7,7 @@ package erp.mod.cfg.utils;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
@@ -17,6 +18,13 @@ import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
+import erp.siieapp.SUserResource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +33,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.internet.AddressException;
@@ -32,6 +41,7 @@ import javax.mail.internet.InternetAddress;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import org.json.simple.JSONObject;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -958,6 +968,8 @@ public abstract class SAuthorizationUtils {
         }
         
         processAuthornMails(session, authorizationType, (int[])pkDps, "");
+        // Enviar notificaciones push
+        sendNotificationsOnSend(session, authorizationType, (int[])pkDps);
     }
     
     /**
@@ -1842,6 +1854,35 @@ public abstract class SAuthorizationUtils {
         SMail mail = new SMail(moMailSender, subject, body, toRecipientsCleaned, toCcRecipients, toBccRecipients);
         mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
         mail.send();
+    }
+    
+    public static void sendNotificationsOnSend(final SGuiSession session, final int authorizationType, int[] pkDps) {
+        ArrayList<Integer> lUsers;
+        try {
+            boolean toNotification = false;
+            lUsers = SAuthorizationUtils.getUsersInTurnAuth(session.getStatement().getConnection().createStatement(), authorizationType, pkDps, toNotification);
+            if (! lUsers.isEmpty()) {
+                SDataDps dps = new SDataDps();
+                dps.read(pkDps, session.getStatement().getConnection().createStatement());
+
+                for (Integer idUser : lUsers) {
+                    SNotificationsUtils.sendPushNotification(session, idUser, dps.getNumber(), SNotificationsUtils.PUSH_NOTIFICATION_NEW, 0);
+                    
+                    ArrayList<SUserResource> lResources = SNotificationsUtils.getResourcesPendingCounter(session.getStatement().getConnection().createStatement(), authorizationType, idUser);
+                    for (SUserResource oRes : lResources) {
+                        if (oRes.getCounter() > 1) {
+                            SNotificationsUtils.sendPushNotification(session, idUser, "", SNotificationsUtils.PUSH_NOTIFICATION_BADGE, oRes.getCounter());
+                        }
+                    }
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private static boolean isValidEmailAddress(String email) {

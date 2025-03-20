@@ -19,6 +19,7 @@ public class SUserResource {
     private int pk4;
     private int pk5;
     private String folio;
+    private int counter;
 
     public int getIdUser() {
         return idUser;
@@ -84,4 +85,12 @@ public class SUserResource {
         this.folio = folio;
     }
 
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+    
 }

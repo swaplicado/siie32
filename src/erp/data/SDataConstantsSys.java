@@ -127,6 +127,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
+    public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
