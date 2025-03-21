@@ -254,7 +254,7 @@ public class SDiotLayout {
         HashMap<SDataTax, Double> vatWithheldsMap = new HashMap<>();
         HashMap<SDataTax, Double> vatWithheldSettlementsMap = new HashMap<>();
         HashMap<String, SDiotTercero> tercerosMap = new HashMap<>(); // key: 'business partner ID' + "-" + 'tipo de operación DIOT'
-        HashMap<String, JournalEntry> accountJournalEntryTotalsMap = new HashMap<>(); // key: number of account
+        HashMap<String, AccountTotal> accountTotalsMap = new HashMap<>(); // key: number of account
         
         moAccountsMap.clear();
         moLedgerAccountsMap.clear();
@@ -290,8 +290,10 @@ public class SDiotLayout {
             
             if (diotAccount.IsConfigParamAccount) {
                 // prepare query to scan accounts, one at a time, set up by configuration:
-                
-                sql = "SELECT re.* "
+
+                sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety, "
+                        + "re.debit, re.credit, re.fid_acc, re.fid_tax_bas_n, re.fid_tax_n, "
+                        + "re.fid_dps_year_n, re.fid_dps_doc_n, re.fid_cfd_n, re.fid_bp_nr, re.occ_fiscal_id, re.usr_id, re.fid_bkk_year_n, re.fid_bkk_num_n "
                         + "FROM fin_rec AS r "
                         + "INNER JOIN fin_rec_ety AS re ON "
                         + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
@@ -307,7 +309,7 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY r.dt, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety;";
+                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
@@ -325,7 +327,9 @@ public class SDiotLayout {
                 
                 // prepare query to scan other purchases and expenses accounts with explicitly tax input:
                 
-                sql = "SELECT re.* "
+                sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety, "
+                        + "re.debit, re.credit, re.fid_acc, re.fid_tax_bas_n, re.fid_tax_n, "
+                        + "re.fid_dps_year_n, re.fid_dps_doc_n, re.fid_cfd_n, re.fid_bp_nr, re.occ_fiscal_id, re.usr_id, re.fid_bkk_year_n, re.fid_bkk_num_n "
                         + "FROM fin_rec AS r "
                         + "INNER JOIN fin_rec_ety AS re ON "
                         + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
@@ -347,7 +351,7 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY r.dt, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety;";
+                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
@@ -481,7 +485,7 @@ public class SDiotLayout {
                         
                         double dpsSubtotalIgnored = 0;
 
-                        if (manConfigTaxRegionsIgnored != null) {
+                        if (manConfigTaxRegionsIgnored != null && manConfigTaxRegionsIgnored.length > 0) {
                             for (int taxRegionIgnored : manConfigTaxRegionsIgnored) {
                                 for (DpsVatSetting dpsVatSetting : dpsVatSettings) {
                                     if (dpsVatSetting.TaxRegionId == taxRegionIgnored) {
@@ -613,14 +617,14 @@ public class SDiotLayout {
 
                     // add to account totals:
 
-                    JournalEntry journalEntry = accountJournalEntryTotalsMap.get(account.getPkAccountIdXXX());
+                    AccountTotal accountTotal = accountTotalsMap.get(account.getPkAccountIdXXX());
 
-                    if (journalEntry == null) {
-                        journalEntry = new JournalEntry(entryDebit, entryCredit);
-                        accountJournalEntryTotalsMap.put(account.getPkAccountIdXXX(), journalEntry);
+                    if (accountTotal == null) {
+                        accountTotal = new AccountTotal(entryDebit, entryCredit);
+                        accountTotalsMap.put(account.getPkAccountIdXXX(), accountTotal);
                     }
                     else {
-                        journalEntry.add(entryDebit, entryCredit);
+                        accountTotal.add(entryDebit, entryCredit);
                     }
 
                     boolean isAccountForDebits = SLibUtils.belongsTo(ledgerAccount.getAccountClassKey(), new int[][] { SDataConstantsSys.FINS_CL_ACC_ASSET, SDataConstantsSys.FINS_CL_ACC_RES_DBT });
@@ -917,12 +921,12 @@ public class SDiotLayout {
             System.out.println("Diferencia total (-) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalcAcumDiffNeg));
             System.out.println("Diferencia total (+) en cálculo de subtotal: " + SLibUtils.getDecimalFormatAmount().format(subtotalCalcAcumDiffPos));
             
-            for (String account : accountJournalEntryTotalsMap.keySet()) {
-                JournalEntry journalEntry = accountJournalEntryTotalsMap.get(account);
+            for (String account : accountTotalsMap.keySet()) {
+                AccountTotal accountTotal = accountTotalsMap.get(account);
                 System.out.println("Cuenta: " + account + "; "
-                        + "debe: " + SLibUtils.getDecimalFormatAmount().format(journalEntry.Debit) + "; "
-                        + "haber: " + SLibUtils.getDecimalFormatAmount().format(journalEntry.Credit) + "; "
-                        + "saldo: " + SLibUtils.getDecimalFormatAmount().format(journalEntry.Debit - journalEntry.Credit));
+                        + "debe: " + SLibUtils.getDecimalFormatAmount().format(accountTotal.Debits) + "; "
+                        + "haber: " + SLibUtils.getDecimalFormatAmount().format(accountTotal.Credits) + "; "
+                        + "saldo: " + SLibUtils.getDecimalFormatAmount().format(accountTotal.Debits - accountTotal.Credits));
             }
             
             System.out.println(SLibUtils.textRepeat("-", 80));
@@ -1018,12 +1022,12 @@ public class SDiotLayout {
             layout += "\n";
             layout += "\"Totales por cuenta contable:\"\n";
             layout += "\"Cuenta contable\",\"Debe\",\"Haber\",\"Saldo\"\n";
-            for (String account : accountJournalEntryTotalsMap.keySet()) {
-                JournalEntry journalEntry = accountJournalEntryTotalsMap.get(account);
+            for (String account : accountTotalsMap.keySet()) {
+                AccountTotal accountTotal = accountTotalsMap.get(account);
                 layout += "\"'" + account + "\"," + 
-                        journalEntry.Debit + "," + 
-                        journalEntry.Credit + "," + 
-                        (journalEntry.Debit - journalEntry.Credit) + "\n";
+                        accountTotal.Debits + "," + 
+                        accountTotal.Credits + "," + 
+                        (accountTotal.Debits - accountTotal.Credits) + "\n";
             }
             layout += "\"Total:\"," + 
                     totalDebit + "," + 
@@ -1109,19 +1113,19 @@ public class SDiotLayout {
         }
     }
     
-    private class JournalEntry {
+    private class AccountTotal {
         
-        public double Debit;
-        public double Credit;
+        public double Debits;
+        public double Credits;
         
-        public JournalEntry(final double debit, final double credit) {
-            Debit = debit;
-            Credit = credit;
+        public AccountTotal(final double debits, final double credits) {
+            Debits = debits;
+            Credits = credits;
         }
         
-        public void add(final double debit, final double credit) {
-            Debit = SLibUtils.roundAmount(Debit + debit);
-            Credit = SLibUtils.roundAmount(Credit + credit);
+        public void add(final double debits, final double credits) {
+            Debits = SLibUtils.roundAmount(Debits + debits);
+            Credits = SLibUtils.roundAmount(Credits + credits);
         }
     }
 }

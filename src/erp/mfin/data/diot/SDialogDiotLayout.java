@@ -74,12 +74,19 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlDateStart = new javax.swing.JLabel();
         jftDateStart = new javax.swing.JFormattedTextField();
         jbPickDateStart = new javax.swing.JButton();
-        jlDummy = new javax.swing.JLabel();
+        jlDummy1 = new javax.swing.JLabel();
         jckExcludeTotallyZero = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbPickDateEnd = new javax.swing.JButton();
+        jlDummy2 = new javax.swing.JLabel();
+        jckGenerateInformativeFile = new javax.swing.JCheckBox();
+        jPanel9 = new javax.swing.JPanel();
+        jlRequiredFiscalIds = new javax.swing.JLabel();
+        jtfRequiredFiscalIds = new javax.swing.JTextField();
+        jbEditRequiredFiscalIds = new javax.swing.JButton();
+        jlRequiredFiscalIdsHint = new javax.swing.JLabel();
         jlFormat = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jrbFormatCsv = new javax.swing.JRadioButton();
@@ -103,7 +110,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT:"));
-        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -121,11 +128,11 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel3.add(jbPickDateStart);
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jlDummy);
+        jlDummy1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlDummy1);
 
-        jckExcludeTotallyZero.setText("Excluir del layout a terceros totalmente en cero");
-        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(300, 23));
+        jckExcludeTotallyZero.setText("Excluir del layout a los terceros totalmente en cero");
+        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel3.add(jckExcludeTotallyZero);
 
         jPanel6.add(jPanel3);
@@ -146,16 +153,44 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel8.add(jbPickDateEnd);
 
+        jlDummy2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlDummy2);
+
+        jckGenerateInformativeFile.setText("Generar archivo informativo de todos los movimientos del layout");
+        jckGenerateInformativeFile.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel8.add(jckGenerateInformativeFile);
+
         jPanel6.add(jPanel8);
 
-        jlFormat.setText("Formato del archivo:");
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRequiredFiscalIds.setText("RFC requeridos:");
+        jlRequiredFiscalIds.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlRequiredFiscalIds);
+
+        jtfRequiredFiscalIds.setText("ABC010101000, ABCD010101000");
+        jtfRequiredFiscalIds.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel9.add(jtfRequiredFiscalIds);
+
+        jbEditRequiredFiscalIds.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditRequiredFiscalIds.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jbEditRequiredFiscalIds);
+
+        jlRequiredFiscalIdsHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlRequiredFiscalIdsHint.setText("(separar los RFC con coma)");
+        jlRequiredFiscalIdsHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel9.add(jlRequiredFiscalIdsHint);
+
+        jPanel6.add(jPanel9);
+
+        jlFormat.setText("Formato del archivo del layout:");
         jPanel6.add(jlFormat);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatCsv);
-        jrbFormatCsv.setText("Valores sin redondear, separados por coma (CSV) + resumen informativo y lista de excepciones");
-        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(600, 23));
+        jrbFormatCsv.setText("Archivo CSV con valores sin redondear, separados por coma + resumen informativo y lista de excepciones");
+        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel14.add(jrbFormatCsv);
 
         jPanel6.add(jPanel14);
@@ -163,8 +198,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatPipe);
-        jrbFormatPipe.setText("Valores redondeados, separados por el carácter | (\"pipe\" o \"barra vertical\")");
-        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(600, 23));
+        jrbFormatPipe.setText("Archivo TXT con valores redondeados como enteros, separados por el carácter denominado pipe o barra vertical (\"|\")");
+        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel13.add(jrbFormatPipe);
 
         jPanel6.add(jPanel13);
@@ -194,7 +229,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Advertencias en la generación del layout de la DIOT:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Advertencias sobre la generación del layout de la DIOT:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jspWarnings.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -231,7 +266,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(736, 489));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -247,6 +282,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jbPickDateStart.addActionListener(this);
         jbPickDateEnd.addActionListener(this);
+        jbEditRequiredFiscalIds.addActionListener(this);
         jbSave.addActionListener(this);
         jbCancel.addActionListener(this);
 
@@ -254,9 +290,29 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         jckExcludeTotallyZero.setSelected(true);
         jrbFormatCsv.setSelected(true);
+        jtfRequiredFiscalIds.setEditable(false);
+        jtfRequiredFiscalIds.setFocusable(false);
+        jtfRequiredFiscalIds.setText("");
         
-        if (mnDiotVersion == SDiotConsts.VER_2) {
-            setTitle("Layout de la DIOT 2025");
+        switch (mnDiotVersion) {
+            case SDiotConsts.VER_1:
+                setTitle("Layout de la DIOT");
+                jlRequiredFiscalIds.setEnabled(false);
+                jbEditRequiredFiscalIds.setEnabled(false);
+                jckGenerateInformativeFile.setEnabled(false);
+                jckGenerateInformativeFile.setSelected(false);
+                break;
+                
+            case SDiotConsts.VER_2:
+                setTitle("Layout de la DIOT 2025");
+                jlRequiredFiscalIds.setEnabled(true);
+                jbEditRequiredFiscalIds.setEnabled(true);
+                jckGenerateInformativeFile.setEnabled(true);
+                jckGenerateInformativeFile.setSelected(true);
+                break;
+                
+            default:
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
         
         processConfig();
@@ -391,6 +447,13 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
     }
 
+    public void actionPerformedEditRequiredFiscalIds() {
+        jbEditRequiredFiscalIds.setEnabled(false);
+        jtfRequiredFiscalIds.setEditable(true);
+        jtfRequiredFiscalIds.setFocusable(true);
+        jtfRequiredFiscalIds.requestFocusInWindow();
+    }
+
     public void actionPerformedSave() {
         SFormValidation validation = validateDialog();
 
@@ -424,25 +487,31 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbEditRequiredFiscalIds;
     private javax.swing.JButton jbPickDateEnd;
     private javax.swing.JButton jbPickDateStart;
     private javax.swing.JButton jbSave;
     private javax.swing.JCheckBox jckExcludeTotallyZero;
+    private javax.swing.JCheckBox jckGenerateInformativeFile;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlDummy;
+    private javax.swing.JLabel jlDummy1;
+    private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlFormat;
+    private javax.swing.JLabel jlRequiredFiscalIds;
+    private javax.swing.JLabel jlRequiredFiscalIdsHint;
     private javax.swing.JRadioButton jrbFormatCsv;
     private javax.swing.JRadioButton jrbFormatPipe;
     private javax.swing.JScrollPane jspDiotConfig;
     private javax.swing.JScrollPane jspWarnings;
     private javax.swing.JTextArea jtaDiotConfig;
     private javax.swing.JTextArea jtaWarnings;
+    private javax.swing.JTextField jtfRequiredFiscalIds;
     // End of variables declaration//GEN-END:variables
-
 
     public SFormValidation validateDialog() {
         SFormValidation validation = new SFormValidation();
@@ -487,6 +556,9 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             }
             else if (button == jbPickDateEnd) {
                 actionPerformedDateEnd();
+            }
+            else if (button == jbEditRequiredFiscalIds) {
+                actionPerformedEditRequiredFiscalIds();
             }
             else if (button == jbSave) {
                 actionPerformedSave();
