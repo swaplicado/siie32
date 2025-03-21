@@ -6,7 +6,6 @@
 package erp.mfin.form;
 
 import cfd.DCfdConsts;
-import cfd.DCfdUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -41,21 +40,23 @@ import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -75,6 +76,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private boolean mbIsTaxCfg;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
+    private HashMap<Integer, String> maFormNames;
+    private HashMap<Integer, JComponent> maFormComponents;
 
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
     private erp.mfin.data.SDataRecord moRecord;
@@ -111,13 +114,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private int[] manLastCurrencyKey;
     private int[] manDpsClassKey;
     private int[] manDpsAdjClassKey;
-    boolean mbIsCurrentAccountDiogAccount;
+    private boolean mbIsCurrentAccountDiogAccount;
     private java.lang.String msCurrentAccountId;
     private erp.mfin.data.SDataAccountCash moEntryAccountCash;
     private erp.mtrn.data.SDataDps moEntryDps;
     private erp.mtrn.data.SDataDps moEntryDpsAdj;
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
     private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
+    
+    private SFinRecordEntry moFinRecordEntry;
 
     private String msXmlPath;
     private ArrayList<SDataCfdRecordRow> maCfdRecordRows = null;
@@ -976,6 +981,60 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        
+        maFormNames = new HashMap<>();
+        maFormNames.put(SFinRecordUtils.COMP_ACC, SGuiUtils.getLabelName("Cuenta contable"));
+        maFormNames.put(SFinRecordUtils.COMP_CONCEPT, SGuiUtils.getLabelName(jlConcept));
+        maFormNames.put(SFinRecordUtils.COMP_BIZPARTNER, SGuiUtils.getLabelName(jlFkBizPartnerId_nr));
+        maFormNames.put(SFinRecordUtils.COMP_OCCASIONAL, SGuiUtils.getLabelName(jlOccasionalFiscalId));
+        maFormNames.put(SFinRecordUtils.COMP_REFERENCE, SGuiUtils.getLabelName(jlReference));
+        maFormNames.put(SFinRecordUtils.COMP_TAX_APP, SGuiUtils.getLabelName(jckIsReferenceTax.getText()));
+        maFormNames.put(SFinRecordUtils.COMP_TAX, SGuiUtils.getLabelName(jlFkTaxId_n));
+        maFormNames.put(SFinRecordUtils.COMP_TAX_CASH, jrbTaxCash.getText());
+        maFormNames.put(SFinRecordUtils.COMP_ENTITY, SGuiUtils.getLabelName(jlFkEntityId_n));
+        maFormNames.put(SFinRecordUtils.COMP_ITEM, SGuiUtils.getLabelName(jlFkItemId_n));
+        maFormNames.put(SFinRecordUtils.COMP_QTY, "Cantidad");
+        maFormNames.put(SFinRecordUtils.COMP_UNIT, "Unidad");
+        maFormNames.put(SFinRecordUtils.COMP_ITEM_AUX, SGuiUtils.getLabelName(jlFkItemAuxId_n));
+        maFormNames.put(SFinRecordUtils.COMP_DPS, SGuiUtils.getLabelName(jlFkDps));
+        maFormNames.put(SFinRecordUtils.COMP_DPS_ADJ, SGuiUtils.getLabelName(jlFkDpsAdj));
+        maFormNames.put(SFinRecordUtils.COMP_YEAR, SGuiUtils.getLabelName(jlFkYearId_n));
+        maFormNames.put(SFinRecordUtils.COMP_CHECK, SGuiUtils.getLabelName(jckIsCheckApplying.getText()));
+        maFormNames.put(SFinRecordUtils.COMP_CUR, SGuiUtils.getLabelName(jlFkCurrencyId));
+        maFormNames.put(SFinRecordUtils.COMP_DEBIT_CY, SGuiUtils.getLabelName(jlDebitCy));
+        maFormNames.put(SFinRecordUtils.COMP_CREDIT_CY, SGuiUtils.getLabelName(jlCreditCy));
+        maFormNames.put(SFinRecordUtils.COMP_DEBIT, SGuiUtils.getLabelName(jlDebit));
+        maFormNames.put(SFinRecordUtils.COMP_CREDIT, SGuiUtils.getLabelName(jlCredit));
+        maFormNames.put(SFinRecordUtils.COMP_EXC_DIFF, jckIsExchangeDifference.getText());
+        maFormNames.put(SFinRecordUtils.COMP_EXC_RATE, SGuiUtils.getLabelName(jlExchangeRate));
+        maFormNames.put(SFinRecordUtils.COMP_CC, SGuiUtils.getLabelName("Centro costo"));
+        
+        maFormComponents = new HashMap<>();
+        maFormComponents.put(SFinRecordUtils.COMP_ACC, moPanelFkAccountId.getFieldAccount().getComponent());
+        maFormComponents.put(SFinRecordUtils.COMP_CONCEPT, jtfConcept);
+        maFormComponents.put(SFinRecordUtils.COMP_BIZPARTNER, jcbFkBizPartnerId_nr);
+        maFormComponents.put(SFinRecordUtils.COMP_OCCASIONAL, jcbOccasionalFiscalId);
+        maFormComponents.put(SFinRecordUtils.COMP_REFERENCE, jtfReference);
+        maFormComponents.put(SFinRecordUtils.COMP_TAX_APP, jckIsReferenceTax);
+        maFormComponents.put(SFinRecordUtils.COMP_TAX, jcbFkTaxId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_TAX_CASH, jrbTaxCash);
+        maFormComponents.put(SFinRecordUtils.COMP_ENTITY, jcbFkEntityId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_ITEM, jcbFkItemId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_QTY, jtfUnits);
+        maFormComponents.put(SFinRecordUtils.COMP_UNIT, jtfUnitsSymbol);
+        maFormComponents.put(SFinRecordUtils.COMP_ITEM_AUX, jcbFkItemAuxId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_DPS, jtfFkDps);
+        maFormComponents.put(SFinRecordUtils.COMP_DPS_ADJ, jtfFkDpsAdj);
+        maFormComponents.put(SFinRecordUtils.COMP_YEAR, jtfFkYearId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_CHECK, jcbFkCheckId_n);
+        maFormComponents.put(SFinRecordUtils.COMP_CUR, jcbFkCurrencyId);
+        maFormComponents.put(SFinRecordUtils.COMP_DEBIT_CY, jtfDebitCy);
+        maFormComponents.put(SFinRecordUtils.COMP_CREDIT_CY, jtfCreditCy);
+        maFormComponents.put(SFinRecordUtils.COMP_DEBIT, jtfDebit);
+        maFormComponents.put(SFinRecordUtils.COMP_CREDIT, jtfCredit);
+        maFormComponents.put(SFinRecordUtils.COMP_EXC_DIFF, jckIsExchangeDifference);
+        maFormComponents.put(SFinRecordUtils.COMP_EXC_RATE, jtfExchangeRate);
+        maFormComponents.put(SFinRecordUtils.COMP_CC, moPanelFkCostCenterId_n.getFieldAccount().getComponent());
     }
 
     private void windowActivated() {
@@ -1838,7 +1897,79 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         
         return bizPartners;
     }
-
+    
+    private void composeFinRecordEntry() {
+        moFinRecordEntry = new SFinRecordEntry();
+        
+        moFinRecordEntry.AccountId = moPanelFkAccountId.getFieldAccount().getString();
+        moFinRecordEntry.Concept = moFieldConcept.getString();
+        moFinRecordEntry.Debit = moFieldDebit.getDouble();
+        moFinRecordEntry.Credit = moFieldCredit.getDouble();
+        moFinRecordEntry.ExchangeRate = moFieldExchangeRate.getDouble();
+        moFinRecordEntry.ExchangeRateSystem = moFieldExchangeRateSystem.getDouble();
+        moFinRecordEntry.DebitCy = moFieldDebitCy.getDouble();
+        moFinRecordEntry.CreditCy = moFieldCreditCy.getDouble();
+        moFinRecordEntry.CurId = moFieldFkCurrencyId.getKeyAsIntArray()[0];
+        moFinRecordEntry.IsExchangeDifference = jckIsExchangeDifference.isSelected();
+        moFinRecordEntry.CostCenter = moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString();
+        moFinRecordEntry.IsSystem = jckIsSystem.isSelected();
+        moFinRecordEntry.IsDeleted = jckIsDeleted.isSelected();
+        
+        if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0) {
+            moFinRecordEntry.BizPartnerId = moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0];
+            SDataBizPartner bp = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId_nr.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+            moFinRecordEntry.IsForegn = !bp.getFiscalFrgId().isEmpty();
+        }
+        if (jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
+            moFinRecordEntry.OccasionalFiscalId = moFieldOccasionalFiscalId.getString();
+        }
+        if (jtfReference.isEnabled()) {
+            moFinRecordEntry.Repository = moFieldReference.getString();
+            moFinRecordEntry.IsReferenceTax = moFieldIsReferenceTax.getBoolean();
+        }
+        if ((jcbFkTaxId_n.isEnabled() || mbIsTaxCfg) && jcbFkTaxId_n.getSelectedIndex() > 0) {
+            moFinRecordEntry.TaxKey = moFieldFkTaxId_n.getKeyAsIntArray();
+        }
+        if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() > 0) {
+            moFinRecordEntry.EntityKey = moFieldFkEntityId_n.getKeyAsIntArray();
+        }
+        if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() > 0) {
+            moFinRecordEntry.ItemKey = moItem.getPkItemId();
+            if (jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
+                moFinRecordEntry.Quantity = 0;
+            }
+            else {
+                moFinRecordEntry.Quantity = moFieldUnits.getDouble();
+                moFinRecordEntry.UnitId = moItem.getFkUnitId();
+            }
+        }
+        if (jtfFkYearId_n.isEnabled()) {
+            moFinRecordEntry.Year  = moFieldFkYearId_n.getInteger();
+        }
+        if (jbFkDps.isEnabled() && moEntryDps != null) {
+            moFinRecordEntry.DpsKey = (int[]) moEntryDps.getPrimaryKey();
+        }
+        if (jbFkDpsAdj.isEnabled() && moEntryDpsAdj != null) {
+            moFinRecordEntry.DpsKeyAdj = (int[]) moEntryDpsAdj.getPrimaryKey();
+        }
+        
+        moFinRecordEntry.IsTaxCash = jrbTaxCash.isSelected();
+        
+        moFinRecordEntry.Account = moPanelFkAccountId.getCurrentInputAccount();
+        moFinRecordEntry.AccountMajor = moPanelFkAccountId.getDataAccountMajor();
+        
+        moFinRecordEntry.IsCheckAppliying = jckIsCheckApplying.isSelected();
+        moFinRecordEntry.IsBizPartnerRequired = mbIsBizPartnerRequired;
+        moFinRecordEntry.IsCurrentAccountDiogAccount = mbIsCurrentAccountDiogAccount;
+        moFinRecordEntry.IsTaxRequired = mbIsTaxRequired;
+        moFinRecordEntry.IsRequiredEntity = jtfEntityCurrencyKey.isEnabled();
+        moFinRecordEntry.IsRequiredYear = jtfFkYearId_n.isEnabled();
+        moFinRecordEntry.MissingFieldsBizPartnerAndOccasionalFiscalId = jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty();
+        moFinRecordEntry.MissingFieldItem = mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ });
+        moFinRecordEntry.FilledFieldItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0;
+        moFinRecordEntry.FilledFieldUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d; 
+    }
+    
     private void itemStateFkEntityId_n() {
         if (enableExchangeRateAccountCash()) {
             jbExchangeRateAccountCashSet.setEnabled(true);
@@ -2322,6 +2453,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         triggerFocusLost();     // this forces all pending focus lost function to be called
 
+        composeFinRecordEntry();
+        
         validation = formValidate();
 
         if (validation.getIsError()) {
@@ -2529,6 +2662,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         String message = "";
+        SFinRecordEntryValidation entryValidation = null;
+        
         SFormValidation validation = new SFormValidation();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -2538,7 +2673,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 break;
             }
         }
-
+        
+        /* Validaciones correspondientes a la versión anterior sin importaciones, ahora la validación se hace a través de una clase de utilería
+        
         if (!validation.getIsError()) {
             // Validate account:
 
@@ -2819,7 +2956,18 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     }
                 }
             }
+        }*/
+        
+        if (!validation.getIsError()) {
+            entryValidation = SFinRecordUtils.validateRecordEntry(miClient, moRecord, moFinRecordEntry, maFormNames, SFinRecordUtils.SOURCE_FORM);
         }
+        
+        if (entryValidation != null) {
+            if (entryValidation.ErrorId != 0) {
+                validation.setMessage(entryValidation.Message);
+                validation.setComponent(maFormComponents.get(entryValidation.ErrorId));
+            } 
+        } 
 
         return validation;
     }
@@ -2931,6 +3079,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
+        /*
         int[] keySystemAccountType = getSystemAccountTypeKey();
         int[] keySystemMoveType = getSystemMoveTypeKey();
         int[] keySystemMoveTypeXXX = getSystemMoveTypeKeyXXX();
@@ -3100,7 +3249,20 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setFkDpsAdjustmentYearId_n(0);
             moRecordEntry.setFkDpsAdjustmentDocId_n(0);
         }
+        */
         
+        moRecordEntry = SFinRecordUtils.composeRecordEntry(miClient, moRecordEntry, moFinRecordEntry);
+        
+        if (!jckIsCheckApplying.isSelected()) {
+            moRecordEntry.setFkCheckWalletId_n(0);
+            moRecordEntry.setFkCheckId_n(0);
+            moRecordEntry.setAuxCheckNumber(0);
+        }
+        else {
+            moRecordEntry.setFkCheckWalletId_n(moFieldFkCheckId_n.getKeyAsIntArray()[0]);
+            moRecordEntry.setFkCheckId_n(moFieldFkCheckId_n.getKeyAsIntArray()[1]);
+            moRecordEntry.setAuxCheckNumber((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement());
+        }
         
         // obtain XML to delete:
         
@@ -3433,7 +3595,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private class BizPartner {
         public int Id;
         public String Name;
-        
+
         public BizPartner(final int id, final String name) {
             Id = id;
             Name = name;

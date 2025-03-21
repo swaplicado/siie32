@@ -129,13 +129,23 @@ public class SFinDpsExchangeRateDiff {
      *
      * @param docNumber Series and number of document for sales and purchases.
      * @param bizPartnerName Business partner or bank name.
+     * @param accountNum
+     * @param currencyCode
      * @return String wiht the concept
      */
-    private String createConceptRecordEntry(final String docNumber, final String reference, final String bizPartnerName) {
+    private String createConceptRecordEntry(final String docNumber, final String reference, final String bizPartnerName, final String accountNum, final String currencyCode) {
         String concept;
 
         if (!docNumber.isEmpty()) {
             concept = SLibUtils.textTrim("DIFERENCIA CAMBIARIA/ F " + docNumber + "/ " + bizPartnerName);
+        }
+        else if(!accountNum.isEmpty()) {
+            if (!reference.isEmpty()) {
+                concept = SLibUtils.textTrim("DIFERENCIA CAMBIARIA/ C CONTAB " + accountNum + "/ REF " + reference + "/ MON " + currencyCode);
+            }
+            else {
+                concept = SLibUtils.textTrim("DIFERENCIA CAMBIARIA/ C CONTAB " + accountNum + "/ SIN REF/ MON " + currencyCode);
+            }
         }
         else {
             if (!reference.isEmpty()) {
@@ -176,6 +186,27 @@ public class SFinDpsExchangeRateDiff {
                 + "d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, "
                 + "re.fid_acc, re.fk_acc;";
         
+        return sql;
+    }
+    
+    private String composeQueryShortTermDocuments(final int accountSpecialType) {
+        String sFormatAccountId = ((SClientInterface) miClient).getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
+        ArrayList<Integer> vLevels = SDataUtilities.getArrayAccountLevels(sFormatAccountId);
+        String sql = "SELECT acc.id_acc, re.ref, c.cur_key, c.id_cur, "
+                + "SUM(re.debit_cur) AS _dbt_cur, SUM(re.credit_cur) AS _cdt_cur, SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN fin_acc AS m_acc ON CONCAT(LEFT(re.fid_acc, " + (vLevels.get(1) - 1) + "), '" + sFormatAccountId.substring(vLevels.get(1) - 1) + "') = m_acc.id_acc " 
+                + "INNER JOIN fin_acc AS acc ON re.fk_acc = acc.pk_acc "
+                + "INNER JOIN erp.fins_tp_acc_spe AS spe ON m_acc.fid_tp_acc_spe = spe.id_tp_acc_spe "
+                + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' "
+                + "AND spe.id_tp_acc_spe = " + accountSpecialType + " "
+                + "AND re.fid_cur <> " + mnLocalCurrency + " " 
+                + "AND NOT r.b_del AND NOT re.b_del "
+                + "GROUP BY re.fid_acc, re.ref, re.fid_cur "
+                + "HAVING SUM(re.debit_cur - re.credit_cur) = 0 AND SUM(re.debit - re.credit) <> 0 " // documentos liquidados con diferencia en cambios
+                + "ORDER BY acc.id_acc, re.ref, c.cur_key, c.id_cur;";
         return sql;
     }
     
@@ -408,6 +439,15 @@ public class SFinDpsExchangeRateDiff {
                 }
                 break;
                 
+            case SDataConstantsSys.BPSS_CT_BP_CO:
+                if (pdDebit != 0) {
+                    anSystemMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+                }
+                else {
+                    anSystemMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
+                }
+                break;
+                
             default:
         }
         
@@ -504,7 +544,7 @@ public class SFinDpsExchangeRateDiff {
      * @param isDebit 
      * @return array  with the aconting register.
      */
-    private double[] computeDebitCredit(final double debit, final double credit, final boolean isDebit){
+    private double[] computeDebitCredit(final double debit, final double credit, final boolean isDebit) {
         double balance;
         double[] debitCredit =  new double[] { 0, 0 };
       
@@ -565,14 +605,14 @@ public class SFinDpsExchangeRateDiff {
         int[] bizPartnerCategories = new int[] { 
             SDataConstantsSys.BPSS_CT_BP_SUP,
             SDataConstantsSys.BPSS_CT_BP_CUS
-            };
+        };
         
         HashMap<Integer, int[]> sysMoveTypeXxxBizPartners = new HashMap<>(); // key = business partner category; value = key of system movement
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_SUP, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP);
         sysMoveTypeXxxBizPartners.put(SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS);
         
-        int sup = 0;
-        int cus = 0;
+        int countSup = 0;
+        int countCus = 0;
         
         for (int bizPartnerCategory : bizPartnerCategories) {
             anSysMoveTypeXxxKeyBizPartner = sysMoveTypeXxxBizPartners.get(bizPartnerCategory);
@@ -582,8 +622,13 @@ public class SFinDpsExchangeRateDiff {
             
             while (resultSet.next()) {
                 switch (bizPartnerCategory) {
-                    case SDataConstantsSys.BPSS_CT_BP_SUP: sup++; break;
-                    case SDataConstantsSys.BPSS_CT_BP_CUS: cus++; break;
+                    case SDataConstantsSys.BPSS_CT_BP_SUP:
+                        countSup++;
+                        break;
+                    case SDataConstantsSys.BPSS_CT_BP_CUS:
+                        countCus++;
+                        break;
+                    default:
                 }
                 
                 // ajuste al saldo del documento:
@@ -596,7 +641,7 @@ public class SFinDpsExchangeRateDiff {
                 nCurrencyId = resultSet.getInt("re.fid_cur");
                 sRecordConcept = createConceptRecordEntry(
                         STrnUtils.formatDocNumber(resultSet.getString("d.num_ser") == null ? "" : resultSet.getString("d.num_ser"), resultSet.getString("d.num") == null ? "" : resultSet.getString("d.num")), 
-                        sReference, resultSet.getString("b.bp_comm"));
+                        sReference, resultSet.getString("b.bp_comm"), "", "");
                 isDebit = SLibUtils.belongsTo(bizPartnerCategory, new int[] { SDataConstantsSys.BPSS_CT_BP_CUS, SDataConstantsSys.BPSS_CT_BP_DBR });
                 adDebitCreditBal = computeDebitCredit(resultSet.getDouble("_dbt"), resultSet.getDouble("_cdt"), isDebit);
 
@@ -644,7 +689,54 @@ public class SFinDpsExchangeRateDiff {
                 }
             }
         }
-        miClient.showMsgBoxInformation("Se ajustaron " + (sup + cus) + " documentos:\n-" + sup + " de proveedores.\n-" + cus + " de clientes.");
+        
+        // procesar documentos por pagar / cobrar a corto plazo
+        
+        int[] accountSpecialTypes = new int[] {
+            SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY,
+            SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC
+        };
+        
+        int countPay = 0;
+        int countRec = 0;
+        
+        for (int accountSpecialType : accountSpecialTypes) {
+            String sql = composeQueryShortTermDocuments(accountSpecialType);
+            resultSet = connection.createStatement().executeQuery(sql);
+            
+            while (resultSet.next()) {
+                switch(accountSpecialType) {
+                    case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY:
+                        countPay++;
+                        break;
+                    case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC:
+                        countRec++;
+                        break;
+                    default:
+                }
+                
+                anDocumentKey = null;
+                sReference = resultSet.getString("ref");
+                sIdAccBal = resultSet.getString("id_acc");
+                nCurrencyId = resultSet.getInt("id_cur");
+                sRecordConcept = createConceptRecordEntry("", sReference, "", sIdAccBal, resultSet.getString("cur_key"));
+                isDebit = true;
+                adDebitCreditBal = computeDebitCredit(resultSet.getDouble("_dbt"), resultSet.getDouble("_cdt"), isDebit);
+
+                maRecordEntries.add(createRecordEntry(0, false, sRecordConcept, adDebitCreditBal[0], adDebitCreditBal[1], sIdAccBal, ++nSortingPosition, 
+                        SDataConstantsSys.FINS_TP_SYS_MOV_NA, 0, 0, anDocumentKey, sReference, nCurrencyId, null));
+                
+                maRecordEntries.add(createRecordEntry(0, true, sRecordConcept, adDebitCreditBal[1], adDebitCreditBal[0], "", ++nSortingPosition, 
+                        null, 0, 0, anDocumentKey, "", mnLocalCurrency, null));
+
+            }
+        }
+        
+        miClient.showMsgBoxInformation("Se ajustaron " + (countSup + countCus + countPay + countRec) + " documentos:\n"
+                + "-" + countSup + " de proveedores.\n"
+                + "-" + countCus + " de clientes.\n"
+                + "-" + countPay  + " documentos por pagar a corto plazo.\n"
+                + "-" + countRec + " documentos por cobrar a corto plazo.");
     }
 
     /**

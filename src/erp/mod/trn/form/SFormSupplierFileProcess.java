@@ -1244,7 +1244,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             else {
                 miClient.getFileChooser().setSelectedFile(new File(System.getProperty("user.home")));
             }
-            if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 if ( miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(" + FILE_EXT + ")$")) {
                     jtfFile.setText(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                     jtfFile.setToolTipText(miClient.getFileChooser().getSelectedFile().getAbsolutePath());

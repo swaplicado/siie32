@@ -46,7 +46,9 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
     private boolean mbShowRecordAdjYearEnd;
     private boolean mbShowRecordAdjAudit;
 
-    /** Creates new form SDialogAccountingDetail */
+    /** Creates new form SDialogAccountingDetail
+     * @param client
+     * @param type */
     public SDialogAccountingDetail(erp.client.SClientInterface client, int type) {
         super(client.getFrame(), true);
         miClient = client;
@@ -530,6 +532,13 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
                 jlField01.setText("Impuesto básico:");
                 jlField02.setText("Impuesto:");
                 break;
+            case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY:
+            case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC:
+                jtfSubsystem.setText("MOVIMIENTOS");
+                jlField01.setText("No. cuenta contable:");
+                jlField02.setText("Cuenta contable:");
+                mvAccountLevels = SDataUtilities.getAccountLevels(SDataUtilities.createNewFormattedAccountId(miClient, miClient.getSessionXXX().getParamsErp().getDeepAccounts()));
+                break;
 
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -722,6 +731,8 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
             switch (mnDetailType) {
                 case SDataConstants.FINX_ACCOUNTING:
                 case SDataConstants.FINX_ACCOUNTING_ALL:
+                case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY:
+                case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC:
                     String accountId = (String) ((Object[]) moParamPrimaryKey)[0];
                     Object[] accountsAndDescription = SDataUtilities.getInputAccountsAndDescription(miClient, accountId, mvAccountLevels);
 

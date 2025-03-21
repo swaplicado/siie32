@@ -127,10 +127,10 @@ public class SViewDpsPayment extends erp.lib.table.STableTab implements java.awt
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND " +
                 "r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
-                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = YEAR('" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "') AND " + sqlDatePeriod + " AND " +
-                "r.id_tp_rec = '" + SDataConstantsSys.FINU_TP_REC_CASH_BANK + "' AND " +
-                "re.fid_ct_sys_mov_xxx = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]) + " AND " +
-                "re.fid_tp_sys_mov_xxx = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " AND re.b_exc_diff = 0 " +
+                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = YEAR('" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "') AND " + sqlDatePeriod + " " +
+                "AND (r.id_tp_rec = '" + SDataConstantsSys.FINU_TP_REC_CASH_BANK + "' OR r.id_tp_rec = '" + SDataConstantsSys.FINU_TP_REC_JOURNAL + "') " +
+                "AND re.fid_ct_sys_mov_xxx = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]) + " " +
+                "AND re.fid_tp_sys_mov_xxx = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " AND re.b_exc_diff = 0 " +
                 "INNER JOIN fin_bkc AS bkc ON r.id_bkc = bkc.id_bkc " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON r.fid_cob = cob.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +

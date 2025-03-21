@@ -1683,10 +1683,15 @@ public abstract class SAuthorizationUtils {
         SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
         fileProcess.read(client.getSession(), pk);
         if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
-            SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
-            dialog.setVisible(true);
-            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
+            if (canSendAuthornAppWeb(client, fileProcess)) {
+                SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
+                dialog.setVisible(true);
+                if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                    new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
+                }
+                else {
+                    return false;
+                }
             }
             else {
                 return false;
@@ -1697,6 +1702,29 @@ public abstract class SAuthorizationUtils {
             return false;
         }
         return true;
+    }
+    
+    public static boolean canSendAuthornAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {
+        boolean send = true;
+        fileProcess.readMaterialRequests(client.getSession());
+        if (fileProcess.getSuppFiles().isEmpty()) {
+            if (client.showMsgBoxConfirm("El documento no tiene archivos de soporte anexados.\n¿Desea enviar a autorización web de todas formas?") != JOptionPane.OK_OPTION) {
+                send = false;
+            }
+        }
+        if (send && fileProcess.getMaterialRequests().isEmpty()) {
+            if (client.showMsgBoxConfirm("El documento no tiene requisiciones de materiales asociadas.\n¿Desea enviar a autorización web de todas formas?") != JOptionPane.OK_OPTION) {
+                send = false;
+            }                        
+        }
+        int entriesWithoutReq = fileProcess.getDpsEntriesWithoutMaterialRequest(client.getSession());
+        if (send && !fileProcess.getMaterialRequests().isEmpty() && entriesWithoutReq > 0) {
+            if (client.showMsgBoxConfirm("El documento tiene " + entriesWithoutReq + " partida" + (entriesWithoutReq > 1 ? "s" : "") + " que no estan asociadas a una requisicion de materiales.\n¿Desea enviar a autorización web de todas formas?") != JOptionPane.OK_OPTION) {
+                send = false;
+            }                                                
+        }
+        
+        return send;
     }
     
     /**

@@ -587,7 +587,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                         SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_ORD)) {
                         // Order:
 
-                        if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && oDps.getIsAuthorized()) {
+                        if (!SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) || !oDps.getIsAuthorized()) {
                             miClient.showMsgBoxWarning("No se puede imprimir el documento porque:\n-No está autorizado.");
                         }
                         else {

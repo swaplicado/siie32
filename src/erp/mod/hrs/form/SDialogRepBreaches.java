@@ -18,8 +18,11 @@ import erp.mtrn.data.STrnUtilities;
 import static erp.mtrn.data.STrnUtilities.getMms;
 import erp.musr.data.SDataAccessCompany;
 import erp.musr.data.SDataUser;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JRadioButton;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -53,7 +57,7 @@ import sa.lib.mail.SMailSender;
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SDialogRepBreaches extends JDialog implements ActionListener {
+public class SDialogRepBreaches extends JDialog implements ActionListener, ItemListener {
 
     private static final SimpleDateFormat moDateFormatDate = new SimpleDateFormat("dd-MMM-yy");
     
@@ -65,6 +69,9 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
     private SGuiFields moFields;
     private ObjectMapper moMapper;
     private SMailSender moMailSender;
+    
+    private Cursor waitCursor; 
+    private Cursor defaultCursor;
     
     /**
      * Creates new form SDialogRepBreaches
@@ -107,6 +114,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         moBooleanSaveEmails = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel10 = new javax.swing.JPanel();
         jlReportCompanies = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         moRadThisCompany = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadAccesCompany = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadCustom = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -210,30 +218,30 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         jlReportCompanies.setText("Reporte de:");
         jPanel10.add(jlReportCompanies);
 
+        jLabel1.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel10.add(jLabel1);
+
         buttonGroup1.add(moRadThisCompany);
         moRadThisCompany.setSelected(true);
         moRadThisCompany.setText("Empresa actual");
-        moRadThisCompany.setToolTipText("");
         moRadThisCompany.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(moRadThisCompany);
 
         buttonGroup1.add(moRadAccesCompany);
-        moRadAccesCompany.setText("Mis empresas con acceso");
-        moRadAccesCompany.setToolTipText("");
-        moRadAccesCompany.setPreferredSize(new java.awt.Dimension(190, 23));
+        moRadAccesCompany.setText("Todas las empresas");
+        moRadAccesCompany.setPreferredSize(new java.awt.Dimension(180, 23));
         jPanel10.add(moRadAccesCompany);
 
         buttonGroup1.add(moRadCustom);
-        moRadCustom.setText("Selección personalizada");
-        moRadCustom.setToolTipText("");
-        moRadCustom.setPreferredSize(new java.awt.Dimension(190, 23));
+        moRadCustom.setText("Personalizado");
+        moRadCustom.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(moRadCustom);
 
         jPanel2.add(jPanel10);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empresas con Módulo Recursos Humanos:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Empresas con Módulo Recursos Humanos:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jScrollPane2.setViewportView(jListCompanies);
@@ -242,8 +250,8 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlNote.setText("Para seleccionar varias opciones mantenga presionada la tecla Ctrl");
-        jlNote.setEnabled(false);
+        jlNote.setForeground(java.awt.SystemColor.textInactiveText);
+        jlNote.setText("(Para seleccionar varias opciones mantenga presionada la tecla Ctrl)");
         jPanel11.add(jlNote);
 
         jPanel5.add(jPanel11, java.awt.BorderLayout.NORTH);
@@ -270,6 +278,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JList jListCompanies;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -375,6 +384,14 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
         
         jbSend.addActionListener(this);
         jbClose.addActionListener(this);
+        moRadThisCompany.addItemListener(this); 
+        moRadAccesCompany.addItemListener(this); 
+        moRadCustom.addItemListener(this); 
+        
+        waitCursor = new Cursor(Cursor.WAIT_CURSOR);
+        defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
+        
+        jListCompanies.setEnabled(false);
     }
     
     private void sendMail() {
@@ -624,8 +641,10 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
     private void actionSend() {
         SGuiValidation validation = validateForm();
         if (validation.isValid()) {
+            this.setCursor(waitCursor);
             sendMail();
             saveMails();
+            this.setCursor(defaultCursor);
             this.setVisible(false);
         }
         else {
@@ -664,6 +683,26 @@ public class SDialogRepBreaches extends JDialog implements ActionListener {
             }
             else if (button == jbClose) {
                 actionClose();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JRadioButton) {
+            JRadioButton radioButton = (JRadioButton) e.getSource();
+            
+            if (radioButton == moRadThisCompany) {
+                jListCompanies.setEnabled(false);
+                jListCompanies.clearSelection();
+            }
+            else if (radioButton == moRadAccesCompany) {
+                jListCompanies.setEnabled(false);
+                jListCompanies.clearSelection();
+            }
+            else if (radioButton == moRadCustom) {
+                jListCompanies.setEnabled(true);
+                jListCompanies.clearSelection();
             }
         }
     }

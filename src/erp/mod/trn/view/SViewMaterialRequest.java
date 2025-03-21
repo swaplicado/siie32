@@ -684,6 +684,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         boolean needAuthJoin = false;
         Object filter;
         int usrId = miClient.getSession().getUser().getPkUserId();
+        boolean admin = miClient.getSession().getUser().isAdministrator() || miClient.getSession().getUser().isSupervisor();
         
         moPaneSettings = new SGridPaneSettings(1);
 
@@ -699,7 +700,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         switch (mnGridMode) {
             case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
                 where += (where.isEmpty() ? "" : "AND ") + "v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_NEW + " ";
-                if (usrId != 2 ) { // SUPER
+                if (!admin) { // SUPER
                     where += (where.isEmpty() ? "" : "AND ") + "(v.fk_usr_req = " + usrId + " OR v.fk_usr_ins = " + usrId + ") ";
                 }
                 break;
@@ -753,7 +754,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
                 break;
             case SModConsts.TRN_MAT_CONS_ENT_USR:
-                if (usrId != 2 ) { // SUPER
+                if (!admin) { // SUPER
                     where += (where.isEmpty() ? "" : "AND ") + "v.id_mat_req IN ( " +
                         "SELECT DISTINCT rc.id_mat_req FROM trn_mat_req_cc AS rc " +
                         "INNER JOIN " +
@@ -778,7 +779,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
 
             break;
             case SModConsts.TRN_MAT_PROV_ENT_USR:
-                if (usrId != 2 ) { // SUPER
+                if (!admin) { // SUPER
                     where += (where.isEmpty() ? "" : "AND ") + "(peu.id_usr = " + usrId + ") ";
                     provJoin = "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
                             + "v.fk_mat_prov_ent = peu.id_mat_prov_ent AND peu.id_usr = " + usrId + " ";
@@ -804,7 +805,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             break;
         }
         
-        if (usrId != 2) { // SUPER
+        if (!admin) { // SUPER
             // Verificar si el modo de la cuadrícula no es ni TRN_MAT_CONS_ENT_USR ni TRN_MAT_PROV_ENT_USR
             // y si el subtipo de la cuadrícula no es TRNX_MAT_REQ_REV ni TRNX_MAT_REQ_ADM
             if (mnGridMode != SModConsts.TRN_MAT_CONS_ENT_USR &&

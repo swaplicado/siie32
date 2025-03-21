@@ -11,6 +11,7 @@
 
 package erp.mtrn.form;
 
+import erp.form.SDialogShowImportErrors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -3148,7 +3149,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             line = br.readLine();
                         }
                         
-                        SDialogShowDiogErrors er = new SDialogShowDiogErrors(error, warning, errors, warnings);
+                        SDialogShowImportErrors er = new SDialogShowImportErrors(error, warning, errors, warnings);
                         if (errors > 0) {
                             er.setVisible(true);
                         }

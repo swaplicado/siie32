@@ -811,6 +811,8 @@ public abstract class SDataConstantsSys {
     public static final int FINS_TP_ACC_SPE_WP = 81;
     public static final int FINS_TP_ACC_SPE_PRP = 82;
     public static final int FINS_TP_ACC_SPE_AIC = 83;
+    public static final int FINS_TP_ACC_SPE_DOC_PAY = 71;
+    public static final int FINS_TP_ACC_SPE_DOC_REC = 72;
     public static final int FINS_TP_ACC_SPE_YER_CLO = 91;
     public static final int FINS_TP_ACC_SPE_YER_RES = 92;
     public static final int FINS_TP_ACC_SPE_JOU = 99;
@@ -966,6 +968,10 @@ public abstract class SDataConstantsSys {
 
     public static final int FINS_ST_FIN_MOV_AVLB = 1;
     public static final int FINS_ST_FIN_MOV_TRANSIT = 2;
+    
+    public static final int FINS_TP_TAX_TRA = 1;
+    public static final int FINS_TP_TAX_RET = 2;
+    public static final int FINS_TP_TAX_OTHER = 9;
 
     public static final int FINU_TAX_BAS_VAT = 1;
     

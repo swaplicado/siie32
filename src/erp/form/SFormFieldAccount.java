@@ -5,16 +5,15 @@
 
 package erp.form;
 
-import javax.swing.JFormattedTextField;
-
-import erp.lib.form.*;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.*;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
+import javax.swing.JFormattedTextField;
 
 /**
  *

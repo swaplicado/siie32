@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 267.0/ 2025-03-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación de la vista de Balanza de comprobación anual.
+2) Creación de la vista Documentos por pagar y por cobrar a corto plazo que visualizan los movimientos contables de este tipo. 
+3) Adición de movimientos de corto plazo en los ajustes de diferencias cambiarias.
+4) Adición del UUID, el número de parcialidad y los movimientos de diario en la vista Consulta de pagos por periodo a detalle.
+5) Creación de la carga masiva de partidas de pólizas contables a través de un archivo externo.
+6) Creación de la forma de captura para prorratear partidas de pólizas contables.
+
+================================================================================
 SIIE 3.2 265.5/ 2025-03-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
