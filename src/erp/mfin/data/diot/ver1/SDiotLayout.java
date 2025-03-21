@@ -33,7 +33,7 @@ import sa.lib.SLibUtils;
 public class SDiotLayout {
     
     private static final double AMOUNT_DIFF_ALLOWANCE = 0.1;
-    private static final double FIXED_SUBTOT_VAT_THIRD_TAXPAYER = 0.01; // fixed subtotal of VAT of third-taxpayer
+    private static final double FIXED_VAT_THIRD_TAXPAYER = 0.01; // fixed pre-arranged subtotal of VAT of third-taxpayer
     
     protected SClientInterface miClient;
     protected Date mtStart;
@@ -547,7 +547,7 @@ public class SDiotLayout {
                                             thirdTaxpayerRatio = dpsVatSetting.Tax / dpsVatAmount;
                                         }
 
-                                        isCustomVatThirdTaxpayer = SLibUtils.compareAmount(dpsVatSetting.Subtotal, FIXED_SUBTOT_VAT_THIRD_TAXPAYER) && dpsVatSetting.Tax > 0 && 
+                                        isCustomVatThirdTaxpayer = SLibUtils.compareAmount(dpsVatSetting.Subtotal, FIXED_VAT_THIRD_TAXPAYER) && dpsVatSetting.Tax > 0 && 
                                                 !vat.getVatType().equals(SDiotConsts.VAT_TYPE_EXEMPT) && !vat.getVatType().equals(SDiotConsts.VAT_TYPE_RATE_0);
                                     }
 
