@@ -3170,18 +3170,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         try {
             if (jbSendAuth.isEnabled()) {
                 if (isRowSelected()) {
-                    boolean refresh = false;
-                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
-                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    if (fileProcess.getSuppFiles().isEmpty()) {
-                        if (miClient.showMsgBoxConfirm("El documento no tiene archivos de soporte anexados.\n¿Desea enviar a autorización web de todas formas?") == JOptionPane.OK_OPTION) {
-                            refresh = SAuthorizationUtils.sendAuthornAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                        }
-                    }
-                    else {
-                        refresh = SAuthorizationUtils.sendAuthornAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    }
-                    if (refresh) {
+                    if (SAuthorizationUtils.sendAuthornAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
                     }

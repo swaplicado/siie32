@@ -3,18 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mtrn.form;
+package erp.form;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import sa.lib.gui.SGuiUtils;
 import javax.swing.JFrame;
+import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
-public class SDialogShowDiogErrors extends javax.swing.JDialog implements ActionListener {
+public class SDialogShowImportErrors extends javax.swing.JDialog implements ActionListener {
 
     public static JFrame OwnerFrame;
     private final String msError;
@@ -24,13 +24,13 @@ public class SDialogShowDiogErrors extends javax.swing.JDialog implements Action
     private final int mnWarnings;
     
     /**
-     * Creates new form SDialogShowDiogErrors
+     * Creates new form SDialogShowImportErrors
      * @param error
      * @param warning
      * @param errors
      * @param warnings
      */
-    public SDialogShowDiogErrors(String error, String warning, int errors, int warnings) {
+    public SDialogShowImportErrors(String error, String warning, int errors, int warnings) {
         super(OwnerFrame, true);
         msError = error;
         msWarning = warning;

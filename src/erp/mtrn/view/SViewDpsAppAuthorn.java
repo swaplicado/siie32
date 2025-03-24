@@ -264,19 +264,13 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     }
 
     @Override
-    public void actionNew() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void actionNew() {}
 
     @Override
-    public void actionEdit() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void actionEdit() {}
 
     @Override
-    public void actionDelete() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void actionDelete() {}
     
     private boolean isRowSelected() {
         return !(moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary());

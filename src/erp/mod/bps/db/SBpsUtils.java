@@ -110,8 +110,8 @@ public abstract class SBpsUtils {
      * @return Business partner ID when found, otherwise zero.
      */
     public static int getBizParterIdByFiscalId(final Statement statement, final String fiscalId, final String fiscalForeignId, final int bizPartnerCategory) {
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
         int bizPartnerId = 0;
 
         try {
@@ -119,7 +119,49 @@ public abstract class SBpsUtils {
                   + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp "  
                   + "WHERE b.fiscal_id = '" + fiscalId + "' "
                   + (bizPartnerCategory != 0 ? "AND bc.id_ct_bp = " + bizPartnerCategory + " " : "")
-                  + (!"".equals(fiscalForeignId) ? "AND b.fiscal_id = '" + fiscalForeignId + "' " : "") ;
+                  + (!"".equals(fiscalForeignId) ? "AND b.fiscal_id = '" + fiscalForeignId + "' " : "")
+                  + "AND NOT b.b_del;";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                bizPartnerId = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SBpsUtils.class.getName(), e);
+        }
+
+        return bizPartnerId;
+    }
+    
+    /**
+     * Get business partner ID by fiscal ID and business partner category.
+     * @param statement Statement of database connection.
+     * @param fiscalId Fiscal ID of business partner.
+     * @param fiscalForeignId Foreign fiscal ID of business partner.
+     * @param bizPartnerCategory Business parter category (constants defined in SDataConstantsSys.BPSS_CT_BP_...) Can be zero to omit filtering in query.
+     * @return Business partner ID when found, otherwise zero.
+     */
+    public static int getBizParterIdByFiscalId(final Statement statement, final String fiscalId, final String fiscalForeignId, final int[] bizPartnerCategory) {
+        String sql;
+        ResultSet resultSet;
+        int bizPartnerId = 0;
+        String category = "";
+        
+        if (bizPartnerCategory != null) {
+            for (int cat : bizPartnerCategory) {
+                category += (category.isEmpty() ? "(" : "OR ") + "bc.id_ct_bp = " + cat + " ";
+            }
+            category += (category.isEmpty() ? "" : ") ");
+        }
+
+        try {
+            sql = "SELECT b.id_bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                  + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp "  
+                  + "WHERE b.fiscal_id = '" + fiscalId + "' "
+                  + (!category.isEmpty() ? "AND " + category : "")
+                  + (!"".equals(fiscalForeignId) ? "AND b.fiscal_id = '" + fiscalForeignId + "' " : "")
+                  + "AND NOT b.b_del;";
             
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {

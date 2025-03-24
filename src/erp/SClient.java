@@ -119,7 +119,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 265.5"; // release date: 2025-03-20
+    public static final String APP_RELEASE = "3.2 267.0"; // release date: 2025-03-21
     public static final String APP_COPYRIGHT = "2007-2025";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -246,7 +246,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private Jedis moJedis;
     private SLockManager moSLockManager;
     
-    private static boolean IsDevMode;
+    public static boolean IsDevMode;
     private static long DevStartControlPoint;
     private static long DevLastControlPoint;
     private static final SimpleDateFormat DevDatetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS Z");

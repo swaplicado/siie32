@@ -127,9 +127,9 @@ public abstract class SAccountUtils {
      * Finds an account only on top level provided array list of account objects (children accounts excluded), searching it by account code-level on standard-format.
      * <strong>Example:</strong>
      * <pre>
-     * Let <i>lev</i> be an account code-level on user-format.
+     * Let <i>acc</i> be an account code-level on user-format.
      * <code><i>acc</i> = "1110"</code>
-     * Its corresponding account code-level on standard-format, is: <code>"001110"</code>.
+     * Its corresponding account code-level on standard-format is: <code>"001110"</code>.
      * </pre>
      * @param accounts Array list of account objects.
      * @param codeLevelStd Account code-level to find on standard-format.
@@ -445,13 +445,13 @@ public abstract class SAccountUtils {
     }
 
     /**
-     * Converts an account code-level in on user-format into standard-format.
+     * Converts an account code-level on user-format into standard-format.
      * <p>
      * <strong>Example:</strong>
      * <pre>
-     * Let <i>lev</i> be an account code-level on user-format.
+     * Let <i>acc</i> be an account code-level on user-format.
      * <code><i>acc</i> = "1110"</code>
-     * Its corresponding account codel-level, on standard-format, is: <code>"001110"</code>.
+     * Its corresponding account codel-level on standard-format is: <code>"001110"</code>.
      * </pre>
      * @param codeLevelUsr Account code-level on user-format.
      * @return Converted account code-level on standard-format.

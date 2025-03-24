@@ -142,18 +142,29 @@ public class SValuationBalances {
      * @param bizPartnerName Business partner or bank name.
      * @return String wiht the concept
      */
-    private String createConceptRecordEntry(final String docNumber, final String reference, final String bizPartnerName) {
+    private String createConceptRecordEntry(final String docNumber, final String reference, final String bizPartnerName, 
+            final String acc, final String currencyKey) {
         String concept;
 
-        if (!docNumber.isEmpty()) {
-            concept = SLibUtils.textTrim("REVALUACIÓN/ F " + docNumber + "/ " + bizPartnerName);
+        if (acc.isEmpty()) {
+            if (!docNumber.isEmpty()) {
+                concept = SLibUtils.textTrim("REVALUACIÓN/ F " + docNumber + "/ " + bizPartnerName);
+            }
+            else {
+                if (!reference.isEmpty()) {
+                    concept = SLibUtils.textTrim("REVALUACIÓN/ REF " + reference + "/ " + bizPartnerName);
+                }
+                else{
+                    concept = SLibUtils.textTrim("REVALUACIÓN/ SIN REF/ " + bizPartnerName);
+                }
+            }
         }
         else {
             if (!reference.isEmpty()) {
-                concept = SLibUtils.textTrim("REVALUACIÓN/ REF " + reference + "/ " + bizPartnerName);
+                concept = SLibUtils.textTrim("REVALUACIÓN/ C CONTAB " + acc + "/ REF " + reference + "/ MON " + currencyKey);
             }
-            else{
-                concept = SLibUtils.textTrim("REVALUACIÓN/ SIN REF/ " + bizPartnerName);
+            else {
+                concept = SLibUtils.textTrim("REVALUACIÓN/ C CONTAB " + acc + "/ SIN REF/ MON " + currencyKey);
             }
         }
 
@@ -203,6 +214,28 @@ public class SValuationBalances {
                 + "ORDER BY ent.ent, re.fid_cob_n, re.fid_ent_n, re.ref, re.fid_acc, re.fk_acc;";
         
         return sql; 
+    }
+    
+    private String composeQueryShortTermDocuments(final int typeAccountSpecial) {
+        String sFormatAccountId = ((SClientInterface) miClient).getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
+        ArrayList<Integer> vLevels = SDataUtilities.getArrayAccountLevels(sFormatAccountId);
+        String sql = "SELECT acc.id_acc, re.ref, c.cur_key, c.id_cur, "
+                + "SUM(re.debit_cur) AS _dbt_cur, SUM(re.credit_cur) AS _cdt_cur, SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN fin_acc AS m_acc ON CONCAT(LEFT(re.fid_acc, " + (vLevels.get(1) - 1) + "), '" + sFormatAccountId.substring(vLevels.get(1) - 1) + "') = m_acc.id_acc "
+                + "INNER JOIN fin_acc AS acc ON re.fk_acc = acc.pk_acc "
+                + "INNER JOIN erp.fins_tp_acc_spe AS spe ON m_acc.fid_tp_acc_spe = spe.id_tp_acc_spe "
+                + "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur "
+                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' "
+                + "AND spe.id_tp_acc_spe = " + typeAccountSpecial + " "
+                + "AND re.fid_cur = " + mnCurrencyId + " "
+                + "AND NOT r.b_del AND NOT re.b_del "
+                + "GROUP BY re.fid_acc, re.ref, re.fid_cur "
+                + "HAVING SUM(re.debit_cur - re.credit_cur) <> 0 "
+                + "ORDER BY acc.id_acc, re.ref, c.cur_key, c.id_cur;";
+        
+        return sql;
     }
 
     /**
@@ -396,6 +429,14 @@ public class SValuationBalances {
                     }
                     break;
                 default:
+            }
+        }
+        else {
+            if (pdDebit != 0) {
+                anSystemMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
+            }
+            else {
+                anSystemMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_JOU_CDT;
             }
         }
         
@@ -618,7 +659,7 @@ public class SValuationBalances {
                     nCurrencyId = resultSet.getInt("re.fid_cur");
                     sRecordConcept = createConceptRecordEntry(
                             STrnUtils.formatDocNumber(resultSet.getString("d.num_ser") == null ? "" : resultSet.getString("d.num_ser"), resultSet.getString("d.num") == null ? "" : resultSet.getString("d.num")), 
-                            sReference, resultSet.getString("b.bp_comm"));
+                            sReference, resultSet.getString("b.bp_comm"), "", "");
                     
                     maRecordEntries.add(createRecordEntry(bizPartnerCategory, 0, false, sRecordConcept, adDebitCredit[0], adDebitCredit[1], sIdAccBal, ++nSortingPosition, 
                             anSysMovTypeXxxKeyBizPartner, nBizParnerId, nBizParnerBranchId, anDocumentKey, anCobEntKey, sReference, nCurrencyId));
@@ -655,7 +696,7 @@ public class SValuationBalances {
                 }
                 
                 isDebit = true;
-                
+                                
                 adDebitCredit = computeDebitCredit(resultSet.getDouble("_dbt_cur"), resultSet.getDouble("_cdt_cur"), 
                         resultSet.getDouble("_dbt"), resultSet.getDouble("_cdt"), isDebit);
                 
@@ -665,7 +706,7 @@ public class SValuationBalances {
                     sReference = resultSet.getString("re.ref");
                     sIdAccBal = resultSet.getString("re.fid_acc");
                     nCurrencyId = resultSet.getInt("re.fid_cur");
-                    sRecordConcept = createConceptRecordEntry("", sReference, resultSet.getString("ent"));
+                    sRecordConcept = createConceptRecordEntry("", sReference, resultSet.getString("ent"), "", "");
 
                     maRecordEntries.add(createRecordEntry(0, cashAccountType, false, sRecordConcept, adDebitCredit[0], adDebitCredit[1], sIdAccBal, ++nSortingPosition, 
                         anSysMovTypeXxxKeyCashAccount, 0, 0, anDocumentKey, anCobEntKey, sReference, nCurrencyId));
@@ -675,9 +716,51 @@ public class SValuationBalances {
                 }
             }
         }
+        
+        int[] accountSpecialTypes = new int[] {
+            SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY,
+            SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC
+        };
+        
+        int toPay = 0;
+        int rec = 0;
+        
+        for (int accountSpecialType : accountSpecialTypes) {
+            sSql = composeQueryShortTermDocuments(accountSpecialType);
+            resultSet = connection.createStatement().executeQuery(sSql);
+            
+            while (resultSet.next()) {
+                switch (accountSpecialType) {
+                    case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY: toPay++; break;
+                    case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC: rec++; break;
+                }
+                
+                isDebit = true;
+                
+                adDebitCredit = computeDebitCredit(resultSet.getDouble("_dbt_cur"), resultSet.getDouble("_cdt_cur"), 
+                        resultSet.getDouble("_dbt"), resultSet.getDouble("_cdt"), isDebit);
+                
+                if (adDebitCredit[0] != 0 || adDebitCredit[1] != 0) {
+                    anDocumentKey = null;
+                    anCobEntKey = null;
+                    sReference = resultSet.getString("ref");
+                    sIdAccBal = resultSet.getString("id_acc");
+                    nCurrencyId = resultSet.getInt("id_cur");
+                    sRecordConcept = createConceptRecordEntry("", sReference, "", sIdAccBal, resultSet.getString("cur_key"));
+
+                    maRecordEntries.add(createRecordEntry(0, 0, false, sRecordConcept, adDebitCredit[0], adDebitCredit[1], sIdAccBal, ++nSortingPosition,
+                        SDataConstantsSys.FINS_TP_SYS_MOV_NA, 0, 0, anDocumentKey, anCobEntKey, sReference, nCurrencyId));
+
+                    maRecordEntries.add(createRecordEntry(0, 0, true, sRecordConcept, adDebitCredit[1], adDebitCredit[0], "", ++nSortingPosition, 
+                        null, 0, 0, anDocumentKey, anCobEntKey, "", mnLocalCurrency));
+                }
+            }
+        }
+        
         miClient.showMsgBoxInformation("Se procesaron:\n-" + docSup + " documentos de proveedores.\n-" + accSup + " cuentas de proveedores.\n"
                 + "-" + docCus + " documentos de clientes.\n-" + accCus + " cuentas de clientes.\n"
-                + "-" + cdr + " cuentas de acreedores.\n-" + dbr + " cuentas de deudores.\n-" + cash + " cuentas de caja.\n-" + bank + " cuentas de bancos.");
+                + "-" + cdr + " cuentas de acreedores.\n-" + dbr + " cuentas de deudores.\n-" + cash + " cuentas de caja.\n-" + bank + " cuentas de bancos.\n"
+                + "-" + toPay + " documentos por pagar a corto plazo.\n-" + rec + " documentos por cobrar a corto plazo.");
     }           
     
     /**

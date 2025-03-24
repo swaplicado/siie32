@@ -371,6 +371,24 @@ public abstract class SDataUtilities {
 
         return levels;
     }
+    
+    /**
+     * Obtains account ID's levels.
+     *
+     * @param psAccountId Account ID.
+     * @return A java.util.ArrayList<java.lang.Integer> object containing all beginning caret dots of each level.
+     */
+    public static java.util.ArrayList<java.lang.Integer> getArrayAccountLevels(java.lang.String psAccountId) {
+        int index = -1;
+        ArrayList<Integer> levels = new ArrayList<>();
+
+        do {
+            levels.add(index + 1);
+            index = psAccountId.indexOf('-', index + 1);
+        } while (index != -1);
+
+        return levels;
+    }
 
     /**
      * Given an account ID, obtains its used levels count.
@@ -3749,4 +3767,14 @@ public abstract class SDataUtilities {
 
         return costCenter;
     }   
+
+    public static int obtainCurrencyId(SClientInterface client, String curKey) throws Exception {
+        int pk = 0;
+        String sql = "SELECT id_cur FROM erp.cfgu_cur WHERE cur_key = '" + curKey + "' AND NOT b_del";
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            pk = resultSet.getInt(1);
+        }
+        return pk;
+    }
 }

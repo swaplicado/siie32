@@ -47,6 +47,11 @@ public class STrnDBCore {
         }
     }
 
+    /**
+     * Obtiene una conexión a la base de datos.
+     *
+     * @return Objeto {@code Connection} si la conexión es exitosa, de lo contrario {@code null}.
+     */
     private Connection getConnection() {
         try {
             return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
@@ -92,10 +97,10 @@ public class STrnDBCore {
             + "    dps.tax_retained_r, "
             + "    dps.tot_r, "
             + "    tcur.cur_key, "
-            + "    mr.num AS mr_num, "
-            + "    mr.dt AS mr_dt, "
-            + "    mrusr.usr AS mr_user, "
-            + "    mrusr.id_usr AS mr_id_usr, "
+            + "    COALESCE(mr.num, 'NA') AS mr_num, "
+            + "    COALESCE(mr.dt, '') AS mr_dt, "
+            + "    COALESCE(mrusr.usr, 'NA') AS mr_user, "
+            + "    COALESCE(mrusr.id_usr, 0) AS mr_id_usr, "
             + "    dps.comms_r, "
             + "    dps.exc_rate, "
             + "    dps.exc_rate_sys, "
@@ -247,8 +252,8 @@ public class STrnDBCore {
                     + "WHERE "
                     + "    NOT dps.b_del AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                     + "        AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                    + "        AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                    + "        AND mr.id_mat_req IS NOT NULL ";
+                    + "        AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " ";
+//                    + "        AND mr.id_mat_req IS NOT NULL ";
 
             // Cuando están pendientes
             if (statusFilter == -1) {
@@ -264,6 +269,7 @@ public class STrnDBCore {
                         + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";;
             }
 
+            // Filtrar usuario involucrado en el proceso de autorización
             if (idUser > 0) {
                 query += "AND " + idUser + " IN (SELECT  "
                         + "    steps1.fk_usr_step "
@@ -414,24 +420,33 @@ public class STrnDBCore {
     }
 
     /**
-     * Obtiene las partidas de un documento.
-     * Incluyendo requisiciones de materiales
+     * Obtiene las partidas de un documento, incluyendo requisiciones de materiales.
+     *
      * @param idYear Año del documento.
      * @param idDoc ID del documento.
      * @param dpsDate Fecha del documento.
+     * @return Lista de objetos {@code SWebDpsEty} con las partidas del documento.
      */
     public ArrayList<SWebDpsEty> getWebDpsEtiesFull(int idYear, int idDoc, String dpsDate) {
         ArrayList<SWebDpsEty> lEties = this.getWebDpsEties(idYear, idDoc, dpsDate);
 
         STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
         for (SWebDpsEty oEty : lEties) {
-            oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
             oEty.getlItemHistory().addAll(this.getDpsItemHistory(dpsDate, oEty.getIdItem(), oEty.getPrice(), oEty.getPriceCur(), 1));
+            oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
         }
 
         return lEties;
     }
 
+    /**
+     * Obtiene las partidas de un documento.
+     *
+     * @param idYear Año del documento.
+     * @param idDoc ID del documento.
+     * @param dpsDate Fecha del documento.
+     * @return Lista de objetos {@code SWebDpsEty} con las partidas del documento.
+     */
     public ArrayList<SWebDpsEty> getWebDpsEties(int idYear, int idDoc, String dpsDate) {
         try {
             Connection conn = this.getConnection();
@@ -452,13 +467,13 @@ public class STrnDBCore {
                     + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
                     + "        INNER JOIN "
                     + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety ON dps.id_year = ety.id_year "
-                    + "        AND dps.id_doc = ety.id_doc " + 
-                    "        INNER JOIN " + 
-                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ety.fid_item = i.id_item "
-                    + "        INNER JOIN " + 
-                    "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
-                    + "        LEFT JOIN " + 
-                    "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
+                    + "        AND dps.id_doc = ety.id_doc " 
+                    + "        INNER JOIN " 
+                    + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ety.fid_item = i.id_item "
+                    + "        INNER JOIN " 
+                    + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
+                    + "        LEFT JOIN " 
+                    + "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
                     + "WHERE "
                     + "   NOT dps.b_del AND NOT ety.b_del "
                     + "   AND dps.id_year = " + idYear + " "
@@ -500,6 +515,13 @@ public class STrnDBCore {
         return new ArrayList<>();
     }
 
+    /**
+     * Obtiene las notas de un documento.
+     *
+     * @param idYear Año del documento.
+     * @param idDoc ID del documento.
+     * @return Lista de objetos {@code SWebDpsNote} con las notas del documento.
+     */
     public ArrayList<SWebDpsNote> getWebDpsNotes(int idYear, int idDoc) {
         try {
             Connection conn = this.getConnection();
@@ -535,6 +557,16 @@ public class STrnDBCore {
         return new ArrayList<>();
     }
 
+    /**
+     * Obtiene el historial de un ítem en un documento.
+     *
+     * @param dateDoc Fecha del documento.
+     * @param idItem ID del ítem.
+     * @param currentPrice Precio actual del ítem.
+     * @param currentPriceCurrency Precio actual del ítem en la moneda del documento.
+     * @param queryLimit Límite de resultados de la consulta.
+     * @return Lista de objetos {@code SWebItemHistory} con el historial del ítem.
+     */
     public ArrayList<SWebItemHistory> getDpsItemHistory(String dateDoc, int idItem, double currentPrice, double currentPriceCurrency, int queryLimit) {
         try {
             Connection conn = this.getConnection();
@@ -547,41 +579,41 @@ public class STrnDBCore {
                 queryLimit = 1;
             }
 
-            String query = "SELECT  " + 
-                                "    de.fid_item, " +
-                                "    d.num, " + 
-                                "    d.dt, " + 
-                                "    bp.bp_comm, " + 
-                                "    de.concept_key, " + 
-                                "    de.concept, " + 
-                                "    de.qty, " + 
-                                "    de.price_u, " + 
-                                "    de.price_u_cur, " + 
-                                "    u.unit, " + 
-                                "    u.symbol, " + 
-                                "    cur.cur, " + 
-                                "    cur.cur_key " + 
-                                "FROM " + 
-                                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " + 
-                                "        INNER JOIN " + 
-                                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " de ON (d.id_year = de.id_year " + 
-                                "        AND d.id_doc = de.id_doc) " + 
-                                "        INNER JOIN " + 
-                                "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON (d.fid_bp_r = bp.id_bp) " + 
-                                "        INNER JOIN " + 
-                                "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON (de.fid_unit = u.id_unit) " + 
-                                "        INNER JOIN " + 
-                                "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON (d.fid_cur = cur.id_cur) " + 
-                                "WHERE " + 
-                                "    de.fid_item = " + idItem + " " + 
-                                "        AND d.dt < '" + dateDoc + "' " + 
-                                "        AND NOT d.b_del " + 
-                                "        AND NOT de.b_del " + 
-                                "        AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " " + 
-                                "        AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " " + 
-                                "        AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " " + 
-                                "ORDER BY d.dt DESC " +
-                                "LIMIT " + queryLimit + ";";
+            String query = "SELECT  " 
+                                + "    de.fid_item, "
+                                + "    d.num, " 
+                                + "    d.dt, " 
+                                + "    bp.bp_comm, " 
+                                + "    de.concept_key, " 
+                                + "    de.concept, " 
+                                + "    de.qty, " 
+                                + "    de.price_u, " 
+                                + "    de.price_u_cur, " 
+                                + "    u.unit, " 
+                                + "    u.symbol, " 
+                                + "    cur.cur, " 
+                                + "    cur.cur_key " 
+                                + "FROM " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " 
+                                + "        INNER JOIN " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " de ON (d.id_year = de.id_year " 
+                                + "        AND d.id_doc = de.id_doc) " 
+                                + "        INNER JOIN " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON (d.fid_bp_r = bp.id_bp) " 
+                                + "        INNER JOIN " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON (de.fid_unit = u.id_unit) " 
+                                + "        INNER JOIN " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON (d.fid_cur = cur.id_cur) " 
+                                + "WHERE " 
+                                + "    de.fid_item = " + idItem + " " 
+                                + "        AND d.dt < '" + dateDoc + "' " 
+                                + "        AND NOT d.b_del " 
+                                + "        AND NOT de.b_del " 
+                                + "        AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " " 
+                                + "        AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " " 
+                                + "        AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " " 
+                                + "ORDER BY d.dt DESC "
+                                + "LIMIT " + queryLimit + ";";
             
             Statement st = conn.createStatement();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
@@ -621,6 +653,13 @@ public class STrnDBCore {
         return new ArrayList<>();
     }
 
+    /**
+     * Obtiene la autorización de un documento.
+     *
+     * @param idYear Año del documento.
+     * @param idDoc ID del documento.
+     * @return Objeto {@code SWebAuthorization} con los datos de la autorización.
+     */
     public SWebAuthorization getDpsAuthorization(int idYear, int idDoc) {
         try {
             SWebAuthorization oAuth = new SWebAuthorization();

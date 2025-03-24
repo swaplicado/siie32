@@ -569,7 +569,7 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewCustomReportsExpenses(miClient, subtype, "Gastos " + (subtype == SViewCustomReportsExpenses.SUBTYPE_MONTHS ? "mensuales x año" : "x período"));
                 break;
             case SModConsts.TRNX_DPS_PAYS:
-                view = new SViewDpsPayment(miClient, "Pagos periodo x parcialidad (detalle)");
+                view = new SViewDpsPayment(miClient, "Pagos periodo (detalle)");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -136,6 +136,9 @@ public class STrnDBMaterialRequest {
                     oMatReq.setMrStorageCloudUrl("#");
                 }
             }
+            else {
+                return oMatReq;
+            }
 
             // Consulta para obtener las notas de la requisición de materiales.
             String matReqNotesQuery = "SELECT " +

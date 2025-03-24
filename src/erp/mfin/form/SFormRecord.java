@@ -34,11 +34,15 @@ import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Vector;
@@ -46,10 +50,12 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiUtils;
@@ -65,7 +71,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private final int CONCEPT_POLICY_RECORD = 2;
     private final int CONCEPT_POLICY_CURR_ENTRY = 3;
     private final int CONCEPT_POLICY_LAST_ENTRY = 4;
-
+    
     private final int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -90,6 +96,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private erp.mfin.form.SDialogRecordPaymentComplete moDialogPaymentCompleteCus;
     private erp.mfin.form.SDialogRecordPaymentMultiple moDialogPaymentMultipleSup;
     private erp.mfin.form.SDialogRecordPaymentMultiple moDialogPaymentMultipleCus;
+    private erp.mfin.form.SDialogRecordApportionment moDialogApportioment;
     private erp.mfin.form.SFormMoneyInOut moFormMoneyInOut;
     private erp.mfin.form.SFormMoneyInOutBizPartner moFormMoneyInOutBizPartner;
     private erp.mfin.form.SFormMoneyOutCheck moFormMoneyOutCheck;
@@ -153,7 +160,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbGetXml = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jlFkAccountCashId_n = new javax.swing.JLabel();
-        jcbFkAccountCashId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkAccountCashId_n = new javax.swing.JComboBox<>();
         jtfAccountCashCurrencyKey = new javax.swing.JTextField();
         jbAccountCashEdit = new javax.swing.JButton();
         jpRecord2 = new javax.swing.JPanel();
@@ -198,13 +205,18 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryShowIndirectCfd = new javax.swing.JButton();
         jsEntry3 = new javax.swing.JSeparator();
         jtbEntryDeletedFilter = new javax.swing.JToggleButton();
+        jsEntry5 = new javax.swing.JSeparator();
+        jbImportFile = new javax.swing.JButton();
+        jbDownFile = new javax.swing.JButton();
+        jsEntry6 = new javax.swing.JSeparator();
+        jbApportionment = new javax.swing.JButton();
         jpCommands12 = new javax.swing.JPanel();
         jpCommands13 = new javax.swing.JPanel();
         jlGuiModeInput = new javax.swing.JLabel();
         jrbModeInputSimple = new javax.swing.JRadioButton();
         jrbModeInputMultiple = new javax.swing.JRadioButton();
         jlGuiModeConcept = new javax.swing.JLabel();
-        jcbGuiModeConcept = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbGuiModeConcept = new javax.swing.JComboBox<>();
         jpCommandsCashAccount = new javax.swing.JPanel();
         jpCommandsCashAccount1 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
@@ -608,6 +620,29 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jtbEntryDeletedFilter.setPreferredSize(new java.awt.Dimension(23, 23));
         jtbEntryDeletedFilter.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         jpCommands11.add(jtbEntryDeletedFilter);
+
+        jsEntry5.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry5.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpCommands11.add(jsEntry5);
+
+        jbImportFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add.gif"))); // NOI18N
+        jbImportFile.setToolTipText("Importar partidas desde archivo externo");
+        jbImportFile.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbImportFile);
+
+        jbDownFile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down.gif"))); // NOI18N
+        jbDownFile.setToolTipText("Descargar formato importación de partidas desde archivo externo");
+        jbDownFile.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbDownFile);
+
+        jsEntry6.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry6.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpCommands11.add(jsEntry6);
+
+        jbApportionment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbApportionment.setToolTipText("Captura por prorrateo");
+        jbApportionment.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbApportionment);
 
         jpCommandsEntries.add(jpCommands11, java.awt.BorderLayout.WEST);
 
@@ -1057,6 +1092,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryShowDirectCfd.addActionListener(this);
         jbEntryShowIndirectCfd.addActionListener(this);
         jtbEntryDeletedFilter.addActionListener(this);
+        jbImportFile.addActionListener(this);
+        jbDownFile.addActionListener(this);
+        jbApportionment.addActionListener(this);
         
         jbMoneyIn.addActionListener(this);
         jbMoneyInOther.addActionListener(this);
@@ -1728,7 +1766,88 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
         }
     }
+    
+    private void actionPerfomedImportFile() {
+        if (jbImportFile.isEnabled()) {
+            try {
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de Excel (*.xlsx)", "xlsx");
+                miClient.getFileChooser().setFileFilter(filter);
+                if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(xlsx)$")) {
+                        
+                        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                        ArrayList<SDataRecordEntry> entries = SFinRecordUtils.processRecordEntriesFile(miClient, miClient.getFileChooser().getSelectedFile(), moRecord);
+                        for (SDataRecordEntry entry : entries) {
+                            moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
+                            renderRecordEntries(true);
+                            calculateBalance();
+                            
+                            msAuxLastEntryConcept = (String) moFormEntry.getValue(SLibConstants.VALUE_TEXT);
+                        }
+                        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxWarning(e.getMessage());
+            }
+        }
+    }
 
+    private void actionPerfomedDownFile() {
+        if (jbDownFile.isEnabled()) {
+            String filePath = "reps/formato polizas contables.xlsx";
+            File fileOrig = new File(filePath);
+            if (fileOrig.exists()) {
+                miClient.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                    File folderDest = miClient.getFileChooser().getSelectedFile();
+                    File fileDest = new File(folderDest, fileOrig.getName());
+
+                    try {
+                        Files.copy(fileOrig.toPath(), fileDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        miClient.showMsgBoxInformation("Archivo descargado correctamente.");
+                    }
+                    catch (IOException e) {
+                        miClient.showMsgBoxWarning("Error al descargar el archivo.");
+                    }
+                }
+            }
+            else {
+                miClient.showMsgBoxInformation("El archivo de origen no existe, contactar a soporte.");
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void actionApportionment() {
+        if (jbApportionment.isEnabled()) {
+            try {
+                if (moDialogApportioment == null) {
+                    moDialogApportioment = new SDialogRecordApportionment(miClient);
+                    moDialogApportioment.formRefreshCatalogues();
+                }
+                moDialogApportioment.formReset();
+                moDialogApportioment.setValue(SDataConstants.FIN_REC, moRecord);
+                moDialogApportioment.setFormVisible(true);
+
+                if (moDialogApportioment.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    ArrayList<SDataRecordEntry> entries = (ArrayList<SDataRecordEntry>) moDialogApportioment.getValue(SDataConstants.FIN_REC_ETY);
+                    for (SDataRecordEntry entry : entries) {
+                        moPaneGridEntries.addTableRow(new SDataRecordEntryRow(entry));
+                        renderRecordEntries(true);
+                        calculateBalance();
+
+                        msAuxLastEntryConcept = (String) moFormEntry.getValue(SLibConstants.VALUE_TEXT);
+                    }
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxInformation("Error al agregar las partidas, contactar a soporte.");
+            }
+        }
+    }
+    
     private void actionPerformedMoneyInOut(final SDataAccountCash cash_n, final boolean in) throws Exception {
         updateRecord();
 
@@ -2134,6 +2253,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAccountCashEdit;
     private javax.swing.JButton jbAddXml;
+    private javax.swing.JButton jbApportionment;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbCdtAdvanceCus;
     private javax.swing.JButton jbCdtAdvanceSupDev;
@@ -2148,6 +2268,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbDbtDebitDbr;
     private javax.swing.JButton jbDbtExchangeRateDiff;
     private javax.swing.JButton jbDbtPaymentSup;
+    private javax.swing.JButton jbDownFile;
     private javax.swing.JButton jbEntryDelete;
     private javax.swing.JButton jbEntryEdit;
     private javax.swing.JButton jbEntryGetXml;
@@ -2160,6 +2281,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbEntryShowIndirectCfd;
     private javax.swing.JButton jbEntryViewSum;
     private javax.swing.JButton jbGetXml;
+    private javax.swing.JButton jbImportFile;
     private javax.swing.JButton jbMiAdvanceCus;
     private javax.swing.JButton jbMiAdvanceSupDev;
     private javax.swing.JButton jbMiCreditCdr;
@@ -2232,6 +2354,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JSeparator jsEntry2;
     private javax.swing.JSeparator jsEntry3;
     private javax.swing.JSeparator jsEntry4;
+    private javax.swing.JSeparator jsEntry5;
+    private javax.swing.JSeparator jsEntry6;
     private javax.swing.JToggleButton jtbEntryDeletedFilter;
     private javax.swing.JTextField jtfAccountCashCurrencyKey;
     private javax.swing.JTextField jtfBalance;
@@ -2517,6 +2641,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             //jbEntryGetXml.setEnabled(...); // keep enabled
             //jbEntryShowDirectCfd.setEnabled(...); // keep enabled
             //jbEntryShowIndirectCfd.setEnabled(...); // keep enabled
+            //jbImportXlsx.setEnabled(...); // keep enabled
 
             jbMoneyIn.setEnabled(false);
             jbMoneyInOther.setEnabled(false);
@@ -2808,6 +2933,15 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 }
                 else if (button == jbEntryShowIndirectCfd) {
                     actionPerformedEntryShowIndirectCfd();
+                }
+                else if (button == jbImportFile) {
+                    actionPerfomedImportFile();
+                }
+                else if (button == jbDownFile) {
+                    actionPerfomedDownFile();
+                }
+                else if (button == jbApportionment) {
+                    actionApportionment();
                 }
                 else if (button == jbMoneyIn) {
                     actionPerformedMoneyInOut(moRecord.getDbmsDataAccountCash(), true);

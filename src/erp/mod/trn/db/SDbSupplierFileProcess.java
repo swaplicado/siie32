@@ -75,6 +75,19 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         }
     }
     
+    public int getDpsEntriesWithoutMaterialRequest(SGuiSession session) throws Exception {
+        int entries = 0;
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        msSql = "SELECT COUNT(*) FROM trn_dps_ety de " +
+                "LEFT JOIN trn_dps_mat_req dr ON de.id_year = dr.fid_dps_year AND de.id_doc = dr.fid_dps_doc AND de.id_ety = dr.fid_dps_ety " +
+                "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND NOT de.b_del AND dr.id_dps_mat_req IS NULL;";
+        ResultSet resultSet = statement.executeQuery(msSql);
+        if (resultSet.next()) {
+            entries = resultSet.getInt(1);
+        }
+        return entries;
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkYearId = pk[0];
