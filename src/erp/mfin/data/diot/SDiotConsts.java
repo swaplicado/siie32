@@ -89,7 +89,7 @@ public abstract class SDiotConsts {
     
     // other DIOT constants:
 
-    public static final String THIRD_GLOBAL_NAME = "Proveedor Global";
+    public static final String NAME_THIRD_GLOBAL = "Proveedor Global";
     
     public static final String NA = "NA";
 }

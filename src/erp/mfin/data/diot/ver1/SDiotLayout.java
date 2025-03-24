@@ -138,7 +138,7 @@ public class SDiotLayout {
                 resultSet.getInt(tableAlias + ".id_num") + " " +
                 resultSet.getInt(tableAlias + ".sort_pos") +
                 (account == null ? "" : "/ cta. ctb. " +  account.getPkAccountIdXXX()) +
-                "/ prov. " + (bizPartner == null ? SDiotConsts.THIRD_GLOBAL_NAME.toUpperCase() : bizPartner.getBizPartnerCommercial() + " " +
+                "/ prov. " + (bizPartner == null ? SDiotConsts.NAME_THIRD_GLOBAL.toUpperCase() : bizPartner.getBizPartnerCommercial() + " " +
                 "(" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")");
     }
     
@@ -309,11 +309,11 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
+                        + "ORDER BY re.fid_acc, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;"; // same ordering for both configured and not configured accounts
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "CUENTA CONTABLE CONFIGURADA PARA DIOT: [" + diotAccount.AccountCode + "] (" + (++accounts + " de " + masConfigDiotAccountCodes.length) + ")") + " ***");
+                System.out.println("*** " + (section = "CUENTA CONTABLE CONFIGURADA PARA LA DIOT: [" + diotAccount.AccountCode + "] (" + (++accounts + " de " + masConfigDiotAccountCodes.length) + ")") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             else {
@@ -351,11 +351,11 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
+                        + "ORDER BY re.fid_acc, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;"; // same ordering for both configured and not configured accounts
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES PARA DIOT") + " ***");
+                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES PARA LA DIOT") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             
@@ -1040,7 +1040,7 @@ public class SDiotLayout {
             layout += "\"Resumen:\"\n";
             layout += "\"renglones pólizas contables procesados:\"," + entries + "\n";
             layout += "\"renglones pólizas contables sin impuesto:\"," + entriesWithoutVat + ",\"(asignadas el impuesto predeterminado para DIOT: " + vatDefault.getTax() + ")\"\n";
-            layout += "\"renglones pólizas contables sin asociado de negocios de catálogo:\"," + entriesWithoutCatalogBizPartner + ",\"(asignados a " + SDiotConsts.THIRD_GLOBAL_NAME + ")\"\n";
+            layout += "\"renglones pólizas contables sin asociado de negocios de catálogo:\"," + entriesWithoutCatalogBizPartner + ",\"(asignados a " + SDiotConsts.NAME_THIRD_GLOBAL + ")\"\n";
             layout += "\"renglones pólizas contables de la empresa '" + miClient.getSessionXXX().getCurrentCompanyName() + "':\"," + entriesForThisCompany + ",\"(incluidos en este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto igual a cero, pero de tipo IVA desconocido:\"," + entriesVatZeroUndefined + ",\"(excluidos de este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto distinto a cero, pero de tipo IVA desconocido:\"," + entriesVatNonZeroUndefined + ",\"(excluidos de este layout)\"\n";

@@ -1,5 +1,6 @@
 package erp.mfin.data.diot.ver2;
 
+import cfd.DCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -31,12 +32,15 @@ import sa.lib.SLibUtils;
  */
 public class SDiotLayout {
     
-    private static final double AMOUNT_DIFF_ALLOWANCE = 0.1;
-    private static final double FIXED_VAT_THIRD_TAXPAYER = 0.01; // fixed pre-arranged subtotal of VAT of third-taxpayer
+    protected static final double AMOUNT_DIFF_ALLOWANCE = 0.1;
+    protected static final double FIXED_VAT_THIRD_TAXPAYER = 0.01; // fixed pre-arranged subtotal of VAT of third-taxpayer
+    protected static final DecimalFormat FormatRecordNumber = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
     
     protected SClientInterface miClient;
     protected Date mtStart;
     protected Date mtEnd;
+    protected ArrayList<String> maRequredFiscalIds;
+    
     protected HashMap<String, SDataAccount> moAccountsMap; // key: number of account
     protected HashMap<String, SDataAccount> moLedgerAccountsMap; // key: number of ledger account
     protected HashMap<String, SDataTax> moVatsMap; // key: 'basic tax ID' + "-" + 'tax ID'
@@ -48,10 +52,12 @@ public class SDiotLayout {
     protected int mnThisCompanyId;
     protected String msThisCompanyFiscalId;
     
-    public SDiotLayout(erp.client.SClientInterface client, Date start, Date end) throws Exception {
+    public SDiotLayout(erp.client.SClientInterface client, Date start, Date end, ArrayList<String> requredFiscalIds) throws Exception {
         miClient = client;
         mtStart = start;
         mtEnd = end;
+        maRequredFiscalIds = requredFiscalIds;
+        
         moAccountsMap = new HashMap<>();
         moLedgerAccountsMap = new HashMap<>();
         moVatsMap = new HashMap<>();
@@ -138,10 +144,11 @@ public class SDiotLayout {
     
     private Object[] createCustomRecordEntryKey(final ResultSet resultSet) throws Exception {
         return new Object[] { 
-            resultSet.getInt("re.id_year"),
-            resultSet.getInt("re.id_per"),
+            SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("re.id_year")),
+            SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("re.id_per")),
             resultSet.getInt("re.id_bkc"),
             resultSet.getString("re.id_tp_rec"),
+            FormatRecordNumber.format(resultSet.getInt("re.id_num")),
             resultSet.getInt("re.sort_pos")
         };
     }
@@ -153,10 +160,10 @@ public class SDiotLayout {
             thirdParty = bizPartner.getBizPartnerCommercial() + " (" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")";
         }
         else if (!occasionalFiscalId.isEmpty()) {
-            thirdParty = "\"" + occasionalFiscalId + "\"";
+            thirdParty = occasionalFiscalId;
         }
         else {
-            thirdParty = "\"" + SDiotConsts.THIRD_GLOBAL_NAME + "\"";
+            thirdParty = SDiotConsts.NAME_THIRD_GLOBAL;
         }
         
         return "Ren. pól. " + 
@@ -166,8 +173,8 @@ public class SDiotLayout {
                 resultSet.getString("re.id_tp_rec") + "-" + 
                 resultSet.getInt("re.id_num") + " " +
                 resultSet.getInt("re.sort_pos") +
-                (account == null ? "" : "/ cta. ctb. " +  account.getPkAccountIdXXX()) +
-                "/ prov. " + thirdParty;
+                (account == null ? "" : "/ cta. ctb. '" +  account.getPkAccountIdXXX()) + "'"+
+                "/ prov. '" + thirdParty + "'";
     }
     
     private void obtainDuplicatedOccasionalFiscalIds() throws Exception {
@@ -184,7 +191,7 @@ public class SDiotLayout {
             sqlDiotAccounts += (!sqlDiotAccounts.isEmpty() ? " OR " : "") + "re.fid_acc LIKE '" + accountCode + "%'";
         }
         
-        // get occasional fiscal IDs from required period (only if they are not in a DIOT account, or, if they are, when there is not any referenced business partner):
+        // get occasional fiscal IDs from required period (those ones that are not in a DIOT account, or, if they are, when there is not any referenced business partner):
         
         sql = "SELECT DISTINCT re.occ_fiscal_id " +
                 "FROM fin_rec AS r " +
@@ -200,7 +207,7 @@ public class SDiotLayout {
             occasionalFiscalIds.add(resultSet.getString(1));
         }
         
-        // get referenced fiscal IDs directly (business partner) or indirectly (business partner of DPS or factoring bank of CFD) from required period (only if they are in a DIOT account):
+        // get fiscal IDs from directly referenced business partners:
         
         sql = "SELECT b.fiscal_id " + // business partners without DPS
                 "FROM fin_rec AS r " +
@@ -259,11 +266,12 @@ public class SDiotLayout {
      * Get DIOT layout in requested format.
      * @param format Requested format: PIPE separated values or CSV.
      * @param excludeTercerosTotallyZero Exclude terceros totally in zero.
-     * @return DIOT layout as <code>String</code>.
+     * @param generateDetailedInfo Generate DIOT detailed information. Works only for CSV format.
+     * @return <code>String</code> array: index 0: DIOT layout; index 1: DIOT detailed information when requested, otherwise an empty string is provided.
      * @throws Exception 
      */
     @SuppressWarnings("deprecation")
-    public String getLayout(final int format, final boolean excludeTercerosTotallyZero) throws Exception {
+    public String[] getLayout(final int format, final boolean excludeTercerosTotallyZero, final boolean generateDetailedInfo) throws Exception {
         int accounts = 0;
         int entries = 0;
         int entriesWithoutVat = 0;
@@ -278,8 +286,10 @@ public class SDiotLayout {
         int year = SLibTimeUtils.digestYear(mtStart)[0];
         double totalDebit = 0;
         double totalCredit = 0;
+        boolean collectDetailedInfo = format == SDiotConsts.FORMAT_CSV && generateDetailedInfo;
         String warning = "";
         String warnings = "";
+        String requiredFiscalIds = "";
         Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
         Statement statementAux = miClient.getSession().getStatement().getConnection().createStatement();
         HashMap<SDataTax, Double> vatSettlementsMap = new HashMap<>();
@@ -287,8 +297,8 @@ public class SDiotLayout {
         HashMap<SDataTax, Double> vatWithheldSettlementsMap = new HashMap<>();
         HashMap<String, SDiotTercero> tercerosMap = new HashMap<>(); // key: 'business partner ID' + "-" + 'tipo de operación DIOT'
         HashMap<String, AccountTotal> accountTotalsMap = new HashMap<>(); // key: number of account
-        ArrayList<String> recordEntriesSkipped = new ArrayList<>();
-        ArrayList<DiotEntry> diotEntriesLayout = new ArrayList<>();
+        ArrayList<String> layoutSkippedRecordEntries = new ArrayList<>();
+        ArrayList<DiotEntry> layoutDiotEntries = new ArrayList<>();
         
         moAccountsMap.clear();
         moLedgerAccountsMap.clear();
@@ -296,8 +306,17 @@ public class SDiotLayout {
         moBizPartnersMap.clear();
         
         // obtain occasional fiscal IDs found as well as referenced IDs:
-        
-        obtainDuplicatedOccasionalFiscalIds();
+
+        if (maRequredFiscalIds.isEmpty()) {
+            // process all fiscal ID:
+            obtainDuplicatedOccasionalFiscalIds();
+        }
+        else {
+            // process only required fiscal ID:
+            for (String fiscalId : maRequredFiscalIds) {
+                requiredFiscalIds += (requiredFiscalIds.isEmpty() ? "" : ", ") + "'" + fiscalId + "'";
+            }
+        }
         
         // add default VAT to map of taxes:
         
@@ -329,8 +348,8 @@ public class SDiotLayout {
                         + "re.debit, re.credit, re.fid_acc, re.fid_tax_bas_n, re.fid_tax_n, "
                         + "re.fid_dps_year_n, re.fid_dps_doc_n, re.fid_cfd_n, re.fid_bp_nr, re.occ_fiscal_id, re.usr_id, re.fid_bkk_year_n, re.fid_bkk_num_n "
                         + "FROM fin_rec AS r "
-                        + "INNER JOIN fin_rec_ety AS re ON "
-                        + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                        + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                        + (maRequredFiscalIds.isEmpty() ? "" : "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr ")
                         + "WHERE NOT r.b_del AND NOT re.b_del "
                         + "AND r.id_year = " + year + " AND r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' "
                         + "AND re.fid_acc LIKE '" + diotAccount.AccountCode + "%' "
@@ -342,11 +361,12 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
+                        + (maRequredFiscalIds.isEmpty() ? "" : "AND (re.occ_fiscal_id IN (" + requiredFiscalIds + ") OR b.fiscal_id IN (" + requiredFiscalIds + ")) ")
+                        + "ORDER BY re.fid_acc, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;"; // same ordering for both configured and not configured accounts
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "CUENTA CONTABLE CONFIGURADA PARA DIOT: [" + diotAccount.AccountCode + "] (" + (++accounts + " de " + masConfigDiotAccountCodes.length) + ")") + " ***");
+                System.out.println("*** " + (section = "CUENTA CONTABLE CONFIGURADA PARA LA DIOT: '" + diotAccount.AccountCode + "' (" + (++accounts + " de " + masConfigDiotAccountCodes.length) + ")") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             else {
@@ -364,12 +384,10 @@ public class SDiotLayout {
                         + "re.debit, re.credit, re.fid_acc, re.fid_tax_bas_n, re.fid_tax_n, "
                         + "re.fid_dps_year_n, re.fid_dps_doc_n, re.fid_cfd_n, re.fid_bp_nr, re.occ_fiscal_id, re.usr_id, re.fid_bkk_year_n, re.fid_bkk_num_n "
                         + "FROM fin_rec AS r "
-                        + "INNER JOIN fin_rec_ety AS re ON "
-                        + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                        + "INNER JOIN fin_acc AS a ON "
-                        + "re.fid_acc = a.id_acc "
-                        + "INNER JOIN fin_acc AS al ON "
-                        + "f_acc_std_ldg(a.code) = al.code "
+                        + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                        + "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc "
+                        + "INNER JOIN fin_acc AS al ON f_acc_std_ldg(a.code) = al.code "
+                        + (maRequredFiscalIds.isEmpty() ? "" : "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr ")
                         + "WHERE NOT r.b_del AND NOT re.b_del "
                         + "AND r.id_year = " + year + " AND r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' "
                         + "AND NOT (" + sqlDiotAccounts + ") AND re.fid_tax_bas_n = " + manConfigDefaultVatKey[0] + " AND (" // only VAT entries
@@ -383,11 +401,12 @@ public class SDiotLayout {
 
                 /////  TESTING SOURCE CODE BLOCK - END /////////////////////////
 
-                        + "ORDER BY re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
+                        + (maRequredFiscalIds.isEmpty() ? "" : "AND (re.occ_fiscal_id IN (" + requiredFiscalIds + ") OR b.fiscal_id IN (" + requiredFiscalIds + ")) ")
+                        + "ORDER BY re.fid_acc, re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;"; // same ordering for both configured and not configured accounts
                 
                 System.out.println();
                 System.out.println(SLibUtils.textRepeat("=", 80));
-                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES PARA DIOT") + " ***");
+                System.out.println("*** " + (section = "MOVIMIENTOS CONTABLES ADICIONALES PARA LA DIOT") + " ***");
                 System.out.println(SLibUtils.textRepeat("=", 80));
             }
             
@@ -510,8 +529,11 @@ public class SDiotLayout {
                                     + " - importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(dpsVatAmount) + ".";
                             warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                             System.out.println(warning);
-
-                            recordEntriesSkipped.add(warning.replaceAll("\n", " "));
+                            
+                            if (collectDetailedInfo) {
+                                layoutSkippedRecordEntries.add(warning.replaceAll("\n", " "));
+                            }
+                            
                             continue; // skip current journal voucher entry, must be ignored!
                         }
 
@@ -539,7 +561,10 @@ public class SDiotLayout {
                                 warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                 System.out.println(warning);
                                 
-                                recordEntriesSkipped.add(warning.replaceAll("\n", " "));
+                                if (collectDetailedInfo) {
+                                    layoutSkippedRecordEntries.add(warning.replaceAll("\n", " "));
+                                }
+                                
                                 continue; // skip current journal voucher entry, must be ignored!
                             }
                         }
@@ -685,7 +710,9 @@ public class SDiotLayout {
                      * 1.7. Proces DIOT entries of current journal voucher entry.
                      */
                     
-                    diotEntriesLayout.addAll(diotEntries); // preserve all DIOT entries
+                    if (collectDetailedInfo) {
+                        layoutDiotEntries.addAll(diotEntries); // preserve all DIOT entries
+                    }
                     
                     for (DiotEntry diotEntry : diotEntries) {
                         double debit = diotEntry.Debit;
@@ -1048,25 +1075,33 @@ public class SDiotLayout {
         // prepare DIOT layout third parties:
         
         ArrayList<SDiotTercero> terceros = new ArrayList<>();
-        HashMap<String, SDiotTercero> duplicatedTercerosMap = new HashMap<>();
         
-        for (SDiotTercero tercero : tercerosMap.values()) {
-            if (!moDuplicatedOccasionalFiscalIdsMap.contains(tercero.TerRfc)) {
-                terceros.add(tercero);
-            }
-            else {
-                if (!duplicatedTercerosMap.containsKey(tercero.getComparableKey())) {
-                    duplicatedTercerosMap.put(tercero.getComparableKey(), tercero);
+        if (maRequredFiscalIds.isEmpty()) {
+            // processing all fiscal ID, may be duplicated ones:
+            HashMap<String, SDiotTercero> duplicatedTercerosMap = new HashMap<>();
+
+            for (SDiotTercero tercero : tercerosMap.values()) {
+                if (!moDuplicatedOccasionalFiscalIdsMap.contains(tercero.TerRfc)) {
+                    terceros.add(tercero);
                 }
                 else {
-                    SDiotTercero duplicatedTercero = duplicatedTercerosMap.get(tercero.getComparableKey());
-                    duplicatedTercero.addTercero(tercero);
+                    if (!duplicatedTercerosMap.containsKey(tercero.getComparableKey())) {
+                        duplicatedTercerosMap.put(tercero.getComparableKey(), tercero);
+                    }
+                    else {
+                        SDiotTercero duplicatedTercero = duplicatedTercerosMap.get(tercero.getComparableKey());
+                        duplicatedTercero.addTercero(tercero);
+                    }
                 }
             }
+
+            if (!duplicatedTercerosMap.isEmpty()) {
+                terceros.addAll(duplicatedTercerosMap.values());
+            }
         }
-        
-        if (!duplicatedTercerosMap.isEmpty()) {
-            terceros.addAll(duplicatedTercerosMap.values());
+        else {
+            // processing only required fiscal ID, cannot be duplicated ones:
+            terceros.addAll(tercerosMap.values());
         }
         
         Collections.sort(terceros);
@@ -1082,8 +1117,8 @@ public class SDiotLayout {
             terceroTotal = new SDiotTercero();
             
             layout += "\"" + miClient.getSessionXXX().getCurrentCompanyName() + "\"\n";
-            layout += "\"Layout DIOT\"\n";
-            layout += "\"Del " + SLibUtils.DateFormatDate.format(mtStart) + " al " + SLibUtils.DateFormatDate.format(mtEnd) + "\"\n";
+            layout += "\"DIOT (del " + SLibUtils.DateFormatDate.format(mtStart) + " al " + SLibUtils.DateFormatDate.format(mtEnd) + ")\"\n";
+            layout += requiredFiscalIds.isEmpty() ? "" : ("\"RFC filtrados: " + requiredFiscalIds.replaceAll("'", "") + "\"\n");
             layout += SDiotTercero.getLayoutCsvHeadings() + "\n";
         }
         
@@ -1125,7 +1160,7 @@ public class SDiotLayout {
             DecimalFormat amountFormat = new DecimalFormat("#0.00");
             
             layout += "\n";
-            layout += "\"Totales:\"\n";
+            layout += "\"TOTALES:\"\n";
             layout += terceroTotal.getLayoutRow(format) + "\n";
             
             layout += "\n";
@@ -1146,10 +1181,10 @@ public class SDiotLayout {
             SDataTax vatDefault = getVat(manConfigDefaultVatKey);
             
             layout += "\n";
-            layout += "\"Resumen:\"\n";
+            layout += "\"RESUMEN:\"\n";
             layout += "\"renglones pólizas contables procesados:\"," + entries + "\n";
             layout += "\"renglones pólizas contables sin impuesto:\"," + entriesWithoutVat + ",\"(asignadas el impuesto predeterminado para DIOT: " + vatDefault.getTax() + ")\"\n";
-            layout += "\"renglones pólizas contables sin asociado de negocios de catálogo:\"," + entriesWithoutCatalogBizPartner + ",\"(asignados a " + SDiotConsts.THIRD_GLOBAL_NAME + ")\"\n";
+            layout += "\"renglones pólizas contables sin asociado de negocios de catálogo:\"," + entriesWithoutCatalogBizPartner + ",\"(asignados a " + SDiotConsts.NAME_THIRD_GLOBAL + ")\"\n";
             layout += "\"renglones pólizas contables de la empresa '" + miClient.getSessionXXX().getCurrentCompanyName() + "':\"," + entriesForThisCompany + ",\"(incluidos en este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto igual a cero, pero de tipo IVA obsoleto:\"," + entriesVatZeroObsolete + ",\"(excluidos de este layout)\"\n";
             layout += "\"renglones pólizas contables con impuesto igual a cero, pero de tipo IVA desconocido:\"," + entriesVatZeroUndefined + ",\"(excluidos de este layout)\"\n";
@@ -1185,7 +1220,51 @@ public class SDiotLayout {
             layout += warnings.isEmpty() ? "\"¡No hay excepciones!\"\n" : warnings;
         }
         
-        return layout;
+        // DIOT detailed information:
+        
+        String detailedInfo = "";
+        
+        if (collectDetailedInfo) {
+            detailedInfo += "\"" + miClient.getSessionXXX().getCurrentCompanyName() + "\"\n";
+            detailedInfo += "\"MOVIMIENTOS CONTABLES DE LA DIOT (del " + SLibUtils.DateFormatDate.format(mtStart) + " al " + SLibUtils.DateFormatDate.format(mtEnd) + ")\"\n";
+            detailedInfo += requiredFiscalIds.isEmpty() ? "" : ("\"RFC filtrados: " + requiredFiscalIds.replaceAll("'", "") + "\"\n");
+            
+            if (layoutDiotEntries.isEmpty()) {
+                detailedInfo += "\"(No hay movimientos contables de la DIOT.)\"\n";
+            }
+            else {
+                Collections.sort(layoutDiotEntries);
+                
+                detailedInfo += layoutDiotEntries.get(0).getCsvHeading() + "\n";
+
+                for (DiotEntry entry : layoutDiotEntries) {
+                    detailedInfo += entry.getAsCsv() + "\n";
+                }
+            }
+            
+            detailedInfo += "\n";
+            detailedInfo += "\"MOVIMIENTOS CONTABLES OMITIDOS DE LA DIOT:\"\n";
+            
+            if (layoutSkippedRecordEntries.isEmpty()) {
+                detailedInfo += "\"(No hay movimientos contables omitidos de la DIOT.)\"\n";
+            }
+            else {
+                for (String string : layoutSkippedRecordEntries) {
+                    detailedInfo += "\"" + string + "\"\n";
+                }
+            }
+        }
+        
+        String[] strings;
+        
+        if (format == SDiotConsts.FORMAT_CSV) {
+            strings = new String[] { SLibUtils.textToAscii(layout), SLibUtils.textToAscii(detailedInfo) };
+        }
+        else {
+            strings = new String[] { layout, detailedInfo };
+        }
+        
+        return strings;
     }
     
     private class DpsVatSetting {
@@ -1209,7 +1288,7 @@ public class SDiotLayout {
         }
     }
     
-    private class DiotEntry {
+    private class DiotEntry implements Comparable<DiotEntry> {
         
         public Object[] EntryKey; // year, period, BKC, record type, record number, entry position
         public SDataBizPartner BizPartner;
@@ -1244,6 +1323,90 @@ public class SDiotLayout {
             
             XtaDpsNumber = "";
             XtaCfdUuid = "";
+        }
+        
+        /**
+         * Gets comparable key as a <code>String</code> of four segments, either in CSV ready or standard format:
+         * 1. RFC
+         * 2. Foreign fiscal ID
+         * 3. Business partner's PK
+         * 4. Fiscal registry entry's PK
+         * @param asCsvFormat CSV ready format.
+         * @return 
+         */
+        public String getComparableKey(final boolean asCsvFormat) {
+            String comparableKey = "";
+            String separator = asCsvFormat ? "," : "-";
+            String quote = asCsvFormat ? "\"" : "";
+            String empty = quote + quote;
+            
+            comparableKey += quote + Account.getPkAccountIdXXX() + quote
+                    + separator;
+            
+            if (BizPartner != null) {
+                if (BizPartner.isDomestic(miClient)) {
+                    comparableKey += quote + BizPartner.getFiscalId() + quote
+                            + separator + empty;
+                }
+                else {
+                    comparableKey += quote + DCfdConsts.RFC_GEN_INT + quote
+                            + separator + quote + BizPartner.getFiscalFrgId() + quote;
+                }
+                
+                comparableKey += separator + BizPartner.getPkBizPartnerId()
+                        + separator;
+            }
+            else if (!OccasionalFiscalId.isEmpty()) {
+                comparableKey += quote + OccasionalFiscalId + quote
+                        + separator + empty
+                        + separator + "0"
+                        + separator;
+            }
+            else {
+                comparableKey += quote + (asCsvFormat ? "(" + SDiotConsts.NAME_THIRD_GLOBAL + ")": SDiotTercero.GLOBAL_RFC) + quote
+                        + separator + empty
+                        + separator + "0"
+                        + separator;
+            }
+            
+            comparableKey += quote + SLibUtils.textKey(EntryKey) + quote;
+            
+            return comparableKey;
+        }
+        
+        public String getCsvHeading() {
+            return
+                    "\"Cuenta contable\"," +
+                    "\"RFC\"," +
+                    "\"ID fiscal\"," +
+                    "\"ID asociado negocios\"," +
+                    "\"Renglón póliza contable\"," +
+                    "\"Asociado negocios\"," +
+                    "\"Es tercero causante\"," +
+                    "\"Impuesto\"," +
+                    "\"Tipo IVA\"," +
+                    "\"Debe\"," +
+                    "\"Haber\"," +
+                    "\"Documento\"," +
+                    "\"UUID CFDI\"";
+        }
+        
+        public String getAsCsv() {
+            return
+                    getComparableKey(true) + "," +
+                    "\"" + (BizPartner != null ? BizPartner.getBizPartnerCommercial() : "") + "\"," +
+                    "\"" + (IsThirdTaxpayer ? "1" : "0") + "\"," +
+                    "\"" + Vat.getTax() + "\"," +
+                    "\"" + Vat.getVatType() + "\"," +
+                    Debit + "," +
+                    Credit + "," +
+                    "\"" + "'" + XtaDpsNumber + "\"," + // add apostroph to prevent large document numbers from being shown in scientific notation in spreadsheet
+                    "\"" + XtaCfdUuid + "\"";
+        }
+
+        @Override
+        public int compareTo(DiotEntry other) {
+            return this.getComparableKey(false).compareTo(other.getComparableKey(false));
         }
     }
     

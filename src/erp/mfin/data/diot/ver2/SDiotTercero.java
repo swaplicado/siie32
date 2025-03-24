@@ -24,6 +24,11 @@ public class SDiotTercero implements Comparable<SDiotTercero> {
      */
     public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.OPER_OTHER;
     
+    /**
+     * Fake RFC for global third parties.
+     */
+    public static final String GLOBAL_RFC = "ZZZZ999999999";
+    
     public boolean IsCurrentCompany;
     public String Clave;
     
