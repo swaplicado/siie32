@@ -99,6 +99,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jrbFormatCsv = new javax.swing.JRadioButton();
         jPanel13 = new javax.swing.JPanel();
         jrbFormatPipe = new javax.swing.JRadioButton();
+        jPanel10 = new javax.swing.JPanel();
+        jlFormatHint = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jspDiotConfig = new javax.swing.JScrollPane();
@@ -117,7 +119,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar el layout de la DIOT:"));
-        jPanel6.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -139,7 +141,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel3.add(jlDummy1);
 
         jckExcludeTotallyZero.setText("Excluir del layout a terceros totalmente en cero");
-        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(500, 23));
+        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(575, 23));
         jPanel3.add(jckExcludeTotallyZero);
 
         jPanel6.add(jPanel3);
@@ -163,8 +165,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlDummy2.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel8.add(jlDummy2);
 
-        jckGenerateDetailedInfoFile.setText("Generar archivo informativo con todos los movimientos del layout (en la misma carpeta)");
-        jckGenerateDetailedInfoFile.setPreferredSize(new java.awt.Dimension(500, 23));
+        jckGenerateDetailedInfoFile.setText("Generar archivo informativo de todos los movimientos contables (en la misma carpeta del archivo del layout)");
+        jckGenerateDetailedInfoFile.setPreferredSize(new java.awt.Dimension(575, 23));
         jPanel8.add(jckGenerateDetailedInfoFile);
 
         jPanel6.add(jPanel8);
@@ -184,8 +186,8 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel9.add(jbEditRequiredFiscalIds);
 
         jlRequiredFiscalIdsHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlRequiredFiscalIdsHint.setText("(separar varios RFC entre sí con coma)");
-        jlRequiredFiscalIdsHint.setPreferredSize(new java.awt.Dimension(230, 23));
+        jlRequiredFiscalIdsHint.setText("(separar varios RFC con coma)");
+        jlRequiredFiscalIdsHint.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel9.add(jlRequiredFiscalIdsHint);
 
         jPanel6.add(jPanel9);
@@ -210,6 +212,15 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel13.add(jrbFormatPipe);
 
         jPanel6.add(jPanel13);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFormatHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlFormatHint.setText("(Información del formato seleccionado del archivo del layout de la DIOT.)");
+        jlFormatHint.setPreferredSize(new java.awt.Dimension(750, 23));
+        jPanel10.add(jlFormatHint);
+
+        jPanel6.add(jPanel10);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -273,7 +284,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(816, 539));
+        setSize(new java.awt.Dimension(896, 589));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -290,23 +301,16 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         mvFields.add(moFieldDateEnd);
         mvFields.add(moFieldRequiredFiscalIds);
 
-        jbPickDateStart.addActionListener(this);
-        jbPickDateEnd.addActionListener(this);
-        jbEditRequiredFiscalIds.addActionListener(this);
-        jbGenerate.addActionListener(this);
-        jbCancel.addActionListener(this);
-        jrbFormatCsv.addItemListener(this);
-        jrbFormatPipe.addItemListener(this);
-
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldRequiredFiscalIds.setFieldValue("");
         
-        jckExcludeTotallyZero.setSelected(true);
-        jrbFormatCsv.setSelected(true);
         jtfRequiredFiscalIds.setEditable(false);
         jtfRequiredFiscalIds.setFocusable(false);
-        jtfRequiredFiscalIds.setText("");
+        
+        jckExcludeTotallyZero.setSelected(true);
+        jrbFormatCsv.setSelected(true);
+        itemStateChangedFormat(SDiotConsts.FORMAT_CSV);
         
         switch (mnDiotVersion) {
             case SDiotConsts.VER_1:
@@ -330,6 +334,14 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         }
         
         processConfig();
+
+        jbPickDateStart.addActionListener(this);
+        jbPickDateEnd.addActionListener(this);
+        jbEditRequiredFiscalIds.addActionListener(this);
+        jbGenerate.addActionListener(this);
+        jbCancel.addActionListener(this);
+        jrbFormatCsv.addItemListener(this);
+        jrbFormatPipe.addItemListener(this);
                 
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedGenerate", "generate", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
@@ -498,10 +510,13 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             case SDiotConsts.FORMAT_CSV:
                 jckGenerateDetailedInfoFile.setEnabled(true);
                 jckGenerateDetailedInfoFile.setSelected(true);
+                jlFormatHint.setText("(El archivo CSV sirve para validar la información de la DIOT solicitada. Contiene las mismas columnas que el layout oficial de la DIOT.)");
+                
                 break;
             case SDiotConsts.FORMAT_PIPE:
                 jckGenerateDetailedInfoFile.setEnabled(false);
                 jckGenerateDetailedInfoFile.setSelected(false);
+                jlFormatHint.setText("(El archivo TXT sirve para presentar la DIOT solicitada ante la autoridad, y se genera de conformidad con las disposiciones oficiales.)");
                 break;
             default:
                 // nothing
@@ -555,6 +570,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFormat;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
@@ -579,6 +595,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlFormat;
+    private javax.swing.JLabel jlFormatHint;
     private javax.swing.JLabel jlRequiredFiscalIds;
     private javax.swing.JLabel jlRequiredFiscalIdsHint;
     private javax.swing.JRadioButton jrbFormatCsv;
