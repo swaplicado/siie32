@@ -24,6 +24,7 @@ import erp.server.SServerResponse;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Vector;
@@ -280,6 +281,8 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
         int period = SLibTimeUtilities.digestYearMonth(miClient.getSessionXXX().getWorkingDate())[1];
         String[] months = SLibTimeUtilities.createMonthsOfYear(Locale.getDefault(), Calendar.LONG);
         STableColumnForm[] aoTableColumns;
+        
+        moIntegerFormat = new DecimalFormat("#,##0;-#,##0");
 
         mvSuscriptors = new Vector<>();
         mvTableSettings = new Vector<>();
