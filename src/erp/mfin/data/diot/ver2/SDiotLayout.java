@@ -167,11 +167,11 @@ public class SDiotLayout {
         }
         
         return "Ren. pól. " + 
-                resultSet.getInt("re.id_year") + "-" + 
-                resultSet.getInt("re.id_per") + "-" + 
+                SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("re.id_year")) + "-" + 
+                SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("re.id_per")) + "-" + 
                 resultSet.getInt("re.id_bkc") + "-" + 
                 resultSet.getString("re.id_tp_rec") + "-" + 
-                resultSet.getInt("re.id_num") + " " +
+                FormatRecordNumber.format(resultSet.getInt("re.id_num")) + " " +
                 resultSet.getInt("re.sort_pos") +
                 (account == null ? "" : "/ cta. ctb. '" +  account.getPkAccountIdXXX()) + "'"+
                 "/ prov. '" + thirdParty + "'";

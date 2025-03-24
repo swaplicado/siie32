@@ -34,6 +34,7 @@ public class SDiotLayout {
     
     private static final double AMOUNT_DIFF_ALLOWANCE = 0.1;
     private static final double FIXED_VAT_THIRD_TAXPAYER = 0.01; // fixed pre-arranged subtotal of VAT of third-taxpayer
+    protected static final DecimalFormat FormatRecordNumber = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
     
     protected SClientInterface miClient;
     protected Date mtStart;
@@ -131,15 +132,15 @@ public class SDiotLayout {
     
     private String composeFinRecordEntry(final ResultSet resultSet, final String tableAlias, final SDataAccount account, final SDataBizPartner bizPartner) throws Exception {
         return "Ren. pól. " + 
-                resultSet.getInt(tableAlias + ".id_year") + "-" + 
-                resultSet.getInt(tableAlias + ".id_per") + "-" + 
+                SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt(tableAlias + ".id_year")) + "-" + 
+                SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt(tableAlias + ".id_per")) + "-" + 
                 resultSet.getInt(tableAlias + ".id_bkc") + "-" + 
                 resultSet.getString(tableAlias + ".id_tp_rec") + "-" + 
-                resultSet.getInt(tableAlias + ".id_num") + " " +
+                FormatRecordNumber.format(resultSet.getInt(tableAlias + ".id_num")) + " " +
                 resultSet.getInt(tableAlias + ".sort_pos") +
-                (account == null ? "" : "/ cta. ctb. " +  account.getPkAccountIdXXX()) +
-                "/ prov. " + (bizPartner == null ? SDiotConsts.NAME_THIRD_GLOBAL.toUpperCase() : bizPartner.getBizPartnerCommercial() + " " +
-                "(" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")");
+                (account == null ? "" : "/ cta. ctb. '" +  account.getPkAccountIdXXX()) + "'" +
+                "/ prov. '" + (bizPartner == null ? SDiotConsts.NAME_THIRD_GLOBAL.toUpperCase() : bizPartner.getBizPartnerCommercial() + " " +
+                "(" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")'");
     }
     
     private void obtainDuplicatedOccasionalFiscalIds() throws Exception {
