@@ -167,7 +167,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             jbLogCardex.setEnabled(false);
             jbSegregate.setEnabled(false);
             mjbSupply.setEnabled(false);
-            mjbCloseOpenSupply.setEnabled(false);
+            mjbCloseOpenSupply.setEnabled(true);
             mjbToNew.setEnabled(false);
             mjbToSupply.setEnabled(false);
             mjbToPur.setEnabled(false);
