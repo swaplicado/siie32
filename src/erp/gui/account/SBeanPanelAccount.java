@@ -4,9 +4,14 @@
  */
 package erp.gui.account;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import static erp.data.SDataUtilities.readRegistry;
 import erp.gui.session.SSessionCustom;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SDataParamsCompany;
-import java.awt.AWTKeyStroke;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataCostCenter;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -35,11 +41,18 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldText;
 
 /**
- *
+ * Panel para la captura de cuentas contables y centros de costo-beneficio.
+ * Es posible obtener además el 
  * @author Sergio Flores
  */
 public class SBeanPanelAccount extends JPanel implements ActionListener, FocusListener, KeyListener {
+    
+    private static final int TYPE_LEDGER = 1;
+    private static final int TYPE_USABLE = 2;
 
+    public static final HashMap<String, SDataAccount> AccountsMap = new HashMap<>(); // key: ledger account number in user-format
+    public static final HashMap<String, SDataCostCenter> CostCentersMap = new HashMap<>(); // key: ledger account number in user-format
+    
     public static Frame OwnerFrame;
 
     private SGuiClient miClient;
@@ -63,7 +76,11 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     private int[] manDigits;
     private DecimalFormat[] maoDecimalFormats;
     private SAccount[] maoAccounts;
+    private boolean mbRetrieveDataAccounts;
+    private boolean mbRetrieveDataCostCenters;
     private ArrayList<SAccountLedger> maAccountLedgers;
+    private SAccountLedger moCurrentAccountLedger;
+    private SBeanPanelAccountOwner miPanelAccountOwner;
 
     /**
      * Creates new panel SBeanPanelAccount.
@@ -192,6 +209,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         add(jPanelMain, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -238,6 +256,10 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         maoDecimalFormats = new DecimalFormat[SAccountConsts.LEVELS];
         maoAccounts = null;
         maAccountLedgers = new ArrayList<>();
+        moCurrentAccountLedger = null;
+        mbRetrieveDataAccounts = false;
+        mbRetrieveDataCostCenters = false;
+        miPanelAccountOwner = null;
 
         maoTextCodeLevelStds[0] = moTextCodeLevel1;
         maoTextCodeLevelStds[1] = moTextCodeLevel2;
@@ -250,7 +272,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         for (int i = 0; i < maoTextCodeLevelStds.length; i++) {
             maoTextCodeLevelStds[i].setEditable(false);
-            maoTextCodeLevelStds[i].setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<AWTKeyStroke>());
+            maoTextCodeLevelStds[i].setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, new HashSet<>());
         }
 
         for (int i = 0; i < maoAccountChoosers.length; i++) {
@@ -260,7 +282,63 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         jbPick.addActionListener(this);
         jbClear.addActionListener(this);
     }
+    
+    private SDataAccount retrieveDataAccount(final String accountId) {
+        SDataAccount account = AccountsMap.get(accountId);
 
+        if (account == null) {
+            account = (SDataAccount) readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { accountId }, SLibConstants.EXEC_MODE_SILENT);
+            AccountsMap.put(accountId, account);
+        }
+        
+        return account;
+    }
+
+    private void computeDataAccountLedger() {
+        if (SLibUtils.parseInt(maoTextCodeLevelStds[0].getValue()) == 0) {
+            moCurrentAccountLedger = null;
+        }
+        else {
+            SAccountLedger accountLedger = (SAccountLedger) SAccountUtils.findAccountByCodeLevelStd(new ArrayList<>(maAccountLedgers), SAccountUtils.convertCodeLevelStd(maoTextCodeLevelStds[0].getValue()));
+
+            if (accountLedger != moCurrentAccountLedger) {
+                moCurrentAccountLedger = accountLedger;
+
+                if (mbRetrieveDataAccounts && moCurrentAccountLedger != null) {
+                    retrieveDataAccount(SAccountUtils.convertCodeUsr(mnAccountMask, moCurrentAccountLedger.getCodeStd()));
+                }
+            }
+        }
+    }
+    
+    private SDataCostCenter retrieveDataCostCenter(final String costCenterId) {
+        SDataCostCenter costCenter = CostCentersMap.get(costCenterId);
+
+        if (costCenter == null) {
+            costCenter = (SDataCostCenter) readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { costCenterId }, SLibConstants.EXEC_MODE_SILENT);
+            CostCentersMap.put(costCenterId, costCenter);
+        }
+        
+        return costCenter;
+    }
+
+    private void computeDataCostCenterLedger() {
+        if (SLibUtils.parseInt(maoTextCodeLevelStds[0].getValue()) == 0) {
+            moCurrentAccountLedger = null;
+        }
+        else {
+            SAccountLedger accountLedger = (SAccountLedger) SAccountUtils.findAccountByCodeLevelStd(new ArrayList<>(maAccountLedgers), SAccountUtils.convertCodeLevelStd(maoTextCodeLevelStds[0].getValue()));
+
+            if (accountLedger != moCurrentAccountLedger) {
+                moCurrentAccountLedger = accountLedger;
+
+                if (mbRetrieveDataCostCenters && moCurrentAccountLedger != null) {
+                    retrieveDataCostCenter(SAccountUtils.convertCodeUsr(mnAccountMask, moCurrentAccountLedger.getCodeStd()));
+                }
+            }
+        }
+    }
+    
     private void renderAccountName(int currentIndex) {
         String text = "";
         Color color = moColorNormal;
@@ -289,10 +367,27 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
         SAccount account = null;
 
         if (index >= 0) {
-            fieldText.setValue(maoDecimalFormats[index].format(SLibUtils.parseInt(fieldText.getValue())));
+            int accountSegment = SLibUtils.parseInt(fieldText.getValue());
+            fieldText.setValue(maoDecimalFormats[index].format(accountSegment));
+            
+            switch (mnAccountType) {
+                case SAccountConsts.TYPE_ACCOUNT:
+                    computeDataAccountLedger();
+                    break;
+                case SAccountConsts.TYPE_COST_CENTER:
+                    computeDataCostCenterLedger();
+                    break;
+                default:
+                    // nothing
+            }
 
             if (index == 0) {
-                account = SAccountUtils.findAccountByCodeLevelStd(new ArrayList<SAccount>(maAccountLedgers), SAccountUtils.convertCodeLevelStd(fieldText.getValue()));
+                if (moCurrentAccountLedger != null) {
+                    account = moCurrentAccountLedger;
+                }
+                else {
+                    account = SAccountUtils.findAccountByCodeLevelStd(new ArrayList<>(maAccountLedgers), SAccountUtils.convertCodeLevelStd(fieldText.getValue()));
+                }
             }
             else {
                 account = maoAccounts[index - 1] == null ? null : SAccountUtils.findAccountByCodeLevelStd(maoAccounts[index - 1].getChildren(), SAccountUtils.convertCodeLevelStd(fieldText.getValue()));
@@ -317,6 +412,14 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
                 for (int i = index + 1; i < mnLevels; i++) {
                     maoAccounts[i] = null;
                     maoTextCodeLevelStds[i].setValue(!maoTextCodeLevelStds[i].isEditable() ? "" : maoDecimalFormats[i].format(0));
+                }
+                
+                if (miPanelAccountOwner != null) {
+                    // notify owner that account has changed!
+                    
+                    if ((index == 0 && account == null) || (moCurrentAccountLedger != null && (index + 1) == moCurrentAccountLedger.getDeep())) {
+                        miPanelAccountOwner.notifyAccountChanged();
+                    }
                 }
             }
 
@@ -469,10 +572,10 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
             point = fieldText.getLocationOnScreen();
 
             if (index == 0) {
-                accounts = new ArrayList<SAccount>(maAccountLedgers);
+                accounts = new ArrayList<>(maAccountLedgers);
             }
             else {
-                accounts = maoAccounts[index - 1] == null ? new ArrayList<SAccount>() : maoAccounts[index - 1].getChildren();
+                accounts = maoAccounts[index - 1] == null ? new ArrayList<>() : maoAccounts[index - 1].getChildren();
             }
 
             accountChooser = maoAccountChoosers[index];
@@ -565,8 +668,8 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         renderAccountName(0);
     }
-
-    public void setAccountNameWidth(int width) {
+    
+    public void setAccountNameWidth(final int width) {
         jtfName.setPreferredSize(new Dimension(width, 23));
     }
 
@@ -663,6 +766,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
                 maAccountLedgers.addAll(((SSessionCustom) miClient.getSession().getSessionCustom()).getCostCenterLedgers());
                 break;
             default:
+                // nothing
         }
 
         mnLevels = SAccountUtils.getLevels(mnAccountMask);
@@ -736,6 +840,80 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         return account;
     }
+    
+    private SDataAccount getDataAccount(final SAccount account, final int type) {
+        SDataAccount dataAccount = null;
+        
+        if (mbRetrieveDataAccounts && moCurrentAccountLedger != null && account != null) {
+            dataAccount = retrieveDataAccount(SAccountUtils.convertCodeUsr(mnAccountMask, account.getCodeStd()));
+            
+            // do a final check:
+            
+            switch (type) {
+                case TYPE_LEDGER:
+                    if (dataAccount.getLevel() != 1) {
+                        dataAccount = null; // retrieved account is not a ledger one!
+                    }
+                    break;
+                    
+                case TYPE_USABLE:
+                    if (dataAccount.getLevel() < moCurrentAccountLedger.getDeep()) {
+                        dataAccount = null; // retrieved account is not usable!
+                    }
+                    break;
+                    
+                default:
+                    dataAccount = null; // type account is unknown!
+            }
+        }
+        
+        return dataAccount;
+    }
+    
+    public SDataAccount getSelectedDataAccount() {
+        return getDataAccount(getSelectedAccount(), TYPE_USABLE);
+    }
+
+    public SDataAccount getSelectedDataAccountLedger() {
+        return getDataAccount(moCurrentAccountLedger, TYPE_LEDGER);
+    }
+
+    private SDataCostCenter getDataCostCenter(final SAccount account, final int type) {
+        SDataCostCenter dataCostCenter = null;
+        
+        if (mbRetrieveDataCostCenters && moCurrentAccountLedger != null && account != null) {
+            dataCostCenter = retrieveDataCostCenter(SAccountUtils.convertCodeUsr(mnAccountMask, account.getCodeStd()));
+            
+            // do a final check:
+            
+            switch (type) {
+                case TYPE_LEDGER:
+                    if (dataCostCenter.getLevel() != 1) {
+                        dataCostCenter = null; // retrieved account is not a ledger one!
+                    }
+                    break;
+                    
+                case TYPE_USABLE:
+                    if (dataCostCenter.getLevel() < moCurrentAccountLedger.getDeep()) {
+                        dataCostCenter = null; // retrieved account is not usable!
+                    }
+                    break;
+                    
+                default:
+                    dataCostCenter = null; // type account is unknown!
+            }
+        }
+        
+        return dataCostCenter;
+    }
+    
+    public SDataCostCenter getSelectedDataCostCenter() {
+        return getDataCostCenter(getSelectedAccount(), TYPE_USABLE);
+    }
+
+    public SDataCostCenter getSelectedDataCostCenterLedger() {
+        return getDataCostCenter(moCurrentAccountLedger, TYPE_LEDGER);
+    }
 
     public void setPanelEditable(boolean enabled) {
         moTextCodeLevel1.setEditable(enabled);
@@ -780,6 +958,18 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         return fieldText;
     }
+    
+    public void setRetrieveDataAccounts(final boolean retrieve) {
+        mbRetrieveDataAccounts = retrieve;
+    }
+
+    public void setRetrieveDataCostCenters(final boolean retrieve) {
+        mbRetrieveDataCostCenters = retrieve;
+    }
+
+    public void setPanelAccountOwner(final SBeanPanelAccountOwner panelAccountOwner) {
+        miPanelAccountOwner = panelAccountOwner;
+    }
 
     public String composeAccountStd() {
         return SAccountUtils.composeCodeStd(maoTextCodeLevelStds);
@@ -816,7 +1006,7 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
         return validation;
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() instanceof SBeanFieldText) {

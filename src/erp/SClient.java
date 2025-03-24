@@ -246,7 +246,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private Jedis moJedis;
     private SLockManager moSLockManager;
     
-    private static boolean IsDevMode;
+    public static boolean IsDevMode;
     private static long DevStartControlPoint;
     private static long DevLastControlPoint;
     private static final SimpleDateFormat DevDatetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS Z");

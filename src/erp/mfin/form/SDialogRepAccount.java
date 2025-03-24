@@ -11,15 +11,18 @@
 
 package erp.mfin.form;
 
+import erp.SClient;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.gui.account.SAccountConsts;
 import erp.gui.account.SAccountUtils;
+import erp.gui.account.SBeanPanelAccountOwner;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.mcfg.data.SDataParamsCompany;
+import erp.mfin.data.SDataAccount;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.util.Map;
@@ -29,13 +32,14 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SDialogRepAccount extends javax.swing.JDialog {
+public class SDialogRepAccount extends javax.swing.JDialog implements SBeanPanelAccountOwner {
 
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDate;
@@ -72,8 +76,8 @@ public class SDialogRepAccount extends javax.swing.JDialog {
         jlLevel = new javax.swing.JLabel();
         jsLevel = new javax.swing.JSpinner();
         jPanel4 = new javax.swing.JPanel();
-        jpAccountBegin = new javax.swing.JPanel();
-        moAccountBegPanel = new erp.gui.account.SBeanPanelAccount();
+        jpAccountStart = new javax.swing.JPanel();
+        moAccountStartPanel = new erp.gui.account.SBeanPanelAccount();
         jpAccountEnd = new javax.swing.JPanel();
         moAccountEndPanel = new erp.gui.account.SBeanPanelAccount();
         jPanel1 = new javax.swing.JPanel();
@@ -129,11 +133,11 @@ public class SDialogRepAccount extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.GridLayout(2, 1));
 
-        jpAccountBegin.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta contable inicial:"));
-        jpAccountBegin.setLayout(new java.awt.BorderLayout());
-        jpAccountBegin.add(moAccountBegPanel, java.awt.BorderLayout.CENTER);
+        jpAccountStart.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta contable inicial:"));
+        jpAccountStart.setLayout(new java.awt.BorderLayout());
+        jpAccountStart.add(moAccountStartPanel, java.awt.BorderLayout.CENTER);
 
-        jPanel4.add(jpAccountBegin);
+        jPanel4.add(jpAccountStart);
 
         jpAccountEnd.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta contable final:"));
         jpAccountEnd.setLayout(new java.awt.BorderLayout());
@@ -192,16 +196,21 @@ public class SDialogRepAccount extends javax.swing.JDialog {
         moFieldDate.setPickerButton(jbDate);
 
         moFieldDate.setFieldValue(miClient.getSessionXXX().getWorkingDate());
-        moAccountBegPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, false);
+        moAccountStartPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, false);
         moAccountEndPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, false, true, false);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldDate);
 
         jsLevel.setModel(new SpinnerNumberModel(1, 1, miClient.getSessionXXX().getParamsErp().getDeepAccounts(), 1));
 
-        moAccountBegPanel.initPanel();
+        moAccountStartPanel.initPanel();
         moAccountEndPanel.initPanel();
+        
+        if (((SClient) miClient).IsDevMode) {
+            moAccountStartPanel.setRetrieveDataAccounts(true);
+            moAccountStartPanel.setPanelAccountOwner(this);
+        }
 
         setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
@@ -244,7 +253,7 @@ public class SDialogRepAccount extends javax.swing.JDialog {
         String msg = "";
         JComponent component = null;
 
-        msCodeAccMin = moAccountBegPanel.getSelectedAccount() == null ? SAccountUtils.composeCodeStdMin() : moAccountBegPanel.getSelectedAccount().getCodeStd();
+        msCodeAccMin = moAccountStartPanel.getSelectedAccount() == null ? SAccountUtils.composeCodeStdMin() : moAccountStartPanel.getSelectedAccount().getCodeStd();
         msCodeAccMax = moAccountEndPanel.getSelectedAccount() == null ? SAccountUtils.composeCodeStdMax(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount()) : moAccountEndPanel.getSelectedAccount().getCodeStd();
 
         for (SFormField field : mvFields) {
@@ -261,7 +270,7 @@ public class SDialogRepAccount extends javax.swing.JDialog {
         }
         else {
             if (msCodeAccMin.compareTo(msCodeAccMax) > 0) {
-                msg = "El valor para el campo '" + ((TitledBorder) jpAccountBegin.getBorder()).getTitle() + "' " +
+                msg = "El valor para el campo '" + ((TitledBorder) jpAccountStart.getBorder()).getTitle() + "' " +
                         "no puede ser mayor al del campo '" + ((TitledBorder) jpAccountEnd.getBorder()).getTitle() + "'.";
             }
             if (msg.length() > 0) {
@@ -289,13 +298,46 @@ public class SDialogRepAccount extends javax.swing.JDialog {
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlLevel;
-    private javax.swing.JPanel jpAccountBegin;
     private javax.swing.JPanel jpAccountEnd;
+    private javax.swing.JPanel jpAccountStart;
     private javax.swing.JButton jpClose;
     private javax.swing.JButton jpPrint;
     private javax.swing.JSpinner jsLevel;
-    private erp.gui.account.SBeanPanelAccount moAccountBegPanel;
     private erp.gui.account.SBeanPanelAccount moAccountEndPanel;
+    private erp.gui.account.SBeanPanelAccount moAccountStartPanel;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    public void notifyAccountChanged() {
+        if (((SClient) miClient).IsDevMode) {
+            System.out.println(SLibUtils.textRepeat("=", 80));
+            System.out.println(getClass().getName() + ".notifyAccountChanged() invoked:");
+            
+            SDataAccount accountLedger = moAccountStartPanel.getSelectedDataAccountLedger();
+            
+            if (accountLedger == null) {
+                System.out.println("- No ledger account selected!");
+            }
+            else {
+                if (accountLedger.getDeep() > 1) {
+                    System.out.println("- Ledger account selected: " + accountLedger.getPkAccountIdXXX());
+                    
+                    SDataAccount account = moAccountStartPanel.getSelectedDataAccount();
+                    
+                    if (account == null) {
+                        System.out.println("- No account selected!");
+                    }
+                    else {
+                        System.out.println("- Account selected: " + account.getPkAccountIdXXX());
+                    }
+                }
+                else {
+                    System.out.println("- Account selected: " + accountLedger.getPkAccountIdXXX());
+                }
+            }
+            
+            System.out.println(SLibUtils.textRepeat("-", 80));
+            System.out.println();
+        }
+    }
 }
