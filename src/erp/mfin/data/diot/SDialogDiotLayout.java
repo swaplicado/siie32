@@ -140,7 +140,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlDummy1.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel3.add(jlDummy1);
 
-        jckExcludeTotallyZero.setText("Excluir del layout a terceros totalmente en cero");
+        jckExcludeTotallyZero.setText("Excluir del layout a terceros con operaciones totalmente en cero");
         jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(575, 23));
         jPanel3.add(jckExcludeTotallyZero);
 
@@ -165,7 +165,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jlDummy2.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel8.add(jlDummy2);
 
-        jckGenerateDetailedInfoFile.setText("Generar archivo informativo de todos los movimientos contables (en la misma carpeta del archivo del layout)");
+        jckGenerateDetailedInfoFile.setText("Generar archivo informativo CSV de todos los movimientos contables (en la misma carpeta del layout)");
         jckGenerateDetailedInfoFile.setPreferredSize(new java.awt.Dimension(575, 23));
         jPanel8.add(jckGenerateDetailedInfoFile);
 
@@ -182,6 +182,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel9.add(jtfRequiredFiscalIds);
 
         jbEditRequiredFiscalIds.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditRequiredFiscalIds.setToolTipText("Capturar RFC a filtrar");
         jbEditRequiredFiscalIds.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jbEditRequiredFiscalIds);
 
