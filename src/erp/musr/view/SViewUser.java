@@ -66,7 +66,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 jbSiieAppSync = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
                 jbSiieAppSync.setPreferredSize(new Dimension(23, 23));
                 jbSiieAppSync.addActionListener(this);
-                jbSiieAppSync.setToolTipText("Sincronizar con SIIE App");
+                jbSiieAppSync.setToolTipText("Sincronizar usuarios con SIIE App");
 
                 addTaskBarUpperComponent(jbSiieAppSync);
             }
