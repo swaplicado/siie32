@@ -26,13 +26,13 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SViewUser extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbCopy;
-    private javax.swing.JButton jbExport;
-    private javax.swing.JButton jbSync;
+    private javax.swing.JButton jbSiieAppExport;
+    private javax.swing.JButton jbSiieAppSync;
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
@@ -54,23 +54,25 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         addTaskBarUpperComponent(jbCopy);
 
-        jbExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
-        jbExport.setPreferredSize(new Dimension(23, 23));
-        jbExport.addActionListener(this);
-        jbExport.setToolTipText("Exportar usuario");
-
-        jbSync = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
-        jbSync.setPreferredSize(new Dimension(23, 23));
-        jbSync.addActionListener(this);
-        jbSync.setToolTipText("Sincronizar con sistemas externos");
-
         try {
             if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS).isEmpty()) {
-                addTaskBarUpperComponent(jbExport);
-                addTaskBarUpperComponent(jbSync);
+                jbSiieAppExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
+                jbSiieAppExport.setPreferredSize(new Dimension(23, 23));
+                jbSiieAppExport.addActionListener(this);
+                jbSiieAppExport.setToolTipText("Exportar usuario a SIIE App");
+
+                addTaskBarUpperComponent(jbSiieAppExport);
+                
+                jbSiieAppSync = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+                jbSiieAppSync.setPreferredSize(new Dimension(23, 23));
+                jbSiieAppSync.addActionListener(this);
+                jbSiieAppSync.setToolTipText("Sincronizar con SIIE App");
+
+                addTaskBarUpperComponent(jbSiieAppSync);
             }
-        } catch (Exception ex) {
-            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception e) {
+            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
         }
 
         addTaskBarUpperSeparator();
@@ -168,8 +170,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         return JOptionPane.showConfirmDialog(this, msg, SGuiConsts.MSG_BOX_CONFIRM, JOptionPane.YES_NO_OPTION);
     }
 
-    private void actionExport() {
-        if (jbExport.isEnabled()) {
+    private void actionSiieAppExport() {
+        if (jbSiieAppExport != null && jbSiieAppExport.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -185,8 +187,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
     }
 
-    private void actionSynchronizeExternal() {
-        if (jbSync.isEnabled()) {
+    private void actionSiieAppSync() {
+        if (jbSiieAppSync != null && jbSiieAppSync.isEnabled()) {
             SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
             oExport.SynchronizeExternal();
         }
@@ -233,11 +235,11 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             if (button == jbCopy) {
                 actionCopy();
             }
-            else if (button == jbExport) {
-                actionExport();
+            else if (button == jbSiieAppExport) {
+                actionSiieAppExport();
             }
-            else if (button == jbSync) {
-                actionSynchronizeExternal();
+            else if (button == jbSiieAppSync) {
+                actionSiieAppSync();
             }
         }
     }
