@@ -97,7 +97,7 @@
                 <Component class="javax.swing.JLabel" name="jlDummy1">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[50, 23]"/>
+                      <Dimension value="[75, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -105,7 +105,7 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Excluir del layout a terceros con operaciones totalmente en cero"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[575, 23]"/>
+                      <Dimension value="[500, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -149,15 +149,27 @@
                 <Component class="javax.swing.JLabel" name="jlDummy2">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[50, 23]"/>
+                      <Dimension value="[75, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckGenerateDetailedInfoFile">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Generar archivo informativo CSV de todos los movimientos contables (en la misma carpeta del layout)"/>
+                    <Property name="text" type="java.lang.String" value="Generar archivo informativo CSV con el detalle de todos los movimientos contables del layout"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[575, 23]"/>
+                      <Dimension value="[500, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlDetailedInfoFileHint">
+                  <Properties>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/erp/img/icon_view_help.png"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Se crear&#xe1; en la misma carpeta destino del layout, distingui&#xe9;ndose de &#xe9;ste con &quot;-info&quot;"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[15, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

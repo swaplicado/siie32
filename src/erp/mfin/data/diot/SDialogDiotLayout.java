@@ -89,6 +89,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateEnd = new javax.swing.JButton();
         jlDummy2 = new javax.swing.JLabel();
         jckGenerateDetailedInfoFile = new javax.swing.JCheckBox();
+        jlDetailedInfoFileHint = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jlRequiredFiscalIds = new javax.swing.JLabel();
         jtfRequiredFiscalIds = new javax.swing.JTextField();
@@ -137,11 +138,11 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel3.add(jbPickDateStart);
 
-        jlDummy1.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlDummy1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel3.add(jlDummy1);
 
         jckExcludeTotallyZero.setText("Excluir del layout a terceros con operaciones totalmente en cero");
-        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(575, 23));
+        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel3.add(jckExcludeTotallyZero);
 
         jPanel6.add(jPanel3);
@@ -162,12 +163,18 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel8.add(jbPickDateEnd);
 
-        jlDummy2.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlDummy2.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel8.add(jlDummy2);
 
-        jckGenerateDetailedInfoFile.setText("Generar archivo informativo CSV de todos los movimientos contables (en la misma carpeta del layout)");
-        jckGenerateDetailedInfoFile.setPreferredSize(new java.awt.Dimension(575, 23));
+        jckGenerateDetailedInfoFile.setText("Generar archivo informativo CSV con el detalle de todos los movimientos contables del layout");
+        jckGenerateDetailedInfoFile.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel8.add(jckGenerateDetailedInfoFile);
+
+        jlDetailedInfoFileHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDetailedInfoFileHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlDetailedInfoFileHint.setToolTipText("Se creará en la misma carpeta destino del layout, distinguiéndose de éste con \"-info\"");
+        jlDetailedInfoFileHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel8.add(jlDetailedInfoFileHint);
 
         jPanel6.add(jPanel8);
 
@@ -593,6 +600,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlDetailedInfoFileHint;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlFormat;
