@@ -143,8 +143,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldFkMwzType; // mininum wage zone
     
     private erp.lib.form.SFormField moFieldFkEmployeeType;
-    private erp.lib.form.SFormField moFieldFkWorkerType;
     private erp.lib.form.SFormField moFieldIsUnionized;
+    private erp.lib.form.SFormField moFieldFkWorkerType;
     private erp.lib.form.SFormField moFieldIsMfgOperator;
     private erp.lib.form.SFormField moFieldFkDepartment;
     private erp.lib.form.SFormField moFieldFkPosition;
@@ -321,9 +321,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel9 = new javax.swing.JPanel();
         jlDateLastDismissal_n = new javax.swing.JLabel();
         jftDateLastDismissal_n = new javax.swing.JFormattedTextField();
+        jlAux1 = new javax.swing.JLabel();
+        jlDatePaymentType = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
         jlFkPaymentType = new javax.swing.JLabel();
         jcbFkPaymentType = new javax.swing.JComboBox<SFormComponentItem>();
+        jftDatePaymentType = new javax.swing.JFormattedTextField();
+        jbDatePaymentType = new javax.swing.JButton();
+        jbDatePaymentTypeEdit = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jlFkSalaryType = new javax.swing.JLabel();
         jcbFkSalaryType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -352,12 +357,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel30 = new javax.swing.JPanel();
         jlFkEmployeeType = new javax.swing.JLabel();
         jcbFkEmployeeType = new javax.swing.JComboBox<SFormComponentItem>();
+        jLabel5 = new javax.swing.JLabel();
+        jckIsUnionized = new javax.swing.JCheckBox();
         jPanel15 = new javax.swing.JPanel();
         jlFkWorkerType = new javax.swing.JLabel();
         jcbFkWorkerType = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel12 = new javax.swing.JPanel();
-        jckIsUnionized = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
         jckIsMfgOperator = new javax.swing.JCheckBox();
+        jPanel12 = new javax.swing.JPanel();
         jlCheckerPolicy = new javax.swing.JLabel();
         jradCheckerNever = new javax.swing.JRadioButton();
         jradCheckerAllways = new javax.swing.JRadioButton();
@@ -374,10 +381,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel44 = new javax.swing.JPanel();
         jlFkWorkingDayType = new javax.swing.JLabel();
         jcbFkWorkingDayType = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel11 = new javax.swing.JPanel();
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        jPanel11 = new javax.swing.JPanel();
         jlOvertimePolicy = new javax.swing.JLabel();
         jradOvertimeNever = new javax.swing.JRadioButton();
         jradOvertimeAllways = new javax.swing.JRadioButton();
@@ -1020,6 +1026,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(jftDateLastDismissal_n);
 
+        jlAux1.setPreferredSize(new java.awt.Dimension(55, 23));
+        jPanel9.add(jlAux1);
+
+        jlDatePaymentType.setText("A partir de:*");
+        jlDatePaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlDatePaymentType);
+
         jPanel3.add(jPanel9);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -1028,8 +1041,24 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlFkPaymentType);
 
-        jcbFkPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbFkPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel28.add(jcbFkPaymentType);
+
+        jftDatePaymentType.setText("yyyy/mm/dd");
+        jftDatePaymentType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel28.add(jftDatePaymentType);
+
+        jbDatePaymentType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDatePaymentType.setToolTipText("Seleccionar fecha");
+        jbDatePaymentType.setFocusable(false);
+        jbDatePaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel28.add(jbDatePaymentType);
+
+        jbDatePaymentTypeEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbDatePaymentTypeEdit.setToolTipText("Modificar fecha");
+        jbDatePaymentTypeEdit.setFocusable(false);
+        jbDatePaymentTypeEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel28.add(jbDatePaymentTypeEdit);
 
         jPanel3.add(jPanel28);
 
@@ -1152,6 +1181,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkEmployeeType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel30.add(jcbFkEmployeeType);
 
+        jLabel5.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel30.add(jLabel5);
+
+        jckIsUnionized.setText("Es sindicalizado");
+        jckIsUnionized.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel30.add(jckIsUnionized);
+
         jPanel4.add(jPanel30);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -1163,35 +1199,34 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkWorkerType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel15.add(jcbFkWorkerType);
 
+        jLabel7.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel15.add(jLabel7);
+
+        jckIsMfgOperator.setText("Es operador");
+        jckIsMfgOperator.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel15.add(jckIsMfgOperator);
+
         jPanel4.add(jPanel15);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jckIsUnionized.setText("Es sindicalizado");
-        jckIsUnionized.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel12.add(jckIsUnionized);
-
-        jckIsMfgOperator.setText("Es operador");
-        jckIsMfgOperator.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jckIsMfgOperator);
-
-        jlCheckerPolicy.setText("Reloj checador:");
-        jlCheckerPolicy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCheckerPolicy.setText("Usa reloj checador:");
+        jlCheckerPolicy.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlCheckerPolicy);
 
         bgCheckerPolicy.add(jradCheckerNever);
         jradCheckerNever.setText("Nunca");
-        jradCheckerNever.setPreferredSize(new java.awt.Dimension(65, 23));
+        jradCheckerNever.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel12.add(jradCheckerNever);
 
         bgCheckerPolicy.add(jradCheckerAllways);
         jradCheckerAllways.setText("Siempre");
-        jradCheckerAllways.setPreferredSize(new java.awt.Dimension(70, 23));
+        jradCheckerAllways.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel12.add(jradCheckerAllways);
 
         bgCheckerPolicy.add(jradCheckerSometimes);
         jradCheckerSometimes.setText("Ocasionalmente");
-        jradCheckerSometimes.setPreferredSize(new java.awt.Dimension(110, 23));
+        jradCheckerSometimes.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jradCheckerSometimes);
 
         jPanel4.add(jPanel12);
@@ -1238,40 +1273,38 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel44.add(jcbFkWorkingDayType);
 
-        jPanel4.add(jPanel44);
-
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
+        jlWorkingHoursDay.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlWorkingHoursDay.setText("Horas jornada:*");
-        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel11.add(jlWorkingHoursDay);
+        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel44.add(jlWorkingHoursDay);
 
         jtfWorkingHoursDay.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWorkingHoursDay.setText("0");
         jtfWorkingHoursDay.setToolTipText("Unidades");
         jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel11.add(jtfWorkingHoursDay);
+        jPanel44.add(jtfWorkingHoursDay);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(45, 23));
-        jPanel11.add(jLabel1);
+        jPanel4.add(jPanel44);
 
-        jlOvertimePolicy.setText("Tiempo extra:");
-        jlOvertimePolicy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlOvertimePolicy.setText("Genera tiempo extra:");
+        jlOvertimePolicy.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlOvertimePolicy);
 
         bgOvertime.add(jradOvertimeNever);
         jradOvertimeNever.setText("Nunca");
-        jradOvertimeNever.setPreferredSize(new java.awt.Dimension(65, 23));
+        jradOvertimeNever.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jradOvertimeNever);
 
         bgOvertime.add(jradOvertimeAllways);
         jradOvertimeAllways.setText("Siempre");
-        jradOvertimeAllways.setPreferredSize(new java.awt.Dimension(70, 23));
+        jradOvertimeAllways.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel11.add(jradOvertimeAllways);
 
         bgOvertime.add(jradOvertimeSometimes);
         jradOvertimeSometimes.setText("Ocasionalmente");
-        jradOvertimeSometimes.setPreferredSize(new java.awt.Dimension(110, 23));
+        jradOvertimeSometimes.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jradOvertimeSometimes);
 
         jPanel4.add(jPanel11);
@@ -2553,10 +2586,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         
         moFieldFkEmployeeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkEmployeeType, jlFkEmployeeType);
         moFieldFkEmployeeType.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
-        moFieldFkWorkerType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkWorkerType, jlFkWorkerType);
-        moFieldFkWorkerType.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldIsUnionized = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsUnionized);
         moFieldIsUnionized.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
+        moFieldFkWorkerType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkWorkerType, jlFkWorkerType);
+        moFieldFkWorkerType.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldIsMfgOperator = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsMfgOperator);
         moFieldIsMfgOperator.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldFkDepartment = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDepartment, jlFkDepartment);
@@ -2726,8 +2759,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldFkMwzType);
         
         mvFields.add(moFieldFkEmployeeType);
-        mvFields.add(moFieldFkWorkerType);
         mvFields.add(moFieldIsUnionized);
+        mvFields.add(moFieldFkWorkerType);
         mvFields.add(moFieldIsMfgOperator);
         mvFields.add(moFieldFkDepartment);
         mvFields.add(moFieldFkPosition);
@@ -3899,11 +3932,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCheckerPolicy;
     private javax.swing.ButtonGroup bgOvertime;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -3984,6 +4018,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbDateChangeSalarySscBase;
     private javax.swing.JButton jbDateChangeWage;
     private javax.swing.JButton jbDateLastHire;
+    private javax.swing.JButton jbDatePaymentType;
+    private javax.swing.JButton jbDatePaymentTypeEdit;
     private javax.swing.JButton jbImagePhoto;
     private javax.swing.JButton jbImagePhotoRemove;
     private javax.swing.JButton jbImagePhotoView;
@@ -4055,6 +4091,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftDateChangeWage;
     private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
+    private javax.swing.JFormattedTextField jftDatePaymentType;
     private javax.swing.JFormattedTextField jftMateDateBirth;
     private javax.swing.JFormattedTextField jftNumber;
     private javax.swing.JFormattedTextField jftSonDateBirth1;
@@ -4069,6 +4106,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlAnnBonSeniorityStart;
     private javax.swing.JLabel jlAnnBonSeniorityStartHelp;
     private javax.swing.JLabel jlAnnBonTable;
+    private javax.swing.JLabel jlAux1;
     private javax.swing.JLabel jlBankAccount;
     private javax.swing.JLabel jlBenDateBenefits;
     private javax.swing.JLabel jlBenDateCutoff;
@@ -4088,6 +4126,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateBirth;
     private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlDatePaymentType;
     private javax.swing.JLabel jlEmergencies;
     private javax.swing.JLabel jlEmergencies0;
     private javax.swing.JLabel jlEmergenciesContact;
@@ -4775,8 +4814,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkMwzType.setFieldValue(new int[] { moEmployee.getFkMwzTypeId() });
 
         moFieldFkEmployeeType.setFieldValue(new int[] { moEmployee.getFkEmployeeTypeId() });
-        moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
         moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
+        moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
         moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
         moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
         itemStateChangedDepartament();
