@@ -7,23 +7,24 @@ package erp.mtrn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.gui.account.SAccountConsts;
+import erp.gui.account.SBeanPanelAccount;
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
-import erp.mfin.form.SPanelAccount;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SDialogCostCenter extends javax.swing.JDialog implements ActionListener {
+public class SDialogCostCenterPicker extends javax.swing.JDialog implements ActionListener {
     
     public static final int DESCRIPTION = 1; 
 
     private final SClientInterface miClient;
-    private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
+    //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     
     private int mnFormResult;
     
@@ -31,7 +32,7 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
      * Creates new form SDialogCostCenter
      * @param client
      */
-    public SDialogCostCenter(SClientInterface client) {
+    public SDialogCostCenterPicker(SClientInterface client) {
         miClient = client;
         initComponents();
         initComponentsExtra();
@@ -47,7 +48,7 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        moCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -58,9 +59,7 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
         setResizable(false);
 
         jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jLabel1.setText("[Panel centro de costo]");
-        jPanel1.add(jLabel1, java.awt.BorderLayout.CENTER);
+        jPanel1.add(moCostCenterPanel, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -81,6 +80,7 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         try {
             moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
             moPanelFkCostCenterId_n.setLabelsWidth(100);
@@ -91,6 +91,14 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
         moPanelFkCostCenterId_n.resetPanel();
         jPanel1.remove(jLabel1);
         jPanel1.add(moPanelFkCostCenterId_n);
+        */
+
+        moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        moCostCenterPanel.setRetrieveDataCostCenters(true);
+
+        moCostCenterPanel.setAccountNameWidth(200);
+        
+        moCostCenterPanel.initPanel();
         
         addListeners();
     }
@@ -111,21 +119,22 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private erp.gui.account.SBeanPanelAccount moCostCenterPanel;
     // End of variables declaration//GEN-END:variables
 
     public Object getValue(int value) {
         Object obj = null;
         switch (value) {
             case SDataConstants.FIN_CC:
-                obj = moPanelFkCostCenterId_n.getCurrentInputCostCenter();
+                //obj = moPanelFkCostCenterId_n.getCurrentInputCostCenter();//XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+                obj = moCostCenterPanel.getSelectedDataCostCenter();
                 break;
             case DESCRIPTION:
-                obj = moPanelFkCostCenterId_n.getAccountDescription();
+                obj = moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getAccountDescription();
                 break;
         }
         return obj;
@@ -139,8 +148,8 @@ public class SDialogCostCenter extends javax.swing.JDialog implements ActionList
         return mnFormResult;
     }
     
-    public erp.mfin.form.SPanelAccount getPanel() {
-        return moPanelFkCostCenterId_n;
+    public SBeanPanelAccount getPanel() {
+        return moCostCenterPanel;
     }
     
     @Override

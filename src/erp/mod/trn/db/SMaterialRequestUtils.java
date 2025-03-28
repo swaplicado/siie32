@@ -1021,7 +1021,7 @@ public abstract class SMaterialRequestUtils {
             int option = JOptionPane.showOptionDialog(null, scrollPane, "Ingrese comentario/observación:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
             String reason = "";
             if (option == JOptionPane.OK_OPTION) {
-                reason = textArea.getText();
+                reason = textArea.getText().toUpperCase();
             }
             else {
                 return "Acción cancelada";
@@ -1029,7 +1029,7 @@ public abstract class SMaterialRequestUtils {
             
             SDbMaterialRequest req = new SDbMaterialRequest();
             req.read(session, pkMatReq);
-            req.setClosePurchase(! req.isClosePurchase());
+            req.setClosePurchase(!req.isClosePurchase());
             req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             

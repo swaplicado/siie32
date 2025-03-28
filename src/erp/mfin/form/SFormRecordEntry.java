@@ -6,10 +6,14 @@
 package erp.mfin.form;
 
 import cfd.DCfdConsts;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.account.SAccount;
+import erp.gui.account.SAccountConsts;
+import erp.gui.account.SBeanPanelAccountOwner;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
@@ -18,10 +22,12 @@ import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataCfdRecordRow;
 import erp.mfin.data.SDataCheck;
+import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataTax;
@@ -33,7 +39,6 @@ import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
@@ -49,13 +54,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.xml.SXmlUtils;
 
@@ -63,7 +67,7 @@ import sa.lib.xml.SXmlUtils;
  *
  * @author Sergio Flores, Isabel Servín, Edwin Carmona
  */
-public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
+public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, SBeanPanelAccountOwner {
     
     private static final String LABEL_BIZ_PARTNER = "Asociado negocios";
 
@@ -119,8 +123,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private erp.mfin.data.SDataAccountCash moEntryAccountCash;
     private erp.mtrn.data.SDataDps moEntryDps;
     private erp.mtrn.data.SDataDps moEntryDpsAdj;
+    /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
     private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
+    */
     
     private SFinRecordEntry moFinRecordEntry;
 
@@ -148,7 +154,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         bgTax = new javax.swing.ButtonGroup();
         jpRegistry = new javax.swing.JPanel();
-        jlDummyAccount = new javax.swing.JLabel();
+        moAccountPanel = new erp.gui.account.SBeanPanelAccount();
         jpRegistryCenter = new javax.swing.JPanel();
         jpRegistryCenterNorth = new javax.swing.JPanel();
         jpSettings = new javax.swing.JPanel();
@@ -157,7 +163,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfConcept = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jlFkBizPartnerId_nr = new javax.swing.JLabel();
-        jcbFkBizPartnerId_nr = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkBizPartnerId_nr = new javax.swing.JComboBox<>();
         jbFkBizPartnerId_nr = new javax.swing.JButton();
         jlOccasionalFiscalId = new javax.swing.JLabel();
         jcbOccasionalFiscalId = new javax.swing.JComboBox();
@@ -169,25 +175,25 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jckIsReferenceTax = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jlFkTaxId_n = new javax.swing.JLabel();
-        jcbFkTaxId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkTaxId_n = new javax.swing.JComboBox<>();
         jbFkTaxId_n = new javax.swing.JButton();
         jrbTaxCash = new javax.swing.JRadioButton();
         jrbTaxPend = new javax.swing.JRadioButton();
         jlFkTaxId_nDiotHint = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jlFkEntityId_n = new javax.swing.JLabel();
-        jcbFkEntityId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkEntityId_n = new javax.swing.JComboBox<>();
         jbFkEntityId_n = new javax.swing.JButton();
         jtfEntityCurrencyKey = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
         jlFkItemId_n = new javax.swing.JLabel();
-        jcbFkItemId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkItemId_n = new javax.swing.JComboBox<>();
         jbFkItemId_n = new javax.swing.JButton();
         jtfUnits = new javax.swing.JTextField();
         jtfUnitsSymbol = new javax.swing.JTextField();
         jPanel14 = new javax.swing.JPanel();
         jlFkItemAuxId_n = new javax.swing.JLabel();
-        jcbFkItemAuxId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkItemAuxId_n = new javax.swing.JComboBox<>();
         jbFkItemAuxId_n = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlFkDps = new javax.swing.JLabel();
@@ -213,11 +219,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfFkYearId_n = new javax.swing.JTextField();
         jlDummy03 = new javax.swing.JLabel();
         jckIsCheckApplying = new javax.swing.JCheckBox();
-        jcbFkCheckId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCheckId_n = new javax.swing.JComboBox<>();
         jpValue = new javax.swing.JPanel();
         jpValue1 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCurrencyId = new javax.swing.JComboBox<>();
         jbFkCurrencyId = new javax.swing.JButton();
         jlFkCurrencyIdHint = new javax.swing.JLabel();
         jlDummy11 = new javax.swing.JLabel();
@@ -258,7 +264,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jlCreditHint = new javax.swing.JLabel();
         jlDummy15 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
-        jlDummyCostCenter = new javax.swing.JLabel();
+        moCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -275,11 +281,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpRegistry.setLayout(new java.awt.BorderLayout(5, 5));
-
-        jlDummyAccount.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyAccount.setText("[Panel cuenta contable]");
-        jlDummyAccount.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpRegistry.add(jlDummyAccount, java.awt.BorderLayout.NORTH);
+        jpRegistry.add(moAccountPanel, java.awt.BorderLayout.NORTH);
 
         jpRegistryCenter.setLayout(new java.awt.BorderLayout());
 
@@ -798,11 +800,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jpRegistryCenterNorth.add(jpValue, java.awt.BorderLayout.CENTER);
 
         jpRegistryCenter.add(jpRegistryCenterNorth, java.awt.BorderLayout.NORTH);
-
-        jlDummyCostCenter.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyCostCenter.setText("[Panel centro de costo-beneficio]");
-        jlDummyCostCenter.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpRegistryCenter.add(jlDummyCostCenter, java.awt.BorderLayout.SOUTH);
+        jpRegistryCenter.add(moCostCenterPanel, java.awt.BorderLayout.SOUTH);
 
         jpRegistry.add(jpRegistryCenter, java.awt.BorderLayout.CENTER);
 
@@ -834,6 +832,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         // Create and add form panels:
 
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         try {
             // account and const center panels:
             moPanelFkAccountId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
@@ -850,6 +849,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jpRegistryCenter.remove(jlDummyCostCenter);
         jpRegistryCenter.add(moPanelFkCostCenterId_n, BorderLayout.SOUTH);
+        */
+        
+        moAccountPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, false);
+        moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        
+        moAccountPanel.setComponentNext(jtfConcept);
         
         jtfDebitCyCur.setText("");
         jtfCreditCyCur.setText("");
@@ -959,7 +964,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jckIsCheckApplying.addItemListener(this);
         jckIsExchangeDifference.addItemListener(this);
 
-        moPanelFkAccountId.getFieldAccount().getComponent().addFocusListener(this);
+        //moPanelFkAccountId.getFieldAccount().getComponent().addFocusListener(this); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         jcbFkEntityId_n.addFocusListener(this);
         jcbFkCurrencyId.addFocusListener(this);
         jtfDebitCy.addFocusListener(this);
@@ -967,6 +972,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jtfDebit.addFocusListener(this);
         jtfCredit.addFocusListener(this);
         jtfExchangeRate.addFocusListener(this);
+        
+        moAccountPanel.setRetrieveDataAccounts(true);
+        moAccountPanel.setPanelAccountOwner(this);
+        
+        moCostCenterPanel.setRetrieveDataCostCenters(true);
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -1010,7 +1020,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         maFormNames.put(SFinRecordUtils.COMP_CC, SGuiUtils.getLabelName("Centro costo"));
         
         maFormComponents = new HashMap<>();
-        maFormComponents.put(SFinRecordUtils.COMP_ACC, moPanelFkAccountId.getFieldAccount().getComponent());
+        maFormComponents.put(SFinRecordUtils.COMP_ACC, moAccountPanel.getTextNumberFirst());
         maFormComponents.put(SFinRecordUtils.COMP_CONCEPT, jtfConcept);
         maFormComponents.put(SFinRecordUtils.COMP_BIZPARTNER, jcbFkBizPartnerId_nr);
         maFormComponents.put(SFinRecordUtils.COMP_OCCASIONAL, jcbOccasionalFiscalId);
@@ -1034,21 +1044,24 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         maFormComponents.put(SFinRecordUtils.COMP_CREDIT, jtfCredit);
         maFormComponents.put(SFinRecordUtils.COMP_EXC_DIFF, jckIsExchangeDifference);
         maFormComponents.put(SFinRecordUtils.COMP_EXC_RATE, jtfExchangeRate);
-        maFormComponents.put(SFinRecordUtils.COMP_CC, moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+        maFormComponents.put(SFinRecordUtils.COMP_CC, moCostCenterPanel.getTextNumberFirst());
     }
 
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            moPanelFkAccountId.getFieldAccount().getComponent().requestFocus();
+            //moPanelFkAccountId.getFieldAccount().getComponent().requestFocus(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            moAccountPanel.getTextNumberFirst().requestFocus();
         }
     }
 
     private void triggerFocusLost() {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         if (moPanelFkAccountId.getFieldAccount().getComponent().isFocusOwner()) {
             actionFkAccountIdFocusLost();
         }
-        else if (jcbFkCurrencyId.isFocusOwner()) {
+        */
+        if (jcbFkCurrencyId.isFocusOwner()) {
             actionFkCurrencyIdFocusLost();
         }
         else if (jtfDebitCy.isFocusOwner()) {
@@ -1072,7 +1085,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mbResetingForm = true;
         
         mbIsCurrentAccountDiogAccount = false;
-        msCurrentAccountId = moPanelFkAccountId.getFieldAccount().getString();
+        //msCurrentAccountId = moPanelFkAccountId.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
 
         int[] anAuxBizParnerKey = (int[]) moFieldFkBizPartnerId_nr.getKey();
         int[] anAuxTaxKey = (int[]) moFieldFkTaxId_n.getKey();
@@ -1117,9 +1130,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         //account = moPanelFkAccountId.getCurrentInputAccount();
 
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         if (!moPanelFkAccountId.isEmptyAccountId()) {
             oAccountMajor = moPanelFkAccountId.getDataAccountMajor();
         }
+        */
+        oAccountMajor = moAccountPanel.getSelectedDataAccountLedger();
 
         if (oAccountMajor == null) {
             jlFkBizPartnerId_nr.setEnabled(false);
@@ -1197,8 +1213,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             boolean isAccSysTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT });
             
             try {
+                /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                         SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
+                */
+                mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), oAccountMajor) || 
+                        SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moAccountPanel.getSelectedDataAccount());
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);
@@ -1281,7 +1301,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             }
 
             // Check if it is necesary to enable tax fields:
-            int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moPanelFkAccountId.getFieldAccount().getString());
+            //int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moPanelFkAccountId.getFieldAccount().getString()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX());
             if (isAccSysTax || isAccSysPurchases || taxFk != null) {
                 mbIsTaxRequired = isAccSysTax;
                 
@@ -1678,8 +1699,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private int[] getSystemAccountTypeKey() {
         int[] type = null;
 
-        if (moPanelFkAccountId.getDataAccountMajor() != null) {
-            switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) {
+        //if (moPanelFkAccountId.getDataAccountMajor() != null) { XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        if (moAccountPanel.getSelectedDataAccountLedger() != null) {
+            //switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) { //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            switch (moAccountPanel.getSelectedDataAccountLedger().getFkAccountSystemTypeId()) {
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
                     type = SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH;
                     break;
@@ -1713,8 +1736,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         int[] key = null;
         boolean isDebitLike = moFieldDebit.getDouble() > 0 || moFieldCredit.getDouble() < 0 || moFieldDebit.getDouble() == 0;
 
-        if (moPanelFkAccountId.getDataAccountMajor() != null) {
-            switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) {
+       //if (moPanelFkAccountId.getDataAccountMajor() != null) { //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        if (moAccountPanel.getSelectedDataAccountLedger() != null) {
+            //switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) { //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            switch (moAccountPanel.getSelectedDataAccountLedger().getFkAccountSystemTypeId()) {
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_CASH:
                 case SDataConstantsSys.FINS_TP_ACC_SYS_CASH_BANK:
                     key = isDebitLike ? SModSysConsts.FINS_TP_SYS_MOV_MI_ADJ : SModSysConsts.FINS_TP_SYS_MOV_MO_ADJ;
@@ -1773,8 +1798,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         SDataTax tax = null;
         SDataItem item = null;
 
-        if (moPanelFkAccountId.getDataAccountMajor() != null) {
-            switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) {
+        //if (moPanelFkAccountId.getDataAccountMajor() != null) { //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        if (moAccountPanel.getSelectedDataAccountLedger() != null) {
+            //switch (moPanelFkAccountId.getDataAccountMajor().getFkAccountSystemTypeId()) { //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            switch (moAccountPanel.getSelectedDataAccountLedger().getFkAccountSystemTypeId()) {
                 case SDataConstantsSys.FINS_TP_ACC_SYS_ASSET_FIX:
                     key = SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_ASSET;
                     break;
@@ -1901,7 +1928,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private void composeFinRecordEntry() {
         moFinRecordEntry = new SFinRecordEntry();
         
-        moFinRecordEntry.AccountId = moPanelFkAccountId.getFieldAccount().getString();
+        //moFinRecordEntry.AccountId = moPanelFkAccountId.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        moFinRecordEntry.AccountId = moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX();
         moFinRecordEntry.Concept = moFieldConcept.getString();
         moFinRecordEntry.Debit = moFieldDebit.getDouble();
         moFinRecordEntry.Credit = moFieldCredit.getDouble();
@@ -1911,7 +1939,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moFinRecordEntry.CreditCy = moFieldCreditCy.getDouble();
         moFinRecordEntry.CurId = moFieldFkCurrencyId.getKeyAsIntArray()[0];
         moFinRecordEntry.IsExchangeDifference = jckIsExchangeDifference.isSelected();
-        moFinRecordEntry.CostCenter = moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString();
+        //moFinRecordEntry.CostCenter = moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        moFinRecordEntry.CostCenter = moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX();
         moFinRecordEntry.IsSystem = jckIsSystem.isSelected();
         moFinRecordEntry.IsDeleted = jckIsDeleted.isSelected();
         
@@ -1955,8 +1984,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         
         moFinRecordEntry.IsTaxCash = jrbTaxCash.isSelected();
         
-        moFinRecordEntry.Account = moPanelFkAccountId.getCurrentInputAccount();
-        moFinRecordEntry.AccountMajor = moPanelFkAccountId.getDataAccountMajor();
+        //moFinRecordEntry.Account = moPanelFkAccountId.getCurrentInputAccount(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        //moFinRecordEntry.AccountMajor = moPanelFkAccountId.getDataAccountMajor(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        moFinRecordEntry.Account = moAccountPanel.getSelectedDataAccount();
+        moFinRecordEntry.AccountMajor = moAccountPanel.getSelectedDataAccountLedger();
         
         moFinRecordEntry.IsCheckAppliying = jckIsCheckApplying.isSelected();
         moFinRecordEntry.IsBizPartnerRequired = mbIsBizPartnerRequired;
@@ -2042,6 +2073,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFileXmlRemove.setEnabled(countFilesXml == 1);
     }
 
+    /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private void actionFkAccountIdFocusGained() {
         if (!msCurrentAccountId.equals(moPanelFkAccountId.getFieldAccount().getString())) {
             renderAccountSettings();
@@ -2053,6 +2085,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             renderAccountSettings();
         }
     }
+    */
 
     private void actionFkEntityId_nFocusGained() {
         manCurrentEntityKey_n = moFieldFkEntityId_n.getKeyAsIntArray();
@@ -2540,8 +2573,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlDummy11;
     private javax.swing.JLabel jlDummy13;
     private javax.swing.JLabel jlDummy15;
-    private javax.swing.JLabel jlDummyAccount;
-    private javax.swing.JLabel jlDummyCostCenter;
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSystem;
     private javax.swing.JLabel jlFileXml;
@@ -2593,6 +2624,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JTextField jtfUnits;
     private javax.swing.JTextField jtfUnitsSymbol;
     private javax.swing.JTextField jtfXmlFilesNumber;
+    private erp.gui.account.SBeanPanelAccount moAccountPanel;
+    private erp.gui.account.SBeanPanelAccount moCostCenterPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -2627,9 +2660,14 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jckIsDeleted.setEnabled(false);
 
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moPanelFkAccountId.resetPanel();
         moPanelFkCostCenterId_n.resetPanel();
-
+        */
+        
+        moAccountPanel.initPanel();
+        moCostCenterPanel.initPanel();
+        
         jcbFkBizPartnerId_nr.removeAllItems();
         jcbFkTaxId_n.removeAllItems();
         jcbFkEntityId_n.removeAllItems();
@@ -3012,12 +3050,29 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jckIsDeleted.setSelected(moRecordEntry.getIsDeleted());
 
         msCurrentAccountId = moRecordEntry.getFkAccountIdXXX();
+        
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moPanelFkAccountId.getFieldAccount().setFieldValue(msCurrentAccountId);
         moPanelFkAccountId.refreshPanel();
 
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moRecordEntry.getFkCostCenterIdXXX_n().length() == 0 ? moPanelFkCostCenterId_n.getEmptyAccountId() : moRecordEntry.getFkCostCenterIdXXX_n());
         moPanelFkCostCenterId_n.refreshPanel();
-
+        */
+        
+        if (moRecordEntry.getAccount() == null) {
+            SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moRecordEntry.getFkAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
+            moRecordEntry.setAccount(account);
+        }
+        moAccountPanel.setSelectedAccount(new SAccount(moRecordEntry.getAccount(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount()));
+        
+        if (!moRecordEntry.getFkCostCenterIdXXX_n().isEmpty()) {
+            if (moRecordEntry.getCostCenter() == null) {
+                SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { moRecordEntry.getFkCostCenterIdXXX_n() }, SLibConstants.EXEC_MODE_SILENT);
+                moRecordEntry.setCostCenter(costCenter);
+            }
+            moCostCenterPanel.setSelectedAccount(new SAccount(moRecordEntry.getCostCenter(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+        }
+        
         renderCurrencySettings();
         renderAccountSettings();
 
@@ -3501,14 +3556,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void focusGained(java.awt.event.FocusEvent e) {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         if (e.getSource() instanceof javax.swing.JFormattedTextField) {
             JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
 
             if (formattedTextField == moPanelFkAccountId.getFieldAccount().getComponent()) {
                 actionFkAccountIdFocusGained();
             }
-        }
-        else if (e.getSource() instanceof javax.swing.JComboBox) {
+        } 
+        else*/ if (e.getSource() instanceof javax.swing.JComboBox) {        
             JComboBox comboBox = (JComboBox) e.getSource();
 
             if (comboBox == jcbFkEntityId_n) {
@@ -3522,14 +3578,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void focusLost(java.awt.event.FocusEvent e) {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         if (e.getSource() instanceof javax.swing.JFormattedTextField) {
             JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
 
             if (formattedTextField == moPanelFkAccountId.getFieldAccount().getComponent()) {
                 actionFkAccountIdFocusLost();
             }
-        }
-        else if (e.getSource() instanceof javax.swing.JComboBox) {
+        } 
+        else*/ if (e.getSource() instanceof javax.swing.JComboBox) {
             JComboBox comboBox = (JComboBox) e.getSource();
 
             if (comboBox == jcbFkEntityId_n) {
@@ -3590,6 +3647,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 }
             }
         }
+    }
+
+    @Override
+    public void notifyAccountChanged() {
+        renderAccountSettings();
     }
     
     private class BizPartner {

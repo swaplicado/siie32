@@ -99,6 +99,10 @@ import sa.lib.gui.SGuiUtils;
  * Business Partner Blocking applies only to order and document for purchases and sales,
  * aswell as printing them.
  * Estimates, contracts and credit notes are independent.
+ * 
+ * PARA LA HABILITACIÓN DE ENVÍO DE ARCHIVOS CREAR UNA VARIABLE DE ENTORNO DE SISTEMA CON LAS CREDENCIALES DE GOOGLE
+ * Nombre de la variable: GOOGLE_APPLICATION_CREDENTIALS
+ * Valor de la variable: ruta accesible al archivo JSON.
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     

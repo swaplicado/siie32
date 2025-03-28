@@ -508,6 +508,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         boolean updateProvisionStatus = false;
+        boolean updatePurchaseStatus = false;
         
         msClassRequest = "M"; // Por el momento todas las requisiciones son de materiales; S corresponde a servicios
         
@@ -559,7 +560,6 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     ")";
         }
         else {
-            boolean updatePurchaseStatus = false;
             
             mnFkUserUpdateId = session.getUser().getPkUserId();
             if (mbAuxLastProvClosedSta != mbCloseProvision && mbCloseProvision) {
@@ -574,9 +574,10 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 mnFkUserClosePurchaseId = session.getUser().getPkUserId();
                 updatePurchaseStatus = true;
             }
-            else if (!mbCloseProvision) {
+            else if (!mbClosePurchase) {
                 mnFkUserClosePurchaseId = SUtilConsts.USR_NA_ID;
             }
+            
             mnFkMatRequestStatusId = mnFkMatRequestStatusId == 0 ? mnAuxReqStatusIdOld : mnFkMatRequestStatusId;
             
             if (mbAuxChangeStatus) {
@@ -658,21 +659,36 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
         mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
         if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
-                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateProvisionStatus) {
-            if (updateProvisionStatus && mnAuxReqStatusIdOld == mnFkMatRequestStatusId && mnFkMatRequestStatusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
-                String st = "";
-                if (! mbAuxLastProvClosedSta) {
-                    st = "Abierto ";
+                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateProvisionStatus || updatePurchaseStatus) {
+            String st;
+            if (updateProvisionStatus) {
+                if (!mbAuxLastProvClosedSta) {
+                    st = "ABIERTO ";
                 }
                 else {
-                    st = "Cerrado ";
+                    st = "CERRADO ";
                 }
                 
                 if (msAuxNotesChangeStatus_n == null || msAuxNotesChangeStatus_n.isEmpty()) {
-                    msAuxNotesChangeStatus_n = st + "para suministro.";
+                    msAuxNotesChangeStatus_n = st + "PARA SUMINISTRO.";
                 }
                 else {
-                    msAuxNotesChangeStatus_n += " " + st + "para suministro.";
+                    msAuxNotesChangeStatus_n += ". " + st + "PARA SUMINISTRO.";
+                }
+            }
+            else if (updatePurchaseStatus) {
+                if (mbAuxLastPurClosedSta) {
+                    st = "ABIERTO ";
+                }
+                else {
+                    st = "CERRADO ";
+                }
+                
+                if (msAuxNotesChangeStatus_n == null || msAuxNotesChangeStatus_n.isEmpty()) {
+                    msAuxNotesChangeStatus_n = st + "PARA COMPRAS.";
+                }
+                else {
+                    msAuxNotesChangeStatus_n += ". " + st + "PARA COMPRAS.";
                 }
             }
             

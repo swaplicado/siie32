@@ -8,15 +8,17 @@ package erp.mtrn.form;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
+import erp.gui.account.SAccount;
+import erp.gui.account.SAccountConsts;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SFinUtilities;
-import erp.mfin.form.SPanelAccount;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import java.awt.BorderLayout;
@@ -25,16 +27,17 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Daniel López, Sergio Flores
+ * @author Juan Barajas, Daniel López, Sergio Flores, Isabel Servín
  */
 public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
     private erp.client.SClientInterface miClient;
     private int mnFormResult;
-    private int mnFormStatus;
+    private int mnFormStatus; 
     private int mnRegistryType;
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -42,10 +45,12 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     private erp.mtrn.data.SDataDps moDps;
     private erp.mtrn.data.SDataDpsEntry moDpsEntry;
     private erp.mtrn.form.SPanelDps moPanelDps;
+    /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private erp.mfin.form.SPanelAccount moPanelAccountOldId;
     private erp.mfin.form.SPanelAccount moPanelCostCenterOldId_n;
     private erp.mfin.form.SPanelAccount moPanelAccountNewId;
     private erp.mfin.form.SPanelAccount moPanelCostCenterNewId_n;
+    */
 
     private SDataAccount moAccountNew;
     private SDataCostCenter moCostCenterNew;
@@ -82,11 +87,11 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         jtfOriginalUnitSymbolRo = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jpPanelAccountsOld = new javax.swing.JPanel();
-        jlDummyAccountOld = new javax.swing.JLabel();
-        jlDummyCostCenterOld_n = new javax.swing.JLabel();
+        moAccountPanelOld = new erp.gui.account.SBeanPanelAccount();
+        moCostCenterPanelOld = new erp.gui.account.SBeanPanelAccount();
         jpPanelAccountsNew = new javax.swing.JPanel();
-        jlDummyAccountNew = new javax.swing.JLabel();
-        jlDummyCostCenterNew_n = new javax.swing.JLabel();
+        moAccountPanelNew = new erp.gui.account.SBeanPanelAccount();
+        moCostCenterPanelNew = new erp.gui.account.SBeanPanelAccount();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -153,31 +158,15 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
 
         jpPanelAccountsOld.setBorder(javax.swing.BorderFactory.createTitledBorder("Contabilización actual:"));
         jpPanelAccountsOld.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
-
-        jlDummyAccountOld.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyAccountOld.setText("[Panel cuenta contable actual]");
-        jlDummyAccountOld.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpPanelAccountsOld.add(jlDummyAccountOld);
-
-        jlDummyCostCenterOld_n.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyCostCenterOld_n.setText("[Panel centro costo-beneficio actual]");
-        jlDummyCostCenterOld_n.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpPanelAccountsOld.add(jlDummyCostCenterOld_n);
+        jpPanelAccountsOld.add(moAccountPanelOld);
+        jpPanelAccountsOld.add(moCostCenterPanelOld);
 
         jPanel2.add(jpPanelAccountsOld);
 
         jpPanelAccountsNew.setBorder(javax.swing.BorderFactory.createTitledBorder("Contabilización nueva:"));
         jpPanelAccountsNew.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
-
-        jlDummyAccountNew.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyAccountNew.setText("[Panel cuenta contable nueva]");
-        jlDummyAccountNew.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpPanelAccountsNew.add(jlDummyAccountNew);
-
-        jlDummyCostCenterNew_n.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyCostCenterNew_n.setText("[Panel centro costo-beneficio nueva]");
-        jlDummyCostCenterNew_n.setPreferredSize(new java.awt.Dimension(100, 50));
-        jpPanelAccountsNew.add(jlDummyCostCenterNew_n);
+        jpPanelAccountsNew.add(moAccountPanelNew);
+        jpPanelAccountsNew.add(moCostCenterPanelNew);
 
         jPanel2.add(jpPanelAccountsNew);
 
@@ -210,14 +199,16 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new java.util.Vector<erp.lib.form.SFormField>();
+        mvFields = new java.util.Vector<>();
 
         try {
             moPanelDps = new SPanelDps(miClient, "");
+            /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             moPanelAccountOldId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
             moPanelCostCenterOldId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
             moPanelAccountNewId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
             moPanelCostCenterNewId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            */
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -226,6 +217,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         jpDps.remove(jlPanelDps);
         jpDps.add(moPanelDps, BorderLayout.NORTH);
         
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         jpPanelAccountsOld.remove(jlDummyAccountOld);
         jpPanelAccountsOld.remove(jlDummyCostCenterOld_n);
         jpPanelAccountsOld.add(moPanelAccountOldId);
@@ -235,7 +227,25 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         jpPanelAccountsNew.remove(jlDummyCostCenterNew_n);
         jpPanelAccountsNew.add(moPanelAccountNewId);
         jpPanelAccountsNew.add(moPanelCostCenterNewId_n);
-
+        */
+        
+        moAccountPanelOld.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        moCostCenterPanelOld.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        moAccountPanelNew.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, true);
+        moCostCenterPanelNew.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        
+        moAccountPanelOld.setAccountNameWidth(275);
+        moCostCenterPanelOld.setAccountNameWidth(275);
+        moAccountPanelNew.setAccountNameWidth(275);
+        moCostCenterPanelNew.setAccountNameWidth(275);
+        
+        moAccountPanelOld.setComponentNext(moCostCenterPanelOld);
+        moCostCenterPanelOld.setComponentNext(moAccountPanelNew);
+        moAccountPanelNew.setComponentNext(moCostCenterPanelNew);
+        
+        moAccountPanelNew.setRetrieveDataAccounts(true);
+        moCostCenterPanelNew.setRetrieveDataCostCenters(true);
+        
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
 
@@ -257,7 +267,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            moPanelAccountNewId.getFieldAccount().getComponent().requestFocus();
+            //moPanelAccountNewId.getFieldAccount().getComponent().requestFocus(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            moAccountPanelNew.getTextNumberFirst().requestFocus();
         }
     }
     
@@ -267,22 +278,38 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         jtfOriginalUnitSymbolRo.setText(moDpsEntry.getDbmsOriginalUnitSymbol());
     }
     
-    private void renderAccount(String account) {
+    private void renderAccount(String accountId) {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moPanelAccountOldId.getFieldAccount().setFieldValue(account);
         moPanelAccountOldId.refreshPanel();
         moPanelAccountOldId.enableFields(false);
         
         moPanelAccountNewId.getFieldAccount().setFieldValue(account);
         moPanelAccountNewId.refreshPanel();
+        */
+        SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { accountId }, SLibConstants.EXEC_MODE_SILENT);
+        SAccount acc = new SAccount(account, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount());
+        moAccountPanelOld.setSelectedAccount(acc);
+        moAccountPanelOld.setPanelEditable(false);
+
+        moAccountPanelNew.setSelectedAccount(acc);
     }
     
-    private void renderCostCenter(String centerCost) {
+    private void renderCostCenter(String costCenterId) {
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moPanelCostCenterOldId_n.getFieldAccount().setFieldValue(centerCost.isEmpty() ? moPanelCostCenterOldId_n.getEmptyAccountId() : centerCost);
         moPanelCostCenterOldId_n.refreshPanel();
         moPanelCostCenterOldId_n.enableFields(false);
 
         moPanelCostCenterNewId_n.getFieldAccount().setFieldValue(centerCost.isEmpty() ? moPanelCostCenterNewId_n.getEmptyAccountId() : centerCost);
         moPanelCostCenterNewId_n.refreshPanel();
+        */
+        SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { costCenterId }, SLibConstants.EXEC_MODE_SILENT);
+        SAccount acc = new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter());
+        moCostCenterPanelOld.setSelectedAccount(acc);
+        moCostCenterPanelOld.setPanelEditable(false);
+
+        moCostCenterPanelNew.setSelectedAccount(acc);
     }
 
     private void actionOk() {
@@ -325,10 +352,6 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JLabel jlDummy;
-    private javax.swing.JLabel jlDummyAccountNew;
-    private javax.swing.JLabel jlDummyAccountOld;
-    private javax.swing.JLabel jlDummyCostCenterNew_n;
-    private javax.swing.JLabel jlDummyCostCenterOld_n;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlOriginalQuantity;
     private javax.swing.JLabel jlPanelDps;
@@ -340,6 +363,10 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     private javax.swing.JTextField jtfItem;
     private javax.swing.JTextField jtfOriginalQuantity;
     private javax.swing.JTextField jtfOriginalUnitSymbolRo;
+    private erp.gui.account.SBeanPanelAccount moAccountPanelNew;
+    private erp.gui.account.SBeanPanelAccount moAccountPanelOld;
+    private erp.gui.account.SBeanPanelAccount moCostCenterPanelNew;
+    private erp.gui.account.SBeanPanelAccount moCostCenterPanelOld;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -358,11 +385,18 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         moDps = null;
         moPanelDps.setDps(null, null);
         
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moPanelAccountOldId.resetPanel();
         moPanelCostCenterOldId_n.resetPanel();
         
         moPanelAccountNewId.resetPanel();
         moPanelCostCenterNewId_n.resetPanel();
+        */
+        
+        moAccountPanelOld.initPanel();
+        moCostCenterPanelOld.initPanel();
+        moAccountPanelNew.initPanel();
+        moCostCenterPanelNew.initPanel();
 
         for (SFormField field : mvFields) {
             field.resetField();
@@ -377,7 +411,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
-        String message = "";
+        String message;
 
         for (SFormField field : mvFields) {
             if (!field.validateField()) {
@@ -386,9 +420,12 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
             }
         }
             
-        moAccountNew = moPanelAccountNewId.getCurrentInputAccount();
-        moCostCenterNew = moPanelCostCenterNewId_n.getCurrentInputCostCenter();
+        //moAccountNew = moPanelAccountNewId.getCurrentInputAccount(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        //moCostCenterNew = moPanelCostCenterNewId_n.getCurrentInputCostCenter(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
 
+        moAccountNew = moAccountPanelNew.getSelectedDataAccount();
+        moCostCenterNew = moCostCenterPanelNew.getSelectedDataCostCenter();
+        
         if (!validation.getIsError()) {
             // Validate account:
 
@@ -396,14 +433,16 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
 
             if (message.length() > 0) {
                 validation.setMessage(message);
-                validation.setComponent(moPanelAccountNewId.getFieldAccount().getComponent());
+                //validation.setComponent(moPanelAccountNewId.getFieldAccount().getComponent()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+                validation.setComponent(moAccountPanelNew.getTextNumberFirst());
             }
             else {
                 SDataAccount ledgerAccount = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                 
                 if (ledgerAccount.getIsRequiredCostCenter() && moCostCenterNew == null) {
                     validation.setMessage("La cuenta contable ('" + moAccountNew.getAccount() + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
-                    validation.setComponent(moPanelCostCenterNewId_n.getFieldAccount().getComponent());
+                    //validation.setComponent(moPanelCostCenterNewId_n.getFieldAccount().getComponent()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+                    validation.setComponent(moCostCenterPanelNew.getTextNumberFirst());
                 }
             }
         }
@@ -416,7 +455,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
 
                 if (message.length() > 0) {
                     validation.setMessage(message);
-                    validation.setComponent(moPanelCostCenterNewId_n.getFieldAccount().getComponent());
+                    //validation.setComponent(moPanelCostCenterNewId_n.getFieldAccount().getComponent()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+                    validation.setComponent(moCostCenterPanelNew.getTextNumberFirst());
                 }
             }
         }

@@ -22,6 +22,14 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbSupplierFile extends SDbRegistryUser {
     
+    public static String QUA = "Q";
+    public static String QUA_EXP = "Q+";
+    public static String QUA_CHE = "Q-";
+    public static String TEC = "T";
+    public static String PRICE_LOWER = "MENOR PRECIO";
+    public static String PRICE_HIGHER = "MAYOR PRECIO";
+    public static String PRICE_INTER = "INTERMEDIO";
+    
     protected int mnPkSupplierFileId;
     protected String msNumber;
     protected String msSupplierFileType;

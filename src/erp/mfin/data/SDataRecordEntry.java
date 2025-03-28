@@ -151,6 +151,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.util.Date mtAuxDateCfd;
 
     protected erp.mfin.data.SDataRecord moParentRecord;
+    protected SDataAccount moAccount;
+    protected SDataCostCenter moCostCenter;
 
     /**
      * Overrides java.lang.Object.clone() function.
@@ -448,8 +450,12 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.util.Date getAuxDateCfd() { return mtAuxDateCfd; }
     
     public void setParentRecord(erp.mfin.data.SDataRecord o) { moParentRecord = o; }
+    public void setAccount(SDataAccount o) { moAccount = o; }
+    public void setCostCenter(SDataCostCenter o) { moCostCenter = o; }
 
     public erp.mfin.data.SDataRecord getParentRecord() { return moParentRecord; }
+    public SDataAccount getAccount() { return moAccount; }
+    public SDataCostCenter getCostCenter() { return moCostCenter; }
 
     public int[] getKeyCompanyBranch() { return new int[] { mnFkCompanyBranchId_n }; }
     public int[] getKeyCompanyBranchEntity() { return new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n }; }
@@ -614,6 +620,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         mtAuxDateCfd = null;
         
         //moParentRecord = null; // prevent from clearing this member
+        moAccount = null;
+        moCostCenter = null;
     }
 
     @Override
@@ -809,6 +817,14 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 int accountSystemType = resultSet.getInt("a.fid_tp_acc_sys");
                 msDbmsAccountComplement = getAccountComplement(accountSystemType);
                 readCheck(statement);
+                
+                moAccount = new SDataAccount();
+                moAccount.read(new Object[] { msFkAccountIdXXX }, statement);
+                
+                if (!msFkCostCenterIdXXX_n.isEmpty()) {
+                    moCostCenter = new SDataCostCenter();
+                    moCostCenter.read(new Object[] { msFkCostCenterIdXXX_n }, statement);
+                }
 
                 // CFD de manera directa: 
                 
