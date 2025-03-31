@@ -28,11 +28,11 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SViewStockValuation extends SGridPaneView implements ActionListener {
 
-    private int levelRightValMatCons;
+    private int mnRightValMatConsLevel;
     
     private SGridFilterDatePeriod moFilterDatePeriod;
     
@@ -46,11 +46,11 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     }
     
     private void initComponents() {
-        levelRightValMatCons = ((SClientInterface) miClient).getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
+        mnRightValMatConsLevel = ((SClientInterface) miClient).getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         
-        jbRowNew.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_CAPTURE);
-        jbRowEdit.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_EDITOR);
-        jbRowDelete.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_MANAGER);
+        jbRowNew.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_CAPTURE);
+        jbRowEdit.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_EDITOR);
+        jbRowDelete.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_MANAGER);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
         

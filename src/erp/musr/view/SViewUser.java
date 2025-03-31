@@ -80,7 +80,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         //jbDelete.setEnabled(false);
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[17];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[18];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -90,9 +90,10 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.email", "Correo-e", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.email", "Correo-e usuario", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Empleado", 250);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo (empleado)", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bbc.email_02", "Correo-e empresa (empleado)", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo (empleado)", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_univ", "Acceso universal", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_edit", "Modificable", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_del", "Eliminable", STableConstants.WIDTH_BOOLEAN_2X);
@@ -207,20 +208,16 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
 
         msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
-                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, e.b_act "
+                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, bbc.email_02, e.b_act "
                 + "FROM erp.usru_usr AS u "
-                + "INNER JOIN erp.usru_usr AS un ON "
-                + "u.fid_usr_new = un.id_usr "
-                + "INNER JOIN erp.usru_usr AS ue ON "
-                + "u.fid_usr_edit = ue.id_usr "
-                + "INNER JOIN erp.usru_usr AS ud ON "
-                + "u.fid_usr_del =  ud.id_usr "
-                + "LEFT JOIN erp.usru_usr AS uls ON "
-                + "u.fid_usr_last_sync_n =  uls.id_usr "
-                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON "
-                + "b.id_bp = u.fid_bp_n "
-                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON "
-                + "b.id_bp = e.id_emp "
+                + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
+                + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "
+                + "INNER JOIN erp.usru_usr AS ud ON u.fid_usr_del =  ud.id_usr "
+                + "LEFT JOIN erp.usru_usr AS uls ON uls.id_usr = u.fid_usr_last_sync_n "
+                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = u.fid_bp_n "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp "
+                + "LEFT OUTER JOIN erp.bpsu_bpb_con AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = 1 "
+                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp "
                 + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere)
                 + "ORDER BY u.usr, u.id_usr ";
     }

@@ -292,7 +292,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqAdm = false;
         boolean hasRightValMatCons = false;
         boolean hasRightStkCommPrice = false;
-        int levelRightValMatCons = 0;
+        int rightValMatConsLevel = 0;
         boolean hasRightMatReqReclass = false;
 
         jmMenuCat = new JMenu("Catálogos");
@@ -918,7 +918,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMatReqPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
-        levelRightValMatCons = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
+        rightValMatConsLevel = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
         hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
         hasRightStkCommPrice = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_STOCK_COMM_PRICE).HasRight;
         
@@ -1045,13 +1045,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry.setEnabled(hasRightStock);
         jmiStkStockRotation.setEnabled(hasRightStock);
         jmiStkStockRotationLot.setEnabled(hasRightStock);
-        jmiStkStockValuation.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
-        jmiStkStockValuationDetail.setEnabled(levelRightValMatCons >= SUtilConsts.LEV_READ);
+        jmiStkStockValuation.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
+        jmiStkStockValuationDetail.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockClosingCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
+        jmiReportMatCons.setEnabled(hasRightValMatCons);
+        jmiReportMatConsCC.setEnabled(hasRightValMatCons);
+        jmiReportMatConsCCRes.setEnabled(hasRightValMatCons);
+        jmiReportBudget.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_EDITOR);
+        jmiReportBudgetSummary.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_EDITOR);
+        jmiReportWarehouseConsumptionDetail.setEnabled(hasRightValMatCons);
 
         moDialogDiogSaved = new SDialogDiogSaved(miClient);
         moDialogUtilStockClosing = new SDialogUtilStockClosing(miClient);

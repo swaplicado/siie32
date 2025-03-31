@@ -424,7 +424,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "INNER JOIN erp.usru_usr AS ud ON bp.fid_usr_del = ud.id_usr " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb_add AS addr ON bpb.id_bpb = addr.id_bpb AND addr.id_add = 1 " +
-                "INNER JOIN erp.bpsu_bpb_con AS CON on bpb.id_bpb = con.id_bpb " +
+                "INNER JOIN erp.bpsu_bpb_con AS con ON bpb.id_bpb = con.id_bpb AND con.id_con = 1 " +
                 "LEFT OUTER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp " +
                 "LEFT OUTER JOIN erp.hrss_tp_pay AS pay ON e.fk_tp_pay = pay.id_tp_pay " +
                 "LEFT OUTER JOIN erp.hrsu_tp_emp AS emp ON e.fk_tp_emp = emp.id_tp_emp " +
