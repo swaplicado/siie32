@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public abstract class SModConsts {
 
@@ -810,6 +810,8 @@ public abstract class SModConsts {
     public static final int HRS_EMPL_SUB = 2063036;
     public static final int HRS_SSC = 2063041;
     public static final int HRS_SSC_ROW = 2063042;
+    public static final int HRS_EMPL_QUO = 2063043;
+    public static final int HRS_EMPL_QUO_ROW = 2063044;
     public static final int HRS_BEN = 2063051;
     public static final int HRS_BEN_ROW = 2063052;
     public static final int HRS_BEN_ROW_AUX = 2063056;
@@ -822,6 +824,7 @@ public abstract class SModConsts {
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
     public static final int HRS_EMP_LOG_SAL_SSC = 2063083;
+    public static final int HRS_EMP_LOG_DEP_POS = 2063084;
     public static final int HRS_EMP_BEN = 2063151;
     public static final int HRS_EMP_BEN_ANN = 2063152;
     public static final int HRS_EMP_WAGE_FAC_ANN = 2063156;
@@ -894,6 +897,8 @@ public abstract class SModConsts {
     public static final int HRSX_BANK_PAY_DISP = 2064108;
     public static final int HRSX_EMP_CC = 2064109;
     public static final int HRSX_IMPORT_CAP = 2064110;
+    public static final int HRSX_EMP_QUO = 2064111;
+    public static final int HRSX_EMP_QUO_REP = 2064112;
     public static final int HRSX_EMP_LOG_SUA = 2064161;
     public static final int HRSX_EMP_LOG_IDSE = 2064162;
     public static final int HRSX_DOC_BREACH_SUM = 2064511;
@@ -1534,6 +1539,8 @@ public abstract class SModConsts {
         TablesMap.put(HRS_EMPL_SUB, "hrs_empl_sub");
         TablesMap.put(HRS_SSC, "hrs_ssc");
         TablesMap.put(HRS_SSC_ROW, "hrs_ssc_row");
+        TablesMap.put(HRS_EMPL_QUO, "hrs_empr_ssc");
+        TablesMap.put(HRS_EMPL_QUO_ROW, "hrs_empr_ssc_row");
         TablesMap.put(HRS_BEN, "hrs_ben");
         TablesMap.put(HRS_BEN_ROW, "hrs_ben_row");
         TablesMap.put(HRS_BEN_ROW_AUX, "hrs_ben_row_aux");
@@ -1547,6 +1554,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_EMP_LOG_HIRE, "hrs_emp_log_hire");
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");
         TablesMap.put(HRS_EMP_LOG_SAL_SSC, "hrs_emp_log_sal_ssc");
+        TablesMap.put(HRS_EMP_LOG_DEP_POS, "hrs_emp_log_pos");
         TablesMap.put(HRS_EMP_BEN, "hrs_emp_ben");
         TablesMap.put(HRS_EMP_BEN_ANN, "hrs_emp_ben_ann");
         TablesMap.put(HRS_EMP_WAGE_FAC_ANN, "hrs_emp_wage_fac_ann");

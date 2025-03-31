@@ -124,6 +124,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsAutPending;
     private javax.swing.JMenuItem jmiContractsAutAutorized;
     private javax.swing.JMenuItem jmiContractsAutRejected;
+    private javax.swing.JMenuItem jmiReportContracts;
     private javax.swing.JMenuItem jmiContractsLinkPendEntryPrice;
     private javax.swing.JMenuItem jmiContractsLinkedEntryPrice;
     private javax.swing.JMenuItem jmiContractsSendMail;
@@ -379,6 +380,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsAutPending = new JMenuItem("Contratos por autorizar");
         jmiContractsAutAutorized = new JMenuItem("Contratos autorizados");
         jmiContractsAutRejected = new JMenuItem("Contratos rechazados");
+        jmiReportContracts = new JMenuItem("Reporte contratos");
         jmiContractsLinkPendEntryPrice = new JMenuItem("Entregas mensuales de contratos por procesar");
         jmiContractsLinkedEntryPrice = new JMenuItem("Entregas mensuales de contratos procesados");
         jmiContractsSendMail = new JMenuItem("Envío de contratos por correo-e");
@@ -395,6 +397,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.add(jmiContractsAutPending);
         jmCon.add(jmiContractsAutAutorized);
         jmCon.add(jmiContractsAutRejected);
+        jmCon.addSeparator();
+        jmCon.add(jmiReportContracts);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinkPendEntryPrice);
         jmCon.add(jmiContractsLinkedEntryPrice);
@@ -774,6 +778,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsAutPending.addActionListener(this);
         jmiContractsAutAutorized.addActionListener(this);
         jmiContractsAutRejected.addActionListener(this);
+        jmiReportContracts.addActionListener(this);
         jmiContractsLinkPendEntryPrice.addActionListener(this);
         jmiContractsLinkedEntryPrice.addActionListener(this);
         jmiContractsSendMail.addActionListener(this);
@@ -1488,6 +1493,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     oViewClass = erp.mtrn.view.SViewDpsPendAuthorized.class;
                     sViewTitle = getViewTitle(auxType01);
                     break;
+                    
+                case SDataConstants.TRNX_DPS_CONTRACT:
+                    oViewClass = erp.mtrn.view.SViewContractReport.class;
+                    sViewTitle = "Reporte contratos";
+                    break;
 
                 case SDataConstants.TRNX_DPS_AUDIT_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsAudit.class;
@@ -1972,6 +1982,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiContractsAutRejected) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_CON_AUT_REJ);
+            }
+            else if (item == jmiReportContracts) {
+                showView(SDataConstants.TRNX_DPS_CONTRACT, SDataConstantsSys.TRNX_DPS_SAL_CON_REP_ALL);
             }
             else if (item == jmiContractsLinkPendEntryPrice) {
                 miClient.getSession().showView(SModConsts.TRN_DPS_ETY_PRC, SModConsts.MOD_TRN_SAL_N, new SGuiParams(SModConsts.VIEW_ST_PEND));

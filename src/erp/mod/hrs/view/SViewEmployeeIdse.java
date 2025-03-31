@@ -181,12 +181,6 @@ public class SViewEmployeeIdse extends SGridPaneView implements ActionListener{
                 "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp " +
                 "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal " +
                 "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day " +  sql ;
-//                "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day " + // alta
-//                "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp " +
-//                "INNER JOIN cfg_param_co AS par " +
-//                "INNER JOIN hrs_cfg AS cfg " +
-//                "WHERE NOT hire.b_del  AND hire.b_hire = 1 AND id_log = 1 " + 
-//                "AND hire.dt_hire >= " + start + " AND hire.dt_hire <= " + end + " ORDER BY bp.id_bp; " ;
                  
     }
 

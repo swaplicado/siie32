@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SHrsConsts {
     
@@ -46,6 +46,9 @@ public class SHrsConsts {
     public static final int SS_RET = 8;             // retirement
     public static final int SS_SEV = 9;             // severance
     public static final int SS_HOM = 10;            // home
+    
+    public static final double IMMS_RETIREMET  = 0.02;
+    public static final double IMMS_INFONAVIT = 0.05;
     
     public static final int CAL_NET_AMT_TYPE = 1;   // Calculeted net amout type
     public static final int CAL_GROSS_AMT_TYPE = 2; // Calculeted gross amout type

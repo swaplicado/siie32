@@ -10,7 +10,7 @@ import sa.lib.SLibRpnArgument;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class STableColumn extends STableField implements java.io.Serializable {
 
@@ -65,4 +65,8 @@ public class STableColumn extends STableField implements java.io.Serializable {
     public boolean isEditable() { return mbEditable; }
 
     public java.util.Vector<sa.lib.SLibRpnArgument> getRpnArguments() { return mvRpnArguments; }
+
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

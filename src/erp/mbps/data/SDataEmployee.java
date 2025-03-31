@@ -41,7 +41,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * Used mainly in CRUD operations on employees.
- * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -61,6 +61,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtDateSalary;
     protected Date mtDateWage;
     protected Date mtDateSalarySscBase;
+    protected Date mtDatePosition;
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
     protected int mnOvertimePolicy;
@@ -111,9 +112,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected double mdAuxNewSalary;
     protected double mdAuxNewWage;
     protected double mdAuxNewSalarySscBase;
+    protected double mdAuxNewDepartamenId;
+    protected double mdAuxNewPositionId;
     protected Date mtAuxNewDateSalary;
     protected Date mtAuxNewDateWage;
     protected Date mtAuxNewDateSalarySscBase;
+    protected Date mtAuxNewDatePosition;
 
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
@@ -187,6 +191,35 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
             statement.execute(sql);
         }
     }
+                                                         
+    private void createChangePositionLog(Connection connection, Date date) throws Exception {
+        try (Statement statement = connection.createStatement()) {
+            int logId = 0;
+            
+            String sql = "SELECT COALESCE(MAX(id_log), 0) + 1 "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_DEP_POS) + " "
+                    + "WHERE id_emp = " + mnPkEmployeeId + ";";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                logId = resultSet.getInt(1);
+            }
+            
+            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_DEP_POS) + " VALUES (" + 
+                    mnPkEmployeeId + ", " +
+                    logId + ", " +
+                    "'" + SLibUtils.DbmsDateFormatDate.format(date) + "', " +                    
+                    (mbDeleted ? 1 : 0) + ", " +
+                    mnFkDepartmentId + ", " +
+                    mnFkPositionId + ", " +
+                    (mbIsRegistryNew ? mnFkUserInsertId : mnFkUserUpdateId) + ", " +
+                    SUtilConsts.USR_NA_ID + ", " +
+                    "NOW()" + ", " +
+                    "NOW()" + ");";
+            
+            statement.execute(sql);
+        }
+    }
 
     public SDataEmployee() {
         super(SModConsts.HRSU_EMP);
@@ -208,6 +241,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setDateSalary(Date t) { mtDateSalary = t; }
     public void setDateWage(Date t) { mtDateWage = t; }
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
+    public void setDatePosition(Date t) { mtDatePosition = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
     public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
@@ -256,9 +290,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setAuxSalary(double d) { mdAuxNewSalary = d; }
     public void setAuxWage(double d) { mdAuxNewWage = d; }
     public void setAuxSalarySscBase(double d) { mdAuxNewSalarySscBase = d; }
+    public void setAuxNewDepartamentId(double d) { mdAuxNewDepartamenId = d; }
+    public void setAuxNewPositionId(double d) { mdAuxNewPositionId = d; }
     public void setAuxDateSalary(Date t) { mtAuxNewDateSalary = t; }
     public void setAuxDateWage(Date t) { mtAuxNewDateWage = t; }
     public void setAuxDateSalarySscBase(Date t) { mtAuxNewDateSalarySscBase = t; }
+    public void setAuxNewDatePosition(Date t) { mtAuxNewDatePosition = t; }
     
     public void setXtaImageIconPhoto_n(javax.swing.ImageIcon o) { moXtaImageIconPhoto_n = o; }
     public void setXtaImageIconSignature_n(javax.swing.ImageIcon o) { moXtaImageIconSignature_n = o; }
@@ -279,6 +316,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getDateSalary() { return mtDateSalary; }
     public Date getDateWage() { return mtDateWage; }
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
+    public Date getDatePosition() { return mtDatePosition; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
     public int getOvertimePolicy() { return mnOvertimePolicy; }
@@ -326,10 +364,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     
     public double getAuxSalary() { return mdAuxNewSalary; }
     public double getAuxWage() { return mdAuxNewWage; }
-    public double getAuxSalarySscBase() { return mdAuxNewSalarySscBase; }
+    public double getAuxNewDepartamentId() { return mdAuxNewDepartamenId; }
+    public double getAuxNewPositionId() { return mdAuxNewPositionId; }
     public Date getAuxDateSalary() { return mtAuxNewDateSalary; }
     public Date getAuxDateWage() { return mtAuxNewDateWage; }
     public Date getAuxDateSalarySscBase() { return mtAuxNewDateSalarySscBase; }
+    public Date getAuxNewDatePosition() { return mtAuxNewDatePosition; }
     
     public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
@@ -460,6 +500,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtDateSalary = null;
         mtDateWage = null;
         mtDateSalarySscBase = null;
+        mtDatePosition = null;
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
         mnOvertimePolicy = 0;
@@ -510,9 +551,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mdAuxNewSalary = 0;
         mdAuxNewWage = 0;
         mdAuxNewSalarySscBase = 0;
+        mdAuxNewDepartamenId = 0;
+        mdAuxNewPositionId = 0;
         mtAuxNewDateSalary = null;
         mtAuxNewDateWage = null;
         mtAuxNewDateSalarySscBase = null;
+        mtAuxNewDatePosition = null;
         
         moXtaImageIconPhoto_n = null;
         moXtaImageIconSignature_n = null;
@@ -552,6 +596,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateSalary = resultSet.getDate("dt_sal");
                 mtDateWage = resultSet.getDate("dt_wage");
                 mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
+                mtDatePosition = resultSet.getDate("dt_pos");
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
                 mtContractExpiration_n = resultSet.getDate("con_exp_n");
                 mnOvertimePolicy = resultSet.getInt("overtime");
@@ -707,6 +752,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
+                        "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " + 
                         mnWorkingHoursDay + ", " +
                         (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                         mnOvertimePolicy + ", " + 
@@ -769,6 +815,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_sal = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " +
                         "dt_wage = '" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " +
                         "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
+                        "dt_pos = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePosition) + "', " + 
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                         "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                         "overtime = " + mnOvertimePolicy + ", " +
@@ -955,6 +1002,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                     throw new Exception("La fecha de última actualización de 'Salario Base de Cotización (SBC)' no ha sido definida.");
                 }
                 createSalarySscBaseLog(connection, mtAuxNewDateSalarySscBase);
+            }
+            
+            if (mtAuxNewDatePosition != null) {
+                if (mtAuxNewDatePosition == null) {
+                    throw new Exception("La fecha del último cambio de departamento o puesto no ha sido definida.");
+                }
+                createChangePositionLog(connection, mtAuxNewDatePosition);
             }
 
             mbIsRegistryNew = false;

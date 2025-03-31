@@ -25,6 +25,7 @@ import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
 import erp.mod.hrs.form.SDialogLayoutAF02;
 import erp.mod.hrs.form.SDialogRepBreaches;
+import erp.mod.hrs.form.SDialogRepEmpSisub;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
 import erp.mod.hrs.form.SDialogRepHrsEarningDeduction;
@@ -50,7 +51,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Claudio Peña, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -62,6 +63,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgEmploymentSubsidy;
     private javax.swing.JMenuItem jmiCfgSsContributionTable;
     private javax.swing.JMenuItem jmiCfgSsContributionTableRow;
+    private javax.swing.JMenuItem jmiCfgSsEmployerQuotaRow;
     private javax.swing.JMenuItem jmiCfgBenefitTable;
     private javax.swing.JMenuItem jmiCfgBenefitTableRow;
     private javax.swing.JMenuItem jmiCfgFirstDayYear;
@@ -103,6 +105,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeHireLog;
     private javax.swing.JMenuItem jmiCatEmployeeWageLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseLog;
+    private javax.swing.JMenuItem jmiCatEmployeeChangeDepPos;
     private javax.swing.JMenuItem jmiCatEmployeeSua;
     private javax.swing.JMenuItem jmiCatEmployeeIdse;
     private javax.swing.JMenuItem jmiCatPosition;
@@ -195,6 +198,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepHireLogByPeriodInactive;
     private javax.swing.JMenuItem jmiRepPtu;
     private javax.swing.JMenuItem jmiRepBenAnnBon;
+    private javax.swing.JMenuItem jmiRepEmpQuo;
+    private javax.swing.JMenuItem jmiRepEmpQuoAcc;
+    private javax.swing.JMenuItem jmiRepEmpSisub;
     private javax.swing.JMenuItem jmiRepBankPayrollDisp;
     private javax.swing.JMenuItem jmiRepAnnexAF02;
     private javax.swing.JMenuItem jmiRepPositions;
@@ -224,6 +230,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgEmploymentSubsidy = new JMenuItem("Configuraciones de subsidio para el empleo");
         jmiCfgSsContributionTable = new JMenuItem("Tablas de retención de SS");
         jmiCfgSsContributionTableRow = new JMenuItem("Tablas de retención de SS a detalle");
+        jmiCfgSsEmployerQuotaRow = new JMenuItem("Tablas de cuotas patronales del SS");
         jmiCfgBenefitTable = new JMenuItem("Tablas de prestaciones");
         jmiCfgBenefitTableRow = new JMenuItem("Tablas de prestaciones a detalle");
         jmiCfgFirstDayYear = new JMenuItem("Primer día del año");
@@ -265,6 +272,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgSsContributionTable);
         jmCfg.add(jmiCfgSsContributionTableRow);
+        jmCfg.add(jmiCfgSsEmployerQuotaRow);
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgBenefitTable);
         jmCfg.add(jmiCfgBenefitTableRow);
@@ -316,6 +324,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog = new JMenuItem("Bitácora de altas y bajas");
         jmiCatEmployeeWageLog = new JMenuItem("Bitácora de sueldos y salarios");
         jmiCatEmployeeSscBaseLog = new JMenuItem("Bitácora de salarios base de cotización");
+        jmiCatEmployeeChangeDepPos = new JMenuItem("Bitácora de departamentos y puestos");
         jmiCatEmployeeSua = new JMenuItem("Empleados para SUA");
         jmiCatEmployeeIdse = new JMenuItem("Empleados para IDSE");
         jmiCatPosition = new JMenuItem("Puestos");
@@ -343,6 +352,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
+        jmCat.add(jmiCatEmployeeChangeDepPos);
         jmCat.add(jmiCatEmployeeSua);
         jmCat.add(jmiCatEmployeeIdse);
         jmCat.addSeparator();
@@ -517,6 +527,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBenAnnBon = new JMenuItem("Consulta provisión aguinaldo");
         jmiRepBankPayrollDisp = new JMenuItem("Consulta de dispersión de nóminas");
         jmiRepAnnexAF02 = new JMenuItem("Layout anexo AF02");
+        jmiRepEmpQuo = new JMenuItem("Cuotas patronales, retiro, vejez");
+        jmiRepEmpQuoAcc = new JMenuItem("Reporte cuotas patronales, retiro, vejez");
+        jmiRepEmpSisub = new JMenuItem("Reporte de empleados para ICSOE - SISUB");
         jmiRepPositions = new JMenuItem("Reporte de posiciones y vacantes");
         
         jmRep.add(jmiRepPayrollAux);
@@ -537,6 +550,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmiRepBankPayrollDisp);
         jmRep.add(jmiRepAnnexAF02);
         jmRep.addSeparator();
+        jmRep.add(jmiRepEmpQuo);
+        jmRep.add(jmiRepEmpQuoAcc);
+//        jmRep.add(jmiRepEmpSisub);
+        jmRep.addSeparator();
         jmRep.add(jmiRepPositions);
         
         // listeners:
@@ -548,6 +565,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgEmploymentSubsidy.addActionListener(this);
         jmiCfgSsContributionTable.addActionListener(this);
         jmiCfgSsContributionTableRow.addActionListener(this);
+        jmiCfgSsEmployerQuotaRow.addActionListener(this);
         jmiCfgBenefitTable.addActionListener(this);
         jmiCfgBenefitTableRow.addActionListener(this);
         jmiCfgFirstDayYear.addActionListener(this);
@@ -585,6 +603,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog.addActionListener(this);
         jmiCatEmployeeWageLog.addActionListener(this);
         jmiCatEmployeeSscBaseLog.addActionListener(this);
+        jmiCatEmployeeChangeDepPos.addActionListener(this);
         jmiCatEmployeeSua.addActionListener(this);
         jmiCatEmployeeIdse.addActionListener(this);
         jmiCatPosition.addActionListener(this);
@@ -670,6 +689,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBenAnnBon.addActionListener(this);
         jmiRepBankPayrollDisp.addActionListener(this);
         jmiRepAnnexAF02.addActionListener(this);
+        jmiRepEmpQuo.addActionListener(this);
+        jmiRepEmpQuoAcc.addActionListener(this);
+        jmiRepEmpSisub.addActionListener(this);
         jmiRepPositions.addActionListener(this);
         
         // display user rights:
@@ -684,6 +706,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgEmploymentSubsidy.setEnabled(true);
         jmiCfgSsContributionTable.setEnabled(true);
         jmiCfgSsContributionTableRow.setEnabled(true);
+        jmiCfgSsEmployerQuotaRow.setEnabled(true);
         jmiCfgBenefitTable.setEnabled(true);
         jmiCfgBenefitTableRow.setEnabled(true);
         jmiCfgFirstDayYear.setEnabled(true);
@@ -732,6 +755,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog.setEnabled(hasRightEmp || hasRightAuxHrs);
         jmiCatEmployeeWageLog.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatEmployeeSscBaseLog.setEnabled(hasRightEmp || hasRightEmpWage);
+        jmiCatEmployeeChangeDepPos.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatEmployeeSua.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatEmployeeIdse.setEnabled(hasRightEmp || hasRightEmpWage);
         jmiCatPosition.setEnabled(hasRightCat || hasRightEmp);
@@ -850,6 +874,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepBenAnnBon.setEnabled(hasRightEmpWage);
         jmiRepBankPayrollDisp.setEnabled(hasRightEmpWage);
         jmiRepAnnexAF02.setEnabled(isConfigAF02);
+        jmiRepEmpQuo.setEnabled(hasRightEmpWage);
+        jmiRepEmpQuoAcc.setEnabled(hasRightEmpWage);
+        jmiRepEmpSisub.setEnabled(hasRightEmpWage);
         jmiRepPositions.setEnabled(hasRightReports);
         
         // GUI configuration:
@@ -1071,6 +1098,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgSsContributionTableRow) {
                 miClient.getSession().showView(SModConsts.HRS_SSC_ROW, 0, null);
             }
+            else if (item == jmiCfgSsEmployerQuotaRow) {
+                miClient.getSession().showView(SModConsts.HRS_EMPL_QUO_ROW, 0, null);
+            }
             else if (item == jmiCfgBenefitTable) {
                 miClient.getSession().showView(SModConsts.HRS_BEN, 0, null);
             }
@@ -1175,6 +1205,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatEmployeeWageLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_WAGE, 0, null);
+            }
+            else if (item == jmiCatEmployeeChangeDepPos) {
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_DEP_POS, 0, null);
             }
             else if (item == jmiCatEmployeeSscBaseLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, 0, null);
@@ -1423,6 +1456,15 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepAnnexAF02) {
                 new SDialogLayoutAF02((SGuiClient) miClient, "Layout AF02").setFormVisible(true);
+            }
+            else if (item == jmiRepEmpQuo) {
+                miClient.getSession().showView(SModConsts.HRSX_EMP_QUO, 0, null);
+            }
+            else if (item == jmiRepEmpQuoAcc) {
+                miClient.getSession().showView(SModConsts.HRSX_EMP_QUO_REP, 0, null);
+            }
+            else if (item == jmiRepEmpSisub) {
+                new SDialogRepEmpSisub((SGuiClient) miClient, "Reporte de empleados para ICSOE - SISUB").setFormVisible(true);
             }
             else if (item == jmiRepPositions) {
                 new SDialogRepHrsPos((SGuiClient) miClient, "Reporte de posiciones y vacantes").setFormVisible(true);
