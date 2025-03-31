@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 267.2/ 2025-03-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización de la vista de seguimiento a ordenes de compras abiertas y cerradas.
+2) Reemplazo del anterior panel de centros de costo y cuentas contables (erp.mfin.form.SPanelAccount) por el nuevo panel (erp.gui.account.SBeanPanelAccount)
+    en algunas formas de captura. 
+
+================================================================================
 SIIE 3.2 267.1/ 2025-03-24
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

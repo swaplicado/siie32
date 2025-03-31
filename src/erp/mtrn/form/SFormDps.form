@@ -4934,13 +4934,7 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlAccDummyCostCenter">
-                              <Properties>
-                                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                                  <Font name="Tahoma" size="12" style="1"/>
-                                </Property>
-                                <Property name="text" type="java.lang.String" value="[Panel centro de costo-beneficio]"/>
-                              </Properties>
+                            <Component class="erp.gui.account.SBeanPanelAccount" name="moCostCenterPanel">
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                                   <BorderConstraints direction="Center"/>

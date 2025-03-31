@@ -665,7 +665,9 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
                 maoTextCodeLevelStds[i].setEditable(false);
             }
         }
-
+        
+        moCurrentAccountLedger = null;
+        
         renderAccountName(0);
     }
     
@@ -913,6 +915,10 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
 
     public SDataCostCenter getSelectedDataCostCenterLedger() {
         return getDataCostCenter(moCurrentAccountLedger, TYPE_LEDGER);
+    }
+    
+    public String getAccountDescription() {
+        return jtfName.getText();
     }
 
     public void setPanelEditable(boolean enabled) {

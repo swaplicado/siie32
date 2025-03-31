@@ -11,14 +11,16 @@
 
 package erp.mtrn.form;
 
-import erp.form.SDialogShowImportErrors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
+import erp.form.SDialogShowImportErrors;
 import erp.form.SFormOptionPickerItems;
+import erp.gui.account.SAccount;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -34,6 +36,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.form.SDialogPickerCompanyBranchEntity;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataCostCenter;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
@@ -135,7 +138,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private int[] manLastWarehouseDestinyKey;
     private erp.mtrn.form.SDialogStockLots moDialogStockLots;
     private erp.mtrn.form.SDialogStockLots moDialogStockLotsProdOrder;
-    private erp.mtrn.form.SDialogCostCenter moDialogCostCenter;
+    private erp.mtrn.form.SDialogCostCenterPicker moDialogCostCenter;
     private erp.mtrn.form.SDialogPickerStockLots moPickerStockLots;
     private erp.mbps.form.SDialogPickerCompanyBranchEntity moPickerWarehouseSource;
     private erp.mbps.form.SDialogPickerCompanyBranchEntity moPickerWarehouseDestiny;
@@ -1478,15 +1481,18 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 if (param.equals("0") || param.equals("1") || param.isEmpty()) {
                     System.out.println("Configuración de centro de costo predefinida inexistente o incorrecta.");
                 }
-                moDialogCostCenter = new SDialogCostCenter(miClient);
-                moDialogCostCenter.getPanel().getFieldAccount().setFieldValue(SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), SLibUtils.parseInt(param)));
-                moDialogCostCenter.getPanel().refreshPanel();
+                moDialogCostCenter = new SDialogCostCenterPicker(miClient);
+                SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), SLibUtils.parseInt(param)) }, SLibConstants.EXEC_MODE_SILENT);
+                moDialogCostCenter.getPanel().setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                //moDialogCostCenter.getPanel().refreshPanel();
                 moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
-                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
-                jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
+                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenterPicker.DESCRIPTION)).split(",");
+                jtfCostCenter.setText(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
                 jtfCostCenter.setCaretPosition(0);
             }
-            catch (Exception e) {}
+            catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
         else {
             jtfCostCenter.setText("");
@@ -3291,14 +3297,14 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private void actionCostCenter() {
         int maxLevel = SFinUtils.getCostCenterMaxLevel(miClient.getSession());
         if (moDialogCostCenter == null) {
-            moDialogCostCenter = new SDialogCostCenter(miClient);
+            moDialogCostCenter = new SDialogCostCenterPicker(miClient);
         }
         moDialogCostCenter.setVisible(true);
         if (moDialogCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
             if (moCostCenter.getLevel() == maxLevel) {
-                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenter.DESCRIPTION)).split(",");
-                jtfCostCenter.setText(moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
+                String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenterPicker.DESCRIPTION)).split("/");
+                jtfCostCenter.setText(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
                 jtfCostCenter.setCaretPosition(0);
             }
             else {

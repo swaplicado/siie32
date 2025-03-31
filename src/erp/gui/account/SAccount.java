@@ -4,6 +4,8 @@
  */
 package erp.gui.account;
 
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataCostCenter;
 import java.util.ArrayList;
 
 /**
@@ -21,6 +23,24 @@ public class SAccount {
     protected int mnDigits;
     protected ArrayList<SAccount> maChildren;
 
+    /**
+     * Se crea una nueva cuenta a partir de un SDataAccount.
+     * @param account Objeto de la cuenta.
+     * @param mask Máscara de la cuenta.
+     */
+    public SAccount(SDataAccount account, int mask) {
+        this(account.getPkAccountId(), account.getCode(), account.getAccount(), account.getIsDeleted(), account.getLevel(), SAccountUtils.getDigits(mask, account.getLevel()));
+    }
+    
+    /**
+     * Se crea una nueva cuenta a partir de un SDataAccount.
+     * @param costCenter Objeto del centro de costo
+     * @param mask Máscara de la cuenta.
+     */
+    public SAccount(SDataCostCenter costCenter, int mask) {
+        this(costCenter.getPkCostCenterId(), costCenter.getCode(), costCenter.getCostCenter(), costCenter.getIsDeleted(), costCenter.getLevel(), SAccountUtils.getDigits(mask, costCenter.getLevel()));
+    }
+    
     /**
      * Creates new account.
      * @param idAccount Account's database ID (primary key).

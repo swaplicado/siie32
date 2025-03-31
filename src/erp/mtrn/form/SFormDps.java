@@ -21,6 +21,8 @@ import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.form.SFormOptionPickerBizPartner;
 import erp.gui.SGuiUtilities;
+import erp.gui.account.SAccount;
+import erp.gui.account.SAccountConsts;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -45,9 +47,9 @@ import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mcfg.data.SDataParamsErp;
+import erp.mfin.data.SDataCostCenter;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
-import erp.mfin.form.SPanelAccount;
 import erp.mfin.form.SPanelRecord;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemConfigBizPartner;
@@ -136,6 +138,7 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SLock;
@@ -372,7 +375,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
     private erp.mitm.data.SDataItem moAccItem;
-    private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
+    //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private int mnAccCurrentAction;
     private double mdAccSubtotal;
     private double mdAccSubtotalCy;
@@ -438,7 +441,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsRebill = new javax.swing.JCheckBox();
         jPanel16 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
-        jcbNumberSeries = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbNumberSeries = new javax.swing.JComboBox<>();
         jtfNumber = new javax.swing.JTextField();
         jtfNumberReference = new javax.swing.JTextField();
         jPanel18 = new javax.swing.JPanel();
@@ -470,13 +473,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel5 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlFkPaymentTypeId = new javax.swing.JLabel();
-        jcbFkPaymentTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkPaymentTypeId = new javax.swing.JComboBox<>();
         jPanel35 = new javax.swing.JPanel();
         jlCfdiPaymentWay = new javax.swing.JLabel();
-        jcbCfdiPaymentWay = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdiPaymentWay = new javax.swing.JComboBox<>();
         jPanel32 = new javax.swing.JPanel();
         jlCfdiPaymentMethod = new javax.swing.JLabel();
-        jcbCfdiPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdiPaymentMethod = new javax.swing.JComboBox<>();
         jPanel25 = new javax.swing.JPanel();
         jlConditionsPayment = new javax.swing.JLabel();
         jtfConditionsPayment = new javax.swing.JTextField();
@@ -491,13 +494,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFkDpsStatusAuthorizationRo = new javax.swing.JTextField();
         jPanel26 = new javax.swing.JPanel();
         jlFkLanguageId = new javax.swing.JLabel();
-        jcbFkLanguageId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkLanguageId = new javax.swing.JComboBox<>();
         jPanel33 = new javax.swing.JPanel();
         jlFkDpsNatureId = new javax.swing.JLabel();
-        jcbFkDpsNatureId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkDpsNatureId = new javax.swing.JComboBox<>();
         jPanel92 = new javax.swing.JPanel();
         jlFkFunctionalAreaId = new javax.swing.JLabel();
-        jcbFkFunctionalAreaId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkFunctionalAreaId = new javax.swing.JComboBox<>();
         jPanel30 = new javax.swing.JPanel();
         jckIsAudited = new javax.swing.JCheckBox();
         jckIsSystem = new javax.swing.JCheckBox();
@@ -518,7 +521,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCurrencyId = new javax.swing.JComboBox<>();
         jbFkCurrencyId = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
         jlExchangeRateSystem = new javax.swing.JLabel();
@@ -586,9 +589,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
-        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<>();
         jlTaxRegionId = new javax.swing.JLabel();
-        jcbTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbTaxRegionId = new javax.swing.JComboBox<>();
         jbTaxRegionId = new javax.swing.JButton();
         jbEditTaxRegion = new javax.swing.JButton();
         jpMarketing = new javax.swing.JPanel();
@@ -610,7 +613,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel38 = new javax.swing.JPanel();
         jlFkProductionOrderId_n = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
-        jcbFkProductionOrderId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkProductionOrderId_n = new javax.swing.JComboBox<>();
         jbFkProductionOrderId_n = new javax.swing.JButton();
         jpOtherMarketing = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
@@ -635,36 +638,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel64 = new javax.swing.JPanel();
         jlFkContactId_n = new javax.swing.JLabel();
         jPanel80 = new javax.swing.JPanel();
-        jcbFkContactId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkContactId_n = new javax.swing.JComboBox<>();
         jpOtherLogistics = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel50 = new javax.swing.JPanel();
         jlFkIncotermId = new javax.swing.JLabel();
-        jcbFkIncotermId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkIncotermId = new javax.swing.JComboBox<>();
         jbFkIncotermId = new javax.swing.JButton();
         jPanel84 = new javax.swing.JPanel();
         jlFkSpotSrcId_n = new javax.swing.JLabel();
-        jcbFkSpotSrcId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSpotSrcId_n = new javax.swing.JComboBox<>();
         jPanel85 = new javax.swing.JPanel();
         jlFkSpotDesId_n = new javax.swing.JLabel();
-        jcbFkSpotDesId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkSpotDesId_n = new javax.swing.JComboBox<>();
         jPanel51 = new javax.swing.JPanel();
         jlFkModeOfTransportationTypeId = new javax.swing.JLabel();
-        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<>();
         jbFkModeOfTransportationTypeId = new javax.swing.JButton();
         jPanel52 = new javax.swing.JPanel();
         jlFkCarrierTypeId = new javax.swing.JLabel();
-        jcbFkCarrierTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCarrierTypeId = new javax.swing.JComboBox<>();
         jPanel53 = new javax.swing.JPanel();
         jlFkCarrierId_n = new javax.swing.JLabel();
-        jcbFkCarrierId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkCarrierId_n = new javax.swing.JComboBox<>();
         jbFkCarrierId_n = new javax.swing.JButton();
         jPanel86 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
         jPanel54 = new javax.swing.JPanel();
         jlFkVehicleId_n = new javax.swing.JLabel();
-        jcbFkVehicleId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkVehicleId_n = new javax.swing.JComboBox<>();
         jbFkVehicleId_n = new javax.swing.JButton();
         jPanel55 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
@@ -692,13 +695,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckCfdCceApplies = new javax.swing.JCheckBox();
         jPanel98 = new javax.swing.JPanel();
         jlCfdCceMoveReason = new javax.swing.JLabel();
-        jcbCfdCceMoveReason = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdCceMoveReason = new javax.swing.JComboBox<>();
         jPanel99 = new javax.swing.JPanel();
         jlCfdCceOperationType = new javax.swing.JLabel();
-        jcbCfdCceOperationType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdCceOperationType = new javax.swing.JComboBox<>();
         jPanel100 = new javax.swing.JPanel();
         jlCfdCceRequestKey = new javax.swing.JLabel();
-        jcbCfdCceRequestKey = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdCceRequestKey = new javax.swing.JComboBox<>();
         jPanel101 = new javax.swing.JPanel();
         jlCfdCceCertificateOrigin = new javax.swing.JLabel();
         jtfCfdCceCertificateOrigin = new javax.swing.JTextField();
@@ -742,7 +745,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfAddCfdAddendaType = new javax.swing.JTextField();
         jPanel41 = new javax.swing.JPanel();
         jlAddCfdAddendaSubtype = new javax.swing.JLabel();
-        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<>();
         jPanel69 = new javax.swing.JPanel();
         jlAddLorealFolioNotaRecepción = new javax.swing.JLabel();
         jtfAddLorealFolioNotaRecepción = new javax.swing.JTextField();
@@ -790,7 +793,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel76 = new javax.swing.JPanel();
         jPanel123 = new javax.swing.JPanel();
         jlAddAmc71SupplierGln = new javax.swing.JLabel();
-        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<String>();
+        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<>();
         jlAddAmc71SupplierGlnHint = new javax.swing.JLabel();
         jPanel124 = new javax.swing.JPanel();
         jlAddAmc71SupplierNumber = new javax.swing.JLabel();
@@ -798,7 +801,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71SupplierNumberHint = new javax.swing.JLabel();
         jPanel125 = new javax.swing.JPanel();
         jlAddAmc71CompanyGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<String>();
+        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<>();
         jlAddAmc71CompanyGlnHint = new javax.swing.JLabel();
         jPanel131 = new javax.swing.JPanel();
         jlAddAmc71CompanyContact = new javax.swing.JLabel();
@@ -806,7 +809,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71CompanyContactHint = new javax.swing.JLabel();
         jPanel126 = new javax.swing.JPanel();
         jlAddAmc71CompanyBranchGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<String>();
+        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<>();
         jlAddAmc71CompanyBranchGlnHint = new javax.swing.JLabel();
         jPanel130 = new javax.swing.JPanel();
         jlAddAmc71ShipToName = new javax.swing.JLabel();
@@ -842,21 +845,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteBillOfLading = new javax.swing.JButton();
         jPanel95 = new javax.swing.JPanel();
         jlCfdiTaxRegimeIssuing = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jlGlobalInf = new javax.swing.JLabel();
         jPanel93 = new javax.swing.JPanel();
         jlCfdiTaxRegimeReceptor = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         jlGblPeriodicity = new javax.swing.JLabel();
-        jcbGblPeriodicity = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbGblPeriodicity = new javax.swing.JComboBox<>();
         jPanel94 = new javax.swing.JPanel();
         jlCfdiCfdiUsage = new javax.swing.JLabel();
-        jcbCfdiCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCfdiCfdiUsage = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
         jlGblMonth = new javax.swing.JLabel();
-        jcbGblMonth = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbGblMonth = new javax.swing.JComboBox<>();
         jPanel114 = new javax.swing.JPanel();
         jlCfdiConfirmation = new javax.swing.JLabel();
         jtfCfdiConfirmation = new javax.swing.JTextField();
@@ -866,7 +869,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfGblYear = new javax.swing.JTextField();
         jPanel132 = new javax.swing.JPanel();
         jlExportation = new javax.swing.JLabel();
-        jcbExportation = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbExportation = new javax.swing.JComboBox<>();
         jPanel115 = new javax.swing.JPanel();
         jbCfdiRelatedDocs = new javax.swing.JButton();
         jtfCfdiFirstRelatedDps = new javax.swing.JTextField();
@@ -885,7 +888,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAccItemRef_n = new javax.swing.JComboBox();
         jbPickAccItemRef_n = new javax.swing.JButton();
         jpCustomAcc112 = new javax.swing.JPanel();
-        jlAccDummyCostCenter = new javax.swing.JLabel();
+        moCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
         jpCustomAcc12 = new javax.swing.JPanel();
         jpCustomAcc121 = new javax.swing.JPanel();
         jlAccQuantity = new javax.swing.JLabel();
@@ -3114,10 +3117,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCustomAcc11.add(jpCustomAcc111, java.awt.BorderLayout.WEST);
 
         jpCustomAcc112.setLayout(new java.awt.BorderLayout());
-
-        jlAccDummyCostCenter.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlAccDummyCostCenter.setText("[Panel centro de costo-beneficio]");
-        jpCustomAcc112.add(jlAccDummyCostCenter, java.awt.BorderLayout.CENTER);
+        jpCustomAcc112.add(moCostCenterPanel, java.awt.BorderLayout.CENTER);
 
         jpCustomAcc11.add(jpCustomAcc112, java.awt.BorderLayout.CENTER);
 
@@ -3860,6 +3860,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mnDeliveryType = SLibConsts.UNDEFINED;
         mnCfdXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
 
+        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         try {
             moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
             moPanelFkCostCenterId_n.setLabelsWidth(100);
@@ -3870,6 +3871,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpCustomAcc112.remove(jlAccDummyCostCenter);
         jpCustomAcc112.add(moPanelFkCostCenterId_n, BorderLayout.NORTH);
+        */
+        
+        moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        moCostCenterPanel.setRetrieveDataCostCenters(true);
+        
+        moCostCenterPanel.setAccountNameWidth(275);
         
         // Action listeners:
 
@@ -7133,7 +7140,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbPickAccUnit.setEnabled(false);
             jbExeWizardAccSubtotal.setEnabled(false);
             
-            moPanelFkCostCenterId_n.enableFields(false);
+            //moPanelFkCostCenterId_n.enableFields(false); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            moCostCenterPanel.setPanelEditable(false);
         }
         else {
             boolean enableable = isCustomAccEnableable();
@@ -7157,7 +7165,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbPickAccUnit.setEnabled(enableable);
             jbExeWizardAccSubtotal.setEnabled(enableable);
             
-            moPanelFkCostCenterId_n.enableFields(enableable);
+            //moPanelFkCostCenterId_n.enableFields(enableable); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            moCostCenterPanel.setPanelEditable(enableable);
         }
     }
     
@@ -7176,7 +7185,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldAccSubtotalCy.resetField();
         moFieldAccConcept.resetField();
         
-        moPanelFkCostCenterId_n.resetPanel();
+        //moPanelFkCostCenterId_n.resetPanel(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+        moCostCenterPanel.initPanel();
         
         if (isLocalCurrency()) {
             jtfAccSubtotal.setText("");
@@ -7220,16 +7230,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             
             // update cost center:
             
-            moPanelFkCostCenterId_n.enableFields(isCustomAccEnableable());
-
+            //moPanelFkCostCenterId_n.enableFields(isCustomAccEnableable()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+            moCostCenterPanel.setPanelEditable(isCustomAccEnableable());
+            
             try {
-                moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId()));
+                //moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId())); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
+                SDataCostCenter costCenter = new SDataCostCenter();
+                costCenter.read(new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId()) }, miClient.getSession().getStatement());
+                moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                jcbAccItem.requestFocus();
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
             finally {
-                moPanelFkCostCenterId_n.refreshPanel();
+                //moPanelFkCostCenterId_n.refreshPanel(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             }
         }
     }
@@ -7252,8 +7267,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldAccSubtotalCy.setDouble(entry.getSubtotalCy());
             moFieldAccConcept.setString(entry.getConcept());
             
-            moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(entry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : entry.getFkCostCenterId_n());
-            moPanelFkCostCenterId_n.refreshPanel();
+            SDataCostCenter costCenter = new SDataCostCenter();
+            if (!entry.getFkCostCenterId_n().isEmpty()) {
+                costCenter.read(new Object[] { entry.getFkCostCenterId_n() }, miClient.getSession().getStatement());
+            }
+            moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+            
+            //moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(entry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : entry.getFkCostCenterId_n());
+            //moPanelFkCostCenterId_n.refreshPanel();
             
             if (isLocalCurrency()) {
                 jtfAccSubtotal.setText("");
@@ -9480,7 +9501,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             
-            boolean isCostCenterEmpty = moPanelFkCostCenterId_n.isEmptyAccountId() || moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null;
+            boolean isCostCenterEmpty = moCostCenterPanel.getSelectedDataCostCenter() == null;
             double accSubtotal = getAccSubtotal();
             
             if (!error) {
@@ -9495,14 +9516,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     component = moFieldAccItem.getComponent();
                 }
                 else {
-
                     if (!isCostCenterEmpty) {
-                        String validation = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moDps.getDate());
+                        String validation = SDataUtilities.validateCostCenter(miClient, moCostCenterPanel.getSelectedDataCostCenter(), moDps.getDate());
 
                         if (!validation.isEmpty()) {
                             error = true;
                             message = validation;
-                            component = moPanelFkCostCenterId_n.getFieldAccount().getComponent();
+                            component = moCostCenterPanel.getTextNumberFirst();
                         }
                     }
 
@@ -9577,7 +9597,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 entry.setIsDeleted(false);
                 entry.setFkItemId(moFieldAccItem.getKeyAsIntArray()[0]);
                 entry.setFkUnitId(moFieldAccUnit.getKeyAsIntArray()[0]);
-                entry.setFkCostCenterId_n(isCostCenterEmpty ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString());
+                entry.setFkCostCenterId_n(isCostCenterEmpty ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX());
                 entry.setFkItemRefId_n(moFieldAccItemRef_n.getKeyAsIntArray()[0]);
                 entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 //entry.setFkUserEditId(...);
@@ -9589,7 +9609,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 entry.setDbmsItemKey(moAccItem.getKey());
                 entry.setDbmsItem(moAccItem.getItem());
                 entry.setDbmsUnitSymbol(moAccItem.getDbmsDataUnit().getSymbol());
-                entry.setDbmsCostCenter_n(isCostCenterEmpty ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCostCenter());
+                entry.setDbmsCostCenter_n(isCostCenterEmpty ? "" : moCostCenterPanel.getSelectedDataCostCenter().getCostCenter());
                 entry.setDbmsItemRefKey_n(itemRef_n == null ? "" : itemRef_n.getKey());
                 entry.setDbmsItemRef_n(itemRef_n == null ? "" : itemRef_n.getItem());
                 //entry.setDbmsUserNew(...);
@@ -10842,7 +10862,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JFormattedTextField jftDateShipment_nRo;
     private javax.swing.JFormattedTextField jftDateStartCredit;
     private javax.swing.JLabel jlAccConcept;
-    private javax.swing.JLabel jlAccDummyCostCenter;
     private javax.swing.JLabel jlAccItem;
     private javax.swing.JLabel jlAccItemRef_n;
     private javax.swing.JLabel jlAccQuantity;
@@ -11101,6 +11120,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfTicket;
     private javax.swing.JTextField jtfTotalCy_rRo;
     private javax.swing.JTextField jtfTotal_rRo;
+    private erp.gui.account.SBeanPanelAccount moCostCenterPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -11323,6 +11343,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtaCfdiRelatedDocs.setText("");
         
         mbResetingForm = false;
+        
+        moCostCenterPanel.initPanel();
     }
 
     @Override
