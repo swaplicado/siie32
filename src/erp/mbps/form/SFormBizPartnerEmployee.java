@@ -324,13 +324,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlDateLastDismissal_n = new javax.swing.JLabel();
         jftDateLastDismissal_n = new javax.swing.JFormattedTextField();
         jlAux1 = new javax.swing.JLabel();
-        jlDatePaymentType = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
         jlFkPaymentType = new javax.swing.JLabel();
         jcbFkPaymentType = new javax.swing.JComboBox<SFormComponentItem>();
-        jftDatePaymentType = new javax.swing.JFormattedTextField();
-        jbDatePaymentType = new javax.swing.JButton();
-        jbDatePaymentTypeEdit = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jlFkSalaryType = new javax.swing.JLabel();
         jcbFkSalaryType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -1035,10 +1031,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlAux1.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel9.add(jlAux1);
 
-        jlDatePaymentType.setText("A partir de:*");
-        jlDatePaymentType.setPreferredSize(new java.awt.Dimension(131, 23));
-        jPanel9.add(jlDatePaymentType);
-
         jPanel3.add(jPanel9);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -1049,23 +1041,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jcbFkPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel28.add(jcbFkPaymentType);
-
-        jftDatePaymentType.setText("yyyy/mm/dd");
-        jftDatePaymentType.setToolTipText("Inicio de vigencia del período de pago");
-        jftDatePaymentType.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel28.add(jftDatePaymentType);
-
-        jbDatePaymentType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDatePaymentType.setToolTipText("Seleccionar fecha");
-        jbDatePaymentType.setFocusable(false);
-        jbDatePaymentType.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel28.add(jbDatePaymentType);
-
-        jbDatePaymentTypeEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbDatePaymentTypeEdit.setToolTipText("Modificar fecha");
-        jbDatePaymentTypeEdit.setFocusable(false);
-        jbDatePaymentTypeEdit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel28.add(jbDatePaymentTypeEdit);
 
         jPanel3.add(jPanel28);
 
@@ -4117,8 +4092,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbDateChangeWage;
     private javax.swing.JButton jbDateLastHire;
     private javax.swing.JButton jbDateLastPosition;
-    private javax.swing.JButton jbDatePaymentType;
-    private javax.swing.JButton jbDatePaymentTypeEdit;
     private javax.swing.JButton jbImagePhoto;
     private javax.swing.JButton jbImagePhotoRemove;
     private javax.swing.JButton jbImagePhotoView;
@@ -4192,7 +4165,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
     private javax.swing.JFormattedTextField jftDateLastPosition;
-    private javax.swing.JFormattedTextField jftDatePaymentType;
     private javax.swing.JFormattedTextField jftMateDateBirth;
     private javax.swing.JFormattedTextField jftNumber;
     private javax.swing.JFormattedTextField jftSonDateBirth1;
@@ -4228,7 +4200,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlDateLastPosition;
-    private javax.swing.JLabel jlDatePaymentType;
     private javax.swing.JLabel jlEmergencies;
     private javax.swing.JLabel jlEmergencies0;
     private javax.swing.JLabel jlEmergenciesContact;
