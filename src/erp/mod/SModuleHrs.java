@@ -41,6 +41,7 @@ import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeBenefitTables;
 import erp.mod.hrs.db.SDbEmployeeBenefitTablesAnnum;
+import erp.mod.hrs.db.SDbEmployeeDepPosLog;
 import erp.mod.hrs.db.SDbEmployeeDismissalType;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SDbEmployeeType;
@@ -165,7 +166,10 @@ import erp.mod.hrs.view.SViewDocAdminRecordSummary;
 import erp.mod.hrs.view.SViewDocBreach;
 import erp.mod.hrs.view.SViewDocBreachSummary;
 import erp.mod.hrs.view.SViewEarning;
+import erp.mod.hrs.view.SViewEmpRetirement;
+import erp.mod.hrs.view.SViewEmpRetirementReport;
 import erp.mod.hrs.view.SViewEmployeeBenefitTables;
+import erp.mod.hrs.view.SViewEmployeeDepPosLog;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeHireLogByPeriod;
@@ -203,6 +207,7 @@ import erp.mod.hrs.view.SViewPtu;
 import erp.mod.hrs.view.SViewShift;
 import erp.mod.hrs.view.SViewSsContributionTable;
 import erp.mod.hrs.view.SViewSsContributionTableRow;
+import erp.mod.hrs.view.SViewSsEmployerQuotaRow;
 import erp.mod.hrs.view.SViewTaxSubsidyTable;
 import erp.mod.hrs.view.SViewTaxSubsidyTableRow;
 import erp.mod.hrs.view.SViewTaxTable;
@@ -234,7 +239,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -584,6 +589,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_EMP_LOG_WAGE:
                 registry = new SDbEmployeeWageLog();
+                break;
+            case SModConsts.HRS_EMP_LOG_DEP_POS:
+                registry = new SDbEmployeeDepPosLog();
                 break;
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
                 registry = new SDbEmployeeWageSscBaseLog();
@@ -1105,7 +1113,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewFirstDayYear(miClient, "Primer día año");
                 break;
             case SModConsts.HRS_HOL:
-                view = new SViewHoliday(miClient, "Días festivos y feriados");
+                view = new SViewHoliday(miClient, "Días feriados");
                 break;
             case SModConsts.HRS_WDS:
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
@@ -1114,7 +1122,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewConditionalEarning(miClient, "Percepciones condicionales");
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
-                view = new SViewPrePayrollCutoffCalendar(miClient, "Fechas corte prenóminas");
+                view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
                 break;
             case SModConsts.HRS_TAX:
                 view = new SViewTaxTable(miClient, "Tablas impuesto");
@@ -1136,6 +1144,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_SSC_ROW:
                 view = new SViewSsContributionTableRow(miClient, "Tablas retención SS - detalle");
+                break;
+            case SModConsts.HRS_EMPL_QUO_ROW:
+                view = new SViewSsEmployerQuotaRow(miClient, "Tablas cuotas patronales");
                 break;
             case SModConsts.HRS_BEN:
                 view = new SViewBenefitTable(miClient, "Tablas prestaciones");
@@ -1181,6 +1192,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_EMP_LOG_WAGE:
                 view = new SViewEmployeeWageLog(miClient, "Bitácora sueldos y salarios");
+                break;
+            case SModConsts.HRS_EMP_LOG_DEP_POS:
+                view = new SViewEmployeeDepPosLog(miClient, "Bitácora departamentos y puestos");
                 break;
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
                 view = new SViewEmployeeWageSscBaseLog(miClient, "Bitácora salarios base cotización");
@@ -1372,6 +1386,12 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSX_BEN_ANN_BON:
                 view = new SViewBenAnnualBon(miClient, "Consulta provisión de aguinaldo");
                 break;
+            case SModConsts.HRSX_EMP_QUO:
+                view = new SViewEmpRetirement(miClient, "Cuotas patronales, retiro, senatia y vejez");
+                break;
+            case SModConsts.HRSX_EMP_QUO_REP:
+                view = new SViewEmpRetirementReport(miClient, "Reporte cuotas patronales, retiro, senatia y vejez");
+                break;
             case SModConsts.HRSX_BANK_PAY_DISP:
                 view = new SViewBankPayDispersion(miClient, "Consulta dispersión mensual");
                 break;
@@ -1518,7 +1538,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormFirstDayYear;
                 break;
             case SModConsts.HRS_HOL:
-                if (moFormHoliday == null) moFormHoliday = new SFormHoliday(miClient, "Día festivo o feriado");
+                if (moFormHoliday == null) moFormHoliday = new SFormHoliday(miClient, "Día feriado");
                 form = moFormHoliday;
                 break;
             case SModConsts.HRS_WDS:
@@ -1530,7 +1550,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormConditionalEarning;
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
-                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Fecha de corte de prenómina");
+                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Calendario de cortes prenómina");
                 form = moFormCutoffCalendar;
                 break;
             case SModConsts.HRS_TAX:

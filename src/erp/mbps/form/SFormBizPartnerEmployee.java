@@ -98,6 +98,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbUpdatingForm;
+    private boolean mbIsNewBizPartner;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
@@ -146,6 +147,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldIsUnionized;
     private erp.lib.form.SFormField moFieldFkWorkerType;
     private erp.lib.form.SFormField moFieldIsMfgOperator;
+    private erp.lib.form.SFormField moFieldDateLastPosition;
     private erp.lib.form.SFormField moFieldFkDepartment;
     private erp.lib.form.SFormField moFieldFkPosition;
     private erp.lib.form.SFormField moFieldFkShift;
@@ -229,7 +231,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         initComponents();
         initComponentsExtra();
     }
-
+    
     /**
      * This method is called from within the constructor to
      * initialize the form.
@@ -369,6 +371,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jradCheckerNever = new javax.swing.JRadioButton();
         jradCheckerAllways = new javax.swing.JRadioButton();
         jradCheckerSometimes = new javax.swing.JRadioButton();
+        jPanel44 = new javax.swing.JPanel();
+        jckChangePosition = new javax.swing.JCheckBox();
+        jlDateLastPosition = new javax.swing.JLabel();
+        jftDateLastPosition = new javax.swing.JFormattedTextField();
+        jbDateLastPosition = new javax.swing.JButton();
         jPanel17 = new javax.swing.JPanel();
         jlFkDepartment = new javax.swing.JLabel();
         jcbFkDepartment = new javax.swing.JComboBox<SFormComponentItem>();
@@ -378,7 +385,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel21 = new javax.swing.JPanel();
         jlFkShift = new javax.swing.JLabel();
         jcbFkShift = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel44 = new javax.swing.JPanel();
         jlFkWorkingDayType = new javax.swing.JLabel();
         jcbFkWorkingDayType = new javax.swing.JComboBox<SFormComponentItem>();
         jlWorkingHoursDay = new javax.swing.JLabel();
@@ -1026,11 +1032,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(jftDateLastDismissal_n);
 
-        jlAux1.setPreferredSize(new java.awt.Dimension(55, 23));
+        jlAux1.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel9.add(jlAux1);
 
         jlDatePaymentType.setText("A partir de:*");
-        jlDatePaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDatePaymentType.setPreferredSize(new java.awt.Dimension(131, 23));
         jPanel9.add(jlDatePaymentType);
 
         jPanel3.add(jPanel9);
@@ -1045,6 +1051,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel28.add(jcbFkPaymentType);
 
         jftDatePaymentType.setText("yyyy/mm/dd");
+        jftDatePaymentType.setToolTipText("Inicio de vigencia del período de pago");
         jftDatePaymentType.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(jftDatePaymentType);
 
@@ -1090,6 +1097,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel10.add(jtfSalary);
 
         jftDateChangeSalary.setText("yyyy/mm/dd");
+        jftDateChangeSalary.setToolTipText("Último cambio de salario diario");
         jftDateChangeSalary.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jftDateChangeSalary);
 
@@ -1118,6 +1126,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel16.add(jtfWage);
 
         jftDateChangeWage.setText("yyyy/mm/dd");
+        jftDateChangeWage.setToolTipText("Último cambio de sueldo mensual");
         jftDateChangeWage.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jftDateChangeWage);
 
@@ -1146,6 +1155,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel18.add(jtfSalarySscBase);
 
         jftDateChangeSalarySscBase.setText("yyyy/mm/dd");
+        jftDateChangeSalarySscBase.setToolTipText("Último cambio de SBC");
         jftDateChangeSalarySscBase.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jftDateChangeSalarySscBase);
 
@@ -1231,6 +1241,30 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel4.add(jPanel12);
 
+        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jckChangePosition.setText("Cambiar puesto");
+        jckChangePosition.setFocusable(false);
+        jckChangePosition.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel44.add(jckChangePosition);
+
+        jlDateLastPosition.setText("Último cambio de puesto:");
+        jlDateLastPosition.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel44.add(jlDateLastPosition);
+
+        jftDateLastPosition.setText("yyyy/mm/dd");
+        jftDateLastPosition.setToolTipText("Último cambio de puesto");
+        jftDateLastPosition.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel44.add(jftDateLastPosition);
+
+        jbDateLastPosition.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateLastPosition.setToolTipText("Seleccionar fecha");
+        jbDateLastPosition.setFocusable(false);
+        jbDateLastPosition.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel44.add(jbDateLastPosition);
+
+        jPanel4.add(jPanel44);
+
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlFkDepartment.setText("Departamento:*");
@@ -1259,32 +1293,29 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFkShift.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel21.add(jlFkShift);
 
-        jcbFkShift.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbFkShift.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jcbFkShift);
 
-        jPanel4.add(jPanel21);
+        jlFkWorkingDayType.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlFkWorkingDayType.setText("Jornada:");
+        jlFkWorkingDayType.setPreferredSize(new java.awt.Dimension(65, 23));
+        jPanel21.add(jlFkWorkingDayType);
 
-        jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
-        jlFkWorkingDayType.setText("Tipo jornada:");
-        jlFkWorkingDayType.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel44.add(jlFkWorkingDayType);
-
-        jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel44.add(jcbFkWorkingDayType);
+        jcbFkWorkingDayType.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel21.add(jcbFkWorkingDayType);
 
         jlWorkingHoursDay.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlWorkingHoursDay.setText("Horas jornada:*");
-        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel44.add(jlWorkingHoursDay);
+        jlWorkingHoursDay.setText("Horas:*");
+        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel21.add(jlWorkingHoursDay);
 
         jtfWorkingHoursDay.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWorkingHoursDay.setText("0");
-        jtfWorkingHoursDay.setToolTipText("Unidades");
+        jtfWorkingHoursDay.setToolTipText("Horas de jornada");
         jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel44.add(jtfWorkingHoursDay);
+        jPanel21.add(jtfWorkingHoursDay);
 
-        jPanel4.add(jPanel44);
+        jPanel4.add(jPanel21);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -2495,7 +2526,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         computeBizPartner_Ro();
     }//GEN-LAST:event_jtfLastname2FocusLost
 
-    private void initComponentsExtra() {
+   private void initComponentsExtra() {
         mvFields = new Vector<>();
 
         // Employee fields:
@@ -2592,6 +2623,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkWorkerType.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldIsMfgOperator = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsMfgOperator);
         moFieldIsMfgOperator.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
+        moFieldDateLastPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateLastPosition, jlDateLastPosition);
+        moFieldDateLastPosition.setPickerButton(jbDateLastPosition);
+        moFieldDateLastPosition.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldFkDepartment = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDepartment, jlFkDepartment);
         moFieldFkDepartment.setTabbedPaneIndex(TAB_DATA_EMP, jTabbedPane);
         moFieldFkPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPosition, jlFkPosition);
@@ -2748,7 +2782,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldDateBenefits);
         mvFields.add(moFieldDateLastHire);
         mvFields.add(moFieldDateLastDismissal_n);
-        mvFields.add(moFieldFkPaymentType);
         mvFields.add(moFieldFkSalaryType);
         mvFields.add(moFieldSalary);
         mvFields.add(moFieldDateChangeSalary);
@@ -2762,6 +2795,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldIsUnionized);
         mvFields.add(moFieldFkWorkerType);
         mvFields.add(moFieldIsMfgOperator);
+        mvFields.add(moFieldDateLastPosition);
         mvFields.add(moFieldFkDepartment);
         mvFields.add(moFieldFkPosition);
         mvFields.add(moFieldFkShift);
@@ -2849,6 +2883,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeWage.addItemListener(this);
         jckChangeSalarySscBase.addItemListener(this);
         jcbFkPaymentType.addItemListener(this);
+        jckChangePosition.addItemListener(this);
+        jbDateLastPosition.addActionListener(this);
         jcbFkDepartment.addItemListener(this);
         jcbFkContractType.addItemListener(this);
         jcbVacTable.addItemListener(this);
@@ -3572,6 +3608,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void actionDateSalarySscBaseChange() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateChangeSalarySscBase.getDate(), moFieldDateChangeSalarySscBase);
     }
+    
+    private void actionDateLastPosition() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateLastPosition.getDate(), moFieldDateLastPosition);
+    }
 
     private void actionContractExpiration() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldContractExpiration.getDate(), moFieldContractExpiration);
@@ -3821,7 +3861,65 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldDateChangeSalarySscBase.setFieldValue(moEmployee == null ? null : moEmployee.getDateSalarySscBase());
         }
     }
+    
+    
+    private void itemNewStateChangePosition(final boolean focusRequired, final boolean mbIsNewBizPartner, SDataEmployee moEmployee ) {
+        if (mbIsNewBizPartner) { 
+            jckChangePosition.setEnabled(false);
+            jckChangePosition.setSelected(false);
+            jlDateLastPosition.setEnabled(false);
+            jftDateLastPosition.setEnabled(false);
+            jbDateLastPosition.setEnabled(false);
+            jcbFkDepartment.setEnabled(true);
+            jcbFkPosition.setEnabled(true);
 
+            moFieldDateLastPosition.setDate(null);
+
+            if (focusRequired) {
+                jftDateLastPosition.requestFocusInWindow();
+            }
+        }
+        else {
+            jckChangePosition.setEnabled(true);
+            jckChangePosition.setSelected(false);
+            jlDateLastPosition.setEnabled(true);
+            jftDateLastPosition.setEnabled(false);
+            jbDateLastPosition.setEnabled(false);
+            jcbFkDepartment.setEnabled(false);
+            moFieldDateLastPosition.setFieldValue(moEmployee == null ? null : moEmployee.getDatePosition());
+            moFieldFkDepartment.setFieldValue(moEmployee == null ? null : new int[] { moEmployee.getFkDepartmentId() });
+            moFieldFkPosition.setFieldValue(moEmployee == null ? null : new int[] { moEmployee.getFkPositionId()});
+            jcbFkPosition.setEnabled(false);
+            
+        }
+    }
+    
+    private void itemStateChangePosition(final boolean focusRequired) {
+        if (jckChangePosition.isSelected()) {
+            jcbFkDepartment.setEnabled(true);
+            jcbFkPosition.setEnabled(true);
+            jftDateLastPosition.setEnabled(true);
+            jbDateLastPosition.setEnabled(true);
+            moFieldDateLastPosition.setDate(null);
+
+            if (focusRequired) {
+                jftDateLastPosition.requestFocusInWindow();
+            }
+        }
+        else {
+            jcbFkDepartment.setEnabled(false);
+            jcbFkPosition.setEnabled(false);
+            jbDateLastPosition.setEnabled(false);
+            jftDateLastPosition.setEnabled(false);
+
+            // If no changes, then restore values:
+            moFieldDateLastPosition.setFieldValue(moEmployee == null ? null : moEmployee.getDatePosition());
+            moFieldFkDepartment.setFieldValue(moEmployee == null ? null : new int[] { moEmployee.getFkDepartmentId() });
+            moFieldFkPosition.setFieldValue(moEmployee == null ? null : new int[] { moEmployee.getFkPositionId()});
+
+        }
+    }
+    
     private void itemStateChangePaymentType() {
         mbUpdatingForm = true;
 
@@ -4018,6 +4116,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JButton jbDateChangeSalarySscBase;
     private javax.swing.JButton jbDateChangeWage;
     private javax.swing.JButton jbDateLastHire;
+    private javax.swing.JButton jbDateLastPosition;
     private javax.swing.JButton jbDatePaymentType;
     private javax.swing.JButton jbDatePaymentTypeEdit;
     private javax.swing.JButton jbImagePhoto;
@@ -4068,6 +4167,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JComboBox<SFormComponentItem> jcbVacBonTable;
     private javax.swing.JComboBox<SFormComponentItem> jcbVacTable;
     private javax.swing.JCheckBox jckBenIsUnionized;
+    private javax.swing.JCheckBox jckChangePosition;
     private javax.swing.JCheckBox jckChangeSalary;
     private javax.swing.JCheckBox jckChangeSalarySscBase;
     private javax.swing.JCheckBox jckChangeWage;
@@ -4091,6 +4191,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftDateChangeWage;
     private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
+    private javax.swing.JFormattedTextField jftDateLastPosition;
     private javax.swing.JFormattedTextField jftDatePaymentType;
     private javax.swing.JFormattedTextField jftMateDateBirth;
     private javax.swing.JFormattedTextField jftNumber;
@@ -4126,6 +4227,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateBirth;
     private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
+    private javax.swing.JLabel jlDateLastPosition;
     private javax.swing.JLabel jlDatePaymentType;
     private javax.swing.JLabel jlEmergencies;
     private javax.swing.JLabel jlEmergencies0;
@@ -4347,6 +4449,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mbUpdatingForm = true;
         mbPhotoChange = false;
         mbSignatureChange = false;
+        mbIsNewBizPartner = true;
         moXtaImageIconPhoto_n = null;
         jlImgPhoto.setIcon(null);
         jlImgPhoto.setText(SPanelQueryIntegralEmployee.NO_PHOTO);
@@ -4381,6 +4484,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalary.setSelected(false);
         jckChangeWage.setSelected(false);
         jckChangeSalarySscBase.setSelected(false);
+        
+        
         updateStatusDateBenefits(true);
         updateStatusDateLastHire(true);
         updateEmployeeNextNumber();
@@ -4389,6 +4494,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //itemStateSalary();    // invocked allready by itemStateChangePaymentType()
         //itemStateWage();      // invocked allready by itemStateChangePaymentType()
         itemStateSalarySscBaseChange(false);
+        itemStateChangePosition(false);
+        itemNewStateChangePosition(false, mbIsNewBizPartner, moEmployee);
         
         jtfSeniority.setText("");
         jtfAge.setText("");
@@ -4424,7 +4531,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moBenefitsVacBonPane.createTable(null);
         moBenefitsAnnBonPane.createTable(null);
         moWageFactorsPane.createTable(null);
-        
+         
         renderBenefitsAndWageFactors();
     }
 
@@ -4559,6 +4666,18 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         validation.setComponent(jftDateChangeSalarySscBase);                                
                         validation.setTabbedPaneIndex(TAB_DATA_EMP);
                     }
+                    else if (jckChangePosition.isSelected()) {
+                            if (moFieldDateLastPosition.getDate() == null) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateLastPosition.getText() + "' (fecha).");
+                            validation.setComponent(jftDateLastPosition);                                
+                            validation.setTabbedPaneIndex(TAB_DATA_EMP);
+                        }
+                            else if (moFieldDateLastPosition.getDate().after(moFieldDateBenefits.getDate()))  {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateLastPosition.getText() + "' (fecha). La fecha no debe de menor la inicio de beneficios");
+                            validation.setComponent(jftDateLastPosition);                                
+                            validation.setTabbedPaneIndex(TAB_DATA_EMP);
+                        }
+                    }                            
                 }
 
                 if (!validation.getIsError()) {
@@ -4762,6 +4881,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbUpdatingForm = true;
+        mbIsNewBizPartner = false;
 
         moBizPartner = (SDataBizPartner) registry;
         moEmployee = moBizPartner.getDbmsDataEmployee();
@@ -4817,6 +4937,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
         moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
         moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
+        if( jckChangePosition.isSelected() ) {
+            moFieldDateLastPosition.setFieldValue(moEmployee.getDatePosition());
+        } 
+        else {
+            moFieldDateLastPosition.setFieldValue(moEmployee.getDateLastHire());
+        }
         moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
         itemStateChangedDepartament();
         moFieldFkPosition.setFieldValue(new int[] { moEmployee.getFkPositionId() });
@@ -4895,6 +5021,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalary.setSelected(false);
         jckChangeWage.setSelected(false);
         jckChangeSalarySscBase.setSelected(moFieldSalarySscBase.getDouble() == 0);
+        jckChangePosition.setSelected(false);
         updateStatusDateBenefits(false);
         updateStatusDateLastHire(false);
 
@@ -4902,6 +5029,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //itemStateSalary();    // invocked allready by itemStateChangePaymentType()
         //itemStateWage();      // invocked allready by itemStateChangePaymentType()
         itemStateSalarySscBaseChange(false);
+        itemStateChangePosition(false);
+        itemNewStateChangePosition(false, mbIsNewBizPartner, moEmployee);
 
         mbUpdatingForm = false;
         enableButtonsPhoto(moXtaImageIconPhoto_n != null);
@@ -5150,6 +5279,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setFkEmployeeTypeId(moFieldFkEmployeeType.getKeyAsIntArray()[0]);
         moEmployee.setFkWorkerTypeId(moFieldFkWorkerType.getKeyAsIntArray()[0]);
         moEmployee.setFkMwzTypeId(moFieldFkMwzType.getKeyAsIntArray()[0]);
+        moEmployee.setDatePosition(moFieldDateLastPosition.getDate());
         moEmployee.setFkDepartmentId(moFieldFkDepartment.getKeyAsIntArray()[0]);
         moEmployee.setFkPositionId(moFieldFkPosition.getKeyAsIntArray()[0]);
         moEmployee.setFkShiftId(moFieldFkShift.getKeyAsIntArray()[0]);
@@ -5184,6 +5314,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         if (jckChangeSalarySscBase.isSelected()) {
             moEmployee.setAuxSalarySscBase(moFieldSalarySscBase.getDouble());
             moEmployee.setAuxDateSalarySscBase(moFieldDateChangeSalarySscBase.getDate());
+        }
+        
+        if (jckChangePosition.isSelected()) {
+            moEmployee.setAuxNewDepartamentId(moFieldFkDepartment.getKeyAsIntArray()[0]);
+            moEmployee.setAuxNewPositionId(moFieldFkDepartment.getKeyAsIntArray()[0]);
+            moEmployee.setAuxNewDatePosition(moFieldDateLastPosition.getDate());
         }
         
         SDataEmployeeRelatives relatives = new SDataEmployeeRelatives();
@@ -5323,6 +5459,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             else if (button == jbDateChangeSalarySscBase) {
                 actionDateSalarySscBaseChange();
             }
+            else if (button == jbDateLastPosition) {
+                actionDateLastPosition();
+            }
             else if (button == jbContractExpiration) {
                 actionContractExpiration();
             }
@@ -5370,6 +5509,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 }
                 else if (checkBox == jckChangeSalarySscBase) {
                     itemStateSalarySscBaseChange(true);
+                }
+                else if (checkBox == jckChangePosition) {
+                    itemStateChangePosition(true);
                 }
             }
             else if (e.getSource() instanceof javax.swing.JComboBox) {

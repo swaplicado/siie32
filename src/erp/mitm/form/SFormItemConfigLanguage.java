@@ -24,7 +24,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SFormItemConfigLanguage extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -370,8 +370,8 @@ public class SFormItemConfigLanguage extends javax.swing.JDialog implements erp.
 
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
-
-
+        moItemConfigLanguage = (SDataItemConfigLanguage) registry;
+                
         moFieldPkLanguageId.setFieldValue(new int[] { moItemConfigLanguage.getPkLanguageId() });
         moFieldItem.setFieldValue(moItemConfigLanguage.getItem());
         moFieldItemShort.setFieldValue(moItemConfigLanguage.getItemShort());
@@ -383,7 +383,7 @@ public class SFormItemConfigLanguage extends javax.swing.JDialog implements erp.
     }
 
     @Override
-    public erp.lib.data.SDataRegistry getRegistry() {
+    public erp.lib.data.SDataRegistry getRegistry() {        
         if (moItemConfigLanguage == null) {
             moItemConfigLanguage = new SDataItemConfigLanguage();
         }

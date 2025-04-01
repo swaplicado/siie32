@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * Used mainly in re-hiring and dismissal operations. The base class used in CRUD operations is SDataEmployee.
- * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
  */
 public class SDbEmployee extends SDbRegistryUser {
     
@@ -58,6 +58,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtDateSalary;
     protected Date mtDateWage;
     protected Date mtDateSalarySscBase;
+    protected Date mtDatePosition;
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
     protected int mnOvertimePolicy;
@@ -140,6 +141,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setDateSalary(Date t) { mtDateSalary = t; }
     public void setDateWage(Date t) { mtDateWage = t; }
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
+    public void setDatePosition(Date t) { mtDatePosition = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
     public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
@@ -199,6 +201,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public Date getDateSalary() { return mtDateSalary; }
     public Date getDateWage() { return mtDateWage; }
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
+    public Date getDatePosition() { return mtDatePosition; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
     public int getOvertimePolicy() { return mnOvertimePolicy; }
@@ -394,6 +397,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mtDateSalary = null;
         mtDateWage = null;
         mtDateSalarySscBase = null;
+        mtDatePosition = null;
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
         mnOvertimePolicy = 0;
@@ -504,6 +508,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mtDateSalary = resultSet.getDate("dt_sal");
             mtDateWage = resultSet.getDate("dt_wage");
             mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
+            mtDatePosition = resultSet.getDate("dt_pos");
             mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
             mtContractExpiration_n = resultSet.getDate("con_exp_n");
             mnOvertimePolicy = resultSet.getInt("overtime");
@@ -633,6 +638,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " + 
                     mnWorkingHoursDay + ", " + 
                     (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                     mnOvertimePolicy + ", " + 
@@ -699,6 +705,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "dt_sal = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalary) + "', " +
                     "dt_wage = '" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " +
                     "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
+                    "dt_pos = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePosition) + "', " + 
                     "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                     "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                     "overtime = " + mnOvertimePolicy + ", " +
