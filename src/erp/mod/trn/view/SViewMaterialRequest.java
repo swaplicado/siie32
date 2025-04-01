@@ -90,7 +90,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
      * @param params
      */
     public SViewMaterialRequest(SGuiClient client, int subType, String title, SGuiParams params) {
-        super(client, SGridConsts.GRID_PANE_VIEW, subType != SModConsts.TRNX_MAT_REQ_RECLASS ? SModConsts.TRN_MAT_REQ : SModConsts.TRNX_MAT_REQ_RECLASS, subType, title, params);
+        super(client, SGridConsts.GRID_PANE_VIEW, subType != SModConsts.TRNX_MAT_REQ_ACC ? SModConsts.TRN_MAT_REQ : SModConsts.TRNX_MAT_REQ_ACC, subType, title, params);
         initComponents();
     }
     
@@ -105,7 +105,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqAdmorRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasMatReqPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
-        hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);

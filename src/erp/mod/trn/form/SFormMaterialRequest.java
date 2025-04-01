@@ -1217,7 +1217,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         hasUserPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
         hasUserProvPurRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight ||
                 ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PUR).HasRight;
-        hasUserReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasUserReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         
         moDialogPickerItem = null;
         moDialogPickerItemRef = null;
@@ -1329,7 +1329,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void enableReqControls(boolean enable) {
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS && hasUserReclassRight && enable) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_ACC && hasUserReclassRight && enable) {
             moTextTypeReq.setEnabled(false);
             moDecTotal.setEnabled(false);
             moKeyProvEnt.setEnabled(false);
@@ -1402,7 +1402,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void enableEntryControls(boolean enable) {
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS && hasUserReclassRight && enable) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_ACC && hasUserReclassRight && enable) {
             moDecUnitPriceSis.setEnabled(false);
             moDecTotalEty.setEnabled(false);
             moDecUnitPriceUsr.setEnabled(false); // se deja en falso temporalmente para que tome el mismo valor que el precio de sistema, regresar a enable para funcionalidad predefinida 24/01/2024
@@ -1457,7 +1457,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
             jbRegisterEty.setEnabled(enable);
             jbCancelEty.setEnabled(enable);
-            jbNewEty.setEnabled(isRegistryEditable && !enable && getFormSubtype() != SModConsts.TRNX_MAT_REQ_RECLASS);
+            jbNewEty.setEnabled(isRegistryEditable && !enable && getFormSubtype() != SModConsts.TRNX_MAT_REQ_ACC);
             moTextItemRefEty.setEnabled(false);
         }
         
@@ -1681,7 +1681,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private void enableGridButtons() {
         if (moGridMatReqList.getTable().getSelectedRow() >= 0 && isRegistryEditable) {
             jbEditEty.setEnabled(true);
-            jbDeleteEty.setEnabled(true && getFormSubtype() != SModConsts.TRNX_MAT_REQ_RECLASS);
+            jbDeleteEty.setEnabled(true && getFormSubtype() != SModConsts.TRNX_MAT_REQ_ACC);
         }
         else {
             if (moGridMatReqList.getSelectedGridRow() != null) {
@@ -2469,7 +2469,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             enableReqControls(true);
             isRegistryEditable = true;
         }
-        else if (moRegistry.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_NEW || getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS) {
+        else if (moRegistry.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_NEW || getFormSubtype() == SModConsts.TRNX_MAT_REQ_ACC) {
             enableReqControls(true);
             isRegistryEditable = true;
         }
@@ -2554,7 +2554,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         registry.setFkWarehouseWarehouse_n(moKeyWhs.getSelectedIndex() == 0 ? 0 : moKeyWhs.getValue()[1]);
         registry.setFkItemReferenceId_n(moKeyItemRef.getSelectedIndex() == 0 ? 0 : moKeyItemRef.getValue()[0]);
         
-        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_RECLASS) {
+        if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_ACC) {
             registry.setAuxChangeStatus(true);
         }
         

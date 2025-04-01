@@ -175,7 +175,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenu jmMenuReqAll;
     private javax.swing.JMenuItem jmiReqAll;
-    private javax.swing.JMenuItem jmiReqAllReclass;
+    private javax.swing.JMenuItem jmiReqAllAcc;
     private javax.swing.JMenuItem jmiCatMatCostCenterGrp;
     private javax.swing.JMenuItem jmiCatMatConsumptionEnt;
     private javax.swing.JMenuItem jmiCatMatConsumptionSubent;
@@ -293,7 +293,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightValMatCons = false;
         boolean hasRightStkCommPrice = false;
         int rightValMatConsLevel = 0;
-        boolean hasRightMatReqReclass = false;
+        boolean hasRightMatReqAcc = false;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -698,7 +698,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         
         jmMenuReqAll = new JMenu("Todas las RM");
         jmiReqAll = new JMenuItem("Todas las RM");
-        jmiReqAllReclass = new JMenuItem("Todas las RM (reclasificación contable)");
+        jmiReqAllAcc = new JMenuItem("Todas las RM (reclasificación contable)");
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
         
         jmMenuReq.add(jmiReqPetNew);
@@ -740,7 +740,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmMenuReqAll);
         jmMenuReqAll.add(jmiReqAll);
         jmMenuReqAll.addSeparator();
-        jmMenuReqAll.add(jmiReqAllReclass);
+        jmMenuReqAll.add(jmiReqAllAcc);
         jmMenuReqAll.addSeparator();
         jmMenuReqAll.add(jmiReqMatConsumptionEntBudget);
         
@@ -773,7 +773,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqFollowingPurClosed.addActionListener(this);
         jmiReqPendEstDet.addActionListener(this);
         jmiReqAll.addActionListener(this);
-        jmiReqAllReclass.addActionListener(this);
+        jmiReqAllAcc.addActionListener(this);
         jmiReqMatConsumptionEntBudget.addActionListener(this);
                
         jmMenuStk = new JMenu("Inventarios");
@@ -919,7 +919,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMatReqAdm = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         hasRightValMatCons = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_VAL_MAT_CONS).HasRight;
         rightValMatConsLevel = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_VAL_MAT_CONS);
-        hasRightMatReqReclass = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_RECLASS).HasRight;
+        hasRightMatReqAcc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         hasRightStkCommPrice = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_STOCK_COMM_PRICE).HasRight;
         
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
@@ -1032,7 +1032,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqFollowingPurClosed.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
-        jmiReqAllReclass.setEnabled(hasRightMatReqReclass);
+        jmiReqAllAcc.setEnabled(hasRightMatReqAcc);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
         jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
@@ -2067,9 +2067,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModConsts.TRNX_MAT_REQ_ALL, null);
             }
-            else if (item == jmiReqAllReclass) {
+            else if (item == jmiReqAllAcc) {
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_RECLASS);
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_RECLASS, SModConsts.TRNX_MAT_REQ_RECLASS, params);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_ACC, SModConsts.TRNX_MAT_REQ_ACC, params);
             }
             else if (item == jmiCatMatCostCenterGrp) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_CC_GRP, SLibConstants.UNDEFINED, null);

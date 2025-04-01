@@ -288,7 +288,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
             case SModConsts.TRNX_MAT_REQ_EST:
-            case SModConsts.TRNX_MAT_REQ_RECLASS:
+            case SModConsts.TRNX_MAT_REQ_ACC:
                 registry = new SDbMaterialRequest();
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
@@ -651,7 +651,7 @@ public class SModuleTrn extends SGuiModule {
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
-            case SModConsts.TRNX_MAT_REQ_RECLASS:
+            case SModConsts.TRNX_MAT_REQ_ACC:
                 title = "Todas las RM (reclasificación ctb.)";
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
@@ -986,12 +986,12 @@ public class SModuleTrn extends SGuiModule {
                 }
                 form = moFormMaterialReq;
                 break;
-            case SModConsts.TRNX_MAT_REQ_RECLASS:
+            case SModConsts.TRNX_MAT_REQ_ACC:
                 if (moFormMaterialReq == null) { 
-                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales (Reclasificación contable)", subtype);
+                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales (reclasificación contable)", subtype);
                 }
                 else {
-                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subtype, "Requisición de materiales (Reclasificación contable)");
+                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subtype, "Requisición de materiales (reclasificación contable)");
                 }
                 form = moFormMaterialReq;
                 break;
