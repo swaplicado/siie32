@@ -1,17 +1,16 @@
-
 ===============================================================================
-SIIE 3.2 267.3/ 2025-03-31 
+SIIE 3.2 267.4/ 2025-03-31 
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
--Adición del campo ultima fecha de cambio departamentos y puestos
--Bitacora de cambio de departamentos y puestos
--Reporte detallado de contratos
--Correción al editar los nombre en ingles de los ítems
--Tabla de cuotas patronales
--Reportes de cuotas patronales
--Adición a reportes de ventas (Agente de ventas, pais y localidad)
--Adicion vistas para SISUB (Solo vistas)
--Corrección vista de IDSE
+1) Adición del campo última fecha de cambio departamentos y puestos.
+2) Implementación de bitácora de cambio de departamentos y puestos.
+3) Implementación de reporte detallado de contratos.
+4) Correción al editar los nombre en idioma extranjero de ítems.
+5) Implementación de tabla de cuotas patronales.
+6) Implementación de consultas para la provisión de cuotas patronales.
+7) Mejoramiento a reportes de ventas: agente de ventas, país y localidad.
+8) Implementación de consultas para SISUB (solo vistas).
+9) Corrección a vista de IDSE.
 
 ================================================================================
 SIIE 3.2 267.3/ 2025-03-31
