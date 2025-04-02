@@ -1,4 +1,11 @@
 ===============================================================================
+SIIE 3.2 267.5/ 2025-04-02
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección de reportes de saldos (Cambio de lugar de entrega a lugar de origen del asociado)
+2) Corrección de vistas de ventas netas  (Cambio de lugar de entrega a lugar de origen del asociado)
+
+===============================================================================
 SIIE 3.2 267.4/ 2025-03-31 
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------

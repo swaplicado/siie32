@@ -638,7 +638,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 " LIMIT 1) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
-                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.id_bpb = d.fid_cob " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
                 " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
                 " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
@@ -690,7 +690,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 " LIMIT 1) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
-                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.id_bpb = d.fid_cob " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
                 " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
                 " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
@@ -744,9 +744,9 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 " LIMIT 1) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
-                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.id_bpb = d.fid_cob " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
-                " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
+                " INNER JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
                 " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
                 " ad.locality, " +
                 " " + sqlColumns + "0 AS f_stot_r, 0 AS f_adj_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
