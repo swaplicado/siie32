@@ -34,7 +34,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -112,7 +112,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jpCompanyPrivileges = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Derechos de usuario");
+        setTitle("Permisos de usuario");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -218,9 +218,9 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jPanel9.add(jpPanel9, java.awt.BorderLayout.CENTER);
 
         jPanel7.add(jPanel9, java.awt.BorderLayout.CENTER);
-        jPanel9.getAccessibleContext().setAccessibleName(null);
+        jPanel9.getAccessibleContext().setAccessibleName("null");
 
-        jTabbedPane1.addTab("Derechos a nivel usuario", jPanel7);
+        jTabbedPane1.addTab("Permisos a nivel de usuario", jPanel7);
 
         jPanel6.setLayout(new java.awt.BorderLayout());
 
@@ -286,7 +286,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel6.add(jPanel11, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Derechos a nivel empresa", jPanel6);
+        jTabbedPane1.addTab("Permisos a nivel de empresa", jPanel6);
 
         jPanel4.add(jTabbedPane1, java.awt.BorderLayout.PAGE_START);
 
@@ -294,8 +294,8 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-950)/2, (screenSize.height-600)/2, 950, 600);
+        setSize(new java.awt.Dimension(950, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

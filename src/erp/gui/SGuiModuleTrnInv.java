@@ -232,7 +232,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportBudget;
     private javax.swing.JMenuItem jmiReportBudgetSummary;
     private javax.swing.JMenuItem jmiReportWarehouseConsumptionDetail;
-    private javax.swing.JMenu jmMenuRepStats;
+    private javax.swing.JMenu jmMenuRepMfgStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendEntryMass;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumedMass;
@@ -296,6 +296,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMatReqAcc = false;
 
         jmMenuCat = new JMenu("Catálogos");
+        
         jmiCatStockLot = new JMenuItem("Lotes");
         jmiCatStockConfig = new JMenuItem("Máximos y mínimos");
         jmiCatStockAdjustmentType = new JMenuItem("Tipos de ajuste de inventario");
@@ -870,23 +871,23 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportBudgetSummary.addActionListener(this);
         jmiReportWarehouseConsumptionDetail.addActionListener(this);
 
-        jmMenuRepStats = new JMenu("Estadísticas de producción");
+        jmMenuRepMfgStats = new JMenu("Estadísticas de producción");
         jmiRepStatsMfgConsumePendMass = new JMenuItem("Masa de insumos y productos por consumir");
         jmiRepStatsMfgConsumePendEntryMass = new JMenuItem("Masa de insumos y productos por consumir a detalle");
         jmiRepStatsMfgConsumedMass = new JMenuItem("Masa de insumos y productos consumidos");
         jmiRepStatsMfgConsumedEntryMass = new JMenuItem("Masa de insumos y productos consumidos a detalle");
-        jmMenuRepStats.add(jmiRepStatsMfgConsumePendMass);
-        jmMenuRepStats.add(jmiRepStatsMfgConsumePendEntryMass);
-        jmMenuRepStats.addSeparator();
-        jmMenuRepStats.add(jmiRepStatsMfgConsumedMass);
-        jmMenuRepStats.add(jmiRepStatsMfgConsumedEntryMass);
+        jmMenuRepMfgStats.add(jmiRepStatsMfgConsumePendMass);
+        jmMenuRepMfgStats.add(jmiRepStatsMfgConsumePendEntryMass);
+        jmMenuRepMfgStats.addSeparator();
+        jmMenuRepMfgStats.add(jmiRepStatsMfgConsumedMass);
+        jmMenuRepMfgStats.add(jmiRepStatsMfgConsumedEntryMass);
         jmiRepStatsMfgConsumePendMass.addActionListener(this);
         jmiRepStatsMfgConsumePendEntryMass.addActionListener(this);
         jmiRepStatsMfgConsumedMass.addActionListener(this);
         jmiRepStatsMfgConsumedEntryMass.addActionListener(this);
         
         jmMenuRep.addSeparator();
-        jmMenuRep.add(jmMenuRepStats);
+        jmMenuRep.add(jmMenuRepMfgStats);
 
         hasRightInPur = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_PUR).HasRight;
         hasRightInSal = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_SAL).HasRight;
@@ -942,10 +943,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatAccMatCostCenterGroupUser.setEnabled(hasRightMatReqAdm);
         jmiCatMatConsumptionSubentCCGrp.setEnabled(hasRightMatReqAdm);
         jmiCatAccMatConsumptionSubentCCGrp.setEnabled(hasRightMatReqAdm);
+        
         jmMenuDpsPurSup.setEnabled(hasRightInPur);
         jmMenuDpsPurRet.setEnabled(hasRightOutPur);
         jmMenuDpsSalSup.setEnabled(hasRightOutSal);
         jmMenuDpsSalRet.setEnabled(hasRightInSal);
+        
         jmMenuMfg.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
         jmiMfgPanelProdOrder.setEnabled(true);
         jmiMfgAssignPend.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
@@ -962,6 +965,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMfgConsumePendEntry.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
         jmiMfgConsumed.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
         jmiMfgConsumedEntry.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
+        
         jmMenuIog.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt || hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
         jmiIogMfgRmAssign.setEnabled(hasRightMfgRmAsg);
         jmiIogMfgRmReturn.setEnabled(hasRightMfgRmDev);
@@ -982,6 +986,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        
         jmMenuMaint.setEnabled(hasRightMaint);
         jmiMaintStockPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
         jmiMaintStockToolAvl.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
@@ -1003,6 +1008,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMaintUserContractorSupv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        
         jmMenuReq.setEnabled(hasRightMatReqPet || hasRightMatReqRev || hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllConsEnt.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
         jmiReqAllSupEnt.setEnabled(hasRightMatReqPet || hasRightMatReqAdm);
@@ -1034,6 +1040,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllAcc.setEnabled(hasRightMatReqAcc);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
+        
         jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
         jmiStkStockLot.setEnabled(hasRightStock);
@@ -1050,14 +1057,20 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockClosingCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmMenuRep.setEnabled(hasRightReports);
-        jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
+        
+        jmMenuRep.setEnabled(hasRightReports && (hasRightStock || hasRightValMatCons || hasRightMfgRmAsg || hasRightMfgRmDev));
+        jmiReportStock.setEnabled(hasRightStock);
+        jmiReportStockPeriod.setEnabled(hasRightStock);
+        jmiReportStockMoves.setEnabled(hasRightStock);
+        jmiReportStockMovesSumSum.setEnabled(hasRightStock);
+        jmiReportStockTrackingLot.setEnabled(hasRightStock);
         jmiReportMatCons.setEnabled(hasRightValMatCons);
         jmiReportMatConsCC.setEnabled(hasRightValMatCons);
         jmiReportMatConsCCRes.setEnabled(hasRightValMatCons);
         jmiReportBudget.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_EDITOR);
         jmiReportBudgetSummary.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_EDITOR);
         jmiReportWarehouseConsumptionDetail.setEnabled(hasRightValMatCons);
+        jmMenuRepMfgStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
 
         moDialogDiogSaved = new SDialogDiogSaved(miClient);
         moDialogUtilStockClosing = new SDialogUtilStockClosing(miClient);

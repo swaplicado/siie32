@@ -49,8 +49,8 @@ public class SViewUserRight extends erp.lib.table.STableTab {
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_rol_usr", "Roles usr.", STableConstants.WIDTH_BOOLEAN_3X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_prv_usr", "Privilegios usr.", STableConstants.WIDTH_BOOLEAN_3X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_rol_usr", "Roles usuario", STableConstants.WIDTH_BOOLEAN_3X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_prv_usr", "Privilegios usuario", STableConstants.WIDTH_BOOLEAN_3X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_rol_co", "Roles empresa", STableConstants.WIDTH_BOOLEAN_3X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_prv_co", "Privilegios empresa", STableConstants.WIDTH_BOOLEAN_3X);
 

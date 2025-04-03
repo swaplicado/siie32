@@ -13,8 +13,9 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.mtrn.data.SDataUserConfigurationTransaction;
 import erp.mtrn.form.SFormUserConfigurationTransaction;
-import erp.musr.data.*;
-import erp.musr.form.*;
+import erp.musr.data.SDataUser;
+import erp.musr.form.SFormUser;
+import erp.musr.form.SFormUserRight;
 import erp.redis.form.SFormRedisSessions;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -61,7 +62,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiAccessCompany = new JMenuItem("Acceso a empresas");
         jmiAccessCompanyBranch = new JMenuItem("Acceso a sucursales de empresas");
         jmiAccessCompanyBranchEntity = new JMenuItem("Acceso a entidades de sucursales");
-        jmiUserRight = new JMenuItem("Derechos de usuarios");
+        jmiUserRight = new JMenuItem("Permisos de usuarios");
         jmiUserRightRole = new JMenuItem("Roles de usuarios");
         jmiUserRightPrivilege = new JMenuItem("Privilegios de usuarios");
         jmiUserConfigurationTransaction = new JMenuItem("Configuración de usuarios para transacciones");
@@ -210,7 +211,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                     break;
                 case SDataConstants.USRX_RIGHT:
                     oViewClass = erp.musr.view.SViewUserRight.class;
-                    sViewTitle = "Derechos usuarios";
+                    sViewTitle = "Permisos usuarios";
                     break;
                 case SDataConstants.USRX_RIGHT_ROL:
                     oViewClass = erp.musr.view.SViewUserRightRole.class;
