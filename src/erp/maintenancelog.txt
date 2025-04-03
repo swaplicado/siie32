@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.5 267.5/ 2025-04-02
+SIIE 3.5 267.6/ 2025-04-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Revisión y estandarización de términos en permisos de usuarios.
@@ -9,8 +9,8 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 267.5/ 2025-04-02
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección de reportes de saldos (Cambio de lugar de entrega a lugar de origen del asociado)
-2) Corrección de vistas de ventas netas  (Cambio de lugar de entrega a lugar de origen del asociado)
+1) Corrección de reportes de saldos (cambio de lugar de entrega a lugar de origen del asociado.)
+2) Corrección de vistas de ventas netas (cambio de lugar de entrega a lugar de origen del asociado.)
 
 ===============================================================================
 SIIE 3.2 267.4/ 2025-03-31 
