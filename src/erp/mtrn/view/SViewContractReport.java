@@ -5,14 +5,11 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mitm.form.SPanelFilterItemGeneric;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
@@ -58,6 +55,7 @@ public class SViewContractReport extends erp.lib.table.STableTab implements java
     
     public SViewContractReport(erp.client.SClientInterface client, java.lang.String tabTitle, int type) {
         this(client, tabTitle, type, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_EST_CON);
+         initComponents();
     }
 
     private void initComponents() {
@@ -282,8 +280,7 @@ public class SViewContractReport extends erp.lib.table.STableTab implements java
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 if (setting.getSetting() != null) {
                     int[] period = (int[]) setting.getSetting();
-                    if (period.length >= 2) { // Aseguramos que haya al menos año y mes
-                        // Filtramos por año y mes específicos
+                    if (period.length >= 2) { 
                         sqlDateYear = period[0];
                         sqlDatePeriod =  period[1];
                     }
@@ -356,8 +353,8 @@ public class SViewContractReport extends erp.lib.table.STableTab implements java
                 + "AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0)) / NULLIF(de.orig_qty, 0)) * 100, 0), 2) AS porcentaje_surtido "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                + "AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + sqlDpsType
-                + "AND d.fid_cob = " + (Integer) setting.getSetting() + " "
+                + "AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " + sqlDpsType
+                + "AND d.fid_cob != " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
                 + "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
                 + "INNER JOIN erp.trnu_dps_nat AS dn ON d.fid_dps_nat = dn.id_dps_nat "
                 + "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb "
