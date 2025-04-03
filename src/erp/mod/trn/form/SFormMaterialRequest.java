@@ -2526,6 +2526,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (registry.isRegistryNew()) {
             registry.setFkMatProvisionStatusId(SModSysConsts.TRNS_ST_MAT_PROV_NA);
             registry.setFkMatPurchaseStatusId(SModSysConsts.TRNS_ST_MAT_PUR_NA);
+            registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         }
         if (registry.isRegistryNew() || moRegistry.getFkMatProvisionEntityId() != moKeyProvEnt.getValue()[0]) {
             registry.setNumber(getNextNumber());
@@ -2547,7 +2548,6 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (!isProvPurForm) {
             registry.setFkMatRequestStatusId(mnStatusReqId);
         }
-        registry.setFkUserRequesterId(moKeyUsrReq.getValue()[0]);
         registry.setFkContractorId_n(moKeyContractor.getSelectedIndex() == 0 ? 0 : moKeyContractor.getValue()[0]);
         registry.setFkDpsNatureId(moKeyDocNature.getValue()[0]);
         registry.setFkWarehouseCompanyBranch_n(moKeyWhs.getSelectedIndex() == 0 ? 0 : moKeyWhs.getValue()[0]);
