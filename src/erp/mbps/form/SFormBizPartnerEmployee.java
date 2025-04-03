@@ -4643,7 +4643,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                             validation.setComponent(jftDateLastPosition);                                
                             validation.setTabbedPaneIndex(TAB_DATA_EMP);
                         }
-                            else if (moFieldDateLastPosition.getDate().after(moFieldDateBenefits.getDate()))  {
+                            else if (moFieldDateLastPosition.getDate().before(moFieldDateBenefits.getDate()) || 
+                            moFieldDateLastPosition.getDate().equals(moFieldDateBenefits.getDate()))  {
                             validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateLastPosition.getText() + "' (fecha). La fecha no debe de menor la inicio de beneficios");
                             validation.setComponent(jftDateLastPosition);                                
                             validation.setTabbedPaneIndex(TAB_DATA_EMP);
