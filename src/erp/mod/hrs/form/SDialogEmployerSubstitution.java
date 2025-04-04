@@ -594,7 +594,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
                     in order to accomplish the task of exporting the employee to a new set of friend companies within ERP.
                     */
                     
-                    SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(connection); // a Connection instance is needed for first-hiring movements
+                    SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(connection, miClient.getSession()); // a Connection instance is needed for first-hiring movements
                     //hrsEmployeeHireLog.setPkEmployeeHireLogId(...);
                     hrsEmployeeHireLog.setPkEmployeeId(moEmployee.getPkEmployeeId());
                     //hrsEmployeeHireLog.setLastHireDate(...);
@@ -613,6 +613,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog implements Item
                     moEmployee.setActive(true); // re-active this inactive employee
                     moEmployee.setDateBenefits(moDateBenefits.getValue());
                     moEmployee.setDateLastHire(moDateHiring.getValue());
+                    moEmployee.setDatePosition(moDateHiring.getValue());
                     moEmployee.setFkSourceCompanyId(moKeyNewEmployer.getValue()[0]);
                     
                     moEmployee.setAuxHireLogDate(moDateHiring.getValue());

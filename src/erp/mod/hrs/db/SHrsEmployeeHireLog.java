@@ -45,7 +45,23 @@ public class SHrsEmployeeHireLog {
     protected int mnRequestMode;
     protected Connection moRequestFormerEmployerConnection;
     
-    private SHrsEmployeeHireLog(final Connection connection, final SGuiSession session) {
+    /**
+     * Create an instance for processing hiring-dismissal movements.
+     * When connection provided, first-hiring movements will be processed.
+     * @param connection Database conection (for former framework of SIIE).
+     */
+    public SHrsEmployeeHireLog(final Connection connection) {
+        this(connection, null);
+    }
+
+    /**
+     * Create an instance for processing hiring-dismissal movements.
+     * When connection provided, first-hiring movements will be processed.
+     * On the other hand, when GUI session provided, modification and correction movements will be processed.
+     * @param connection Database conection (for former framework of SIIE).
+     * @param session GUI session.
+     */
+    public SHrsEmployeeHireLog(final Connection connection, final SGuiSession session) {
         moConnection = connection;
         moSession = session;
         
@@ -64,16 +80,6 @@ public class SHrsEmployeeHireLog {
         mbRequestFirstHiring = false;
         mnRequestMode = 0;
         moRequestFormerEmployerConnection = null;
-    }
-
-    /**
-     * Create an instance for processing hiring-dismissal movements.
-     * When connection provided, supposedly first-hiring movements will be processed.
-     * On the other hand, when GUI session provided, supposedly modification and correction movements will be processed.
-     * @param connection Database conection (for former framework of SIIE).
-     */
-    public SHrsEmployeeHireLog(final Connection connection) {
-        this(connection, null);
     }
 
     /**
