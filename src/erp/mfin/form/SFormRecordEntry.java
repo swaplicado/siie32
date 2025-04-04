@@ -1966,6 +1966,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moFinRecordEntry.ItemKey = moItem.getPkItemId();
             if (jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
                 moFinRecordEntry.Quantity = 0;
+                moFinRecordEntry.ItemAuxKey = moItemAux.getPkItemId();
             }
             else {
                 moFinRecordEntry.Quantity = moFieldUnits.getDouble();

@@ -3964,8 +3964,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             try {
                 //moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId())); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId())}, SLibConstants.EXEC_MODE_SILENT);
-                moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
-                jcbFkItemId.requestFocus();
+                if (costCenter != null) {
+                    moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                    jcbFkItemId.requestFocus();
+                }
+                else {
+                    moCostCenterPanel.initPanel();
+                }
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
