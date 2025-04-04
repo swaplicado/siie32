@@ -1,4 +1,22 @@
 ================================================================================
+SIIE 3.2 267.98/ 2025-04-04
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a las vistas de ventas: agente de ventas, país y localidad.
+
+================================================================================
+SIIE 3.2 267.8/ 2025-04-03
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio al guardar las RM para ingresar el usuario solicitante únicamente cuando esta sea nueva, con el fin de poder modificarla cuando el usuario ya no esté activo.
+
+===============================================================================
+SIIE 3.2 267.7/ 2025-04-02
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección mensaje de error y validación al capturar la fecha del cambio de puesto
+
+================================================================================
 SIIE 3.5 267.6/ 2025-04-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -101,7 +101,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         populateTable();
     }
 
-    private void renderTableColumns() {
+        private void renderTableColumns() {
         int i = 0;
 
         moTablePane.reset();
@@ -632,17 +632,23 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         msSql = "SELECT " + sqlColumns + " MAX(sales_agent) AS sales_agent, MAX(country) AS country, locality, SUM(f_stot_r) AS f_stot_r, SUM(f_adj_r) AS f_adj_r, SUM(f_adj_d) AS f_adj_d, SUM(f_stot_net) AS f_stot_net, symbol, cur_key, " +
                 createColumnsUnitsSum() + " " +
                 "FROM (" +
-                "(SELECT  (SELECT bp2.bp " +
-                "FROM erp.bpsu_bp AS bp2 " +
-                " WHERE bp2.id_bp = doc.fid_sal_agt_n " +
-                " LIMIT 1) AS sales_agent, " +
+                "(SELECT " + sqlColumns + "COALESCE(SUM(" + columnStot + "), 0) AS f_stot_r, " +
+                " (SELECT bp.bp " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.bpsu_bp AS bp on bp.id_bp = d.fid_sal_agt_n " +
+                " WHERE d.id_year = doc.id_year AND doc.id_doc = doc.id_doc LIMIT 1 ) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
                 " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
                 " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
-                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
-                " ad.locality, " + sqlColumns + "COALESCE(SUM(" + columnStot + "), 0) AS f_stot_r, " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS country, " +
+                " (SELECT ad.locality " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
+                " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
+                " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS locality, " +
                 "0 AS f_adj_r, 0 AS f_adj_d, " +
                 "COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net, " +
                 sqlColumnsUnit + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
@@ -673,8 +679,6 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                         "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
-                "INNER JOIN erp.BPSU_BPB_ADD AS ad ON " +
-                "ad.id_bpb = doc.fid_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
                 "AND doc.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " " +
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " " +
@@ -684,17 +688,24 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 sqlCompanyBranch + sqlDatePeriod + sqlFunctAreas +
                 sqlGroupOrder + ") " +
                 "UNION " +
-                "(SELECT (SELECT bp2.bp " +
-                "FROM erp.bpsu_bp AS bp2 " +
-                " WHERE bp2.id_bp = doc.fid_sal_agt_n " +
-                " LIMIT 1) AS sales_agent, " +
+                "(SELECT " + sqlColumns + "0 AS f_stot_r, " +
+                " (SELECT bp.bp " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.bpsu_bp AS bp on bp.id_bp = d.fid_sal_agt_n " +
+                " WHERE d.id_year = doc.id_year AND doc.id_doc =doc.id_doc LIMIT 1 ) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
                 " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
                 " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
-                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
-                " ad.locality, " + sqlColumns + "0 AS f_stot_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_r, 0 AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS country, " +
+                " (SELECT ad.locality " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
+                " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
+                " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS locality, " +
+                " COALESCE(SUM(" + columnStot + "), 0) AS f_adj_r, 0 AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
                 createColumnsUnitsRet() + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                 (mnUnitTotalType == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                     mnUnitTotalType == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
@@ -727,8 +738,6 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                         "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
-                "INNER JOIN erp.BPSU_BPB_ADD AS ad ON " +
-                "ad.id_bpb = doc.fid_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
                 "AND doc.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " " +
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
@@ -738,18 +747,25 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
                 sqlCompanyBranch + sqlDatePeriod + sqlFunctAreas +
                 sqlGroupOrder + ") " +
-                "UNION (SELECT (SELECT bp2.bp " +
-                "FROM erp.bpsu_bp AS bp2 " +
-                " WHERE bp2.id_bp = doc.fid_sal_agt_n " +
-                " LIMIT 1) AS sales_agent, " +
+                "UNION " +
+                "(SELECT " + sqlColumns + "0 AS f_stot_r, " +
+                " (SELECT bp.bp " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.bpsu_bp AS bp on bp.id_bp = d.fid_sal_agt_n " +
+                " WHERE d.id_year = doc.id_year AND doc.id_doc = doc.id_doc LIMIT 1 ) AS sales_agent, " +
                 " (SELECT COALESCE(ct.cty, (SELECT cty FROM erp.LOCU_CTY WHERE id_cty = 1)) AS cty_final " +
                 " FROM trn_dps AS d " +
                 " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
                 " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
-                " INNER JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
-                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc) AS country, " +
-                " ad.locality, " +
-                " " + sqlColumns + "0 AS f_stot_r, 0 AS f_adj_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
+                " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS country, " +
+                " (SELECT ad.locality " +
+                " FROM trn_dps AS d " +
+                " INNER JOIN erp.BPSU_BPB AS bpb ON bpb.fid_bp = d.fid_bp_r " +
+                " INNER JOIN erp.BPSU_BPB_ADD AS ad ON ad.id_bpb = bpb.id_bpb " +
+                " LEFT JOIN erp.LOCU_CTY AS ct ON ct.id_cty = ad.fid_cty_n " +
+                " WHERE d.id_year = doc.id_year AND d.id_doc = doc.id_doc LIMIT 1 ) AS locality, " +
+                 " 0 AS f_adj_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
                 createColumnsUnitsDis() + ", (SELECT unit_base FROM erp.itmu_tp_unit WHERE id_tp_unit = " +
                 (mnUnitTotalType == SDataConstantsSys.TRNX_TP_UNIT_TOT_QTY ? SDataConstantsSys.ITMU_TP_UNIT_QTY :
                     mnUnitTotalType == SDataConstantsSys.TRNX_TP_UNIT_TOT_LEN ? SDataConstantsSys.ITMU_TP_UNIT_LEN :
@@ -782,8 +798,6 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                         "LEFT JOIN erp.itmu_item AS ir ON e.fid_item_ref_n = ir.id_item LEFT JOIN erp.itmu_igen AS irg ON ir.fid_igen = irg.id_igen " : "") +
                 "INNER JOIN erp.bpsu_bpb AS cob ON " +
                 "doc.fid_cob = cob.id_bpb " +
-                "INNER JOIN erp.BPSU_BPB_ADD AS ad ON " +
-                "ad.id_bpb = doc.fid_bpb " +
                 "WHERE e.b_del = FALSE AND doc.b_del = FALSE " +
                 "AND doc.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " " +
                 "AND doc.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " " +
@@ -803,7 +817,6 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
 
         }
     }
-    
 
     @Override
     public void actionEdit() {
