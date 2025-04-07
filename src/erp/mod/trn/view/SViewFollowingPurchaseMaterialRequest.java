@@ -164,6 +164,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
                 + "LPAD(r.num, " + SDataConstantsSys.NUM_LEN_MAT_REQ + ", 0) AS " + SDbConsts.FIELD_CODE + ", "
                 + "r.dt AS " + SDbConsts.FIELD_DATE + ", "
                 + "ur.usr AS _user, "
+                + "'' AS f_name, "
                 + "re.dt_req_n AS _req_date, "
                 + "mp.name AS _pty_req, "
                 + "ireq.item AS _item_req, "
@@ -186,8 +187,8 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
                 + "dp.dt_doc_delivery_n AS _ord_deli_date, "
                 + "bp.bp, "
                 + "ip.item AS _item, "
-                + "dpe._qty, "
-                + "up._symbol, "
+                + "dpe.qty, "
+                + "up.symbol, "
                 //+ "#AUTORIZACIÓN\n" //preservar para depuración de la consulta
                 + "MIN(dpa.ts_new) AS _first_auth_date, "
                 + "MAX(dpa.ts_new) AS _last_auth_date, "
@@ -215,7 +216,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " AS sls ON "
                 + "r.id_mat_req = sls.id_mat_req AND sls.fk_st_mat_req = 4 "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS mp ON "
-                + "re.fk_mat__req_pty_n = mp.id_mat__req_pty "
+                + "re.fk_mat_req_pty_n = mp.id_mat_req_pty "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS ir ON "
                 + "re.fk_item_ref_n = ir.id_item "
                 //+ "#DPS PEDIDO Y FACTURA\n" //preservar para depuración de la consulta
@@ -295,8 +296,8 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_ord_deli_date", "Fecha entrega pedido"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp", "Asociado negocios"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "_item", "Item pedido"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_qty", "Cantidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "_symbol", "Unidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "qty", "Cantidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "_first_auth_date", "Pri fecha envío autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "_last_auth_date", "Ult fecha envío autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "_ord_auth", "Fecha autorización pedido"));
