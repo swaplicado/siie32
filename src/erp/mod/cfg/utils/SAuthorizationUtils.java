@@ -292,11 +292,16 @@ public abstract class SAuthorizationUtils {
      * 
      * @param statement
      * @param pk
+     * @param bCode
      * 
      * @return 
      */
-    public static String getDpsFolio(java.sql.Statement statement, int[] pk) {
-        String sql = "SELECT CONCAT(td.code, ' ', CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip "
+    public static String getDpsFolio(java.sql.Statement statement, int[] pk, boolean bCode) {
+        String sql = "SELECT CONCAT(";
+        if (bCode) {
+            sql += "td.code, ' ', ";
+        }
+            sql += "CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS td ON d.fid_ct_dps = td.id_ct_dps AND d.fid_cl_dps = td.id_cl_dps AND d.fid_tp_dps = td.id_tp_dps "
                 + "WHERE id_year = " + ((int[]) pk)[0] +" AND id_doc = " + ((int[]) pk)[1] + " ";
