@@ -395,7 +395,7 @@ public abstract class SFinAccountUtilities {
                     "aii.id_acc_item = ai.id_acc_item AND ai.b_del = 0 " +
                     "WHERE aii.id_tp_link = " + type + " AND aii.id_ref = " + idReference + " AND aii.id_bkc = " + idBkc + " AND " +
                     "aii.id_dt_start <= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' AND aii.b_del = 0 " +
-                    "ORDER BY aii.id_dt_start DESC, aii.id_acc_item ";
+                    "ORDER BY aii.id_dt_start DESC, aii.ts_edit DESC, aii.id_acc_item ";
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
                 idAccount = resultSet.getInt("aii.id_acc_item");

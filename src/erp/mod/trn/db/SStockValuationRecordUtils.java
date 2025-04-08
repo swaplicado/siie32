@@ -74,15 +74,35 @@ public class SStockValuationRecordUtils {
         if ((n * 2) > oCfg.getMaxRecEntries()) {
             throw new Exception("No se puede realizar esta acción, excedería el número máximo de partidas para la póliza, pruebe con un periodo de tiempo más corto");
         }
-        SDataRecord oRecord = new SDataRecord();
-        oRecord.read((Object) recordPk, session.getStatement());
-        int sortPosition = oRecord.getLastSortingPosition();
+        int sortPosition = SDataRecord.getLastSortingPosition(session.getStatement().getConnection(), recordPk);
         sortPosition = sortPosition == 0 ? 1 : sortPosition;
         int nItemReference;
         SDataBookkeepingNumber bookkeepingNumber = new SDataBookkeepingNumber();
-        bookkeepingNumber.setPkYearId(oRecord.getPkYearId());
+        bookkeepingNumber.setPkYearId((int) recordPk[0]);
         bookkeepingNumber.setFkUserNewId(session.getUser().getPkUserId());
-        if (bookkeepingNumber.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+        // realizar 5 intentos de guardar bookkeepingNumber, si no lanzar la excepción, sleep de 2 segundos en cada intento:
+        boolean bSaved = false;
+        for (int ibkk = 0; ibkk < 5; ibkk++) {
+            if (bookkeepingNumber.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                try {
+                    if (ibkk == 0) {
+                        bookkeepingNumber.setPkNumberId(bookkeepingNumber.getMaxNumber(session.getStatement().getConnection()) + 2);
+                    }
+                    else {
+                        bookkeepingNumber.setPkNumberId(bookkeepingNumber.getPkNumberId() + 1);
+                    }
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + " Error en sleep al guardar SDataBookkeepingNumber.");
+                }
+                ibkk++;
+            }
+            else {
+                bSaved = true;
+                break;
+            }
+        }
+        if (! bSaved) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + " Error al guardar SDataBookkeepingNumber.");
         }
         for (SDbStockValuationMvt oConsumption : lConsumptions) {
