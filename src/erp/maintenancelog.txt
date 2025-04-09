@@ -8,6 +8,13 @@ Isabel Danae GARCÍA SERVÍN
 4) Creación de consultas y reportes correspondientes al porcentaje de acidez y a las etiquetas contables.
 
 ================================================================================
+SIIE 3.2 267.12/ 2025-04-08
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Modificaciones en la valuación de consumos de inventario para mejorar el desempeño y evitar errores.
+2) Corrección en la consulta de configuraciones de cuentas contables vs items.
+
+================================================================================
 SIIE 3.2 267.11/ 2025-04-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

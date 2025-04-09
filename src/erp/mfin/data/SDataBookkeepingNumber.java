@@ -78,6 +78,25 @@ public class SDataBookkeepingNumber extends erp.lib.data.SDataRegistry implement
         mtUserEditTs = null;
         mtUserDeleteTs = null;
     }
+    
+    // función para obtener el máximo número de la tabla fin_bkk_num
+    public int getMaxNumber(java.sql.Connection connection) {
+        int nMaxNumber = 0;
+        String sql = "SELECT MAX(id_num) AS max_num FROM fin_bkk_num WHERE id_year = " + mnPkYearId + ";";
+        ResultSet resultSet = null;
+
+        try {
+            resultSet = connection.createStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                nMaxNumber = resultSet.getInt("max_num");
+            }
+        }
+        catch (java.sql.SQLException e) {
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return nMaxNumber;
+    }
 
     @Override
     public int read(java.lang.Object pk, java.sql.Statement statement) {

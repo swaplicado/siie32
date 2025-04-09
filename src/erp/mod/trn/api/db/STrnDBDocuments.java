@@ -82,7 +82,7 @@ public class STrnDBDocuments {
                     "    f.fk_cur_quot, " +
                     "    IF(LENGTH(f.ext_bp_name) > 0, f.ext_bp_name, COALESCE(bp.bp, '')) AS bp_name, " +
                     "    CASE " + 
-                    "        WHEN ety_count.count = 1 THEN CONCAT('Precio unitario: ', (SELECT ROUND(price_u, 2) "
+                    "        WHEN ety_count.count = 1 THEN CONCAT('Precio unitario: ', (SELECT FORMAT(ROUND(price_u, 2), 2) "
                                                                                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " "
                                                                                         + "WHERE id_year = " + idYear + " AND id_doc = " + idDoc + " AND id_ety = ety_count.id_ety), ' MXN') " +
                     "        WHEN ety_count.count > 1 THEN CONCAT('Número partidas: ', ety_count.count) " +

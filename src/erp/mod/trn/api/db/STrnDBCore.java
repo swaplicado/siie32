@@ -266,7 +266,7 @@ public class STrnDBCore {
             } // Estatus específico
             else if (statusFilter > 0) {
                 query += "AND tda.fid_st_authorn = " + statusFilter + " "
-                        + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";;
+                        + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";
             }
 
             // Filtrar usuario involucrado en el proceso de autorización
@@ -278,21 +278,26 @@ public class STrnDBCore {
                         + "WHERE "
                         + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
                         + "        AND steps1.res_pk_n1_n = dps.id_year "
-                        + "        AND steps1.res_pk_n2_n = dps.id_doc "
-                        + "        AND NOT steps1.b_authorn "
-                        + "        AND NOT steps1.b_reject "
-                        + "        AND steps1.lev = (SELECT  "
-                        + "            step2.lev "
-                        + "        FROM "
-                        + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
-                        + "        WHERE "
-                        + "            NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-                        + "                AND step2.res_pk_n1_n = dps.id_year "
-                        + "                AND step2.res_pk_n2_n = dps.id_doc "
-                        + "                AND NOT step2.b_authorn "
-                        + "                AND NOT step2.b_reject "
-                        + "        ORDER BY step2.lev ASC "
-                        + "        LIMIT 1)) ";
+                        + "        AND steps1.res_pk_n2_n = dps.id_doc ";
+                if (statusFilter == -1) {
+                    query += "AND NOT steps1.b_authorn "
+                            + "        AND NOT steps1.b_reject "
+                            + "        AND steps1.lev = (SELECT  "
+                            + "            step2.lev "
+                            + "        FROM "
+                            + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
+                            + "        WHERE "
+                            + "            NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                            + "                AND step2.res_pk_n1_n = dps.id_year "
+                            + "                AND step2.res_pk_n2_n = dps.id_doc "
+                            + "                AND NOT step2.b_authorn "
+                            + "                AND NOT step2.b_reject "
+                            + "        ORDER BY step2.lev ASC "
+                            + "        LIMIT 1)) ";
+                }
+                else {
+                    query += ")";
+                }
             }
 
             query += "GROUP BY id_year , id_doc "

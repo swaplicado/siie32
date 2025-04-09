@@ -107,8 +107,8 @@ public class SAuthorizationsAPI {
                                 boolean toNotificationPush = false;
                                 lUsersNotified = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotificationPush);
                                 oResponse.getNextUsers().addAll(lUsersNotified);
-                                
-                                String folio = SAuthorizationUtils.getDpsFolio(oSession.getStatement().getConnection().createStatement(), ((int[]) pk));
+                                boolean folioWithCode = false;
+                                String folio = SAuthorizationUtils.getDpsFolio(oSession.getStatement().getConnection().createStatement(), ((int[]) pk), folioWithCode);
                                 oResponse.setFolio(folio);
                             }
                             catch (SQLException ex) {

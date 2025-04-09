@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona
  */
 public abstract class SNotificationsUtils {
-    
+
     public static final int PUSH_NOTIFICATION_NEW = 1;
     public static final int PUSH_NOTIFICATION_AUTH = 2;
     public static final int PUSH_NOTIFICATION_REJ = 3;
@@ -42,6 +42,7 @@ public abstract class SNotificationsUtils {
     public static ArrayList<SUserResource> getResourcesPending(java.sql.Statement statement,
             final int authorizationType) {
         String sTable = "";
+        String sWhereByType = "";
         switch (authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
                 sTable = SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ);
@@ -49,6 +50,15 @@ public abstract class SNotificationsUtils {
 
             case AUTH_TYPE_DPS:
                 sTable = SModConsts.TablesMap.get(SModConsts.TRN_DPS);
+                sWhereByType = " AND (SELECT "
+                        + "                    COUNT(id_year) "
+                        + "                FROM "
+                        + "                    trn_dps "
+                        + "                WHERE "
+                        + "                    id_year = steps1.res_pk_n1_n "
+                        + "                        AND id_doc = steps1.res_pk_n2_n "
+                        + "                        AND fid_st_dps_authorn IN (" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " , "
+                                                                                + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ")) = 0 ";
                 break;
         }
 
@@ -60,8 +70,13 @@ public abstract class SNotificationsUtils {
                 + "    NOT steps1.b_del "
                 + "        AND steps1.res_tab_name_n = '" + sTable + "' "
                 + "        AND NOT steps1.b_authorn "
-                + "        AND NOT steps1.b_reject "
-                + "        AND steps1.lev = (SELECT  "
+                + "        AND NOT steps1.b_reject ";
+        
+        if (authorizationType == AUTH_TYPE_DPS) {
+            sql += sWhereByType;
+        }
+                
+        sql += " AND steps1.lev = (SELECT  "
                 + "            step2.lev "
                 + "        FROM "
                 + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
@@ -97,10 +112,11 @@ public abstract class SNotificationsUtils {
 
         return lResources;
     }
-    
+
     public static ArrayList<SUserResource> getResourcesPendingCounter(java.sql.Statement statement,
             final int authorizationType, final int idUser) {
         String sTable = "";
+        String sWhereByType = "";
         switch (authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
                 sTable = SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ);
@@ -108,6 +124,15 @@ public abstract class SNotificationsUtils {
 
             case AUTH_TYPE_DPS:
                 sTable = SModConsts.TablesMap.get(SModConsts.TRN_DPS);
+                sWhereByType = " AND (SELECT "
+                        + "                    COUNT(id_year) "
+                        + "                FROM "
+                        + "                    trn_dps "
+                        + "                WHERE "
+                        + "                    id_year = steps1.res_pk_n1_n "
+                        + "                        AND id_doc = steps1.res_pk_n2_n "
+                        + "                        AND fid_st_dps_authorn IN (" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " , "
+                                                                                + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ")) = 0 ";
                 break;
         }
 
@@ -133,8 +158,12 @@ public abstract class SNotificationsUtils {
                 + "    NOT steps1.b_del "
                 + "        AND steps1.res_tab_name_n = '" + sTable + "' "
                 + "        AND NOT steps1.b_authorn "
-                + "        AND NOT steps1.b_reject "
-                + "        AND steps1.lev = (SELECT  "
+                + "        AND NOT steps1.b_reject ";
+        if (authorizationType == AUTH_TYPE_DPS) {
+            sql += sWhereByType;
+        }
+        
+        sql += " AND steps1.lev = (SELECT  "
                 + "            step2.lev "
                 + "        FROM "
                 + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
@@ -155,6 +184,7 @@ public abstract class SNotificationsUtils {
 
         ArrayList<SUserResource> lResources = new ArrayList<>();
         try {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, "getResourcesPendingCounter {0}", sql);
             ResultSet res = statement.executeQuery(sql);
             SUserResource oResource = null;
             while (res.next()) {
@@ -174,13 +204,14 @@ public abstract class SNotificationsUtils {
     }
 
     public static ArrayList<SUserResource> getFoliosFromDps(java.sql.Statement statement, ArrayList<SUserResource> lDpsPending) {
+        boolean folioWithCode = false;
         for (SUserResource oDpsPending : lDpsPending) {
-            oDpsPending.setFolio(SAuthorizationUtils.getDpsFolio(statement, new int[]{oDpsPending.getPk1(), oDpsPending.getPk2()}));
+            oDpsPending.setFolio(SAuthorizationUtils.getDpsFolio(statement, new int[]{oDpsPending.getPk1(), oDpsPending.getPk2()}, folioWithCode));
         }
 
         return lDpsPending;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void sendPushNotification(final SGuiSession session, int idUser, String folio, int porpouse, int badge) {
         try {
@@ -215,7 +246,7 @@ public abstract class SNotificationsUtils {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (InputStream response = connection.getInputStream();
-                     Scanner scanner = new Scanner(response)) {
+                        Scanner scanner = new Scanner(response)) {
                     String responseBody = scanner.useDelimiter("\\A").next();
                     Logger.getLogger(SAuthorizationUtils.class.getName()).
                             log(Level.INFO, "Notificación push enviada: {0}", responseBody);
