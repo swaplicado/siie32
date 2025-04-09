@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 268.0/ 2025-04-09
+SIIE 3.2 269.0/ 2025-04-09
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Creación del catálogo de carrotanques y se agregó a la forma de captura de partidas de DPS.
