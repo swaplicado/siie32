@@ -19,10 +19,10 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Isabel Servín
  */
-public class SViewTrailer extends SGridPaneView {
+public class SViewTankCar extends SGridPaneView {
 
-    public SViewTrailer(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, title);
+    public SViewTankCar(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_TANK_CAR, SLibConstants.UNDEFINED, title);
         setRowButtonsEnabled(true, false, true, false, true);
         
         initComponetsCustom();
@@ -55,11 +55,9 @@ public class SViewTrailer extends SGridPaneView {
         }
 
         msSql = "SELECT " 
-            + "t.id_trailer AS " + SDbConsts.FIELD_ID + "1, " 
+            + "t.id_tank_car AS " + SDbConsts.FIELD_ID + "1, " 
             + "'' AS " + SDbConsts.FIELD_CODE + ", "
-            + "t.name AS " + SDbConsts.FIELD_NAME + ", "
-            + "t.plate, "
-            + "t.trailer_subtype, "
+            + "t.plate AS " + SDbConsts.FIELD_NAME + ", "
             + "t.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
             + "t.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
             + "t.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
@@ -67,22 +65,20 @@ public class SViewTrailer extends SGridPaneView {
             + "t.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
             + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
             + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_TRAILER) + " AS t " 
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_TANK_CAR) + " AS t " 
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON t.fk_usr_ins = ui.id_usr "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON t.fk_usr_upd = uu.id_usr "
             + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "ORDER BY t.name ";
+            + "ORDER BY t.plate ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[8];
+        SGridColumnView[] columns = new SGridColumnView[6];
 
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Remolque");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "plate", "Placa");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "trailer_subtype", "Subtipo remolque");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, SDbConsts.FIELD_NAME, "Matricula");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS);

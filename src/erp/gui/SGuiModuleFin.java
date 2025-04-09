@@ -17,6 +17,7 @@ import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataAccountBizPartner;
 import erp.mfin.data.SDataAccountCash;
@@ -117,6 +118,7 @@ import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.data.SDataCtr;
+import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormCtr;
@@ -274,6 +276,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiQryCurrencyBalanceBizPartnerSup;
     private javax.swing.JMenuItem jmiRepBizPartnerLastMovCus;
     private javax.swing.JMenuItem jmiRepBizPartnerLastMovSup;
+    private javax.swing.JMenuItem jmiRepTrnDpsAciPerCus;
+    private javax.swing.JMenuItem jmiRepTrnDpsAciPerSup;
+    private javax.swing.JMenuItem jmiRepTrnDpsAccTagCus;
+    private javax.swing.JMenuItem jmiRepTrnDpsAccTagSup;
+    private javax.swing.JMenuItem jmiRepTrnAccTagCus;
+    private javax.swing.JMenuItem jmiRepTrnAccTagSup;
     private javax.swing.JMenu jmRepBizPartnerBalAging;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingCus;
     private javax.swing.JMenuItem jmiRepBizPartnerBalAgingSup;
@@ -359,6 +367,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckFormat moFormCheckFormat;
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
     private erp.mtrn.form.SFormCtr moFormCtr;
+    private erp.mtrn.form.SDialogRepAccountTag moDialogRepAccTag;
 
     private erp.form.SFormOptionPicker moPickerAccountSpecializedType;
     private erp.form.SFormOptionPicker moPickerFiscalAccount;
@@ -687,6 +696,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCurrencyBalanceBizPartnerSup =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
         jmiRepBizPartnerLastMovCus =  new JMenuItem("Reporte de último movimiento de clientes");
         jmiRepBizPartnerLastMovSup =  new JMenuItem("Reporte de último movimiento de proveedores");
+        jmiRepTrnDpsAciPerCus = new JMenuItem("Partidas de documentos de ventas con acidez");
+        jmiRepTrnDpsAciPerSup = new JMenuItem("Partidas de documentos de compras con acidez");
+        jmiRepTrnDpsAccTagCus = new JMenuItem("Documentos de ventas con etiqueta contable");
+        jmiRepTrnDpsAccTagSup = new JMenuItem("Documentos de compras con etiqueta contable");
+        jmiRepTrnAccTagCus = new JMenuItem("Reporte de facturas de ventas con etiqueta contable...");
+        jmiRepTrnAccTagSup = new JMenuItem("Reporte de facturas de compras con etiqueta contable...");
         jmRepBizPartnerBalAging = new JMenu("Antigüedad de saldos de asociados de negocios");
         jmiRepBizPartnerBalAgingCus = new JMenuItem("Antigüedad de saldos de clientes...");
         jmiRepBizPartnerBalAgingSup = new JMenuItem("Antigüedad de saldos de proveedores...");
@@ -795,6 +810,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerBal.addSeparator();
         jmRepBizPartnerBal.add(jmiRepBizPartnerLastMovCus);
         jmRepBizPartnerBal.add(jmiRepBizPartnerLastMovSup);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiRepTrnDpsAciPerCus);
+        jmRepBizPartnerBal.add(jmiRepTrnDpsAciPerSup);
+        jmRepBizPartnerBal.add(jmiRepTrnDpsAccTagCus);
+        jmRepBizPartnerBal.add(jmiRepTrnDpsAccTagSup);
+        jmRepBizPartnerBal.addSeparator();
+        jmRepBizPartnerBal.add(jmiRepTrnAccTagCus);
+        jmRepBizPartnerBal.add(jmiRepTrnAccTagSup);
         jmRep.add(jmRepBizPartnerBal);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingCus);
         jmRepBizPartnerBalAging.add(jmiRepBizPartnerBalAgingSup);
@@ -875,6 +898,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         
         jmRep.add(jmiGlobalStatement);
+        
+        moDialogRepAccTag = new SDialogRepAccountTag(miClient);
         
         jmiCatAccount.addActionListener(this);
         jmiCatFiscalAccount.addActionListener(this);
@@ -996,6 +1021,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCurrencyBalanceBizPartnerSup.addActionListener(this);
         jmiRepBizPartnerLastMovCus.addActionListener(this);
         jmiRepBizPartnerLastMovSup.addActionListener(this);
+        jmiRepTrnDpsAciPerCus.addActionListener(this);
+        jmiRepTrnDpsAciPerSup.addActionListener(this);
+        jmiRepTrnDpsAccTagCus.addActionListener(this);
+        jmiRepTrnDpsAccTagSup.addActionListener(this);
+        jmiRepTrnAccTagCus.addActionListener(this);
+        jmiRepTrnAccTagSup.addActionListener(this);
         jmiRepBizPartnerBalAgingCus.addActionListener(this);
         jmiRepBizPartnerBalAgingSup.addActionListener(this);
         jmiRepBizPartnerStatCus.addActionListener(this);
@@ -1070,6 +1101,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         boolean hasRightAuxCustom = miClient.getSessionXXX().getUser().hasRight(miClient, erp.data.SDataConstantsSys.PRV_FIN_REP_AUX_CUSTOM).HasRight;
 
+        boolean hasConfAccTag = false;
+        try {
+            hasConfAccTag = !SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty();
+        } 
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
         jmCfg.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
 
         jmCfgAbpLink.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem);
@@ -1198,6 +1237,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPrtChartOfAccounts.setEnabled(hasRightRep);
         jmiRepTaxesByConcept.setEnabled(hasRightRep);
         jmRepFiscal.setEnabled(hasRightRep);
+        jmiRepTrnDpsAccTagCus.setEnabled(hasConfAccTag);
+        jmiRepTrnDpsAccTagSup.setEnabled(hasConfAccTag);
+        jmiRepTrnAccTagCus.setEnabled(hasConfAccTag);
+        jmiRepTrnAccTagSup.setEnabled(hasConfAccTag);
         
         // GUI configuration:
         
@@ -2310,6 +2353,18 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRepBizPartnerLastMovSup) {
                 new SDialogRepBizPartnerLastMove(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
+            else if (item == jmiRepTrnDpsAciPerCus) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ETY_ACI_PER, SModConsts.MOD_TRN_SAL_N, null);
+            }
+            else if (item == jmiRepTrnDpsAciPerSup) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ETY_ACI_PER, SModConsts.MOD_TRN_PUR_N, null);
+            }
+            else if (item == jmiRepTrnDpsAccTagCus) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ACC_TAG, SModConsts.MOD_TRN_SAL_N, null);
+            }
+            else if (item == jmiRepTrnDpsAccTagSup) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_ACC_TAG, SModConsts.MOD_TRN_PUR_N, null);
+            }
             else if (item == jmiRepBizPartnerBalAgingCus) {
                 new SDialogRepBizPartnerBalanceAging(miClient, SDataRepConstants.REP_ACC_AGI + " " + SBpsUtils.getBizPartnerCategoryName(SModSysConsts.BPSS_CT_BP_CUS, SUtilConsts.NUM_PLR).toLowerCase(), SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
@@ -2486,6 +2541,18 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgAbpRep) {
                 miClient.getSession().showView(SModConsts.FIN_REP_CUS_ACC, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiRepTrnAccTagCus) {
+                moDialogRepAccTag.formRefreshCatalogues();
+                moDialogRepAccTag.formReset();
+                moDialogRepAccTag.setParamIsSupplier(false);
+                moDialogRepAccTag.setFormVisible(true);
+            }
+            else if (item == jmiRepTrnAccTagSup) {
+                moDialogRepAccTag.formRefreshCatalogues();
+                moDialogRepAccTag.formReset();
+                moDialogRepAccTag.setParamIsSupplier(true);
+                moDialogRepAccTag.setFormVisible(true);
             }
         }
     }

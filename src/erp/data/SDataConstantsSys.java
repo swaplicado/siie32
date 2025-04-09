@@ -125,6 +125,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_PUR_ACC_ASSET_START = "TRN_PUR_ACC_ASSET_START";
     public static final String CFG_PARAM_TRN_STK_SUP_ZERO = "TRN_STK_SUP_ZERO";
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
+    public static final String CFG_PARAM_TRN_ITEM_TANK_CAR = "TRN_ITEM_TANK_CAR";
+    public static final String CFG_PARAM_TRN_ITEM_ACIDITY = "TRN_ITEM_ACIDITY";
+    public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
@@ -1817,6 +1820,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_CON_STK = 207110;
     public static final int REP_TRN_CFDI_PAYROLL_33 = 207111;
     public static final int REP_TRN_CFDI_PAYROLL_40 = 207115;
+    public static final int REP_TRN_ACC_TAG = 207118;
 
     public static final int REP_MFG_PROG_MON = 208001;
     public static final int REP_MFG_ORD = 208002;

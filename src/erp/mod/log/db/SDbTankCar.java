@@ -5,8 +5,8 @@
  */
 package erp.mod.log.db;
 
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
-import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -19,12 +19,10 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín
  */
-public class SDbTrailer extends SDbRegistryUser implements Serializable {
+public class SDbTankCar extends SDbRegistryUser {
 
-    protected int mnPkTrailerId;
-    protected String msName;
+    protected int mnPkTankCarId;
     protected String msPlate;
-    protected String msTrailerSubtype;
     /*
     protected boolean mbDeleted;
     protected int mnFkUserInsertId;
@@ -33,81 +31,74 @@ public class SDbTrailer extends SDbRegistryUser implements Serializable {
     protected Date mtTsUserUpdate;
     */
     
-    public SDbTrailer() {
-        super(SModConsts.LOG_TRAILER);
+    public SDbTankCar() {
+        super(SModConsts.LOG_TANK_CAR);
     }
     
-    public void setPkTrailerId(int n) { mnPkTrailerId = n; }
-    public void setName(String s) { msName = s; }
+    public void setPkTankCarId(int n) { mnPkTankCarId = n; }
     public void setPlate(String s) { msPlate = s; }
-    public void setTrailerSubtype(String s) { msTrailerSubtype = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
-    
-    public int getPkTrailerId() { return mnPkTrailerId; }
-    public String getName() { return msName; }
+
+    public int getPkTankCarId() { return mnPkTankCarId; }
     public String getPlate() { return msPlate; }
-    public String getTrailerSubtype() { return msTrailerSubtype; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
-
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkTrailerId = pk[0];
+        mnPkTankCarId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkTrailerId };
+        return new int[] { mnPkTankCarId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
         
-        mnPkTrailerId = 0;
-        msName = "";
+        mnPkTankCarId = 0;
         msPlate = "";
-        msTrailerSubtype = "";
         mbDeleted = false;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
     }
-
+    
     @Override
     public String getSqlTable() {
         return SModConsts.TablesMap.get(mnRegistryType);
     }
-
+    
     @Override
     public String getSqlWhere() {
-        return "WHERE id_trailer = " + mnPkTrailerId + " ";
+        return "WHERE id_tank_car = " + mnPkTankCarId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_trailer = " + pk[0] + " ";
+        return "WHERE id_tank_car = " + pk[0] + " ";
     }
-
+    
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet;
         
-        mnPkTrailerId = 0;
+        mnPkTankCarId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_trailer), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_tank_car), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkTrailerId = resultSet.getInt(1);
+            mnPkTankCarId = resultSet.getInt(1);
         }
     }
 
@@ -118,17 +109,15 @@ public class SDbTrailer extends SDbRegistryUser implements Serializable {
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
-        
-        msSql = "SELECT * FROM " + getSqlTable() + " WHERE id_trailer = " + pk[0];
+
+        msSql = "SELECT * FROM " + getSqlTable() + " WHERE id_tank_car = " + pk[0] + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
         }
         else {
-            mnPkTrailerId = resultSet.getInt("id_trailer");
-            msName = resultSet.getString("name");
+            mnPkTankCarId = resultSet.getInt("id_tank_car");
             msPlate = resultSet.getString("plate");
-            msTrailerSubtype = resultSet.getString("trailer_subtype");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -156,32 +145,27 @@ public class SDbTrailer extends SDbRegistryUser implements Serializable {
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
-            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkTrailerId + ", " + 
-                "'" + msName + "', " + 
-                "'" + msPlate + "', " + 
-                "'" + msTrailerSubtype + "', " + 
-                (mbDeleted ? 1 : 0) + ", " + 
-                mnFkUserInsertId + ", " + 
-                mnFkUserUpdateId + ", " + 
-                "NOW()" + ", " + 
-                "NOW()" + " " +
-                ")";
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES(" +
+                    mnPkTankCarId + ", " + 
+                    "'" + msPlate + "', " + 
+                    (mbDeleted ? 1 : 0) + ", " + 
+                    mnFkUserInsertId + ", " + 
+                    mnFkUserUpdateId + ", " + 
+                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
+                    ")";
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
-            
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                //"id_trailer = " + mnPkTrailerId + ", " +
-                "name = '" + msName + "', " +
-                "plate = '" + msPlate + "', " +
-                "trailer_subtype = '" + msTrailerSubtype + "', " +
-                "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                //"ts_usr_ins = " + "NOW()" + ", " +
-                "ts_usr_upd = " + "NOW()" + " " +
-                getSqlWhere();
+                    //"id_tank_car = " + mnPkTankCarId + ", " +
+                    "plate = '" + msPlate + "', " +
+                    "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    //"ts_usr_ins = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
+                    getSqlWhere();
         }
         
         session.getStatement().execute(msSql);
@@ -190,13 +174,11 @@ public class SDbTrailer extends SDbRegistryUser implements Serializable {
     }
 
     @Override
-    public SDbTrailer clone() throws CloneNotSupportedException {
-        SDbTrailer registry = new SDbTrailer();
+    public SDbTankCar clone() throws CloneNotSupportedException {
+        SDbTankCar registry = new SDbTankCar();
         
-        registry.setPkTrailerId(this.getPkTrailerId());
-        registry.setName(this.getName());
+        registry.setPkTankCarId(this.getPkTankCarId());
         registry.setPlate(this.getPlate());
-        registry.setTrailerSubtype(this.getTrailerSubtype());
         registry.setDeleted(this.isDeleted());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());

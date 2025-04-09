@@ -69,7 +69,16 @@ public class SModUtils implements SGuiModuleUtils {
     @Override
     public int getModuleSubtypeBySubtype(final int type, final int subtype) {
         int moduleSubtype = SLibConsts.UNDEFINED;
-
+        
+        switch (type) {
+            case SModConsts.TRNX_DPS_TANK_CAR:
+            case SModConsts.TRNX_DPS_ETY_ACI_PER:
+            case SModConsts.TRNX_DPS_ACC_TAG:
+                moduleSubtype = subtype;
+                break;
+            default:
+        }
+        
         return moduleSubtype;
     }
 }

@@ -77,9 +77,7 @@ public class SViewDpsPayment extends SGridPaneView {
                         count = resultSet.getInt(1);
                     }
                 }
-                row.getRowValueAt(10);
                 row.setRowValueAt(count + 1, 10);
-                row.getRowValueAt(10);
                 count++;
             }
         } catch (SQLException e) {

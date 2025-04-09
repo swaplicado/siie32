@@ -582,6 +582,10 @@ public abstract class SModConsts {
     public static final int TRNX_INV_VAL_UPD_COST = 2;  // inventory valuation: update costs (from file)
     public static final int TRNX_TP_VAL_MVT = 2024092;
     public static final int TRNX_SUP_FILE_DPS_PROC = 2024093;   // DPS support file process
+    public static final int TRNX_DPS_TANK_CAR = 2024094;
+    public static final int TRNX_DPS_TANK_CAR_CARDEX = 2024095;
+    public static final int TRNX_DPS_ETY_ACI_PER = 2024096;
+    public static final int TRNX_DPS_ACC_TAG = 2024097;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -668,6 +672,7 @@ public abstract class SModConsts {
     public static final int LOG_INSURER = 2043011;
     public static final int LOG_VEH = 2043001;
     public static final int LOG_TRAILER = 2043012;
+    public static final int LOG_TANK_CAR = 2043091;
     public static final int LOG_BOL_PERSON = 2043013;
     public static final int LOG_DRIVER_VEH = 2043014;
     public static final int LOG_DIST_LOCATION = 2043015;
@@ -1424,6 +1429,7 @@ public abstract class SModConsts {
         TablesMap.put(LOG_INSURER, "log_insurer");
         TablesMap.put(LOG_VEH, "log_veh");
         TablesMap.put(LOG_TRAILER, "log_trailer");
+        TablesMap.put(LOG_TANK_CAR, "log_tank_car");
         TablesMap.put(LOG_BOL_PERSON, "log_bol_person");
         TablesMap.put(LOG_DRIVER_VEH, "log_driver_veh");
         TablesMap.put(LOG_DIST_LOCATION, "log_dist_location");

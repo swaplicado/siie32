@@ -89,6 +89,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdWeightPackagingExtra;
     protected double mdWeightGross;
     protected double mdWeightDelivery;
+    protected Double mdAcidityPercentage_n;
     protected double mdSurplusPercentage;    
     protected double mdContractBase;
     protected double mdContractFuture;
@@ -101,6 +102,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msPlate;
     protected java.lang.String msTicket;
     protected java.lang.String msContainerTank;
+    protected java.lang.String msTankCar;
     protected java.lang.String msVgm;
     protected int mnOperationsType;
     protected int mnUserId;
@@ -291,6 +293,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setWeightPackagingExtra(double d) { mdWeightPackagingExtra = d; }
     public void setWeightGross(double d) { mdWeightGross = d; }
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
+    public void setAcidityPercentage_n(Double d) { mdAcidityPercentage_n = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
     public void setContractBase(double d) { mdContractBase = d; }
     public void setContractFuture(double d) { mdContractFuture = d; }
@@ -303,6 +306,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setPlate(java.lang.String s) { msPlate = s; }
     public void setTicket(java.lang.String s) { msTicket = s; }
     public void setContainerTank(java.lang.String s) { msContainerTank = s; }
+    public void setTankCar(java.lang.String s) { msTankCar = s; }
     public void setVgm(java.lang.String s) { msVgm = s; }
     public void setOperationsType(int n) { mnOperationsType = n; }
     public void setUserId(int n) { mnUserId = n; }
@@ -391,6 +395,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public double getWeightPackagingExtra() { return mdWeightPackagingExtra; }
     public double getWeightGross() { return mdWeightGross; }
     public double getWeightDelivery() { return mdWeightDelivery; }
+    public Double getAcidityPercentage_n() { return mdAcidityPercentage_n; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
     public double getContractBase() { return mdContractBase; }
     public double getContractFuture() { return mdContractFuture; }
@@ -403,6 +408,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getPlate() { return msPlate; }
     public java.lang.String getTicket() { return msTicket; }
     public java.lang.String getContainerTank() { return msContainerTank; }
+    public java.lang.String getTankCar() { return msTankCar; }
     public java.lang.String getVgm() { return msVgm; }
     public int getOperationsType() { return mnOperationsType; }
     public int getUserId() { return mnUserId; }
@@ -644,6 +650,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdWeightPackagingExtra = 0;
         mdWeightGross = 0;
         mdWeightDelivery = 0;
+        mdAcidityPercentage_n = null;
         mdSurplusPercentage = 0;
         mdContractBase = 0;
         mdContractFuture = 0;
@@ -656,6 +663,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msPlate = "";
         msTicket = "";
         msContainerTank = "";
+        msTankCar = "";
         msVgm = "";
         mnOperationsType = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS; // just for keeping consistence with existing source code
         mnUserId = 0;
@@ -861,6 +869,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mdWeightPackagingExtra = resultSet.getDouble("de.weight_pack_extra");
                 mdWeightGross = resultSet.getDouble("de.weight_gross");
                 mdWeightDelivery = resultSet.getDouble("de.weight_delivery");
+                mdAcidityPercentage_n = resultSet.getObject("acidity_per_n") == null ? null : resultSet.getDouble("acidity_per_n");
                 mdSurplusPercentage = resultSet.getDouble("de.surplus_per");
                 mdContractBase = resultSet.getDouble("de.con_base");
                 mdContractFuture = resultSet.getDouble("de.con_future");
@@ -873,6 +882,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 msPlate = resultSet.getString("de.plate");
                 msTicket = resultSet.getString("de.ticket");
                 msContainerTank = resultSet.getString("de.cont_tank");
+                msTankCar = resultSet.getString("tank_car");
                 msVgm = resultSet.getString("de.vgm");
                 mnOperationsType = resultSet.getInt("de.ops_type");
                 mnUserId = resultSet.getInt("de.usr_id");
@@ -1283,7 +1293,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -1338,6 +1348,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setDouble(nParam++, mdWeightPackagingExtra);
             callableStatement.setDouble(nParam++, mdWeightGross);
             callableStatement.setDouble(nParam++, mdWeightDelivery);
+            if (mdAcidityPercentage_n != null) callableStatement.setDouble(nParam++, mdAcidityPercentage_n); else callableStatement.setNull(nParam++, java.sql.Types.DOUBLE);
             callableStatement.setDouble(nParam++, mdSurplusPercentage);
             callableStatement.setDouble(nParam++, mdContractBase);
             callableStatement.setDouble(nParam++, mdContractFuture);
@@ -1350,6 +1361,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setString(nParam++, msPlate);
             callableStatement.setString(nParam++, msTicket);
             callableStatement.setString(nParam++, msContainerTank);
+            callableStatement.setString(nParam++, msTankCar);
             callableStatement.setString(nParam++, msVgm);
             callableStatement.setInt(nParam++, mnOperationsType);
             callableStatement.setInt(nParam++, mnUserId);
@@ -1960,6 +1972,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdMass = 0;
         mdWeightPackagingExtra = 0;
         mdWeightGross = 0;
+        mdAcidityPercentage_n = null;
         mdWeightDelivery = 0;
 
         // Other members:
@@ -2040,6 +2053,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setWeightPackagingExtra(mdWeightPackagingExtra);
         clone.setWeightGross(mdWeightGross);
         clone.setWeightDelivery(mdWeightDelivery);
+        clone.setAcidityPercentage_n(mdAcidityPercentage_n);
         clone.setSurplusPercentage(mdSurplusPercentage);
         clone.setContractBase(mdContractBase);
         clone.setContractFuture(mdContractFuture);
@@ -2052,6 +2066,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setPlate(msPlate);
         clone.setTicket(msTicket);
         clone.setContainerTank(msContainerTank);
+        clone.setTankCar(msTankCar);
         clone.setVgm(msVgm);
         clone.setOperationsType(mnOperationsType);
         clone.setUserId(mnUserId);

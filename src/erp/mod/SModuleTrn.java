@@ -5,6 +5,7 @@
 package erp.mod;
 
 import erp.data.SDataConstantsSys;
+import erp.mod.log.db.SDbTankCar;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsItem;
 import erp.mod.trn.db.SDbConfCostCenterGroupVsUser;
 import erp.mod.trn.db.SDbConfEmployeeVsEntity;
@@ -90,8 +91,11 @@ import erp.mod.trn.view.SViewConfWarehouseVsProvEntityDetail;
 import erp.mod.trn.view.SViewCurrencyBalance;
 import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
+import erp.mod.trn.view.SViewDpsAccountTag;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
+import erp.mod.trn.view.SViewDpsEtyAcidityPercentage;
 import erp.mod.trn.view.SViewDpsSendWebService;
+import erp.mod.trn.view.SViewDpsTankCar;
 import erp.mod.trn.view.SViewFollowingPurchaseMaterialRequest;
 import erp.mod.trn.view.SViewFunctionalAreaBudgets;
 import erp.mod.trn.view.SViewFunctionalAreaExpenses;
@@ -338,6 +342,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_SUP_FILE_DPS_PROC:
                 registry = new SDbSupplierFileProcess();
+                break;
+            case SModConsts.TRNX_DPS_TANK_CAR:
+                registry = new SDbTankCar();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -851,7 +858,40 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_COST_IDENT_CALC:
                 view = new SViewIdentifiedCostCalculation(miClient, "Costos identificados ventas");
                 break;
-                    default:
+            case SModConsts.TRNX_DPS_TANK_CAR:
+                switch (subtype) {
+                    case SModConsts.MOD_TRN_SAL_N:
+                        title = "Facturas ventas carrotanques";
+                        break;
+                    case SModConsts.MOD_TRN_PUR_N:
+                        title = "Facturas compras carrotanques";
+                        break;
+                }
+                view = new SViewDpsTankCar(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_DPS_ETY_ACI_PER:
+                switch (subtype) {
+                    case SModConsts.MOD_TRN_SAL_N:
+                        title = "Partidas documentos ventas acidez";
+                        break;
+                    case SModConsts.MOD_TRN_PUR_N:
+                        title = "Partidas documentos compras acidez";
+                        break;
+                }
+                view = new SViewDpsEtyAcidityPercentage(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_DPS_ACC_TAG:
+                switch (subtype) {
+                    case SModConsts.MOD_TRN_SAL_N:
+                        title = "Documnetos ventas etiqueta contable";
+                        break;
+                    case SModConsts.MOD_TRN_PUR_N:
+                        title = "Documentos compras etiqueta contable";
+                        break;
+                }
+                view = new SViewDpsAccountTag(miClient, subtype, title);
+                break;
+            default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 

@@ -180,6 +180,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnPayments;
     protected java.lang.String msPaymentMethod;
     protected java.lang.String msPaymentAccount;
+    protected java.lang.String msAccountingTag;
     protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
@@ -1883,6 +1884,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setPayments(int n) { mnPayments = n; }
     public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
+    public void setAccountingTag(java.lang.String s) { msAccountingTag = s; }
     public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
@@ -2007,6 +2009,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getPayments() { return mnPayments; }
     public java.lang.String getPaymentMethod() { return msPaymentMethod; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
+    public java.lang.String getAccountingTag() { return msAccountingTag; }
     public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
@@ -2322,6 +2325,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnPayments = 0;
         msPaymentMethod = "";
         msPaymentAccount = "";
+        msAccountingTag = "";
         mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
@@ -2523,6 +2527,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
+                msAccountingTag = oResultSet.getString("acc_tag");
                 mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
@@ -2915,7 +2920,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2959,6 +2964,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnPayments);
             oCallableStatement.setString(nParam++, msPaymentMethod);
             oCallableStatement.setString(nParam++, msPaymentAccount);
+            oCallableStatement.setString(nParam++, msAccountingTag);
             oCallableStatement.setInt(nParam++, mnAutomaticAuthorizationRejection);
             oCallableStatement.setBoolean(nParam++, mbIsPublic);
             oCallableStatement.setBoolean(nParam++, mbIsLinked);

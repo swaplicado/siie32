@@ -76,6 +76,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatalogueBolPerson;
     private javax.swing.JMenuItem jmiCatalogueInsurer;
     private javax.swing.JMenuItem jmiCatalogueRate;
+    private javax.swing.JMenuItem jmiCatalogueTankCar;
 
     private javax.swing.JMenu jmReports;
     private javax.swing.JMenuItem jmiRepRate;
@@ -146,6 +147,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueBolPerson = new JMenuItem("Figuras de transporte");
         jmiCatalogueInsurer = new JMenuItem("Aseguradoras");
         jmiCatalogueRate = new JMenuItem("Tarifas");
+        jmiCatalogueTankCar = new JMenuItem("Carrotanques");
 
         jmReports = new JMenu("Reportes");
         jmiRepRate = new JMenuItem("Listado de tarifas...");
@@ -208,6 +210,8 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCatalogue.add(jmiCatalogueBolPerson);
         jmCatalogue.add(jmiCatalogueInsurer);
         jmCatalogue.add(jmiCatalogueRate);
+        jmShipmentDiog.addSeparator();
+        jmCatalogue.add(jmiCatalogueTankCar);
         
         jmReports.add(jmiRepRate);
 
@@ -252,6 +256,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueBolPerson.addActionListener(this);
         jmiCatalogueInsurer.addActionListener(this);
         jmiCatalogueRate.addActionListener(this);
+        jmiCatalogueTankCar.addActionListener(this);
 
         jmiRepRate.addActionListener(this);
         
@@ -281,6 +286,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueBolPerson.setEnabled(hasRightMisc || hasRightRate);
         jmiCatalogueInsurer.setEnabled(hasRightMisc || hasRightRate);
         jmiCatalogueRate.setEnabled(hasRightRate);
+        jmiCatalogueTankCar.setEnabled(true);
         
         jmiRepRate.setEnabled(hasRightRate);
     }
@@ -403,7 +409,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatalogueRate) {
                 miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
             }
-
+            else if (item == jmiCatalogueTankCar) {
+                miClient.getSession().showView(SModConsts.LOG_TANK_CAR, SLibConstants.UNDEFINED, null);
+            }
             else if (item == jmiShipment) {
                 miClient.getSession().showView(SModConsts.LOG_SHIP, SLibConstants.UNDEFINED, new SGuiParams(SModConsts.VIEW_SC_SUM));
             }

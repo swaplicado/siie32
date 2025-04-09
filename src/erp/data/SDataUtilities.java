@@ -3166,6 +3166,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_CON_STK:
                 name = "reps/trn_con_stk.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_ACC_TAG:
+                name = "reps/trn_acc_tag.jasper";
+                break;
             case SDataConstantsSys.REP_MFG_BOM:
                 name = "reps/mfg_bom.jasper";
                 break;

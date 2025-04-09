@@ -20,6 +20,7 @@ import erp.mod.log.db.SDbShipmentDestiny;
 import erp.mod.log.db.SDbSpot;
 import erp.mod.log.db.SDbSpotCompanyBranch;
 import erp.mod.log.db.SDbSpotCompanyBranchEntity;
+import erp.mod.log.db.SDbTankCar;
 import erp.mod.log.db.SDbTrailer;
 import erp.mod.log.db.SDbVehicle;
 import erp.mod.log.db.SDbVehicleType;
@@ -32,6 +33,7 @@ import erp.mod.log.form.SFormShipmentDelivery;
 import erp.mod.log.form.SFormSpot;
 import erp.mod.log.form.SFormSpotCompanyBranch;
 import erp.mod.log.form.SFormSpotCompanyBranchEntity;
+import erp.mod.log.form.SFormTankCar;
 import erp.mod.log.form.SFormTrailer;
 import erp.mod.log.form.SFormVehicle;
 import erp.mod.log.form.SFormVehicleType;
@@ -50,6 +52,7 @@ import erp.mod.log.view.SViewShipmentDpsCost;
 import erp.mod.log.view.SViewSpot;
 import erp.mod.log.view.SViewSpotCompanyBranch;
 import erp.mod.log.view.SViewSpotCompanyBranchEntity;
+import erp.mod.log.view.SViewTankCar;
 import erp.mod.log.view.SViewTrailer;
 import erp.mod.log.view.SViewVehicle;
 import erp.mod.log.view.SViewVehicleType;
@@ -88,6 +91,7 @@ public class SModuleLog extends SGuiModule {
     private SFormBillOfLading moFormBillOfLadingTypeT;
     private SFormBillOfLading moFormBillOfLadingTypeI;
     private SFormShipmentDelivery moFormShipmentDelivery;
+    private SFormTankCar moFormTankCar;
 
     private final SClientInterface miClient_xxx;
 
@@ -172,6 +176,9 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_SHIP_DEST:
             case SModConsts.LOGX_SHIP_DLY:
                 registry = new SDbShipmentDestiny();
+                break;
+            case SModConsts.LOG_TANK_CAR:
+                registry = new SDbTankCar();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -451,6 +458,10 @@ public class SModuleLog extends SGuiModule {
                 }
                 break;
                 
+            case SModConsts.LOG_TANK_CAR:
+                view = new SViewTankCar(miClient, "Carrotanques");
+                break;
+                
             case SModConsts.LOGX_SHIP_AUTH:
                 switch (subtype) {
                     case SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN:
@@ -660,6 +671,10 @@ public class SModuleLog extends SGuiModule {
                         form = moFormBillOfLadingTypeI;
                     default:        
                 }
+                break;
+            case SModConsts.LOG_TANK_CAR:
+                if (moFormTankCar == null) moFormTankCar = new SFormTankCar(miClient, "Carrotanque");
+                form = moFormTankCar;
                 break;
             case SModConsts.LOGX_SHIP_DLY:
                 if (moFormShipmentDelivery == null) moFormShipmentDelivery = new SFormShipmentDelivery(miClient, "Asignación fecha de entrega real");

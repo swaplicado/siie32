@@ -45,6 +45,7 @@ import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mfin.data.SDataCostCenter;
@@ -163,6 +164,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int DECS_PCT = 4; // 0.01% is 0.0001
     
     private static final int UUID_FIRST_SECC_LENGHT = 8;
+    
+    private static final String SEL_ACC_TAG = "(Seleccionar etiqueta contable)";
 
     private int mnFormType;
     private int mnFormResult;
@@ -503,10 +506,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkFunctionalAreaId = new javax.swing.JComboBox<>();
         jPanel30 = new javax.swing.JPanel();
         jckIsAudited = new javax.swing.JCheckBox();
-        jckIsSystem = new javax.swing.JCheckBox();
-        jPanel31 = new javax.swing.JPanel();
         jckIsAuthorized = new javax.swing.JCheckBox();
-        jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel31 = new javax.swing.JPanel();
+        jlAccTag = new javax.swing.JLabel();
+        jcbAccTag = new javax.swing.JComboBox<>();
         jPanel13 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jckRecordUser = new javax.swing.JCheckBox();
@@ -543,6 +546,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsDiscountDocPercentage = new javax.swing.JCheckBox();
         jtfDiscountDocPercentage = new javax.swing.JTextField();
         jPanel58 = new javax.swing.JPanel();
+        jckIsSystem = new javax.swing.JCheckBox();
+        jckIsDeleted = new javax.swing.JCheckBox();
         jpValue = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
@@ -1389,25 +1394,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsAudited.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jckIsAudited);
 
-        jckIsSystem.setText("Sistema");
-        jckIsSystem.setEnabled(false);
-        jckIsSystem.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel30.add(jckIsSystem);
+        jckIsAuthorized.setText("Autorizado");
+        jckIsAuthorized.setEnabled(false);
+        jckIsAuthorized.setMargin(new java.awt.Insets(2, 0, 2, 2));
+        jckIsAuthorized.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel30.add(jckIsAuthorized);
 
         jPanel5.add(jPanel30);
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsAuthorized.setText("Autorizado");
-        jckIsAuthorized.setEnabled(false);
-        jckIsAuthorized.setMargin(new java.awt.Insets(2, 0, 2, 2));
-        jckIsAuthorized.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel31.add(jckIsAuthorized);
+        jlAccTag.setText("Etiq. contable:");
+        jlAccTag.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel31.add(jlAccTag);
 
-        jckIsDeleted.setText("Eliminado");
-        jckIsDeleted.setEnabled(false);
-        jckIsDeleted.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel31.add(jckIsDeleted);
+        jcbAccTag.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel31.add(jcbAccTag);
 
         jPanel5.add(jPanel31);
 
@@ -1595,6 +1597,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency.add(jPanel37);
 
         jPanel58.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsSystem.setText("Sistema");
+        jckIsSystem.setEnabled(false);
+        jckIsSystem.setPreferredSize(new java.awt.Dimension(145, 23));
+        jPanel58.add(jckIsSystem);
+
+        jckIsDeleted.setText("Eliminado");
+        jckIsDeleted.setEnabled(false);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel58.add(jckIsDeleted);
+
         jpCurrency.add(jPanel58);
 
         jPanel1.add(jpCurrency, java.awt.BorderLayout.NORTH);
@@ -6007,6 +6020,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
             jcbFkFunctionalAreaId.setEnabled(false);
+            
+            jcbAccTag.setEnabled(false);
 
             jcbFkCurrencyId.setEnabled(false);
             jbFkCurrencyId.setEnabled(false);
@@ -6125,7 +6140,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
             jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalAreaId.getItemCount() - 1) != 1); // enable when functional areas applying and only one asignated to current user
-
+            
+            try {
+                jcbAccTag.setEnabled(!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty());
+            }
+            catch (Exception e) {}
+            
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             itemStateChangedFkCurrencyId(false);      // do not calculate document's total
@@ -10795,6 +10815,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JComboBox jcbAccItem;
     private javax.swing.JComboBox jcbAccItemRef_n;
+    private javax.swing.JComboBox<String> jcbAccTag;
     private javax.swing.JComboBox jcbAccUnit;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyBranchGln;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyGln;
@@ -10866,6 +10887,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlAccItemRef_n;
     private javax.swing.JLabel jlAccQuantity;
     private javax.swing.JLabel jlAccSubtotal;
+    private javax.swing.JLabel jlAccTag;
     private javax.swing.JLabel jlAccUnit;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGln;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGlnHint;
@@ -11285,6 +11307,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_MOT_NA });
         moFieldFkCarrierTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_CAR_NA });
         
+        jcbAccTag.setSelectedIndex(0);
+        
         renderBasicSettings();
         renderDpsType();
         renderDpsValue();
@@ -11398,6 +11422,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbCfdCceFkAddresseeBizPartner);
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB, jcbCfdCceFkAddresseeBizPartnerBranch);
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB_ADD, jcbCfdCceFkAddresseeBizPartnerBranchAddress);
+        
+        try {
+            String sAccTags[] = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).replaceAll(" ", "").split(",");
+            jcbAccTag.removeAllItems();
+            jcbAccTag.addItem(SEL_ACC_TAG);
+            for (String tag : sAccTags) {
+                jcbAccTag.addItem(tag);
+            }    
+        } 
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
         
         mbResetingForm = false;
     }
@@ -12313,6 +12349,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldShipments.setFieldValue(moDps.getShipments());
         moFieldIsLinked.setFieldValue(moDps.getIsLinked());
         moFieldIsClosed.setFieldValue(moDps.getIsClosed());
+        
+        jcbAccTag.setSelectedItem(moDps.getAccountingTag());
 
         moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
@@ -12684,6 +12722,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setIsCopy(moFieldIsCopy.getBoolean());
             //moDps.setIsSystem(...
             moDps.setIsDeleted(moFieldIsDeleted.getBoolean());  // when document was deleted, user can reactivate it on save
+            
+            if (!((String) jcbAccTag.getSelectedItem()).equals(SEL_ACC_TAG)) {
+                moDps.setAccountingTag((String) jcbAccTag.getSelectedItem());
+            }
 
             moDps.setFkDpsCategoryId(moDpsType.getPkDpsCategoryId());
             moDps.setFkDpsClassId(moDpsType.getPkDpsClassId());

@@ -19,7 +19,7 @@ import java.util.Date;
  *
  * @author Isabel Servín
  */
-public class SDataScaleTicketDps extends SDataRegistry{
+public class SDataScaleTicketDps extends SDataRegistry {
 
     protected int mnPkScaleTicketId;
     protected int mnPkDpsYearId;
@@ -100,7 +100,7 @@ public class SDataScaleTicketDps extends SDataRegistry{
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
         try {
-            String msSql = "INSERT INTO trn_sca_tic_dps VALUES (" +
+            String msSql = "INSERT INTO trn_sca_tic_dps VALUES(" +
                     mnPkScaleTicketId + ", " + 
                     mnPkDpsYearId + ", " + 
                     mnPkDpsDocId + " " + 

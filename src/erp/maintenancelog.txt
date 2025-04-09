@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 268.0/ 2025-04-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación del catálogo de carrotanques y se agregó a la forma de captura de partidas de DPS.
+2) Adición del porcentaje de acidez en la forma de captura de partidas de DPS.
+3) Adición de las etiquetas contables en la forma de captura de DPS.
+4) Creación de consultas y reportes correspondientes al porcentaje de acidez y a las etiquetas contables.
+
+================================================================================
 SIIE 3.2 267.11/ 2025-04-07
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
