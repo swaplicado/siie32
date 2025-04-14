@@ -41,10 +41,12 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.trn.db.SDbDpsEntryAnalysis;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
+import erp.mqlt.form.SFormAnalysisDpsEty;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfdEntry;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
@@ -78,6 +80,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -2906,10 +2910,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
         // Quality pane:
         
+        SFormAnalysisDpsEty oForm = new SFormAnalysisDpsEty(miClient, "Análisis para ítem");
+        
         moGridAnalysis = new SGridPaneForm((SGuiClient) miClient, SModConsts.TRN_DPS_ETY_ANALYSIS, SDataConstantsSys.UNDEFINED, "Configuración de análisis") {
             @Override
             public void initGrid() {
-                setRowButtonsEnabled(false);
+                jbRowNew.setEnabled(true);
+                jbRowEdit.setEnabled(false);
+                jbRowDelete.setEnabled(false);
             }
 
             @Override
@@ -2939,6 +2947,31 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 columns.add(column);
                 
                 return columns;
+            }
+            
+            @Override
+            public void actionRowNew() {
+                if (jbRowNew.isEnabled()) {
+                    oForm.formReset();
+                    oForm.setValue(SFormAnalysisDpsEty.DPS_YEAR, moDpsEntry.getPkYearId());
+                    oForm.setValue(SFormAnalysisDpsEty.DPS_DOC, moDpsEntry.getPkDocId());
+                    oForm.setValue(SFormAnalysisDpsEty.DPS_ETY, moDpsEntry.getPkEntryId());
+                    oForm.setValue(SFormAnalysisDpsEty.DPS_ITEM, moItem.getPkItemId());
+                    
+                    oForm.setVisible(true);
+                    if (oForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        try {
+                            SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) oForm.getRegistry();
+                            
+                            moGridAnalysis.addGridRow(oRegistry);
+                            moGridAnalysis.resetSortKeys();
+                            moGridAnalysis.setSelectedGridRow(0);
+                        }
+                        catch (Exception ex) {
+                            Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
             }
         };
         
