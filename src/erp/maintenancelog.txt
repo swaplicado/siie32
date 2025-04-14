@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 269.1/ 2025-04-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio de nombre del campo "Repositorio contable" por "Referencia contable" y habilitación del campo cuando la cuenta de mayor tenga asignada cuentas especiales de corto plazo.
+2) Refactorización general de menús y vistas.
+
+================================================================================
 SIIE 3.2 269.0/ 2025-04-09
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

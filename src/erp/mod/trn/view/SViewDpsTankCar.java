@@ -38,6 +38,8 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewDpsTankCar extends SGridPaneView implements ActionListener, ItemListener {
     
+    public static final int START_YEAR = 2025; // año de inicio de la funcionalidad de carrotanques
+    
     private JCheckBox jcbInCatalog;
     private JButton jbCardex;
     
@@ -106,46 +108,59 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
                         + "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) AS num, "
                         + "d.num_ref, "
                         + "d.dt, "
+                        + "cob.code AS f_cob_code, "
                         + "bp.bp, "
+                        + "bpc.bp_key, "
+                        + "bpb.bpb, "
                         + "CONCAT(ad.street, ' ', ad.street_num_ext, IF(ad.street_num_int <> '', CONCAT('-', ad.street_num_int), '')) AS street, "
                         + "ad.neighborhood AS nei, "
                         + "ad.zip_code, "
                         + "ad.locality, "
                         + "ad.county, "
                         + "ad.state, "
-                        + "IF(c.cty IS NULL, csys.cty, c.cty) AS cty "
+                        + "IF(c.cty IS NULL, '" + miClient.getSession().getSessionCustom().getLocalCountry() + "', c.cty) AS cty "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON "
                         + "d.id_year = de.id_year AND d.id_doc = de.id_doc "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON "
                         + "d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON "
+                        + "d.fid_cob = cob.id_bpb "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                         + "d.fid_bp_r = bp.id_bp "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bpc ON "
+                        + "bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (mnGridSubtype == SModConsts.MOD_TRN_SAL_N ?  SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP) + " " 
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON "
+                        + "d.fid_bpb = bpb.id_bpb "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS ad ON "
                         + "d.fid_bpb = ad.id_bpb AND d.fid_add = ad.id_add "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS c ON "
                         + "ad.fid_cty_n = c.id_cty "
-                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS csys ON "
-                        + "csys.id_cty = (SELECT fid_cty FROM " + SModConsts.TablesMap.get(SModConsts.CFG_PARAM_ERP) + ") "
-                        + "WHERE FIND_IN_SET('" + plate + "', de.tank_car) "
+                        + "WHERE "
+                        + "NOT d.b_del AND NOT de.b_del AND de.tank_car <> '' AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND "
                         + (mnGridSubtype == SModConsts.MOD_TRN_SAL_N ?
-                        "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " " :
-                        "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " ")
-                        + "ORDER BY de.ts_new DESC LIMIT 1;";
+                        "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " " :
+                        "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " ")
+                        + "AND YEAR(d.dt) >= " + START_YEAR + " "
+                        + "AND de.tank_car LIKE '%" + plate + "%' "
+                        + "ORDER BY d.dt DESC, de.ts_new DESC LIMIT 1;";
                 ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                 if (resultSet.next()) {
                     row.setRowValueAt(resultSet.getString("code"), 3);
                     row.setRowValueAt(resultSet.getString("num"), 4);
                     row.setRowValueAt(resultSet.getString("num_ref"), 5);
                     row.setRowValueAt(resultSet.getDate("dt"), 6);
-                    row.setRowValueAt(resultSet.getString("bp"), 7);
-                    row.setRowValueAt(resultSet.getString("street"), 8);
-                    row.setRowValueAt(resultSet.getString("nei"), 9);
-                    row.setRowValueAt(resultSet.getString("zip_code"), 10);
-                    row.setRowValueAt(resultSet.getString("locality"), 11);
-                    row.setRowValueAt(resultSet.getString("county").toUpperCase(), 12);
-                    row.setRowValueAt(resultSet.getString("state").toUpperCase(), 13);
-                    row.setRowValueAt(resultSet.getString("cty").toUpperCase(), 14);
+                    row.setRowValueAt(resultSet.getString("f_cob_code"), 7);
+                    row.setRowValueAt(resultSet.getString("bp"), 8);
+                    row.setRowValueAt(resultSet.getString("bp_key"), 9);
+                    row.setRowValueAt(resultSet.getString("bpb"), 10);
+                    row.setRowValueAt(resultSet.getString("street"), 11);
+                    row.setRowValueAt(resultSet.getString("nei"), 12);
+                    row.setRowValueAt(resultSet.getString("zip_code"), 13);
+                    row.setRowValueAt(resultSet.getString("locality"), 14);
+                    row.setRowValueAt(resultSet.getString("county").toUpperCase(), 15);
+                    row.setRowValueAt(resultSet.getString("state").toUpperCase(), 16);
+                    row.setRowValueAt(resultSet.getString("cty").toUpperCase(), 17);
                 }
             }
         } catch (SQLException e) {
@@ -174,7 +189,7 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
             sql += (sql.isEmpty() ? "" : "AND ") + "b.b_cat = 1 ";
         }
         
-        msSql = "SELECT * FROM("
+        msSql = "SELECT * FROM ("
             + "SELECT "
             + "t.id_tank_car AS " + SDbConsts.FIELD_ID + "1, "
             + "'' AS " + SDbConsts.FIELD_CODE + ", "
@@ -183,7 +198,10 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
             + "'' AS inv, "
             + "'' AS ref, "
             + "NULL AS date, "
+            + "'' AS f_cob_code, "
             + "'' AS bp, "
+            + "'' AS bp_key, "
+            + "'' AS bpb, "
             + "'' AS street, "
             + "'' AS nei, "
             + "'' AS zip_code, "
@@ -203,7 +221,10 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
             + "'' AS inv, "
             + "'' AS ref, "
             + "NULL AS date, "
+            + "'' AS f_cob_code, "
             + "'' AS bp, "
+            + "'' AS bp_key, "
+            + "'' AS bpb, "
             + "'' AS street, "
             + "'' AS nei, "
             + "'' AS zip_code, "
@@ -213,11 +234,11 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
             + "'' AS cty, "
             + "0 AS b_cat, "
             + "0 AS " + SDbConsts.FIELD_IS_DEL + " "
-            + "FROM("
+            + "FROM ("
             + "SELECT DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(de.tank_car, ',', n.n), ',', -1) AS plate "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
-            + "JOIN(SELECT 1 AS n UNION ALL SELECT 2) n ON " // se debe ajustar de acuerdo a la cantidad de posibles matriculas en el campo
-            + "n.n <= (LENGTH(de.tank_car) - LENGTH(REPLACE(de.tank_car, ',', '')) + 1) "
+            + "JOIN (SELECT 1 AS n UNION ALL SELECT 2) n ON " // se debe agregar 'SELECT' de acuerdo al número máximo de matrículas en el campo
+            + "n.n <= (LENGTH(de.tank_car) - LENGTH(REPLACE(de.tank_car, ',', '')) + 1) " // conteo del número de matrículas del campo
             + "WHERE de.tank_car <> '') AS a "
             + "WHERE a.plate NOT IN "
             + "(SELECT t.plate FROM " + SModConsts.TablesMap.get(SModConsts.LOG_TANK_CAR) + " AS t)) AS b "
@@ -229,7 +250,7 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[15];
+        SGridColumnView[] columns = new SGridColumnView[18];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, SDbConsts.FIELD_NAME, "Matricula");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "b_cat", "Catalogo carrotanques");
@@ -238,7 +259,17 @@ public class SViewDpsTankCar extends SGridPaneView implements ActionListener, It
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "inv", "Folio documento");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "ref", "Referencia documento");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE, "date", "Fecha documento");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp", "Asociado negocios");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_cob_code", "Sucursal empresa", 35);
+        if (mnGridSubtype == SModConsts.MOD_TRN_SAL_N) {
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp", "Cliente");
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp_key", "Clave cliente", 50);
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bpb", "Sucursal cliente", 75);
+        }
+        else {
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp", "Proveedor");
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp_key", "Clave proveedor", 50);
+            columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bpb", "Sucursal proveedor", 75);
+        }
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "street", "Calle", 250);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nei", "Colonia", 150);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "zip_code", "Código postal", 50);
