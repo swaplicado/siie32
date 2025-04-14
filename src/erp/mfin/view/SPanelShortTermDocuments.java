@@ -39,6 +39,8 @@ import sa.lib.srv.SSrvConsts;
  */
 public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.lib.table.STableTabInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener {
 
+    public static final String WITHOUT_REFERENCE = "(SIN REFERENCIA)";
+    
     protected erp.client.SClientInterface miClient;
     protected java.lang.String msTabTitle;
     protected int mnTabType;
@@ -331,7 +333,7 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
         aoTableColumns = new STableColumnForm[14];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia", STableConstants.WIDTH_ACCOUNT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia contable", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo inicial mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cargos mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Abonos mon $", STableConstants.WIDTH_VALUE_2X);
@@ -434,7 +436,7 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
 
         // I. Read all accounting moves belonging to current period:
         
-        sSql = "SELECT acc.id_acc, acc.acc, IF(re.ref = '', '(SIN REFERENCIA)', re.ref) AS ref, " +
+        sSql = "SELECT acc.id_acc, acc.acc, IF(re.ref = '', '" + WITHOUT_REFERENCE + "', re.ref) AS ref, " +
                     "SUM(IF(r.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "', re.debit_cur - re.credit_cur, 0)) AS f_si_cur, " +
                     "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.debit_cur, 0))  AS debit_cur, " +
                     "SUM(IF(r.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateStart) + "' AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtDateEnd) + "', re.credit_cur, 0)) AS credit_cur, " +

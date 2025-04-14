@@ -5,6 +5,7 @@
 
 package erp.gui;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataRepConstants;
@@ -38,6 +39,7 @@ import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
+import erp.mtrn.data.SItemConfigurationDps;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -177,6 +179,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepQueries;
+    private javax.swing.JMenu jmRepAccTag;
     private javax.swing.JMenuItem jmiRepTrnGlobal;
     private javax.swing.JMenuItem jmiRepTrnByMonth;
     private javax.swing.JMenuItem jmiRepTrnByItemGeneric;
@@ -190,8 +193,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByItemGenericReference;
     private javax.swing.JMenuItem jmiRepTrnByItemReference;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
+    private javax.swing.JMenuItem jmiRepAccDpsAccTag;
     private javax.swing.JMenuItem jmiRepTrnDpsAciPer;
-    private javax.swing.JMenuItem jmiRepTrnDpsAccTag;
     private javax.swing.JMenuItem jmiRepFunctionalAreaExpenses;
     private javax.swing.JMenu jmRepBackorder;
     private javax.swing.JMenuItem jmiRepBackorderContract;
@@ -236,8 +239,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnContractBackorderStock;
     private javax.swing.JSeparator jsRepContract;
     private javax.swing.JMenuItem jmiRepTrnUnitaryCosts;
-    private javax.swing.JSeparator jsRepTrnAccTag;
-    private javax.swing.JMenuItem jmiRepAccTag;
+    private javax.swing.JMenuItem jmiRepAccAccTag;
     
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
@@ -286,10 +288,15 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightScaleCfg = false;
         boolean hasComAuthAppWeb = false;
         boolean hasConfAccTag = false;
+        boolean hasConfAciPer = false;
+        boolean hasConfTankCar = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
 
+        SItemConfigurationDps confItemAcidityPercentage;
+        SItemConfigurationDps confItemTankCar;
+        
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
         jmiCatDiogDncDocumentNumberSeries = new JMenuItem("Folios de docs. de inventarios");
@@ -428,7 +435,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice = new JMenuItem("Precios de compras");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
-        jmiDpsDocTankCar = new JMenuItem("Facturas de compras y carrotanques");
+        jmiDpsDocTankCar = new JMenuItem("Facturas vs. carrotanques");
         jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         jmiSearchCfdiByUuid = new JMenuItem("Búsqueda de CFDI por UUID...");
         jmiSearchDps = new JMenuItem("Búsqueda de documentos...");
@@ -458,7 +465,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsPriceHist);
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocRemission);
-        jmDps.addSeparator();
         jmDps.add(jmiDpsDocTankCar);
         jmDps.addSeparator();
         jmDps.add(jmiCfdiMassiveValidation);
@@ -528,8 +534,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
-        jmRepQueries = new JMenu("Consultas de saldos de proveedores");
-        jmRepBal = new JMenu("Saldos de proveedores");
         jmiRepTrnGlobal = new JMenuItem("Compras globales");
         jmiRepTrnByMonth = new JMenuItem("Compras globales por mes");
         jmiRepTrnByItemGeneric = new JMenuItem("Compras por ítem genérico");
@@ -544,7 +548,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByItemReference = new JMenuItem("Compras por ítem de referencia");
         jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de compras por ítem-proveedor");
         jmiRepTrnDpsAciPer = new JMenuItem("Partidas de documentos de compras con acidez");
-        jmiRepTrnDpsAccTag = new JMenuItem("Documentos de compras con etiqueta contable");
         jmiRepFunctionalAreaExpenses= new JMenuItem("Control de presupuestos mensuales de gastos");
         jmRepBackorder = new JMenu("Consultas de backorder de compras");
         jmiRepBackorderContract = new JMenuItem("Backorder de contratos");
@@ -555,11 +558,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepBackorderOrderByItem = new JMenuItem("Backorder de pedidos por ítem");
         jmiRepBackorderOrderByItemBizPartner = new JMenuItem("Backorder de pedidos por ítem-proveedor");
         jmiRepBackorderOrderByItemBizPartnerBra = new JMenuItem("Backorder de pedidos por ítem-proveedor sucursal");
+        jmRepQueries = new JMenu("Consultas de saldos de proveedores");
         jmiQryBizPartnerBalance = new JMenuItem("Consulta de saldos de proveedores");
         jmiQryBizPartnerAccountsAging = new JMenuItem("Consulta de antigüedad de saldos de proveedores");
         jmiQryBizPartnerLastMove = new JMenuItem("Consulta último movimiento de proveedores");
         jmiQryCurrencyBalance =  new JMenuItem("Consulta de cuentas por pagar por moneda");
         jmiQryCurrencyBalanceBizPartner =  new JMenuItem("Consulta de cuentas por pagar por moneda-proveedor");
+        jmRepAccTag = new JMenu("Documentos de compras con etiqueta contable");
+        jmiRepAccDpsAccTag = new JMenuItem("Documentos de compras con etiqueta contable");
+        jmiRepAccAccTag = new JMenuItem("Reporte de documentos de compras con etiqueta contable...");
+        jmRepBal = new JMenu("Saldos de proveedores");
         jmiRepBizPartnerBalance = new JMenuItem("Saldos proveedores...");
         jmiRepBizPartnerBalanceDps = new JMenuItem("Saldos proveedores por documento...");
         jmiRepBizPartnerBalanceAging = new JMenuItem("Antigüedad de saldos de proveedores...");
@@ -588,8 +596,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnContractBackorderStock = new JMenuItem("Reporte de backorder contratos de compras vs. existencias...");
         jsRepContract = new JPopupMenu.Separator();
         jmiRepTrnUnitaryCosts = new JMenuItem("Reporte de costos unitarios de compras...");
-        jsRepTrnAccTag = new JPopupMenu.Separator();
-        jmiRepAccTag = new JMenuItem("Reporte de facturas de compras con etiqueta contable...");
         
         jmRepStats.add(jmiRepTrnGlobal);
         jmRepStats.add(jmiRepTrnByMonth);
@@ -604,9 +610,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepStats.add(jmiRepTrnByItemGenericReference);
         jmRepStats.add(jmiRepTrnByItemReference);
         jmRepStats.addSeparator();
-        jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
         jmRepStats.add(jmiRepTrnDpsAciPer);
-        jmRepStats.add(jmiRepTrnDpsAccTag);
+        jmRepStats.addSeparator();
+        jmRepStats.add(jmiRepTrnDpsByItemBizPartner);
         jmRepStats.addSeparator();
         jmRepStats.add(jmiRepFunctionalAreaExpenses);
         jmRepBackorder.add(jmiRepBackorderContract);
@@ -628,10 +634,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRepBal.add(jmiRepBizPartnerBalanceDps);
         jmRepBal.add(jmiRepBizPartnerBalAdvSup);
         jmRepBal.add(jmiRepAdv);
+        jmRepAccTag.add(jmiRepAccDpsAccTag);
+        jmRepAccTag.add(jmiRepAccAccTag);
         
         jmRep.add(jmRepStats);
         jmRep.add(jmRepBackorder);
         jmRep.add(jmRepQueries);
+        jmRep.addSeparator();
+        jmRep.add(jmRepAccTag);
         jmRep.addSeparator();
         jmRep.add(jmRepBal);
         jmRep.add(jmiRepBizPartnerBalanceAging);
@@ -664,8 +674,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnContractBackorderStock);
         jmRep.add(jsRepContract); // separator
         jmRep.add(jmiRepTrnUnitaryCosts);
-        jmRep.add(jsRepTrnAccTag); // separator
-        jmRep.add(jmiRepAccTag);
         
         moDialogRepDpsList = new SDialogRepDpsList(miClient);
         moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
@@ -784,7 +792,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByItemReference.addActionListener(this);
         jmiRepTrnDpsByItemBizPartner.addActionListener(this);
         jmiRepTrnDpsAciPer.addActionListener(this);
-        jmiRepTrnDpsAccTag.addActionListener(this);
+        jmiRepAccDpsAccTag.addActionListener(this);
         jmiRepFunctionalAreaExpenses.addActionListener(this);
         jmiRepBackorderContract.addActionListener(this);
         jmiRepBackorderContractByItem.addActionListener(this);
@@ -825,7 +833,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnContractStatus.addActionListener(this);
         jmiRepTrnContractBackorderStock.addActionListener(this);
         jmiRepTrnUnitaryCosts.addActionListener(this);
-        jmiRepAccTag.addActionListener(this);
+        jmiRepAccAccTag.addActionListener(this);
 
         hasRightDnsDps = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DPS_DNS).HasRight;
         hasRightDnsDiog = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_DIOG_CFG).HasRight;
@@ -853,6 +861,18 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         try {
             hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == 1;
             hasConfAccTag = !SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty();
+        } 
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
+            String sItemTankCar = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_TANK_CAR);
+            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
+            confItemTankCar = mapper.readValue(sItemTankCar, SItemConfigurationDps.class);
+            hasConfAciPer = confItemAcidityPercentage.getigen().size() > 0 || confItemAcidityPercentage.getifam().size() > 0;
+            hasConfTankCar = confItemTankCar.getigen().size() > 0 || confItemTankCar.getifam().size() > 0;
         } 
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -896,7 +916,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
-        jmiDpsDocTankCar.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiDpsDocTankCar.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR && hasConfTankCar);
         jmiCfdiMassiveValidation.setEnabled(true);
         jmiSearchCfdiByUuid.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiSearchDps.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
@@ -932,8 +952,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
 
         jmRep.setEnabled(hasRightReports);
-        jmiRepTrnDpsAccTag.setEnabled(hasConfAccTag);
-        jmiRepAccTag.setEnabled(hasConfAccTag);
+        jmiRepAccDpsAccTag.setEnabled(hasConfAccTag);
+        jmiRepTrnDpsAciPer.setEnabled(hasConfAciPer);
+        jmRepAccTag.setEnabled(hasConfAccTag);
+        jmiRepAccAccTag.setEnabled(hasConfAccTag);
         
         jmiQryBizPartnerLastMove.setEnabled(false); // SQL query in associated view needs refactoring
         
@@ -1940,7 +1962,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiRepTrnDpsAciPer) {
                 miClient.getSession().showView(SModConsts.TRNX_DPS_ETY_ACI_PER, SModConsts.MOD_TRN_PUR_N, null);
             }
-            else if (item == jmiRepTrnDpsAccTag) {
+            else if (item == jmiRepAccDpsAccTag) {
                 miClient.getSession().showView(SModConsts.TRNX_DPS_ACC_TAG, SModConsts.MOD_TRN_PUR_N, null);
             }
             else if (item == jmiRepFunctionalAreaExpenses) {
@@ -2099,7 +2121,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepPurchasesUnitaryCost.formReset();
                 moDialogRepPurchasesUnitaryCost.setFormVisible(true);
             }
-            else if (item == jmiRepAccTag) {
+            else if (item == jmiRepAccAccTag) {
                 moDialogRepAccTag.formRefreshCatalogues();
                 moDialogRepAccTag.formReset();
                 moDialogRepAccTag.setParamIsSupplier(true);

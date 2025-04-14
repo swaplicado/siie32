@@ -101,7 +101,7 @@ public abstract class SFinRecordUtils {
         fileColumns.put(COMP_BIZPARTNER, "RFC asociado negocio");
         fileColumns.put(COMP_OCCASIONAL, "RFC ocasional");
         fileColumns.put(COMP_FOREGN, "ID fiscal extranjero");
-        fileColumns.put(COMP_REFERENCE, "Repositorio contable");
+        fileColumns.put(COMP_REFERENCE, "Referencia contable");
         fileColumns.put(COMP_TAX_APP, "Aplican impuestos");
         fileColumns.put(COMP_TAX, "Impuesto base, Tipo impuesto, Tasa impuesto, Tipo IVA");
         fileColumns.put(COMP_TAX_CASH, "Tipo aplicación impuesto");
@@ -156,7 +156,7 @@ public abstract class SFinRecordUtils {
                     String ocassionalFiscalId = row.getCell(11) == null ? "" : row.getCell(11).getStringCellValue();
                     String country = row.getCell(12) == null ? "" : row.getCell(12).getStringCellValue();
                     String fiscalForegnId = row.getCell(13) == null ? "" : row.getCell(13).getStringCellValue();
-                    String repository = row.getCell(14) == null ? "" : row.getCell(14).getStringCellValue();
+                    String reference = row.getCell(14) == null ? "" : row.getCell(14).getStringCellValue();
                     String taxAppliying = row.getCell(15) == null ? "" : row.getCell(15).getStringCellValue();
                     String taxBase = row.getCell(16) == null ? "" : row.getCell(16).getStringCellValue();
                     String taxType = row.getCell(17) == null ? "" : row.getCell(17).getStringCellValue();
@@ -189,6 +189,7 @@ public abstract class SFinRecordUtils {
                         mnAccountSystemTypeId = accMajor.getFkAccountSystemTypeId();
                         int[] anAccountSubclass = new int[] { accMajor.getFkAccountTypeId_r(), accMajor.getFkAccountClassId_r(), accMajor.getFkAccountSubclassId_r() };
 
+                        boolean isAccShortTermDoc = accMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY || accMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC;
                         boolean isAccSysBizPartnerAll = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR });
                         boolean isAccSysBizPartnerSupCus = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS });
                         boolean isAccSysPurchases = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ });
@@ -305,10 +306,10 @@ public abstract class SFinRecordUtils {
                             entry.IsForegn = !country.isEmpty();
                         }
 
-                        // Validar si se debe agregar el repositorio
+                        // Validar si se debe agregar la referencia contable
                         
-                        if (isAccSysBizPartnerAll) {
-                            entry.Repository = repository;
+                        if (isAccSysBizPartnerAll || isAccShortTermDoc) {
+                            entry.Reference = reference;
                             entry.IsReferenceTax = taxAppliying.equalsIgnoreCase("Sí");
                         }
 
@@ -1295,8 +1296,8 @@ public abstract class SFinRecordUtils {
             recordEntry.setOccasionalFiscalId("");
         }
 
-        if (!entry.Repository.isEmpty()) {
-            recordEntry.setReference(entry.Repository);
+        if (!entry.Reference.isEmpty()) {
+            recordEntry.setReference(entry.Reference);
             recordEntry.setIsReferenceTax(entry.IsReferenceTax);
         }
         else {
@@ -1418,7 +1419,7 @@ class SFinRecordEntry {
     public int BizPartnerId;
     public String OccasionalFiscalId;
     public boolean IsForegn;
-    public String Repository;
+    public String Reference;
     public boolean IsReferenceTax;
     public int[] TaxKey;
     public int[] EntityKey;
@@ -1464,7 +1465,7 @@ class SFinRecordEntry {
         BizPartnerId = 0;
         OccasionalFiscalId = "";
         IsForegn = false;
-        Repository = "";
+        Reference = "";
         IsReferenceTax = false;
         TaxKey = null;
         EntityKey = null;
