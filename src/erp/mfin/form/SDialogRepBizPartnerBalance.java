@@ -23,6 +23,7 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsConsts;
 import erp.mod.bps.db.SBpsUtils;
@@ -115,6 +116,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jrbCurrencyLoc = new javax.swing.JRadioButton();
+        jlCurrencyLocWarning = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jrbCurrencyDoc = new javax.swing.JRadioButton();
         jlCurrencyDocWarning = new javax.swing.JLabel();
@@ -126,11 +128,11 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jbPickExRate = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         jlSalesAgent = new javax.swing.JLabel();
-        jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbSalesAgent = new javax.swing.JComboBox<>();
         jbPickSalesAgent = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
@@ -176,17 +178,17 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
 
         bgType.add(jrbTypeCutoff);
         jrbTypeCutoff.setText("Saldos al corte");
-        jrbTypeCutoff.setPreferredSize(new java.awt.Dimension(100, 23));
+        jrbTypeCutoff.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel9.add(jrbTypeCutoff);
 
         bgType.add(jrbTypeCutoffCredit);
         jrbTypeCutoffCredit.setText("Saldos al corte vs. crédito");
-        jrbTypeCutoffCredit.setPreferredSize(new java.awt.Dimension(160, 23));
+        jrbTypeCutoffCredit.setPreferredSize(new java.awt.Dimension(190, 23));
         jPanel9.add(jrbTypeCutoffCredit);
 
         bgType.add(jrbTypePeriod);
         jrbTypePeriod.setText("Saldos por período");
-        jrbTypePeriod.setPreferredSize(new java.awt.Dimension(125, 23));
+        jrbTypePeriod.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jrbTypePeriod);
 
         jPanel6.add(jPanel9);
@@ -252,18 +254,23 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jrbCurrencyLoc.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel15.add(jrbCurrencyLoc);
 
+        jlCurrencyLocWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jlCurrencyLocWarning.setText("NOTA: ¡Contiene todos los movimientos.!");
+        jlCurrencyLocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
+        jPanel15.add(jlCurrencyLocWarning);
+
         jPanel6.add(jPanel15);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         bgCurrency.add(jrbCurrencyDoc);
-        jrbCurrencyDoc.setText("Moneda del documento");
+        jrbCurrencyDoc.setText("Moneda transacción");
         jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jrbCurrencyDoc);
 
         jlCurrencyDocWarning.setForeground(new java.awt.Color(255, 0, 0));
         jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en la moneda seleccionada!");
-        jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(300, 23));
+        jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel16.add(jlCurrencyDocWarning);
 
         jPanel6.add(jPanel16);
@@ -302,7 +309,6 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlBizPartner);
 
-        jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbBizPartner.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel4.add(jcbBizPartner);
 
@@ -320,7 +326,6 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
         jlSalesAgent.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlSalesAgent);
 
-        jcbSalesAgent.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbSalesAgent.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel8.add(jcbSalesAgent);
 
@@ -592,6 +597,15 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                     sqlDpsFilter += "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsBegin.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsEnd.getDate()) + "' ";
                 }
                 
+                String txtCurrency = SUtilConsts.TXT_CURRENCY.toUpperCase() + ": ";
+                if (jrbCurrencyLoc.isSelected()) {
+                    txtCurrency += "MONEDA LOCAL (" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")";
+                }
+                else {
+                    SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+                    txtCurrency += cur.getCurrency() + " (" + cur.getKey() + ")";
+                }
+                
                 map = miClient.createReportParams();
                 map.put("nSysMoveCatId", manSysMoveTypeKey[0]);
                 map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
@@ -606,7 +620,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("sFilterBizPartner", filterBp);
                 map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
                 map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
-                map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
+                map.put("sCurrency", txtCurrency);
                 map.put("sFilterCurrency", filterCur);
                 map.put("dExchangeRate", moFieldExRate.getDouble());
                 map.put("oExcRateFormat", SLibUtils.getDecimalFormatExchangeRate());
@@ -651,7 +665,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("sTitle", getTitle().toUpperCase());
                 map.put("sBizPartner", msBizPartnerCatSng.toUpperCase() + ": " + (jcbBizPartner.getSelectedIndex() <= 0 ? SUtilConsts.ALL : jcbBizPartner.getSelectedItem().toString()));
                 map.put("sSalesAgent", jcbSalesAgent.getSelectedIndex() <= 0 ? "" : SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString());
-                map.put("sCurrency", SUtilConsts.TXT_CURRENCY.toUpperCase() + ": " + miClient.getSession().getSessionCustom().getLocalCurrency());
+                map.put("sCurrency", SUtilConsts.TXT_CURRENCY.toUpperCase() + ": " + "MONEDA LOCAL (" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")");
                 map.put("sCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
                 map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]);
                 map.put("tDateStart", moFieldDateStart.getDate());
@@ -743,11 +757,13 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
 
     private void itemStateChangedCurrencyOptions() {
         if (jrbCurrencyLoc.isSelected()) {
+            jlCurrencyLocWarning.setVisible(true);
             jlCurrencyDocWarning.setVisible(false);
             jcbCurrency.setEnabled(false);
             moFieldCurrency.setKey(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
         }
         else if (jrbCurrencyDoc.isSelected()) {
+            jlCurrencyLocWarning.setVisible(false);
             jlCurrencyDocWarning.setVisible(true);
             jcbCurrency.setEnabled(true);
             moFieldCurrency.resetField();
@@ -907,6 +923,7 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlCurrencyDocWarning;
+    private javax.swing.JLabel jlCurrencyLocWarning;
     private javax.swing.JLabel jlDateCutoff;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;

@@ -5,6 +5,7 @@
 
 package erp.mtrn.form;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
@@ -13,6 +14,7 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mcfg.data.SCfgUtils;
+import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -21,6 +23,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.*;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -192,10 +195,10 @@ public class SDialogRepAccountTag extends javax.swing.JDialog implements erp.lib
         if (mbFirstTime) {
             mbFirstTime = false;
             if (mbParamIsSupplier) {
-                setTitle("Reporte de facturas de compras con etiqueta contable");
+                setTitle("Reporte de documentos de compras con etiqueta contable");
             }
             else {
-                setTitle("Reporte de facturas de ventas con etiqueta contable");
+                setTitle("Reporte de documentos de ventas con etiqueta contable");
             }
             jtfYear.setText(miClient.getSession().getCurrentYear() + "");
             jtfYear.requestFocus();
@@ -221,6 +224,8 @@ public class SDialogRepAccountTag extends javax.swing.JDialog implements erp.lib
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
+                String areas[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, SLibConsts.UNDEFINED);
+                
                 map = miClient.createReportParams();
                 map.put("nYear", moFieldYear.getInteger());
                 map.put("bIsSupplier", mbParamIsSupplier);
@@ -228,6 +233,8 @@ public class SDialogRepAccountTag extends javax.swing.JDialog implements erp.lib
                 map.put("sDocType", mbParamIsSupplier ? "COMPRAS" : "VENTAS");
                 map.put("bShowDetail", jrbDetail.isSelected());
                 map.put("nFidCtDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_CT_DPS_PUR : SDataConstantsSys.TRNU_CT_DPS_SAL);
+                map.put("sSqlOrderBy", mbParamIsSupplier ? "m.mon, bp.bp, dt.code, d.num" : "m.mon, dt.code, d.num, bp.bp");
+                map.put("sFuncAreas", areas[1]);
                 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_ACC_TAG, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

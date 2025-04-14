@@ -128,6 +128,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_ITEM_TANK_CAR = "TRN_ITEM_TANK_CAR";
     public static final String CFG_PARAM_TRN_ITEM_ACIDITY = "TRN_ITEM_ACIDITY";
     public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
+    public static final String CFG_PARAM_TRN_TP_VEH_TANK_CAR = "TRN_TP_VEH_TANK_CAR";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
