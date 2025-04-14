@@ -504,12 +504,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel92 = new javax.swing.JPanel();
         jlFkFunctionalAreaId = new javax.swing.JLabel();
         jcbFkFunctionalAreaId = new javax.swing.JComboBox<>();
-        jPanel30 = new javax.swing.JPanel();
-        jckIsAudited = new javax.swing.JCheckBox();
-        jckIsAuthorized = new javax.swing.JCheckBox();
         jPanel31 = new javax.swing.JPanel();
         jlAccTag = new javax.swing.JLabel();
         jcbAccTag = new javax.swing.JComboBox<>();
+        jPanel30 = new javax.swing.JPanel();
+        jckIsAudited = new javax.swing.JCheckBox();
+        jckIsAuthorized = new javax.swing.JCheckBox();
         jPanel13 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jckRecordUser = new javax.swing.JCheckBox();
@@ -1386,6 +1386,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel5.add(jPanel92);
 
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccTag.setText("Etiqueta contable:");
+        jlAccTag.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel31.add(jlAccTag);
+
+        jcbAccTag.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel31.add(jcbAccTag);
+
+        jPanel5.add(jPanel31);
+
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckIsAudited.setText("Auditado");
@@ -1401,17 +1412,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel30.add(jckIsAuthorized);
 
         jPanel5.add(jPanel30);
-
-        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlAccTag.setText("Etiq. contable:");
-        jlAccTag.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel31.add(jlAccTag);
-
-        jcbAccTag.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel31.add(jcbAccTag);
-
-        jPanel5.add(jPanel31);
 
         jPanel3.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -7468,6 +7468,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moFormEntry.setValue(SDataConstants.FINU_TAX_REG, ((SFormComponentItem) jcbTaxRegionId.getSelectedItem()).getPrimaryKey());
                 moFormEntry.setValue(SFormDpsEntry.LINK_TICKET_SELECT, jtbLinkTicket.isSelected());
                 moFormEntry.setValue(SFormDpsEntry.LINKED_TICKET, mvScaleTicDps);
+                moFormEntry.setValue(SFormDpsEntry.TP_VEH, jcbFkVehicleId_n.isEnabled() ? moFieldFkVehicleTypeId_n.getKeyAsIntArray()[0] : 0);
                 
                 moFormEntry.setFormVisible(true);
 
@@ -11729,6 +11730,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             else if (jcbFkSpotDesId_n.isEnabled() && jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
                                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotDesId_n.getText() + "'.");
                                 validation.setComponent(jcbFkSpotDesId_n);
+                                validation.setTabbedPaneIndex(TAB_MKT);
+                            }
+                            else if (jcbFkModeOfTransportationTypeId.isEnabled() && 
+                                    (moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_LAN ||
+                                    moFieldFkModeOfTransportationTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_MOT_MUL) &&
+                                    moFieldFkCarrierTypeId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_TP_CAR_NA) {
+                                validation.setMessage("El valor para el campo '" + jlFkCarrierTypeId.getText() + "' debe ser diferente de (N/A)");
+                                validation.setComponent(jcbFkCarrierTypeId);
                                 validation.setTabbedPaneIndex(TAB_MKT);
                             }
                             else {

@@ -150,7 +150,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCompanyBranch);
 
-        jcbCompanyBranch.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbCompanyBranch.setPreferredSize(new java.awt.Dimension(266, 23));
         jPanel6.add(jcbCompanyBranch);
 
@@ -162,7 +161,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jlBizArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlBizArea);
 
-        jcbBizArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbBizArea.setPreferredSize(new java.awt.Dimension(266, 23));
         jPanel5.add(jcbBizArea);
 
@@ -174,7 +172,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlBizPartner);
 
-        jcbBizPartner.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbBizPartner.setPreferredSize(new java.awt.Dimension(266, 23));
         jPanel7.add(jcbBizPartner);
 
@@ -186,7 +183,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jlAgent.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlAgent);
 
-        jcbAgent.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbAgent.setPreferredSize(new java.awt.Dimension(266, 23));
         jPanel8.add(jcbAgent);
 
@@ -198,7 +194,6 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jlRoute.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlRoute);
 
-        jcbRoute.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbRoute.setPreferredSize(new java.awt.Dimension(266, 23));
         jPanel9.add(jcbRoute);
 
@@ -258,7 +253,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(576, 389));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

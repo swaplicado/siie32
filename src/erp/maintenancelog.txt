@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 270.0/ 2025-04-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Habilitación de campos en la forma de captura de DPS dependiendo las configuraciones en la tabla CFG_PARAM.
+2) Cambio le lugares en los campos de captura del DPS.
+
+================================================================================
 SIIE 3.2 269.1/ 2025-04-14
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
