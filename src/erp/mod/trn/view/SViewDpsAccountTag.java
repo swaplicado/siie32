@@ -56,7 +56,9 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
         jlFuncArea = new JLabel("  Áreas funcionales:");
         
         jcbAccTag = new JComboBox<>(); 
+        jcbAccTag.setPreferredSize(new java.awt.Dimension(100, 23));
         jcbAccTag.addItemListener(this);
+        
         jtfFuncArea = new JTextField(areas[1]);
         jtfFuncArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jtfFuncArea.setEnabled(false);
