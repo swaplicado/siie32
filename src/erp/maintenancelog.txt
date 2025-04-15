@@ -3,7 +3,7 @@ SIIE 3.2 270.0/ 2025-04-14
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Habilitación de campos en la forma de captura de DPS relacionados con el porcentaje de acidez, etiquetas contables y carrotanques, dependiendo de las configuraciones en la tabla CFG_PARAM.
-2) Reubicación del capo de captura de etiquetas contables en la forma de DPS.
+2) Reubicación del campo de captura de etiquetas contables en la forma de DPS.
 
 ================================================================================
 SIIE 3.2 269.1/ 2025-04-14
