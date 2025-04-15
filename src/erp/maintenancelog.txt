@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 270.2/ 2025-04-15
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se pueden regresar todas las RM al solicitante con la aclaración de cuantas partidas se pueden modificar.
+2) Se muestra al solicitante cuales partidas se pueden modificar en la forma de captura de RM.
+
+================================================================================
 SIIE 3.2 270.1/ 2025-04-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

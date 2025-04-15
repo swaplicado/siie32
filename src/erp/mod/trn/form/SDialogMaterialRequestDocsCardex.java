@@ -5,7 +5,6 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
-import erp.mod.trn.db.SDbMaterialRequestStatusLog;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SRowMaterialRequestDocs;
 import java.awt.BorderLayout;
@@ -100,7 +99,7 @@ public class SDialogMaterialRequestDocsCardex extends SBeanFormDialog implements
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
 
-        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_DOCS_KAR, SLibConsts.UNDEFINED, "Documentos de la RM") {
+        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_DOCS_KAR, SLibConsts.UNDEFINED, "Vínculos de la RM") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -115,6 +114,7 @@ public class SDialogMaterialRequestDocsCardex extends SBeanFormDialog implements
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Ítem"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "# parte"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Un.", 35));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Sum.", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cot.", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Ped.", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Fact.", 80));
@@ -138,8 +138,8 @@ public class SDialogMaterialRequestDocsCardex extends SBeanFormDialog implements
         moGridLogs.setSelectedGridRow(0);
     }
     
-    public void setFormParams(final int matReqId) {
-        ArrayList<SRowMaterialRequestDocs> lLogs = SMaterialRequestUtils.getMaterialRequestDocs(miClient.getSession(), matReqId);
+    public void setFormParams(final int matReqId, final int matReqEtyId) {
+        ArrayList<SRowMaterialRequestDocs> lLogs = SMaterialRequestUtils.getMaterialRequestLinks(miClient.getSession(), matReqId, matReqEtyId);
         this.mlLogs = lLogs;
         showLog();
     }

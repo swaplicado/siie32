@@ -18,7 +18,6 @@ import erp.mod.trn.form.SDialogMaterialRequestLogsCardex;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -198,23 +197,20 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             }
             else {
                 try {
-                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de devolver la requisición a estatus de nuevo?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
-                        int[] key = (int[]) gridRow.getRowPrimaryKey();
-                        String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
-                        if (! message.isEmpty()) {
-                            miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    String message = SMaterialRequestUtils.getReturnMessage(miClient.getSession(), key);
+                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de regresar al solicitante?\n"
+                            + message) == JOptionPane.OK_OPTION) {
+                        
+                        message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
+                        if (!message.isEmpty()) {
+                            miClient.showMsgBoxError(message);
                         }
-                        else {
-                            message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
-                            if (! message.isEmpty()) {
-                                miClient.showMsgBoxError(message);
-                            }
-                            
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
+
+                        miClient.getSession().notifySuscriptors(mnGridType);
                     }
                 }
-                catch (SQLException ex) {
+                catch (Exception ex) {
                     Logger.getLogger(SViewMaterialRequesPendingSupply.class.getName()).log(Level.SEVERE, null, ex);
                     SLibUtils.showException(this, ex);
                 }
@@ -424,7 +420,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                 try {
                     int[] key = (int[]) gridRow.getRowPrimaryKey();
                     
-                    moDialogDocsCardex.setFormParams(key[0]);
+                    moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
                     
                     miClient.getSession().notifySuscriptors(mnGridType);
