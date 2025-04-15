@@ -5,8 +5,12 @@
  */
 package erp.mod.cfg.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
@@ -25,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -254,6 +259,9 @@ public abstract class SAuthorizationUtils {
      * @return 
      */
     public static HashMap<String, String> getMailsOfUsers(java.sql.Statement statement, ArrayList<Integer> userIds) {
+        if (userIds.isEmpty()) {
+            return new HashMap<>();
+        }
         StringBuilder userIn = new StringBuilder("(");
         for (int i = 0; i < userIds.size(); i++) {
             userIn.append(userIds.get(i));
@@ -1756,128 +1764,205 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static void sendAuthornMails(final sa.lib.gui.SGuiSession session, int mailType, String to, String cc,
-            String bcc, int[] pkDps, final String actionUserName, final String comment) throws Exception {
+    /**
+     * 
+     * 
+     * @param session
+     * @param mailType
+     * @param to
+     * @param cc
+     * @param bcc
+     * @param pkDps
+     * @param actionUserName
+     * @param comment
+     * @throws Exception 
+     */
+    public static void sendAuthornMails(
+            final SGuiSession session,
+            final int mailType,
+            final String to,
+            final String cc,
+            final String bcc,
+            final int[] pkDps,
+            final String actionUserName,
+            final String comment
+    ) throws Exception {
+        // Read purchase order data
         SDataDps dps = new SDataDps();
-        dps.read(pkDps, session.getStatement().getConnection().createStatement());
-        SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
+        try (Connection conn = session.getStatement().getConnection();
+            java.sql.Statement stmt = conn.createStatement()) {
+            dps.read(pkDps, stmt);
 
-        ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")));
-        ArrayList<String> toCcRecipients = cc.isEmpty() ? new ArrayList<>()
-                : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")));
-        ArrayList<String> toBccRecipients = bcc.isEmpty() ? new ArrayList<>()
-                : new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")));
+            // Parse recipient lists
+            List<String> toRecipients = to != null && !to.isEmpty()
+                    ? new ArrayList<>(Arrays.asList(SLibUtils.textExplode(to.toLowerCase(), ";")))
+                    : new ArrayList<>();
+            List<String> ccRecipients = cc != null && !cc.isEmpty()
+                    ? new ArrayList<>(Arrays.asList(SLibUtils.textExplode(cc.toLowerCase(), ";")))
+                    : new ArrayList<>();
+            List<String> bccRecipients = bcc != null && !bcc.isEmpty()
+                    ? new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bcc.toLowerCase(), ";")))
+                    : new ArrayList<>();
 
-        String body = "<html>";
-        body += "<head>";
-        body += "<style>"
-                + "body {"
-                + " font-size: 100%;"
-                + "} "
-                + "h1 {"
-                + " font-size: 2.00em;"
-                + " font-family: sans-serif;"
-                + "} "
-                + "h2 {"
-                + " font-size: 1.75em;"
-                + " font-family: sans-serif;"
-                + "} "
-                + "h3 {"
-                + " font-size: 1.50em;"
-                + " font-family: sans-serif;"
-                + "} "
-                + "h4 {"
-                + " font-size: 1.25em;"
-                + " font-family: sans-serif;"
-                + "} "
-                + "</style>";
-        body += "</head>";
-        body += "<body>";
-        body += "<h2>" + SLibUtils.textToHtml("¡Hola!") + "</h2>";
-        String subject = "";
-        switch (mailType) {
-            case AUTH_MAIL_AUTH_PEND:
-                subject = "[SIIE] Autorizacion pendiente de orden de compra "
-                        + dps.getNumber();
-                body += "<p>" + SLibUtils.textToHtml("Tienes una orden de compra por autorizar") + "</p>";
-                body += "<b>Folio: " + dps.getNumber() + "</b>";
-                if (comment != null && !comment.isEmpty()) {
-                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
-                }
-                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
-                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>";
-                break;
-            case AUTH_MAIL_AUTH_DONE:
-                subject = "[SIIE] OC " + dps.getNumber() + " autorizada";
-                body += "<p>La siguiente orden de compra ha sido <span style='color: green;'>AUTORIZADA</span> por: <b>" + actionUserName + "</b></p>";
-                body += "<b>Folio: " + dps.getNumber() + "</b>";
-                if (comment != null && !comment.isEmpty()) {
-                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
-                }
-                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
-                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
-                if (!mms.getRecipientTo().isEmpty()) {
-                    toRecipients
-                            .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
-                }
-                break;
-            case AUTH_MAIL_AUTH_REJ:
-                subject = "[SIIE] OC " + dps.getNumber() + " rechazada";
-                body += "<p>La siguiente orden de compra ha sido <span style='color: red;'>RECHAZADA</span> por: <b>" + actionUserName + "</b></p>";
-                body += "<b>Folio: " + dps.getNumber() + "</b>";
-                if (comment != null && !comment.isEmpty()) {
-                    body += "<p><b>Comentarios:</b> " + SLibUtils.textToHtml(comment) + "</p>";
-                }
-                body += "<p>Ingresa " + SLibUtils.textToHtml("aquí")
-                        + " al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>";
-                if (!mms.getRecipientTo().isEmpty()) {
-                    toRecipients
-                            .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";"))));
-                }
-                break;
-        }
+            // Build HTML body
+            StringBuilder body = new StringBuilder("<html><head><style>")
+                    .append("body { font-size: 100%; } ")
+                    .append("h1 { font-size: 2.00em; font-family: sans-serif; } ")
+                    .append("h2 { font-size: 1.75em; font-family: sans-serif; } ")
+                    .append("h3 { font-size: 1.50em; font-family: sans-serif; } ")
+                    .append("h4 { font-size: 1.25em; font-family: sans-serif; } ")
+                    .append("</style></head><body>")
+                    .append("<h2>").append(SLibUtils.textToHtml("¡Hola!")).append("</h2>");
 
-        body += "<p>" + SLibUtils.textToHtml("También") + " puedes accesar al portal introduciendo esta "
-                + SLibUtils.textToHtml("dirección") + " en tu navegador:</p>";
-        body += "<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">https://aeth.siieapp.com/portal-autorizaciones/public/dps</a>";
-        body += "<p>Recuerda: tu usuario y " + SLibUtils.textToHtml("contraseña")
-                + " del portal son los mismos que tu cuenta SIIE.</p>";
-        body += "<span style='font-size:10px'>" + STrnUtilities.composeMailFooter("") + "</span>";
+            /**
+             * JSON muestra de la configuración sCfg:
+             * {
+             *   "usuariosCompras" : {
+             *     "bcc" : [],
+             *     "cc" : [],
+             *     "to" : [95, 81],
+             *     "vistaOC" : [95, 81]
+             *   },
+             *   "usuariosProyectos" : {
+             *     "bcc" : [],
+             *     "cc" : [],
+             *     "to" : [137, 181, 113],
+             *     "vistaOC" : [137, 181, 113]
+             *   }
+             * }
+             */
+            String subject;
+            switch (mailType) {
+                case AUTH_MAIL_AUTH_PEND:
+                    subject = String.format("[SIIE] Autorización pendiente de orden de compra %s", dps.getNumber());
+                    body.append("<p>").append(SLibUtils.textToHtml("Tienes una orden de compra por autorizar")).append("</p>")
+                            .append("<b>Folio: ").append(dps.getNumber()).append("</b>");
+                    if (comment != null && !comment.isEmpty()) {
+                        body.append("<p><b>Comentarios:</b> ").append(SLibUtils.textToHtml(comment)).append("</p>");
+                    }
+                    body.append("<p>Ingresa ").append(SLibUtils.textToHtml("aquí"))
+                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>");
+                    break;
 
-        body += "</body>";
+                case AUTH_MAIL_AUTH_DONE:
+                case AUTH_MAIL_AUTH_REJ:
+                    subject = String.format("[SIIE] OC %s %s", dps.getNumber(), mailType == AUTH_MAIL_AUTH_DONE ? "autorizada" : "rechazada");
+                    body.append("<p>La siguiente orden de compra ha sido <span style='color: ")
+                            .append(mailType == AUTH_MAIL_AUTH_DONE ? "green;'>AUTORIZADA" : "red;'>RECHAZADA")
+                            .append("</span> por: <b>").append(actionUserName).append("</b></p>")
+                            .append("<b>Folio: ").append(dps.getNumber()).append("</b>");
+                    if (comment != null && !comment.isEmpty()) {
+                        body.append("<p><b>Comentarios:</b> ").append(SLibUtils.textToHtml(comment)).append("</p>");
+                    }
+                    body.append("<p>Ingresa ").append(SLibUtils.textToHtml("aquí"))
+                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>");
 
-        body += "</html>";
+                    // Update recipients for authorized or rejected cases
+                    String sCfg = SCfgUtils.getParamValue(session.getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+                    if (sCfg.isEmpty()) {
+                        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.WARNING,
+                                "No se encontraron destinatarios para el envío de correo de {0}.",
+                                mailType == AUTH_MAIL_AUTH_DONE ? "autorización" : "rechazo de autorización");
+                        return;
+                    }
 
-        SMailSender moMailSender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(),
-                mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-        moMailSender.setMailReplyTo(mms.getXtaMailReplyTo());
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode rootNode = mapper.readTree(sCfg);
+                    int lastUser = SAuthDBUtils.getLastUserInsert(session, pkDps[0], pkDps[1]);
+                    if (lastUser == 0) {
+                        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.WARNING,
+                                "No se encontró el último usuario para el envío de correo.");
+                        return;
+                    }
 
-        if (!mms.getRecipientCarbonCopy().isEmpty()) {
-            toCcRecipients
-                    .addAll(new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";"))));
-        }
+                    List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", lastUser);
+                    String userGroup = "usuariosCompras";
+                    if (toUsers.isEmpty()) {
+                        toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", lastUser);
+                        userGroup = "usuariosProyectos";
+                        if (toUsers.isEmpty()) {
+                            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.WARNING,
+                                    "No se encontraron destinatarios para el envío de correo de {0}.",
+                                    mailType == AUTH_MAIL_AUTH_DONE ? "autorización" : "rechazo de autorización");
+                            return;
+                        }
+                    }
 
-        if (!mms.getRecipientBlindCarbonCopy().isEmpty()) {
-            toBccRecipients.addAll(
-                    new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";"))));
-        }
+                    toRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(toUsers)).values());
+                    List<Integer> ccUsers = SAuthJSONUtils.getArrayIfContains(rootNode, userGroup, "cc", lastUser);
+                    if (!ccUsers.isEmpty()) {
+                        ccRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(ccUsers)).values());
+                    }
+                    List<Integer> bccUsers = SAuthJSONUtils.getArrayIfContains(rootNode, userGroup, "bcc", lastUser);
+                    if (!bccUsers.isEmpty()) {
+                        bccRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(bccUsers)).values());
+                    }
+                    break;
 
-        ArrayList<String> toRecipientsCleaned = new ArrayList<>();
-        if (toRecipients.isEmpty()) {
-            throw new Exception("No hay destinatarios configurados para la notificación de correo");
-        }
-        else {
-            for (String rec : toRecipients) {
-                if (rec != null && !rec.isEmpty() && isValidEmailAddress(rec)) {
-                    toRecipientsCleaned.add(rec);
+                default:
+                    throw new IllegalArgumentException("Tipo de mail desconocido: " + mailType);
+            }
+
+            // Append common email footer
+            body.append("<p>").append(SLibUtils.textToHtml("También")).append(" puedes accesar al portal introduciendo esta ")
+                    .append(SLibUtils.textToHtml("dirección")).append(" en tu navegador:</p>")
+                    .append("<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">https://aeth.siieapp.com/portal-autorizaciones/public/dps</a>")
+                    .append("<p>Recuerda: tu usuario y ").append(SLibUtils.textToHtml("contraseña"))
+                    .append(" del portal son los mismos que tu cuenta SIIE.</p>")
+                    .append("<span style='font-size:10px'>").append(STrnUtilities.composeMailFooter("")).append("</span>")
+                    .append("</body></html>");
+            
+            // Initialize email configuration
+            SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
+            
+            // Configure and send email
+            SMailSender mailSender = new SMailSender(
+                    mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(),
+                    mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser()
+            );
+            mailSender.setMailReplyTo(mms.getXtaMailReplyTo());
+
+            // Add MMS-specific recipients
+            if (!mms.getRecipientCarbonCopy().isEmpty()) {
+                ccRecipients.addAll(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";")));
+            }
+            if (!mms.getRecipientBlindCarbonCopy().isEmpty()) {
+                bccRecipients.addAll(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";")));
+            }
+
+            ArrayList<String> toRecipientsCleaned = new ArrayList<>();
+            ArrayList<String> ccRecipientsCleaned = new ArrayList<>();
+            ArrayList<String> bccRecipientsCleaned = new ArrayList<>();
+            if (toRecipients.isEmpty()) {
+                throw new Exception("No hay destinatarios configurados para la notificación de correo");
+            }
+            else {
+                for (String rec : toRecipients) {
+                    if (rec != null && !rec.isEmpty() && isValidEmailAddress(rec)) {
+                        toRecipientsCleaned.add(rec);
+                    }
                 }
             }
+            if (!ccRecipients.isEmpty()) {
+                for (String rec : ccRecipients) {
+                    if (rec != null && !rec.isEmpty() && isValidEmailAddress(rec)) {
+                        ccRecipientsCleaned.add(rec);
+                    }
+                }
+            }
+            if (!bccRecipients.isEmpty()) {
+                for (String rec : bccRecipients) {
+                    if (rec != null && !rec.isEmpty() && isValidEmailAddress(rec)) {
+                        bccRecipientsCleaned.add(rec);
+                    }
+                }
+            }
+
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, "Enviando mail a: {0}", toRecipientsCleaned);
+            SMail mail = new SMail(mailSender, subject, body.toString(), toRecipientsCleaned, ccRecipientsCleaned, bccRecipientsCleaned);
+            mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
+            mail.send();
         }
-        
-        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, "Enviando mail a: {0}", toRecipientsCleaned.toString());
-        SMail mail = new SMail(moMailSender, subject, body, toRecipientsCleaned, toCcRecipients, toBccRecipients);
-        mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
-        mail.send();
     }
     
     public static void sendNotificationsOnSend(final SGuiSession session, final int authorizationType, int[] pkDps) {
