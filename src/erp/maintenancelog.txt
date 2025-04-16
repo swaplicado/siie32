@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 270.2/ 2025-04-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de campo de texto para mostrar ID de registros en la formas de captura de línea de ítems, ítem genérico, grupo de ítems, familia de ítems y unidades de medida.
+2) Refactorización de controles y consulta en vista de documentos cuando la autorización web está disponible,
+    porque esta funcionalidad sólo aplica para órdenes de compra, y estando habilitada en la configuración de la empresase, afectaba innecesariamente la creación de comandos e adiciones a las consultas de cualquier tipo de documento.
+3) Corrección a la validación de captura de carrotanques, porque no se validaba el largo del texto de carrotanques, y además se solicitaba erróneamente ítem en la partida aún cuando ya hubiera uno seleccionado.
+
+================================================================================
 SIIE 3.2 270.1/ 2025-04-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

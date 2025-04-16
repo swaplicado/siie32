@@ -479,10 +479,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpAttribute15 = new javax.swing.JPanel();
         jlAttribute15 = new javax.swing.JLabel();
         jtfAttribute15 = new javax.swing.JTextField();
-        jpCommand = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
+        jpCommandBar = new javax.swing.JPanel();
+        jpCommandBar1 = new javax.swing.JPanel();
         jtfPkItemId_Ro = new javax.swing.JTextField();
-        jPanel12 = new javax.swing.JPanel();
+        jpCommandBar2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -1663,34 +1663,34 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
-        jpCommand.setPreferredSize(new java.awt.Dimension(792, 33));
-        jpCommand.setLayout(new java.awt.GridLayout(1, 0));
+        jpCommandBar.setPreferredSize(new java.awt.Dimension(792, 33));
+        jpCommandBar.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        jpCommandBar1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jtfPkItemId_Ro.setEditable(false);
         jtfPkItemId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPkItemId_Ro.setToolTipText("ID del registro");
         jtfPkItemId_Ro.setFocusable(false);
         jtfPkItemId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
-        jPanel13.add(jtfPkItemId_Ro);
+        jpCommandBar1.add(jtfPkItemId_Ro);
 
-        jpCommand.add(jPanel13);
+        jpCommandBar.add(jpCommandBar1);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpCommandBar2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jbOk);
+        jpCommandBar2.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jPanel12.add(jbCancel);
+        jpCommandBar2.add(jbCancel);
 
-        jpCommand.add(jPanel12);
+        jpCommandBar.add(jpCommandBar2);
 
-        getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(jpCommandBar, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(976, 647));
         setLocationRelativeTo(null);
@@ -3509,8 +3509,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
@@ -3718,7 +3716,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jpAttribute8;
     private javax.swing.JPanel jpAttribute9;
     private javax.swing.JPanel jpAttributes;
-    private javax.swing.JPanel jpCommand;
+    private javax.swing.JPanel jpCommandBar;
+    private javax.swing.JPanel jpCommandBar1;
+    private javax.swing.JPanel jpCommandBar2;
     private javax.swing.JPanel jpConfig;
     private javax.swing.JPanel jpConfig1;
     private javax.swing.JPanel jpConfig2;

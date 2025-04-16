@@ -582,37 +582,65 @@
         </Container>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jpCommand">
-      <Properties>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[392, 33]"/>
-        </Property>
-      </Properties>
+    <Container class="javax.swing.JPanel" name="jpCommandBar">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
           <BorderConstraints direction="South"/>
         </Constraint>
       </Constraints>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-        <Property name="alignment" type="int" value="2"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+        <Property name="columns" type="int" value="2"/>
+        <Property name="rows" type="int" value="1"/>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="jbOk">
+        <Container class="javax.swing.JPanel" name="jpCommandBar1">
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+            <Property name="alignment" type="int" value="0"/>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JTextField" name="jtfPkItemLineId_Ro">
+              <Properties>
+                <Property name="editable" type="boolean" value="false"/>
+                <Property name="horizontalAlignment" type="int" value="11"/>
+                <Property name="toolTipText" type="java.lang.String" value="ID del registro"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[65, 23]"/>
+                </Property>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jpCommandBar2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Aceptar"/>
-            <Property name="toolTipText" type="java.lang.String" value="[Ctrl + Enter]"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[75, 23]"/>
+              <Dimension value="[392, 33]"/>
             </Property>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="jbCancel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Cancelar"/>
-            <Property name="toolTipText" type="java.lang.String" value="[Escape]"/>
-          </Properties>
-        </Component>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+            <Property name="alignment" type="int" value="2"/>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JButton" name="jbOk">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Aceptar"/>
+                <Property name="toolTipText" type="java.lang.String" value="[Ctrl + Enter]"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[75, 23]"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="jbCancel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cancelar"/>
+                <Property name="toolTipText" type="java.lang.String" value="[Escape]"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
   </SubComponents>
