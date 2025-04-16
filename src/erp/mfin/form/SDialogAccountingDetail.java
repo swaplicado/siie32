@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDialogAccountingDetail extends javax.swing.JDialog implements java.awt.event.ActionListener {
 

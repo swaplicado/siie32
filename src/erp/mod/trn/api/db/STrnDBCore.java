@@ -5,8 +5,12 @@
  */
 package erp.mod.trn.api.db;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthJSONUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebAuthStep;
@@ -21,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -224,7 +229,7 @@ public class STrnDBCore {
      * @param startDate Fecha inicial (YYYY-MM-DD).
      * @param endDate Fecha final (YYYY-MM-DD).
      * @param idUser ID del usuario del filtro.
-     * @param idSessionUser ID del usuario del filtro.
+     * @param idSessionUser ID del usuario de la sesión.
      * @param statusFilter
      * @return Lista de objetos {@code SWebDpsRow} con los datos obtenidos.
      */
@@ -234,6 +239,14 @@ public class STrnDBCore {
 
             if (conn == null) {
                 return null;
+            }
+
+            // Validación de parámetros:
+            if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
+                throw new Exception("Las fechas de inicio y fin no pueden estar vacías.");
+            }
+            if (idSessionUser <= 0) {
+                throw new Exception("El ID del usuario de la sesión no puede ser negativo o 0.");
             }
 
             String query = BASE_QUERY_FIRST 
@@ -268,10 +281,41 @@ public class STrnDBCore {
                 query += "AND tda.fid_st_authorn = " + statusFilter + " "
                         + "AND dps.dt_doc BETWEEN '" + startDate + "' AND '" + endDate + "' ";
             }
+            
+            String whereUsers = "";
+            String sCfg = SCfgUtils.getParamValue(conn.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+            if (! sCfg.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(sCfg);
+                List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosCompras", "vistaOC", idSessionUser);
+                // String userGroup = "usuariosCompras";
+                if (toUsers.isEmpty()) {
+                    toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosProyectos", "vistaOC", idSessionUser);
+                    // userGroup = "usuariosProyectos";
+                    if (toUsers.isEmpty()) {
+                        toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaOC", idSessionUser);
+                        // userGroup = "usuariosSuper";
+                        if (! toUsers.isEmpty()) {
+                            whereUsers = "1 = 1 ";
+                        }
+                    }
+                }
+
+                if (! toUsers.isEmpty() && whereUsers.isEmpty()) {
+                    whereUsers = "tda.fid_usr_edit IN (" + SAuthJSONUtils.getListAsString(toUsers) + ") ";
+                }
+            }
 
             // Filtrar usuario involucrado en el proceso de autorización
             if (idUser > 0) {
-                query += "AND " + idUser + " IN (SELECT  "
+                if (! whereUsers.isEmpty()) {
+                    query += " AND (" + whereUsers + " OR ";
+                }
+                else {
+                    query += "AND ";
+                }
+                
+                query += "" + idUser + " IN (SELECT  "
                         + "    steps1.fk_usr_step "
                         + "FROM "
                         + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
@@ -298,6 +342,10 @@ public class STrnDBCore {
                 else {
                     query += ")";
                 }
+                
+                if (! whereUsers.isEmpty()) {
+                    query += ")";
+                }
             }
 
             query += "GROUP BY id_year , id_doc "
@@ -316,6 +364,8 @@ public class STrnDBCore {
 
             return lDocuments;
         } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 

@@ -215,7 +215,7 @@ public abstract class SNotificationsUtils {
     @SuppressWarnings("unchecked")
     public static void sendPushNotification(final SGuiSession session, int idUser, String folio, int porpouse, int badge) {
         try {
-            String url = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF);
+            String url = SCfgUtils.getParamValue(session.getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF);
             if (url.isEmpty()) {
                 return;
             }

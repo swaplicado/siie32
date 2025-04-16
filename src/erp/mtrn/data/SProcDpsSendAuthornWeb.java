@@ -76,7 +76,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
             if (auth.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_OK) {
                 if (sendAuthorn()) {
                     auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
-                    auth.save(connection);
+                    auth.save(miClient.getSession().getDatabase().getConnection());
                     moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
                 }
                 else {

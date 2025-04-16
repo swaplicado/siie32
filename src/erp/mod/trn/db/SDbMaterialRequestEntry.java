@@ -18,6 +18,7 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
 
@@ -57,6 +58,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     protected int mnAuxRowId;
     protected double mdAuxQuantityOld;
+    
+    protected boolean mbHasLinks;
     
     protected SDataItem moDataItem;
     protected SDataItem moDataItemRef;
@@ -99,7 +102,7 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     
     public void setAuxRowId(int n) { mnAuxRowId = n; }
     public void setAuxQuantityOld(double d) { mdAuxQuantityOld = d; }
-
+    
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
@@ -128,11 +131,14 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public ArrayList<SDbMaterialRequestEntryItemChange> getChildItemChange() { return maChildItemChange; }
     public ArrayList<SDbEstimationRequestEntry> getEstReqEty() { return maEstReqEty; }
     
-    public int getAuxRowId() { return mnAuxRowId; }
-    public double getAuxQuantityOld() { return mdAuxQuantityOld; }
     public SDataItem getDataItem() { return moDataItem; }
     public SDataItem getDataItemRef() { return moDataItemRef; }
     public SDataUnit getDataUnitUsr() { return moDataUnitUsr; }
+    
+    public int getAuxRowId() { return mnAuxRowId; }
+    public double getAuxQuantityOld() { return mdAuxQuantityOld; }
+    
+    public boolean getHasLinks() { return mbHasLinks; }
     
     public String getItemNewDescription() {
         for (SDbMaterialRequestEntryNote note : maChildNotes) {
@@ -211,6 +217,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             moDbmsMatReqPty = new SDbMaterialRequestPriority();
             moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
         }
+        
+        mbHasLinks = SMaterialRequestUtils.hasLinksMaterialRequestEntry(session, getPrimaryKey());
     }
             
     @Override
@@ -264,6 +272,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatConsEntity = null;
         moDbmsMatConsSubentity = null;
         moDbmsMatReqPty = null;
+        
+        mbHasLinks = false;
     }
 
     @Override
@@ -605,13 +615,14 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 5: value = moDataUnitUsr != null ? moDataUnitUsr.getSymbol() : ""; break;
             case 6: value = mdQuantity; break;
             case 7: value = moDataItem.getDbmsDataUnit().getSymbol(); break;
-            case 8: value = mdTotal_r; break;
-            case 9: value = mbNewItem; break;
-            case 10: value = mnCosnsumptionEstimated; break;
-            case 11: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
-            case 12: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
-            case 13: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
-            case 14: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
+            case 8: value = mbHasLinks ? SGridConsts.ICON_ANNUL : SGridConsts.ICON_NULL; break;
+            case 9: value = mdTotal_r; break;
+            case 10: value = mbNewItem; break;
+            case 11: value = mnCosnsumptionEstimated; break;
+            case 12: value = moDbmsMatConsEntity != null ? moDbmsMatConsEntity.getCode() : ""; break;
+            case 13: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
+            case 14: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
+            case 15: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
         }
         
         return value;

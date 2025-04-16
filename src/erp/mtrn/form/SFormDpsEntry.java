@@ -114,6 +114,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     public static final int LINK_TICKET_SELECT = 1; 
     public static final int LINK_TICKET_ENABLED = 2; 
     public static final int LINKED_TICKET = 3; 
+    public static final int TP_VEH = 4; 
     
     private static final int TAB_TAX = 0;
     private static final int TAB_SAL_CMS = 1; // sales comissions
@@ -268,6 +269,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private ArrayList<SDataDpsEntryAnalysis> mlDpsEntryAnalysis;
     private Vector<SDataScaleTicketDpsEntry> mvScaleTicDpsEty;
     private Vector<SDataScaleTicketDps> mvScaleTicDps;
+    private int mnTypeVeh;
     
     private int mnAuxEntryPriceAction;
     private int mnAuxEntryPriceEditedIndex;
@@ -279,6 +281,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     
     private SItemConfigurationDps confItemAcidityPercentage;
     private SItemConfigurationDps confItemTankCar;
+    private String[] confTpVehIds;
 
     /** Creates new form DFormDpsEntry
      * @param client GUI client.
@@ -1841,7 +1844,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel58.add(jbTankCarPicker);
 
         jbCleanTankCar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_erase.gif"))); // NOI18N
-        jbCleanTankCar.setToolTipText("Borrar boletos");
+        jbCleanTankCar.setToolTipText("Borrar carrotanques");
         jbCleanTankCar.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel58.add(jbCleanTankCar);
 
@@ -3112,12 +3115,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     
         // Read item configurations params
         
+        confTpVehIds = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
             String sItemTankCar = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_TANK_CAR);
             confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
             confItemTankCar = mapper.readValue(sItemTankCar, SItemConfigurationDps.class);
+            confTpVehIds = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_TP_VEH_TANK_CAR).replaceAll(" ", "").split(",");
         }
         catch (Exception e) {
             miClient.showMsgBoxWarning(e.getMessage());
@@ -3214,6 +3219,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean isCfdAddendaPosible() {
         return moParamDps != null && moParamDps.isDocumentOrAdjustmentSal() && 
                 moParamBizPartner != null && moParamBizPartner.getIsCustomer() && moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA;
+    }
+    
+    private boolean isTankCarRequired() {
+        if (confTpVehIds != null) {
+            for (String tpVehId : confTpVehIds) {
+                if (SLibUtils.parseInt(tpVehId) == mnTypeVeh) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     private String composeMsgMissingShipData() {
@@ -6510,6 +6526,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage("Debe indicar un valor para el campo " + SGuiUtils.getLabelName(jlAcidityPercentage));
                     validation.setComponent(jtfAcidityPercentage);
                 }
+                else if (isTankCarRequired() && jbTankCarPicker.isEnabled() && jtfTankCar.getText().isEmpty()) {
+                    validation.setMessage("Debe indicar un valor para el campo " + SGuiUtils.getLabelName(jlTankCar));
+                    validation.setComponent(jtfTankCar);
+                }
                 else {
                     // Validate unitary price vs unitary month price in monthly order:
 
@@ -7229,6 +7249,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             case LINKED_TICKET:
                 mvScaleTicDps = (Vector<SDataScaleTicketDps>) value;
+                break;
+                
+            case TP_VEH:
+                mnTypeVeh = (int) value;
                 break;
                 
             default:

@@ -883,10 +883,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_DPS_ACC_TAG:
                 switch (subtype) {
                     case SModConsts.MOD_TRN_SAL_N:
-                        title = "Documnetos ventas etiqueta contable";
+                        title = "Doctos ventas etiqueta contable";
                         break;
                     case SModConsts.MOD_TRN_PUR_N:
-                        title = "Documentos compras etiqueta contable";
+                        title = "Doctos compras etiqueta contable";
                         break;
                 }
                 view = new SViewDpsAccountTag(miClient, subtype, title);

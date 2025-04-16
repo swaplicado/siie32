@@ -18,6 +18,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsConsts;
 import erp.mod.bps.db.SBpsUtils;
@@ -38,7 +39,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Isabel Servín
  */
 public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -57,8 +58,13 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private erp.lib.form.SFormField moFieldCoBranch;
     private erp.lib.form.SFormField moFieldBizPartner;
     private erp.lib.form.SFormField moFieldSalesAgent;
+    private erp.lib.form.SFormField moFieldCurrency;
 
-    /** Creates new form SDialogRepBizPartnerStatement */
+    /** Creates new form SDialogRepBizPartnerStatement
+     * @param client
+     * @param title
+     * @param bizPartnerCategory 
+     */
     public SDialogRepBizPartnerStatement(erp.client.SClientInterface client, String title, int bizPartnerCategory) {
         super(client.getFrame(), title, false);
         miClient = client;
@@ -80,6 +86,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private void initComponents() {
 
         bgBizPartner = new javax.swing.ButtonGroup();
+        bgCur = new javax.swing.ButtonGroup();
         jpParams = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -92,7 +99,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlCoBranch = new javax.swing.JLabel();
-        jcbCoBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCoBranch = new javax.swing.JComboBox<>();
         jbPickCoBranch = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jrbBizPartner = new javax.swing.JRadioButton();
@@ -100,12 +107,21 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jrbSalesAgent = new javax.swing.JRadioButton();
         jPanel98 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel99 = new javax.swing.JPanel();
         jlSalesAgent = new javax.swing.JLabel();
-        jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbSalesAgent = new javax.swing.JComboBox<>();
         jbPickSalesAgent = new javax.swing.JButton();
+        jPanel16 = new javax.swing.JPanel();
+        jrbCurrencyLoc = new javax.swing.JRadioButton();
+        jlCurrencyLocWarning = new javax.swing.JLabel();
+        jPanel17 = new javax.swing.JPanel();
+        jrbCurrencyDoc = new javax.swing.JRadioButton();
+        jlCurrencyDocWarning = new javax.swing.JLabel();
+        jPanel18 = new javax.swing.JPanel();
+        jlCurrency = new javax.swing.JLabel();
+        jcbCurrency = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
         jckAdvancePayments = new javax.swing.JCheckBox();
         jpControls = new javax.swing.JPanel();
@@ -123,7 +139,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jpParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jpParams.setLayout(new java.awt.BorderLayout());
 
-        jPanel8.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
+        jPanel8.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -231,6 +247,46 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
         jPanel8.add(jPanel99);
 
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgCur.add(jrbCurrencyLoc);
+        jrbCurrencyLoc.setSelected(true);
+        jrbCurrencyLoc.setText("Moneda local");
+        jrbCurrencyLoc.setPreferredSize(new java.awt.Dimension(170, 23));
+        jPanel16.add(jrbCurrencyLoc);
+
+        jlCurrencyLocWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jlCurrencyLocWarning.setText("NOTA: ¡Contiene todos los movimientos.!");
+        jlCurrencyLocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
+        jPanel16.add(jlCurrencyLocWarning);
+
+        jPanel8.add(jPanel16);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgCur.add(jrbCurrencyDoc);
+        jrbCurrencyDoc.setText("Moneda transacción");
+        jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(170, 23));
+        jPanel17.add(jrbCurrencyDoc);
+
+        jlCurrencyDocWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en la moneda seleccionada!");
+        jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
+        jPanel17.add(jlCurrencyDocWarning);
+
+        jPanel8.add(jPanel17);
+
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCurrency.setText("Moneda:*");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jlCurrency);
+
+        jcbCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel18.add(jcbCurrency);
+
+        jPanel8.add(jPanel18);
+
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jckAdvancePayments.setText("Incluir anticipos");
@@ -257,7 +313,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(496, 339));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -265,6 +321,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         String name = "";
         
@@ -278,14 +335,18 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         moFieldBizPartner.setPickerButton(jbPickBizPartner);
         moFieldSalesAgent = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbSalesAgent, jlSalesAgent);
         moFieldSalesAgent.setPickerButton(jbPickSalesAgent);
-
+        moFieldCurrency = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCurrency, jlCurrency);
+        
         mvFields = new Vector<>();
         mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
         mvFields.add(moFieldCoBranch);
         mvFields.add(moFieldBizPartner);
         mvFields.add(moFieldSalesAgent);
+        mvFields.add(moFieldCurrency);
 
+        SFormUtilities.populateComboBox(miClient, jcbCurrency, SDataConstants.CFGU_CUR);
+        
         jbPickDateStart.addActionListener(this);
         jbPickDateEnd.addActionListener(this);
         jbPickBizPartner.addActionListener(this);
@@ -294,6 +355,8 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jbClose.addActionListener(this);
         jrbBizPartner.addItemListener(this);
         jrbSalesAgent.addItemListener(this);
+        jrbCurrencyLoc.addItemListener(this);
+        jrbCurrencyDoc.addItemListener(this);
         
         name = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG);
         jlBizPartner.setText(name + ": *");
@@ -353,6 +416,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             mbFirstTime = false;
             jftDateStart.requestFocus();
         }
+        itemStateChangedCurrencyOptions();
     }
 
     @SuppressWarnings("unchecked")
@@ -401,7 +465,14 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 sqlFilterBizPartner = "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " ";
             }
             
-            txtCurrency = SUtilConsts.TXT_CURRENCY.toUpperCase() + ": " + miClient.getSession().getSessionCustom().getLocalCurrency();
+            txtCurrency = SUtilConsts.TXT_CURRENCY.toUpperCase() + ": ";
+            if (jrbCurrencyLoc.isSelected()) {
+                txtCurrency += "MONEDA LOCAL (" +miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")";
+            }
+            else {
+                SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+                txtCurrency += cur.getCurrency() + " (" + cur.getKey() + ")";
+            }
             
             switch (mnBizPartnerCategory) {
                 case SDataConstantsSys.BPSS_CT_BP_SUP:
@@ -425,6 +496,8 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 default:
             }
             
+            String filterCur = !jrbCurrencyDoc.isSelected() ? "" : " AND re.fid_cur = " + moFieldCurrency.getKeyAsIntArray()[0] + " ";
+            
             map = miClient.createReportParams();
             map.put("sTitle", getTitle().toUpperCase());
             map.put("sCoBranch", txtCoBranch);
@@ -439,6 +512,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             map.put("sSqlFilterAccountClass", sqlFilterAccountClass);
             map.put("sSqlFilterCoBranch", sqlFilterCoBranch);
             map.put("sSqlFilterBizPartner", sqlFilterBizPartner);
+            map.put("sSqlFilterCur", filterCur);
 
             // Report view:
 
@@ -467,6 +541,21 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jbPickBizPartner.setEnabled(false);
         jcbSalesAgent.setEnabled(true);
         jbPickSalesAgent.setEnabled(true);
+    }
+    
+    private void itemStateChangedCurrencyOptions() {
+        if (jrbCurrencyLoc.isSelected()) {
+            jlCurrencyLocWarning.setVisible(true);
+            jlCurrencyDocWarning.setVisible(false);
+            jcbCurrency.setEnabled(false);
+            moFieldCurrency.setKey(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
+        }
+        else if (jrbCurrencyDoc.isSelected()) {
+            jlCurrencyLocWarning.setVisible(false);
+            jlCurrencyDocWarning.setVisible(true);
+            jcbCurrency.setEnabled(true);
+            moFieldCurrency.resetField();
+        }
     }
     
     private void actionPickDateStart() {
@@ -504,9 +593,13 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgBizPartner;
+    private javax.swing.ButtonGroup bgCur;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -522,18 +615,24 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox<SFormComponentItem> jcbCoBranch;
+    private javax.swing.JComboBox jcbCurrency;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesAgent;
     private javax.swing.JCheckBox jckAdvancePayments;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCoBranch;
+    private javax.swing.JLabel jlCurrency;
+    private javax.swing.JLabel jlCurrencyDocWarning;
+    private javax.swing.JLabel jlCurrencyLocWarning;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlSalesAgent;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpParams;
     private javax.swing.JRadioButton jrbBizPartner;
+    private javax.swing.JRadioButton jrbCurrencyDoc;
+    private javax.swing.JRadioButton jrbCurrencyLoc;
     private javax.swing.JRadioButton jrbSalesAgent;
     // End of variables declaration//GEN-END:variables
 
@@ -683,6 +782,12 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 }
                 else if (radioButton == jrbSalesAgent) {
                     itemStateChangedSalesAgent();
+                }
+                else if (radioButton == jrbCurrencyLoc) {
+                    itemStateChangedCurrencyOptions();
+                }
+                else if (radioButton == jrbCurrencyDoc) {
+                    itemStateChangedCurrencyOptions();
                 }
             }
         }

@@ -22,6 +22,7 @@ public class SRowMaterialRequestDocs implements SGridRow, Serializable {
     public String msItem;
     public String msPartNumber;
     public String msUnitSymbol;
+    public String msSum;
     public String msCot;
     public String msPed;
     public String msFact;
@@ -71,9 +72,10 @@ public class SRowMaterialRequestDocs implements SGridRow, Serializable {
             case 2: value = msItem; break;
             case 3: value = msPartNumber; break;
             case 4: value = msUnitSymbol; break;
-            case 5: value = msCot; break;
-            case 6: value = msPed; break;
-            case 7: value = msFact; break;
+            case 5: value = msSum; break;
+            case 6: value = msCot; break;
+            case 7: value = msPed; break;
+            case 8: value = msFact; break;
         }
         
         return value;

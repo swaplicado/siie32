@@ -336,7 +336,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlReference.setText("Repositorio contable:");
+        jlReference.setText("Referencia contable:");
         jlReference.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlReference);
 
@@ -1204,6 +1204,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             mnAccountSystemTypeId = oAccountMajor.getFkAccountSystemTypeId();
             int[] anAccountSubclass = new int[] { oAccountMajor.getFkAccountTypeId_r(), oAccountMajor.getFkAccountClassId_r(), oAccountMajor.getFkAccountSubclassId_r() };
             
+            boolean isAccShortTermDoc = oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY || oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC;
             boolean isAccSysBizPartnerAll = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR });
             boolean isAccSysBizPartnerSupCus = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS });
             boolean isAccSysPurchases = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ });
@@ -1287,7 +1288,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
             // Check if it is necesary to enable money reference fields:
 
-            if (isAccSysBizPartnerAll) {
+            if (isAccSysBizPartnerAll || isAccShortTermDoc) {
                 jlReference.setEnabled(true);
                 jtfReference.setEnabled(true);
                 jbReference.setEnabled(true);
@@ -1953,7 +1954,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moFinRecordEntry.OccasionalFiscalId = moFieldOccasionalFiscalId.getString();
         }
         if (jtfReference.isEnabled()) {
-            moFinRecordEntry.Repository = moFieldReference.getString();
+            moFinRecordEntry.Reference = moFieldReference.getString();
             moFinRecordEntry.IsReferenceTax = moFieldIsReferenceTax.getBoolean();
         }
         if ((jcbFkTaxId_n.isEnabled() || mbIsTaxCfg) && jcbFkTaxId_n.getSelectedIndex() > 0) {

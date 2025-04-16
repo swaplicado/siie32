@@ -1,4 +1,31 @@
 ================================================================================
+SIIE 3.2 270.2/ 2025-04-15
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se pueden regresar todas las RM al solicitante con la aclaración de cuantas partidas se pueden modificar.
+2) Se muestra al solicitante cuales partidas se pueden modificar en la forma de captura de RM.
+
+================================================================================
+SIIE 3.2 270.1/ 2025-04-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega configuración para visualización y notificaciones de OC en API.
+
+================================================================================
+SIIE 3.2 270.0/ 2025-04-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Habilitación de campos en la forma de captura de DPS relacionados con el porcentaje de acidez, etiquetas contables y carrotanques, dependiendo de las configuraciones en la tabla CFG_PARAM.
+2) Reubicación del campo de captura de etiquetas contables en la forma de DPS.
+
+================================================================================
+SIIE 3.2 269.1/ 2025-04-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio de nombre del campo "Repositorio contable" por "Referencia contable" y habilitación del campo cuando la cuenta de mayor tenga asignada cuentas especiales de corto plazo.
+2) Refactorización general de menús y vistas.
+
+================================================================================
 SIIE 3.2 269.0/ 2025-04-09
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
