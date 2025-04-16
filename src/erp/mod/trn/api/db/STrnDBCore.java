@@ -11,8 +11,6 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJSONUtils;
-import erp.mod.cfg.utils.SAuthorizationUtils;
-import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_MAIL_AUTH_DONE;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebAuthStep;
@@ -243,6 +241,14 @@ public class STrnDBCore {
                 return null;
             }
 
+            // Validación de parámetros:
+            if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
+                throw new Exception("Las fechas de inicio y fin no pueden estar vacías.");
+            }
+            if (idSessionUser <= 0) {
+                throw new Exception("El ID del usuario de la sesión no puede ser negativo o 0.");
+            }
+
             String query = BASE_QUERY_FIRST 
                     + "    COALESCE((SELECT  "
                     + "                    COUNT(*) "
@@ -289,7 +295,9 @@ public class STrnDBCore {
                     if (toUsers.isEmpty()) {
                         toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaOC", idSessionUser);
                         // userGroup = "usuariosSuper";
-                        whereUsers = "1 = 1 ";
+                        if (! toUsers.isEmpty()) {
+                            whereUsers = "1 = 1 ";
+                        }
                     }
                 }
 
