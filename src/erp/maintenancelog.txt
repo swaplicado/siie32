@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 270.4/ 2025-04-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de aplicación de filtro para "(TODAS)" las etiquetas, y adición de columna "moneda local", a la vista de documentos con etiquetas contables.
+
+================================================================================
 SIIE 3.2 270.3/ 2025-04-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

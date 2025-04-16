@@ -80,6 +80,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
+        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlFuncArea);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jtfFuncArea);
     }
@@ -95,7 +96,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
         moPaneSettings.setUserInsertApplying(false);
         moPaneSettings.setUserUpdateApplying(false);
         
-        if (((String)jcbAccTag.getSelectedItem()).equals("TODAS")) {
+        if (((String)jcbAccTag.getSelectedItem()).equals("(TODAS)")) {
             where = "WHERE d.acc_tag <> '' ";
         }
         else {
@@ -120,6 +121,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
                 + "bpc.bp_key, "
                 + "bpb.bpb, "
                 + "IF(d.fid_cl_dps = 5, COALESCE(d.stot_r, 0.0) * -1, COALESCE(d.stot_r, 0.0)) AS stot_r, "
+                + "'" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS _cur, "
                 + "d.acc_tag "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON "
@@ -142,7 +144,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[10];
+        SGridColumnView[] columns = new SGridColumnView[11];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "acc_tag", "Etiqueta contable", 100);
         if (mnGridSubtype == SModConsts.MOD_TRN_SAL_N) {
@@ -167,6 +169,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
         }
         columns[col] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "stot_r", "Subtotal $");
         columns[col++].setSumApplying(true);
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "_cur", "Moneda");
         
         gridColumnsViews.addAll(Arrays.asList((SGridColumnView[]) columns));
 
