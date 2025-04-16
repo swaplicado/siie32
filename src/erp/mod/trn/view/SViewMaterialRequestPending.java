@@ -21,7 +21,6 @@ import erp.mod.trn.form.SDialogMaterialRequestSupply;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -369,23 +368,20 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 try {
                     int[] key = (int[]) gridRow.getRowPrimaryKey();
                     boolean est = SMaterialRequestUtils.hasMatReqEstimation(miClient.getSession(), key);
-                    if (miClient.showMsgBoxConfirm((est ? "Al regresar al solicitante se corre el riesgo de que se eliminen la(s) solicitud(es) de cotización al haber cambio de ítem o eliminación de la partida.\n" : "") + 
-                            "¿Esta seguro/a de regresar al solicitante?") == JOptionPane.OK_OPTION) {
-                        String message = SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), key);
-                        if (! message.isEmpty()) {
-                            miClient.showMsgBoxInformation("No se pudo completar la acción.\n" + message);
+                    String message = SMaterialRequestUtils.getReturnMessage(miClient.getSession(), key);
+                    if (miClient.showMsgBoxConfirm("¿Esta seguro/a de regresar al solicitante?\n"
+                            + (est ? "Si se cambian ítems o eliminan partidas de la RM, se perderán la solicitudes de cotización existentes.\n" : "")
+                            + message) == JOptionPane.OK_OPTION) {
+                        
+                        message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
+                        if (!message.isEmpty()) {
+                            miClient.showMsgBoxError(message);
                         }
-                        else {
-                            message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
-                            if (! message.isEmpty()) {
-                                miClient.showMsgBoxError(message);
-                            }
-                            
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
+
+                        miClient.getSession().notifySuscriptors(mnGridType);
                     }
                 }
-                catch (SQLException ex) {
+                catch (Exception ex) {
                     Logger.getLogger(SViewMaterialRequestPending.class.getName()).log(Level.SEVERE, null, ex);
                     SLibUtils.showException(this, ex);
                 }
@@ -620,7 +616,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 try {
                     int[] key = (int[]) gridRow.getRowPrimaryKey();
                     
-                    moDialogDocsCardex.setFormParams(key[0]);
+                    moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
                     
                     miClient.getSession().notifySuscriptors(mnGridType);

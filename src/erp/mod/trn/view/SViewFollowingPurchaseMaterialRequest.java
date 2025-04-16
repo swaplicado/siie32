@@ -124,7 +124,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
                 try {
                     int[] key = (int[]) gridRow.getRowPrimaryKey();
                     
-                    moDialogDocsCardex.setFormParams(key[0]);
+                    moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
                     
                     miClient.getSession().notifySuscriptors(mnGridType);

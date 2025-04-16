@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -57,6 +58,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridPaneFormOwner;
 import sa.lib.grid.SGridRow;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
@@ -98,6 +100,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private SDialogItemPicker moDialogPickerItemRefEty;
     private SDialogUnitPicker moDialogPickerUnit;
     
+    private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
+    
     private String msReqNotes;
     private String msEtyNotes;
     
@@ -130,6 +134,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     
     private double mdPriceUnitaryEty;
     
+    private JButton jbDocsCardex;
     private JButton jbSaveAndSend;
     
     private int mnItemRefCt;
@@ -1180,10 +1185,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 350));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Número parte"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cantidad"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cantidad", 90));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cant. equivalente"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Cant. equivalente", 90));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad equivalente"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Modificable"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Importe"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Nuevo ítem"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Tiempo consumo"));
@@ -1232,6 +1238,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyWhs.setPreferredSize(new java.awt.Dimension(300, 23));
         moKeyWhs.setKeySettings(miClient, SGuiUtils.getLabelName("Almacén"), false);
         moFields.addField(moKeyWhs);
+        
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la RM", this);
+        moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
+        
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la partida de la RM");
     }
     
     private void populateMatReqCC() {
@@ -2159,33 +2170,43 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void actionEditEty() {
-        if (isRegistryEditable) {
-            isEtyNew = false;
-            isCapturingData = true;
-            jbEditEty.setEnabled(false);
-            jbDeleteEty.setEnabled(false);
-            enableEntryControls(true);
+        if (!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getHasLinks()) {
+            if (isRegistryEditable) {
+                isEtyNew = false;
+                isCapturingData = true;
+                jbEditEty.setEnabled(false);
+                jbDeleteEty.setEnabled(false);
+                enableEntryControls(true);
+            }
+            else if (isProvPurForm && hasUserProvPurRight) {
+                jbPickItem.setEnabled(!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getItemNewDescription().isEmpty() && !hasLinkMatReq);
+                moDateDeliveryEty.setEnabled(isPurForm && hasUserPurRight);
+                jbRegisterEty.setEnabled(true);
+                jbCancelEty.setEnabled(true);
+                jbEditEty.setEnabled(false);
+            }
         }
-        else if (isProvPurForm && hasUserProvPurRight) {
-            jbPickItem.setEnabled(!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getItemNewDescription().isEmpty() && !hasLinkMatReq);
-            moDateDeliveryEty.setEnabled(isPurForm && hasUserPurRight);
-            jbRegisterEty.setEnabled(true);
-            jbCancelEty.setEnabled(true);
-            jbEditEty.setEnabled(false);
+        else {
+            miClient.showMsgBoxInformation("No se puede modificar debido a que la partida tiene movimientos de almacén o tiene vínculos con documentos.");
         }
     }
     
     private void actionDeleteEty() {
         try {
-            int rowId = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getAuxRowId();
-            for (SDbMaterialRequestEntry ety : maMatReqEntries) {
-                if (ety.getAuxRowId() == rowId) {
-                    ety.setDeleted(true);
+            if (!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getHasLinks()) {
+                int rowId = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getAuxRowId();
+                for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                    if (ety.getAuxRowId() == rowId) {
+                        ety.setDeleted(true);
+                    }
                 }
+                populateMatReqEntries();
+                isCapturingData = false;
+                enableEntryControls(false);
             }
-            populateMatReqEntries();
-            isCapturingData = false;
-            enableEntryControls(false);
+            else {
+                miClient.showMsgBoxInformation("No se puede eliminar debido a que la partida tiene movimientos de almacén o tiene vínculos con documentos.");
+            }            
         }
         catch (Exception e) {
             miClient.showMsgBoxError(e.getMessage());
@@ -2280,6 +2301,19 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moTextEtyNotes.setValue(msEtyNotes);
             moTextEtyNotes.setEnabled(!(msEtyNotes.contains("\n") || msEtyNotes.contains("\r\n")));
         }
+    }
+    
+    private void actionDocsKardex() {
+        try {
+            int[] key = ((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getPrimaryKey();
+
+            moDialogDocsCardex.setFormParams(key[0], key[1]);
+            moDialogDocsCardex.setVisible(true);
+
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }   
     }
 
     @Override
@@ -2492,8 +2526,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         populateWhs();
         if (!moRegistry.isRegistryNew()) {
-            jbAuthorize.setEnabled(hasUserRevRight && !isProvPurForm);
-            jbReject.setEnabled(hasUserRevRight && !isProvPurForm);
+            //jbAuthorize.setEnabled(hasUserRevRight && !isProvPurForm);
+            //jbReject.setEnabled(hasUserRevRight && !isProvPurForm);
+            jbAuthorize.setEnabled(false);
+            jbReject.setEnabled(false);
             if (moRegistry.getTypeRequest().equals(SModSysConsts.TRNS_MAT_REQ_TP_R)){
                 moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlKeyWhs);
                 moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moKeyWhs);
@@ -2657,6 +2693,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             }
             else if (button == jbEtyNotes) {
                 actionEtyNotes();
+            }
+            else if (button == jbDocsCardex) {
+                actionDocsKardex();
             }
         }
     }

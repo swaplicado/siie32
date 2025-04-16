@@ -964,16 +964,20 @@ public abstract class SMaterialRequestUtils {
             req.read(session, pkMatReq);
             req.setFkMatRequestStatusId(statusId);
             
-            if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
-                SAuthorizationUtils.deleteStepsOfAuthorization(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, pkMatReq);
-            }
-            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
-                req.setCloseProvision(true);
-                req.setClosePurchase(false);
-            }
-            else if (statusId == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
-                req.setCloseProvision(false);
-                req.setClosePurchase(true);
+            switch (statusId) {
+                case SModSysConsts.TRNS_ST_MAT_REQ_NEW:
+                    SAuthorizationUtils.deleteStepsOfAuthorization(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, pkMatReq);
+                    break;
+                case SModSysConsts.TRNS_ST_MAT_REQ_PUR:
+                    req.setCloseProvision(true);
+                    req.setClosePurchase(false);
+                    break;
+                case SModSysConsts.TRNS_ST_MAT_REQ_PROV:
+                    req.setCloseProvision(false);
+                    req.setClosePurchase(true);
+                    break;
+                default:
+                    break;
             }
             
             req.setAuxNotesChangeStatus_n(reason);
@@ -984,6 +988,63 @@ public abstract class SMaterialRequestUtils {
         catch (Exception ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             return ex.getMessage();
+        }
+    }
+    
+    public static boolean hasLinksMaterialRequestEntry(SGuiSession session, int[] pkMatReqEty) throws Exception {
+        boolean hasLinks = false;
+        String sql = "SELECT ety.* FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS ety "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di ON ety.id_year = di.id_year "
+                    + "AND ety.id_doc = di.id_doc "
+                    + "WHERE ety.fid_mat_req_n = " + pkMatReqEty[0] + " AND ety.fid_mat_req_ety_n = " + pkMatReqEty[1] + " "
+                    + "AND NOT ety.b_del "
+                    + "AND NOT di.b_del;";
+        
+        ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            hasLinks = true;
+        }
+        
+        if (!hasLinks) {
+            sql = "SELECT " +
+                "dpsmr.* " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON ety.id_year = d.id_year AND ety.id_doc = d.id_doc " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dpsmr ON ety.id_year = dpsmr.fid_dps_year AND ety.id_doc = dpsmr.fid_dps_doc AND ety.id_ety = dpsmr.fid_dps_ety " +
+                "WHERE NOT d.b_del AND NOT ety.b_del AND dpsmr.fid_mat_req = " + pkMatReqEty[0] + " AND dpsmr.fid_mat_req_ety = " + pkMatReqEty[1];
+
+            ResultSet resultSetDps = session.getStatement().getConnection().createStatement().executeQuery(sql);
+
+            if (resultSetDps.next()) {
+                hasLinks = true;
+            }
+        }
+        
+        return hasLinks;
+    }
+    
+    public static String getReturnMessage(SGuiSession session, int[] pkMatReq) throws Exception {
+        int i = 0;
+        SDbMaterialRequest moMaterialRequest = new SDbMaterialRequest();
+        moMaterialRequest.read(session, new int[] { pkMatReq[0] });
+        for (SDbMaterialRequestEntry entry : moMaterialRequest.getChildEntries()) {
+            if(!hasLinksMaterialRequestEntry(session, entry.getPrimaryKey())){
+                i++;
+            }
+        }
+        
+        if (i == moMaterialRequest.getChildEntries().size()) {
+            return "Considere que se pueden modificar todas las partidas de la RM.";
+        }
+        else if (i == 0) {
+            return "Considere que no se puede modificar ninguna partida de la RM.";
+        }
+        else {
+            if (i == 1) {
+                return "Considere que sólo se puede modificar " + i + " partida de " + moMaterialRequest.getChildEntries().size() + " de la RM.";
+            }
+            return "Considere que sólo se pueden modificar " + i + " partidas de " + moMaterialRequest.getChildEntries().size() + " de la RM.";
         }
     }
     
@@ -1114,7 +1175,7 @@ public abstract class SMaterialRequestUtils {
         return null;
     }
     
-    public static ArrayList<SRowMaterialRequestDocs> getMaterialRequestDocs(SGuiSession session, int pkMatReq) {
+    public static ArrayList<SRowMaterialRequestDocs> getMaterialRequestLinks(SGuiSession session, int matReqId, int matReqEtyId) {
         String sql = "SELECT  " +
                 "    req.id_mat_req, " +
                 "    req.num, " +
@@ -1128,6 +1189,7 @@ public abstract class SMaterialRequestUtils {
                 "    itm.item, " +
                 "    itm.part_num, " +
                 "    uni.symbol," +
+                "    GROUP_CONCAT(COALESCE(IF(length(iog.num_ser) > 0, CONCAT('SUM ', iog.num_ser, '-', iog.num), CONCAT('SUM ', iog.num)), '')) AS sum, " +
                 "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ", " +
@@ -1161,8 +1223,14 @@ public abstract class SMaterialRequestUtils {
                 "        LEFT JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON ety.id_year = dps.id_year " +
                 "        AND ety.id_doc = dps.id_doc " +
+                "        LEFT JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " ioety ON ioety.fid_mat_req_n = reqty.id_mat_req " +
+                "        AND ioety.fid_mat_req_ety_n = reqty.id_ety " +
+                "        LEFT JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " iog ON ioety.id_year = iog.id_year " +
+                "        AND ioety.id_doc = iog.id_doc " +
                 "WHERE " +
-                "    req.id_mat_req = " + pkMatReq + " AND NOT reqty.b_del " +
+                "    reqty.id_mat_req = " + matReqId + (matReqEtyId == 0 ? "" : " AND reqty.id_ety = " + matReqEtyId) + " AND NOT reqty.b_del " +
                 "        AND (dmr.fid_mat_req IS NULL " +
                 "        OR (NOT ety.b_del AND NOT dps.b_del " +
                 "        AND ((dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
@@ -1190,6 +1258,7 @@ public abstract class SMaterialRequestUtils {
                 oMatReqEtyDocsRow.msItem = resultSet.getString("item");
                 oMatReqEtyDocsRow.msPartNumber = resultSet.getString("part_num");
                 oMatReqEtyDocsRow.msUnitSymbol = resultSet.getString("symbol");
+                oMatReqEtyDocsRow.msSum = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("sum"));
                 oMatReqEtyDocsRow.msCot = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("cot"));
                 oMatReqEtyDocsRow.msPed = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("ped"));
                 oMatReqEtyDocsRow.msFact = SMaterialRequestUtils.formatTextWithCommas(resultSet.getString("fact"));
