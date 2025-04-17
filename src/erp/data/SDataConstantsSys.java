@@ -1428,6 +1428,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_SAL_TOT_BY_TP_BP_BP = 313;
     public static final int TRNX_SAL_TOT_BY_IGEN_IREF = 316;
     public static final int TRNX_SAL_TOT_BY_IREF = 317;
+    public static final int TRNX_SAL_TOT_BY_ITEM_AGT = 318;
+    public static final int TRNX_SAL_TOT_BY_ITEM_BP_AGT = 319;
+    public static final int TRNX_SAL_TOT_BY_BP_AGT = 320;
+    public static final int TRNX_SAL_TOT_BY_BP_ITEM_AGT = 321;
     /** All sales document entries at once. What type of document is needed must be provided: invoices or credit notes. */
     public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ALL = 314;
     /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */

@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 270.5/ 2025-04-16
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Separación de vistas ventas por cliente, ventas por cliente-item, ventas por item, ventas por item-cliente.
+2) Creacion de de vistas ventas por cliente-agente, ventas por cliente-item-agente, ventas por item-agente, ventas por item-cliente-agente.
+
+================================================================================
 SIIE 3.2 270.4/ 2025-04-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
