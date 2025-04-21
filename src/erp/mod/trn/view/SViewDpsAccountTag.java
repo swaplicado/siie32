@@ -7,13 +7,16 @@ package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -34,13 +37,17 @@ import sa.lib.gui.SGuiDate;
  *
  * @author Isabel Servín
  */
-public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
+public class SViewDpsAccountTag extends SGridPaneView implements ActionListener, ItemListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JLabel jlAccTag;
     private JLabel jlFuncArea;
     private JComboBox<String> jcbAccTag;
     private JTextField jtfFuncArea;
+    
+    private javax.swing.JButton mjbViewDps;
+    private javax.swing.JButton mjbViewNotes;
+    private javax.swing.JButton mjbViewLinks;
     
     public SViewDpsAccountTag(SGuiClient client, int subType, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_DPS_ACC_TAG, subType, title);
@@ -49,6 +56,18 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
 
     private void initComponentsCustom() {
         setRowButtonsEnabled(false);
+        
+        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
+        mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
+        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        
+        mjbViewDps.setToolTipText("Ver documento");
+        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewLinks.setToolTipText("Ver vínculos del documento");
+        
+        mjbViewDps.addActionListener(this);
+        mjbViewNotes.addActionListener(this);
+        mjbViewLinks.addActionListener(this);
         
         String areas[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, SLibConsts.UNDEFINED);
         
@@ -117,6 +136,8 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
                 + "d.num_ref, "
                 + "d.dt, "
                 + "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, "
+                + "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS concept, "
+                + "f.code AS func, "
                 + "bp.bp, "
                 + "bpc.bp_key, "
                 + "bpb.bpb, "
@@ -126,6 +147,8 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON "
                 + "d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON "
+                + "d.fid_func = f.id_func "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "d.fid_bp_r = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bpc ON "
@@ -144,7 +167,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[11];
+        SGridColumnView[] columns = new SGridColumnView[13];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "acc_tag", "Etiqueta contable", 100);
         if (mnGridSubtype == SModConsts.MOD_TRN_SAL_N) {
@@ -170,6 +193,8 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
         columns[col] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "stot_r", "Subtotal $");
         columns[col++].setSumApplying(true);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "_cur", "Moneda");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "func", "Área funcional", 35);
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "concept", "Concepto", 200);
         
         gridColumnsViews.addAll(Arrays.asList((SGridColumnView[]) columns));
 
@@ -186,6 +211,24 @@ public class SViewDpsAccountTag extends SGridPaneView implements ItemListener {
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        actionGridReload();
+        refreshGridWithReload();
+    }
+
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        
+        if (e.getSource() instanceof javax.swing.JButton) {
+            JButton button = (javax.swing.JButton) e.getSource();
+
+//            if (button == mjbViewDps) {
+//                actionViewDps();
+//            }
+//            else if (button == mjbViewNotes) {
+//                actionViewNotes();
+//            }
+//            else if (button == mjbViewLinks) {
+//                actionViewLinks();
+//            }
+        }
     }
 }
