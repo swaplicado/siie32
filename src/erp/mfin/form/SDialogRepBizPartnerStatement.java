@@ -26,9 +26,11 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -43,6 +45,8 @@ import sa.lib.SLibUtils;
  */
 public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
+    private static final int LAN_ENG = 2; 
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -87,6 +91,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
         bgBizPartner = new javax.swing.ButtonGroup();
         bgCur = new javax.swing.ButtonGroup();
+        bgLanguaje = new javax.swing.ButtonGroup();
         jpParams = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -113,6 +118,10 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jlSalesAgent = new javax.swing.JLabel();
         jcbSalesAgent = new javax.swing.JComboBox<>();
         jbPickSalesAgent = new javax.swing.JButton();
+        jPanel19 = new javax.swing.JPanel();
+        jrbLanLoc = new javax.swing.JRadioButton();
+        jPanel20 = new javax.swing.JPanel();
+        jrbLanEnglish = new javax.swing.JRadioButton();
         jPanel16 = new javax.swing.JPanel();
         jrbCurrencyLoc = new javax.swing.JRadioButton();
         jlCurrencyLocWarning = new javax.swing.JLabel();
@@ -139,7 +148,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jpParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jpParams.setLayout(new java.awt.BorderLayout());
 
-        jPanel8.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel8.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -247,6 +256,25 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
         jPanel8.add(jPanel99);
 
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgLanguaje.add(jrbLanLoc);
+        jrbLanLoc.setSelected(true);
+        jrbLanLoc.setText("Emitir en idioma del sistema");
+        jrbLanLoc.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel19.add(jrbLanLoc);
+
+        jPanel8.add(jPanel19);
+
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        bgLanguaje.add(jrbLanEnglish);
+        jrbLanEnglish.setText("Emitir en inglés");
+        jrbLanEnglish.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel20.add(jrbLanEnglish);
+
+        jPanel8.add(jPanel20);
+
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         bgCur.add(jrbCurrencyLoc);
@@ -313,7 +341,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(656, 439));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -357,6 +385,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jrbSalesAgent.addItemListener(this);
         jrbCurrencyLoc.addItemListener(this);
         jrbCurrencyDoc.addItemListener(this);
+        jcbBizPartner.addItemListener(this);
         
         name = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG);
         jlBizPartner.setText(name + ": *");
@@ -440,34 +469,36 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             // Report params:
 
             if (jcbCoBranch.getSelectedIndex() <= 0) {
-                txtCoBranch = SUtilConsts.TXT_BRANCH.toUpperCase() + ": " + SUtilConsts.ALL_F;
+                txtCoBranch = jrbLanLoc.isSelected() ? SUtilConsts.TXT_BRANCH.toUpperCase() + ": " + SUtilConsts.ALL_F : "BRANCH: (ALL)";
             }
             else {
-                txtCoBranch = SUtilConsts.TXT_BRANCH.toUpperCase() + ": " + jcbCoBranch.getSelectedItem().toString();
+                txtCoBranch = (jrbLanLoc.isSelected() ? SUtilConsts.TXT_BRANCH.toUpperCase() : "BRANCH") + ": " + jcbCoBranch.getSelectedItem().toString();
                 sqlFilterCoBranch = "AND (d.fid_cob = " + moFieldCoBranch.getKeyAsIntArray()[0] + " OR (re.fid_dps_year_n IS NULL AND r.fid_cob = " + moFieldCoBranch.getKeyAsIntArray()[0] + ")) ";
             }
 
             if (mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_CUS) {
                 if (jrbBizPartner.isSelected()) {
                     // Customer:
-                    txtBizPartner = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString();
+                    txtBizPartner = jrbLanLoc.isSelected() ? SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString() : 
+                            SBpsUtils.getBizPartnerCategoryNameEnglish(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString();
                     sqlFilterBizPartner = "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " ";
                 }
                 else {
                     // Sales agent:
-                    txtBizPartner = SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() + ": " + jcbSalesAgent.getSelectedItem().toString();
+                    txtBizPartner = (jrbLanLoc.isSelected() ? SBpsConsts.BPS_ATT_SAL_AGT.toUpperCase() : "SALES AGENT") + ": " + jcbSalesAgent.getSelectedItem().toString();
                     sqlFilterBizPartner = "AND d.fid_sal_agt_n = " + moFieldSalesAgent.getKeyAsIntArray()[0] + " ";
                 }
             }
             else {
                 // Other business partner categories:
-                txtBizPartner = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString();
+                txtBizPartner = jrbLanLoc.isSelected() ? SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString() : 
+                        SBpsUtils.getBizPartnerCategoryNameEnglish(mnBizPartnerCategory, SUtilConsts.NUM_SNG).toUpperCase() + ": " + jcbBizPartner.getSelectedItem().toString();
                 sqlFilterBizPartner = "AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0] + " ";
             }
             
-            txtCurrency = SUtilConsts.TXT_CURRENCY.toUpperCase() + ": ";
+            txtCurrency = (jrbLanLoc.isSelected() ? SUtilConsts.TXT_CURRENCY.toUpperCase() : "CURRENCY") + ": ";
             if (jrbCurrencyLoc.isSelected()) {
-                txtCurrency += "MONEDA LOCAL (" +miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")";
+                txtCurrency += (jrbLanLoc.isSelected() ? "MONEDA LOCAL " : "SYSTEM CURRENCY ") + "(" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")";
             }
             else {
                 SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
@@ -478,12 +509,12 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 case SDataConstantsSys.BPSS_CT_BP_SUP:
                     idSysAccountClass = SModSysConsts.FINS_CL_SYS_ACC_BPR_SUP;
                     sqlFilterAccountClass = jckAdvancePayments.isSelected() ? "" + SModSysConsts.FINS_CL_ACC_LIABTY[1] + ", " + SModSysConsts.FINS_CL_ACC_ASSET[1] : "" + SModSysConsts.FINS_CL_ACC_LIABTY[1];
-                    txtAdvancePayments = "(" + (jckAdvancePayments.isSelected() ? SUtilConsts.WITH.toUpperCase() : SUtilConsts.WITHOUT.toUpperCase()) + " " + SDataRepConstants.ADV_PAYS.toUpperCase() + ")";
+                    txtAdvancePayments = "(" + (jckAdvancePayments.isSelected() ? (jrbLanLoc.isSelected() ? SUtilConsts.WITH.toUpperCase() : "WITH") : (jrbLanLoc.isSelected() ? SUtilConsts.WITHOUT.toUpperCase() : "WITHOUT")) + " " + (jrbLanLoc.isSelected() ? SDataRepConstants.ADV_PAYS.toUpperCase() : "ADVANCES") + ")";
                     break;
                 case SDataConstantsSys.BPSS_CT_BP_CUS:
                     idSysAccountClass = SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS;
                     sqlFilterAccountClass = jckAdvancePayments.isSelected() ? "" + SModSysConsts.FINS_CL_ACC_ASSET[1] + ", " + SModSysConsts.FINS_CL_ACC_LIABTY[1] : "" + SModSysConsts.FINS_CL_ACC_ASSET[1];
-                    txtAdvancePayments = "(" + (jckAdvancePayments.isSelected() ? SUtilConsts.WITH.toUpperCase() : SUtilConsts.WITHOUT.toUpperCase()) + " " + SDataRepConstants.ADV_PAYS.toUpperCase() + ")";
+                    txtAdvancePayments = "(" + (jckAdvancePayments.isSelected() ? (jrbLanLoc.isSelected() ? SUtilConsts.WITH.toUpperCase() : "WITH") : (jrbLanLoc.isSelected() ? SUtilConsts.WITHOUT.toUpperCase() : "WITHOUT")) + " " + (jrbLanLoc.isSelected() ? SDataRepConstants.ADV_PAYS.toUpperCase() : "ADVANCES") + ")";
                     break;
                 case SDataConstantsSys.BPSS_CT_BP_CDR:
                     idSysAccountClass = SModSysConsts.FINS_CL_SYS_ACC_BPR_CDR;
@@ -496,10 +527,26 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 default:
             }
             
+            String title = ""; 
+            switch (mnBizPartnerCategory) {
+                case SDataConstantsSys.BPSS_CT_BP_SUP:
+                    title = "VENDOR STATEMENT"; 
+                    break;
+                case SDataConstantsSys.BPSS_CT_BP_CUS:
+                    title = "CUSTOMER STATEMENT";
+                    break;
+                case SDataConstantsSys.BPSS_CT_BP_CDR:
+                    title = "CREDITOR STATEMENT";
+                    break;
+                case SDataConstantsSys.BPSS_CT_BP_DBR:
+                    title = "DEBTOR STATEMENT";
+                    break;
+            }
+            
             String filterCur = !jrbCurrencyDoc.isSelected() ? "" : " AND re.fid_cur = " + moFieldCurrency.getKeyAsIntArray()[0] + " ";
             
             map = miClient.createReportParams();
-            map.put("sTitle", getTitle().toUpperCase());
+            map.put("sTitle", jrbLanLoc.isSelected() ? getTitle().toUpperCase() : title);
             map.put("sCoBranch", txtCoBranch);
             map.put("sBizPartner", txtBizPartner);
             map.put("sCurrency", txtCurrency);
@@ -513,6 +560,10 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             map.put("sSqlFilterCoBranch", sqlFilterCoBranch);
             map.put("sSqlFilterBizPartner", sqlFilterBizPartner);
             map.put("sSqlFilterCur", filterCur);
+            map.put("sConcept", jrbLanEnglish.isSelected() ? "OPENING BALANCE" : "SALDO INICIAL");
+            map.put("bEnglish", jrbLanEnglish.isSelected());
+            map.put("oDateFormat", jrbLanEnglish.isSelected() ? SLibUtils.CsvFormatDate : SLibUtils.DateFormatDate);
+            map.put("oDatetimeFormat", jrbLanEnglish.isSelected() ? SLibUtils.CsvFormatDatetime : SLibUtils.DateFormatDatetime);
 
             // Report view:
 
@@ -554,7 +605,34 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             jlCurrencyLocWarning.setVisible(false);
             jlCurrencyDocWarning.setVisible(true);
             jcbCurrency.setEnabled(true);
-            moFieldCurrency.resetField();
+        }
+    }
+    
+    private void itemStateChangedBizPartnerBox() {
+        try {
+            if (jrbBizPartner.isSelected()) {
+            String sql = "SELECT fid_lan_n FROM erp.bpsu_bp_ct "
+                    + "WHERE id_bp = " + moFieldBizPartner.getKeyAsIntArray()[0] + " "
+                    + "AND id_ct_bp = " + mnBizPartnerCategory;
+                ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    if (resultSet.getInt(1) == LAN_ENG) {
+                        jrbLanEnglish.setSelected(true);
+                    }
+                    else {
+                        jrbLanLoc.setSelected(true);
+                    }
+                }
+                else {
+                    jrbLanLoc.setSelected(true);
+                }
+            }
+            else {
+                jrbLanLoc.setSelected(true);
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
     
@@ -594,13 +672,16 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgBizPartner;
     private javax.swing.ButtonGroup bgCur;
+    private javax.swing.ButtonGroup bgLanguaje;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel8;
@@ -633,6 +714,8 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private javax.swing.JRadioButton jrbBizPartner;
     private javax.swing.JRadioButton jrbCurrencyDoc;
     private javax.swing.JRadioButton jrbCurrencyLoc;
+    private javax.swing.JRadioButton jrbLanEnglish;
+    private javax.swing.JRadioButton jrbLanLoc;
     private javax.swing.JRadioButton jrbSalesAgent;
     // End of variables declaration//GEN-END:variables
 
@@ -791,5 +874,13 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 }
             }
         }
+        
+        else if (e.getSource() instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbBizPartner) {
+                itemStateChangedBizPartnerBox();
+            }
+        } 
     }
 }

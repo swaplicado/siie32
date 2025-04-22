@@ -11,12 +11,12 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -168,9 +168,10 @@ public class SCliRepBalenceAge {
             map.put("sSqlSortBy", " _due_dt, d.num_ser, d.num, d.id_year, d.id_doc, re.ref ");  
             if (idBp == BP_AETH) {
                map.put("sSqlFilterCoBranch", " AND (d.fid_cob = 2890 OR (re.fid_dps_year_n IS NULL AND r.fid_cob = 2890))" );
-               map.put("sFuncText", "TODAS");
+               map.put("sFuncText", "(TODAS)");
                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( 1, 2, 3, 4, 5, 6 )" );
-            } else if (idBp == BP_AME) {
+            }
+            else if (idBp == BP_AME) {
                map.put("sSqlFilterCoBranch", " AND (d.fid_cob = 5051 OR (re.fid_dps_year_n IS NULL AND r.fid_cob = 5051))" );
                map.put("sFuncText", "(ND)");
                map.put("sFilterFunctionalArea", "" );

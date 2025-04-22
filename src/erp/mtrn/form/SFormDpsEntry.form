@@ -2438,6 +2438,7 @@
                             <Component class="javax.swing.JButton" name="jbTicketPicker">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar boletos b&#xe1;scula"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
                                 </Property>
@@ -2448,18 +2449,7 @@
                                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                                   <Image iconType="3" name="/erp/img/icon_std_erase.gif"/>
                                 </Property>
-                                <Property name="toolTipText" type="java.lang.String" value="Borrar boletos"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[23, 23]"/>
-                                </Property>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JButton" name="jbEditLogistics">
-                              <Properties>
-                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                                  <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
-                                </Property>
-                                <Property name="toolTipText" type="java.lang.String" value="Modificar datos"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Borrar boletos b&#xe1;scula"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
                                 </Property>
@@ -2494,6 +2484,7 @@
                             <Component class="javax.swing.JButton" name="jbTankCarPicker">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar carrotanques"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
                                 </Property>
@@ -2505,6 +2496,17 @@
                                   <Image iconType="3" name="/erp/img/icon_std_erase.gif"/>
                                 </Property>
                                 <Property name="toolTipText" type="java.lang.String" value="Borrar carrotanques"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbEditLogistics">
+                              <Properties>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_std_edit_ro.gif"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Modificar datos"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[23, 23]"/>
                                 </Property>

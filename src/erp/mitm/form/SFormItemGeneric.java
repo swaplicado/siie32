@@ -385,7 +385,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsShipDataInternationalReq = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
         jckIsShipDataQualityReq = new javax.swing.JCheckBox();
-        jpCommand = new javax.swing.JPanel();
+        jpCommandBar = new javax.swing.JPanel();
+        jpCommandBar1 = new javax.swing.JPanel();
+        jtfPkItemGenericId_Ro = new javax.swing.JTextField();
+        jpCommandBar2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -1305,19 +1308,34 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
-        jpCommand.setPreferredSize(new java.awt.Dimension(792, 33));
-        jpCommand.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpCommandBar.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpCommandBar1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkItemGenericId_Ro.setEditable(false);
+        jtfPkItemGenericId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPkItemGenericId_Ro.setToolTipText("ID del registro");
+        jtfPkItemGenericId_Ro.setFocusable(false);
+        jtfPkItemGenericId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpCommandBar1.add(jtfPkItemGenericId_Ro);
+
+        jpCommandBar.add(jpCommandBar1);
+
+        jpCommandBar2.setPreferredSize(new java.awt.Dimension(792, 33));
+        jpCommandBar2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpCommand.add(jbOk);
+        jpCommandBar2.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jpCommand.add(jbCancel);
+        jpCommandBar2.add(jbCancel);
 
-        getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
+        jpCommandBar.add(jpCommandBar2);
+
+        getContentPane().add(jpCommandBar, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(960, 600));
         setLocationRelativeTo(null);
@@ -2387,7 +2405,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlSurplusPercentage;
     private javax.swing.JList<SFormComponentItem> jltBizAreaAsignated;
     private javax.swing.JList<SFormComponentItem> jltBizAreaAvailable;
-    private javax.swing.JPanel jpCommand;
+    private javax.swing.JPanel jpCommandBar;
+    private javax.swing.JPanel jpCommandBar1;
+    private javax.swing.JPanel jpCommandBar2;
     private javax.swing.JPanel jpProperties;
     private javax.swing.JPanel jpProperties1;
     private javax.swing.JPanel jpProperties11;
@@ -2470,6 +2490,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JTextField jtfNamingOrdinaryPosManufacturer;
     private javax.swing.JTextField jtfNamingOrdinaryPosName;
     private javax.swing.JTextField jtfNamingOrdinaryPosPresentation;
+    private javax.swing.JTextField jtfPkItemGenericId_Ro;
     private javax.swing.JTextField jtfSerialNumber;
     private javax.swing.JTextField jtfSerialNumberFormat;
     private javax.swing.JTextField jtfSurplusPercentage;
@@ -2493,6 +2514,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
+        jtfPkItemGenericId_Ro.setText("");
         moComboBoxFamilyItem.reset();
         moComboBoxCategoryItem.reset();
         moFieldFkSerialNumberTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMS_TP_SNR_NA });
@@ -2830,6 +2852,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsShipDataDomestic.setFieldValue(moItemGeneric.getIsDataShipDomesticReq());
         moFieldIsShipDataInternational.setFieldValue(moItemGeneric.getIsDataShipInternationalReq());
         moFieldIsShipDataQuality.setFieldValue(moItemGeneric.getIsDataQualityReq());
+        jtfPkItemGenericId_Ro.setText("" + moItemGeneric.getPkItemGenericId());
 
         if (!moItemGeneric.getIsItemShortApplying()) {
             jtfItemGenericShort.setEnabled(false);

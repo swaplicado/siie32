@@ -95,7 +95,10 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jckIsDeleted = new javax.swing.JCheckBox();
-        jpCommand = new javax.swing.JPanel();
+        jpCommandBar = new javax.swing.JPanel();
+        jpCommandBar1 = new javax.swing.JPanel();
+        jtfPkItemGroupId_Ro = new javax.swing.JTextField();
+        jpCommandBar2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -121,7 +124,6 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         jlFkItemFamilyId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel111.add(jlFkItemFamilyId);
 
-        jcbFkItemFamilyId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkItemFamilyId.setPreferredSize(new java.awt.Dimension(300, 23));
         jcbFkItemFamilyId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -185,19 +187,34 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
-        jpCommand.setPreferredSize(new java.awt.Dimension(392, 33));
-        jpCommand.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpCommandBar.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpCommandBar1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkItemGroupId_Ro.setEditable(false);
+        jtfPkItemGroupId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPkItemGroupId_Ro.setToolTipText("ID del registro");
+        jtfPkItemGroupId_Ro.setFocusable(false);
+        jtfPkItemGroupId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpCommandBar1.add(jtfPkItemGroupId_Ro);
+
+        jpCommandBar.add(jpCommandBar1);
+
+        jpCommandBar2.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpCommandBar2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpCommand.add(jbOk);
+        jpCommandBar2.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jpCommand.add(jbCancel);
+        jpCommandBar2.add(jbCancel);
 
-        getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
+        jpCommandBar.add(jpCommandBar2);
+
+        getContentPane().add(jpCommandBar, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(480, 300));
         setLocationRelativeTo(null);
@@ -351,9 +368,12 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JCheckBox jckIsFreePrice;
     private javax.swing.JLabel jlFkItemFamilyId;
     private javax.swing.JLabel jlItemGroup;
-    private javax.swing.JPanel jpCommand;
+    private javax.swing.JPanel jpCommandBar;
+    private javax.swing.JPanel jpCommandBar1;
+    private javax.swing.JPanel jpCommandBar2;
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JTextField jtfItemGroup;
+    private javax.swing.JTextField jtfPkItemGroupId_Ro;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -373,6 +393,8 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
+        jtfPkItemGroupId_Ro.setText("");
+        
         readItemFamilySettings();
         
         jckIsDeleted.setEnabled(false);
@@ -451,6 +473,7 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         moFieldIsFreeDiscount.setFieldValue(moItemGroup.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItemGroup.getIsFreeCommissions());
         moFieldIsDeleted.setFieldValue(moItemGroup.getIsDeleted());
+        jtfPkItemGroupId_Ro.setText("" + moItemGroup.getPkItemGroupId());
 
         jckIsDeleted.setEnabled(true);
     }

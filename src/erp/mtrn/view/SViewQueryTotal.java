@@ -85,6 +85,10 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_IREF:
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IREF:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT:            
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT:
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT:
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(moTabFilterBizPartner);
                 break;
@@ -108,12 +112,10 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
 
         if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM ||
                 mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM) {
-            if (isPurchase()) {
-                maoTableColumns = new STableColumn[12];
-            }
-            else {
-                maoTableColumns = new STableColumn[15];           
-            }
+            maoTableColumns = new STableColumn[12];
+        }
+        else if ( mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT) {
+            maoTableColumns = new STableColumn[15];
         }
         else if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP
                 || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN
@@ -124,13 +126,11 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         else  if (mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_TP_BP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_BP || mnTabTypeAux01 == SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN_BP) {
             maoTableColumns = new STableColumn[13];
         }
+        else  if (mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT || mnTabTypeAux01 == SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT ) {
+            maoTableColumns = new STableColumn[17];
+        }
         else {
-            if (isPurchase()) {
-                maoTableColumns = new STableColumn[14];
-            }
-            else {
-                maoTableColumns = new STableColumn[17];           
-            }
+            maoTableColumns = new STableColumn[14];
         }
 
         i = 0;
@@ -155,24 +155,30 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                     else {
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
-                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "country", "País", 100);
-                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Localidad", 100);
-                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sales_agent", "Agente de ventas", 200);
                     }
                 }
+                break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT:
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "country", "País", 100);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Localidad", 100);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sales_agent", "Agente de ventas", 200);
                 break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM:
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
+                }
+                break;
+             case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT:
+                if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "country", "País", 100);
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Localidad", 100);
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sales_agent", "Agente de ventas", 200);
-                }
-                else {
-                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
-                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
                 }
                 break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_IGEN:
@@ -229,6 +235,36 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                     else {
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                    }
+                }
+                if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
+                }
+                else {
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+                }
+                break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT:
+                if (isPurchase()) {
+                    if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                    }
+                    else {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                    }
+                }
+                else {
+                    if (miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                    }
+                    else {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "country", "País", 100);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Localidad", 100);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sales_agent", "Agente de ventas", 200);
@@ -248,11 +284,41 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
-                      if (!isPurchase()) {
+                }
+                else {
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+                }
+                if (isPurchase()) {
+                    if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                    }
+                    else {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                    }
+                }
+                else {
+                    if (miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                    }
+                    else {
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Asociado negocios", 200);
+                        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave", 100);
+                    }
+                }
+                break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT:
+                if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
+                    maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
+                       if (!isPurchase()) {
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "country", "País", 100);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Localidad", 100);
                         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sales_agent", "Agente de ventas", 200);
-                      }
+                       }
                 }
                 else {
                     maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
@@ -565,8 +631,20 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                             "bp, bp_key " : miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp " :
                                 "bp, bp_key ");
                 break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT:
+                sqlColumns = "bp, bp_key, ";
+                sqlGroupOrder = "GROUP BY " + sqlCurrency + "bp, bp_key ORDER BY " + sqlCurrency +
+                        (isPurchase() ? miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp " :
+                            "bp, bp_key " : miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp " :
+                                "bp, bp_key ");
+                break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM:
+                sqlColumns = "item, item_key, ";
+                sqlGroupOrder = "GROUP BY " + sqlCurrency + "item, item_key ORDER BY " + sqlCurrency +
+                        (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item " : "item, item_key ");
+                break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT:
                 sqlColumns = "item, item_key, ";
                 sqlGroupOrder = "GROUP BY " + sqlCurrency + "item, item_key ORDER BY " + sqlCurrency +
                         (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item " : "item, item_key ");
@@ -603,8 +681,24 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                                 "bp, bp_key, ") +
                                 (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item " : "item, item_key ");
                 break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT:
+                sqlColumns = "bp, bp_key, item, item_key, ";
+                sqlGroupOrder = "GROUP BY " + sqlCurrency + "bp, bp_key, item, item_key ORDER BY " + sqlCurrency +
+                        (isPurchase() ? miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp, " :
+                            "bp, bp_key, " : miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp, " :
+                                "bp, bp_key, ") +
+                                (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item " : "item, item_key ");
+                break;
             case SDataConstantsSys.TRNX_PUR_TOT_BY_ITEM_BP:
             case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP:
+                sqlColumns = "item, item_key, bp, bp_key, ";
+                sqlGroupOrder = "GROUP BY " + sqlCurrency + "item, item_key, bp, bp_key ORDER BY " + sqlCurrency +
+                        (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item, " : "item, item_key, ") +
+                        (isPurchase() ? miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp " :
+                            "bp, bp_key " : miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "bp_key, bp " :
+                                "bp, bp_key ");
+                break;
+            case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT:
                 sqlColumns = "item, item_key, bp, bp_key, ";
                 sqlGroupOrder = "GROUP BY " + sqlCurrency + "item, item_key, bp, bp_key ORDER BY " + sqlCurrency +
                         (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "item_key, item, " : "item, item_key, ") +

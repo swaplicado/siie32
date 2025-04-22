@@ -229,6 +229,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnByBizPartnerTypeBizPartner;
     private javax.swing.JMenuItem jmiRepTrnByItemGenericReference;
     private javax.swing.JMenuItem jmiRepTrnByItemReference;
+    private javax.swing.JMenuItem jmiRepTrnByItemAgent;
+    private javax.swing.JMenuItem jmiRepTrnByItemBizPartnerAgent;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartnerAgent;
+    private javax.swing.JMenuItem jmiRepTrnByBizPartnerItemAgent;
     private javax.swing.JMenuItem jmiRepTrnDpsByItemBizPartner;
     private javax.swing.JMenuItem jmiRepAccDpsAccTag;
     private javax.swing.JMenuItem jmiRepTrnDpsAciPer;
@@ -630,6 +634,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerTypeBizPartner = new JMenuItem("Ventas por tipo de cliente-cliente");
         jmiRepTrnByItemGenericReference = new JMenuItem("Ventas por ítem genérico del ítem de referencia");
         jmiRepTrnByItemReference = new JMenuItem("Ventas por ítem de referencia");
+        jmiRepTrnByItemAgent = new JMenuItem("Ventas por ítem-agente de ventas");
+        jmiRepTrnByItemBizPartnerAgent = new JMenuItem("Ventas por ítem-cliente-agente de ventas");
+        jmiRepTrnByBizPartnerAgent = new JMenuItem("Ventas por cliente-agente de ventas");
+        jmiRepTrnByBizPartnerItemAgent = new JMenuItem("Ventas por cliente-ítem-agente de ventas");
         jmiRepTrnDpsByItemBizPartner = new JMenuItem("Documentos de ventas por ítem-cliente");
         jmiRepTrnDpsAciPer = new JMenuItem("Partidas de documentos de ventas con acidez");
         jmiRepCustomReportFsc = new JMenuItem("Reporte personalizado de ventas...");
@@ -696,6 +704,11 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRepStats.add(jmiRepTrnByBizPartnerTypeBizPartner);
         jmRepStats.add(jmiRepTrnByItemGenericReference);
         jmRepStats.add(jmiRepTrnByItemReference);
+        jmRepStats.addSeparator();
+        jmRepStats.add(jmiRepTrnByItemAgent);
+        jmRepStats.add(jmiRepTrnByItemBizPartnerAgent);
+        jmRepStats.add(jmiRepTrnByBizPartnerAgent);
+        jmRepStats.add(jmiRepTrnByBizPartnerItemAgent);
         jmRepStats.addSeparator();
         jmRepStats.add(jmiRepTrnDpsAciPer);
         jmRepStats.addSeparator();
@@ -897,6 +910,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnByBizPartnerTypeBizPartner.addActionListener(this);
         jmiRepTrnByItemGenericReference.addActionListener(this);
         jmiRepTrnByItemReference.addActionListener(this);
+        jmiRepTrnByItemAgent.addActionListener(this);
+        jmiRepTrnByItemBizPartnerAgent.addActionListener(this);
+        jmiRepTrnByBizPartnerAgent.addActionListener(this);
+        jmiRepTrnByBizPartnerItemAgent.addActionListener(this);
         jmiRepTrnDpsByItemBizPartner.addActionListener(this);
         jmiRepTrnDpsAciPer.addActionListener(this);
         jmiRepAccDpsAccTag.addActionListener(this);
@@ -1224,6 +1241,18 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                break;
            case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
                viewTitle = "Ventas x ítem ref";
+               break;
+          case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT:
+               viewTitle = "Ventas x ítem-agente";
+               break;
+           case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT:
+               viewTitle = "Ventas x ítem-cliente-agente";
+               break;
+           case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT:
+               viewTitle = "Ventas x tipo cliente-agente";
+               break;
+           case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT:
+               viewTitle = "Ventas x tipo cliente-item-agente";
                break;
             default:
         }
@@ -1705,6 +1734,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_TP_BP_BP:
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN_IREF:
                         case SDataConstantsSys.TRNX_SAL_TOT_BY_IREF:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT:
+                        case SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT:
                             oViewClass = erp.mtrn.view.SViewQueryTotal.class;
                             sViewTitle = getViewTitle(auxType01);
                             break;
@@ -2299,6 +2332,18 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiRepTrnByItemReference) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_IREF);                
+            }
+            else if (item == jmiRepTrnByItemAgent) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_AGT);
+            }
+            else if (item == jmiRepTrnByItemBizPartnerAgent) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_ITEM_BP_AGT);
+            }
+            else if (item == jmiRepTrnByBizPartnerAgent) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_BP_AGT);
+            }
+            else if (item == jmiRepTrnByBizPartnerItemAgent) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_TOT_BY_BP_ITEM_AGT);
             }
             else if (item == jmiRepTrnDpsByItemBizPartner) {
                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_ONE);
