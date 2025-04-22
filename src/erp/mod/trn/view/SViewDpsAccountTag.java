@@ -6,7 +6,9 @@
 package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -28,6 +31,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -65,6 +69,10 @@ public class SViewDpsAccountTag extends SGridPaneView implements ActionListener,
         mjbViewNotes.setToolTipText("Ver notas");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         
+        mjbViewDps.setPreferredSize(new java.awt.Dimension(23, 23));
+        mjbViewNotes.setPreferredSize(new java.awt.Dimension(23, 23));
+        mjbViewLinks.setPreferredSize(new java.awt.Dimension(23, 23));
+        
         mjbViewDps.addActionListener(this);
         mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
@@ -85,6 +93,11 @@ public class SViewDpsAccountTag extends SGridPaneView implements ActionListener,
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JPopupMenu.Separator());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewLinks);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JPopupMenu.Separator());
         
         try {
             String sAccTags[] = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).replaceAll(" ", "").split(",");
@@ -102,6 +115,31 @@ public class SViewDpsAccountTag extends SGridPaneView implements ActionListener,
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlFuncArea);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jtfFuncArea);
+    }
+    
+    private void actionViewDps() {
+        SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+        int gui = mnGridSubtype == SModConsts.MOD_TRN_PUR_N ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+        int[] type = mnGridSubtype == SModConsts.MOD_TRN_PUR_N ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+
+        if (gridRow != null) {
+            ((SClientInterface) miClient).getGuiModule(gui).setFormComplement(type);  // document type key
+            ((SClientInterface) miClient).getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, gridRow.getRowPrimaryKey());
+        }
+    }
+
+    private void actionViewNotes() {
+        if (mjbViewNotes.isEnabled()) {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SModuleUtilities.showDocumentNotes((SClientInterface) miClient, SDataConstants.TRN_DPS, gridRow.getRowPrimaryKey());
+        }
+    }
+
+    private void actionViewLinks() {
+        if (mjbViewLinks.isEnabled()) {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+            SModuleUtilities.showDocumentLinks((SClientInterface) miClient, gridRow.getRowPrimaryKey());
+        }
     }
     
     @Override
@@ -220,15 +258,15 @@ public class SViewDpsAccountTag extends SGridPaneView implements ActionListener,
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
 
-//            if (button == mjbViewDps) {
-//                actionViewDps();
-//            }
-//            else if (button == mjbViewNotes) {
-//                actionViewNotes();
-//            }
-//            else if (button == mjbViewLinks) {
-//                actionViewLinks();
-//            }
+            if (button == mjbViewDps) {
+                actionViewDps();
+            }
+            else if (button == mjbViewNotes) {
+                actionViewNotes();
+            }
+            else if (button == mjbViewLinks) {
+                actionViewLinks();
+            }
         }
     }
 }
