@@ -302,7 +302,7 @@ public class STrnDBCore {
                 }
 
                 if (! toUsers.isEmpty() && whereUsers.isEmpty()) {
-                    whereUsers = "tda.fid_usr_edit IN (" + SAuthJSONUtils.getListAsString(toUsers) + ") ";
+                    whereUsers = "tda.fid_usr_new IN (" + SAuthJSONUtils.getListAsString(toUsers) + ") ";
                 }
             }
 
