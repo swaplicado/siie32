@@ -760,6 +760,14 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Grupo de impuestos", 300);
                 setTitle("Seleccionar un grupo de impuestos");
                 break;
+                
+            case SDataConstants.FINX_ACC_ETY_REF:
+                aoTableColumns = new STableColumnForm[3];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia contable", 200);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", 50);
+                setTitle("Seleccionar referencia contable");
+                break;
 
             case SDataConstants.TRNS_TP_LINK:
                 aoTableColumns = new STableColumnForm[1];

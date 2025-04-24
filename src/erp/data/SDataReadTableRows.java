@@ -1767,6 +1767,30 @@ public abstract class SDataReadTableRows {
                         "FROM fin_tax_grp WHERE b_del = 0 " +
                         "ORDER BY tax_grp, id_tax_grp ";
                 break;
+                
+            case SDataConstants.FINX_ACC_ETY_REF:
+                aoPkFields = new STableField[1];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "num");
+
+                i = 0;
+                aoQueryFields = new STableField[3];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "ref");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "balance");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cur_key");
+
+                Object[] filter = (Object[]) filterKey;
+                
+                sSql = "SELECT @numero := @numero + 1 AS num, re.ref, " +
+                        "SUM(re.debit_cur - re.credit_cur) AS balance, c.cur_key " +
+                        "FROM (SELECT @numero := 0) AS init, fin_rec_ety AS re " +
+                        "INNER JOIN erp.cfgu_cur AS c ON re.fid_cur = c.id_cur " +
+                        "WHERE id_year = " + filter[0] + " " +
+                        "AND re.fid_acc = '" + filter[1] + "' " +
+                        "AND re.ref <> '' " +
+                        "GROUP BY re.ref " +
+                        "HAVING balance <> 0 " +
+                        "ORDER BY re.ref;";
+                break;
 
             default:
                 piClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);

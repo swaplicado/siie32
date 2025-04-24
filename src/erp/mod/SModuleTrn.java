@@ -128,9 +128,12 @@ import erp.mod.trn.view.SViewStockValuationDetail;
 import erp.mod.trn.view.SViewValCost;
 import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JMenu;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistrySysFly;
@@ -155,6 +158,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 public class SModuleTrn extends SGuiModule {
 
     private SBeanOptionPicker moPickerSuppFile;
+    private SBeanOptionPicker moPickerMatReq;
     
     private SFormItemRequiredDpsConfig moFormItemRequiredDpsConfig;
     private SFormMaterialCostCenterGroup moFormMaterialCostCenterGroup;
@@ -919,6 +923,24 @@ public class SModuleTrn extends SGuiModule {
                 moPickerSuppFile = new SBeanOptionPicker();
                 moPickerSuppFile.setPickerSettings(miClient, type, SModConsts.TRNX_SUP_FILE_DPS_PROC, settings);
                 picker = moPickerSuppFile;
+                break;
+                
+            case SModConsts.TRN_MAT_REQ:
+                int[] date = SLibTimeUtils.digestDate(miClient.getSession().getCurrentDate());
+                Date beginDate = SLibTimeUtils.createDate(date[0] - 1, date[1], 1);
+                sql = "SELECT id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
+                        + "LPAD(num, 6, 0) AS " + SDbConsts.FIELD_PICK + "1, "
+                        + "dt AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "FROM trn_mat_req "
+                        + "WHERE fk_usr_req = " + params.getType() + " "
+                        + "AND NOT b_del AND dt >= '" + SLibUtils.DbmsDateFormatDate.format(beginDate) + "' "
+                        + "ORDER BY num DESC, dt DESC";
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
+                settings = new SGuiOptionPickerSettings("Selecciona una RM", sql, gridColumns, 1);
+                moPickerMatReq = new SBeanOptionPicker();
+                moPickerMatReq.setPickerSettings(miClient, type, SLibConsts.UNDEFINED, settings);
+                picker = moPickerMatReq;
                 break;
                 
             default:

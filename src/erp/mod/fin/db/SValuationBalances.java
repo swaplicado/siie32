@@ -717,6 +717,8 @@ public class SValuationBalances {
             }
         }
         
+        // processing short term docs:
+        
         int[] accountSpecialTypes = new int[] {
             SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY,
             SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC

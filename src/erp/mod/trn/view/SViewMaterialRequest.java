@@ -47,6 +47,7 @@ import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDate;
+import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -67,6 +68,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private JButton jbToNew;
     private JButton jbAuthComments;
     private JButton jbEditNotes;
+    private JButton jbCopyReqPicker;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterPanelMatReqStatus moFilterMatReqStatus;
     private SDialogAuthorizationCardex moDialogAuthCardex;
@@ -107,6 +109,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
+        jbCopyReqPicker = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif")), "Crear RM a partir de una anterior", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de autorizaciones", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Ver bitácora de cambios", this);
@@ -120,6 +123,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbNewSupReq);
+        getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbCopyReqPicker);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
@@ -172,6 +176,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             jbRowDisable.setEnabled(false);
             jbRowDelete.setEnabled(false);
             jbNewSupReq.setEnabled(false);
+            jbCopyReqPicker.setEnabled(false);
         }
         if (mnGridMode == SModSysConsts.TRNS_ST_MAT_REQ_AUTH && mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
             jbAuthorize.setEnabled(hasAuthRight);
@@ -220,6 +225,33 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 }
             }
             catch(Exception e) {
+                miClient.showMsgBoxError(e.getMessage());
+            }
+        }
+    }
+    
+    private void actionCopyReqPicker() {
+        if (jbCopyReqPicker.isEnabled()) {
+            try {
+                SGuiParams params = new SGuiParams(miClient.getSession().getUser().getPkUserId());
+                SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_TRN_N).getOptionPicker(SModConsts.TRN_MAT_REQ, SLibConsts.UNDEFINED, params);
+                picker.resetPicker();
+                picker.setPickerVisible(true);
+                if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                    SDbMaterialRequest req = new SDbMaterialRequest();
+                    req.read(miClient.getSession(), (int[]) picker.getOption());
+                    SDbMaterialRequest reqCopy = req.clone();
+                    reqCopy.setRegistryNew(true);
+                    SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición de materiales", SLibConsts.UNDEFINED);
+                    form.setRegistry(reqCopy);
+                    form.setVisible(true);
+                    if (form.validateForm().isValid()) {
+                        form.getRegistry().save(miClient.getSession());
+                        this.refreshGridWithRefresh();
+                    }
+                }
+            }
+            catch (Exception e) {
                 miClient.showMsgBoxError(e.getMessage());
             }
         }
@@ -1014,6 +1046,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
 
             if (button == jbNewSupReq) {
                 actionNewSupReq();
+            }
+            else if (button == jbCopyReqPicker) {
+                actionCopyReqPicker();
             }
             else if (button == jbPrint) {
                 actionPrint();

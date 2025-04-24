@@ -220,7 +220,7 @@
                         <Component class="javax.swing.JButton" name="jbReference">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="..."/>
-                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar repositorio contable"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar referencia contable"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[23, 23]"/>
