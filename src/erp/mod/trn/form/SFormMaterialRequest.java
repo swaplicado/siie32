@@ -1181,7 +1181,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
                 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Código ítem"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave ítem"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 350));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Número parte"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
@@ -1239,7 +1239,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyWhs.setKeySettings(miClient, SGuiUtils.getLabelName("Almacén"), false);
         moFields.addField(moKeyWhs);
         
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la partida de RM", this);
         moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la partida de la RM");

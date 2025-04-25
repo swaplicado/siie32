@@ -399,6 +399,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.form.SFormOptionPicker moPickerAdministrativeConceptType;
     private erp.form.SFormOptionPicker moPickerTaxableConceptType;
     private erp.form.SFormOptionPicker moPickerYear;
+    private erp.form.SFormOptionPicker moPickerAccReference;
 
     public SGuiModuleFin(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_FIN);
@@ -2011,6 +2012,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.FIN_YEAR:
                     picker = moPickerYear = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerYear);
+                    break;
+                case SDataConstants.FINX_ACC_ETY_REF:
+                    picker = moPickerAccReference = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerAccReference);
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);

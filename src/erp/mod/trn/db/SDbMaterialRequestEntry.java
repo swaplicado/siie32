@@ -103,6 +103,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setAuxRowId(int n) { mnAuxRowId = n; }
     public void setAuxQuantityOld(double d) { mdAuxQuantityOld = d; }
     
+    public void setHasLinks(boolean b) { mbHasLinks = b; }
+    
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public Date getDateRequest_n() { return mtDateRequest_n; }
@@ -559,10 +561,55 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         
         registry.setDataItem(this.getDataItem());
         registry.setDataItemRef(this.getDataItemRef());
+        registry.setDataUnitUsr(this.getDataUnitUsr());
         registry.setAuxRowId(this.getAuxRowId());
         registry.setAuxQuantityOld(this.getAuxQuantityOld());
 
         registry.setRegistryNew(this.isRegistryNew());
+        
+        return registry;
+    }
+    
+    public SDbMaterialRequestEntry cloneToCopy() throws CloneNotSupportedException {
+        SDbMaterialRequestEntry registry = new SDbMaterialRequestEntry();
+        
+        //registry.setPkMatRequestId(this.getPkMatRequestId());
+        //registry.setPkEntryId(this.getPkEntryId());
+        //registry.setDateRequest_n(this.getDateRequest_n());
+        //registry.setDateDelivery_n(this.getDateDelivery_n());
+        registry.setQuantity(this.getQuantity());
+        registry.setPriceUnitarySystem(this.getPriceUnitarySystem());
+        registry.setPriceUnitary(this.getPriceUnitary());
+        registry.setUserQuantity(this.getUserQuantity());
+        registry.setUserPriceUnitary(this.getUserPriceUnitary());
+        registry.setUserPriceUnitaryReference(this.getUserPriceUnitaryReference());
+        registry.setTotal_r(this.getTotal_r());
+        registry.setCosnsumptionEstimated(this.getCosnsumptionEstimated());
+        registry.setNewItem(this.isNewItem());
+        registry.setDeleted(this.isDeleted());
+        registry.setFkItemId(this.getFkItemId());
+        registry.setFkUnitId(this.getFkUnitId());
+        registry.setFkUserUnitId(this.getFkUserUnitId());
+        registry.setFkMatRequestPriorityId_n(this.getFkMatRequestPriorityId_n());
+        registry.setFkEntMatConsumptionEntityId_n(this.getFkEntMatConsumptionEntityId_n());
+        registry.setFkSubentMatConsumptionEntityId_n(this.getFkSubentMatConsumptionEntityId_n());
+        registry.setFkSubentMatConsumptionSubentityId_n(this.getFkSubentMatConsumptionSubentityId_n());
+        registry.setFkCostCenterId_n(this.getFkCostCenterId_n());
+        registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
+        
+        for (SDbMaterialRequestEntryNote note : this.getChildNotes()) {
+            registry.getChildNotes().add(note);
+        }
+        
+        registry.setDataItem(this.getDataItem());
+        registry.setDataItemRef(this.getDataItemRef());
+        registry.setDataUnitUsr(this.getDataUnitUsr());
+        registry.setAuxRowId(this.getAuxRowId());
+        registry.setAuxQuantityOld(this.getAuxQuantityOld());
+
+        registry.setHasLinks(false);
+        
+        registry.setRegistryNew(true);
         
         return registry;
     }

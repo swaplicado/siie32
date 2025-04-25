@@ -278,6 +278,31 @@ public class SDbMaterialRequestCostCenter extends SDbRegistryUser implements SGr
         
         return registry;
     }
+    
+    public SDbMaterialRequestCostCenter cloneToCopy() throws CloneNotSupportedException {
+        SDbMaterialRequestCostCenter registry = new SDbMaterialRequestCostCenter();
+        
+        //registry.setPkMatRequestId(this.getPkMatRequestId());
+        registry.setPkEntMatConsumptionEntityId(this.getPkEntMatConsumptionEntityId());
+        registry.setPkSubentMatConsumptionEntityId(this.getPkSubentMatConsumptionEntityId());
+        registry.setPkSubentMatConsumptionSubentityId(this.getPkSubentMatConsumptionSubentityId());
+        registry.setPkCostCenterId(this.getPkCostCenterId());
+        registry.setPercentage(this.getPercentage());
+        registry.setFkBudgetMatConsumptionEntityId(this.getFkBudgetMatConsumptionEntityId());
+        registry.setFkBudgetYearId(this.getFkBudgetYearId());
+        registry.setFkBudgetPeriodId(this.getFkBudgetPeriodId());
+        
+        registry.setDbmsConsSubent(this.getDbmsConsSubent());
+        registry.setDataCostCenter(this.getDataCostCenter());
+        registry.setDbmsEntBudget(this.getDbmsEntBudget());
+        
+        registry.setRowConsBudWOReq(this.getRowConsBudWOReq());
+        registry.setRowConsBudWReq(this.getRowConsBudWReq());
+        
+        registry.setRegistryNew(true);
+        
+        return registry;
+    }
 
     @Override
     public int[] getRowPrimaryKey() {

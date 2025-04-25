@@ -22,7 +22,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 public class SDialogUnitPicker extends SBeanOptionPicker implements KeyListener {
 
     /**
-     * Creates new form SBeanItemPicker
+     * Creates new form SBeanUnitPicker
      */
     
     private javax.swing.JPanel jpControl;

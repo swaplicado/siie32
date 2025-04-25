@@ -345,7 +345,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel5.add(jtfReference);
 
         jbReference.setText("...");
-        jbReference.setToolTipText("Seleccionar repositorio contable");
+        jbReference.setToolTipText("Seleccionar referencia contable");
         jbReference.setFocusable(false);
         jbReference.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jbReference);
@@ -1201,6 +1201,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moFieldFkYearId_n.resetField();
         }
         else {
+            SDataAccount selectedDataAccount = null;
             mnAccountSystemTypeId = oAccountMajor.getFkAccountSystemTypeId();
             int[] anAccountSubclass = new int[] { oAccountMajor.getFkAccountTypeId_r(), oAccountMajor.getFkAccountClassId_r(), oAccountMajor.getFkAccountSubclassId_r() };
             
@@ -1218,12 +1219,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                         SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
                 */
+                selectedDataAccount = moAccountPanel.getSelectedDataAccount();
                 mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), oAccountMajor) || 
-                        SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moAccountPanel.getSelectedDataAccount());
+                        SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), selectedDataAccount);
             }
-            catch (Exception e) {
-                SLibUtils.showException(this, e);
-            }
+            catch (Exception e) { }
 
             // Check if it is necesary to enable business partner fields:
 
@@ -1303,7 +1303,10 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
             // Check if it is necesary to enable tax fields:
             //int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moPanelFkAccountId.getFieldAccount().getString()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-            int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX());
+            int[] taxFk = null;
+            if (selectedDataAccount != null) {
+                SValidationUtils.getTaxFkByAcc(miClient.getSession(), moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX());
+            }
             if (isAccSysTax || isAccSysPurchases || taxFk != null) {
                 mbIsTaxRequired = isAccSysTax;
                 
@@ -2114,7 +2117,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionReference() {
-        // XXX
+        moFieldReference.setFieldValue(miClient.pickOption(SDataConstants.FINX_ACC_ETY_REF, new Object[] { moRecord.getPkYearId(), moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX() }));
     }
 
     private void actionFkTaxId_n() {
