@@ -52,6 +52,37 @@ public abstract class SBpsUtils {
 
         return name;
     }
+    
+    /**
+     * @param idCategory Business partner category, constants defined in <code>erp.mod.SModSysConsts.BPSS_CT_BP_...</code>.
+     * @param number Number noun, constants defined in <code>sa.lib.SUtilConsts.NUM_...</code>.
+     * @return Name of business partner category.
+     */
+    public static String getBizPartnerCategoryNameEnglish(final int idCategory, final int number) {
+        String name = "";
+
+        switch (idCategory) {
+            case SModSysConsts.BPSS_CT_BP_CO:
+                name = number == SUtilConsts.NUM_SNG ? "Company" : "Companies";
+                break;
+            case SModSysConsts.BPSS_CT_BP_CUS:
+                name = number == SUtilConsts.NUM_SNG ? "Customer" : "Customers";
+                break;
+            case SModSysConsts.BPSS_CT_BP_SUP:
+                name = number == SUtilConsts.NUM_SNG ? "Vendor" : "Vendors";
+                break;
+            case SModSysConsts.BPSS_CT_BP_DBR:
+                name = number == SUtilConsts.NUM_SNG ? "Debtor" : "Debtors";
+                break;
+            case SModSysConsts.BPSS_CT_BP_CDR:
+                name = number == SUtilConsts.NUM_SNG ? "Creditor" : "Creditors";
+                break;
+            default:
+                name = number == SUtilConsts.NUM_SNG ? "Biz partner" : "Biz partners";
+        }
+
+        return name;
+    }
 
     public static int[] getBizPartnerType(final SGuiSession session, final int idBizPartner, final int idBizPartnerCategory) {
         int[] type = null;

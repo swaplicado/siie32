@@ -104,7 +104,10 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfSortingPosition = new javax.swing.JTextField();
         jPanel14 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
-        jpCommand = new javax.swing.JPanel();
+        jpCommandBar = new javax.swing.JPanel();
+        jpCommandBar1 = new javax.swing.JPanel();
+        jtfPkUnitId_Ro = new javax.swing.JTextField();
+        jpCommandBar2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -128,7 +131,6 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jlFkUnitTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlFkUnitTypeId);
 
-        jcbFkUnitTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jcbFkUnitTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
         jcbFkUnitTypeId.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -250,19 +252,34 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
-        jpCommand.setPreferredSize(new java.awt.Dimension(400, 33));
-        jpCommand.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpCommandBar.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpCommandBar1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkUnitId_Ro.setEditable(false);
+        jtfPkUnitId_Ro.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPkUnitId_Ro.setToolTipText("ID del registro");
+        jtfPkUnitId_Ro.setFocusable(false);
+        jtfPkUnitId_Ro.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpCommandBar1.add(jtfPkUnitId_Ro);
+
+        jpCommandBar.add(jpCommandBar1);
+
+        jpCommandBar2.setPreferredSize(new java.awt.Dimension(400, 33));
+        jpCommandBar2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpCommand.add(jbOk);
+        jpCommandBar2.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jpCommand.add(jbCancel);
+        jpCommandBar2.add(jbCancel);
 
-        getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
+        jpCommandBar.add(jpCommandBar2);
+
+        getContentPane().add(jpCommandBar, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
@@ -405,8 +422,11 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlUnit;
     private javax.swing.JLabel jlUnitBaseEquivalence;
     private javax.swing.JLabel jlUnitCustoms;
-    private javax.swing.JPanel jpCommand;
+    private javax.swing.JPanel jpCommandBar;
+    private javax.swing.JPanel jpCommandBar1;
+    private javax.swing.JPanel jpCommandBar2;
     private javax.swing.JPanel jpRegistry;
+    private javax.swing.JTextField jtfPkUnitId_Ro;
     private javax.swing.JTextField jtfSortingPosition;
     private javax.swing.JTextField jtfSymbol;
     private javax.swing.JTextField jtfUnit;
@@ -434,6 +454,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
+        jtfPkUnitId_Ro.setText("");
         jtfUnitTypeBase.setText("");
         jckIsDeleted.setEnabled(false);
         mbResetingForm = false;
@@ -504,6 +525,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUnitBaseEquivalence.setFieldValue(moUnit.getUnitBaseEquivalence());
         moFieldSortingPosition.setFieldValue(moUnit.getSortingPosition());
         moFieldIsDeleted.setFieldValue(moUnit.getIsDeleted());
+        jtfPkUnitId_Ro.setText("" + moUnit.getPkUnitId());
 
         readUnitBase();
 

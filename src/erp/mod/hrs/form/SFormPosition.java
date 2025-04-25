@@ -46,6 +46,9 @@ public class SFormPosition extends SBeanForm {
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jlDepartment = new javax.swing.JLabel();
+        moKeyDepartment = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jlCode = new javax.swing.JLabel();
         moTextCode = new sa.lib.gui.bean.SBeanFieldText();
@@ -53,24 +56,32 @@ public class SFormPosition extends SBeanForm {
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
-        jlPos = new javax.swing.JLabel();
-        moTextPos = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel7 = new javax.swing.JPanel();
-        jlDepartment = new javax.swing.JLabel();
-        moKeyDepartment = new sa.lib.gui.bean.SBeanFieldKey();
+        jlPositions = new javax.swing.JLabel();
+        moIntPositions = new sa.lib.gui.bean.SBeanFieldInteger();
+        jLabel1 = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDepartment.setForeground(java.awt.Color.blue);
+        jlDepartment.setText("Departamento:*");
+        jlDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlDepartment);
+
+        moKeyDepartment.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel7.add(moKeyDepartment);
+
+        jPanel2.add(jPanel7);
+
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlCode);
-
-        moTextCode.setText("sBeanFieldText1");
         jPanel4.add(moTextCode);
 
         jPanel2.add(jPanel4);
@@ -81,39 +92,33 @@ public class SFormPosition extends SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPos.setText("Posiciones*");
-        jlPos.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlPos);
+        jlPositions.setText("Posiciones*");
+        jlPositions.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel6.add(jlPositions);
 
-        moTextPos.setText("sBeanFieldText1");
-        jPanel6.add(moTextPos);
+        moIntPositions.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel6.add(moIntPositions);
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("(Número de vacantes o plazas de este puesto.)");
+        jLabel1.setPreferredSize(new java.awt.Dimension(245, 23));
+        jPanel6.add(jLabel1);
 
         jPanel2.add(jPanel6);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDepartment.setText("Departamento:*");
-        jlDepartment.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlDepartment);
-
-        moKeyDepartment.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(moKeyDepartment);
-
-        jPanel2.add(jPanel7);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -124,25 +129,25 @@ public class SFormPosition extends SBeanForm {
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDepartment;
     private javax.swing.JLabel jlName;
-    private javax.swing.JLabel jlPos;
+    private javax.swing.JLabel jlPositions;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPositions;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDepartment;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
-    private sa.lib.gui.bean.SBeanFieldText moTextPos;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
+        moKeyDepartment.setKeySettings(miClient, SGuiUtils.getLabelName(jlDepartment), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
-        moTextPos.setTextSettings(SGuiUtils.getLabelName(jlPos.getText()), 5);
-        moKeyDepartment.setKeySettings(miClient, SGuiUtils.getLabelName(jlDepartment), true);
+        moIntPositions.setIntegerSettings(SGuiUtils.getLabelName(jlPositions), SGuiConsts.GUI_TYPE_INT, true);
 
+        moFields.addField(moKeyDepartment);
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
-        moFields.addField(moTextPos);
-        moFields.addField(moKeyDepartment);
+        moFields.addField(moIntPositions);
 
         moFields.setFormButton(jbSave);
     }
@@ -181,12 +186,19 @@ public class SFormPosition extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
+        moKeyDepartment.setValue(new int[] { moRegistry.getFkDepartmentId() });
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
-        moTextPos.setValue(moRegistry.getPositions() + "");
-        moKeyDepartment.setValue(new int[] { moRegistry.getFkDepartmentId() });
+        moIntPositions.setValue(moRegistry.getPositions());
 
         setFormEditable(true);
+        
+        if (moRegistry.isRegistryNew()) {
+            // nothing
+        }
+        else {
+            moKeyDepartment.setEnabled(false);
+        }
 
         addAllListeners();
     }
@@ -199,7 +211,7 @@ public class SFormPosition extends SBeanForm {
 
         registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
-        registry.setPositions(Integer.parseInt(moTextPos.getValue()));
+        registry.setPositions(moIntPositions.getValue());
         registry.setFkDepartmentId(moKeyDepartment.getValue()[0]);
 
         return registry;

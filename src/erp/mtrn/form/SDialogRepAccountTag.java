@@ -235,6 +235,7 @@ public class SDialogRepAccountTag extends javax.swing.JDialog implements erp.lib
                 map.put("nFidCtDps", mbParamIsSupplier ? SDataConstantsSys.TRNU_CT_DPS_PUR : SDataConstantsSys.TRNU_CT_DPS_SAL);
                 map.put("sSqlOrderBy", mbParamIsSupplier ? "m.mon, bp.bp, dt.code, d.num" : "m.mon, dt.code, d.num, bp.bp");
                 map.put("sFuncAreas", areas[1]);
+                map.put("sMoneda", "MONEDA LOCAL (" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + ")");
                 
                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_ACC_TAG, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);

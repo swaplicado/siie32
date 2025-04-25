@@ -17,9 +17,11 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbTankCar extends SDbRegistryUser {
+    
+    public static final int PLATE_LENGTH = 12;
 
     protected int mnPkTankCarId;
     protected String msPlate;

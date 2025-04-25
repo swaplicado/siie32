@@ -15,9 +15,9 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.form.SDialogShowRecordCfd;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.form.SDialogShowSendsAuthAppWebLog;
 import erp.mtrn.form.SDialogShowDocumentLinks;
 import erp.mtrn.form.SDialogShowDocumentNotes;
+import erp.mtrn.form.SDialogShowSendsAuthAppWebLog;
 import java.awt.Cursor;
 import java.sql.ResultSet;
 import sa.lib.grid.SGridRow;
@@ -132,7 +132,7 @@ public abstract class SModuleUtilities {
             authorn = dialog.readSendsAuthAppWeb();
 
             if (authorn == 0) {
-                client.showMsgBoxInformation("El documento no ha sido enviado a autorización vía app wep");
+                client.showMsgBoxInformation("El documento no ha sido enviado a autorización vía app wep.");
             }
             else {
                 dialog.setFormVisible(true);

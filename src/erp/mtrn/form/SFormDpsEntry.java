@@ -43,6 +43,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.qlt.db.SQltUtils;
 import erp.mod.trn.db.SDbDpsEntryAnalysis;
+import erp.mod.log.db.SDbTankCar;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
@@ -315,7 +316,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel4 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlFkItemId = new javax.swing.JLabel();
-        jcbFkItemId = new javax.swing.JComboBox<>();
+        jcbFkItemId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemId = new javax.swing.JButton();
         jbSetPrepayment = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
@@ -332,7 +333,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbItemBizPartnerDescription = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
         jlFkOriginalUnitId = new javax.swing.JLabel();
-        jcbFkOriginalUnitId = new javax.swing.JComboBox<>();
+        jcbFkOriginalUnitId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkOriginalUnitId = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
         jlAcidityPercentage = new javax.swing.JLabel();
@@ -429,7 +430,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel35 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jlFkItemReferenceId_n = new javax.swing.JLabel();
-        jcbFkItemReferenceId_n = new javax.swing.JComboBox<>();
+        jcbFkItemReferenceId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkItemReferenceId_n = new javax.swing.JButton();
         jPanel40 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
@@ -449,7 +450,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel33 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jlFkTaxRegionId = new javax.swing.JLabel();
-        jcbFkTaxRegionId = new javax.swing.JComboBox<>();
+        jcbFkTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxRegionId = new javax.swing.JButton();
         jbEditTaxRegion = new javax.swing.JButton();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
@@ -524,7 +525,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel38 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel43 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
         jtfDriver = new javax.swing.JTextField();
@@ -548,12 +549,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfTicket = new javax.swing.JTextField();
         jbTicketPicker = new javax.swing.JButton();
         jbCleanTickets = new javax.swing.JButton();
-        jbEditLogistics = new javax.swing.JButton();
         jPanel58 = new javax.swing.JPanel();
         jlTankCar = new javax.swing.JLabel();
         jtfTankCar = new javax.swing.JTextField();
         jbTankCarPicker = new javax.swing.JButton();
         jbCleanTankCar = new javax.swing.JButton();
+        jbEditLogistics = new javax.swing.JButton();
         jpExtraDataUnits = new javax.swing.JPanel();
         jpExtraDataUnitsNorth = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
@@ -604,7 +605,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jradAccAdvanceBilled = new javax.swing.JRadioButton();
         jPanel62 = new javax.swing.JPanel();
         jlFkCashAccountId_n = new javax.swing.JLabel();
-        jcbFkCashAccountId_n = new javax.swing.JComboBox<>();
+        jcbFkCashAccountId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel64 = new javax.swing.JPanel();
         jlFkCashAccountId_n1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -638,7 +639,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfAddElektraOrder = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jlAddGenBarcode = new javax.swing.JLabel();
-        jcbAddGenBarcode = new javax.swing.JComboBox<>();
+        jcbAddGenBarcode = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel48 = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel70 = new javax.swing.JPanel();
@@ -689,7 +690,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel81 = new javax.swing.JPanel();
         jPanel91 = new javax.swing.JPanel();
         jlItemComposition = new javax.swing.JLabel();
-        jcbItemComposition = new javax.swing.JComboBox<>();
+        jcbItemComposition = new javax.swing.JComboBox<SFormComponentItem>();
         jbItemComposition = new javax.swing.JButton();
         jPanel92 = new javax.swing.JPanel();
         jlItemCompositionPer = new javax.swing.JLabel();
@@ -1818,18 +1819,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel56.add(jtfTicket);
 
         jbTicketPicker.setText("...");
+        jbTicketPicker.setToolTipText("Seleccionar boletos báscula");
         jbTicketPicker.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel56.add(jbTicketPicker);
 
         jbCleanTickets.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_erase.gif"))); // NOI18N
-        jbCleanTickets.setToolTipText("Borrar boletos");
+        jbCleanTickets.setToolTipText("Borrar boletos báscula");
         jbCleanTickets.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel56.add(jbCleanTickets);
-
-        jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
-        jbEditLogistics.setToolTipText("Modificar datos");
-        jbEditLogistics.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel56.add(jbEditLogistics);
 
         jPanel38.add(jPanel56);
 
@@ -1844,6 +1841,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel58.add(jtfTankCar);
 
         jbTankCarPicker.setText("...");
+        jbTankCarPicker.setToolTipText("Seleccionar carrotanques");
         jbTankCarPicker.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel58.add(jbTankCarPicker);
 
@@ -1851,6 +1849,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbCleanTankCar.setToolTipText("Borrar carrotanques");
         jbCleanTankCar.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel58.add(jbCleanTankCar);
+
+        jbEditLogistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif"))); // NOI18N
+        jbEditLogistics.setToolTipText("Modificar datos");
+        jbEditLogistics.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel58.add(jbEditLogistics);
 
         jPanel38.add(jPanel58);
 
@@ -5441,18 +5444,27 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     
     private void actionTankCarPicker() {
         try {
-            if (jcbFkItemId.getSelectedIndex() <= 1) {
-                miClient.showMsgBoxInformation("Seleccione un ítem para la partida");
+            if (moFieldTankCar.getString().length() > SDbTankCar.PLATE_LENGTH) {
+                miClient.showMsgBoxWarning("No se pueden seleccionar más carrotanques.\nSe pueden borrar los carrotanques seleccionados, y seleccionar otros distintos.");
             }
             else {
-                if (moDialogTankCarPicker == null) {
-                    moDialogTankCarPicker = new SDialogTankCarPicker(miClient);
+                if (jcbFkItemId.getSelectedIndex() <= 0) {
+                    jcbFkItemId.requestFocusInWindow();
+                    miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId.getText() + "'.");
                 }
-                moDialogTankCarPicker.populateTicketTable();
-                moDialogTankCarPicker.setFormVisible(true);
-                if (moDialogTankCarPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    SRowTankCarsPicker tankSelcted = (SRowTankCarsPicker) moDialogTankCarPicker.getSelectedOption();
-                    moFieldTankCar.setFieldValue(moFieldTankCar.getFieldValue() + (moFieldTankCar.getFieldValue().toString().isEmpty() ? "" : ",") + tankSelcted.msPlate);
+                else {
+                    if (moDialogTankCarPicker == null) {
+                        moDialogTankCarPicker = new SDialogTankCarPicker(miClient);
+                    }
+                    
+                    moDialogTankCarPicker.populateTicketTable();
+                    moDialogTankCarPicker.setFormVisible(true);
+                    
+                    if (moDialogTankCarPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        SRowTankCarsPicker tankCar = (SRowTankCarsPicker) moDialogTankCarPicker.getSelectedOption();
+                        moFieldTankCar.setFieldValue(moFieldTankCar.getFieldValue() + (moFieldTankCar.getFieldValue().toString().isEmpty() ? "" : ", ") + tankCar.msPlate);
+                        jtfTankCar.setToolTipText(moFieldTankCar.getString());
+                    }
                 }
             }
         }
@@ -5462,8 +5474,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void actionCleanTankCar() {
-        if (miClient.showMsgBoxConfirm("Se eliminarán todos los carrotanques vinculados hasta ahora, ¿Desea continuar?.") == JOptionPane.OK_OPTION) {
+        if (miClient.showMsgBoxConfirm("Se borrarán todos los carrotanques seleccionados\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
             moFieldTankCar.setFieldValue("");
+            jtfTankCar.setToolTipText(null);
         }
     }
 
