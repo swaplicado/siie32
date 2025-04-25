@@ -856,4 +856,62 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         return registry;
     }
+    
+    public SDbMaterialRequest cloneToCopy() throws CloneNotSupportedException {
+        SDbMaterialRequest registry = new SDbMaterialRequest();
+        
+        //registry.setPkMatRequestId(this.getPkMatRequestId());
+        registry.setClassRequest(this.getClassRequest());
+        registry.setTypeRequest(this.getTypeRequest());
+        //registry.setNumber(this.getNumber());
+        registry.setDate(this.getDate());
+        registry.setDateRequest_n(this.getDateRequest_n());
+        registry.setDateDelivery_n(this.getDateDelivery_n());
+        registry.setReference(this.getReference());
+        registry.setTotal_r(this.getTotal_r());
+        registry.setExternalSystem(this.isExternalSystem());
+        registry.setExternalSystemId(this.getExternalSystemId());
+        registry.setCloseProvision(false);
+        registry.setClosePurchase(false);
+        registry.setDeleted(false);
+        registry.setFkMatProvisionEntityId(this.getFkMatProvisionEntityId());
+        registry.setFkMatRequestPriorityId(this.getFkMatRequestPriorityId());
+        //registry.setFkMatRequestStatusId(this.getFkMatRequestStatusId());
+        //registry.setFkMatProvisionStatusId(this.getFkMatProvisionStatusId());
+        //registry.setFkMatPurchaseStatusId(this.getFkMatPurchaseStatusId());
+        registry.setFkDpsNatureId(this.getFkDpsNatureId());
+        registry.setFkUserRequesterId(this.getFkUserRequesterId());
+        registry.setFkContractorId_n(this.getFkContractorId_n());
+        registry.setFkWarehouseCompanyBranch_n(this.getFkWarehouseCompanyBranch_n());
+        registry.setFkWarehouseWarehouse_n(this.getFkWarehouseWarehouse_n());
+        registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
+        //registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
+        //registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
+        //registry.setFkUserChangeId(this.getFkUserChangeId());
+        //registry.setFkUserInsertId(this.getFkUserInsertId());
+        //registry.setFkUserUpdateId(this.getFkUserUpdateId());
+        //registry.setTsUserCloseProvision(this.getTsUserCloseProvision());
+        //registry.setTsUserClosePurchase(this.getTsUserClosePurchase());
+        //registry.setTsUserChange(this.getTsUserChange());
+        //registry.setTsUserInsert(this.getTsUserInsert());
+        //registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        for (SDbMaterialRequestNote note : this.getChildNotes()) {
+            registry.getChildNotes().add(note);
+        }
+        
+        for (SDbMaterialRequestCostCenter cc : this.getChildCostCenters()) {
+            registry.getChildCostCenters().add(cc.cloneToCopy());
+        }
+        
+        for (SDbMaterialRequestEntry entry : this.getChildEntries()) {
+            registry.getChildEntries().add(entry.cloneToCopy());
+        }
+        
+        registry.setDbmsItemRef(this.getDbmsItemRef());
+        
+        registry.setRegistryNew(true);
+        
+        return registry;
+    }
 }

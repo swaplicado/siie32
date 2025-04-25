@@ -109,7 +109,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         
         jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
-        jbCopyReqPicker = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif")), "Crear RM a partir de una anterior", this);
+        jbCopyReqPicker = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif")), "Copia de RM a partir de otra", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de autorizaciones", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Ver bitácora de cambios", this);
@@ -117,7 +117,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbHardAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up_c.gif")), "Autorización forzada", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la RM", this);
         jbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización de pedidos de compras", this);
         jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas", this);
@@ -240,8 +240,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), (int[]) picker.getOption());
-                    SDbMaterialRequest reqCopy = req.clone();
-                    reqCopy.setRegistryNew(true);
+                    SDbMaterialRequest reqCopy = req.cloneToCopy();
                     SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición de materiales", SLibConsts.UNDEFINED);
                     form.setRegistry(reqCopy);
                     form.setVisible(true);
@@ -565,8 +564,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
                     String message = "No se puede modificar las notas de la RM seleccionada debido a:";
-                    if (req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR) {
+                    if (req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR || req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
                         boolean canEdit = true;
+                        // Se puede cambiar el comentario si la orden de compra no esta pendiente de autorizar o autorizada.
                         String sql = "SELECT DISTINCT " +
                                 "IF(d.num_ser = '', d.num, CONCAT(d.num_ser, '-', d.num)) invoice, " +
                                 "IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING + ", " +
@@ -612,7 +612,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         }
                     }
                     else {
-                        miClient.showMsgBoxInformation(message + "\n- La RM no está en Compras.");
+                        miClient.showMsgBoxInformation(message + "\n- La RM no está en compras o en suministro.");
                     }
                 }
                 catch (Exception e) {
@@ -979,7 +979,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
 
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Cen suministro"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "prov_ent", "Cto suministro"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "folio", "Folio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_req", "Solicitante"));

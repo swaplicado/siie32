@@ -760,11 +760,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jLabel14.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel7.add(jLabel14);
 
-        jlPartNum.setText("No. parte:");
-        jlPartNum.setPreferredSize(new java.awt.Dimension(67, 23));
+        jlPartNum.setText("Número parte:");
+        jlPartNum.setPreferredSize(new java.awt.Dimension(82, 23));
         jPanel7.add(jlPartNum);
 
-        jtfPartNum.setPreferredSize(new java.awt.Dimension(130, 23));
+        jtfPartNum.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel7.add(jtfPartNum);
 
         jPanel4.add(jPanel7);
@@ -812,11 +812,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel10.add(jLabel15);
 
         jlAcidityPercentage.setText("Acidez (%):");
-        jlAcidityPercentage.setPreferredSize(new java.awt.Dimension(67, 23));
+        jlAcidityPercentage.setPreferredSize(new java.awt.Dimension(82, 23));
         jPanel10.add(jlAcidityPercentage);
 
         jtfAcidityPercentage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAcidityPercentage.setPreferredSize(new java.awt.Dimension(130, 23));
+        jtfAcidityPercentage.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel10.add(jtfAcidityPercentage);
 
         jPanel4.add(jPanel10);

@@ -928,16 +928,34 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ:
                 int[] date = SLibTimeUtils.digestDate(miClient.getSession().getCurrentDate());
                 Date beginDate = SLibTimeUtils.createDate(date[0] - 1, date[1], 1);
-                sql = "SELECT id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
-                        + "LPAD(num, 6, 0) AS " + SDbConsts.FIELD_PICK + "1, "
-                        + "dt AS " + SDbConsts.FIELD_PICK + "2 "
-                        + "FROM trn_mat_req "
-                        + "WHERE fk_usr_req = " + params.getType() + " "
-                        + "AND NOT b_del AND dt >= '" + SLibUtils.DbmsDateFormatDate.format(beginDate) + "' "
-                        + "ORDER BY num DESC, dt DESC";
-                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio"));
+                sql = "SELECT r.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
+                        + "pe.code AS " + SDbConsts.FIELD_PICK + "1, "
+                        + "LPAD(r.num, 6, 0) AS " + SDbConsts.FIELD_PICK + "2, "
+                        + "r.dt AS " + SDbConsts.FIELD_PICK + "3, "
+                        + "ur.usr AS " + SDbConsts.FIELD_PICK + "4, "
+                        + "r.tp_req AS " + SDbConsts.FIELD_PICK + "5, "
+                        + "iref.item_key AS " + SDbConsts.FIELD_PICK + "6, "
+                        + "smr.name AS " + SDbConsts.FIELD_PICK + "7 "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " AS r "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON "
+                        + "r.fk_mat_prov_ent = pe.id_mat_prov_ent "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ur ON "
+                        + "r.fk_usr_req = ur.id_usr "
+                        + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON "
+                        + "r.fk_item_ref_n = iref.id_item "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_MAT_REQ) + " AS smr ON "
+                        + "r.fk_st_mat_req = smr.id_st_mat_req "
+                        + "WHERE r.fk_usr_req = " + params.getType() + " "
+                        + "AND NOT r.b_del AND dt >= '" + SLibUtils.DbmsDateFormatDate.format(beginDate) + "' "
+                        + "ORDER BY r.num DESC, dt DESC";
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cto suministro"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
-                settings = new SGuiOptionPickerSettings("Selecciona una RM", sql, gridColumns, 1);
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Solicitante"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo requisición", 20));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Estatus"));
+                settings = new SGuiOptionPickerSettings("Selecciona una RM para copiar", sql, gridColumns, 1);
                 moPickerMatReq = new SBeanOptionPicker();
                 moPickerMatReq.setPickerSettings(miClient, type, SLibConsts.UNDEFINED, settings);
                 picker = moPickerMatReq;
