@@ -41,6 +41,7 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
+import erp.mod.qlt.db.SQltUtils;
 import erp.mod.trn.db.SDbDpsEntryAnalysis;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
@@ -76,6 +77,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,12 +98,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
@@ -2920,7 +2924,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             public void initGrid() {
                 jbRowNew.setEnabled(true);
                 jbRowEdit.setEnabled(false);
-                jbRowDelete.setEnabled(false);
+                jbRowDelete.setEnabled(true);
             }
 
             @Override
@@ -2933,19 +2937,36 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Orden captura", 50);
                 columns.add(column);
+                
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Análisis", 200);
                 columns.add(column);
+                
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Especificación", 200);
+                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+                column.setCellRenderer(f);
+                columns.add(column);
+                
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor mínimo", 100);
-                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
-                column.setCellRenderer(f);
+                
+//                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor mínimo", 100);
+//                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+//                column.setCellRenderer(f);
+//                columns.add(column);
+//                
+//                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor máximo", 100);
+//                column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
+//                column.setCellRenderer(f);
+//                columns.add(column);
+                
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Req. ficha", 75);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Valor máximo", 100);
+                
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "En contrato", 75);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
-                column.setCellRenderer(f);
                 columns.add(column);
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Requerido", 75);
+                
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "En CoA", 75);
                 column.setEditable(mnFormStatus == SLibConstants.FORM_STATUS_EDIT);
                 columns.add(column);
                 
@@ -2955,29 +2976,73 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             @Override
             public void actionRowNew() {
                 if (jbRowNew.isEnabled()) {
-                    oForm.formReset();
-                    oForm.setValue(SFormAnalysisDpsEty.DPS_YEAR, moDpsEntry.getPkYearId());
-                    oForm.setValue(SFormAnalysisDpsEty.DPS_DOC, moDpsEntry.getPkDocId());
-                    oForm.setValue(SFormAnalysisDpsEty.DPS_ETY, moDpsEntry.getPkEntryId());
-                    oForm.setValue(SFormAnalysisDpsEty.DPS_ITEM, moItem.getPkItemId());
+//                    oForm.formReset();
+                    SGuiParams params = new SGuiParams();
+                    params.getParamsMap().put(SFormAnalysisDpsEty.DPS_YEAR, moDpsEntry.getPkYearId());
+                    params.getParamsMap().put(SFormAnalysisDpsEty.DPS_DOC, moDpsEntry.getPkDocId());
+                    params.getParamsMap().put(SFormAnalysisDpsEty.DPS_ETY, moDpsEntry.getPkEntryId());
+                    params.getParamsMap().put(SFormAnalysisDpsEty.DPS_ITEM, moItem.getPkItemId());
+                    moFormParams = params;
                     
-                    oForm.setVisible(true);
-                    if (oForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                    if (jbRowNew.isEnabled()) {
+                        int row = 0;
+                        SGridRow gridRow = null;
+                        SDbRegistry registry = null;
+
                         try {
-                            SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) oForm.getRegistry();
-                            
-                            moGridAnalysis.addGridRow(oRegistry);
-                            moGridAnalysis.resetSortKeys();
-                            moGridAnalysis.setSelectedGridRow(0);
+                            ((SFormAnalysisDpsEty) miForm).formReset();
+                            registry = miClient.getSession().getRegistry(mnGridType, moFormParams);
+                            registry.setFormAction(SGuiConsts.FORM_ACTION_NEW);
+
+                            miForm.setRegistry(registry);
+
+                            if (moFormParams != null) {
+                                for (Integer key : moFormParams.getParamsMap().keySet()) {
+                                    miForm.setValue(key, moFormParams.getParamsMap().get(key));
+                                }
+                                moFormParams = null;
+                            }
+
+                            miForm.setFormVisible(true);
+
+                            if (miForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                                SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) miForm.getRegistry();
+                                SDataDpsEntryAnalysis oCopy = SQltUtils.newAnalysisEntryToOldAnalysisEntry(miClient.getSession().getStatement(), oRegistry);
+                                moModel.getGridRows().add(oCopy);
+                                moModel.renderGridRows();
+
+                                row = moModel.getRowCount() - 1;
+                                setSelectedGridRow(row);
+
+                                if (miPaneFormOwner != null) {
+                                    miPaneFormOwner.notifyRowNew(mnGridType, mnGridSubtype, row, gridRow);
+                                }
+                            }
                         }
-                        catch (Exception ex) {
-                            Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
                         }
                     }
+                    
+//                    oForm.setVisible(true);
+//                    if (oForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+//                        try {
+//                            SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) oForm.getRegistry();
+//                            SDataDpsEntryAnalysis oCopy = SQltUtils.newAnalysisEntryToOldAnalysisEntry(oRegistry);
+//                            
+//                            moGridAnalysis.addGridRow(oCopy);
+//                            moGridAnalysis.resetSortKeys();
+//                            moGridAnalysis.setSelectedGridRow(0);
+//                        }
+//                        catch (Exception ex) {
+//                            Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                    }
                 }
             }
         };
         
+        moGridAnalysis.setForm(oForm);
         jpQuality.add(moGridAnalysis, BorderLayout.CENTER);
         
         // Complimentary dialogs and forms:
@@ -6718,6 +6783,26 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 catch (Exception e) {
                     validation.setMessage("El campo acidez(%) no tiene un formato numérico válido.");
                     validation.setComponent(jtfAcidityPercentage);
+                }
+            }
+            /**
+             * Validación de parámetros de calidad para contratos de ventas
+             */
+            if (!validation.getIsError()) {
+                if (moParamDps.isDpsTypeContractSal()) {
+                    if (this.mlDpsEntryAnalysis.isEmpty()) {
+                        try {
+                            boolean hasConfiguration = SQltUtils.mustBeConfigured(miClient.getSession().getStatement(), moItem.getPkItemId());
+
+                            if (hasConfiguration) {
+                                validation.setMessage("El ítem debe tener asociada una ficha técnica de calidad para poderse agregar.");
+                                validation.setComponent(jpQuality);
+                            }
+                        }
+                        catch (SQLException ex) {
+                            Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
             }
         }

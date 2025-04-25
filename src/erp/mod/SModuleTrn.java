@@ -18,6 +18,7 @@ import erp.mod.trn.db.SDbDelivery;
 import erp.mod.trn.db.SDbDeliveryEntry;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
+import erp.mod.trn.db.SDbDpsEntryAnalysis;
 import erp.mod.trn.db.SDbDpsEntryPrice;
 import erp.mod.trn.db.SDbFunctionalAreaBudget;
 import erp.mod.trn.db.SDbFunctionalAreaBudgets;
@@ -233,6 +234,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 registry = new SDbDpsEntryPrice();
+                break;
+            case SModConsts.TRN_DPS_ETY_ANALYSIS:
+                registry = new SDbDpsEntryAnalysis();
                 break;
             case SModConsts.TRN_INV_VAL:
             case SModConsts.TRNX_INV_VAL_COST_UPD:

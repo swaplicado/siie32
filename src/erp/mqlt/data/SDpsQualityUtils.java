@@ -6,6 +6,8 @@
 package erp.mqlt.data;
 
 import erp.data.SDataConstants;
+import erp.mod.SModConsts;
+import erp.mod.qlt.db.SQltUtils;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryAnalysis;
 import java.sql.ResultSet;
@@ -41,15 +43,20 @@ public class SDpsQualityUtils {
     public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByItem(final SGuiSession session, final int idItem) {
         String sql = "";
         
+        try {
+            // Se obtiene el id del template de calidad:
+            int idTemplate = SQltUtils.obtainDatasheetTemplateByItemLink(session.getStatement(), idItem);
+            if (idTemplate == 0) {
+                return new ArrayList<>();
+            }
             sql = "SELECT "
                 + " * "
-                + "FROM "
-                + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS_ITEM) + " "
-                + "WHERE "
-                + "id_item = " + idItem + " AND NOT b_del "
-                + "ORDER BY sort_pos ASC, ts_new DESC;";
-            
-        try {
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " AS qdt "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE_ROW) + " AS qdtr "
+                + "ON qdt.id_datasheet_template = qdtr.id_datasheet_template "
+                + "WHERE qdt.id_datasheet_template = " + idTemplate + " AND NOT qdtr.b_del "
+                + "ORDER BY qdtr.sort_pos ASC, qdtr.ts_usr_ins DESC;";
+
             ResultSet resultSet = null;
             resultSet = session.getStatement().executeQuery(sql);
             
@@ -60,13 +67,19 @@ public class SDpsQualityUtils {
                 oEtyAnalysis = new SDataDpsEntryAnalysis();
                 
                 oEtyAnalysis.setSortPosition(sortPosition);
-                oEtyAnalysis.setMinValue(resultSet.getString("min_value"));
-                oEtyAnalysis.setMaxValue(resultSet.getString("max_value"));
-                oEtyAnalysis.setIsMin(resultSet.getBoolean("b_min"));
-                oEtyAnalysis.setIsMax(resultSet.getBoolean("b_max"));
-                oEtyAnalysis.setIsRequired(resultSet.getBoolean("b_required"));
-                oEtyAnalysis.setFkAnalysisId(resultSet.getInt("id_analysis"));
-                oEtyAnalysis.setFkItemId(resultSet.getInt("id_item"));
+                oEtyAnalysis.setOriginalSpecification(resultSet.getString("qdtr.orig_specification"));
+                oEtyAnalysis.setSpecification(resultSet.getString("qdtr.specification"));
+                oEtyAnalysis.setOriginalMinValue(resultSet.getString("qdtr.orig_min_value"));
+                oEtyAnalysis.setOriginalMaxValue(resultSet.getString("qdtr.orig_max_value"));
+                oEtyAnalysis.setMinValue(resultSet.getString("qdtr.min_value"));
+                oEtyAnalysis.setMaxValue(resultSet.getString("qdtr.max_value"));
+                oEtyAnalysis.setIsMin(resultSet.getBoolean("qdtr.b_min"));
+                oEtyAnalysis.setIsMax(resultSet.getBoolean("qdtr.b_max"));
+                oEtyAnalysis.setIsRequired(resultSet.getBoolean("qdtr.b_req"));
+                oEtyAnalysis.setIsForDps(resultSet.getBoolean("qdtr.b_dps"));
+                oEtyAnalysis.setIsForCoA(resultSet.getBoolean("qdtr.b_coa"));
+                oEtyAnalysis.setFkAnalysisId(resultSet.getInt("qdtr.id_analysis"));
+                oEtyAnalysis.setFkItemId(idItem);
                 
                 sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                         + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
@@ -93,8 +106,9 @@ public class SDpsQualityUtils {
         }
         catch (SQLException ex) {
             Logger.getLogger(SDpsQualityUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return new ArrayList<>();
         }
+        
+        return new ArrayList<>();
     }
     
     /**
@@ -113,11 +127,10 @@ public class SDpsQualityUtils {
                 + "FROM "
                 + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " "
                 + "WHERE "
-                + "fid_dps_year_n = " + entryDocPk[0] + " AND "
-                + "fid_dps_doc_n = " + entryDocPk[1] + " AND "
-                + "fid_dps_ety_n = " + entryDocPk[2] + " AND "
-                + "fid_item_id = " + idItem + " AND "
-                + "b_required = 1 "
+                + "fid_dps_year = " + entryDocPk[0] + " AND "
+                + "fid_dps_doc = " + entryDocPk[1] + " AND "
+                + "fid_dps_ety = " + entryDocPk[2] + " AND "
+                + "fid_item = " + idItem + " AND "
                 + "ORDER BY sort_pos ASC, id_ety_analysis ASC;";
         
         try {
@@ -200,46 +213,46 @@ public class SDpsQualityUtils {
                     + "</thead>"
                     + "<tbody>";
                  
-                for (SDataDpsEntryAnalysis oDpsEntryAnalysis : oDpsEntry.getDbmsDpsEntryAnalysis()) {
-                    htmlTable += "<tr>";
-
-                    // Orden
-                    htmlTable += "<td style=\"text-align: center;\">" + SLibUtils.textToHtml(oDpsEntryAnalysis.getSortPosition() + "") + "</td>";
-                    // Tipo
-                    htmlTable += "<td>" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisType()) + "</td>";
-                    // Análisis
-                    htmlTable += "<td>" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisName()) + "</td>";
-                    // Unidad
-                    htmlTable += "<td style=\"text-align: center;\">" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisUnit()) + "</td>";
-                    // Valor mínimo normativo
-                    htmlTable += "<td style=\"text-align: right;\">" + SLibUtils.textToHtml(mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMinValue()) + "</td>";
-                    // Valor mínimo
-                    htmlTable += "<td style=\"text-align: right;" + 
-                            (! mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMinValue().equals(oDpsEntryAnalysis.getMinValue()) ? "color: blue" : "") + "\">" + 
-                            SLibUtils.textToHtml(oDpsEntryAnalysis.getMinValue()) + "</td>";
-                    // Valor máximo normativo
-                    htmlTable += "<td style=\"text-align: right;\">" + SLibUtils.textToHtml(mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMaxValue()) + "</td>";
-                    // Valor máximo
-                    htmlTable += "<td style=\"text-align: right;" + 
-                            (! mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMaxValue().equals(oDpsEntryAnalysis.getMaxValue()) ? "color: blue" : "") + "\">" + 
-                            SLibUtils.textToHtml(oDpsEntryAnalysis.getMaxValue()) + "</td>";
-                    // Requerido
-                    htmlTable += "<td style=\"text-align: center;\">" + 
-                                    SLibUtils.textToHtml(oDpsEntryAnalysis.isRequired() ? "SÍ" : "NO") + 
-                                "</td>";
-                    // Modificación de requerido
-                    htmlTable += "<td style=\"text-align: center;\">" + 
-                                    (oDpsEntryAnalysis.isRequiredModified() ? "<b>" : "") + SLibUtils.textToHtml(oDpsEntryAnalysis.isRequiredModified() ? "SÍ" : "NO") + 
-                                    (oDpsEntryAnalysis.isRequiredModified() ? "</b>" : "") + 
-                                "</td>";
-                    // Modificación de parámetros
-                    htmlTable += "<td style=\"text-align: center;\">" + 
-                                    (oDpsEntryAnalysis.isLimitModified() ? "<b>" : "") + SLibUtils.textToHtml(oDpsEntryAnalysis.isLimitModified() ? "SÍ" : "NO") + 
-                                    (oDpsEntryAnalysis.isLimitModified() ? "</b>" : "") + 
-                                "</td>";
-
-                    htmlTable += "</tr>";
-                }
+//                for (SDataDpsEntryAnalysis oDpsEntryAnalysis : oDpsEntry.getDbmsDpsEntryAnalysis()) {
+//                    htmlTable += "<tr>";
+//
+//                    // Orden
+//                    htmlTable += "<td style=\"text-align: center;\">" + SLibUtils.textToHtml(oDpsEntryAnalysis.getSortPosition() + "") + "</td>";
+//                    // Tipo
+//                    htmlTable += "<td>" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisType()) + "</td>";
+//                    // Análisis
+//                    htmlTable += "<td>" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisName()) + "</td>";
+//                    // Unidad
+//                    htmlTable += "<td style=\"text-align: center;\">" + SLibUtils.textToHtml(oDpsEntryAnalysis.getAuxAnalysisUnit()) + "</td>";
+//                    // Valor mínimo normativo
+//                    htmlTable += "<td style=\"text-align: right;\">" + SLibUtils.textToHtml(mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMinValue()) + "</td>";
+//                    // Valor mínimo
+//                    htmlTable += "<td style=\"text-align: right;" + 
+//                            (! mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMinValue().equals(oDpsEntryAnalysis.getMinValue()) ? "color: blue" : "") + "\">" + 
+//                            SLibUtils.textToHtml(oDpsEntryAnalysis.getMinValue()) + "</td>";
+//                    // Valor máximo normativo
+//                    htmlTable += "<td style=\"text-align: right;\">" + SLibUtils.textToHtml(mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMaxValue()) + "</td>";
+//                    // Valor máximo
+//                    htmlTable += "<td style=\"text-align: right;" + 
+//                            (! mAnaItems.get(oDpsEntryAnalysis.getFkAnalysisId()).getMaxValue().equals(oDpsEntryAnalysis.getMaxValue()) ? "color: blue" : "") + "\">" + 
+//                            SLibUtils.textToHtml(oDpsEntryAnalysis.getMaxValue()) + "</td>";
+//                    // Requerido
+//                    htmlTable += "<td style=\"text-align: center;\">" + 
+//                                    SLibUtils.textToHtml(oDpsEntryAnalysis.isForCoA() ? "SÍ" : "NO") + 
+//                                "</td>";
+//                    // Modificación de requerido
+//                    htmlTable += "<td style=\"text-align: center;\">" + 
+//                                    (oDpsEntryAnalysis.isForCoA() ? "<b>" : "") + SLibUtils.textToHtml(oDpsEntryAnalysis.isForCoA() ? "SÍ" : "NO") + 
+//                                    (oDpsEntryAnalysis.isForCoA() ? "</b>" : "") + 
+//                                "</td>";
+//                    // Modificación de parámetros
+//                    htmlTable += "<td style=\"text-align: center;\">" + 
+//                                    (! oDpsEntryAnalysis.getOriginalSpecification().equals(oDpsEntryAnalysis.getSpecification()) ? "<b>" : "") + SLibUtils.textToHtml(! oDpsEntryAnalysis.getOriginalSpecification().equals(oDpsEntryAnalysis.getSpecification()) ? "SÍ" : "NO") + 
+//                                    (! oDpsEntryAnalysis.getOriginalSpecification().equals(oDpsEntryAnalysis.getSpecification()) ? "</b>" : "") + 
+//                                "</td>";
+//
+//                    htmlTable += "</tr>";
+//                }
                 
                 htmlTable += "</tbody>"
                         + "</table>";

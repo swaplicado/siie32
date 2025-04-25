@@ -953,6 +953,10 @@ public abstract class SModConsts {
     public static final int QLT_TP_ANALYSIS = 2073010;
     public static final int QLT_ANALYSIS = 2073011;
     public static final int QLT_ANALYSIS_ITEM = 2073012;
+    public static final int QLT_DATASHEET_TEMPLATE = 2073012;
+    public static final int QLT_DATASHEET_TEMPLATE_ROW = 2073013;
+    public static final int QLT_DATASHEET_TEMPLATE_LINK = 2073014;
+    public static final int QLT_QLTY_CONFIG_REQUIRED = 2073015;
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
@@ -1607,5 +1611,10 @@ public abstract class SModConsts {
         TablesMap.put(QLT_TP_ANALYSIS, "qlt_tp_analysis");
         TablesMap.put(QLT_ANALYSIS, "qlt_analysis");
         TablesMap.put(QLT_ANALYSIS_ITEM, "qlt_analysis_item");
+        TablesMap.put(QLT_DATASHEET_TEMPLATE, "qlt_datasheet_template");
+        TablesMap.put(QLT_DATASHEET_TEMPLATE_ROW, "qlt_datasheet_template_row");
+        TablesMap.put(QLT_DATASHEET_TEMPLATE_LINK, "qlt_datasheet_template_link");
+        TablesMap.put(QLT_QLTY_CONFIG_REQUIRED, "qlt_qlty_config_required");
+
     }
 }
