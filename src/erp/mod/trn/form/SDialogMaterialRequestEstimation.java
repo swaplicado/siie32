@@ -708,7 +708,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         String to = "";
         String cc = "";
         String cco = "";
-        String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
+        String subject = msSubjectDefault + " REQ-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
         String body = msBodyDefault.replace("---", msBodyRows);
         
         if (providerId > 0) {
@@ -922,7 +922,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
             }
             else if (button == jbNext) {
                 jTPGeneralPanel.setSelectedIndex(1);
-                String subject = msSubjectDefault + " REQ.-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
+                String subject = msSubjectDefault + " REQ-" + String.format("%05d", moMaterialRequest.getNumber()) + "-" + mnMailNumber;
                 String body = msBodyDefault.replace("---", msBodyRows);
                 moTextSubject.setValue(subject);
                 jtAreaBody.setText(body);
