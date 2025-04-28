@@ -1,8 +1,9 @@
 ================================================================================
 SIIE 3.2 270.9/ 2025-04-28
-Jhonatan Claudio PEÑA HERNANDEZ
+Jhonatan Claudio PEÑA HERNANDEZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Plantilla para reporte SISub e ICSOE
+2) Inhabilitar la captura de la acidez cuando no se trate de un documento de ventas en la captura de DPS.
 
 ================================================================================
 SIIE 3.2 270.8/ 2025-04-25

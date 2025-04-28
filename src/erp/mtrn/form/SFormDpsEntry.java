@@ -3857,8 +3857,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void enableExtraFields() {
-        boolean enableAcidity = confItemAcidityPercentage.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
-                || confItemAcidityPercentage.getigen().contains(moItem.getFkItemGenericId());
+        boolean enableAcidity = moParamDps.isForSales() && (confItemAcidityPercentage.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
+                || confItemAcidityPercentage.getigen().contains(moItem.getFkItemGenericId()));
         boolean enableTankCar = confItemTankCar.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
                 || confItemTankCar.getigen().contains(moItem.getFkItemGenericId());
         
