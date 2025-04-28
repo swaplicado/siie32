@@ -2923,6 +2923,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         SFormAnalysisDpsEty oForm = new SFormAnalysisDpsEty(miClient, "Análisis para ítem");
         
         moGridAnalysis = new SGridPaneForm((SGuiClient) miClient, SModConsts.TRN_DPS_ETY_ANALYSIS, SDataConstantsSys.UNDEFINED, "Configuración de análisis") {
+
             @Override
             public void initGrid() {
                 jbRowNew.setEnabled(true);
@@ -4302,6 +4303,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         else {
             // Obtener configuraciones cuando el registro no es nuevo, en base al item y la versión correspondiente
             this.mlDpsEntryAnalysis = moDpsEntry.getDbmsDpsEntryAnalysis();
+
+            // En caso de que no existan configuraciones, se obtienen en base al ítem, solo si se puede editar el registro
+            if (this.mlDpsEntryAnalysis.isEmpty() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
+                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId());
+            }
         }
         
         Vector<SGridRow> rows = new Vector<>();
@@ -4544,6 +4550,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbNotesDelete.setEnabled(false);
             jbPickSystemNotes.setEnabled(false);
 
+            moGridAnalysis.setRowButtonsEnabled(false, false, false);
+
             jlAddBachocoNúmeroPosición.setEnabled(false);
             jtfAddBachocoNúmeroPosición.setEnabled(false);
             jlAddBachocoCentro.setEnabled(false);
@@ -4624,6 +4632,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbNotesDelete.setEnabled(true);
             jbPickSystemNotes.setEnabled(true);
             jbEditNotes.setEnabled(false);
+
+            moGridAnalysis.setRowButtonsEnabled(true, false, true);
             
             jtfComplConceptKey.setEnabled(true);
             jtfComplConcept.setEnabled(true);
