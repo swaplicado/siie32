@@ -552,7 +552,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.addSeparator();
         jmRep.add(jmiRepEmpQuo);
         jmRep.add(jmiRepEmpQuoAcc);
-//        jmRep.add(jmiRepEmpSisub);
+        jmRep.add(jmiRepEmpSisub);
         jmRep.addSeparator();
         jmRep.add(jmiRepPositions);
         

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,7 +68,7 @@ import sa.lib.prt.SPrtUtils;
 /**
  * Utilerías varias para el procesamiento y emisión de nóminas.
  * 
- * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Edwin Carmona, Sergio Flores, Sergio Flores, Sergio Flores, Claudio Peña
  */
 public abstract class SHrsUtils {
     
@@ -1861,7 +1862,7 @@ public abstract class SHrsUtils {
      * @param dateLayoutStart Date start layout
      * @param dateLayoutEnd  Date final layout
      */
-    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) { // xx123
+    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
@@ -2187,6 +2188,275 @@ public abstract class SHrsUtils {
             }
         }
     }
+
+
+    public static void createLayoutSibub(SGuiClient client, int year, int bimester) throws Exception {
+        ResultSet resultSetHeader = null;
+        int mnYear = year;
+        int mnBimester = bimester;
+        int mnMonthEnd = mnBimester * 2;
+        int mnMonthStart = mnMonthEnd - 1;
+        int daysYear = 365;
+        int monthYear = 12;
+        int asimilable = 38;
+        Date mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthStart));
+        Date mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthEnd));
+        Integer result = SLibTimeUtils.countPeriodDays(mtDateStart, mtDateEnd);
+        int mnPeriodDays = result == null ? 0 : result;
+        double foodExemptFortnightly = SLibUtils.roundAmount(SHrsUtils.getRecentUma(client.getSession(), mtDateStart) * (SHrsConsts.FORTNIGHT_FIXED_DAYS ) * 0.4);
+
+        String fileName = "Archivo SISUB Año " + mnYear + " Bimestre " +mnBimester+ ".csv";
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+            String header = "No.Empleado,Dias_No_Laborados,Dias_Trabajados,Tipo_Movimiento,Nombre,RFC,SSN,Salario_Diario,PercepcionFija,Despensa,Bono_Aguinaldo,Utilidades,Prima_Vacacional,Liquidacion,Otras_Percepciones,Asimilables,Total_Percepciones,Salario_SSC";
+            bw.write(header + "\r\n");
+
+            String sql = "SELECT emp.id_emp, emp.num, bp.bp, bp.fiscal_id, emp.ssn, ((IFNULL((SELECT  wage FROM hrs_emp_log_wage WHERE id_emp = emp.id_emp AND dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ORDER BY dt DESC limit 1),emp.wage)/ " + daysYear + " )*" + monthYear + ") AS SD, " +
+                        "IFNULL((SELECT sal_ssc FROM hrs_emp_log_sal_ssc WHERE id_emp = emp.id_emp AND dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ORDER BY dt DESC limit 1 ), emp.sal_ssc) AS sal_ssc, '" + mnPeriodDays + "' as DiasPeriodo,  " +
+                        "CASE " +
+                        "WHEN emp.dt_hire BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "' THEN CONCAT('INGRESO ', emp.dt_hire) " +
+                        "WHEN emp.dt_dis_n BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "' THEN CONCAT('BAJA ', emp.dt_dis_n) " +
+                        "ELSE '' " +
+                        "END AS Movimiento, " +
+                        "IFNULL((SELECT SUM(pre.amt_r - (" + foodExemptFortnightly + ")) AS despensa FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em ON pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear =  " + SModSysConsts.HRSS_TP_EAR_FOOD + " " + 
+                        "AND pre.id_emp = emp.id_emp " +
+                        "AND pre.amt_r > (" + foodExemptFortnightly + ")), 0) AS despensa, " +                    
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_ANN_BONUS + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS BonoAguinaldo, " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_PTU + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS Utilidades, " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_VAC_BONUS + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS primaVacacional, " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_SETT + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS liquidacion, " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + asimilable + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS bonoOtrasPercep, " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_ASS_INC + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) AS Asimilables, " +
+                        "(IFNULL((SELECT SUM(pre.amt_r - (" + foodExemptFortnightly + ")) AS despensa FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em ON pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_FOOD + " " +
+                        "AND pre.id_emp = emp.id_emp " +
+                        "AND pre.amt_r > (" + foodExemptFortnightly + ")), 0) + " + 
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_ANN_BONUS + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) +  " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_PTU + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) + " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_VAC_BONUS + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) + " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_SETT + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) + " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + asimilable + " " +
+                        "AND pre.id_emp = emp.id_emp), 0) + " +
+                        "IFNULL((SELECT SUM(pre.amt_taxa) " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                        "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                        "INNER JOIN erp.hrsu_emp AS em on pre.id_emp = em.id_emp " +
+                        "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del " +
+                        "AND p.per_year = " + mnYear + " AND p.per BETWEEN " + mnMonthStart + " AND " + mnMonthEnd + " AND e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_ASS_INC + " " +
+                        "AND pre.id_emp = emp.id_emp), 0)) AS totalPercepciones, " +
+                        "IFNULL((SELECT sum(a.eff_day) FROM hrs_abs AS a " +
+                        "INNER JOIN erp.hrsu_tp_abs AS ta ON ta.id_cl_abs = a.fk_cl_abs AND ta.id_tp_abs = a.fk_tp_abs " +
+                        "WHERE ((a.dt_sta BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_end BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_sta < '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND a.dt_end > '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "')) AND " +
+                        "NOT ta.b_pay AND NOT a.b_del AND a.id_emp = emp.id_emp), 0) AS diasNoLaborados, " +
+                        "(" + mnPeriodDays + " - IFNULL((SELECT sum(a.eff_day) FROM hrs_abs AS a " +
+                        "INNER JOIN erp.hrsu_tp_abs AS ta ON ta.id_cl_abs = a.fk_cl_abs AND ta.id_tp_abs = a.fk_tp_abs " +
+                        "WHERE ((a.dt_sta BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_end BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_sta < '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND a.dt_end > '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "')) AND " +
+                        "NOT ta.b_pay AND NOT a.b_del AND a.id_emp = emp.id_emp), 0)) AS diasTrabajados, " +
+                        "((((IFNULL((SELECT  wage FROM hrs_emp_log_wage WHERE id_emp = emp.id_emp AND dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' ORDER BY dt DESC limit 1), emp.wage)/ " + daysYear + " )*" + monthYear + ")) * (" + mnPeriodDays + " - IFNULL((SELECT sum(a.eff_day) FROM hrs_abs AS a " +
+                        "INNER JOIN erp.hrsu_tp_abs AS ta ON ta.id_cl_abs = a.fk_cl_abs AND ta.id_tp_abs = a.fk_tp_abs " +
+                        "WHERE ((a.dt_sta BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_end BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR (a.dt_sta < '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND a.dt_end > '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "')) AND " +
+                        "NOT ta.b_pay AND NOT a.b_del AND a.id_emp = emp.id_emp), 0))) as PercepcionFija "+
+                        "FROM erp.hrsu_emp AS emp " +
+                        "INNER JOIN erp.bpsu_bp AS bp ON emp.id_emp = bp.id_bp " +
+                        "INNER JOIN hrs_emp_member AS men ON men.id_emp = emp.id_emp " +
+                        "WHERE emp.b_del = 0 AND ( " +
+                        "(emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "' AND (emp.dt_dis_n IS NULL OR emp.dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "')) OR " +
+                        "(emp.dt_hire BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR " +
+                        "(emp.dt_dis_n BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "') OR" +
+                        "(emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "' AND (b_act = 1))) ORDER BY bp";
+
+            resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+            while (resultSetHeader.next()) {
+                int num = resultSetHeader.getInt("num");
+                int diasNoLab = resultSetHeader.getInt("diasNoLaborados");
+                int diasLab = resultSetHeader.getInt("diasTrabajados");
+                String movimiento = resultSetHeader.getString("Movimiento");
+                String bp = resultSetHeader.getString("bp");
+                String fiscalId = resultSetHeader.getString("fiscal_id");
+                String ssn = resultSetHeader.getString("ssn");
+                double sd = resultSetHeader.getDouble("SD");
+                double percepcionFija = resultSetHeader.getDouble("PercepcionFija");
+                double despensa = resultSetHeader.getDouble("despensa");
+                boolean despensaNull = resultSetHeader.wasNull();
+                double bonoA = resultSetHeader.getDouble("BonoAguinaldo");
+                boolean bonoANull = resultSetHeader.wasNull();
+                double utili = resultSetHeader.getDouble("Utilidades");
+                boolean utiliNull = resultSetHeader.wasNull();
+                double prima = resultSetHeader.getDouble("primaVacacional");
+                boolean primaNull = resultSetHeader.wasNull();
+                double liqui = resultSetHeader.getDouble("liquidacion");
+                boolean liquiNull = resultSetHeader.wasNull();
+                double otrasPer = resultSetHeader.getDouble("bonoOtrasPercep");
+                boolean otrasPerNull = resultSetHeader.wasNull();
+                double asimi = resultSetHeader.getDouble("Asimilables");
+                boolean asimiNull = resultSetHeader.wasNull();
+                double total = resultSetHeader.getDouble("totalPercepciones");
+                boolean totalNull = resultSetHeader.wasNull();
+                double salSsc = resultSetHeader.getDouble("sal_ssc");
+
+                String safeMovimiento = "\"" + movimiento.replace("\"", "\"\"") + "\"";
+                String safeBp = "\"" + bp.replace("\"", "\"\"") + "\"";
+                String safeFiscalId = "\"" + (fiscalId != null ? fiscalId.replace("\"", "\"\"") : "") + "\"";
+                String safeSsn = "\"" + (ssn != null ? ssn.replace("\"", "\"\"") : "") + "\"";
+                String sdFormatted = String.format("%.2f", sd);
+                String percepcionFijaFormatted = String.format("%.2f", percepcionFija);
+                String salSscFormatted = String.format("%.2f", salSsc);
+                String despensaFormatted = despensaNull ? "0.00" : String.format("%.2f", despensa);
+                String bonoAFormatted = bonoANull ? "0.00" : String.format("%.2f", bonoA);
+                String utiliFormatted = utiliNull ? "0.00" : String.format("%.2f", utili);
+                String primaFormatted = primaNull ? "0.00" : String.format("%.2f", prima);
+                String liquiFormatted = liquiNull ? "0.00" : String.format("%.2f", liqui);
+                String otrasPerFormatted = otrasPerNull ? "0.00" : String.format("%.2f", otrasPer);
+                String asimiFormatted = asimiNull ? "0.00" : String.format("%.2f", asimi);
+                String totalFormatted = totalNull ? "0.00" : String.format("%.2f", total);
+
+                String row = num + "," +
+                            diasNoLab + ","+
+                            diasLab + ","+
+                            safeMovimiento + "," +
+                            safeBp + "," +
+                            safeFiscalId + "," +
+                            safeSsn + "," +
+                            sdFormatted + "," +
+                            percepcionFijaFormatted + "," +
+                            despensaFormatted + "," +
+                            bonoAFormatted + "," +
+                            utiliFormatted + "," +
+                            primaFormatted + "," +
+                            liquiFormatted + "," +
+                            otrasPerFormatted + "," +
+                            asimiFormatted + "," +
+                            totalFormatted + "," +
+                            salSscFormatted;
+                bw.write(row + "\r\n");
+            }
+
+            if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                SLibUtilities.launchFile(file.getPath());
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
+        }
+        finally {
+            try {
+                if (resultSetHeader != null) {
+                    resultSetHeader.close();
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+
     
     /**
     *

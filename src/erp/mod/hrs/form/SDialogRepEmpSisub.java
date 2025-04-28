@@ -4,8 +4,8 @@
  */
 package erp.mod.hrs.form;
 
-import erp.client.SClientInterface;
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SHrsUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +14,6 @@ import java.awt.event.FocusListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
-import javax.swing.JTextField;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -27,8 +26,6 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * @author Claudio Peña
  */
 public class SDialogRepEmpSisub extends SBeanFormDialog implements FocusListener, ActionListener {
-
-    private SFormMassiveUpdateSsc moFormMassiveUpdateSsc;
     boolean isEmployeLim = false;
             
     /**
@@ -190,13 +187,11 @@ public class SDialogRepEmpSisub extends SBeanFormDialog implements FocusListener
                 dispose();
                 try {
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
-//                    moFormMassiveUpdateSsc = new SFormMassiveUpdateSsc((SClientInterface) miClient, moIntPeriodYear.getValue(), moIntBimester.getValue(), isEmployeLim );
-                    moFormMassiveUpdateSsc.formReset();
+                    SHrsUtils.createLayoutSibub(miClient, moIntPeriodYear.getValue(), moIntBimester.getValue());
                 } catch (Exception ex) {
                     Logger.getLogger(SDialogRepEmpSisub.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                moFormMassiveUpdateSsc.setVisible(true);
                 mnFormResult = SGuiConsts.FORM_RESULT_OK;
                 dispose();
             }
