@@ -5,6 +5,8 @@
 
 package erp.mod.qlt.db;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,6 +42,10 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
+    
+    protected String msAnalysisName;
+    protected String msAnalysisUnit;
+    protected String msAnalysisType;
 
     public SDbDatasheetTemplateRow() {
         super(SModConsts.QLT_DATASHEET_TEMPLATE_ROW);
@@ -55,6 +61,10 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     public void setMax(boolean b) { mbMax = b; }
     public void setIsForDps(boolean b) { mbIsForDps = b; }
     public void setIsForCoA(boolean b) { mbIsForCoA = b; }
+    
+    public void setAuxAnalysisName(String s) { msAnalysisName = s; }
+    public void setAuxAnalysisUnit(String s) { msAnalysisUnit = s; }
+    public void setAuxAnalysisType(String s) { msAnalysisType = s; }
 
     public int getPkDatasheetTemplateId() { return mnPkDatasheetTemplateId; }
     public int getPkAnalysisId() { return mnPkAnalysisId; }
@@ -66,6 +76,30 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     public boolean isMax() { return mbMax; }
     public boolean isForDps() { return mbIsForDps; }
     public boolean isForCoA() { return mbIsForCoA; }
+    
+    public String getAuxAnalysisName() { return msAnalysisName; }
+    public String getAuxAnalysisUnit() { return msAnalysisUnit; }
+    public String getAuxAnalysisType() { return msAnalysisType; }
+
+    public void readAnalysisAuxData(java.sql.Statement statement) {
+        String sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
+                + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
+                + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
+                + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
+                + "WHERE qa.id_analysis = " + mnPkAnalysisId;
+        
+        try {
+            ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                msAnalysisName = resultSet.getString("analysis_name");
+                msAnalysisUnit = resultSet.getString("unit_symbol");
+                msAnalysisType = resultSet.getString("name");
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+    }
     
     @Override
     public String getSqlTable() {
@@ -150,6 +184,7 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
             mbRegistryNew = false;
             
 //            moAuxAnalysisType.read(session, new int[] { mnFkAnalysisTypeId });
+            this.readAnalysisAuxData(session.getStatement());
         }
 
         mnQueryResultId = SDbConsts.READ_OK;
@@ -233,6 +268,10 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setAuxAnalysisName(this.getAuxAnalysisName());
+        registry.setAuxAnalysisUnit(this.getAuxAnalysisUnit());
+        registry.setAuxAnalysisType(this.getAuxAnalysisType());
+
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
@@ -283,18 +322,20 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
             case 0:
                 return mnSortPosition;
             case 1:
-                return msSpecification;
+                return msAnalysisName;
             case 2:
-                return msMinValue;
+                return msSpecification;
             case 3:
-                return msMaxValue;
+                return msMinValue;
             case 4:
-                return mbMin;
+                return msMaxValue;
             case 5:
-                return mbMax;
+                return mbMin;
             case 6:
-                return mbIsForDps;
+                return mbMax;
             case 7:
+                return mbIsForDps;
+            case 8:
                 return mbIsForCoA;
             default:
                 return null;
@@ -307,24 +348,27 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
             case 0:
                 mnSortPosition = (Integer) value;
             case 1:
-                msSpecification = (String) value;
+                msAnalysisName = (String) value;
                 break;
             case 2:
-                msMinValue = (String) value;
+                msSpecification = (String) value;
                 break;
             case 3:
-                msMaxValue = (String) value;
+                msMinValue = (String) value;
                 break;
             case 4:
-                mbMin = (boolean) value;
+                msMaxValue = (String) value;
                 break;
             case 5:
-                mbMax = (boolean) value;
+                mbMin = (boolean) value;
                 break;
             case 6:
-                mbIsForDps = (boolean) value;
+                mbMax = (boolean) value;
                 break;
             case 7:
+                mbIsForDps = (boolean) value;
+                break;
+            case 8:
                 mbIsForCoA = (boolean) value;
                 break;
         }

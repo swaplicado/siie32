@@ -29,12 +29,12 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmQltLab;
     private javax.swing.JMenuItem jmQltLabAnalysis;
     private javax.swing.JMenuItem jmQltDatasheetTemplates;
-    private javax.swing.JMenuItem jmQltDatasheetTemplateLink;
     private javax.swing.JMenuItem jmQltDpsAnalysis;
     private javax.swing.JMenuItem jmQltDpsAnalysisDetail;
     private javax.swing.JMenu jmQltCfg;
-    private javax.swing.JMenuItem jmQltItemsVsAnalysisDetail;
-    private javax.swing.JMenuItem jmQltItemsVsAnalysis;
+//    private javax.swing.JMenuItem jmQltItemsVsAnalysisDetail;
+//    private javax.swing.JMenuItem jmQltItemsVsAnalysis;
+    private javax.swing.JMenuItem jmQltDatasheetTemplateLink;
     
     private SFormAnalysisItem moFormAnalysisItem;
     
@@ -51,39 +51,39 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmQltLab = new JMenu("Laboratorio");
         jmQltLabAnalysis = new JMenuItem("Análisis de laboratorio");
         jmQltDatasheetTemplates = new JMenuItem("Fichas técnicas");
-        jmQltDatasheetTemplateLink = new JMenuItem("Fichas técnicas e ítems");
         jmQltDpsAnalysis = new JMenuItem("Documentos vs análisis");
         jmQltDpsAnalysisDetail = new JMenuItem("Documentos vs análisis a detalle");
         jmQltCfg = new JMenu("Configuración");
-        jmQltItemsVsAnalysis = new JMenuItem("Items vs análisis");
-        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
+        jmQltDatasheetTemplateLink = new JMenuItem("Fichas técnicas e ítems");
+//        jmQltItemsVsAnalysis = new JMenuItem("Items vs análisis");
+//        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
         
         jmQlt.add(jmiQltLot);
         jmQltLab.add(jmQltLabAnalysis);
         jmQltLab.add(jmQltDatasheetTemplates);
-        jmQltLab.add(jmQltDatasheetTemplateLink);
         jmQltLab.add(jmQltDpsAnalysis);
         jmQltLab.add(jmQltDpsAnalysisDetail);
-        jmQltCfg.add(jmQltItemsVsAnalysis);
-        jmQltCfg.add(jmQltItemsVsAnalysisDetail);
+//        jmQltCfg.add(jmQltItemsVsAnalysis);
+//        jmQltCfg.add(jmQltItemsVsAnalysisDetail);
+        jmQltCfg.add(jmQltDatasheetTemplateLink);
 
         jmiQltLot.setEnabled(true);
         jmQltLabAnalysis.setEnabled(true);
         jmQltDatasheetTemplates.setEnabled(true);
-        jmQltDatasheetTemplateLink.setEnabled(true);
         jmQltDpsAnalysis.setEnabled(true);
         jmQltDpsAnalysisDetail.setEnabled(true);
-        jmQltItemsVsAnalysis.setEnabled(true);
-        jmQltItemsVsAnalysisDetail.setEnabled(true);
+//        jmQltItemsVsAnalysis.setEnabled(true);
+//        jmQltItemsVsAnalysisDetail.setEnabled(true);
+        jmQltDatasheetTemplateLink.setEnabled(true);
 
         jmiQltLot.addActionListener(this);
         jmQltLabAnalysis.addActionListener(this);
         jmQltDatasheetTemplates.addActionListener(this);
-        jmQltDatasheetTemplateLink.addActionListener(this);
         jmQltDpsAnalysis.addActionListener(this);
         jmQltDpsAnalysisDetail.addActionListener(this);
-        jmQltItemsVsAnalysis.addActionListener(this);
-        jmQltItemsVsAnalysisDetail.addActionListener(this);
+//        jmQltItemsVsAnalysis.addActionListener(this);
+//        jmQltItemsVsAnalysisDetail.addActionListener(this);
+        jmQltDatasheetTemplateLink.addActionListener(this);
         
         jmQlt.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
         jmQltLab.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
@@ -278,12 +278,12 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmQltDatasheetTemplateLink) {
                 miClient.getSession().showView(SModConsts.QLT_DATASHEET_TEMPLATE_LINK, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmQltItemsVsAnalysis) {
-                showView(SDataConstants.QLTX_ITEM_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
-            }
-            else if (item == jmQltItemsVsAnalysisDetail) {
-                showView(SDataConstants.QLT_ANALYSIS_ITEM, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
-            }
+//            else if (item == jmQltItemsVsAnalysis) {
+//                showView(SDataConstants.QLTX_ITEM_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+//            }
+//            else if (item == jmQltItemsVsAnalysisDetail) {
+//                showView(SDataConstants.QLT_ANALYSIS_ITEM, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+//            }
             else if (item == jmQltDpsAnalysis) {
                 showView(SDataConstants.QLTX_DOCUMENT_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
             }

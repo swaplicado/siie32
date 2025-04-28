@@ -15,7 +15,6 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRowCustom;
 import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataBizPartner;
-import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
@@ -200,7 +199,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         int col = 0;
         STableColumnForm[] columns = null;
 
-        columns = new STableColumnForm[19];
+        columns = new STableColumnForm[17];
         
         columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_SMALLINT);
         columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo análisis", STableConstants.WIDTH_ITEM_2X);
@@ -213,8 +212,6 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
         columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Aplica máx", STableConstants.WIDTH_BOOLEAN);
         columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Máximo", STableConstants.WIDTH_VALUE);
         columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Requerido", STableConstants.WIDTH_BOOLEAN);
-        columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Lim. mod.", STableConstants.WIDTH_BOOLEAN);
-        columns[col++] = new  STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Req. mod.", STableConstants.WIDTH_BOOLEAN);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);
         columns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. modificación", STableConstants.WIDTH_USER);
@@ -296,9 +293,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
                 + "    v.max_value, "
                 + "    v.b_min, "
                 + "    v.b_max, "
-                + "    v.b_required, "
-                + "    v.b_lim_mod, "
-                + "    v.b_req_mod, "
+                + "    v.b_req, "
                 + "    CONCAT(ta.code, '-', ta.name) AS analysis_type, "
                 + "    ta.name, "
                 + "    v.b_del, "
@@ -314,9 +309,9 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY_ANALYSIS) + " AS v "
                 + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON v.fid_item_id = i.id_item "
+                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON v.fid_item = i.id_item "
                 + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS a ON v.fid_analysis_id = a.id_analysis "
+                + "    " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " AS a ON v.fid_analysis = a.id_analysis "
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " AS ta ON a.fk_tp_analysis_id = ta.id_tp_analysis "
                 + "        INNER JOIN "
@@ -326,7 +321,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ud ON v.fid_usr_del = ud.id_usr "
                 + "WHERE "
-                + " NOT v.b_del AND v.fid_dps_year_n = " + mnIdYear + " AND v.fid_dps_doc_n = " + mnIdDoc + " "
+                + " NOT v.b_del AND v.fid_dps_year = " + mnIdYear + " AND v.fid_dps_doc = " + mnIdDoc + " "
                 + "ORDER BY v.sort_pos ASC";
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -343,9 +338,7 @@ public class SDialogAnalysisDocumentKardex extends javax.swing.JDialog implement
                 rowCustom.getValues().add(resulSet.getString("min_value"));
                 rowCustom.getValues().add(resulSet.getBoolean("b_max"));
                 rowCustom.getValues().add(resulSet.getString("max_value"));
-                rowCustom.getValues().add(resulSet.getBoolean("b_required"));
-                rowCustom.getValues().add(resulSet.getBoolean("b_lim_mod"));
-                rowCustom.getValues().add(resulSet.getBoolean("b_req_mod"));
+                rowCustom.getValues().add(resulSet.getBoolean("b_req"));
                 rowCustom.getValues().add(resulSet.getString("usr_ins"));
                 rowCustom.getValues().add(resulSet.getDate("ts_new"));
                 rowCustom.getValues().add(resulSet.getString("usr_upd"));

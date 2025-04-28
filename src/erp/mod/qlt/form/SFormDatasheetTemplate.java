@@ -198,7 +198,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAnalysis.setText("Parámetro:*");
+        jlAnalysis.setText("Análisis:*");
         jlAnalysis.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlAnalysis);
 
@@ -372,7 +372,8 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Orden"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Especificación"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Análisis"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Especificación"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Valor mínimo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Valor máximo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Mínimo"));
@@ -470,8 +471,20 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         oDataSheetRow = (SDbDatasheetTemplateRow) moGridParameterRows.getSelectedGridRow();
 
         if (oDataSheetRow != null) {
+            moBooleanSpecification.removeItemListener(this);
+            moBooleanQltyCert.removeItemListener(this);
+            moBooleanDps.removeItemListener(this);
+            moBooleanMin.removeItemListener(this);
+            moBooleanMax.removeItemListener(this);
+
             showDatasheetRow(oDataSheetRow);
             enableOrDisableFields(false);
+
+            moBooleanSpecification.addItemListener(this);
+            moBooleanQltyCert.addItemListener(this);
+            moBooleanDps.addItemListener(this);
+            moBooleanMin.addItemListener(this);
+            moBooleanMax.addItemListener(this);
         }
     }
 
@@ -529,7 +542,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
     private void actionSaveRow() {
         // Validación de los campos antes de guardar:
         if (moKeyAnalysis.getSelectedIndex() <= 0) {
-            miClient.showMsgBoxWarning("No ha seleccionado un parámetro.");
+            miClient.showMsgBoxWarning("No ha seleccionado un análisis.");
             moKeyAnalysis.requestFocus();
             return;
         }
@@ -582,6 +595,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
             moGridParameterRows.removeGridRow(index);
         }
 
+        moDatasheetRow.readAnalysisAuxData(miClient.getSession().getStatement());
         moGridParameterRows.addGridRow(moDatasheetRow);
         moGridParameterRows.renderGridRows();
         moGridParameterRows.clearSortKeys();

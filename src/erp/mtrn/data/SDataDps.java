@@ -5129,7 +5129,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     SMailSender sender = null;
                     Object images = null;
                     Date sentDate = null;
-                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                    STrnUtilities.sendMail(client, mmsType, qualityBody, 
+                                    (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                    toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
                     toRecipients.clear();
                 }
                 catch (Exception ex) {

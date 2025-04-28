@@ -482,7 +482,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
             //     msMaxValue = (String) value;
             //     break;
             case 5:
-                mbIsForDps = (Boolean) value;
+                mbIsForDps = mbIsRequired ? true : (Boolean) value;
                 break;
             case 6:
                 mbIsForCoA = (Boolean) value;
