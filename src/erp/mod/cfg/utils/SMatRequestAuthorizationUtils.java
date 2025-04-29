@@ -5,14 +5,18 @@
  */
 package erp.mod.cfg.utils;
 
+import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
+
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
 
@@ -186,5 +190,43 @@ public abstract class SMatRequestAuthorizationUtils {
         }
         
         return "";
+    }
+    
+    /**
+     * Obtiene el cuerpo del correo electrónico si el dps tiene requisiciones de materiales asociadas.
+     *
+     * @param oStatement
+     * @param pkDps
+     * 
+     * @return String con el extracto del cuerpo para el correo electrónico
+     */
+    public static String getMaterailRequestBodyOfDps(java.sql.Statement oStatement, int[] pkDps) {
+        String sBody = "";
+        String sQuery = "SELECT DISTINCT  " +
+                        "    u.usr, mr.id_mat_req, tp_req, num, dt " +
+                        "FROM " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dmr " +
+                        "        INNER JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON dmr.fid_mat_req = mr.id_mat_req " +
+                        "        INNER JOIN " +
+                        "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u ON mr.fk_usr_req = u.id_usr " +
+                        "WHERE " +
+                        "    dmr.fid_dps_year = " + pkDps[0] + " " +
+                        "        AND dmr.fid_dps_doc = " + pkDps[1] + ";";
+
+        ResultSet oResultSet = null;
+        try {
+            oResultSet = oStatement.executeQuery(sQuery);
+            while (oResultSet.next()) {
+                sBody += "<p>" + SLibUtils.textToHtml("Requisición de materiales") + ": <b>" + String.format("%0" + 6 + "d", oResultSet.getInt("num"))+ "</b>" +
+                        " del " + SLibUtils.textToHtml(SLibUtils.DateFormatDate.format(oResultSet.getDate("dt"))) + 
+                        " (<b>" + SLibUtils.textToHtml(oResultSet.getString("usr")) + "</b>)</p>";
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMatRequestAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return sBody;
     }
 }

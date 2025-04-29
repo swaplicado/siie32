@@ -1854,6 +1854,16 @@ public abstract class SAuthorizationUtils {
                     if (comment != null && !comment.isEmpty()) {
                         body.append("<p><b>Comentarios:</b> ").append(SLibUtils.textToHtml(comment)).append("</p>");
                     }
+                    try {
+                        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, "Consultando requisiciones de materiales.");
+                        String sMatReq = SMatRequestAuthorizationUtils.getMaterailRequestBodyOfDps(session.getStatement().getConnection().createStatement(), pkDps);
+                        if (!sMatReq.isEmpty()) {
+                            body.append(sMatReq);
+                        }
+                    }
+                    catch (Exception e) {
+                        Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
+                    }
                     body.append("<p>Ingresa ").append(SLibUtils.textToHtml("aquí"))
                             .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>");
 
