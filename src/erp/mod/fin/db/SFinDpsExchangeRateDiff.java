@@ -164,27 +164,23 @@ public class SFinDpsExchangeRateDiff {
      * @param sysMoveTypeXxxKey Key of system movement typeSDataConstantsSys.FINS_CT_SYS_MOV_...
      * @return SQL query.
      */
-    private String composeQueryBizPartnersBalance(final int bizPartnerCat, final int[] sysMoveTypeXxxKey) {
+    private String composeQueryBizPartnersBalance(final int[] sysMoveTypeXxxKey) {
         String sql = "SELECT re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, "
-                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur, " 
-                + "SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt " 
-                + "FROM fin_rec AS r " 
+                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bpb.bpb, re.fid_cur, SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt "
+                + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr " 
-                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = " + bizPartnerCat + " " 
-                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_ct_bp = btp.id_ct_bp AND bct.fid_tp_bp = btp.id_tp_bp " 
-                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.id_bpb = re.fid_bpb_n " 
-                + "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " 
-                + "WHERE NOT r.b_del AND NOT re.b_del " 
-                + "AND r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' " 
-                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxxKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxxKey[1] + " " 
-                + "AND re.fid_cur <> " + mnLocalCurrency + " " 
-                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc " 
+                + "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp "
+                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx "
+                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_tp_bp = btp.id_tp_bp AND btp.id_ct_bp = re.fid_tp_sys_mov_xxx "
+                + "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bpb ON bpb.id_bpb = re.fid_bpb_n "
+                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' "
+                + "AND NOT r.b_del AND NOT re.b_del "
+                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxxKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxxKey[1] + " "
+                + "AND re.fid_cur <> " + mnLocalCurrency + " "
+                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc "
                 + "HAVING SUM(re.debit_cur - re.credit_cur) = 0 AND SUM(re.debit - re.credit) <> 0 " // documentos liquidados con diferencia en cambios
-                + "AND re.fid_dps_year_n IS NOT NULL " // Sólo documentos
-                + "ORDER BY b.bp_comm, bb.bpb, re.fid_bp_nr, re.fid_bpb_n, "
-                + "d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, "
-                + "re.fid_acc, re.fk_acc;";
+                + "ORDER BY b.bp_comm, bpb.bpb, re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc;";
         
         return sql;
     }
@@ -617,7 +613,7 @@ public class SFinDpsExchangeRateDiff {
         for (int bizPartnerCategory : bizPartnerCategories) {
             anSysMoveTypeXxxKeyBizPartner = sysMoveTypeXxxBizPartners.get(bizPartnerCategory);
             
-            String sql = composeQueryBizPartnersBalance(bizPartnerCategory, anSysMoveTypeXxxKeyBizPartner);
+            String sql = composeQueryBizPartnersBalance(anSysMoveTypeXxxKeyBizPartner);
             resultSet = connection.createStatement().executeQuery(sql);
             
             while (resultSet.next()) {

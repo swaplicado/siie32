@@ -558,12 +558,10 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             
             String sqlDpsFilter = "";
             if (jrbDpsYear.isSelected()) {
-                sqlDpsFilter = jrbCurrencyLoc.isSelected() ? "WHERE " : "AND "; 
-                sqlDpsFilter += "YEAR(d.dt) = " + moFieldYear.getString() + " ";
+                sqlDpsFilter += "AND YEAR(d.dt) = " + moFieldYear.getString() + " ";
             }
             else if (jrbDpsPeriod.isSelected()) {
-                sqlDpsFilter = jrbCurrencyLoc.isSelected() ? "WHERE " : "AND "; 
-                sqlDpsFilter += "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsBegin.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsEnd.getDate()) + "' ";
+                sqlDpsFilter += "AND d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsBegin.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateDpsEnd.getDate()) + "' ";
             }
             
             String areasFilter = "";
