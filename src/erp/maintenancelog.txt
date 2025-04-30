@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 270.11/ 2025-04-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de las ruta de los reportes internos del formato de impresión de facturas USA.
+2) Corrección de validación de suma total del porcentaje de prorrateo en los paquetes de centros de costo para la contabilización de nóminas.
+
+================================================================================
 SIIE 3.2 270.10/ 2025-04-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
