@@ -177,24 +177,29 @@ public class SValuationBalances {
      * @param sysMoveTypeXxx Type of movement.
      * @return SQL query.
      */
-    private String composeQueryBizPartnersBalance(final int bizPartnerCat, final int[] sysMoveTypeXxx) {
+    private String composeQueryBizPartnersBalance(final int[] sysMoveTypeXxx) {
         String sql = "SELECT re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc, "
-                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bb.bpb, re.fid_cur, " 
-                + "SUM(re.debit_cur) AS _dbt_cur, SUM(re.credit_cur) AS _cdt_cur, SUM(re.debit) AS _dbt, SUM(re.credit) AS _cdt " 
-                + "FROM fin_rec AS r " 
-                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " 
-                + "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " 
-                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = " + bizPartnerCat + " "
-                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_ct_bp = btp.id_ct_bp AND bct.fid_tp_bp = btp.id_tp_bp " 
-                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON re.fid_bpb_n = bb.id_bpb " 
-                + "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " 
-                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' " 
-                + "AND NOT r.b_del AND NOT re.b_del " 
-                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxx[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxx[1] + " " 
-                + "AND re.fid_cur = " + mnCurrencyId + " " 
-                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc " 
-                + "HAVING SUM(re.debit_cur - re.credit_cur) <> 0 " 
-                + "ORDER BY b.bp_comm, bb.bpb, re.fid_bp_nr, re.fid_bpb_n ,d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc;";
+                + "re.fid_bp_nr, re.fid_bpb_n, d.num_ser, d.num, b.bp_comm, bpb.bpb, re.fid_cur, "
+                + "SUM(re.debit_cur) AS _dbt_cur, "
+                + "SUM(re.credit_cur) AS _cdt_cur, "
+                + "SUM(re.debit) AS _dbt, "
+                + "SUM(re.credit) AS _cdt "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp "
+                + "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx "
+                + "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_tp_bp = btp.id_tp_bp AND btp.id_ct_bp = re.fid_tp_sys_mov_xxx "
+                + "LEFT JOIN erp.bpsu_bpb AS bpb ON re.fid_bpb_n = bpb.id_bpb "
+                + "LEFT JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
+                + "LEFT JOIN erp.trnu_tp_dps AS dtp ON d.fid_ct_dps = dtp.id_ct_dps AND d.fid_cl_dps = dtp.id_cl_dps AND d.fid_tp_dps = dtp.id_tp_dps "
+                + "LEFT JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb "
+                + "WHERE r.id_year = " + mnRecYear + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtEndOfMonth) + "' "
+                + "AND NOT r.b_del AND NOT re.b_del "
+                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeXxx[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeXxx[1] + " "
+                + "AND re.fid_cur = " + mnCurrencyId + " "
+                + "GROUP BY re.fid_bp_nr, re.fid_bpb_n, re.fid_cur, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc "
+                + "HAVING SUM(re.debit_cur - re.credit_cur) <> 0 "
+                + "ORDER BY b.bp_comm, bpb.bpb, re.fid_bp_nr, re.fid_bpb_n ,d.num_ser, d.num, re.fid_dps_year_n, re.fid_dps_doc_n, re.ref, re.fid_acc, re.fk_acc;";
         
         return sql;
     }
@@ -619,7 +624,7 @@ public class SValuationBalances {
         
         for (int bizPartnerCategory : bizPartnerCategories) {
             anSysMovTypeXxxKeyBizPartner = sysMoveTypeXxxBizPartners.get(bizPartnerCategory);
-            sSql = composeQueryBizPartnersBalance(bizPartnerCategory, anSysMovTypeXxxKeyBizPartner);
+            sSql = composeQueryBizPartnersBalance(anSysMovTypeXxxKeyBizPartner);
             resultSet = connection.createStatement().executeQuery(sSql);
             
             while (resultSet.next()) {
