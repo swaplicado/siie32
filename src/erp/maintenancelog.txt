@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 270.12/ 2025-05-02
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Prorrateo de cantidades de unidades físicas de valuaciones de consumos de almacén.
+2) Modificación de la generación del texto del concepto contable de los costeos individuales.
+
+================================================================================
 SIIE 3.2 270.11/ 2025-04-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
