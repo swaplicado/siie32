@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 270.13/ 2025-05-05
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se elimina el texto "a corto plazo" para en los menús de documentos por pagar y por cobrar.
+2) Creación de las vistas Documentos por pagar y por cobrar a detalle.
+3) Corrección en el dialogo de movimientos de cuentas contables a detalle para cuando existe una referencia contable.
+4) Habilitación de los campos "Forma de pago predeterminada", "Uso de CFDI predeterminado" y "Regimén fiscal" en la forma de captura de proveedores.
+5) Validaciones en el campo "Régimen fiscal" para personas físicas, morales o extranjeros.
+
+================================================================================
 SIIE 3.2 270.12/ 2025-05-02
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

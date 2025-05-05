@@ -107,8 +107,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_stk_out.gif")), "Suministrar", this);
         mjbCloseOpenSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mfg_rm_con_del.gif")), 
                 (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL ? "Abrir suministro" : "Cerrar suministro"), this);
-        mjbCloseOpenPurchase = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mfg_rm_con.gif")), 
-                (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR ? "Cerrar compras" : "Abrir compras"), this);        
+        //mjbCloseOpenPurchase = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mfg_rm_con.gif")), 
+        //        (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR ? "Cerrar compras" : "Abrir compras"), this);        
+        mjbCloseOpenPurchase = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mfg_rm_con.gif")), "Cerrar/abrir compras", this);        
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
@@ -1000,7 +1001,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "unit", "Unidad"));
             if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
-                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per", "% suministro"));
+                columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per", "% suministrado"));
             }
         }
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridSubtype == SLibConsts.UNDEFINED) {
@@ -1008,12 +1009,12 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "contractor", "Contratista"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "ety", "Partidas"));
-            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_sumi", "% suministro"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_sumi", "% suministrado"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
-            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_pur", "% comprado"));
-            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_pur", "% x comprar"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_pur", "% pedido"));
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_pur", "% x por pedir"));
         }
         
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL) {

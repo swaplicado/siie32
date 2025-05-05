@@ -42,6 +42,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
     private int[] manParamCurrencyKey;
     private erp.lib.table.STablePane moPaneDetails;
     private java.util.Vector<Integer> mvAccountLevels;
+    private String msReference;
 
     private boolean mbShowRecordAdjYearEnd;
     private boolean mbShowRecordAdjAudit;
@@ -641,7 +642,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
     }
 
     public void actionRefresh() {
-        showAccountingDetail(moParamPrimaryKey, mnParamYear, mtParamDateStart, mtParamDateEnd, manParamCurrencyKey, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+        showAccountingDetail(moParamPrimaryKey, mnParamYear, mtParamDateStart, mtParamDateEnd, manParamCurrencyKey, msReference, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
     }
 
     public void refreshAccountingDetail() {
@@ -658,7 +659,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
     }
 
     @SuppressWarnings("unchecked")
-    public void showAccountingDetail(java.lang.Object poPrimaryKey, int pnYear, java.util.Date ptDateStart, java.util.Date ptDateEnd, int[] panCurrencyKey, boolean bShowRecordAdjYearEnd, boolean bShowRecordAdjAudit) {
+    public void showAccountingDetail(java.lang.Object poPrimaryKey, int pnYear, java.util.Date ptDateStart, java.util.Date ptDateEnd, int[] panCurrencyKey, String reference, boolean bShowRecordAdjYearEnd, boolean bShowRecordAdjAudit) {
         double dOpeningBalance = 0;
         double dDebit = 0;
         double dCredit = 0;
@@ -669,6 +670,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
         String sql = "";
         ResultSet resulSet = null;
         String sqlWhere = "";
+        String sqlGroupBy = "";
         String sqlFromPrevious = "";
         String sqlFromCurrent = "";
         String sConcept = "";
@@ -683,6 +685,15 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
         manParamCurrencyKey = panCurrencyKey;
         mbShowRecordAdjYearEnd = bShowRecordAdjYearEnd;
         mbShowRecordAdjAudit = bShowRecordAdjAudit;
+        msReference = reference.equals("(SIN REFERENCIA)") ? "" : reference;
+        if (msReference != null) {
+            if (!msReference.isEmpty()) {
+                this.setTitle("Movimientos del período (" + msReference + ")");
+            }
+            else {
+                this.setTitle("Movimientos del período (Sin referencia)");
+            }
+        }
 
         jckShowRecordAdjYearEnd.setSelected(mbShowRecordAdjYearEnd);
         jckShowRecordAdjAudit.setSelected(mbShowRecordAdjAudit);
@@ -862,9 +873,16 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
 
             sqlFromPrevious += sTemp;
             sqlFromCurrent += sTemp;
+            
+            if (msReference != null) {
+                sqlWhere += (sqlWhere.length() == 0 ? "WHERE " : "AND ") + " re.ref = '" + msReference + "' ";
+                sqlGroupBy += (sqlGroupBy.length() == 0 ? "GROUP BY " : "") + " re.ref ";
+            }
 
             sql = "SELECT COALESCE(SUM(re.debit" + sCur + " - re.credit" + sCur + "), 0) AS f_balance " +
-                    sqlFromPrevious;
+                    sqlFromPrevious + " " +
+                    sqlWhere + " " +
+                    sqlGroupBy + " ";
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
@@ -898,7 +916,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
             if (!mbShowRecordAdjAudit) {
                 sqlWhere += (sqlWhere.length() == 0 ? "WHERE " : "AND ") + " b_adj_audit = 0 ";
             }
-
+            
             sql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, re.concept, r.b_sys, r.b_del, " +
                     "f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) AS f_acc, a.acc, bkc.code, cob.code, mtp.tp_acc_mov, mcl.cl_acc_mov, mcls.cls_acc_mov, un.usr, ue.usr, ud.usr, " +
                     (manParamCurrencyKey != null ? "c.id_cur AS f_id_cur, c.cur_key AS f_cur_key, " :
@@ -919,7 +937,8 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
                     (mnDetailType != SDataConstants.FINX_ACCOUNTING ? "" :
                         "LEFT OUTER JOIN erp.cfgu_cob_ent AS xe ON re.fid_cob_n = xe.id_cob AND re.fid_ent_n = xe.id_ent " +
                         "LEFT OUTER JOIN erp.bpsu_bp AS xb ON re.fid_bp_nr = xb.id_bp ") +
-                     sqlWhere +
+                    sqlWhere +
+                    sqlGroupBy +
                     "ORDER BY r.dt, r.id_year, r.id_per, bkc.code, r.id_bkc, r.id_tp_rec, r.id_num ";
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);

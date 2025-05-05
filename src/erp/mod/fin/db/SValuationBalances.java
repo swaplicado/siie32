@@ -767,7 +767,7 @@ public class SValuationBalances {
         miClient.showMsgBoxInformation("Se procesaron:\n-" + docSup + " documentos de proveedores.\n-" + accSup + " cuentas de proveedores.\n"
                 + "-" + docCus + " documentos de clientes.\n-" + accCus + " cuentas de clientes.\n"
                 + "-" + cdr + " cuentas de acreedores.\n-" + dbr + " cuentas de deudores.\n-" + cash + " cuentas de caja.\n-" + bank + " cuentas de bancos.\n"
-                + "-" + toPay + " documentos por pagar a corto plazo.\n-" + rec + " documentos por cobrar a corto plazo.");
+                + "-" + toPay + " documentos por pagar.\n-" + rec + " documentos por cobrar.");
     }           
     
     /**

@@ -180,7 +180,8 @@ public class SViewAccountMoves extends erp.lib.table.STableTab {
         msSql = "SELECT CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, bkc.code AS bkc, cob.code AS cob, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) as f_num, r.dt, re.concept, re.debit, re.credit, re.exc_rate, " +
                 "re.debit_cur, re.credit_cur, c.cur_key, re.b_sys, re.b_exc_diff, re.b_del, re.ts_new, re.ts_edit, re.ts_del, " +
-                "f.id_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", f.code) AS f_acc, f.acc, cc.id_cc AS cc, cc.cc AS ncc, cl.cls_acc_mov, i.item_key, i.item, un.usr, ue.usr, ud.usr " +
+                "f.id_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", f.code) AS f_acc, f.acc, cc.id_cc AS cc, cc.cc AS ncc, cl.cls_acc_mov, i.item_key, i.item, " +
+                "un.usr, ue.usr, ud.usr " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
                 "INNER JOIN fin_acc AS f ON re.fid_acc = f.id_acc " +

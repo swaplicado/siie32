@@ -403,6 +403,7 @@ public abstract class SDataConstants {
     public static final int FINX_REC_CFD_INDIRECT = 206523;
     public static final int FINX_MOVES_ACC_DET_VIEW = 206524;
     public static final int FINX_SHORT_TERM_DOCS = 206525;
+    public static final int FINX_SHORT_TERM_DOCS_DET = 206528;
     public static final int FINX_ANNUAL_ACC_BALANCE = 206526;
     public static final int FINX_ACC_ETY_REF = 206527;
     

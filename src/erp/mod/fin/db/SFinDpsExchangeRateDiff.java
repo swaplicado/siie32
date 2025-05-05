@@ -731,8 +731,8 @@ public class SFinDpsExchangeRateDiff {
         miClient.showMsgBoxInformation("Se ajustaron " + (countSup + countCus + countPay + countRec) + " documentos:\n"
                 + "-" + countSup + " de proveedores.\n"
                 + "-" + countCus + " de clientes.\n"
-                + "-" + countPay  + " documentos por pagar a corto plazo.\n"
-                + "-" + countRec + " documentos por cobrar a corto plazo.");
+                + "-" + countPay  + " documentos por pagar.\n"
+                + "-" + countRec + " documentos por cobrar.");
     }
 
     /**

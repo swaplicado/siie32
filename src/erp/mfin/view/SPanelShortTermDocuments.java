@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Vector;
@@ -335,14 +336,14 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Referencia contable", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo inicial mon $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cargos mon $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Abonos mon $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Debe mon $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Haber mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo final mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "T cambio", STableConstants.WIDTH_EXCHANGE_RATE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo inicial $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cargos $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Abonos $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Debe $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Haber $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo final $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
 
@@ -412,9 +413,10 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
                 miClient.showMsgBoxInformation("No se pueden mostrar movimientos de este registro.");
             }
             else {
+                SPanelShortTermDocumentsRow shortTermRow = (SPanelShortTermDocumentsRow) row;
                 moDialogAccountingDetail.refreshAccountingDetail();
                 moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStart, mtDateEnd, 
-                        new int[] { ((SPanelShortTermDocumentsRow) row).getCurrencyId() }, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+                        new int[] { shortTermRow.getCurrencyId() }, shortTermRow.getReference(), mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
             }
         }
     }
@@ -426,7 +428,7 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
         String sSqlWhere;
         String sFormatAccountId = miClient.getSessionXXX().getParamsErp().getFormatAccountId().replace('9', '0');
         Vector<Vector<Object>> vQueryRows;
-        Vector<Integer> vLevels = SDataUtilities.getAccountLevels(sFormatAccountId);
+        ArrayList<Integer> vLevels = SDataUtilities.getArrayAccountLevels(sFormatAccountId);
         SPanelShortTermDocumentsRow oAccountingRow;
         SServerRequest oRequest;
         SServerResponse oResponse;
