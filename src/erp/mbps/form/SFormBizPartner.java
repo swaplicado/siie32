@@ -126,6 +126,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldFkUserAnalystId;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
+    private erp.lib.form.SFormField moFieldLeadTime;
     private erp.lib.form.SFormField moFieldCfdiPaymentWay;
     private erp.lib.form.SFormField moFieldCfdiCfdiUsage;
     private erp.lib.form.SFormField moFieldTaxRegime;
@@ -340,11 +341,15 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlDateStart = new javax.swing.JLabel();
         jftDateStart = new javax.swing.JFormattedTextField();
         jbSetDateStart = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jlDateEnd_n = new javax.swing.JLabel();
         jftDateEnd_n = new javax.swing.JFormattedTextField();
         jbSetDateEnd_n = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jlLeadTime = new javax.swing.JLabel();
+        jtfLeadTime = new javax.swing.JTextField();
+        jlLeadTimeDays = new javax.swing.JLabel();
+        jlLeadTimeHint = new javax.swing.JLabel();
         jPanel17 = new javax.swing.JPanel();
         jPanel47 = new javax.swing.JPanel();
         jlCfdiPaymentWay = new javax.swing.JLabel();
@@ -1049,9 +1054,6 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbSetDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jbSetDateStart);
 
-        jLabel3.setPreferredSize(new java.awt.Dimension(5, 23));
-        jPanel9.add(jLabel3);
-
         jPanel46.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1069,6 +1071,29 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jbSetDateEnd_n.setFocusable(false);
         jbSetDateEnd_n.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbSetDateEnd_n);
+
+        jLabel3.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel10.add(jLabel3);
+
+        jlLeadTime.setText("Plazo de entrega:");
+        jlLeadTime.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel10.add(jlLeadTime);
+
+        jtfLeadTime.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfLeadTime.setText("0");
+        jtfLeadTime.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel10.add(jtfLeadTime);
+
+        jlLeadTimeDays.setForeground(java.awt.SystemColor.textInactiveText);
+        jlLeadTimeDays.setText("días");
+        jlLeadTimeDays.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel10.add(jlLeadTimeDays);
+
+        jlLeadTimeHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlLeadTimeHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlLeadTimeHint.setToolTipText("Plazo de entrega en días promedio del asociado de negocios");
+        jlLeadTimeHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel10.add(jlLeadTimeHint);
 
         jPanel46.add(jPanel10);
 
@@ -1624,6 +1649,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateEnd_n, jlDateEnd_n);
         moFieldDateEnd.setTabbedPaneIndex(1, jTabbedPane1);
         moFieldDateEnd.setPickerButton(jbSetDateEnd_n);
+        moFieldLeadTime = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfLeadTime, jlLeadTime);
+        moFieldLeadTime.setTabbedPaneIndex(1, jTabbedPane1);
 
         moFieldCfdiPaymentWay = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiPaymentWay, jlCfdiPaymentWay);
         moFieldCfdiPaymentWay.setTabbedPaneIndex(1, jTabbedPane1);
@@ -1701,6 +1728,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         mvFieldsCategory.add(moFieldFkUserAnalystId);
         mvFieldsCategory.add(moFieldDateStart);
         mvFieldsCategory.add(moFieldDateEnd);
+        mvFieldsCategory.add(moFieldLeadTime);
         mvFieldsCategory.add(moFieldCfdiPaymentWay);
         mvFieldsCategory.add(moFieldCfdiCfdiUsage);
         mvFieldsCategory.add(moFieldTaxRegime);
@@ -2087,6 +2115,10 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlDateEnd_n.setEnabled(enable);
         jftDateEnd_n.setEnabled(enable);
         jbSetDateEnd_n.setEnabled(enable);
+        jlLeadTime.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
+        jtfLeadTime.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
+        jlLeadTimeDays.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
+        jlLeadTimeHint.setEnabled(enable && mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_SUP);
         jlWeb.setEnabled(enable);
         jtfWeb.setEnabled(enable);
         jlNotes.setEnabled(enable);
@@ -2959,6 +2991,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlIsSignRestrictedHint;
     private javax.swing.JLabel jlKey;
     private javax.swing.JLabel jlLastName;
+    private javax.swing.JLabel jlLeadTime;
+    private javax.swing.JLabel jlLeadTimeDays;
+    private javax.swing.JLabel jlLeadTimeHint;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumberExporter;
     private javax.swing.JLabel jlTaxRegime;
@@ -2996,6 +3031,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfGuarantee;
     private javax.swing.JTextField jtfInsurance;
     private javax.swing.JTextField jtfLastName;
+    private javax.swing.JTextField jtfLeadTime;
     private javax.swing.JTextField jtfNotes;
     private javax.swing.JTextField jtfNumberExporter;
     private javax.swing.JTextField jtfPkBizPartnerId_Ro;
@@ -3583,6 +3619,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             moFieldFkCurrencyId_n.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() });
             moFieldDateStart.setFieldValue(moBizPartnerCategory.getDateStart());
             moFieldDateEnd.setFieldValue(moBizPartnerCategory.getDateEnd_n());
+            moFieldLeadTime.setFieldValue(moBizPartnerCategory.getLeadTime());
             moFieldCfdiPaymentWay.setFieldValue(moBizPartnerCategory.getCfdiPaymentWay());
             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
             moFieldTaxRegime.setFieldValue(moBizPartnerCategory.getTaxRegime());
@@ -3794,6 +3831,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartnerCategory.setCfdiPaymentWay(jcbCfdiPaymentWay.getSelectedIndex() <= 0 ? "" : moFieldCfdiPaymentWay.getKey().toString());
         moBizPartnerCategory.setCfdiCfdiUsage(jcbCfdiCfdiUsage.getSelectedIndex() <= 0 ? "" : moFieldCfdiCfdiUsage.getKey().toString());
         moBizPartnerCategory.setTaxRegime(jcbTaxRegime.getSelectedIndex() <= 0 ? "" : moFieldTaxRegime.getKey().toString());
+        moBizPartnerCategory.setLeadTime(moFieldLeadTime.getInteger()); 
 
         moBizPartnerCategory.setIsCreditByUser(jckIsCreditByUser.isSelected());
         moBizPartnerCategory.setFkBizPartnerCategoryId(mnParamBizPartnerCategory);

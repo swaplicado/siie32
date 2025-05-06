@@ -160,7 +160,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
                     "INNER JOIN ERP.BPSU_BPB_ADD AS AD ON BPB.ID_BPB = AD.ID_BPB " +
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                     "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                    "WHERE DET.ID_TAX_BAS = " + SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_TRN_DPS_RUS_TAX)) + " " + sqlWherePeriod ;
+                    "WHERE DET.ID_TAX_BAS = " + SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_RUS_TAX)) + " " + sqlWherePeriod ;
         } catch (Exception ex) {
             Logger.getLogger(SViewDpsTaxRustic.class.getName()).log(Level.SEVERE, null, ex);
         }

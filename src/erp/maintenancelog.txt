@@ -1,4 +1,18 @@
 ================================================================================
+SIIE 3.2 272.2/ 2025-05-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de parámetros de configuración para la impresión de facturas USA.
+2) Implementación de variación del formato de cantidad en la impresión de facturas USA de acuerdo a su configuración.
+3) Corrección al nombre de la constante del parámetro de configuración del impuesto predial rústico.
+
+================================================================================
+SIIE 3.2 272.1/ 2025-05-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agrega el campo "Plazo de entrega" en días en la forma de captura de proveedores.
+
+================================================================================
 SIIE 3.2 272.0/ 2025-05-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -11,7 +25,7 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 270.15/ 2025-05-06
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Se modifica la forma de requisiciones con el fin de poder modificar las partidas con vínculos sólo en la reclasificación contable.
+1) Se modifica la forma de requisiciones de materiales con el fin de poder modificar todas las partidas en la reclasificación contable, incluso si las partidas tienen vínculos con otros registros.
 
 ================================================================================
 SIIE 3.2 270.14/ 2025-05-06
