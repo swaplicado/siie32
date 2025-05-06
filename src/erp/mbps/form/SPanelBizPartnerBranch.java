@@ -1312,7 +1312,17 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
     @Override
     public java.lang.Object getValue(int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object value = null;
+        
+        switch(type) {
+            case SDataConstants.LOCU_CTY:
+                value = moPanelBizPartnerBranchAddress.getValue(type);
+                break;
+                
+            default:
+        }
+        
+        return value;
     }
 
     @Override

@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.db;
 
+import erp.mfin.data.SDataRecordEntry;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ import sa.lib.gui.SGuiSession;
 public class SDbStockValuationAccount extends SDbRegistryUser {
     
     protected int mnPkStockValuationAccountId;
+    protected double mdProrationPercentage;
     protected boolean mbDeleted;
     protected int mnFkFinRecYearId;
     protected int mnFkFinRecPerId;
@@ -30,12 +32,16 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
     protected int mnFkFinRecEty;
     protected int mnFkStockValuationId;
     protected int mnFkStockValuationMvtId;
+    
+    protected double mdAuxQuantity;
+    protected SDataRecordEntry oAuxRecordEntry;
 
     public SDbStockValuationAccount() {
         super(SModConsts.TRN_STK_VAL_ACC);
     }
     
     public void setPkStockValuationAccountId(int n) { mnPkStockValuationAccountId = n; }
+    public void setProrationPercentage(double d) { mdProrationPercentage = d; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkFinRecYearId(int n) { mnFkFinRecYearId = n; }
     public void setFkFinRecPerId(int n) { mnFkFinRecPerId = n; }
@@ -45,8 +51,12 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
     public void setFkFinRecEty(int n) { mnFkFinRecEty = n; }
     public void setFkStockValuationId(int n) { mnFkStockValuationId = n; }
     public void setFkValuationMvtId(int n) { mnFkStockValuationMvtId = n; }
+
+    public void setAuxQuantity(double d) { mdAuxQuantity = d; }
+    public void setAuxRecordEntry(SDataRecordEntry o) { oAuxRecordEntry = o; }
     
     public int getPkStockValuationAccountId() { return mnPkStockValuationAccountId; }
+    public double getProrationPercentage() { return mdProrationPercentage; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkFinRecYearId() { return mnFkFinRecYearId; }
     public int getFkFinRecPerId() { return mnFkFinRecPerId; }
@@ -56,6 +66,9 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
     public int getFkFinRecEty() { return mnFkFinRecEty; }
     public int getFkStockValuationId() { return mnFkStockValuationId; }
     public int getFkValuationMvtId() { return mnFkStockValuationMvtId; }
+    
+    public double getAuxQuantity() { return mdAuxQuantity; }
+    public SDataRecordEntry getAuxRecordEntry() { return oAuxRecordEntry; }
 
     @Override
     public void setPrimaryKey(int[] key) {
@@ -72,6 +85,7 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkStockValuationAccountId = 0;
+        mdProrationPercentage = 0;
         mbDeleted = false;
         mnFkFinRecYearId = 0;
         mnFkFinRecPerId = 0;
@@ -81,6 +95,9 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
         mnFkFinRecEty = 0;
         mnFkStockValuationId = 0;
         mnFkStockValuationMvtId = 0;
+        
+        mdAuxQuantity = 0;
+        oAuxRecordEntry = new SDataRecordEntry();
     }
 
     @Override
@@ -125,6 +142,7 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
         }
         else {
             mnPkStockValuationAccountId = resultSet.getInt("id_stk_val_acc");
+            mdProrationPercentage = resultSet.getDouble("prorat_per");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkFinRecYearId = resultSet.getInt("fk_fin_rec_year");
             mnFkFinRecPerId = resultSet.getInt("fk_fin_rec_per");
@@ -134,6 +152,10 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
             mnFkFinRecEty = resultSet.getInt("fk_fin_rec_ety");
             mnFkStockValuationId = resultSet.getInt("fk_stk_val");
             mnFkStockValuationMvtId = resultSet.getInt("fk_stk_val_mvt");
+            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
+            mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
+            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
             mbRegistryNew = false;
         }
@@ -154,6 +176,7 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkStockValuationAccountId + ", " +
+                    mdProrationPercentage + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkFinRecYearId + ", " +
                     mnFkFinRecPerId + ", " +
@@ -173,6 +196,7 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
             msSql = "UPDATE " + getSqlTable() + " SET " +
+                    "prorat_per = " + mdProrationPercentage + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_fin_rec_year = " + mnFkFinRecYearId + ", " +
                     "fk_fin_rec_per = " + mnFkFinRecPerId + ", " +
@@ -200,6 +224,7 @@ public class SDbStockValuationAccount extends SDbRegistryUser {
         SDbStockValuationAccount registry = new SDbStockValuationAccount();
         
         registry.setPkStockValuationAccountId(this.getPkStockValuationAccountId());
+        registry.setProrationPercentage(this.getProrationPercentage());
         registry.setDeleted(this.isDeleted());
         registry.setFkFinRecYearId(this.getFkFinRecYearId());
         registry.setFkFinRecPerId(this.getFkFinRecPerId());

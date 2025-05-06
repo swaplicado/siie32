@@ -405,7 +405,7 @@ public class SPanelAnnualAccounting extends javax.swing.JPanel implements erp.li
                 }
 
                 moDialogAccountingDetail.refreshAccountingDetail();
-                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStartYear, mtDateEndYear, currencyKey, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStartYear, mtDateEndYear, currencyKey, null, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
             }
         }
     }

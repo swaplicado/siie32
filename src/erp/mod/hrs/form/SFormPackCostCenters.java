@@ -111,8 +111,8 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
         jPanel5.add(moTextName);
 
         jlTotalProration.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlTotalProration.setText("% prorrateo:");
-        jlTotalProration.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlTotalProration.setText("% prorrateo total:");
+        jlTotalProration.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel5.add(jlTotalProration);
 
         jtfTotalProration.setEditable(false);
@@ -240,7 +240,7 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
         double sum = 0;
         
         for (SGridRow row : moGridCostCenters.getModel().getGridRows()) {
-            sum += ((SDbPackCostCentersCostCenter) row).getProrationPercentage();
+            sum = SLibUtils.round(sum + ((SDbPackCostCentersCostCenter) row).getProrationPercentage(), SLibUtils.getDecimalFormatPercentageDiscount().getMaximumFractionDigits());
         }
         
         return sum;
@@ -383,9 +383,14 @@ public class SFormPackCostCenters extends SBeanForm implements SGridPaneFormOwne
                 validation.setMessage("Se deben capturar los centros de costo del paquete.");
                 validation.setComponent(moPanelCostCenter.getTextNumberFirst());
             }
-            else if (sumTotalProration() != 1d) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlTotalProration) + "'"
-                        + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + SLibUtils.getDecimalFormatPercentageDiscount().format(1d) + ".");
+            else {
+                double totalProration = sumTotalProration();
+                
+                if (totalProration != 1d) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlTotalProration) + "'"
+                            + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + SLibUtils.getDecimalFormatPercentageDiscount().format(1d) + ", "
+                            + "pero no " + SLibUtils.getDecimalFormatPercentageDiscount().format(totalProration) + ".");
+                }
             }
         }
         

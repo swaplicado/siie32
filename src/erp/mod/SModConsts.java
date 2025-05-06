@@ -533,6 +533,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_WAH = 2024003;         // stock by warehouse
     public static final int TRNX_STK_COST = 2024049;        // stock cost
     public static final int TRNX_STK_VAL_DET = 2024091;
+    public static final int TRNX_STK_VAL_DET_CONS = 2024092;
     public static final int TRNX_INV_VAL_COST_UPD = 2024061;    // inventory valuation vs. cost
     public static final int TRNX_INV_VAL_COST_QRY = 2024066;    // inventory valuation vs. cost
     public static final int TRNX_ORD_LIM_MAX = 2024051;     // operations control
@@ -586,6 +587,7 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_TANK_CAR_CARDEX = 2024095;
     public static final int TRNX_DPS_ETY_ACI_PER = 2024096;
     public static final int TRNX_DPS_ACC_TAG = 2024097;
+    public static final int TRNX_STK_VAL_UPD = 2024098;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;

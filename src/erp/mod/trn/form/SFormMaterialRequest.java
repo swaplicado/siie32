@@ -142,13 +142,13 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private int mnItemRefPickerSeccSelectedEty;
     
     /**
-     * Creates new form SFormItemCost
+     * Creates new form SFormMaterialRequest
      * @param client
      * @param title
-     * @param type
+     * @param subType
      */
-    public SFormMaterialRequest(SGuiClient client, String title, int type) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, title);
+    public SFormMaterialRequest(SGuiClient client, String title, int subType) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subType, title);
         initComponents();
         initComponentsCustom();
     }
@@ -2170,7 +2170,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     }
     
     private void actionEditEty() {
-        if (!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getHasLinks()) {
+        if (!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getHasLinks() ||
+                getFormSubtype() == SModConsts.TRNX_MAT_REQ_ACC) {
             if (isRegistryEditable) {
                 isEtyNew = false;
                 isCapturingData = true;

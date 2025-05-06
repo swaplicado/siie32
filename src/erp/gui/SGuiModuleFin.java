@@ -203,7 +203,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecBalAll;
     private javax.swing.JMenuItem jmiRecAnnBal;
     private javax.swing.JMenuItem jmiRecShortTermDocsPay;
+    private javax.swing.JMenuItem jmiRecShortTermDocsPayDet;
     private javax.swing.JMenuItem jmiRecShortTermDocsRec;
+    private javax.swing.JMenuItem jmiRecShortTermDocsRecDet;
     private javax.swing.JMenuItem jmiRecCashAccBalountCash;
     private javax.swing.JMenuItem jmiRecCashAccBalountBank;
     private javax.swing.JMenuItem jmiRecBizPartnerBalCus;
@@ -541,8 +543,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBal = new JMenuItem("Balanza de comprobación");
         jmiRecBalAll = new JMenuItem("Balanza de comprobación completa");
         jmiRecAnnBal = new JMenuItem("Balanza de comprobación anual");
-        jmiRecShortTermDocsPay = new JMenuItem("Documentos por pagar a corto plazo");
-        jmiRecShortTermDocsRec = new JMenuItem("Documentos por cobrar a corto plazo");
+        jmiRecShortTermDocsPay = new JMenuItem("Documentos por pagar");
+        jmiRecShortTermDocsPayDet = new JMenuItem("Documentos por pagar a detalle");
+        jmiRecShortTermDocsRec = new JMenuItem("Documentos por cobrar");
+        jmiRecShortTermDocsRecDet = new JMenuItem("Documentos por cobrar a detalle");
         jmiRecCashAccBalountCash = new JMenuItem("Saldos cajas");
         jmiRecCashAccBalountBank = new JMenuItem("Saldos cuentas bancarias");
         jmiRecBizPartnerBalCus = new JMenuItem("Saldos clientes");
@@ -572,7 +576,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec.add(jmiRecAnnBal);
         jmRec.addSeparator();
         jmRec.add(jmiRecShortTermDocsPay);
+        jmRec.add(jmiRecShortTermDocsPayDet);
         jmRec.add(jmiRecShortTermDocsRec);
+        jmRec.add(jmiRecShortTermDocsRecDet);
         jmRec.addSeparator();
         jmRec.add(jmiRecCashAccBalountCash);
         jmRec.add(jmiRecCashAccBalountBank);
@@ -937,7 +943,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBalAll.addActionListener(this);
         jmiRecAnnBal.addActionListener(this);
         jmiRecShortTermDocsPay.addActionListener(this);
+        jmiRecShortTermDocsPayDet.addActionListener(this);
         jmiRecShortTermDocsRec.addActionListener(this);
+        jmiRecShortTermDocsRecDet.addActionListener(this);
         jmiRecCashAccBalountCash.addActionListener(this);
         jmiRecCashAccBalountBank.addActionListener(this);
         jmiRecBizPartnerBalCus.addActionListener(this);
@@ -1182,7 +1190,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecBalAll.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecAnnBal.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecShortTermDocsPay.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecShortTermDocsPayDet.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecShortTermDocsRec.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecShortTermDocsRecDet.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecCashAccBalountCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash || hasRightRep);
         jmiRecCashAccBalountBank.setEnabled(hasRightBookkeeping || hasRightMoveAccCash || hasRightRep);
         jmiRecBizPartnerBalCus.setEnabled(hasRightBookkeeping || hasRightRep);
@@ -1838,10 +1848,23 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     oViewClass = erp.mfin.view.SPanelShortTermDocuments.class;
                     switch (auxType01) {
                         case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY:
-                            sViewTitle = "Docs x pagar corto plazo";
+                            sViewTitle = "Docs x pagar";
                             break;
                         case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC:
-                            sViewTitle = "Docs x cobrar corto plazo";
+                            sViewTitle = "Docs x cobrar";
+                            break;
+                        default:
+                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
+                    }
+                    break;
+                case SDataConstants.FINX_SHORT_TERM_DOCS_DET:
+                    oViewClass = erp.mfin.view.SViewShortTermDocumentsDetail.class;
+                    switch (auxType01) {
+                        case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY:
+                            sViewTitle = "Docs x pagar(detalle)";
+                            break;
+                        case SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC:
+                            sViewTitle = "Docs x cobrar(detalle)";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -2199,8 +2222,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRecShortTermDocsPay) {
                 showView(SDataConstants.FINX_SHORT_TERM_DOCS, SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY);
             }
+            else if (item == jmiRecShortTermDocsPayDet) {
+                showView(SDataConstants.FINX_SHORT_TERM_DOCS_DET, SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY);
+            }
             else if (item == jmiRecShortTermDocsRec) {
                 showView(SDataConstants.FINX_SHORT_TERM_DOCS, SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC);
+            }
+            else if (item == jmiRecShortTermDocsRecDet) {
+                showView(SDataConstants.FINX_SHORT_TERM_DOCS_DET, SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC);
             }
             else if (item == jmiRecDpsBizPartnerCus) {
                 showView(SDataConstants.FINX_REC_DPS, SDataConstantsSys.BPSS_CT_BP_CUS);

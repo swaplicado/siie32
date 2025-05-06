@@ -609,7 +609,7 @@ public class SPanelAccounting extends javax.swing.JPanel implements erp.lib.tabl
                 }
 
                 moDialogAccountingDetail.refreshAccountingDetail();
-                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStart, mtDateEnd, currencyKey, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStart, mtDateEnd, currencyKey, null, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
             }
         }
     }

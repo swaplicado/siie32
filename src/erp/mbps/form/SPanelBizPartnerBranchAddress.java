@@ -598,7 +598,17 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
 
     @Override
     public java.lang.Object getValue(int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object value = null;
+        
+        switch(type) {
+            case SDataConstants.LOCU_CTY:
+                value = moFieldFkCountryId.getKeyAsIntArray();
+                break;
+                
+            default:
+        }
+        
+        return value;
     }
 
     @Override

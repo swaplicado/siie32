@@ -185,6 +185,46 @@ public class SCfdXmlCatalogs {
     }
     
     /**
+     * Gets is taxpayer person of catalog entry for corresponding code from given catalog.
+     * @param catalog Desired catalog (SDataConstantsSys.TRNS_CFD_CAT_...).
+     * @param code Code of desired catalog-entry's taxpayer.
+     * @return isTaxpayerPerson of desired catalog entry. An false for invalid catalog or code.
+     */
+    public boolean getEntryIsTaxpayerPerson(final int catalog, final String code) {
+        boolean taxpayer = false;
+        
+        ArrayList<SCfdXmlCatalogEntry> entries = mhmCatalogs.get(catalog);
+        for (SCfdXmlCatalogEntry entry : entries) {
+            if (entry.getCode().compareTo(code) == 0) {
+                taxpayer = entry.isTaxpayerPer();
+                break;
+            }
+        }
+        
+        return taxpayer;
+    }
+    
+    /**
+     * Gets is taxpayer person of catalog entry for corresponding code from given catalog.
+     * @param catalog Desired catalog (SDataConstantsSys.TRNS_CFD_CAT_...).
+     * @param code Code of desired catalog-entry's taxpayer.
+     * @return isTaxpayerPerson of desired catalog entry. An false for invalid catalog or code.
+     */
+    public boolean getEntryIsTaxpayerOrganization(final int catalog, final String code) {
+        boolean taxpayer = false;
+        
+        ArrayList<SCfdXmlCatalogEntry> entries = mhmCatalogs.get(catalog);
+        for (SCfdXmlCatalogEntry entry : entries) {
+            if (entry.getCode().compareTo(code) == 0) {
+                taxpayer = entry.isTaxpayerOrg();
+                break;
+            }
+        }
+        
+        return taxpayer;
+    }
+    
+    /**
      * Composes code and name of catalog entry for corresponding code of given catalog entry.
      * @param catalog Desired catalog (SDataConstantsSys.TRNS_CFD_CAT_...).
      * @param code Code of desired catalog entry.

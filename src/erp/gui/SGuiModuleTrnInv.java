@@ -16,6 +16,7 @@ import erp.lib.table.STableTabInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
+import erp.mod.trn.form.SFormStockValuationUpdate;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogAdjustmentType;
 import erp.mtrn.data.SDataStockConfig;
@@ -43,6 +44,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import sa.gui.util.SUtilConsts;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -216,9 +218,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockRotationLot;
     private javax.swing.JMenuItem jmiStkStockValuation;
     private javax.swing.JMenuItem jmiStkStockValuationDetail;
+    private javax.swing.JMenuItem jmiStkStockValuationDetailConsumptions;
     private javax.swing.JMenuItem jmiStkStockItemHistoric;
     private javax.swing.JMenuItem jmiStkStockClosing;
     private javax.swing.JMenuItem jmiStkStockClosingCost;
+    private javax.swing.JMenuItem jmiStkStockValuationUpdate;
     
     private javax.swing.JMenu jmMenuRep;
     private javax.swing.JMenuItem jmiReportStock;
@@ -254,6 +258,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SFormStockConfigDns moFormStockConfigDns;
     private erp.mtrn.form.SDialogUtilStockClosing moDialogUtilStockClosing;
     private erp.mtrn.form.SDialogUtilStockClosingCost moDialogUtilStockClosingCost;
+    private SFormStockValuationUpdate moDialogValuationUpdate;
 
     public SGuiModuleTrnInv(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_INV);
@@ -790,9 +795,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
         jmiStkStockValuation = new JMenuItem("Valuación de consumos de materiales");
         jmiStkStockValuationDetail = new JMenuItem("Valuación de consumos de materiales detalle");
+        jmiStkStockValuationDetailConsumptions = new JMenuItem("Valuación de consumos de materiales (salidas)");
         jmiStkStockItemHistoric = new JMenuItem("Movimientos de inventarios históricos");
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         jmiStkStockClosingCost = new JMenuItem("Generación de inventarios iniciales por costo...");
+        jmiStkStockValuationUpdate = new JMenuItem("Actualización de valuación de consumos...");
         
         jmMenuStk.add(jmiStkStock);
         jmMenuStk.add(jmiStkStockLot);
@@ -811,11 +818,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockValuation);
         jmMenuStk.add(jmiStkStockValuationDetail);
+        jmMenuStk.add(jmiStkStockValuationDetailConsumptions);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockItemHistoric);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockClosing);
         jmMenuStk.add(jmiStkStockClosingCost);
+        jmMenuStk.addSeparator();
+        jmMenuStk.add(jmiStkStockValuationUpdate);
         
         jmiStkStock.addActionListener(this);
         jmiStkStockLot.addActionListener(this);
@@ -829,9 +839,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockRotationLot.addActionListener(this);
         jmiStkStockValuation.addActionListener(this);
         jmiStkStockValuationDetail.addActionListener(this);
+        jmiStkStockValuationDetailConsumptions.addActionListener(this);
         jmiStkStockItemHistoric.addActionListener(this);
         jmiStkStockClosing.addActionListener(this);
         jmiStkStockClosingCost.addActionListener(this);
+        jmiStkStockValuationUpdate.addActionListener(this);
 
         jmMenuRep = new JMenu("Reportes");
         jmiReportStock = new JMenuItem("Reporte de existencias...");
@@ -1054,6 +1066,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockRotationLot.setEnabled(hasRightStock);
         jmiStkStockValuation.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
         jmiStkStockValuationDetail.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
+        jmiStkStockValuationDetailConsumptions.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
+        jmiStkStockValuationUpdate.setEnabled(rightValMatConsLevel >= SUtilConsts.LEV_READ);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockClosingCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiStkStockItemHistoric.setEnabled(hasRightInAdj || hasRightOutAdj);
@@ -1075,6 +1089,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         moDialogDiogSaved = new SDialogDiogSaved(miClient);
         moDialogUtilStockClosing = new SDialogUtilStockClosing(miClient);
         moDialogUtilStockClosingCost = new SDialogUtilStockClosingCost(miClient);
+        moDialogValuationUpdate = new SFormStockValuationUpdate((SGuiClient) miClient, "Actualización de cantidades prorrateadas");
     }
 
     private void menuRepStock() {
@@ -2185,6 +2200,13 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStockValuationDetail) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_VAL_DET, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiStkStockValuationDetailConsumptions) {
+                miClient.getSession().showView(SModConsts.TRNX_STK_VAL_DET_CONS, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiStkStockValuationUpdate) {
+                moDialogValuationUpdate.resetForm();
+                moDialogValuationUpdate.setVisible(true);
             }
             else if (item == jmiStkStockItemHistoric) {
                 showView(SDataConstants.TRNX_STK_ITEM_HIST);

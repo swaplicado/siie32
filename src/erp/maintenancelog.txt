@@ -1,4 +1,49 @@
 ================================================================================
+SIIE 3.2 272.0/ 2025-05-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega porcentaje de prorrateo a valuación de consumos de inventario.
+2) Funcionalidad de actualización de cantidades en renglones de pólizas contables en base a valuaciones.
+3) Prorrateo de cantidades a 3 decimales en valuación de consumos.
+4) Vista de salidas/consumos de inventario para identificaciones de movimientos y costeo.
+
+================================================================================
+SIIE 3.2 270.15/ 2025-05-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se modifica la forma de requisiciones con el fin de poder modificar las partidas con vínculos sólo en la reclasificación contable.
+
+================================================================================
+SIIE 3.2 270.14/ 2025-05-06
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección a la determinación del tipo de movimiento contable en la generación de las diferencias cambiarias.
+
+================================================================================
+SIIE 3.2 270.13/ 2025-05-05
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se elimina el texto "a corto plazo" para en los menús de documentos por pagar y por cobrar.
+2) Creación de las vistas Documentos por pagar y por cobrar a detalle.
+3) Corrección en el dialogo de movimientos de cuentas contables a detalle para cuando existe una referencia contable.
+4) Habilitación de los campos "Forma de pago predeterminada", "Uso de CFDI predeterminado" y "Regimén fiscal" en la forma de captura de proveedores.
+5) Validaciones en el campo "Régimen fiscal" para personas físicas, morales o extranjeros.
+
+================================================================================
+SIIE 3.2 270.12/ 2025-05-02
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Prorrateo de cantidades de unidades físicas de valuaciones de consumos de almacén.
+2) Modificación de la generación del texto del concepto contable de los costeos individuales.
+
+================================================================================
+SIIE 3.2 270.11/ 2025-04-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de las ruta de los reportes internos del formato de impresión de facturas USA.
+2) Corrección de validación de suma total del porcentaje de prorrateo en los paquetes de centros de costo para la contabilización de nóminas.
+
+================================================================================
 SIIE 3.2 270.10/ 2025-04-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

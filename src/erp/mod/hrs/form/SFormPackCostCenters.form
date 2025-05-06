@@ -102,9 +102,9 @@
                 <Component class="javax.swing.JLabel" name="jlTotalProration">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="0"/>
-                    <Property name="text" type="java.lang.String" value="% prorrateo:"/>
+                    <Property name="text" type="java.lang.String" value="% prorrateo total:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
+                      <Dimension value="[115, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

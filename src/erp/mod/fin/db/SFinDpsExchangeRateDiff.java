@@ -435,7 +435,7 @@ public class SFinDpsExchangeRateDiff {
                 }
                 break;
                 
-            case SDataConstantsSys.BPSS_CT_BP_CO:
+            case SLibConstants.UNDEFINED:
                 if (pdDebit != 0) {
                     anSystemMoveTypeKey = SModSysConsts.FINS_TP_SYS_MOV_JOU_DBT;
                 }
@@ -719,10 +719,10 @@ public class SFinDpsExchangeRateDiff {
                 isDebit = true;
                 adDebitCreditBal = computeDebitCredit(resultSet.getDouble("_dbt"), resultSet.getDouble("_cdt"), isDebit);
 
-                maRecordEntries.add(createRecordEntry(0, false, sRecordConcept, adDebitCreditBal[0], adDebitCreditBal[1], sIdAccBal, ++nSortingPosition, 
+                maRecordEntries.add(createRecordEntry(SLibConstants.UNDEFINED, false, sRecordConcept, adDebitCreditBal[0], adDebitCreditBal[1], sIdAccBal, ++nSortingPosition, 
                         SDataConstantsSys.FINS_TP_SYS_MOV_NA, 0, 0, anDocumentKey, sReference, nCurrencyId, null));
                 
-                maRecordEntries.add(createRecordEntry(0, true, sRecordConcept, adDebitCreditBal[1], adDebitCreditBal[0], "", ++nSortingPosition, 
+                maRecordEntries.add(createRecordEntry(SLibConstants.UNDEFINED, true, sRecordConcept, adDebitCreditBal[1], adDebitCreditBal[0], "", ++nSortingPosition, 
                         null, 0, 0, anDocumentKey, "", mnLocalCurrency, null));
 
             }
@@ -731,8 +731,8 @@ public class SFinDpsExchangeRateDiff {
         miClient.showMsgBoxInformation("Se ajustaron " + (countSup + countCus + countPay + countRec) + " documentos:\n"
                 + "-" + countSup + " de proveedores.\n"
                 + "-" + countCus + " de clientes.\n"
-                + "-" + countPay  + " documentos por pagar a corto plazo.\n"
-                + "-" + countRec + " documentos por cobrar a corto plazo.");
+                + "-" + countPay  + " documentos por pagar.\n"
+                + "-" + countRec + " documentos por cobrar.");
     }
 
     /**
