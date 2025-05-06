@@ -51,6 +51,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -83,8 +84,12 @@ import sa.lib.srv.SSrvConsts;
  */
 public abstract class STrnUtilities {
     
+    /** Default decimal format for quantities in US DPS. */
+    public static final DecimalFormat DefaultQuantityFormat = new DecimalFormat("#,##0.#");
+
     /** Map of payroll composed texts of year and number. Content: key = payroll ID; value = composed text of year and number. */
     private static final HashMap<Integer, String> PayrollYearAndNumbersMap = new HashMap<>();
+    
     /** Map of payroll subject hints for mailing. Content: key = payroll ID; value = subject hint for mailing. */
     private static final HashMap<Integer, String> PayrollSubjectHintsMap = new HashMap<>();
 

@@ -74,6 +74,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
@@ -85,6 +86,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
@@ -167,6 +170,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private java.text.DecimalFormat moUsQuantityFormat;
 
     private boolean mbIsCategoryPur;
     private boolean mbIsCategorySal;
@@ -1481,6 +1485,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         return save.getSelectedFile();
     }
     
+    private String getUsQuantityFormat() throws Exception {
+        String format = "";
+        String jsonUsConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_US);
+        
+        if (!jsonUsConfig.isEmpty()) {
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonUsConfig);
+            format = jsonObject.get("qtyFormat").toString();
+        }
+        
+        return format;
+    }
+    
     private void actionPrint(final boolean contractKgAsTon) {
         if ((!contractKgAsTon && jbPrint.isEnabled()) || (contractKgAsTon && jbPrintContractKgAsTon.isEnabled())) {
             if (isRowSelected()) {
@@ -1637,6 +1654,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
                                     dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                
+                                if (moUsQuantityFormat == null) {
+                                    String format = getUsQuantityFormat();
+                                    moUsQuantityFormat = !format.isEmpty() ? new DecimalFormat(format): STrnUtilities.DefaultQuantityFormat;
+                                }
+                                
+                                map.put("oQuantityFormat", moUsQuantityFormat);
 
                                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_US, map);
                                 jasperViewer = new JasperViewer(jasperPrint, false);

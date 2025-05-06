@@ -128,8 +128,10 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_DPS_AUTH_USR_GRP = "TRN_DPS_AUTH_USR_GRP";
     public static final String CFG_PARAM_TRN_ITEM_TANK_CAR = "TRN_ITEM_TANK_CAR";
     public static final String CFG_PARAM_TRN_ITEM_ACIDITY = "TRN_ITEM_ACIDITY";
-    public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_TRN_TP_VEH_TANK_CAR = "TRN_TP_VEH_TANK_CAR";
+    public static final String CFG_PARAM_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
+    public static final String CFG_PARAM_TRN_DPS_US = "TRN_DPS_US";
+    public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
@@ -144,7 +146,6 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_CFG = "TRN_MAIL_REP_SCA_TIC_CFG";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_GRP = "TRN_MAIL_REP_SCA_TIC_GRP";
     public static final String CFG_PARAM_TRN_MAIL_REP_SCA_TIC_TO = "TRN_MAIL_REP_SCA_TIC_TO";
-    public static final String CFG_PARAM_TRN_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
     
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FULL_NAME = 11;
     public static final int CFG_PARAM_CFD_ORG_NAMES_ALL_FISCAL_NAME = 12;
