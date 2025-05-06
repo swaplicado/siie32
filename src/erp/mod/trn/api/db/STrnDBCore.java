@@ -644,6 +644,7 @@ public class STrnDBCore {
                                 + "    de.qty, " 
                                 + "    de.price_u, " 
                                 + "    de.price_u_cur, " 
+                                + "    i.b_inv, " 
                                 + "    u.unit, " 
                                 + "    u.symbol, " 
                                 + "    cur.cur, " 
@@ -656,6 +657,8 @@ public class STrnDBCore {
                                 + "        INNER JOIN " 
                                 + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON (d.fid_bp_r = bp.id_bp) " 
                                 + "        INNER JOIN " 
+                                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON (de.fid_item = i.id_item) " 
+                                + "        INNER JOIN " 
                                 + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON (de.fid_unit = u.id_unit) " 
                                 + "        INNER JOIN " 
                                 + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON (d.fid_cur = cur.id_cur) " 
@@ -664,6 +667,7 @@ public class STrnDBCore {
                                 + "        AND d.dt < '" + dateDoc + "' " 
                                 + "        AND NOT d.b_del " 
                                 + "        AND NOT de.b_del " 
+                                + "        AND i.b_inv " 
                                 + "        AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " " 
                                 + "        AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " " 
                                 + "        AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " " 
@@ -685,6 +689,7 @@ public class STrnDBCore {
                 oHistory.setQuantity(res.getDouble("de.qty"));
                 oHistory.setPriceUnitary(res.getDouble("de.price_u"));
                 oHistory.setPriceUnitaryCur(res.getDouble("de.price_u_cur"));
+                oHistory.setInventory(res.getBoolean("i.b_inv"));
                 oHistory.setUnitName(res.getString("u.unit"));
                 oHistory.setUnitSymbol(res.getString("u.symbol"));
                 oHistory.setCurrencyName(res.getString("cur.cur"));

@@ -23,6 +23,7 @@ public class SWebItemHistory {
     private double priceUnitaryCur;
     private double currentPriceUnitary;
     private double currentPriceUnitaryCur;
+    private boolean inventory;
     private String unitName;
     private String unitSymbol;
     private String currencyName;
@@ -115,6 +116,14 @@ public class SWebItemHistory {
 
     public void setCurrentPriceUnitaryCur(double currentPriceUnitaryCur) {
         this.currentPriceUnitaryCur = currentPriceUnitaryCur;
+    }
+
+    public boolean isInventory() {
+        return inventory;
+    }
+
+    public void setInventory(boolean inventory) {
+        this.inventory = inventory;
     }
 
     public String getUnitName() {
