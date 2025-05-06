@@ -48,6 +48,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     protected java.lang.String msCfdiPaymentWay;
     protected java.lang.String msCfdiCfdiUsage;
     protected java.lang.String msTaxRegime;
+    protected int mnLeadTime;
     protected boolean mbIsCreditByUser;
     protected boolean mbIsGuaranteeInProcess;
     protected boolean mbIsInsuranceInProcess;
@@ -109,6 +110,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public void setCfdiPaymentWay(java.lang.String s) { msCfdiPaymentWay = s; }
     public void setCfdiCfdiUsage(java.lang.String s) { msCfdiCfdiUsage = s; }
     public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
+    public void setLeadTime(int n) { mnLeadTime = n; }
     public void setIsCreditByUser(boolean b) { mbIsCreditByUser = b; }
     public void setIsGuaranteeInProcess(boolean b) { mbIsGuaranteeInProcess = b; }
     public void setIsInsuranceInProcess(boolean b) { mbIsInsuranceInProcess = b; }
@@ -147,6 +149,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
     public java.lang.String getCfdiPaymentWay() { return msCfdiPaymentWay; }
     public java.lang.String getCfdiCfdiUsage() { return msCfdiCfdiUsage; }
     public java.lang.String getTaxRegime() { return msTaxRegime; }
+    public int getLeadTime() { return mnLeadTime; }
     public boolean getIsCreditByUser() { return mbIsCreditByUser; }
     public boolean getIsGuaranteeInProcess() { return mbIsGuaranteeInProcess; }
     public boolean getIsInsuranceInProcess() { return mbIsInsuranceInProcess; }
@@ -230,6 +233,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
         msCfdiPaymentWay = "";
         msCfdiCfdiUsage = "";
         msTaxRegime = "";
+        mnLeadTime = 0;
         mbIsCreditByUser = false;
         mbIsGuaranteeInProcess = false;
         mbIsInsuranceInProcess = false;
@@ -314,6 +318,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                 msCfdiPaymentWay = resultSet.getString("bp_ct.cfdi_pay_way");
                 msCfdiCfdiUsage = resultSet.getString("bp_ct.cfdi_cfd_use");
                 msTaxRegime = resultSet.getString("bp_ct.tax_regime");
+                mnLeadTime = resultSet.getInt("lead_time");
                 mbIsCreditByUser = resultSet.getBoolean("bp_ct.b_cred_usr");
                 mbIsGuaranteeInProcess = resultSet.getBoolean("bp_ct.b_garnt_prc");
                 mbIsInsuranceInProcess = resultSet.getBoolean("bp_ct.b_insur_prc");
@@ -393,7 +398,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkBizPartnerId);
             callableStatement.setInt(nParam++, mnPkBizPartnerCategoryId);
             callableStatement.setString(nParam++, msKey);
@@ -412,6 +417,7 @@ public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implemen
             callableStatement.setString(nParam++, msCfdiPaymentWay);
             callableStatement.setString(nParam++, msCfdiCfdiUsage);
             callableStatement.setString(nParam++, msTaxRegime);
+            callableStatement.setInt(nParam++, mnLeadTime);
             callableStatement.setBoolean(nParam++, mbIsCreditByUser);
             callableStatement.setBoolean(nParam++, mbIsGuaranteeInProcess);
             callableStatement.setBoolean(nParam++, mbIsInsuranceInProcess);
