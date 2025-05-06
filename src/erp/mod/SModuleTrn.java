@@ -70,6 +70,7 @@ import erp.mod.trn.form.SFormMaterialRequestCostCenter;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.form.SFormScaleTicket;
 import erp.mod.trn.form.SFormStockValuation;
+import erp.mod.trn.form.SFormStockValuationUpdate;
 import erp.mod.trn.form.SFormSupplierFileProcess;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewConfEmployeeVsEntity;
@@ -124,6 +125,7 @@ import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
 import erp.mod.trn.view.SViewScaleTicket;
 import erp.mod.trn.view.SViewStockValuation;
+import erp.mod.trn.view.SViewStockValuationConsumptions;
 import erp.mod.trn.view.SViewStockValuationDetail;
 import erp.mod.trn.view.SViewValCost;
 import erp.mod.trn.view.SViewWarehouseConsumptionDetail;
@@ -190,6 +192,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
     private SFormMaterialConsumptionEntityBudget moFormMaterialConsumptionEntityBudget;
     private SFormStockValuation moFormStockValuation;
+    private SFormStockValuationUpdate moFormStockValuationUpdate;
     private SFormScaleTicket moFormScaleTicket;
     private SFormSupplierFileProcess moFormSupplierFileProcess;
     
@@ -674,6 +677,10 @@ public class SModuleTrn extends SGuiModule {
                 title = "Valuación consumos materiales (detalle)";
                 view = new SViewStockValuationDetail(miClient, title);
                 break;
+            case SModConsts.TRNX_STK_VAL_DET_CONS:
+                title = "Valuación consumos materiales (salidas)";
+                view = new SViewStockValuationConsumptions(miClient, title);
+                break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
                     case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar (detalle)";
@@ -1092,6 +1099,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_STK_VAL:
                 if (moFormStockValuation == null) moFormStockValuation = new SFormStockValuation(miClient, "Valuación de inventario");
                 form = moFormStockValuation;
+                break;
+            case SModConsts.TRNX_STK_VAL_UPD:
+                if (moFormStockValuationUpdate == null) moFormStockValuationUpdate = new SFormStockValuationUpdate(miClient, "Valuación de inventario");
+                form = moFormStockValuationUpdate;
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");

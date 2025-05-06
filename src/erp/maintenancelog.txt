@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 272.0/ 2025-05-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega porcentaje de prorrateo a valuación de consumos de inventario.
+2) Funcionalidad de actualización de cantidades en renglones de pólizas contables en base a valuaciones.
+3) Prorrateo de cantidades a 3 decimales en valuación de consumos.
+4) Vista de salidas/consumos de inventario para identificaciones de movimientos y costeo.
+
+================================================================================
 SIIE 3.2 270.15/ 2025-05-06
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

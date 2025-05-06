@@ -209,13 +209,13 @@ public class SStockValuationRecordUtils {
                     }
 
                     double partialAmount = SLibUtils.roundAmount(config.getPercentage() * oConsumption.getCost_r());
-                    double partialQuantity = SLibUtils.round(config.getPercentage() * oConsumption.getQuantityMovement(), 2);
+                    double partialQuantity = SLibUtils.round(config.getPercentage() * oConsumption.getQuantityMovement(), 3);
 
                     config.setAuxAmount(partialAmount);
                     config.setAuxQuantity(partialQuantity);
 
                     totalAmount = SLibUtils.roundAmount(totalAmount + partialAmount);
-                    totalQuantity = SLibUtils.round(totalQuantity + partialQuantity, 2);
+                    totalQuantity = SLibUtils.round(totalQuantity + partialQuantity, 3);
                 }
 
                 // Ajustar diferencia en el monto, si es necesario
@@ -225,9 +225,9 @@ public class SStockValuationRecordUtils {
                 }
 
                 // Ajustar diferencia en la cantidad, si es necesario
-                double quantityDifference = SLibUtils.round(oConsumption.getQuantityMovement() - totalQuantity, 2);
-                if (Math.abs(quantityDifference) >= 0.01d && mainConfig != null) {
-                    mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 2));
+                double quantityDifference = SLibUtils.round(oConsumption.getQuantityMovement() - totalQuantity, 3);
+                if (Math.abs(quantityDifference) >= 0.001d && mainConfig != null) {
+                    mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 3));
                 }
                 
                 // Se asigna el centro de costo del movimiento de almacén de salida:
@@ -331,13 +331,13 @@ public class SStockValuationRecordUtils {
                     }
 
                     double partialAmount = SLibUtils.roundAmount(config.getPercentage() * oConsumption.getCost_r());
-                    double partialQuantity = SLibUtils.round(config.getPercentage() * oConsumption.getQuantityMovement(), 2);
+                    double partialQuantity = SLibUtils.round(config.getPercentage() * oConsumption.getQuantityMovement(), 3);
 
                     config.setAuxAmount(partialAmount);
                     config.setAuxQuantity(partialQuantity);
 
                     totalAmount = SLibUtils.roundAmount(totalAmount + partialAmount);
-                    totalQuantity = SLibUtils.round(totalQuantity + partialQuantity, 2);
+                    totalQuantity = SLibUtils.round(totalQuantity + partialQuantity, 3);
                 }
 
                 // Ajustar diferencia en el monto, si es necesario
@@ -347,9 +347,9 @@ public class SStockValuationRecordUtils {
                 }
 
                 // Ajustar diferencia en la cantidad, si es necesario
-                double quantityDifference = SLibUtils.round(oConsumption.getQuantityMovement() - totalQuantity, 2);
-                if (Math.abs(quantityDifference) >= 0.01d && mainConfig != null) {
-                    mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 2));
+                double quantityDifference = SLibUtils.round(oConsumption.getQuantityMovement() - totalQuantity, 3);
+                if (Math.abs(quantityDifference) >= 0.001d && mainConfig != null) {
+                    mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 3));
                 }
                 for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
@@ -428,7 +428,7 @@ public class SStockValuationRecordUtils {
      * @param dCost The parameter `dCost` represents the cost of the item.
      * @param oUnit oUnit is an object of type SDataUnit, which represents a unit of measurement for an
      * item. It contains information such as the unit's symbol and conversion factors to other units.
-     * @param sConceptText The parameter `sConceptText` is a string that represents the concept or
+     * @param sConfigConceptText The parameter `sConceptText` is a string that represents the concept or
      * description of the record entry. It is used to provide additional information about the entry,
      * such as the purpose or reason for the transaction.
      * @param oAccount An object of type SDataAccount, which represents the accounting account
@@ -461,7 +461,7 @@ public class SStockValuationRecordUtils {
      */
     private static SDataRecordEntry createRecordEntry(SGuiSession session, 
             final int movType, final Object[] recordPk, final SDataItem oItem, final double dQuantity, final double dPercent, 
-            final double dQuantityPercent, final double dCost, final SDataUnit oUnit, final String sConceptText, final SDataAccount oAccount, 
+            final double dQuantityPercent, final double dCost, final SDataUnit oUnit, final String sConfigConceptText, final SDataAccount oAccount, 
             final int nIdCc, final String sIdCc, final int sortPosition, final int[] pkDiog, final int nItemRef, 
             final int[] fkSystemMove, final int[] fkSystemAccount, final int[] fkSystemMoveType, final int[] pkWhs, final int stkValuationId, 
             final int stkValuationMvtId, final SDataBookkeepingNumber bookkeepingNumber) throws Exception {
@@ -472,7 +472,7 @@ public class SStockValuationRecordUtils {
         oRecordEntry.setPkBookkeepingCenterId((int) recordPk[2]);
         oRecordEntry.setPkRecordTypeId((String) recordPk[3]);
         oRecordEntry.setPkNumberId((int) recordPk[4]);
-        oRecordEntry.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), dQuantity, dPercent, dQuantityPercent, oUnit.getSymbol(), sConceptText));
+        oRecordEntry.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), dQuantity, dPercent, oUnit.getSymbol(), sConfigConceptText));
         oRecordEntry.setReference("");
         oRecordEntry.setIsReferenceTax(false);
         if (movType == TYPE_INV) {
@@ -558,6 +558,7 @@ public class SStockValuationRecordUtils {
         
         SDbStockValuationAccount oRecEtyAcc = new SDbStockValuationAccount();
             
+        oRecEtyAcc.setProrationPercentage(dPercent);
         oRecEtyAcc.setFkFinRecYearId(oRecordEntry.getPkYearId());
         oRecEtyAcc.setFkFinRecPerId(oRecordEntry.getPkPeriodId());
         oRecEtyAcc.setFkFinRecBkcId(oRecordEntry.getPkBookkeepingCenterId());
@@ -584,11 +585,11 @@ public class SStockValuationRecordUtils {
      * @param qty The quantity of the item.
      * @param percent The percentage of the item.
      * @param qtyPerc The quantity percentage of the item.
-     * @param unit The symbol of the unit of measurement.
-     * @param text The text associated with the concept.
+     * @param unitSymbol The symbol of the unit of measurement.
+     * @param conceptConfigtext The text associated with the concept.
      * @return The method is returning a string that represents the concept.
      */
-    private static String getConcept(final String itemName, final double qty, final double percent, final double qtyPerc, final String unit, final String text) {
+    private static String getConcept(final String itemName, final double qty, final double percent, final String unitSymbol, final String conceptConfigtext) {
         StringBuilder concept = new StringBuilder();
 
         // Formato de la cantidad
@@ -597,7 +598,7 @@ public class SStockValuationRecordUtils {
             : SimpleQuanityFormatValue0D.format(qty));
 
         // Unidad
-        concept.append(" ").append(unit);
+        concept.append(" ").append(unitSymbol);
 
         // Porcentaje si aplica
         if (percent < 1d) {
@@ -608,8 +609,8 @@ public class SStockValuationRecordUtils {
         concept.append(" ").append(itemName);
 
         // Texto adicional si existe
-        if (!text.isEmpty()) {
-            concept.append(" / ").append(text);
+        if (!conceptConfigtext.isEmpty()) {
+            concept.append(" / ").append(conceptConfigtext);
         }
 
         return concept.toString();
