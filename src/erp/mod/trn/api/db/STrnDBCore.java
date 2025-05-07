@@ -714,20 +714,29 @@ public class STrnDBCore {
     }
 
     /**
-     * Obtiene la autorización de un documento.
+     * Obtiene la autorización de un documento o requisición de materiales.
      *
-     * @param idYear Año del documento.
-     * @param idDoc ID del documento.
+     * @param tableName Nombre de la tabla (e.g., SModConsts.TRN_DPS o SModConsts.TRN_MAT_REQ).
+     * @param idPrimaryKey1 Primera clave primaria (obligatoria para TRN_DPS, opcional para TRN_MAT_REQ).
+     * @param idPrimaryKey2 Segunda clave primaria (solo para TRN_DPS, ignorada para TRN_MAT_REQ).
      * @return Objeto {@code SWebAuthorization} con los datos de la autorización.
      */
-    public SWebAuthorization getDpsAuthorization(int idYear, int idDoc) {
+    public SWebAuthorization getAuthorization(final int tableName, final int idPrimaryKey1, final int idPrimaryKey2) {
         try {
+            Connection oCconn = this.getConnection();
+            
+            if (oCconn == null) {
+                return null;
+            }
+            
             SWebAuthorization oAuth = new SWebAuthorization();
 
-            Connection conn = this.getConnection();
-
-            if (conn == null) {
-                return null;
+            // Construcción dinámica de la consulta según la tabla y claves primarias:
+            String whereClause = "s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
+            if (tableName == SModConsts.TRN_DPS) {
+                whereClause += "AND s.res_pk_n1_n = " + idPrimaryKey1 + " AND s.res_pk_n2_n = " + idPrimaryKey2 + " ";
+            } else if (tableName == SModConsts.TRN_MAT_REQ) {
+                whereClause += "AND s.res_pk_n1_n = " + idPrimaryKey1 + " ";
             }
 
             String query = "SELECT  "
@@ -749,13 +758,10 @@ public class STrnDBCore {
                     + "        INNER JOIN "
                     + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u ON s.fk_usr_step = u.id_usr "
                     + "WHERE "
-                    + "        s.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-                    + //                    "        AND NOT s.b_del " +
-                    "        AND s.res_pk_n1_n = " + idYear + " "
-                    + "        AND s.res_pk_n2_n = " + idDoc + " "
+                    + whereClause
                     + "ORDER BY ts_usr_ins ASC, s.lev ASC, s.id_authorn_step ASC;";
 
-            Statement st = conn.createStatement();
+            Statement st = oCconn.createStatement();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebAuthStep> lSteps = new ArrayList<>();
@@ -780,11 +786,12 @@ public class STrnDBCore {
             }
             oAuth.setlSteps(lSteps);
 
+            // Consulta para obtener el estado de autorización:
             String queryStatus = "SELECT "
                     + "CFG_GET_ST_AUTHORN(2, "
-                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "', "
-                    + "" + idYear + ", "
-                    + "" + idDoc + ", "
+                    + "'" + SModConsts.TablesMap.get(tableName) + "', "
+                    + idPrimaryKey1 + ", "
+                    + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
                     + "NULL, NULL, NULL) AS auth_st, "
                     + "tb.name AS auth_st_name, "
                     + "(SELECT "
@@ -792,19 +799,21 @@ public class STrnDBCore {
                     + "        FROM "
                     + " " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
                     + "        WHERE "
-                    + "            NOT b_del AND res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-                    + "                AND res_pk_n1_n = " + idYear + " "
-                    + "                AND res_pk_n2_n = " + idDoc + " ORDER BY fk_usr_upd DESC LIMIT 1) AS last_action_at "
+                    + "            NOT b_del AND res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "                AND res_pk_n1_n = " + idPrimaryKey1 + " "
+                    + (tableName == SModConsts.TRN_DPS ? "AND res_pk_n2_n = " + idPrimaryKey2 + " " : "")
+                    + "ORDER BY fk_usr_upd DESC LIMIT 1) AS last_action_at "
                     + "FROM "
                     + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS tb "
                     + "WHERE "
                     + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(2, "
-                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "', "
-                    + "" + idYear + ", "
-                    + "" + idDoc + ", "
+                    + "'" + SModConsts.TablesMap.get(tableName) + "', "
+                    + idPrimaryKey1 + ", "
+                    + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
                     + "NULL, NULL, NULL);";
-            Statement stStatus = conn.createStatement();
-            System.out.println(queryStatus);
+
+            Statement stStatus = oCconn.createStatement();
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryStatus);
             ResultSet resStatus = stStatus.executeQuery(queryStatus);
             if (resStatus.next()) {
                 oAuth.setIdAuthStatus(resStatus.getInt("auth_st"));
@@ -812,15 +821,16 @@ public class STrnDBCore {
                 oAuth.setLastActionAt(resStatus.getString("last_action_at"));
             }
 
+            // Consulta para obtener los usuarios en turno:
             String queryUsersInTurn = "SELECT  "
                     + "    steps1.fk_usr_step "
                     + "FROM "
                     + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
                     + "WHERE "
                     + "    NOT steps1.b_del "
-                    + "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-                    + "        AND steps1.res_pk_n1_n = " + idYear + " "
-                    + "        AND steps1.res_pk_n2_n = " + idDoc + " "
+                    + "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "        AND steps1.res_pk_n1_n = " + idPrimaryKey1 + " "
+                    + (tableName == SModConsts.TRN_DPS ? "AND steps1.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "        AND NOT steps1.b_authorn "
                     + "        AND NOT steps1.b_reject "
                     + "        AND steps1.lev = (SELECT  "
@@ -829,15 +839,15 @@ public class STrnDBCore {
                     + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
                     + "        WHERE "
                     + "            NOT step2.b_del "
-                    + "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
-                    + "                AND step2.res_pk_n1_n = " + idYear + " "
-                    + "                AND step2.res_pk_n2_n = " + idDoc + " "
+                    + "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "                AND step2.res_pk_n1_n = " + idPrimaryKey1 + " "
+                    + (tableName == SModConsts.TRN_DPS ? "AND step2.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "                AND NOT step2.b_authorn "
                     + "                AND NOT step2.b_reject "
                     + "        ORDER BY step2.lev ASC "
                     + "        LIMIT 1);";
 
-            Statement stUsersInTurn = conn.createStatement();
+            Statement stUsersInTurn = oCconn.createStatement();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryUsersInTurn);
             ArrayList<Integer> lUsersInTurn = new ArrayList<>();
             ResultSet resUsersInTurn = stUsersInTurn.executeQuery(queryUsersInTurn);
@@ -853,5 +863,4 @@ public class STrnDBCore {
 
         return null;
     }
-
 }
