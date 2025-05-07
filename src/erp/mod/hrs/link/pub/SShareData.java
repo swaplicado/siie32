@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.SModConsts;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
@@ -37,7 +38,10 @@ import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
+import erp.mod.trn.api.data.SWebMaterialRequest;
+import erp.mod.trn.api.data.SWebMaterialRequestEty;
 import erp.mod.trn.api.db.STrnDBDocuments;
+import erp.mod.trn.api.db.STrnDBMaterialRequest;
 
 /**
  *
@@ -330,9 +334,35 @@ public class SShareData {
         /**
          * Autorización
          */
-        SWebAuthorization oAuthorization = oTrnCore.getDpsAuthorization(idYear, idDoc);
+        SWebAuthorization oAuthorization = oTrnCore.getAuthorization(SModConsts.TRN_DPS, idYear, idDoc);
         oWebDocument.setoWebAuthorization(oAuthorization);
         
         return oWebDocument;
+    }
+    
+    public ArrayList<SWebMaterialRequest> getMaterialRequestList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter) {
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest();
+        ArrayList<SWebMaterialRequest> lMRs = oMatReqCore.getMatReqs(startDate, endDate, idUser, idSessionUser, statusFilter);
+
+        return lMRs;
+    }
+
+    public SWebMaterialRequest getMaterialRequestByPk(Integer idMaterialRequest) {
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest();
+        STrnDBCore oTrnCore = new STrnDBCore();
+        /**
+         * Se obtiene el DPS
+         */
+        SWebMaterialRequest oMatReq = oMatReqCore.getMatReqById(idMaterialRequest);
+        oMatReq.getlEtys().clear();
+        oMatReq.getlEtys().addAll(oMatReqCore.loadMaterialRequestEtys(oMatReq.getIdMaterialRequest()));
+
+        /**
+         * Autorización
+         */
+        SWebAuthorization oAuthorization = oTrnCore.getAuthorization(SModConsts.TRN_MAT_REQ, oMatReq.getIdMaterialRequest(), 0);
+        oMatReq.setoWebAuthorization(oAuthorization);
+
+        return oMatReq;
     }
 }
