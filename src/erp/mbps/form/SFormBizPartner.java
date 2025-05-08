@@ -1110,7 +1110,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel47.add(jcbCfdiPaymentWay);
 
         jbEditCfdiPaymentWay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEditCfdiPaymentWay.setToolTipText("Modificar idioma");
+        jbEditCfdiPaymentWay.setToolTipText("Modificar forma de pago predeterminada");
         jbEditCfdiPaymentWay.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEditCfdiPaymentWay.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel47.add(jbEditCfdiPaymentWay);
@@ -1127,7 +1127,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jPanel53.add(jcbCfdiCfdiUsage);
 
         jbEditCfdiCfdiUsage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEditCfdiCfdiUsage.setToolTipText("Modificar idioma");
+        jbEditCfdiCfdiUsage.setToolTipText("Modificar uso de CFDI predeterminado");
         jbEditCfdiCfdiUsage.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEditCfdiCfdiUsage.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel53.add(jbEditCfdiCfdiUsage);
@@ -3358,7 +3358,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                         validation.setComponent(jcbCfdiCfdiUsage);
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiCfdiUsage.getText() + "'");
                     }
-                    else if (!((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros) || 
+                    else if (!((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros) && 
                             !((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalSinObligacionesFiscales)) {
                         validation.setComponent(jcbTaxRegime);
                         validation.setMessage("El valor para el campo '" + jlTaxRegime.getText() + "' debe ser " +
