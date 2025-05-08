@@ -119,7 +119,7 @@ import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.data.SDataCtr;
-import erp.mtrn.data.SItemConfigurationDps;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
@@ -1111,12 +1111,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             SLibUtils.printException(this, e);
         }
         
-        SItemConfigurationDps confItemAcidityPercentage;
+        SConfigurationItemDps confItemAcidityPercentage;
         boolean hasConfAciPer = false;
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
-            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
+            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SConfigurationItemDps.class);
             hasConfAciPer = confItemAcidityPercentage.getigen().size() > 0 || confItemAcidityPercentage.getifam().size() > 0;
         } 
         catch (Exception e) {

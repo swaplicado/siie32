@@ -39,7 +39,7 @@ import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
-import erp.mtrn.data.SItemConfigurationDps;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -294,8 +294,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
 
-        SItemConfigurationDps confItemAcidityPercentage;
-        SItemConfigurationDps confItemTankCar;
+        SConfigurationItemDps confItemAcidityPercentage;
+        SConfigurationItemDps confItemTankCar;
         
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
@@ -869,8 +869,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
             String sItemTankCar = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_TANK_CAR);
-            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
-            confItemTankCar = mapper.readValue(sItemTankCar, SItemConfigurationDps.class);
+            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SConfigurationItemDps.class);
+            confItemTankCar = mapper.readValue(sItemTankCar, SConfigurationItemDps.class);
             hasConfAciPer = confItemAcidityPercentage.getigen().size() > 0 || confItemAcidityPercentage.getifam().size() > 0;
             hasConfTankCar = confItemTankCar.getigen().size() > 0 || confItemTankCar.getifam().size() > 0;
         } 

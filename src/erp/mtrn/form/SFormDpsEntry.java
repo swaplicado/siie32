@@ -46,6 +46,7 @@ import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfdEntry;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
@@ -64,7 +65,6 @@ import erp.mtrn.data.SDataDpsEntryTax;
 import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.SDataScaleTicketDps;
 import erp.mtrn.data.SDataScaleTicketDpsEntry;
-import erp.mtrn.data.SItemConfigurationDps;
 import erp.mtrn.data.SRowTankCarsPicker;
 import erp.mtrn.data.SRowTicketsPicker;
 import erp.mtrn.data.STrnUtilities;
@@ -276,9 +276,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbPostEmissionEdition;
     private boolean mbPostEmissionEditionDone;
     
-    private SItemConfigurationDps confItemAcidityPercentage;
-    private SItemConfigurationDps confItemTankCar;
-    private String[] confTpVehIds;
+    private SConfigurationItemDps moConfItemAcidityPercentage;
+    private SConfigurationItemDps moConfItemTankCar;
+    private String[] moConfTpVehIds;
 
     /** Creates new form DFormDpsEntry
      * @param client GUI client.
@@ -3085,14 +3085,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     
         // Read item configurations params
         
-        confTpVehIds = null;
+        moConfTpVehIds = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
             String sItemTankCar = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_TANK_CAR);
-            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
-            confItemTankCar = mapper.readValue(sItemTankCar, SItemConfigurationDps.class);
-            confTpVehIds = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_TP_VEH_TANK_CAR).replaceAll(" ", "").split(",");
+            moConfItemAcidityPercentage = mapper.readValue(sItemAcidity, SConfigurationItemDps.class);
+            moConfItemTankCar = mapper.readValue(sItemTankCar, SConfigurationItemDps.class);
+            moConfTpVehIds = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_TP_VEH_TANK_CAR).replaceAll(" ", "").split(",");
         }
         catch (Exception e) {
             miClient.showMsgBoxWarning(e.getMessage());
@@ -3192,8 +3192,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private boolean isTankCarRequired() {
-        if (confTpVehIds != null) {
-            for (String tpVehId : confTpVehIds) {
+        if (moConfTpVehIds != null) {
+            for (String tpVehId : moConfTpVehIds) {
                 if (SLibUtils.parseInt(tpVehId) == mnTypeVeh) {
                     return true;
                 }
@@ -3857,10 +3857,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void enableExtraFields() {
-        boolean enableAcidity = moParamDps.isForSales() && (confItemAcidityPercentage.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
-                || confItemAcidityPercentage.getigen().contains(moItem.getFkItemGenericId()));
-        boolean enableTankCar = confItemTankCar.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
-                || confItemTankCar.getigen().contains(moItem.getFkItemGenericId());
+        boolean enableAcidity = moParamDps.isForSales() && (moConfItemAcidityPercentage.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
+                || moConfItemAcidityPercentage.getigen().contains(moItem.getFkItemGenericId()));
+        boolean enableTankCar = moConfItemTankCar.getifam().contains(moItem.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
+                || moConfItemTankCar.getigen().contains(moItem.getFkItemGenericId());
         
         jtfAcidityPercentage.setText("");
         moFieldTankCar.setFieldValue("");
