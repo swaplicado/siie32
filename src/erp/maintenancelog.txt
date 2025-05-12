@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 273.0/ 2025-05-08
+SIIE 3.2 272.4/ 2025-05-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para ordenes de compra.
