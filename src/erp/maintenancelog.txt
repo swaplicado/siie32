@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.8/ 2025-05-12
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización de las vistas de seguimiento de RM abiertas y cerradas.
+2) Restringir la captura de archivos de soporte de OC cuando los totales no coincidan con la categoría seleccionada.
+
+================================================================================
 SIIE 3.2 272.7/ 2025-05-12
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
