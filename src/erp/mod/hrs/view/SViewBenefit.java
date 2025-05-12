@@ -409,7 +409,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Nombre empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_emp_num", "Número empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_emp_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_emp_act", "Activo empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pay_tp_name", "Período pago", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_sal_day", "Salario diario $", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_emp_dt_ben", "Inicio prestaciones"));

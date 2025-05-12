@@ -199,11 +199,11 @@ public class SDialogCalculatedBonus extends SBeanFormDialog {
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 SGridColumnForm column = null;
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "Número empleado", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Percepción", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "T. Bono", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto", 100));

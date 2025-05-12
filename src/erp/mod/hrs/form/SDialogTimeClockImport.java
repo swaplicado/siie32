@@ -6,8 +6,8 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
-import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.db.SRowPayrollEmployee;
+import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
 import erp.mod.hrs.link.utils.SUtilsJSON;
 import java.awt.BorderLayout;
@@ -188,10 +188,10 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "Número empleado", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Faltas", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Hr. Extra", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Domingos", 50));

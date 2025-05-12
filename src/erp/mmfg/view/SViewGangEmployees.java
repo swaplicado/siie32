@@ -5,17 +5,14 @@
 
 package erp.mmfg.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataReadDescriptions;
+import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.lib.SLibConstants;
+import javax.swing.JButton;
 
 /**
  *
@@ -55,7 +52,7 @@ public class SViewGangEmployees extends erp.lib.table.STableTab implements java.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "g.num", "Folio", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "g.des", "Cuadrilla", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "t.turn", "Turno", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Empleado", 300);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Empleado", 250);
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }

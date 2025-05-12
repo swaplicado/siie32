@@ -424,8 +424,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
         i = 0;
         aoTableColumns = new STableColumnForm[10];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 150);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 250);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", 50);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total percepciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total deducciones $", STableConstants.WIDTH_VALUE);
@@ -444,8 +444,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
         i = 0;
         aoTableColumns = new STableColumnForm[11];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 150);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 250);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", 50);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total percepciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total deducciones $", STableConstants.WIDTH_VALUE);

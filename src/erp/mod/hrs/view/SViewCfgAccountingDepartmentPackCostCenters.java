@@ -80,7 +80,7 @@ public class SViewCfgAccountingDepartmentPackCostCenters extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " departamento"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " departamento"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ca.dt_sta", "Inicio vigencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "pc.name", SGridConsts.COL_TITLE_NAME + " paquete centros costo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "pc.name", SGridConsts.COL_TITLE_NAME + " paquete centros costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "pc.code", SGridConsts.COL_TITLE_CODE + " paquete centros costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "d.b_del", SGridConsts.COL_TITLE_IS_DEL + " departamento"));

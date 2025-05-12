@@ -338,7 +338,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
                 aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Número empleado", 50);
                 aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo empleado", STableConstants.WIDTH_BOOLEAN_2X);
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
                 msOrderKey = "bp.bp, bp.id_bp ";
                 

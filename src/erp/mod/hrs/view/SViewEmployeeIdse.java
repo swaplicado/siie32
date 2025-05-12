@@ -189,9 +189,9 @@ public class SViewEmployeeIdse extends SGridPaneView implements ActionListener{
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Param", "Registro patronal", 95));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE , "Clave", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE , "Número empleado", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "SSN", "NNS", 100));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S,  SDbConsts.FIELD_NAME, "Empleado", 250));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S,  SDbConsts.FIELD_NAME, "Nombre empleado", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "Salario", "SBC",50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "TpTrabajador", "Tipo de trabajador", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "TpSalario", "Tipo de salario", 50));
