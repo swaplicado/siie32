@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 272.6/ 2025-05-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Estandarización de vistas del módulo Recursos Humanos, en relación al texto y ancho de las columnas de nombre y número de empleado, y también departamento, siendo este último en relación al contexto de la vista.
+
+================================================================================
 SIIE 3.2 272.05/ 2025-05-12
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
