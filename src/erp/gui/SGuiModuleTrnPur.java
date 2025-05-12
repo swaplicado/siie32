@@ -39,7 +39,7 @@ import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
-import erp.mtrn.data.SItemConfigurationDps;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -74,7 +74,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -229,6 +229,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnLocality;
     private javax.swing.JMenuItem jmiRepTrnComparative;
     private javax.swing.JMenuItem jmiRepTrnDpsDetailBizPartner;
+    private javax.swing.JMenuItem jmiRepTaxRustic;
     private javax.swing.JMenuItem jmiRepTrnNetTotal;
     private javax.swing.JMenuItem jmiRepTrnNetAnalytic;
     private javax.swing.JMenuItem jmiRepTrnFileCsv;
@@ -294,8 +295,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
 
-        SItemConfigurationDps confItemAcidityPercentage;
-        SItemConfigurationDps confItemTankCar;
+        SConfigurationItemDps confItemAcidityPercentage;
+        SConfigurationItemDps confItemTankCar;
         
         jmCat = new JMenu("Catálogos");
         jmiCatDpsDncDocumentNumberSeries = new JMenuItem("Folios de docs. de compras");
@@ -586,6 +587,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnLocality = new JMenuItem("Reporte de compras netas por zona geográfica...");
         jmiRepTrnComparative = new JMenuItem("Reporte comparativo de compras netas...");
         jmiRepTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de compras por proveedor...");
+        jmiRepTaxRustic = new JMenuItem("Reporte predial rustico");
         jmiRepTrnNetTotal = new JMenuItem("Relación de compras netas por período...");
         jmiRepTrnNetAnalytic = new JMenuItem("Relación de compras, devoluciones y descuentos por período...");
         jmiRepTrnFileCsv = new JMenuItem("Archivo CSV de compras netas por período...");
@@ -661,6 +663,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnLocality);
         jmRep.add(jmiRepTrnComparative);
         jmRep.add(jmiRepTrnDpsDetailBizPartner);
+        jmRep.add(jmiRepTaxRustic);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnNetTotal);
         jmRep.add(jmiRepTrnNetAnalytic);
@@ -825,6 +828,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnLocality.addActionListener(this);
         jmiRepTrnComparative.addActionListener(this);
         jmiRepTrnDpsDetailBizPartner.addActionListener(this);
+        jmiRepTaxRustic.addActionListener(this);
         jmiRepTrnNetTotal.addActionListener(this);
         jmiRepTrnNetAnalytic.addActionListener(this);
         jmiRepTrnFileCsv.addActionListener(this);
@@ -869,8 +873,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
             String sItemTankCar = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_TANK_CAR);
-            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SItemConfigurationDps.class);
-            confItemTankCar = mapper.readValue(sItemTankCar, SItemConfigurationDps.class);
+            confItemAcidityPercentage = mapper.readValue(sItemAcidity, SConfigurationItemDps.class);
+            confItemTankCar = mapper.readValue(sItemTankCar, SConfigurationItemDps.class);
             hasConfAciPer = confItemAcidityPercentage.getigen().size() > 0 || confItemAcidityPercentage.getifam().size() > 0;
             hasConfTankCar = confItemTankCar.getigen().size() > 0 || confItemTankCar.getifam().size() > 0;
         } 
@@ -958,7 +962,17 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepAccAccTag.setEnabled(hasConfAccTag);
         
         jmiQryBizPartnerLastMove.setEnabled(false); // SQL query in associated view needs refactoring
+        //Saber si es necesaio activar el menú dependiendo la configuracion (Para APSA)
+        boolean isConfigZoneSinaloa = false;
         
+        try {
+            isConfigZoneSinaloa = SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_AF02)) == 1;
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+        
+        jmiRepTaxRustic.setEnabled(true);
         // GUI configuration:
         
         if (((erp.SClient) miClient).getCfgProcesor() != null) {
@@ -1528,6 +1542,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                                 sViewTitle += "Notas crédito (detalle)";
                             }
                             break;
+                       case SDataConstants.TRNX_DPS_TAX_RUS:
+                            oViewClass = erp.mtrn.view.SViewDpsTaxRustic.class;
+                            sViewTitle += "Impuesto predial rustico";
+                            break;
                        case SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT:
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemHistory.class;
                             
@@ -2076,6 +2094,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepSalesPurchasesDetailByBizPartner.formReset();
                 moDialogRepSalesPurchasesDetailByBizPartner.setParamIsSupplier(true);
                 moDialogRepSalesPurchasesDetailByBizPartner.setFormVisible(true);
+            }
+            else if (item == jmiRepTaxRustic) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstants.TRNX_DPS_TAX_RUS);
             }
             else if (item == jmiRepTrnNetTotal) {
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();

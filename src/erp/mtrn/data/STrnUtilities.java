@@ -6,12 +6,14 @@ package erp.mtrn.data;
 
 import erp.SClient;
 import erp.cfd.SCfdConsts;
+import erp.cfd.SCfdXmlCatalogs;
 import erp.cfd.SDialogCfdSending;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
+import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -2725,6 +2727,10 @@ public abstract class STrnUtilities {
         String[] addressOficial = null;
         String[] addressDelivery = null;
         String[] addressDeliveryCompany = null;
+        String payMet = "";
+        String taxRegimeIss = "";
+        String taxRegimeRec = "";
+        String cfdiUsage = "";
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
@@ -2733,6 +2739,7 @@ public abstract class STrnUtilities {
         SDataBizPartnerBranchAddress oAddress = null;
         SDataUser oUserBuyer = null;
         SDataUser oUserAuthorize = null;
+        SDataBizPartner bizPartner = null;
         SDataBizPartner bizPartnerUserBuyer = null;
         SDataBizPartner bizPartnerUserAuthorize = null;
         SDataEmployee employeeUserBuyer = null;
@@ -2740,7 +2747,10 @@ public abstract class STrnUtilities {
         boolean isPurchase = false;
         boolean isPending = false;
         boolean isReject = false;
+        boolean applyFiscalData;
         FileOutputStream outputStreamPdf = null;
+        
+        SCfdXmlCatalogs xmlCatalogs;
         
         try {
             cursor = client.getFrame().getCursor();
@@ -2776,7 +2786,7 @@ public abstract class STrnUtilities {
             addressDelivery = oAddress.obtainAddress(nFkRecAddressFormatTypeId_n,
                 SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
             addressDeliveryCompany = oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkEmiAddressFormatTypeId_n,
-                SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                SDataBizPartnerBranchAddress.ADDRESS_3ROWS, bincludeCountry);
             oUserBuyer = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() }, SLibConstants.EXEC_MODE_SILENT);
             oUserAuthorize = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() }, SLibConstants.EXEC_MODE_SILENT);
 
@@ -2798,6 +2808,16 @@ public abstract class STrnUtilities {
                 map.put("oUserAuthorize", employeeUserAuthorize);
             }
             
+            bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT); 
+            applyFiscalData = isPurchase && bizPartner.isDomestic(client) && dps.getDbmsDataDpsCfd() != null;
+            if (applyFiscalData) {
+                xmlCatalogs = ((SSessionCustom) client.getSession().getSessionCustom()).getCfdXmlCatalogs();
+                payMet = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, dps.getDbmsDataDpsCfd().getPaymentMethod());
+                taxRegimeIss = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
+                taxRegimeRec = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+                cfdiUsage = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, dps.getDbmsDataDpsCfd().getCfdiUsage());
+            }
+            
             map.put("nIdYear", dps.getPkYearId());
             map.put("nIdDoc", dps.getPkDocId());
             map.put("sTitle", SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(),
@@ -2810,8 +2830,6 @@ public abstract class STrnUtilities {
             map.put("sAddressDelivery1", isPurchase ? addressDeliveryCompany[0] : addressDelivery[0]);
             map.put("sAddressDelivery2", isPurchase ? addressDeliveryCompany[1] : addressDelivery[1]);
             map.put("sAddressDelivery3", isPurchase ? addressDeliveryCompany[2] : addressDelivery[2]);
-            map.put("sAddressDelivery4", isPurchase ? addressDeliveryCompany.length > 3 ? addressDeliveryCompany[3] : "" :
-                addressDelivery.length > 3 ? addressDelivery[3] : "");
             map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
             map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
             map.put("bIsPending", isPending);
@@ -2820,6 +2838,11 @@ public abstract class STrnUtilities {
             map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
             map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
             map.put("bAuthorn", hasAuthornSteps(client, dps.getPkYearId(), dps.getPkDocId()));
+            map.put("bApplyFiscalData", applyFiscalData);
+            map.put("sPayMet", payMet);
+            map.put("sTaxRegimeIss", taxRegimeIss);
+            map.put("sTaxRegimeRec", taxRegimeRec);
+            map.put("sCfdiUsage", cfdiUsage);
 
             jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             

@@ -311,7 +311,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             }
             else {
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
-                String message = SMaterialRequestUtils.openOrCloseToSupply(miClient.getSession(), key);
+                String message = SMaterialRequestUtils.openOrCloseProvision(miClient.getSession(), key);
                 if (! message.isEmpty()) {
                     miClient.showMsgBoxError(message);
                 }

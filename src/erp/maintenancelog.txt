@@ -1,4 +1,18 @@
 ================================================================================
+SIIE 3.2 272.05/ 2025-05-12
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Se agrega al menu la vista de impuesto predial rustico (APSA)
+2) Se agregan constantes a la vistya de impuesto predial rustico
+
+================================================================================
+SIIE 3.2 272.4/ 2025-05-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para ordenes de compra.
+2) Se agregan los "Datos fiscales" en la impresión de ordenes de compra.
+
+================================================================================
 SIIE 3.2 272.3/ 2025-05-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

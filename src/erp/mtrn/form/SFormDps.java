@@ -11,6 +11,7 @@ import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DCfdi40Consts;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
@@ -64,6 +65,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
+import erp.mtrn.data.SConfigurationDpsOrderFiscalData;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -159,6 +161,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_ADD = 4; // CFD Addenda
     private static final int TAB_CFD_XML = 5; // CFD XML file
     private static final int TAB_ACC = 6; // costomized accounting
+    private static final int TAB_FIS_DATA = 7; // fiscal data purchase orders
     private static final int ACTION_NEW = 1; // acción de captura: nuevo
     private static final int ACTION_EDIT = 2; // acción de captura: modificación
     private static final int DECS_PCT = 4; // 0.01% is 0.0001
@@ -293,6 +296,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldAccSubtotalPct;
     private erp.lib.form.SFormField moFieldAccSubtotalCy;
     private erp.lib.form.SFormField moFieldAccConcept;
+    private erp.lib.form.SFormField moFieldFisDataPaymentMethod;
+    private erp.lib.form.SFormField moFieldFisDataTaxRegimeIss;
+    private erp.lib.form.SFormField moFieldFisDataTaxRegimeRec;
+    private erp.lib.form.SFormField moFieldFisDataCfdiUsage;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     
     private erp.mtrn.data.SDataDps moParamDpsSource;
@@ -378,6 +385,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
     private erp.mitm.data.SDataItem moAccItem;
+    private SConfigurationDpsOrderFiscalData moConfDpsOrderFiscalData;
     //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private int mnAccCurrentAction;
     private double mdAccSubtotal;
@@ -926,6 +934,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfAccSubtotalSubtotalCur = new javax.swing.JTextField();
         jtfAccSubtotalSubtotalCy = new javax.swing.JTextField();
         jtfAccSubtotalSubtotalCyCur = new javax.swing.JTextField();
+        jpFiscalData = new javax.swing.JPanel();
+        jPanel133 = new javax.swing.JPanel();
+        jPanel134 = new javax.swing.JPanel();
+        jPanel145 = new javax.swing.JPanel();
+        jlFisDataPaymentMethod = new javax.swing.JLabel();
+        jcbFisDataPaymentMethod = new javax.swing.JComboBox<>();
+        jPanel137 = new javax.swing.JPanel();
+        jlFisDataTaxRegimeIssuing = new javax.swing.JLabel();
+        jcbFisDataTaxRegimeIssuing = new javax.swing.JComboBox<>();
+        jPanel138 = new javax.swing.JPanel();
+        jlFisDataTaxRegimeReceptor = new javax.swing.JLabel();
+        jcbFisDataTaxRegimeReceptor = new javax.swing.JComboBox<>();
+        jPanel140 = new javax.swing.JPanel();
+        jlFisDataCfdiUsage = new javax.swing.JLabel();
+        jcbFisDataCfdiUsage = new javax.swing.JComboBox<>();
         jpControls = new javax.swing.JPanel();
         jpControlsPk = new javax.swing.JPanel();
         jtfPkRo = new javax.swing.JTextField();
@@ -3300,6 +3323,67 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jTabbedPane.addTab("Contabilización", jpCustomAcc);
 
+        jpFiscalData.setLayout(new java.awt.BorderLayout());
+
+        jPanel133.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos fiscales requeridos en el CFDI del proveedor:"));
+        jPanel133.setLayout(new java.awt.BorderLayout(0, 2));
+
+        jPanel134.setLayout(new java.awt.GridLayout(8, 2, 0, 2));
+
+        jPanel145.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataPaymentMethod.setText("Método de pago: *");
+        jlFisDataPaymentMethod.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel145.add(jlFisDataPaymentMethod);
+
+        jcbFisDataPaymentMethod.setToolTipText("Uso CFDI del receptor");
+        jcbFisDataPaymentMethod.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel145.add(jcbFisDataPaymentMethod);
+
+        jPanel134.add(jPanel145);
+
+        jPanel137.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataTaxRegimeIssuing.setText("Régimen fiscal del emisor: *");
+        jlFisDataTaxRegimeIssuing.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel137.add(jlFisDataTaxRegimeIssuing);
+
+        jcbFisDataTaxRegimeIssuing.setToolTipText("Régimen fiscal del emisor");
+        jcbFisDataTaxRegimeIssuing.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel137.add(jcbFisDataTaxRegimeIssuing);
+
+        jPanel134.add(jPanel137);
+
+        jPanel138.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataTaxRegimeReceptor.setText("Régimen fiscal del receptor: *");
+        jlFisDataTaxRegimeReceptor.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel138.add(jlFisDataTaxRegimeReceptor);
+
+        jcbFisDataTaxRegimeReceptor.setToolTipText("Régimen fiscal del emisor");
+        jcbFisDataTaxRegimeReceptor.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel138.add(jcbFisDataTaxRegimeReceptor);
+
+        jPanel134.add(jPanel138);
+
+        jPanel140.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataCfdiUsage.setText("Uso del CFDI: *");
+        jlFisDataCfdiUsage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel140.add(jlFisDataCfdiUsage);
+
+        jcbFisDataCfdiUsage.setToolTipText("Uso CFDI del receptor");
+        jcbFisDataCfdiUsage.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel140.add(jcbFisDataCfdiUsage);
+
+        jPanel134.add(jPanel140);
+
+        jPanel133.add(jPanel134, java.awt.BorderLayout.NORTH);
+
+        jpFiscalData.add(jPanel133, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Datos fiscales", jpFiscalData);
+
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpDocument, java.awt.BorderLayout.CENTER);
@@ -3626,6 +3710,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldAccConcept.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
         moFieldAccConcept.setLengthMax(100);
         
+        // fiscal data purchase order
+        
+        moFieldFisDataPaymentMethod = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataPaymentMethod, jlFisDataPaymentMethod);
+        moFieldFisDataPaymentMethod.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataTaxRegimeIss = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataTaxRegimeIssuing, jlFisDataTaxRegimeIssuing);
+        moFieldFisDataTaxRegimeIss.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataTaxRegimeRec = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataTaxRegimeReceptor, jlFisDataTaxRegimeReceptor);
+        moFieldFisDataTaxRegimeRec.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataCfdiUsage = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataCfdiUsage, jlFisDataCfdiUsage);
+        moFieldFisDataCfdiUsage.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        
         mvFields = new Vector<>();
         mvFields.add(moFieldDate);
         mvFields.add(moFieldNumberSeries);
@@ -3733,6 +3828,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldAccSubtotalPct);
         mvFields.add(moFieldAccSubtotalCy);
         mvFields.add(moFieldAccConcept);
+        
+        mvFields.add(moFieldFisDataPaymentMethod);
+        mvFields.add(moFieldFisDataTaxRegimeIss);
+        mvFields.add(moFieldFisDataTaxRegimeRec);
+        mvFields.add(moFieldFisDataCfdiUsage);
         
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
@@ -4028,6 +4128,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.putActionMap(moPanelRecord, actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         
         mbIsDpsTimeReq = mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL;
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String sFiscalData = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD);
+            moConfDpsOrderFiscalData = mapper.readValue(sFiscalData, SConfigurationDpsOrderFiscalData.class);
+        }
+        catch (Exception e) {}
     }
     
     public void actionExportCsv() {
@@ -4092,6 +4199,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     mbFormSettingsOk = goAhead = false;
                                     actionCancel();
                                 }
+                                
+                                if (!isApplingFiscalData()) {
+                                    enableFiscalData(false);
+                                }
                             }
                         }
                     }
@@ -4107,6 +4218,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             actionCancel();
                         }
 
+                        if (!isApplingFiscalData()) {
+                            enableFiscalData(false);
+                        }
+                        
                         // import data from previous document:
                               
                         try {
@@ -4205,6 +4320,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      */
     private boolean isBizPartnerInt() {
         return moBizPartner != null && !moBizPartner.isDomestic(miClient);
+    }
+    
+    /**
+     * Checks if current business partner, has a generic fiscal Id.
+     * @return <code>true</code> if current business partner has a generic fiscal Id.
+     */
+    private boolean isBizPartnerGenericFiscalId() {
+        return moBizPartner != null && moBizPartner.isGenericFiscalId();
     }
     
     /**
@@ -4681,6 +4804,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         return json;
     }
+    
+    private void enableFiscalData(boolean enable) {
+        jTabbedPane.setEnabledAt(TAB_FIS_DATA, isApplingFiscalData());
+        jcbFisDataPaymentMethod.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataTaxRegimeIssuing.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataTaxRegimeReceptor.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataCfdiUsage.setEnabled(enable && isApplingFiscalData());
+    }
 
     /**
      * Checks if number series are defined by system.
@@ -4815,6 +4946,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         return isUpdateNeeded;
+    }
+    
+    private boolean isApplingFiscalData() {
+        return moConfDpsOrderFiscalData != null && moConfDpsOrderFiscalData.getapplyFiscalData() == 1 && mbIsDpsOrder && !mbIsSales && !isBizPartnerInt();
     }
     
     private void isBolAlreadySelected(int[] pk) {
@@ -4986,6 +5121,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 moFieldCfdiConfirmation.setFieldValue(""); // confirmation is unique, cannot be copied when document is being created
                 moFieldCfdiGblYear.setFieldValue(0); // clear global year, cannot be copied when document is being created
+            }
+            
+            if (isApplingFiscalData()) {
+                moFieldFisDataPaymentMethod.setFieldValue(moConfDpsOrderFiscalData.getMetodoPago());
+                moFieldFisDataTaxRegimeIss.setFieldValue(moBizPartnerCategory.getTaxRegime()); 
+                moFieldFisDataTaxRegimeRec.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal()); 
+                moFieldFisDataCfdiUsage.setFieldValue(moConfDpsOrderFiscalData.getUsoCFDI());
             }
         }
     }
@@ -6095,6 +6237,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(false);
             
             enableCfdFields(false);   // disable CFD form tabs & fields
+            enableFiscalData(false);
             
             enableCustomAccControls(false, false);
             enableCustomAccFields(false, true);
@@ -6224,6 +6367,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(mbIsSales);
             
             enableCfdFields(true);    // enable CFD form tabs & fields
+            enableFiscalData(true);
             
             enableCustomAccControls(true, false);
             enableCustomAccFields(true, true);
@@ -10655,9 +10799,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel130;
     private javax.swing.JPanel jPanel131;
     private javax.swing.JPanel jPanel132;
+    private javax.swing.JPanel jPanel133;
+    private javax.swing.JPanel jPanel134;
+    private javax.swing.JPanel jPanel137;
+    private javax.swing.JPanel jPanel138;
     private javax.swing.JPanel jPanel139;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel140;
     private javax.swing.JPanel jPanel142;
+    private javax.swing.JPanel jPanel145;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
@@ -10837,6 +10987,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegimeReceptor;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox<SFormComponentItem> jcbExportation;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataCfdiUsage;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataPaymentMethod;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataTaxRegimeIssuing;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataTaxRegimeReceptor;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
@@ -10965,6 +11119,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExportation;
     private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
+    private javax.swing.JLabel jlFisDataCfdiUsage;
+    private javax.swing.JLabel jlFisDataPaymentMethod;
+    private javax.swing.JLabel jlFisDataTaxRegimeIssuing;
+    private javax.swing.JLabel jlFisDataTaxRegimeReceptor;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkCarrierId_n;
     private javax.swing.JLabel jlFkCarrierTypeId;
@@ -11032,6 +11190,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jpEntriesControls;
     private javax.swing.JPanel jpEntriesControlsEast;
     private javax.swing.JPanel jpEntriesControlsWest;
+    private javax.swing.JPanel jpFiscalData;
     private javax.swing.JPanel jpHeader;
     private javax.swing.JPanel jpMarketing;
     private javax.swing.JPanel jpNotes;
@@ -11418,6 +11577,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         catalogs.populateComboBox(jcbCfdCceOperationType, SDataConstantsSys.TRNS_CFD_CAT_INT_OPN_TP, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdCceRequestKey, SDataConstantsSys.TRNS_CFD_CAT_INT_REQ_KEY, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbExportation, SDataConstantsSys.TRNS_CFD_CAT_EXP, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataPaymentMethod, SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataTaxRegimeIssuing, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataTaxRegimeReceptor, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
         
         moComboBoxGroupCfdCceGroupAddressee.clear();
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbCfdCceFkAddresseeBizPartner);
@@ -12382,7 +12545,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         // check if payment method should be taken from document:
-        if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
+        if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty() && mbIsSales) {
             moFieldCfdiPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
         }
         
@@ -12498,6 +12661,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateChangedFkPaymentTypeId(false);
         itemStateChangedFkCurrencyId(false); // do not calculate document's total
 
+        if (moDps.getDbmsDataDpsCfd() != null && isApplingFiscalData()) {
+            if (!moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
+                moFieldFisDataPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing().isEmpty()) {
+                moFieldFisDataTaxRegimeIss.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
+                moFieldFisDataTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
+                moFieldFisDataCfdiUsage.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiUsage());
+            }
+        }
+        
         if (isCfdEmissionRequired()) {
             setAddendaData();
             
@@ -12851,6 +13032,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setAuxAppPrepayCurCrossPayExchangeRate(0.0);
 
             boolean isCfdEmissionRequired = isCfdEmissionRequired(); // convenience variable
+            
+            if (isApplingFiscalData()) {
+                SDataDpsCfd dpsCfd = new SDataDpsCfd();
+                dpsCfd.setPaymentMethod(moFieldFisDataPaymentMethod.getFieldValue().toString());
+                dpsCfd.setTaxRegimeIssuing(moFieldFisDataTaxRegimeIss.getFieldValue().toString());
+                dpsCfd.setTaxRegimeReceptor(moFieldFisDataTaxRegimeRec.getFieldValue().toString());
+                dpsCfd.setCfdiUsage(moFieldFisDataCfdiUsage.getFieldValue().toString());
+                moDps.setDbmsDataDpsCfd(dpsCfd);
+            }
+            else {
+                moDps.setDbmsDataDpsCfd(null);
+            }
 
             if (isCfdEmissionRequired) {
                 SDataDpsCfd dpsCfd = new SDataDpsCfd();
