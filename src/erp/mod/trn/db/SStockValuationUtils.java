@@ -331,9 +331,13 @@ public class SStockValuationUtils {
                 }
 
                 if (qtyToConsume > 0d) {
-//                    throw new Exception("No hay suficiente stock para consumir.");
-                    System.out.println("WARNING: No hay suficiente stock para consumir. ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
-                            + "ID_DOC = " + (res.getInt("fid_diog_doc")) + ", ID_ETY = " + res.getInt("fid_diog_ety"));
+                    throw new Exception("WARNING: No hay suficiente stock para consumir. Fecha mov: " + (res.getString("d.dt")) + 
+                                            ", num: " + res.getString("d.num") + 
+                                            " / ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
+                                            + "ID_DOC = " + (res.getInt("fid_diog_doc")) + 
+                                            ", ID_ETY = " + res.getInt("fid_diog_ety") + ".");
+//                    System.out.println("WARNING: No hay suficiente stock para consumir. Fecha mov: " + (res.getString("d.dt")) + ", num: " + res.getString("d.num") + " / ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
+//                            + "ID_DOC = " + (res.getInt("fid_diog_doc")) + ", ID_ETY = " + res.getInt("fid_diog_ety"));
                 }
                 else {
                     lConsumptions.addAll(lTempConsumptions);
