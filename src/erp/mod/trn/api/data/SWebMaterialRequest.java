@@ -29,6 +29,7 @@ public class SWebMaterialRequest {
     private boolean authorized;
     private boolean returned;
     private String authText;
+    private int authStatusId;
     private int matReqUserId;
     private String matReqUser;
     private String notesAuth;
@@ -176,6 +177,14 @@ public class SWebMaterialRequest {
         this.authText = authText;
     }
 
+    public int getAuthStatusId() {
+        return authStatusId;
+    }
+
+    public void setAuthStatusId(int authStatusId) {
+        this.authStatusId = authStatusId;
+    }
+    
     public int getMatReqUserId() {
         return matReqUserId;
     }

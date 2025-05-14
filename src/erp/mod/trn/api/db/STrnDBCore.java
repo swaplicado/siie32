@@ -11,6 +11,7 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJSONUtils;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebAuthStep;
@@ -730,6 +731,7 @@ public class STrnDBCore {
             }
             
             SWebAuthorization oAuth = new SWebAuthorization();
+            int authorizationType = tableName == SModConsts.TRN_DPS ? SAuthorizationUtils.AUTH_TYPE_DPS : SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 
             // Construcción dinámica de la consulta según la tabla y claves primarias:
             String whereClause = "s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
@@ -788,7 +790,7 @@ public class STrnDBCore {
 
             // Consulta para obtener el estado de autorización:
             String queryStatus = "SELECT "
-                    + "CFG_GET_ST_AUTHORN(2, "
+                    + "CFG_GET_ST_AUTHORN(" + authorizationType + ", "
                     + "'" + SModConsts.TablesMap.get(tableName) + "', "
                     + idPrimaryKey1 + ", "
                     + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
@@ -806,7 +808,7 @@ public class STrnDBCore {
                     + "FROM "
                     + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS tb "
                     + "WHERE "
-                    + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(2, "
+                    + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(" + authorizationType + ", "
                     + "'" + SModConsts.TablesMap.get(tableName) + "', "
                     + idPrimaryKey1 + ", "
                     + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
