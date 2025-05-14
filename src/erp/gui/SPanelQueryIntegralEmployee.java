@@ -1048,10 +1048,10 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         int i = 0;
         STableColumnForm[] aoTableColumns = new STableColumnForm[17];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 250);
-        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 50);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 250);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Número empleado", 50);
         aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Activo empleado", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período pago", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Categoría", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo empleado", 100);

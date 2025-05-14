@@ -57,7 +57,7 @@ public class SViewAccountCashCash extends erp.lib.table.STableTab implements jav
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "t.tp_acc_cash", "Tipo de cuenta", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_acc", "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "a.acc", "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo empleado", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ac.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "ac.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);

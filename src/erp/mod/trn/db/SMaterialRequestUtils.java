@@ -1048,7 +1048,7 @@ public abstract class SMaterialRequestUtils {
         }
     }
     
-    public static String openOrCloseToSupply(SGuiSession session, int[] pkMatReq) {
+    public static String openOrCloseProvision(SGuiSession session, int[] pkMatReq) {
         try {
             JTextArea textArea = new JTextArea(5, 40); // Set the number of rows and columns
             JScrollPane scrollPane = new JScrollPane(textArea);
@@ -1063,7 +1063,7 @@ public abstract class SMaterialRequestUtils {
             
             SDbMaterialRequest req = new SDbMaterialRequest();
             req.read(session, pkMatReq);
-            req.setCloseProvision(! req.isCloseProvision());
+            req.setCloseProvision(!req.isCloseProvision());
             req.setAuxNotesChangeStatus_n(reason);
             req.save(session);
             

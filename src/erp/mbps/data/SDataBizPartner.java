@@ -233,6 +233,10 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         return isDomestic;
     }
     
+    public boolean isGenericFiscalId() {
+        return msFiscalId.equals(DCfdConsts.RFC_GEN_NAC) || msFiscalId.equals(DCfdConsts.RFC_GEN_INT);
+    }
+    
     public String getDiotTerceroClave() {
         return mnPkBizPartnerId + "-" + getDbmsCategorySettingsSup().msDiotOperation;
     }

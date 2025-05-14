@@ -390,7 +390,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             }
             else {
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
-                String message = SMaterialRequestUtils.openOrCloseToSupply(miClient.getSession(), key);
+                String message = SMaterialRequestUtils.openOrCloseProvision(miClient.getSession(), key);
                 if (! message.isEmpty()) {
                     miClient.showMsgBoxError(message);
                 }

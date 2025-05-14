@@ -47,13 +47,15 @@ public class SViewCfgAccountingEmployeeDeduction extends SGridPaneView {
                 + "ca.id_emp AS " + SDbConsts.FIELD_ID + "1, "
                 + "ca.id_ded AS " + SDbConsts.FIELD_ID + "2, "
                 + "e.num AS " + SDbConsts.FIELD_CODE + ", "
-                + "ebp.bp AS " + SDbConsts.FIELD_NAME + ", "
+                + "bp.bp AS " + SDbConsts.FIELD_NAME + ", "
                 + "e.b_act, "
                 + "e.b_del, "
                 + "c.code, "
                 + "c.name, "
                 + "c.b_del, "
-                + "bp.bp, "
+                + "tp.name, "
+                + "dep.name, "
+                + "bpc.bp, "
                 + "IF(ca.fk_tp_acc_rec = c.fk_tp_acc_rec, " + SGridConsts.ICON_OK + ", " + SGridConsts.ICON_WARN + ") AS _ta_ok, "
                 + "ca.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "ca.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -67,29 +69,35 @@ public class SViewCfgAccountingEmployeeDeduction extends SGridPaneView {
                 + "ca.id_ded = c.id_ded "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON "
                 + "ca.id_emp = e.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ebp ON "
-                + "e.id_emp = ebp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
-                + "ca.fk_bp = bp.id_bp "
+                + "e.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON "
+                + "e.fk_tp_pay = tp.id_tp_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
+                + "e.fk_dep = dep.id_dep "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bpc ON "
+                + "ca.fk_bp = bpc.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "ca.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "ca.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY ebp.bp, e.num, ca.id_emp, c.code, c.name, c.id_ded ";
+                + "ORDER BY bp.bp, e.num, ca.id_emp, c.code, c.name, c.id_ded ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Clave"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Nombre empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp.name", "Período pago empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dep.name", "Departamento empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "c.code", SGridConsts.COL_TITLE_CODE + " deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "c.name", SGridConsts.COL_TITLE_NAME + " deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ta_ok", "Coincidencia registro contable deducción"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", SGridConsts.COL_TITLE_NAME + " asociado negocios"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bpc.bp", SGridConsts.COL_TITLE_NAME + " asociado negocios"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "e.b_del", SGridConsts.COL_TITLE_IS_DEL + " empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "c.b_del", SGridConsts.COL_TITLE_IS_DEL + " deducción"));

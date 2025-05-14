@@ -1086,7 +1086,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewPosition(miClient, "Puestos");
                 break;
             case SModConsts.HRSU_DEP:
-                view = new SViewDepartment(miClient, "Deptos.");
+                view = new SViewDepartment(miClient, "Departamentos");
                 break;
             case SModConsts.HRSU_TP_EXP:
                 view = new SViewExpenseType(miClient, "Tipos gasto");
@@ -1098,7 +1098,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewPackExpensesItem(miClient, "Paqs. gastos ítems");
                 break;
             case SModConsts.HRS_DEP_CC:
-                view = new SViewDepartmentCostCenter(miClient, "Deptos. y centros costo");
+                view = new SViewDepartmentCostCenter(miClient, "Departamentos y centros costo");
                 break;
             case SModConsts.HRSX_EMP_CC:
                 view = new SViewEmployeesCc(miClient, "Empleados y centros costo");
@@ -1306,7 +1306,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewPackCostCentersCostCenter(miClient, "Paqs. centros costos y centros costos");
                 break;
             case SModConsts.HRS_CFG_ACC_DEP_PACK_CC:
-                view = new SViewCfgAccountingDepartmentPackCostCenters(miClient, "Deptos. y paqs. centros costos");
+                view = new SViewCfgAccountingDepartmentPackCostCenters(miClient, "Departamentos y paqs. centros costos");
                 break;
             case SModConsts.HRS_CFG_ACC_EMP_PACK_CC:
                 view = new SViewCfgAccountingEmployeePackCostCenters(miClient, "Empleados y paqs. centros costos");

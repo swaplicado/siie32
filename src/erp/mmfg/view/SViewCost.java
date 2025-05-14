@@ -5,19 +5,18 @@
 
 package erp.mmfg.view;
 
-import java.awt.Dimension;
-import java.util.Date;
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.lib.SLibConstants;
+import java.awt.Dimension;
+import java.util.Date;
+import javax.swing.JButton;
 
 /**
  *

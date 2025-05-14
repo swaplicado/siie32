@@ -1,4 +1,52 @@
 ================================================================================
+SIIE 3.2 272.8/ 2025-05-12
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización de las vistas de seguimiento de RM abiertas y cerradas.
+2) Restringir la captura de archivos de soporte de OC cuando los totales no coincidan con la categoría seleccionada.
+
+================================================================================
+SIIE 3.2 272.7/ 2025-05-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección de valuación de consumos de insumos de almacén
+2) Vista de seguimiento de consumos de valuación.
+
+================================================================================
+SIIE 3.2 272.6/ 2025-05-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Estandarización de vistas del módulo Recursos Humanos, en relación al texto y ancho de las columnas de nombre y número de empleado, y también departamento, siendo este último en relación al contexto de la vista.
+
+================================================================================
+SIIE 3.2 272.05/ 2025-05-12
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Se agrega al menu la vista de impuesto predial rustico (APSA)
+2) Se agregan constantes a la vistya de impuesto predial rustico
+
+================================================================================
+SIIE 3.2 272.4/ 2025-05-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para ordenes de compra.
+2) Se agregan los "Datos fiscales" en la impresión de ordenes de compra.
+
+================================================================================
+SIIE 3.2 272.3/ 2025-05-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la validación al elegir regimén fiscal en la forma de captura de proveedores al ser extranjeros.
+
+================================================================================
+SIIE 3.2 272.2/ 2025-05-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de parámetros de configuración para la impresión de facturas USA.
+2) Implementación de variación del formato de cantidad en la impresión de facturas USA de acuerdo a su configuración.
+3) Corrección al nombre de la constante del parámetro de configuración del impuesto predial rústico.
+
+================================================================================
 SIIE 3.2 272.1/ 2025-05-06
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -17,7 +65,7 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 270.15/ 2025-05-06
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Se modifica la forma de requisiciones con el fin de poder modificar las partidas con vínculos sólo en la reclasificación contable.
+1) Se modifica la forma de requisiciones de materiales con el fin de poder modificar todas las partidas en la reclasificación contable, incluso si las partidas tienen vínculos con otros registros.
 
 ================================================================================
 SIIE 3.2 270.14/ 2025-05-06

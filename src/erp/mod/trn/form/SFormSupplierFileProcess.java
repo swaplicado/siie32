@@ -1040,6 +1040,25 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private SGuiValidation validateFile() {
         SGuiValidation validation = moFields.validateFields();
         
+        if (validation.isValid()) {
+            for (SDbSupplierFile file : maSuppFiles) {
+                SDbSupplierFileDps fileDps = file.getSuppFileDps();
+                if (fileDps.getSupplierFileDpsType().equals(SDbSupplierFile.QUA)) {
+                    if (jbLowerQ.isEnabled()) {
+                        if (fileDps.getTotalLocal_r() < moDecSuppTotal.getValue()) {
+                            validation.setMessage("El total del archivo '" + jbLowerQ.getText() + "' no puede ser mayor al total del archivo '" + jbPickedQ.getText() + "'.");
+                            validation.setComponent(moDecSuppCurTotal);
+                        }
+                    }
+                    else if (jbHiggerQ.isEnabled()) {
+                        if (fileDps.getTotalLocal_r() >= moDecSuppTotal.getValue()) {
+                            validation.setMessage("El total del archivo '" + jbHiggerQ.getText() + "' no puede ser menor o igual al total del archivo '" + jbPickedQ.getText() + "'.");
+                            validation.setComponent(moDecSuppCurTotal);
+                        }
+                    }
+                }
+            }
+        }
         if (validation.isValid() && !mbIsExistingFile && (moFile == null || jtfFile.getText().isEmpty())) {
             validation.setMessage("No se ha indicado un archivo de soporte.");
             validation.setComponent(jtfFile);
@@ -1130,27 +1149,39 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     
     private void actionPickedQ() {
         if (jbPickedQ.isEnabled()) {
-            cleanSuppComponets();
-            mbIsExistingFile = false;
-            jbHiggerQ.setEnabled(false);
-            jbLowerQ.setEnabled(false);
-            jbTechnical.setEnabled(false);
-            enableSuppComponets(true);
-            moKeySuppBp.setEnabled(false);
-            moTextNoRegSuppBp.setEnabled(false);
-            moKeySuppCur.setEnabled(false);
-            moDecSuppCurTotal.setEnabled(false);
-            moKeySuppBp.setValue((int[]) moDocBizPartner.getPrimaryKey());
-            moKeySuppCur.setValue((int[]) moDocCur.getPrimaryKey());
-            moTextSuppNum.setValue(moTextDocReference.getValue());
-            for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
-                row.setVinculed(false);
+            boolean add = true;
+            for (SDbSupplierFile file : maSuppFiles) {
+                SDbSupplierFileDps fileDps = file.getSuppFileDps();
+                if (fileDps.getSupplierFileDpsType().equals(SDbSupplierFile.QUA)) {
+                    add = false;
+                }
             }
-            jbSelectAll.setEnabled(true);
-            jbDeselectAll.setEnabled(true);
-            populateGridDpsEntries();
-            
-            mbIsCapturingFile = true;
+            if (add) {
+                cleanSuppComponets();
+                mbIsExistingFile = false;
+                jbHiggerQ.setEnabled(false);
+                jbLowerQ.setEnabled(false);
+                jbTechnical.setEnabled(false);
+                enableSuppComponets(true);
+                moKeySuppBp.setEnabled(false);
+                moTextNoRegSuppBp.setEnabled(false);
+                moKeySuppCur.setEnabled(false);
+                moDecSuppCurTotal.setEnabled(false);
+                moKeySuppBp.setValue((int[]) moDocBizPartner.getPrimaryKey());
+                moKeySuppCur.setValue((int[]) moDocCur.getPrimaryKey());
+                moTextSuppNum.setValue(moTextDocReference.getValue());
+                for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
+                    row.setVinculed(false);
+                }
+                jbSelectAll.setEnabled(true);
+                jbDeselectAll.setEnabled(true);
+                populateGridDpsEntries();
+
+                mbIsCapturingFile = true;
+            }
+            else {
+                miClient.showMsgBoxInformation("No se puede agregar más de un archivo de soporte de proveedor.");
+            }
         }
     }
     

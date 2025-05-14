@@ -137,14 +137,16 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "p.dt_sta, "
                 + "p.dt_end, "
                 + "p.nts, "
+                + "e.b_act, "
+                + "dep.name, "
                 + "tpsc.code, "
                 + "tps.name, "
+                + "trs.name, "
                 + "pr.ear_r, "
                 + "pr.ded_r, "
                 + "pr.pay_r, "
                 + "pr.b_cfd_req, "
                 + "pr.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "trs.name, "
                 + "pr.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "pr.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "pr.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -173,6 +175,7 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON pr.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON pr.fk_dep = dep.id_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON pr.fk_tp_rec_sche = trs.id_tp_rec_sche "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON pr.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON pr.fk_usr_upd = uu.id_usr "
@@ -190,8 +193,10 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "tpsc.code", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Nombre empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dep.name", "Departamento recibo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.ear_r", "Percepciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.ded_r", "Deducciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pr.pay_r", "Total neto $"));

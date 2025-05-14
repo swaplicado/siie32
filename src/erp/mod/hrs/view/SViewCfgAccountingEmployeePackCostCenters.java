@@ -56,6 +56,8 @@ public class SViewCfgAccountingEmployeePackCostCenters extends SGridPaneView {
                 + "pc.code, "
                 + "pc.name, "
                 + "pc.b_del, "
+                + "tp.name, "
+                + "dep.name, "
                 + "ca.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "ca.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "ca.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -70,6 +72,10 @@ public class SViewCfgAccountingEmployeePackCostCenters extends SGridPaneView {
                 + "ca.id_emp = e.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
                 + "e.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON "
+                + "e.fk_tp_pay = tp.id_tp_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
+                + "e.fk_dep = dep.id_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "ca.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
@@ -82,12 +88,14 @@ public class SViewCfgAccountingEmployeePackCostCenters extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Clave"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Nombre empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "e.b_act", "Activo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp.name", "Período pago empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dep.name", "Departamento empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ca.dt_sta", "Inicio vigencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ca.dt_end_n", "Fin vigencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "pc.name", SGridConsts.COL_TITLE_NAME + " paquete centros costo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "pc.name", SGridConsts.COL_TITLE_NAME + " paquete centros costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "pc.code", SGridConsts.COL_TITLE_CODE + " paquete centros costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "e.b_del", SGridConsts.COL_TITLE_IS_DEL + " empleado"));

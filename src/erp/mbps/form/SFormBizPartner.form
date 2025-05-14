@@ -1529,7 +1529,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Modificar idioma"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Modificar forma de pago predeterminada"/>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[2, 0, 2, 0]"/>
                             </Property>
@@ -1570,7 +1570,7 @@
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
                             </Property>
-                            <Property name="toolTipText" type="java.lang.String" value="Modificar idioma"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Modificar uso de CFDI predeterminado"/>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[2, 0, 2, 0]"/>
                             </Property>
