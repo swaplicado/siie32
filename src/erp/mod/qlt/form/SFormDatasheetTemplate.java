@@ -42,10 +42,6 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
     protected SDbDatasheetTemplate moDatasheetTemplate;
     protected List<SDbDatasheetTemplateRow> mlDatasheetRows;
     protected SGridPaneForm moGridParameterRows;
-    protected int mnSegregationId;
-    protected int mnParamMaintUserType;
-    protected int mnItemDefaultId;
-    protected boolean mbAreSigned;
     protected SDbDatasheetTemplateRow moDatasheetRow;
     
     private static final int ACTION_NEW_ROW = 1;
@@ -86,6 +82,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         jPanel15 = new javax.swing.JPanel();
         jlTemplateEstandard = new javax.swing.JLabel();
         moTextTemplateEstandard = new sa.lib.gui.bean.SBeanFieldText();
+        moBooleanIsDomestic = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel3 = new javax.swing.JPanel();
         jpTemplateRow = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -167,6 +164,9 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
 
         moTextTemplateEstandard.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel15.add(moTextTemplateEstandard);
+
+        moBooleanIsDomestic.setText("Es nacional");
+        jPanel15.add(moBooleanIsDomestic);
 
         jPanel4.add(jPanel15);
 
@@ -331,6 +331,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
     private javax.swing.JPanel jpSupplyRows;
     private javax.swing.JPanel jpTemplateRow;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanDps;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanIsDomestic;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanMax;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanMin;
     private sa.lib.gui.bean.SBeanFieldBoolean moBooleanQltyCert;
@@ -407,6 +408,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         moTextMin.setValue("");
         moBooleanMax.setValue(false);
         moTextMax.setValue("");
+        moBooleanIsDomestic.setValue(true);
         
         enableOrDisableButtons(ACTION_SAVE_ROW);
     }
@@ -703,6 +705,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         moTextVersion.setValue(moDatasheetTemplate.getTemplateVersion());
         moTextTemplateName.setValue(moDatasheetTemplate.getTemplateName());
         moTextTemplateEstandard.setValue(moDatasheetTemplate.getTemplateStandard());
+        moBooleanIsDomestic.setValue(moDatasheetTemplate.getFkLogTypeDeliveryId_n() == 1);
         
         mlDatasheetRows = new ArrayList<>();
         for (SDbDatasheetTemplateRow oDataRow : moDatasheetTemplate.getDatasheetTemplateRows()) {
@@ -723,6 +726,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         moDatasheetTemplate.setTemplateVersion(moTextVersion.getValue());
         moDatasheetTemplate.setTemplateName(moTextTemplateName.getValue());
         moDatasheetTemplate.setTemplateStandard(moTextTemplateEstandard.getValue());
+        moDatasheetTemplate.setFkLogTypeDeliveryId_n(moBooleanIsDomestic.getValue() ? 1 : 2);
 
         List<SDbDatasheetTemplateRow> rows = new ArrayList<>();
         for (int i = 0; i < moGridParameterRows.getTable().getRowCount(); i++) {

@@ -2988,44 +2988,41 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     params.getParamsMap().put(SFormAnalysisDpsEty.DPS_ITEM, moItem.getPkItemId());
                     moFormParams = params;
                     
-                    if (jbRowNew.isEnabled()) {
-                        int row = 0;
-                        SGridRow gridRow = null;
-                        SDbRegistry registry = null;
+                    int row = 0;
+                    SGridRow gridRow = null;
+                    SDbRegistry registry = null;
+                    try {
+                        ((SFormAnalysisDpsEty) miForm).formReset();
+                        registry = miClient.getSession().getRegistry(mnGridType, moFormParams);
+                        registry.setFormAction(SGuiConsts.FORM_ACTION_NEW);
 
-                        try {
-                            ((SFormAnalysisDpsEty) miForm).formReset();
-                            registry = miClient.getSession().getRegistry(mnGridType, moFormParams);
-                            registry.setFormAction(SGuiConsts.FORM_ACTION_NEW);
+                        miForm.setRegistry(registry);
 
-                            miForm.setRegistry(registry);
-
-                            if (moFormParams != null) {
-                                for (Integer key : moFormParams.getParamsMap().keySet()) {
-                                    miForm.setValue(key, moFormParams.getParamsMap().get(key));
-                                }
-                                moFormParams = null;
+                        if (moFormParams != null) {
+                            for (Integer key : moFormParams.getParamsMap().keySet()) {
+                                miForm.setValue(key, moFormParams.getParamsMap().get(key));
                             }
+                            moFormParams = null;
+                        }
 
-                            miForm.setFormVisible(true);
+                        miForm.setFormVisible(true);
 
-                            if (miForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                                SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) miForm.getRegistry();
-                                SDataDpsEntryAnalysis oCopy = SQltUtils.newAnalysisEntryToOldAnalysisEntry(miClient.getSession().getStatement(), oRegistry);
-                                moModel.getGridRows().add(oCopy);
-                                moModel.renderGridRows();
+                        if (miForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) miForm.getRegistry();
+                            SDataDpsEntryAnalysis oCopy = SQltUtils.newAnalysisEntryToOldAnalysisEntry(miClient.getSession().getStatement(), oRegistry);
+                            moModel.getGridRows().add(oCopy);
+                            moModel.renderGridRows();
 
-                                row = moModel.getRowCount() - 1;
-                                setSelectedGridRow(row);
+                            row = moModel.getRowCount() - 1;
+                            setSelectedGridRow(row);
 
-                                if (miPaneFormOwner != null) {
-                                    miPaneFormOwner.notifyRowNew(mnGridType, mnGridSubtype, row, gridRow);
-                                }
+                            if (miPaneFormOwner != null) {
+                                miPaneFormOwner.notifyRowNew(mnGridType, mnGridSubtype, row, gridRow);
                             }
                         }
-                        catch (Exception e) {
-                            SLibUtils.showException(this, e);
-                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
                     }
                     
 //                    oForm.setVisible(true);
@@ -4291,10 +4288,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void renderQualityAnalysisConfiguration() {
         this.mlDpsEntryAnalysis = new ArrayList<>();
         
+        int idTemplate = 0;
+        int idLogTpDelivery = moParamBizPartner.isDomestic(miClient) ? 1 : 2;
         if (moDpsEntry.getIsRegistryNew()) {
             if (moItem != null) {
                 // Obtener configuraciones en base al ítem (versión más nueva)
-                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId());
+                idTemplate = SQltUtils.obtainDatasheetTemplateByItemLink(miClient.getSession().getStatement(), moItem.getPkItemId(), idLogTpDelivery);
+                
+                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId(), idTemplate);
             }
             else {
                 this.mlDpsEntryAnalysis = new ArrayList<>();
@@ -4306,7 +4307,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             // En caso de que no existan configuraciones, se obtienen en base al ítem, solo si se puede editar el registro
             if (this.mlDpsEntryAnalysis.isEmpty() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
-                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId());
+                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId(), idLogTpDelivery);
             }
         }
         
@@ -6813,9 +6814,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
              * Validación de parámetros de calidad para contratos de ventas
              */
             if (!validation.getIsError()) {
-                if (moParamDps.isDpsTypeContractSal()) {
-                    if (this.mlDpsEntryAnalysis.isEmpty()) {
-                        try {
+                try {
+                    boolean hasConfiguration1 = SQltUtils.mustBeConfigured(miClient.getSession().getStatement(), moItem.getPkItemId());
+                    if (moParamDps.isDpsTypeContractSal()) {
+                        if (this.mlDpsEntryAnalysis.isEmpty()) {
                             boolean hasConfiguration = SQltUtils.mustBeConfigured(miClient.getSession().getStatement(), moItem.getPkItemId());
 
                             if (hasConfiguration) {
@@ -6823,10 +6825,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                                 validation.setComponent(jpQuality);
                             }
                         }
-                        catch (SQLException ex) {
-                            Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
-                        }
                     }
+                }
+                catch (SQLException ex) {
+                    Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

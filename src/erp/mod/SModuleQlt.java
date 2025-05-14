@@ -18,6 +18,7 @@ import erp.mod.qlt.view.SViewAnalysis;
 import erp.mod.qlt.view.SViewDatasheetTemplate;
 import erp.mod.qlt.view.SViewDatasheetTemplateLink;
 import erp.mod.qlt.view.SViewQltLotApproved;
+import erp.mod.qlt.view.SViewQualityCoADpsEntry;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -126,6 +127,9 @@ public class SModuleQlt extends SGuiModule {
         switch (type) {
             case SModConsts.QLT_LOT_APR:
                 view = new SViewQltLotApproved(miClient, "Lotes aprobados");
+                break;
+            case SModConsts.QLTX_QLT_DPS_ETY:
+                view = new SViewQualityCoADpsEntry(miClient, "Facturas y certificados");
                 break;
             case SModConsts.QLT_ANALYSIS:
                 view = new SViewAnalysis(miClient, "Análisis de laboratorio");

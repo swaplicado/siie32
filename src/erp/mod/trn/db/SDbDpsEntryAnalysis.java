@@ -32,6 +32,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
     protected int mnFkDpsEntryId;
     protected int mnFkAnalysisId;
     protected int mnFkItemId;
+    protected int mnFkDatasheetTemplateId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -70,6 +71,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
     public void setFkDpsEntryId(int n) { mnFkDpsEntryId = n; }
     public void setFkAnalysisId(int n) { mnFkAnalysisId = n; }
     public void setFkItemId(int n) { mnFkItemId = n; }
+    public void setFkDatasheetTemplateId_n(int n) { mnFkDatasheetTemplateId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -101,6 +103,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
     public int getFkDpsEntryId() { return mnFkDpsEntryId; }
     public int getFkAnalysisId() { return mnFkAnalysisId; }
     public int getFkItemId() { return mnFkItemId; }
+    public int getFkDatasheetTemplateId_n() { return mnFkDatasheetTemplateId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -150,6 +153,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
         mnFkDpsEntryId = 0;
         mnFkAnalysisId = 0;
         mnFkItemId = 0;
+        mnFkDatasheetTemplateId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -222,6 +226,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
             mnFkDpsEntryId = resultSet.getInt("fid_dps_ety");
             mnFkAnalysisId = resultSet.getInt("fid_analysis");
             mnFkItemId = resultSet.getInt("fid_item");
+            mnFkDatasheetTemplateId_n = resultSet.getInt("fid_dtsht_tmplte_n");
             mnFkUserNewId = resultSet.getInt("fid_usr_new");
             mnFkUserEditId = resultSet.getInt("fid_usr_edit");
             mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -281,6 +286,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
                     mnFkDpsEntryId + ", " +
                     mnFkAnalysisId + ", " +
                     mnFkItemId + ", " +
+                    (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
                     mnFkUserNewId + ", " +
                     mnFkUserEditId + ", " +
                     mnFkUserDeleteId + ", " +
@@ -312,6 +318,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
                     // "fid_dps_ety_n = " + mnFkDpsEntryId_n + ", " +
                     "fid_analysis_id = " + mnFkAnalysisId + ", " +
                     "fid_item_id = " + mnFkItemId + ", " +
+                    "fid_dtsht_tmplte_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
                     "fid_usr_edit = " + mnFkUserEditId + ", " +
                     "fid_usr_del = " + mnFkUserDeleteId + ", " +
                     "ts_edit = " + "NOW()" + ", " +
@@ -349,6 +356,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
         registry.setFkDpsEntryId(this.getFkDpsEntryId());
         registry.setFkAnalysisId(this.getFkAnalysisId());
         registry.setFkItemId(this.getFkItemId());
+        registry.setFkDatasheetTemplateId_n(this.getFkDatasheetTemplateId_n());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
         registry.setFkUserDeleteId(this.getFkUserDeleteId());

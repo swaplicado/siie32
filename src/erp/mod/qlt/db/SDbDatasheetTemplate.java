@@ -33,6 +33,9 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
+    */
+    protected int mnFkLogTypeDeliveryId_n;
+    /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
@@ -50,12 +53,14 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
     public void setTemplateName(String s) { msTemplateName = s; }
     public void setTemplateStandard(String s) { msTemplateStandard = s; }
     public void setTemplateVersion(String s) { msTemplateVersion = s; }
+    public void setFkLogTypeDeliveryId_n(int n) { mnFkLogTypeDeliveryId_n = n; }
 
     public int getPkDatasheetTemplateId() { return mnPkDatasheetTemplateId; }
     public Date getDate() { return mtDate; }
     public String getTemplateName() { return msTemplateName; }
     public String getTemplateStandard() { return msTemplateStandard; }
     public String getTemplateVersion() { return msTemplateVersion; }
+    public int getFkLogTypeDeliveryId_n() { return mnFkLogTypeDeliveryId_n; }
 
     public List<SDbDatasheetTemplateRow> getDatasheetTemplateRows() { return lDatasheetTemplateRows; }
     
@@ -85,6 +90,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
         msTemplateVersion = "";
         mbDeleted = false;
         mbSystem = false;
+        mnFkLogTypeDeliveryId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -137,6 +143,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
             msTemplateVersion = resultSet.getString("template_version");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
+            mnFkLogTypeDeliveryId_n = resultSet.getInt("fk_log_tp_dly_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -181,6 +188,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
                         "'" + msTemplateVersion + "', " + 
                         (mbDeleted ? 1 : 0) + ", " + 
                         (mbSystem ? 1 : 0) + ", " + 
+                        (mnFkLogTypeDeliveryId_n == 0 ? "NULL" : mnFkLogTypeDeliveryId_n) + ", " +
                         mnFkUserInsertId + ", " + 
                         mnFkUserUpdateId + ", " + 
                         "NOW()" + ", " + 
@@ -198,6 +206,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
                     "template_version = '" + msTemplateVersion + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
 //                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    "fk_log_tp_dly_n = " + (mnFkLogTypeDeliveryId_n == 0 ? "NULL" : mnFkLogTypeDeliveryId_n) + ", " +
 //                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
 //                    "ts_usr_ins = " + "NOW()" + ", " +
@@ -232,6 +241,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
         registry.setTemplateVersion(this.getTemplateVersion());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
+        registry.setFkLogTypeDeliveryId_n(this.getFkLogTypeDeliveryId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

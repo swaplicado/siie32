@@ -26,6 +26,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmQlt;
     private javax.swing.JMenuItem jmiQltLot;
+    private javax.swing.JMenuItem jmiQltCoA;
     private javax.swing.JMenu jmQltLab;
     private javax.swing.JMenuItem jmQltLabAnalysis;
     private javax.swing.JMenuItem jmQltDatasheetTemplates;
@@ -48,6 +49,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private void initComponents() {
         jmQlt = new JMenu("Calidad");
         jmiQltLot = new JMenuItem("Lotes aprobados");
+        jmiQltCoA = new JMenuItem("Generar certificado");
         jmQltLab = new JMenu("Laboratorio");
         jmQltLabAnalysis = new JMenuItem("Análisis de laboratorio");
         jmQltDatasheetTemplates = new JMenuItem("Fichas técnicas");
@@ -59,6 +61,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 //        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
         
         jmQlt.add(jmiQltLot);
+        jmQlt.add(jmiQltCoA);
         jmQltLab.add(jmQltLabAnalysis);
         jmQltLab.add(jmQltDatasheetTemplates);
         jmQltLab.add(jmQltDpsAnalysis);
@@ -68,6 +71,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmQltCfg.add(jmQltDatasheetTemplateLink);
 
         jmiQltLot.setEnabled(true);
+        jmiQltCoA.setEnabled(true);
         jmQltLabAnalysis.setEnabled(true);
         jmQltDatasheetTemplates.setEnabled(true);
         jmQltDpsAnalysis.setEnabled(true);
@@ -77,6 +81,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmQltDatasheetTemplateLink.setEnabled(true);
 
         jmiQltLot.addActionListener(this);
+        jmiQltCoA.addActionListener(this);
         jmQltLabAnalysis.addActionListener(this);
         jmQltDatasheetTemplates.addActionListener(this);
         jmQltDpsAnalysis.addActionListener(this);
@@ -268,6 +273,9 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
             if (item == jmiQltLot) {
                 miClient.getSession().showView(SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, null);
+            }
+            if (item == jmiQltCoA) {
+                miClient.getSession().showView(SModConsts.QLTX_QLT_DPS_ETY, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmQltLabAnalysis) {
                 miClient.getSession().showView(SModConsts.QLT_ANALYSIS, SLibConsts.UNDEFINED, null);

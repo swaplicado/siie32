@@ -38,14 +38,15 @@ public class SDpsQualityUtils {
      * 
      * @param session
      * @param idItem
+     * @param idLogTpDelivery
      * @return 
      */
-    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByItem(final SGuiSession session, final int idItem) {
+    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByItem(final SGuiSession session, final int idItem, final int idLogTpDelivery) {
         String sql = "";
         
         try {
             // Se obtiene el id del template de calidad:
-            int idTemplate = SQltUtils.obtainDatasheetTemplateByItemLink(session.getStatement(), idItem);
+            int idTemplate = SQltUtils.obtainDatasheetTemplateByItemLink(session.getStatement(), idItem, idLogTpDelivery);
             if (idTemplate == 0) {
                 return new ArrayList<>();
             }
@@ -80,6 +81,7 @@ public class SDpsQualityUtils {
                 oEtyAnalysis.setIsForCoA(resultSet.getBoolean("qdtr.b_coa"));
                 oEtyAnalysis.setFkAnalysisId(resultSet.getInt("qdtr.id_analysis"));
                 oEtyAnalysis.setFkItemId(idItem);
+                oEtyAnalysis.setFkDatasheetTemplateId_n(resultSet.getInt(idTemplate));
                 
                 sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
                         + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
@@ -119,7 +121,7 @@ public class SDpsQualityUtils {
      * @param isPrint
      * @return 
      */
-    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByDocumentEty(final SGuiSession session, final int idItem, final int[] entryDocPk, final boolean isPrint) {
+    public static ArrayList<SDataDpsEntryAnalysis> getAnalysisByDocumentEty(final SGuiSession session, final int idItem, final int[] entryDocPk, final boolean isPrint, final int idLogTpDelivery) {
         String sql = "";
         
         sql = "SELECT "
@@ -147,7 +149,7 @@ public class SDpsQualityUtils {
             }
             
             if (lAnalysis.isEmpty() && !isPrint) {
-                return SDpsQualityUtils.getAnalysisByItem(session, idItem);
+                return SDpsQualityUtils.getAnalysisByItem(session, idItem, idLogTpDelivery);
             }
             
             return lAnalysis;
