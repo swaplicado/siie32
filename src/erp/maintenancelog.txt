@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.9/ 2025-05-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al diálogo de emisión de CFDI de recibos de nómina por problema con el tipo de dato en la conversión de números de empleados.
+2) Mejoramiento a la interfaz de usuario de la gestión de catálogos de clientes y proveedores, para facilitar la captura de datos relacionados con la emisión de CFDI y generación de la DIOT.
+
+================================================================================
 SIIE 3.2 272.8/ 2025-05-12
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -9,7 +16,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 272.7/ 2025-05-12
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Corrección de valuación de consumos de insumos de almacén
+1) Corrección de valuación de consumos de insumos de almacén.
 2) Vista de seguimiento de consumos de valuación.
 
 ================================================================================
@@ -22,8 +29,8 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 272.05/ 2025-05-12
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Se agrega al menu la vista de impuesto predial rustico (APSA)
-2) Se agregan constantes a la vistya de impuesto predial rustico
+1) Se agrega al menu la vista de impuesto predial rústico (APSA).
+2) Se agregan constantes a la vista de impuesto predial rústico.
 
 ================================================================================
 SIIE 3.2 272.4/ 2025-05-08

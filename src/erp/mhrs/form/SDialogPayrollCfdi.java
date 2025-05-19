@@ -43,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiUtils;
 
 /**
@@ -425,7 +426,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         i = 0;
         aoTableColumns = new STableColumnForm[10];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 250);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", 50);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Número empleado", 50);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total percepciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total deducciones $", STableConstants.WIDTH_VALUE);

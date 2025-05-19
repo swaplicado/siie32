@@ -910,7 +910,7 @@ public final class SDialogRepRecords extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbBookKeepingCenter, SDataConstants.FIN_BKC);
         SFormUtilities.populateComboBox(miClient, jcbRecordType, SDataConstants.FINX_TP_REC_ALL);
         SFormUtilities.populateComboBox(miClient, jcbAccountCash, SDataConstants.FIN_ACC_CASH, new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() });
-        SFormUtilities.populateComboBox(miClient, jcbCreator, SDataConstants.USRX_FIN_REC);
+        SFormUtilities.populateComboBox(miClient, jcbCreator, SDataConstants.USRX_QRY_FIN_REC);
     }
 
     @Override

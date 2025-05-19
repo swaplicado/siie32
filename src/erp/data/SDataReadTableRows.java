@@ -165,7 +165,8 @@ public abstract class SDataReadTableRows {
 
         switch (pnDataType) {
             case SDataConstants.USRU_USR:
-            case SDataConstants.USRX_FIN_REC:
+            case SDataConstants.USRX_QRY_FIN_REC:
+            case SDataConstants.USRX_QRY_SAL_AGT:
                 aoPkFields = new STableField[1];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_usr");
 

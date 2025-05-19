@@ -190,11 +190,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 break;
                 
             case SDataConstants.BPSX_BP_SUP:
-                aoTableColumns = new STableColumn[36];
+                aoTableColumns = new STableColumn[39];
                 break;
                 
             case SDataConstants.BPSX_BP_CUS:
-                aoTableColumns = new STableColumn[39];
+                aoTableColumns = new STableColumn[40];
                 break;
                 
             case SDataConstants.BPSX_BP_CDR:
@@ -475,14 +475,18 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_SUP) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.diot_oper", "Tipo operación DIOT", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_pay_way", "Forma pago predeterminada", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_cfd_use", "Uso CFDI predeterminado", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.tax_regime", "Regimen fiscal CFDI", 50);
         }
 
         // for customers:
 
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_CUS) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_pay_way", "Forma de pago", 50);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_cfd_use", "Uso CFDI", 50);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.tax_regime", "Regimen fiscal", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_pay_way", "Forma pago predeterminada", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.cfdi_cfd_use", "Uso CFDI predeterminado", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.tax_regime", "Regimen fiscal CFDI", 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tca.tp_cfd_add", "Tipo addenda CFDI", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Analista AN", 100);
         }
 
@@ -867,7 +871,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
                 "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
                 (mbIsViewBizPartnersSimple ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.num_exporter, bp_ct.diot_oper, bp_ct.cfdi_pay_way, bp_ct.cfdi_cfd_use, bp_ct.tax_regime, bp_ct.dt_start, bp_ct.dt_end_n, " +
-                "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, ") +
+                "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, tca.tp_cfd_add, ") +
                 "(SELECT MAX(dt) FROM trn_dps WHERE b_del = 0 AND fid_bp_r = bp.id_bp AND fid_ct_dps IN(" + SDataConstantsSys.TRNS_CT_DPS_PUR + ", " + SDataConstantsSys.TRNS_CT_DPS_SAL + ") AND " +
                 "fid_cl_dps IN(" + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + ")) AS f_last_trans, " +
                 (!mbIsViewEmployees ? "" :
@@ -891,6 +895,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp.id_bp = bp_ct.id_bp AND bp_ct.fid_ct_bp = " + mnBizPartnerCategory + " " + sqlCategoryWhere +
                 "INNER JOIN erp.bpss_ct_bp AS ct ON bp_ct.fid_ct_bp = ct.id_ct_bp " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON bp_ct.fid_ct_bp = tp.id_ct_bp AND bp_ct.fid_tp_bp = tp.id_tp_bp " +
+                "INNER JOIN erp.bpss_tp_cfd_add AS tca ON bp_ct.fid_tp_cfd_add = tca.id_tp_cfd_add " +
                 "LEFT OUTER JOIN erp.usru_usr AS us ON bp_ct.fid_usr_ana_n = us.id_usr " +
                 "LEFT OUTER JOIN erp.trnu_tp_pay_sys AS tpy ON bp_ct.fid_tp_pay_sys_n = tpy.id_tp_pay_sys " +
                 "LEFT OUTER JOIN erp.cfgu_cur AS c ON bp_ct.fid_cur_n = c.id_cur " +

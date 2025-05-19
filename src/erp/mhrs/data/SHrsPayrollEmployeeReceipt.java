@@ -23,7 +23,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     protected String msNotes;
     protected int mnFkPaymentTypeId;
     
-    protected String msEmployeeNumber;
+    protected int mnEmployeeNumber;
     protected String msEmployeeName;
     protected int mnDepartmentId;
     protected String msDepartment;
@@ -51,7 +51,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mtDateEnd = null;
         msNotes = "";
         mnFkPaymentTypeId = 0;
-        msEmployeeNumber = "";
+        mnEmployeeNumber = 0;
         msEmployeeName = "";
         mnDepartmentId = 0;
         msDepartment = "";
@@ -71,7 +71,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void prepareTableRow() {
         mvValues.clear();
         mvValues.add(msEmployeeName);
-        mvValues.add(msEmployeeNumber);
+        mvValues.add(mnEmployeeNumber);
         mvValues.add(mdTotalEarnings);
         mvValues.add(mdTotalDeductions);
         mvValues.add(mdTotalNet);
@@ -94,7 +94,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setNotes(String s) { msNotes = s; }
     /** Besides setting payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
-    public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
+    public void setEmployeeNumber(int n) { mnEmployeeNumber = n; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
     public void setDepartmentId(int n) { mnDepartmentId = n; }
     public void setDepartment(String s) { msDepartment = s; }
@@ -120,7 +120,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public String getNotes() { return msNotes; }
     /** Besides getting payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
-    public String getEmployeeNumber() { return msEmployeeNumber; }
+    public int getEmployeeNumber() { return mnEmployeeNumber; }
     public String getEmployeeName() { return msEmployeeName; }
     public int getDepartmentId() { return mnDepartmentId; }
     public String getDepartment() { return msDepartment; }
