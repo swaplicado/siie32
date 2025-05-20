@@ -23,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -84,16 +83,8 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
             mnFilterAuthorId = 0;
         }
         
-        moFileChooserUpload = new JFileChooser();
-        moFileChooserUpload.setAcceptAllFileFilterUsed(false);
-        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Documento PDF (*.pdf)", "pdf"));
-        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Archivo de imagen (*.bpm, *.gif, *.png, *.jpg, *.jpeg)", "bmp", "gif", "png", "jpg", "jpeg"));
-        moFileChooserUpload.setDialogTitle("Seleccionar archivo a cargar...");
-        
-        moFileChooserDownload = new JFileChooser();
-        moFileChooserDownload.setAcceptAllFileFilterUsed(false);
-        moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        moFileChooserDownload.setDialogTitle("Seleccionar directorio para descargar archivo...");
+        moFileChooserUpload = null;
+        moFileChooserDownload = null;
         
         moFilterYear = new SGridFilterYear(miClient, this);
         moFilterYear.initFilter(null);
@@ -286,6 +277,11 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning("Este documento ya tiene un archivo (ID: '" + docBreach.getFilevaultId() + "', TS: '" + SLibUtils.DateFormatDatetime.format(docBreach.getFilevaultTs_n()) + "').");
                 }
                 else {
+                    if (moFileChooserUpload == null) {
+                        miClient.showMsgBoxInformation(SDocUtils.MSG_WAIT_CREATION_FILE_CHOOSER);
+                        moFileChooserUpload = SDocUtils.createFileChooserForUpload();
+                    }
+                    
                     moFileChooserUpload.setSelectedFile(new File("")); // clear previous selected file
                     
                     if (moFileChooserUpload.showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -324,6 +320,11 @@ public class SViewDocBreach extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning("Este documento no tiene archivo.");
                 }
                 else {
+                    if (moFileChooserDownload == null) {
+                        miClient.showMsgBoxInformation(SDocUtils.MSG_WAIT_CREATION_FILE_CHOOSER);
+                        moFileChooserDownload = SDocUtils.createFileChooserForUpload();
+                    }
+                    
                     if (moFileChooserDownload.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                         try {
                             boolean returnPath = false;

@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 272.10/ 2025-05-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la captura de documentos de consecuencias para incorporar empleados de otras empresas, y para postergar hasta cuando sea necesario la creación de los diálogos "abrir" y "guardar" archivos.
+
+================================================================================
 SIIE 3.2 272.9/ 2025-05-19
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
