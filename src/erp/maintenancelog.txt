@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.11/ 2025-05-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la conversión de tipo de dato del número de empleado en el diálogo de importación de registros de asistencia desde el dispositivo externo ("reloj checador").
+2) Clarificación del código fuente de la contabilización de nóminas con vistas a generar bitácoras de contabilización, para analizar la aplicación de las configuraciones de contabilización vigentes.
+
+================================================================================
 SIIE 3.2 272.10/ 2025-05-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

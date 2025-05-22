@@ -2283,7 +2283,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                 removeByImportation(false);
-                ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
+                ArrayList<SRowTimeClock> rows = dialog.getGridRows();
                 addPerceptAndDeductByImportation(rows, ppayroll.getRows());
 
                 computeReceipts();
@@ -2341,7 +2341,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             if (! receiptFound) {
-                throw new Exception("El empleado " + timeClockRow.getEmployee() + " no se pudo procesar, intente de nuevo la carga de prenómina.");
+                throw new Exception("El empleado " + timeClockRow.getEmployeeName() + " no se pudo procesar, intente de nuevo la carga de prenómina.");
             }
 
             double doubleOvertimeValue = ((Number) timeClockRow.getOvertime()).doubleValue();
