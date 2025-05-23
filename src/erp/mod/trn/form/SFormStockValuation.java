@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -305,27 +306,36 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         
         if (validation.isValid()) {
             try {
-                String res = SStockValuationUtils.arePastValuationsValid(miClient.getSession(), moDateDateEnd.getValue());
-                if (! res.isEmpty()) {
-                    if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {
-                        String canDelete = SStockValuationUtils.canDeleteValuations((SClientInterface) miClient, moDateDateEnd.getValue());
-                        if (! canDelete.isEmpty()) {
-                            validation.setMessage(canDelete);
+                // validar que la fecha inicial no sea mayor a la fecha de corte
+                Date dateStart = SDbStockValuation.computeStartDate(miClient.getSession(), moDateDateEnd.getValue());
+                if (dateStart != null && dateStart.after(moDateDateEnd.getValue())) {
+                    validation.setMessage("La fecha de corte no puede ser menor a la fecha de corte de la valuación anterior.");
+                    validation.setComponent(moDateDateEnd);
+                }
+
+                if (validation.isValid()) {
+                    String res = SStockValuationUtils.arePastValuationsValid(miClient.getSession(), moDateDateEnd.getValue());
+                    if (! res.isEmpty()) {
+                        if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {
+                            String canDelete = SStockValuationUtils.canDeleteValuations((SClientInterface) miClient, moDateDateEnd.getValue());
+                            if (! canDelete.isEmpty()) {
+                                validation.setMessage(canDelete);
+                            }
+                            else {
+                                ArrayList<SDbStockValuation> lValuations = SStockValuationUtils.deleteValuations(miClient, moDateDateEnd.getValue());
+                                if (lValuations == null) {
+                                    validation.setMessage("Error al eliminar las valuaciones, contacte a soporte técnico.");
+                                }
+                                
+                                String result = SStockValuationUtils.revaluateValuations(miClient, lValuations);
+                                if (! result.isEmpty()) {
+                                    validation.setMessage(result);
+                                }
+                            }
                         }
                         else {
-                            ArrayList<SDbStockValuation> lValuations = SStockValuationUtils.deleteValuations(miClient, moDateDateEnd.getValue());
-                            if (lValuations == null) {
-                                validation.setMessage("Error al eliminar las valuaciones, contacte a soporte técnico.");
-                            }
-                            
-                            String result = SStockValuationUtils.revaluateValuations(miClient, lValuations);
-                            if (! result.isEmpty()) {
-                                validation.setMessage(result);
-                            }
+                            validation.setMessage(res);
                         }
-                    }
-                    else {
-                        validation.setMessage(res);
                     }
                 }
             }

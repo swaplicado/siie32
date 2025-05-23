@@ -54,35 +54,40 @@ public class SDbStockValuation extends SDbRegistryUser {
      * 
      * @param session The session parameter is an object of type SGuiSession, which is used to
      * establish a connection to the database and execute SQL queries.
+     * @param cutoffDate
+     * @return 
+     * @throws java.sql.SQLException 
      */
-    private void computeStartDate(SGuiSession session) throws SQLException, Exception {
+    public static Date computeStartDate(SGuiSession session, Date cutoffDate) throws SQLException, Exception {
         ResultSet resultSet;
 
-        mtDateStart = null;
+        Date tDateStart = null;
 
-        msSql = "SELECT DATE_ADD(dt_end, INTERVAL 1 DAY) "
-                + "FROM " + getSqlTable() + " "
+        String msSql = "SELECT DATE_ADD(dt_end, INTERVAL 1 DAY) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
                 + "WHERE NOT b_del "
-                + "AND YEAR(dt_end) = " + (new SimpleDateFormat("yyyy")).format(mtDateEnd) + " "
+                + "AND YEAR(dt_end) = " + (new SimpleDateFormat("yyyy")).format(cutoffDate) + " "
                 + "ORDER BY dt_end DESC";
         
         resultSet = session.getStatement().getConnection().createStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mtDateStart = resultSet.getDate(1);
+            tDateStart = resultSet.getDate(1);
         }
         else {
             Calendar cal = Calendar.getInstance();
 
             // Establecer la fecha en el objeto Calendar
-            cal.setTime(mtDateEnd);
+            cal.setTime(cutoffDate);
 
             // Establecer el mes y el día del primer día del año
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DAY_OF_MONTH, 1);
 
             // Obtener el primer día del año como objeto Date
-            mtDateStart = cal.getTime();
+            tDateStart = cal.getTime();
         }
+
+        return tDateStart;
     }
     
     /**
@@ -179,6 +184,39 @@ public class SDbStockValuation extends SDbRegistryUser {
                     averaged.setFkDiogDocOutId_n(group.get(0).getFkDiogDocOutId_n());  // Tomar doc del primer elemento del grupo
                     averaged.setFkDiogEntryOutId_n(group.get(0).getFkDiogEntryOutId_n());  // Tomar id ety del primer elemento del grupo
                     averaged.setCostUnitary(avCostUnitary.getAsDouble());
+
+                    return averaged;
+                })
+                .collect(Collectors.toList());
+    }
+    
+    
+    private List<SDbStockValuationMvt> groupByDiogEtyAndCalculateCost(ArrayList<SDbStockValuationMvt> stockValuations) {
+        // Agrupar por mtDateMove, mnFkItemId, mnFkUnitId, mnFkMaterialRequestItemRef_n, mnFkStockValuationId
+        Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
+                .collect(Collectors.groupingBy(valuation ->
+                        valuation.getFkDiogYearOutId_n() + "_" +
+                        valuation.getFkDiogDocOutId_n() + "_" +
+                        valuation.getFkDiogEntryOutId_n()));
+
+        // Crear nuevos objetos SDbStockValuationMvt con los valores sumados
+        return groupedValuations.values().stream()
+                .map(group -> {
+                    SDbStockValuationMvt averaged = new SDbStockValuationMvt();
+
+                    // Sumar mdQuantityConsumption y mdCost_r
+                    double costR = group.stream()
+                            .mapToDouble(SDbStockValuationMvt::getCost_r)
+                            .sum();
+                    double quantityR = group.stream()
+                            .mapToDouble(SDbStockValuationMvt::getQuantityMovement)
+                            .sum();
+
+                    // Configurar el nuevo objeto SDbStockValuationMvt
+                    averaged.setFkDiogYearOutId_n(group.get(0).getFkDiogYearOutId_n());  // Tomar el año del primer elemento del grupo
+                    averaged.setFkDiogDocOutId_n(group.get(0).getFkDiogDocOutId_n());  // Tomar doc del primer elemento del grupo
+                    averaged.setFkDiogEntryOutId_n(group.get(0).getFkDiogEntryOutId_n());  // Tomar id ety del primer elemento del grupo
+                    averaged.setCostUnitary(costR / quantityR);
 
                     return averaged;
                 })
@@ -315,7 +353,7 @@ public class SDbStockValuation extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             if (! mbAuxIsAllInsert) {
-                computeStartDate(session);
+                mtDateStart = SDbStockValuation.computeStartDate(session, mtDateEnd);
             }
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -359,17 +397,20 @@ public class SDbStockValuation extends SDbRegistryUser {
                 System.out.println("Guardando consumos...");
                 for (SDbStockValuationMvt consumption : lConsumptions) {
                     consumption.save(session);
+                    if (consumption.getLogMessage() != null && ! consumption.getLogMessage().isEmpty()) {
+                        SStockValuationLogUtils.logConsume(mtDateStart, mtDateEnd, consumption, consumption.getLogMessage());
+                    }
                 }
                 
                 // The above code is grouping a list of consumptions and then updating the cost of
                 // stock rows based on the grouped data. It first creates an empty ArrayList called
                 // lGrouped. Then, it adds the grouped data to the lGrouped list using the
-                // groupByDiogEtyAndAverage method. Finally, it iterates over each row in the lGrouped
+                // groupByDiogEtyAndCalculateCost method. Finally, it iterates over each row in the lGrouped
                 // list and updates the cost of the stock row using the updateTrnStockRowCostByDiog
                 // method.
                 System.out.println("Agrupando consumos...");
                 ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
-                lGrouped.addAll(groupByDiogEtyAndAverage(lConsumptions));
+                lGrouped.addAll(groupByDiogEtyAndCalculateCost(lConsumptions));
                 System.out.println("Actualizando costos en stock...");
                 for (SDbStockValuationMvt oRow : lGrouped) {
                      SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
