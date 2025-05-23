@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.12/ 2025-05-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al cálculo del subtotal en moneda nacional para documentos en moneda extranjera en la personalización de la contabilización.
+2) Mejoramiento a la captura de documentos con personalización de contabilización.
+
+================================================================================
 SIIE 3.2 272.11/ 2025-05-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
