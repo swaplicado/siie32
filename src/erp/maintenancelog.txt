@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.13/ 2025-05-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de redondeo de los montos en la importación de partidas de pólizas contables desde un archivo externo.
+2) Corrección en la validación del nivel de profundidad de centros de costo en las salidas de inventario.
+
+================================================================================
 SIIE 3.2 272.12/ 2025-05-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

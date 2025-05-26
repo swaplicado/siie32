@@ -1332,10 +1332,10 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
         finEntry.CostCenter = moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX();
         
         if (row == null) {
-            finEntry.Debit = SLibUtils.round(moFieldDebit.getDouble() * moFieldApportionment.getDouble(), 2);
-            finEntry.Credit = SLibUtils.round(moFieldCredit.getDouble() * moFieldApportionment.getDouble(), 2);
-            finEntry.DebitCy = SLibUtils.round(moFieldDebitCy.getDouble() * moFieldApportionment.getDouble(), 2);
-            finEntry.CreditCy = SLibUtils.round(moFieldCreditCy.getDouble() * moFieldApportionment.getDouble(), 2);            
+            finEntry.Debit = SLibUtils.roundAmount(moFieldDebit.getDouble() * moFieldApportionment.getDouble());
+            finEntry.Credit = SLibUtils.roundAmount(moFieldCredit.getDouble() * moFieldApportionment.getDouble());
+            finEntry.DebitCy = SLibUtils.roundAmount(moFieldDebitCy.getDouble() * moFieldApportionment.getDouble());
+            finEntry.CreditCy = SLibUtils.roundAmount(moFieldCreditCy.getDouble() * moFieldApportionment.getDouble());            
         }
         else {
             finEntry.Debit = row.getDebit();
