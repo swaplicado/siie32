@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 272.14/ 2025-05-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la conversión de tipo de dato del número de empleado en el diálogo de importación de bonos desde el dispositivo externo ("reloj checador").
+
+================================================================================
 SIIE 3.2 272.13/ 2025-05-26
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
