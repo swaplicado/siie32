@@ -6,6 +6,7 @@ import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebCostCenter;
 import erp.mod.trn.api.data.SWebMatReqEtyNote;
 import erp.mod.trn.api.data.SWebMatReqNote;
 import erp.mod.trn.api.data.SWebMaterialRequest;
@@ -403,9 +404,18 @@ public class STrnDBMaterialRequest {
         oMatReq.setAuthText(res.getString("auth_status"));
         oMatReq.setAuthStatusId(res.getInt("auth_status_id"));
 
+        oMatReq.getlCostCenter().clear();
+        oMatReq.getlCostCenter().addAll(this.getCostCenters(oMatReq.getIdMaterialRequest()));
+
         return oMatReq;
     }
 
+    /**
+     * Carga las entradas de requisición de materiales asociadas a una requisición específica.
+     *
+     * @param materialRequestId ID de la requisición de materiales.
+     * @return Una lista de objetos SWebMaterialRequestEty que representan las entradas de la requisición.
+     */
     public ArrayList<SWebMaterialRequestEty> loadMaterialRequestEtys(final int materialRequestId) {
         /**
          * SELECT 
@@ -434,11 +444,15 @@ public class STrnDBMaterialRequest {
                             "    i.item_key, " +
                             "    i.item AS item_name, " +
                             "    u.symbol AS unit_symbol, " +
-                            "    u.unit AS unit_name " +
+                            "    u.unit AS unit_name, " +
+                            "    cc.pk_cc, " +
+                            "    cc.cc, " +
+                            "    cc.id_cc " +
                             "FROM " +
                             SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre  " +
                             "INNER JOIN erp.itmu_item AS i ON mre.fk_item = i.id_item  " +
                             "INNER JOIN erp.itmu_unit AS u ON mre.fk_unit = u.id_unit  " +
+                            "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
                             // Agregar la tabla de notas de partidas de requisición de materiales
                             // INNER JOIN erp.trn_mat_req_ety_nts AS mre_nts ON mre.id_mat_req = mre_nts.fid_mat_req AND mre.id_ety = mre_nts.fid_mat_req_ety  "
                             // Agregar la tabla de notas de requisición de materiales
@@ -469,6 +483,8 @@ public class STrnDBMaterialRequest {
                 oMatReqEty.setTotal(resEtys.getDouble("tot_r"));
                 oMatReqEty.setItemKey(resEtys.getString("item_key"));
                 oMatReqEty.setItemName(resEtys.getString("item_name"));
+                oMatReqEty.setIdCostCenter(resEtys.getInt("id_cc"));
+                oMatReqEty.setCostCenter(resEtys.getString("pk_cc") + " - " + resEtys.getString("cc"));
 
                 oMatReqEty.getlEtyNotes().clear();
                 oMatReqEty.getlEtyNotes().addAll(this.getMaterialRequestEntryNotes(oMatReqEty.getIdMaterialRequest(), oMatReqEty.getIdEty()));
@@ -477,6 +493,54 @@ public class STrnDBMaterialRequest {
             }
             
             return etys;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+
+    /**
+     * Obtiene los centros de costo asociados a una requisición de materiales.
+     *
+     * @param materialRequestId ID de la requisición de materiales.
+     * @return Una lista de objetos SWebCostCenter que representan los centros de costo asociados.
+     */
+    private ArrayList<SWebCostCenter> getCostCenters(final int materialRequestId) {
+        String costCenterQuery = "SELECT  " +
+                "    mrcc.*, cc.pk_cc, mrcc.per, cc.cc, cc.id_cc " +
+                "FROM " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrcc " +
+                "        INNER JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mrcc.id_cc = cc.pk_cc " +
+                "    WHERE mrcc.id_mat_req = " + materialRequestId + ";";
+
+        try {
+            // Conexión a la base de datos principal.
+            Connection conn = this.getConnection();
+
+            if (conn == null) {
+                return null;
+            }
+
+            Statement st = conn.createStatement();
+            ArrayList<SWebCostCenter> costCenters = new ArrayList<>();
+            ResultSet resCostCenters = st.executeQuery(costCenterQuery);
+            while (resCostCenters.next()) {
+                SWebCostCenter oCostCenter = new SWebCostCenter();
+                oCostCenter.setIdMatReq(resCostCenters.getInt("mrcc.id_mat_req"));
+                oCostCenter.setIdConsumeEntity(resCostCenters.getInt("mrcc.id_mat_ent_cons_ent"));
+                oCostCenter.setIdConsumeSubEntity(resCostCenters.getInt("mrcc.id_mat_subent_cons_ent"));
+                oCostCenter.setIdConsumeSubSubEntity(resCostCenters.getInt("mrcc.id_mat_subent_cons_subent"));
+                oCostCenter.setIdCostCenter(resCostCenters.getInt("mrcc.id_cc"));
+                oCostCenter.setPercentage(resCostCenters.getDouble("per"));
+                oCostCenter.setCostCenter(resCostCenters.getString("cc.id_cc") + " - " + resCostCenters.getString("cc.cc"));
+
+                costCenters.add(oCostCenter);
+            }
+            
+            return costCenters;
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);

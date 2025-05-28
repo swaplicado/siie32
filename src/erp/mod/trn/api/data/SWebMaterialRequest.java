@@ -36,6 +36,7 @@ public class SWebMaterialRequest {
     private String userInTurn;
     private int authorizationPriority;
     private String mrStorageCloudUrl;
+    private ArrayList<SWebCostCenter> lCostCenter;
     private ArrayList<SWebMaterialRequestEty> lEtys;
     private ArrayList<SWebMatReqNote> lNotes;
     private ArrayList<SWebMatReqEtyNote> lEtyNotes;
@@ -44,6 +45,7 @@ public class SWebMaterialRequest {
 
     public SWebMaterialRequest() {
         this.mrStorageCloudUrl = "";
+        this.lCostCenter = new ArrayList<>();
         this.lEtys = new ArrayList<>();
         this.lNotes = new ArrayList<>();
         this.lEtyNotes = new ArrayList<>();
@@ -231,6 +233,10 @@ public class SWebMaterialRequest {
 
     public void setMrStorageCloudUrl(String mrStorageCloudUrl) {
         this.mrStorageCloudUrl = mrStorageCloudUrl;
+    }
+
+    public ArrayList<SWebCostCenter> getlCostCenter() {
+        return lCostCenter;
     }
 
     public ArrayList<SWebMaterialRequestEty> getlEtys() {
