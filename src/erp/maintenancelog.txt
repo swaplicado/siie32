@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 272.14/ 2025-05-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de un indicador de "primera vez en suministro" en las vistas de RM pendientes de suministrar.
+2) Adición de validación de centros de costo en la forma de captura de RM.
+
+================================================================================
 SIIE 3.2 272.13/ 2025-05-26
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

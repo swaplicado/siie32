@@ -548,7 +548,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "is_estimated", "Cotizada"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "count_pur", "Veces en compras"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "count_pur", "Más de una vez compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "comp_doc", "Doc compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "i.item_key", "Clave"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Ítem"));
