@@ -42,6 +42,10 @@ public class SWebMaterialRequestEty {
     private double total;
     private String itemKey;
     private String itemName;
+    private String unitSymbol;
+    private String unitName;
+    private String itemRefKey;
+    private String itemRefName;
     private int idCostCenter;
     private String costCenter;
 
@@ -50,6 +54,10 @@ public class SWebMaterialRequestEty {
     public SWebMaterialRequestEty() {
         this.itemKey = "";
         this.itemName = "";
+        this.unitSymbol = "";
+        this.unitName = "";
+        this.itemRefKey = "";
+        this.itemRefName = "";
         
         this.lEtyNotes = new ArrayList<>();
     }
@@ -116,6 +124,38 @@ public class SWebMaterialRequestEty {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public String getUnitSymbol() {
+        return unitSymbol;
+    }
+
+    public void setUnitSymbol(String unitSymbol) {
+        this.unitSymbol = unitSymbol;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getItemRefKey() {
+        return itemRefKey;
+    }
+
+    public void setItemRefKey(String itemRefKey) {
+        this.itemRefKey = itemRefKey;
+    }
+
+    public String getItemRefName() {
+        return itemRefName;
+    }
+
+    public void setItemRefName(String itemRefName) {
+        this.itemRefName = itemRefName;
     }
 
     public int getIdCostCenter() {

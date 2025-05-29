@@ -309,9 +309,11 @@ public class STrnDBMaterialRequest {
 
         // Aplicar filtros según el estado.
         switch (statusFilter) {
+            // TODAS MIS RM
             case -2:
                 query += "AND mr.fk_usr_req = " + idUser + " AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
                 break;
+            // RM PENDIENTES
             case -1:
                 query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                         + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
@@ -319,6 +321,13 @@ public class STrnDBMaterialRequest {
                 break;
             case 0:
                 query += "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                query += "AND " + idUser + " IN (SELECT  "
+                        + "    steps1.fk_usr_step "
+                        + "FROM "
+                        + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                        + "WHERE "
+                        + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                        + "        AND steps1.res_pk_n1_n = mr.id_mat_req) ";
                 break;
             default:
                 if (statusFilter > 0) {
@@ -445,13 +454,16 @@ public class STrnDBMaterialRequest {
                             "    i.item AS item_name, " +
                             "    u.symbol AS unit_symbol, " +
                             "    u.unit AS unit_name, " +
+                            "    iref.item_key AS item_ref_key, " +
+                            "    iref.item AS item_ref_name, " +
                             "    cc.pk_cc, " +
                             "    cc.cc, " +
                             "    cc.id_cc " +
                             "FROM " +
                             SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre  " +
-                            "INNER JOIN erp.itmu_item AS i ON mre.fk_item = i.id_item  " +
-                            "INNER JOIN erp.itmu_unit AS u ON mre.fk_unit = u.id_unit  " +
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON mre.fk_item = i.id_item  " +
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON mre.fk_unit = u.id_unit  " +
+                            "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON mre.fk_item_ref_n = iref.id_item  " +
                             "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
                             // Agregar la tabla de notas de partidas de requisición de materiales
                             // INNER JOIN erp.trn_mat_req_ety_nts AS mre_nts ON mre.id_mat_req = mre_nts.fid_mat_req AND mre.id_ety = mre_nts.fid_mat_req_ety  "
@@ -483,8 +495,12 @@ public class STrnDBMaterialRequest {
                 oMatReqEty.setTotal(resEtys.getDouble("tot_r"));
                 oMatReqEty.setItemKey(resEtys.getString("item_key"));
                 oMatReqEty.setItemName(resEtys.getString("item_name"));
-                oMatReqEty.setIdCostCenter(resEtys.getInt("id_cc"));
-                oMatReqEty.setCostCenter(resEtys.getString("pk_cc") + " - " + resEtys.getString("cc"));
+                oMatReqEty.setUnitSymbol(resEtys.getString("unit_symbol"));
+                oMatReqEty.setUnitName(resEtys.getString("unit_name"));
+                oMatReqEty.setItemRefKey(resEtys.getString("item_ref_key"));
+                oMatReqEty.setItemRefName(resEtys.getString("item_ref_name"));
+                oMatReqEty.setIdCostCenter(resEtys.getInt("cc.pk_cc"));
+                oMatReqEty.setCostCenter(resEtys.getString("cc.id_cc") + " - " + resEtys.getString("cc.cc"));
 
                 oMatReqEty.getlEtyNotes().clear();
                 oMatReqEty.getlEtyNotes().addAll(this.getMaterialRequestEntryNotes(oMatReqEty.getIdMaterialRequest(), oMatReqEty.getIdEty()));
