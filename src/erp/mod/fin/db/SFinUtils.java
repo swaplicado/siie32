@@ -108,21 +108,20 @@ public abstract class SFinUtils {
         return id;
     }
     
-    public static int getCostCenterMaxLevel(final SGuiSession session) {
-        int level = 0;
-        
+    public static boolean isCostCenterMaxLevel(final SGuiSession session, String ccIdxxx) {
         try {
-            String sql = "SELECT MAX(lev) FROM " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " ";
+            String sql = "SELECT mc.deep, c.lev FROM " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS mc "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS c ON "
+                    + "LEFT(mc.id_cc, 3) = LEFT(c.id_cc, 3) AND c.lev = mc.deep "
+                    + "WHERE c.id_cc = '" + ccIdxxx + "'";
             ResultSet resultSet = session.getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                level = resultSet.getInt(1);
-            }
+            return resultSet.next();
         }
         catch (Exception e){
             SLibUtils.showException(SFinUtils.class.getName(), e);
         }
         
-        return level;
+        return false;
     }
 
     public static int getCashCurrencyId(SGuiSession session, int[] keyCash) {

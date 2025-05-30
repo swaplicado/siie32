@@ -21,11 +21,16 @@ public class SWebMaterialRequestEty {
             mre.price_u,
             mre.tot_r,
             i.item_key,
-            i.item
+            i.item,
+            cc.pk_cc,
+            cc.cc,
+            cc.id_cc
         FROM
             erp_aeth.trn_mat_req_ety AS mre
                 INNER JOIN
             erp.itmu_item AS i ON mre.fk_item = i.id_item
+                LEFT JOIN
+	        erp_aeth.fin_cc AS cc ON mre.fk_cc_n = cc.pk_cc
         WHERE
             NOT mre.b_del AND mre.id_mat_req = 8263;
          */
@@ -37,12 +42,22 @@ public class SWebMaterialRequestEty {
     private double total;
     private String itemKey;
     private String itemName;
+    private String unitSymbol;
+    private String unitName;
+    private String itemRefKey;
+    private String itemRefName;
+    private int idCostCenter;
+    private String costCenter;
 
     private ArrayList<SWebMatReqEtyNote> lEtyNotes;
 
     public SWebMaterialRequestEty() {
         this.itemKey = "";
         this.itemName = "";
+        this.unitSymbol = "";
+        this.unitName = "";
+        this.itemRefKey = "";
+        this.itemRefName = "";
         
         this.lEtyNotes = new ArrayList<>();
     }
@@ -109,6 +124,54 @@ public class SWebMaterialRequestEty {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public String getUnitSymbol() {
+        return unitSymbol;
+    }
+
+    public void setUnitSymbol(String unitSymbol) {
+        this.unitSymbol = unitSymbol;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getItemRefKey() {
+        return itemRefKey;
+    }
+
+    public void setItemRefKey(String itemRefKey) {
+        this.itemRefKey = itemRefKey;
+    }
+
+    public String getItemRefName() {
+        return itemRefName;
+    }
+
+    public void setItemRefName(String itemRefName) {
+        this.itemRefName = itemRefName;
+    }
+
+    public int getIdCostCenter() {
+        return idCostCenter;
+    }
+
+    public void setIdCostCenter(int idCostCenter) {
+        this.idCostCenter = idCostCenter;
+    }
+
+    public String getCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(String costCenter) {
+        this.costCenter = costCenter;
     }
 
     public ArrayList<SWebMatReqEtyNote> getlEtyNotes() {
