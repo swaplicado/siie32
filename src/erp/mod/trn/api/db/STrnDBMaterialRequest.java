@@ -1,8 +1,13 @@
 package erp.mod.trn.api.db;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.StorageManagerException;
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthJSONUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
@@ -17,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -306,58 +312,93 @@ public class STrnDBMaterialRequest {
      */
     public ArrayList<SWebMaterialRequest> getMatReqs(String startDate, String endDate, int idUser, int idSessionUser, int statusFilter) {
         String query = BASE_QUERY + WHERE_NOT_DELETED;
+        
+        try {
+            Connection conn = this.getConnection();
 
-        // Aplicar filtros según el estado.
-        switch (statusFilter) {
-            // TODAS MIS RM
-            case -2:
-                query += "AND mr.fk_usr_req = " + idUser + " AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
-                break;
-            // RM PENDIENTES
-            case -1:
-                query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                        + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
-                        + "NULL, NULL, NULL, NULL) IN (" + SAuthorizationUtils.AUTH_STATUS_PENDING + ", " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + ") ";
-                break;
-            case 0:
-                query += "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
-                query += "AND " + idUser + " IN (SELECT  "
-                        + "    steps1.fk_usr_step "
-                        + "FROM "
-                        + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
-                        + "WHERE "
-                        + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
-                        + "        AND steps1.res_pk_n1_n = mr.id_mat_req) ";
-                break;
-            default:
-                if (statusFilter > 0) {
-                    query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
-                            + "NULL, NULL, NULL, NULL) = " + statusFilter + " "
-                            + "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+            String whereUsers = "";
+            String sCfg = SCfgUtils.getParamValue(conn.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+            if (! sCfg.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(sCfg);
+                List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaRM", idSessionUser);
+                // userGroup = "usuariosSuper";
+                if (! toUsers.isEmpty()) {
+                    whereUsers = "1 = 1 ";
                 }
-                break;
-        }
-
-        query += ORDER_BY_ID;
-
-        Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, query);
-        try (Connection conn = this.getConnection();
-                Statement st = conn.createStatement();
-                ResultSet res = st.executeQuery(query)) {
-
-            ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
-
-            while (res.next()) {
-                SWebMaterialRequest oMatReq = buildMaterialRequest(res);
-                oMatReq.getlNotes().addAll(this.loadMaterialRequestNotes(oMatReq.getIdMaterialRequest()));
-                materialRequests.add(oMatReq);
             }
 
-            return materialRequests;
+            // Aplicar filtros según el estado.
+            switch (statusFilter) {
+                // TODAS MIS RM
+                case -2:
+                    if (whereUsers.isEmpty()) {
+                        query += "AND mr.fk_usr_req = " + idUser + " AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    else {
+                        query += "AND ((" + whereUsers + ") OR (mr.fk_usr_req = " + idUser + ")) AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    break;
+                // RM PENDIENTES
+                case -1:
+                    query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+                            + "NULL, NULL, NULL, NULL) IN (" + SAuthorizationUtils.AUTH_STATUS_PENDING + ", " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + ") ";
+                    break;
+                case 0:
+                    query += "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    if (whereUsers.isEmpty()) {
+                        query += "AND " + idUser + " IN (SELECT  "
+                                + "    steps1.fk_usr_step "
+                                + "FROM "
+                                + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                                + "WHERE "
+                                + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                                + "        AND steps1.res_pk_n1_n = mr.id_mat_req) ";
+                    }
+                    else {
+                        query += "AND ((" + whereUsers + ") OR (" + idUser + " IN (SELECT  "
+                                + "    steps1.fk_usr_step "
+                                + "FROM "
+                                + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                                + "WHERE "
+                                + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                                + "        AND steps1.res_pk_n1_n = mr.id_mat_req))) ";
+                    }
+                    break;
+                default:
+                    if (statusFilter > 0) {
+                        query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+                                + "NULL, NULL, NULL, NULL) = " + statusFilter + " "
+                                + "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    break;
+            }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+            query += ORDER_BY_ID;
+
+            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, query);
+            try (Connection conn1 = this.getConnection();
+                    Statement st = conn1.createStatement();
+                    ResultSet res = st.executeQuery(query)) {
+
+                ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
+
+                while (res.next()) {
+                    SWebMaterialRequest oMatReq = buildMaterialRequest(res);
+                    oMatReq.getlNotes().addAll(this.loadMaterialRequestNotes(oMatReq.getIdMaterialRequest()));
+                    materialRequests.add(oMatReq);
+                }
+
+                return materialRequests;
+
+            } catch (SQLException ex) {
+                Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        catch (Exception e) {
+            
         }
 
         return new ArrayList<>();
