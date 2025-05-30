@@ -17,7 +17,10 @@ import erp.mod.trn.db.SStockValuationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -311,6 +314,31 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                 if (dateStart != null && dateStart.after(moDateDateEnd.getValue())) {
                     validation.setMessage("La fecha de corte no puede ser menor a la fecha de corte de la valuación anterior.");
                     validation.setComponent(moDateDateEnd);
+                }
+
+                if (validation.isValid()) {
+                    Calendar cal1 = Calendar.getInstance();
+                    cal1.setTime(dateStart);
+
+                    Calendar cal2 = Calendar.getInstance();
+                    cal2.setTime(moDateDateEnd.getValue());
+
+                    int anio1 = cal1.get(Calendar.YEAR);
+                    int anio2 = cal2.get(Calendar.YEAR);
+                    
+                    if (anio1 != anio2) {
+                        validation.setMessage("La fecha de corte debe ser del mismo año que la fecha de corte de la valuación anterior.");
+                        validation.setComponent(moDateDateEnd);
+                    }
+                }
+
+                if (validation.isValid()) {
+                    String res = SStockValuationUtils.periodHasDiogsWithoutInvoice(miClient.getSession(), dateStart, moDateDateEnd.getValue());
+                    if (! res.isEmpty()) {
+                        if (miClient.showMsgBoxConfirm(res + "\n ¿Desea continuar?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage("Debe asociar los movimientos de inventario a una factura antes de continuar.");
+                        }
+                    }
                 }
 
                 if (validation.isValid()) {

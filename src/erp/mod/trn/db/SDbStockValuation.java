@@ -390,6 +390,7 @@ public class SDbStockValuation extends SDbRegistryUser {
             
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
+                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.makeStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Creando entries...");
                 SStockValuationUtils.createEntries(session, SModSysConsts.TRNS_CT_IOG_IN, mtDateStart, mtDateEnd, mnPkStockValuationId);
 
@@ -419,6 +420,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                                             oRow.getCostUnitary(),
                                             SStockValuationUtils.CREDIT);
                 }
+                lConsumptions.addAll(0, lMvtAdjs);
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
                 System.out.println("Terminado.");

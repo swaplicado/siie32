@@ -80,7 +80,14 @@ public class SStockValuationUtils {
                 + "    de.fid_cc,"
                 + "    tp.tp_iog, "
                 + "    i.item_key, "
-                + "    i.item AS item_name "
+                + "    i.item AS item_name,"
+                + "    dps.num AS dps_num, "
+                + "    dps.dt AS dps_date, "
+                + "    dps.fid_ct_dps, "
+                + "    dps.fid_cl_dps, "
+                + "    dps.fid_tp_dps, "
+                + "    supp.id_des_year, "
+                + "    supp.id_des_doc "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
                 + "        INNER JOIN "
@@ -101,6 +108,12 @@ public class SStockValuationUtils {
                 + "        AND de.fid_mat_req_ety_n = mre.id_ety "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " mr ON d.fid_mat_req_n = mr.id_mat_req "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON stk.fid_dps_year_n = dps.id_year AND stk.fid_dps_doc_n = dps.id_doc "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON stk.fid_dps_year_n = supp.id_src_year "
+                + "        AND stk.fid_dps_doc_n = supp.id_src_doc "
+                + "        AND stk.fid_dps_ety_n = supp.id_src_ety "
                 + "WHERE "
                 + "    NOT d.b_del AND NOT de.b_del AND NOT stk.b_del "
                 + "    AND stk.id_year = YEAR('" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "') "
@@ -178,6 +191,25 @@ public class SStockValuationUtils {
             oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
             oEntry.setFkWarehouseId(res.getInt("id_wh"));
             oEntry.setFkUserInsertId(session.getUser().getPkUserId());
+            oEntry.setAuxTypeDpsIn(new int[] { res.getInt("fid_ct_dps"), 
+                                                res.getInt("fid_cl_dps"), 
+                                                res.getInt("fid_tp_dps") });
+
+            if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] && 
+                oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] && 
+                oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                    if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                        oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                        oEntry.setTemporalPrice(true);
+                        String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
+                                + "con número de documento " + res.getInt("d.num") + " y "
+                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", " 
+                                + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".\n"
+                                + "Pruebe a crear la valuación a un día previo a la fecha del movimiento.";
+                        SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
+                    }
+            }
             
             oEntry.save(session);
         }
@@ -205,11 +237,25 @@ public class SStockValuationUtils {
                 + "ve.fk_lot, "
                 + "ve.cost_u, "
                 + "ve.fk_cob,"
-                + "ve.fk_wh "
-                + "FROM "
-                + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
+                + "ve.fk_wh, "
+                + "dps.fid_ct_dps, "
+                + "dps.fid_cl_dps, "
+                + "dps.fid_tp_dps, "
+                + "supp.id_des_year, "
+                + "supp.id_des_doc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS diog_ety ON ve.fk_diog_year_in_n = diog_ety.id_year "
+                + "        AND ve.fk_diog_doc_in_n = diog_ety.id_doc AND ve.fk_diog_ety_in_n = diog_ety.id_ety "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON diog_ety.fid_dps_year_n = dps.id_year AND diog_ety.fid_dps_doc_n = dps.id_doc "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON diog_ety.fid_dps_year_n = supp.id_src_year "
+                + "        AND diog_ety.fid_dps_doc_n = supp.id_src_doc "
+                + "        AND diog_ety.fid_dps_ety_n = supp.id_src_ety "
                 + "WHERE "
-                + "NOT ve.b_del AND ve.fk_diog_year_in_n = " + idYear + " "
+                + "NOT ve.b_del "
+//                + "AND ve.fk_diog_year_in_n = " + idYear + " "
                 + "GROUP BY ve.fk_cob , ve.fk_wh , ve.fk_item , ve.fk_unit , ve.fk_lot , ve.cost_u , "
                 + "ve.fk_diog_year_in_n , ve.fk_diog_doc_in_n , ve.fk_diog_ety_in_n "
                 + "HAVING qty > 0 "
@@ -235,6 +281,22 @@ public class SStockValuationUtils {
             oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
             oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
             oEntry.setFkWarehouseId(res.getInt("fk_wh"));
+
+            if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
+                    res.getInt("dps.fid_tp_dps") > 0) {
+                oEntry.setAuxTypeDpsIn(new int[] {
+                                                    res.getInt("dps.fid_ct_dps"), 
+                                                    res.getInt("dps.fid_cl_dps"), 
+                                                    res.getInt("dps.fid_tp_dps") 
+                                                });
+                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                        if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                            oEntry.setTemporalPrice(true);
+                        }
+                }
+            }
 
             entries.add(oEntry);
         }
@@ -309,6 +371,11 @@ public class SStockValuationUtils {
                         oConsumption.setQuantityMovement(consumeQuantity);
                         oConsumption.setCostUnitary(entry.getCostUnitary());
                         oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+
+                        if (entry.isTemporalPrice()) {
+                            oConsumption.setTemporalPrice(true);
+                        }
+
                         oConsumption.setFkItemId(res.getInt("id_item"));
                         oConsumption.setFkUnitId(res.getInt("id_unit"));
                         oConsumption.setFkLotId(res.getInt("id_lot"));
@@ -403,6 +470,9 @@ public class SStockValuationUtils {
      * @throws java.sql.SQLException
      */
     public static boolean deleteValuation(SGuiSession session, final int idValuation) throws SQLException {
+        /**
+         * Eliminar pólizas
+        */
         String sql = "SELECT  " +
                     "    * " +
                     "FROM " +
@@ -427,6 +497,9 @@ public class SStockValuationUtils {
             session.getStatement().getConnection().createStatement().executeUpdate(delRecEtys);
         }
         
+        /**
+         * Eliminar registros de valuación vs pólizas
+         */
         String sqlDelLinks = "UPDATE " +
                             SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " " +
                             "SET b_del = 1 " +
@@ -435,6 +508,25 @@ public class SStockValuationUtils {
                             
         session.getStatement().getConnection().createStatement().executeUpdate(sqlDelLinks);
         
+        /**
+         * Eliminar revisiones de ajuste de precios temporales
+         */
+        String sqlDelRevs = "UPDATE trn_stk_val_mvt AS mvt1 " +
+                            "JOIN ( " +
+                            "    SELECT DISTINCT id_stk_val_mvt " +
+                            "    FROM trn_stk_val_mvt " +
+                            "    WHERE NOT b_del AND fk_stk_val = " + idValuation + " " +
+                            ") AS mvt2 ON mvt1.fk_stk_val_mvt_rev_n = mvt2.id_stk_val_mvt " +
+                            "SET  " +
+                            "    mvt1.b_rev = 0, " +
+                            "    mvt1.fk_stk_val_mvt_n = NULL " +
+                            "WHERE NOT mvt1.b_del;";
+        
+        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelRevs);
+        
+        /**
+         * Eliminar movimientos de valuación
+         */
         String sqlDelEtys = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " SET b_del = 1 "
                 + "WHERE fk_stk_val = " + idValuation + ";";
         
@@ -573,9 +665,6 @@ public class SStockValuationUtils {
         ResultSet res = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
         String result = "";
         while (res.next()) {
-//            oVal = new SDbStockValuation();
-//            oVal.read(session, new int[] { res.getInt("id_stk_val") });
-            
             if (! SDataUtilities.isPeriodOpen(client, res.getDate("dt"))) {
                 result += "La valuación del '" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' al "
                             + "'" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' no se puede reevaluar porque la póliza: "
@@ -588,7 +677,7 @@ public class SStockValuationUtils {
     }
     
     public static Date getFirstInvalidValuationDate(SGuiSession session, Date endDate) throws SQLException, Exception {
-        String sql = "SELECT id_stk_val, dt_sta "
+        String sql = "SELECT id_stk_val, dt_sta  "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
                 + "WHERE NOT b_del "
                 + "AND dt_end < '" + SLibUtils.DbmsDateFormatDate.format(endDate) + "' "
@@ -729,6 +818,40 @@ public class SStockValuationUtils {
         
         return lMatReqs;
     }
+
+
+    public static String periodHasDiogsWithoutInvoice(SGuiSession session, Date startDate, Date cutDate) throws SQLException {
+        String sql = "SELECT d.id_year, d.id_doc, d.dt, d.num, d.fid_dps_year_n, d.fid_dps_doc_n, "
+                + "dps.num, dps.dt "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON (d.fid_dps_year_n = dps.id_year AND d.fid_dps_doc_n = dps.id_doc) "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON d.fid_dps_year_n = supp.id_src_year "
+                + "        AND d.fid_dps_doc_n = supp.id_src_doc "
+                + "WHERE NOT d.b_del "
+                + "AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(startDate) + "' "
+                + "AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
+                + "AND d.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND COALESCE(supp.id_des_year, 0) = 0 "
+                + "ORDER BY d.dt ASC, d.num ASC;";
+
+        String sResult = "";
+        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        while (res.next()) {
+            sResult += "Folio: " + res.getString("d.num") + ", fecha: "
+                    + SLibUtils.DateFormatDate.format(res.getDate("d.dt")) 
+                    +  " y pedido con folio:" + res.getString("dps.num") + ", fecha: " 
+                    + SLibUtils.DateFormatDate.format(res.getDate("dps.dt")) + ".\n";
+        }
+        if (! sResult.isEmpty()) {
+            sResult = "Los movimientos de entrada al almacén: \n" + sResult
+                    + "no tienen una factura asociada.\n";
+        }
+
+        return sResult;
+    }
     
     private static void updateTrnStockRowCost(SGuiSession session, final int idYear,
                                                                 final int idItem, 
@@ -776,7 +899,6 @@ public class SStockValuationUtils {
      * table for which the stock row cost needs to be updated.
      * @param dCost The parameter "dCost" represents the cost value that needs to be updated in the
      * TrnStock table.
-     * @param dQty dQty is the quantity of the item being updated in the transaction stock row.
      * @param opType The "opType" parameter is an integer that represents the type of operation to be
      * performed. It is used to determine how the stock row cost should be updated. The specific values
      * and their meanings would depend on the implementation of the "updateTrnStockRowCost" method.
