@@ -43,6 +43,7 @@ public class SWebDpsRow {
     private String notesAuth;
     private String userInTurn;
     private int authorizationPriority;
+    private SWebCfd oCfd;
 
     public int getIdYear() {
         return idYear;
@@ -300,4 +301,11 @@ public class SWebDpsRow {
         this.authorizationPriority = authorizationPriority;
     }
     
+    public SWebCfd getoCfd() {
+        return oCfd;
+    }
+
+    public void setoCfd(SWebCfd oCfd) {
+        this.oCfd = oCfd;
+    }
 }
