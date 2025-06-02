@@ -14,6 +14,8 @@ import redis.clients.jedis.Jedis;
  * @author Sergio Flores
  */
 public interface SClientInterface {
+    
+    public boolean isGui();
 
     public sa.lib.gui.SGuiSession getSession();
     public erp.server.SSessionXXX getSessionXXX();
