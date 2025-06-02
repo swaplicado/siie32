@@ -116,10 +116,10 @@ import sa.lib.xml.SXmlUtils;
  * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Edwin Carmona, Sergio Flores
  * @version 3.2
  */
-public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
+public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 272.11"; // release date: 2025-05-22
+    public static final String APP_RELEASE = "3.2 272.15"; // release date: 2025-05-28
     public static final String APP_COPYRIGHT = "2007-2025";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -2054,106 +2054,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     }
 
     @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
-
-            if (button == jbCurrentDate) {
-                actionFileCurrentDate();
-            }
-            else if (button == jbSession) {
-                actionFileSession(false);
-            }
-        }
-        else if (e.getSource() instanceof javax.swing.JToggleButton) {
-            javax.swing.JToggleButton toggleButton = (javax.swing.JToggleButton) e.getSource();
-
-            if (toggleButton == jtbModuleCfg) {
-                actionModuleCfg();
-            }
-            else if (toggleButton == jtbModuleFin) {
-                actionModuleFin();
-            }
-            else if (toggleButton == jtbModulePur) {
-                actionModulePur();
-            }
-            else if (toggleButton == jtbModuleSal) {
-                actionModuleSal();
-            }
-            else if (toggleButton == jtbModuleInv) {
-                actionModuleInv();
-            }
-            else if (toggleButton == jtbModuleMkt) {
-                actionModuleMkt();
-            }
-            else if (toggleButton == jtbModuleLog) {
-                actionModuleLog();
-            }
-            else if (toggleButton == jtbModuleMfg) {
-                actionModuleMfg();
-            }
-            else if (toggleButton == jtbModuleHrs) {
-                actionModuleHrs();
-            }
-            else if (toggleButton == jtbModuleQlt) {
-                actionModuleQlt();
-            }            
-        }
-        else if (e.getSource() instanceof javax.swing.JMenuItem) {
-            javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
-
-            if (item == jmiFileCurrentDate) {
-                actionFileCurrentDate();
-            }
-            else if (item == jmiFileSession) {
-                actionFileSession(false);
-            }
-            else if (item == jmiFilePassword) {
-                actionFilePassword();
-            }
-            if (item == jmiFileCloseViews) {
-                actionFileCloseViews();
-            }
-            if (item == jmiFileCloseSession) {
-                actionFileCloseSession();
-            }
-            else if (item == jmiFileClose) {
-                actionFileClose();
-            }
-            else if (item == jmiViewModuleCfg) {
-                actionModuleCfg();
-            }
-            else if (item == jmiViewModuleFin) {
-                actionModuleFin();
-            }
-            else if (item == jmiViewModulePur) {
-                actionModulePur();
-            }
-            else if (item == jmiViewModuleSal) {
-                actionModuleSal();
-            }
-            else if (item == jmiViewModuleInv) {
-                actionModuleInv();
-            }
-            else if (item == jmiViewModuleMkt) {
-                actionModuleMkt();
-            }
-            else if (item == jmiViewModuleLog) {
-                actionModuleLog();
-            }
-            else if (item == jmiViewModuleMfg) {
-                actionModuleMfg();
-            }         
-            else if (item == jmiViewModuleQlt) {
-                actionModuleQlt();
-            }               
-            else if (item == jmiViewModuleHrs) {
-                actionModuleHrs();
-            }
-            else if (item == jmiHelpAbout) {
-                actionHelpAbout();
-            }
-        }
+    public boolean isGui() {
+        return true;
     }
 
     @Override
@@ -2571,6 +2473,109 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public Object getLockManager() {
         moSLockManager = new SLockManager();
         return moSLockManager;
+    }
+
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+
+            if (button == jbCurrentDate) {
+                actionFileCurrentDate();
+            }
+            else if (button == jbSession) {
+                actionFileSession(false);
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JToggleButton) {
+            javax.swing.JToggleButton toggleButton = (javax.swing.JToggleButton) e.getSource();
+
+            if (toggleButton == jtbModuleCfg) {
+                actionModuleCfg();
+            }
+            else if (toggleButton == jtbModuleFin) {
+                actionModuleFin();
+            }
+            else if (toggleButton == jtbModulePur) {
+                actionModulePur();
+            }
+            else if (toggleButton == jtbModuleSal) {
+                actionModuleSal();
+            }
+            else if (toggleButton == jtbModuleInv) {
+                actionModuleInv();
+            }
+            else if (toggleButton == jtbModuleMkt) {
+                actionModuleMkt();
+            }
+            else if (toggleButton == jtbModuleLog) {
+                actionModuleLog();
+            }
+            else if (toggleButton == jtbModuleMfg) {
+                actionModuleMfg();
+            }
+            else if (toggleButton == jtbModuleHrs) {
+                actionModuleHrs();
+            }
+            else if (toggleButton == jtbModuleQlt) {
+                actionModuleQlt();
+            }            
+        }
+        else if (e.getSource() instanceof javax.swing.JMenuItem) {
+            javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
+
+            if (item == jmiFileCurrentDate) {
+                actionFileCurrentDate();
+            }
+            else if (item == jmiFileSession) {
+                actionFileSession(false);
+            }
+            else if (item == jmiFilePassword) {
+                actionFilePassword();
+            }
+            if (item == jmiFileCloseViews) {
+                actionFileCloseViews();
+            }
+            if (item == jmiFileCloseSession) {
+                actionFileCloseSession();
+            }
+            else if (item == jmiFileClose) {
+                actionFileClose();
+            }
+            else if (item == jmiViewModuleCfg) {
+                actionModuleCfg();
+            }
+            else if (item == jmiViewModuleFin) {
+                actionModuleFin();
+            }
+            else if (item == jmiViewModulePur) {
+                actionModulePur();
+            }
+            else if (item == jmiViewModuleSal) {
+                actionModuleSal();
+            }
+            else if (item == jmiViewModuleInv) {
+                actionModuleInv();
+            }
+            else if (item == jmiViewModuleMkt) {
+                actionModuleMkt();
+            }
+            else if (item == jmiViewModuleLog) {
+                actionModuleLog();
+            }
+            else if (item == jmiViewModuleMfg) {
+                actionModuleMfg();
+            }         
+            else if (item == jmiViewModuleQlt) {
+                actionModuleQlt();
+            }               
+            else if (item == jmiViewModuleHrs) {
+                actionModuleHrs();
+            }
+            else if (item == jmiHelpAbout) {
+                actionHelpAbout();
+            }
+        }
     }
     
     public static boolean checkIsDevMode(final String[] args) {

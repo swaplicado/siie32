@@ -1,4 +1,24 @@
 ================================================================================
+SIIE 3.2 272.15/ 2025-05-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de un indicador de "primera vez en suministro" en las vistas de RM pendientes de suministrar.
+2) Adición de validación de centros de costo en la forma de captura de RM.
+
+================================================================================
+SIIE 3.2 272.14/ 2025-05-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la conversión de tipo de dato del número de empleado en el diálogo de importación de bonos desde el dispositivo externo ("reloj checador").
+
+================================================================================
+SIIE 3.2 272.13/ 2025-05-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de redondeo de los montos en la importación de partidas de pólizas contables desde un archivo externo.
+2) Corrección en la validación del nivel de profundidad de centros de costo en las salidas de inventario.
+
+================================================================================
 SIIE 3.2 272.12/ 2025-05-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

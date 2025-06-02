@@ -729,7 +729,10 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                         + "COALESCE(SUM(ve.qty) - de.sumi_qty, SUM(ve.qty)) AS pen_sumi_qty, "
                         + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per, "
                         + "rpe.name AS ety_pty, "
-                        + "ve.dt_req_n, ";
+                        + "ve.dt_req_n, "
+                        + "IF((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " AS mrl "
+                        + " WHERE mrl.id_mat_req = v.id_mat_req AND mrl.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + ") = 1, " + SGridConsts.ICON_CIRC_MAGENTA + ", " + SGridConsts.ICON_CIRC_WHITE + ") "
+                        + " AS count_sum, ";
                 join += "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item "
                         + "INNER JOIN erp.itmu_unit AS u ON ve.fk_unit = u.id_unit "
                         + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
@@ -779,7 +782,10 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             else if (mnGridSubtype == SLibConsts.UNDEFINED) {
                 select = "COUNT(ve.id_ety) AS ety, " 
                         + "COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_sumi, " 
-                        + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, ";
+                        + "1 - COALESCE(SUM(de.sumi_qty), 0) / SUM(ve.qty) AS per_x_sumi, "
+                        + "IF((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " AS mrl "
+                        + " WHERE mrl.id_mat_req = v.id_mat_req AND mrl.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + ") = 1, " + SGridConsts.ICON_CIRC_MAGENTA + ", " + SGridConsts.ICON_CIRC_WHITE + ") "
+                        + " AS count_sum, ";
                 where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_C + "' ";
 //                subWhere += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PROV + " AND NOT v.b_clo_prov  ";
                 groupOrderBy = "v.id_mat_req, v.dt, v.num ";
@@ -1004,6 +1010,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per", "% suministrado"));
             }
         }
+        
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED || mnGridSubtype == SLibConsts.UNDEFINED) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "req_pty", "Prioridad"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req_n", "Fecha requerida"));
@@ -1012,6 +1019,11 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_sumi", "% suministrado"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
+        
+        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL || mnGridSubtype == SLibConsts.UNDEFINED) {
+            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON_CIRC, "count_sum", "Primera vez suministro", 70));
+        }
+        
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_PUR || mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_pur", "% pedido"));
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_pur", "% x por pedir"));

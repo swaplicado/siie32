@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /**
  * Clase de utilería para válidar y crear renglones de pólizas contables desde la forma de captura o desde un archivo externo.
@@ -129,6 +130,10 @@ public abstract class SFinRecordUtils {
         boolean mbIsCurrentAccountDiogAccount = false;
         String msEmptyAccountId = SDataUtilities.createNewFormattedAccountId(client, client.getSessionXXX().getParamsErp().getDeepAccounts());
         Vector<Integer> mvAccountLevels = SDataUtilities.getAccountLevels(msEmptyAccountId);
+        double roundSumDebit = 0d;
+        double roundSumCredit = 0d;
+        double directSumDebit = 0d;
+        double directSumCredit = 0d;
         
         // Leer el archivo y crear las partidas
         
@@ -211,16 +216,20 @@ public abstract class SFinRecordUtils {
 
                         // Guardar los montos
 
-                        entry.Debit = debit;
-                        entry.Credit = credit;
+                        directSumDebit += debit;
+                        directSumCredit += credit;
+                        roundSumDebit = SLibUtils.roundAmount(roundSumDebit + debit);
+                        roundSumCredit = SLibUtils.roundAmount(roundSumCredit + credit);
+                        entry.Debit = SLibUtils.roundAmount(debit);
+                        entry.Credit = SLibUtils.roundAmount(credit);
                         entry.ExchangeRate = exchangeRate;
                         entry.IsExchangeDifference = exchangeDiference.equalsIgnoreCase("Sí");
                         if (entry.ExchangeRate == 0 && !entry.IsExchangeDifference) {
                             error += "No se especificó un valor en Tipo cambio para el renglón " + (i + 1) + ".\n";
                             errors++;
                         }
-                        entry.DebitCy = debitCy;
-                        entry.CreditCy = creditCy;
+                        entry.DebitCy = SLibUtils.roundAmount(debitCy);
+                        entry.CreditCy = SLibUtils.roundAmount(creditCy);
                         entry.CurId = SDataUtilities.obtainCurrencyId(client, curCode);
                         if (entry.CurId == 0) {
                             error += "No se encontró el Código moneda '" + curCode + "' para el renglón " + (i + 1) + ".\n";
@@ -229,6 +238,18 @@ public abstract class SFinRecordUtils {
                         
                         if (entry.Debit == 0d && entry.Credit == 0d && entry.DebitCy == 0d && entry.CreditCy == 0d) {
                             error += "No se ingresó ningún monto en los campos Debe, Haber, Debe moneda, Haber moneda para el renglón " + (i + 1) + ".\n";
+                            errors++;
+                        }
+                        
+                        String message = SDataUtilities.validateExchangeRate(client, entry.DebitCy, entry.ExchangeRate, entry.Debit, fileColumns.get(COMP_EXC_RATE));
+                        if (!message.isEmpty()) {
+                            error += message.replaceAll("\n", " ") + " en el renglón " + (i + 1) + ".\n";
+                            errors++;
+                        }
+                        
+                        message = SDataUtilities.validateExchangeRate(client, entry.CreditCy, entry.ExchangeRate, entry.Credit, fileColumns.get(COMP_EXC_RATE));
+                        if (!message.isEmpty()) {
+                            error += message.replaceAll("\n", " ") + " en el renglón " + (i + 1) + ".\n";
                             errors++;
                         }
                         
@@ -585,30 +606,56 @@ public abstract class SFinRecordUtils {
                 total++;
             }
             
+            // Compara las sumas de las cantidades directas vs. cantidades redondeadas
+            
+            boolean go = true;
+            boolean showMessage = false;
+            
+            String message = "Se encontraron diferencias entre los montos proporcionados en el archivo externo y los montos procesados en moneda local:\n";
+            if (!SLibUtils.compareAmount(directSumDebit, roundSumDebit)) {
+                message += "En el debe, la suma de los montos del archivo externo es $" + SLibUtils.DecimalFormatValue8D.format(directSumDebit) + ", pero la suma de los montos procesados es de $" + SLibUtils.DecimalFormatValue2D.format(roundSumDebit) + ".\n"
+                        + "Hay una diferencia de $" + SLibUtils.DecimalFormatValue8D.format(directSumDebit - roundSumDebit) + ".\n";
+                showMessage = true;
+            }
+            if (!SLibUtils.compareAmount(directSumCredit, roundSumCredit)) {
+                message += "En el haber, la suma de los montos del archivo externo es $" + SLibUtils.DecimalFormatValue8D.format(directSumCredit) + ", pero la suma de los montos procesados es de $" + SLibUtils.DecimalFormatValue2D.format(roundSumCredit) + ".\n"
+                        + "Hay una diferencia de $" + SLibUtils.DecimalFormatValue8D.format(directSumCredit - roundSumCredit) + ".\n";
+                showMessage = true;
+            }
+            
+            if (showMessage) {
+                go = client.showMsgBoxConfirm(message + "¿Desea continuar con los montos procesados?") == JOptionPane.OK_OPTION;
+            }
+            
             // Muestra los errores y advertencias en el dialogo
             
-            SDialogShowImportErrors dialog = new SDialogShowImportErrors(error, warning, errors, warnings);
-            if (errors > 0) {
-                dialog.setVisible(true);
+            if (go) {
+                SDialogShowImportErrors dialog = new SDialogShowImportErrors(error, warning, errors, warnings);
+                if (errors > 0) {
+                    dialog.setVisible(true);
+                }
+                else {
+                    int ans = 0;
+                    if (warnings > 0) {
+                        dialog.setVisible(true);
+                        ans = client.showMsgBoxConfirm("¿Desea continuar con la inserción a pesar de las advertencias?");
+                    }
+                    if (ans == JOptionPane.OK_OPTION) {
+                        try {
+                            for (SFinRecordEntry finEty : maFinRecordEntries) {
+                                SDataRecordEntry ety = composeRecordEntry(client, null, finEty);
+                                maRecordEntries.add(ety);
+                            }
+                            client.showMsgBoxInformation("Se importaron " + total + " partidas desde el archivo externo.");
+                        }
+                        catch (Exception e) {
+                            client.showMsgBoxWarning("Error al ingresar las partidas, contacte a soporte.");
+                        }
+                    }
+                }
             }
             else {
-                int ans = 0;
-                if (warnings > 0) {
-                    dialog.setVisible(true);
-                    ans = client.showMsgBoxConfirm("¿Desea continuar con la inserción a pesar de las advertencias?");
-                }
-                if (ans == JOptionPane.OK_OPTION) {
-                    try {
-                        for (SFinRecordEntry finEty : maFinRecordEntries) {
-                            SDataRecordEntry ety = composeRecordEntry(client, null, finEty);
-                            maRecordEntries.add(ety);
-                        }
-                        client.showMsgBoxInformation("Se importaron " + total + " partidas desde el archivo externo.");
-                    }
-                    catch (Exception e) {
-                        client.showMsgBoxWarning("Error al ingresar las partidas, contacte a soporte.");
-                    }
-                }
+                client.showMsgBoxWarning("Favor de revisar y ajustar los montos del archivo externo.");
             }
         } 
         catch (Exception e) {
