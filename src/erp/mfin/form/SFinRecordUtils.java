@@ -1317,7 +1317,7 @@ public abstract class SFinRecordUtils {
         recordEntry.setFkSystemMoveCategoryIdXXX(keySystemMoveTypeXXX[0]);
         recordEntry.setFkSystemMoveTypeIdXXX(keySystemMoveTypeXXX[1]);
 
-        recordEntry.setDbmsAccount(entry.Account == null ? "" : entry.Account.getPkAccountIdXXX());
+        recordEntry.setDbmsAccount(entry.Account == null ? "" : entry.Account.getAccount());
         recordEntry.setDbmsAccountComplement("");
         recordEntry.setDbmsCostCenter_n(entry.CostCenter);
         recordEntry.setDbmsCurrencyKey(currency.getKey());
