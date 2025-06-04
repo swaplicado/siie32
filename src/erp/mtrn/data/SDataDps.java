@@ -582,7 +582,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
                 boolean hasComAuthAppWeb = true;
                 try {
-                    hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == 1;
+                    hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
                 } 
                 catch (Exception e) {}
                 

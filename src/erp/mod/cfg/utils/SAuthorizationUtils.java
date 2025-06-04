@@ -7,7 +7,6 @@ package erp.mod.cfg.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -1972,6 +1971,19 @@ public abstract class SAuthorizationUtils {
             SMail mail = new SMail(mailSender, subject, body.toString(), toRecipientsCleaned, ccRecipientsCleaned, bccRecipientsCleaned);
             mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
             mail.send();
+        }
+    }
+    
+    /**
+     * Enviar correo de autorización / rechazo a los proveedores, solo cuando este habilitado el envío automático de correo
+     * 
+     * @param client
+     * @param pkDps
+     * @throws Exception 
+     */
+    public static void sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
+        if (SLibUtils.parseInt(SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT) {
+            STrnUtilities.sendDpsOrder(client, pkDps, false);
         }
     }
     
