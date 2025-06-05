@@ -1,11 +1,17 @@
 package erp.mod.trn.api.db;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.StorageManagerException;
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthJSONUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebCostCenter;
 import erp.mod.trn.api.data.SWebMatReqEtyNote;
 import erp.mod.trn.api.data.SWebMatReqNote;
 import erp.mod.trn.api.data.SWebMaterialRequest;
@@ -16,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +37,46 @@ public class STrnDBMaterialRequest {
         "    mr.id_mat_req, mr.cl_req AS _mr_class, mr.tp_req AS _mr_type, mr.num AS _mr_folio, " +
         "    mr.dt AS _mr_dt, mr.tot_r AS _mr_total, pe.name AS _mr_prov_ent, " +
         "    pty.name AS _mr_priority, st.name AS _mr_status, nat.dps_nat AS _mr_nat, " +
-        "    usr.usr AS _mr_usr, itm.item AS _mr_item_ref " +
+        "    usr.usr AS _mr_usr, itm.item AS _mr_item_ref, "
+            +"CASE "
+            + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+            + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
+            + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+            + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " THEN 'RECHAZADO' "
+            + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+            + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
+            + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+            + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + " THEN 'EN PROCESO' "
+            + "ELSE '(NO APLICA)' "
+            + "END AS auth_status, " +
+        "   cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", " +
+        "   '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, " +
+        "   NULL, NULL, NULL, NULL) AS auth_status_id, " +
+        "    COALESCE(( " +
+        "        SELECT GROUP_CONCAT(u.usr SEPARATOR ', ') " +
+        "        FROM cfgu_authorn_step AS steps1 " +
+        "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr " +
+        "        WHERE NOT steps1.b_del " +
+        "            AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
+        "            AND steps1.res_pk_n1_n = mr.id_mat_req " +
+        "            AND NOT steps1.b_authorn " +
+        "            AND NOT steps1.b_reject " +
+        "            AND steps1.lev = ( " +
+        "                SELECT step2.lev " +
+        "                FROM cfgu_authorn_step AS step2 " +
+        "                WHERE NOT step2.b_del " +
+        "                    AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
+        "                    AND step2.res_pk_n1_n = mr.id_mat_req " +
+        "                    AND NOT step2.b_authorn " +
+        "                    AND NOT step2.b_reject " +
+        "                ORDER BY step2.lev ASC " +
+        "                LIMIT 1 " +
+        "            ) " +
+        "    ), 'NA') AS user_in_turn " +
         "FROM " +
         SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr " +
         "INNER JOIN trn_mat_prov_ent AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
@@ -91,8 +137,8 @@ public class STrnDBMaterialRequest {
     }
 
     private ArrayList<SWebMatReqNote> loadMaterialRequestNotes(final int materialRequestId) throws SQLException {
-        String notesQuery = "SELECT id_nts, nts FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_NTS)
-                            + " WHERE id_mat_req = " + materialRequestId + ";";
+        String notesQuery = "SELECT id_nts, nts FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_NTS) + " "
+                            + "WHERE id_mat_req = " + materialRequestId + ";";
     
         try {
             // Conexión a la base de datos principal.
@@ -103,7 +149,6 @@ public class STrnDBMaterialRequest {
             }
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, notesQuery);
             ArrayList<SWebMatReqNote> notes = new ArrayList<>();
             ResultSet resNts = st.executeQuery(notesQuery);
         
@@ -126,7 +171,7 @@ public class STrnDBMaterialRequest {
 
     private ArrayList<SWebMatReqEtyNote> getMaterialRequestEntryNotes(final int materialRequestId, final int idEty) {
         String etyQuery = "SELECT id_mat_req, id_ety, id_nts, notes FROM " + 
-            SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_NTS) +
+            SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_NTS) + " " +
             "WHERE id_mat_req = " + materialRequestId + " ";
 
             if (idEty > 0) {
@@ -142,10 +187,8 @@ public class STrnDBMaterialRequest {
                 }
     
                 Statement st = conn.createStatement();
-                Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, etyQuery);
                 ResultSet resEtyNts = st.executeQuery(etyQuery);
                 ArrayList<SWebMatReqEtyNote> etyNotes = new ArrayList<>();
-            
                 while (resEtyNts.next()) {
                     etyNotes.add(new SWebMatReqEtyNote(
                         resEtyNts.getInt("id_mat_req"),
@@ -269,39 +312,93 @@ public class STrnDBMaterialRequest {
      */
     public ArrayList<SWebMaterialRequest> getMatReqs(String startDate, String endDate, int idUser, int idSessionUser, int statusFilter) {
         String query = BASE_QUERY + WHERE_NOT_DELETED;
+        
+        try {
+            Connection conn = this.getConnection();
 
-        // Aplicar filtros según el estado.
-        if (statusFilter == -1) {
-            query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL) IN (" + SAuthorizationUtils.AUTH_STATUS_PENDING + ", " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + ") ";
-        } else if (statusFilter == 0) {
-            query += "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
-        } else if (statusFilter > 0) {
-            query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
-                    + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
-                    + "NULL, NULL, NULL, NULL) = " + statusFilter + " "
-                    + "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
-        }
-
-        query += ORDER_BY_ID;
-
-        try (Connection conn = this.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet res = st.executeQuery(query)) {
-
-            ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
-
-            while (res.next()) {
-                SWebMaterialRequest oMatReq = buildMaterialRequest(res);
-                oMatReq.getlNotes().addAll(this.loadMaterialRequestNotes(oMatReq.getIdMaterialRequest()));
-                materialRequests.add(oMatReq);
+            String whereUsers = "";
+            String sCfg = SCfgUtils.getParamValue(conn.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+            if (! sCfg.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(sCfg);
+                List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaRM", idSessionUser);
+                // userGroup = "usuariosSuper";
+                if (! toUsers.isEmpty()) {
+                    whereUsers = "1 = 1 ";
+                }
             }
 
-            return materialRequests;
+            // Aplicar filtros según el estado.
+            switch (statusFilter) {
+                // TODAS MIS RM
+                case -2:
+                    if (whereUsers.isEmpty()) {
+                        query += "AND mr.fk_usr_req = " + idUser + " AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    else {
+                        query += "AND ((" + whereUsers + ") OR (mr.fk_usr_req = " + idUser + ")) AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    break;
+                // RM PENDIENTES
+                case -1:
+                    query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                            + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+                            + "NULL, NULL, NULL, NULL) IN (" + SAuthorizationUtils.AUTH_STATUS_PENDING + ", " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + ") ";
+                    break;
+                case 0:
+                    query += "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    if (whereUsers.isEmpty()) {
+                        query += "AND " + idUser + " IN (SELECT  "
+                                + "    steps1.fk_usr_step "
+                                + "FROM "
+                                + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                                + "WHERE "
+                                + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                                + "        AND steps1.res_pk_n1_n = mr.id_mat_req) ";
+                    }
+                    else {
+                        query += "AND ((" + whereUsers + ") OR (" + idUser + " IN (SELECT  "
+                                + "    steps1.fk_usr_step "
+                                + "FROM "
+                                + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                                + "WHERE "
+                                + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                                + "        AND steps1.res_pk_n1_n = mr.id_mat_req))) ";
+                    }
+                    break;
+                default:
+                    if (statusFilter > 0) {
+                        query += "AND cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
+                                + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', mr.id_mat_req, "
+                                + "NULL, NULL, NULL, NULL) = " + statusFilter + " "
+                                + "AND mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
+                    }
+                    break;
+            }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+            query += ORDER_BY_ID;
+
+            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, query);
+            try (Connection conn1 = this.getConnection();
+                    Statement st = conn1.createStatement();
+                    ResultSet res = st.executeQuery(query)) {
+
+                ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
+
+                while (res.next()) {
+                    SWebMaterialRequest oMatReq = buildMaterialRequest(res);
+                    oMatReq.getlNotes().addAll(this.loadMaterialRequestNotes(oMatReq.getIdMaterialRequest()));
+                    materialRequests.add(oMatReq);
+                }
+
+                return materialRequests;
+
+            } catch (SQLException ex) {
+                Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        catch (Exception e) {
+            
         }
 
         return new ArrayList<>();
@@ -353,10 +450,22 @@ public class STrnDBMaterialRequest {
         oMatReq.setMrStatus(res.getString("_mr_status"));
         oMatReq.setMrNature(res.getString("_mr_nat"));
         oMatReq.setMrItemReference(res.getString("_mr_item_ref"));
+        oMatReq.setUserInTurn(res.getString("user_in_turn"));
+        oMatReq.setAuthText(res.getString("auth_status"));
+        oMatReq.setAuthStatusId(res.getInt("auth_status_id"));
+
+        oMatReq.getlCostCenter().clear();
+        oMatReq.getlCostCenter().addAll(this.getCostCenters(oMatReq.getIdMaterialRequest()));
 
         return oMatReq;
     }
 
+    /**
+     * Carga las entradas de requisición de materiales asociadas a una requisición específica.
+     *
+     * @param materialRequestId ID de la requisición de materiales.
+     * @return Una lista de objetos SWebMaterialRequestEty que representan las entradas de la requisición.
+     */
     public ArrayList<SWebMaterialRequestEty> loadMaterialRequestEtys(final int materialRequestId) {
         /**
          * SELECT 
@@ -385,11 +494,18 @@ public class STrnDBMaterialRequest {
                             "    i.item_key, " +
                             "    i.item AS item_name, " +
                             "    u.symbol AS unit_symbol, " +
-                            "    u.unit AS unit_name " +
+                            "    u.unit AS unit_name, " +
+                            "    iref.item_key AS item_ref_key, " +
+                            "    iref.item AS item_ref_name, " +
+                            "    cc.pk_cc, " +
+                            "    cc.cc, " +
+                            "    cc.id_cc " +
                             "FROM " +
                             SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre  " +
-                            "INNER JOIN erp.itmu_item AS i ON mre.fk_item = i.id_item  " +
-                            "INNER JOIN erp.itmu_unit AS u ON mre.fk_unit = u.id_unit  " +
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON mre.fk_item = i.id_item  " +
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON mre.fk_unit = u.id_unit  " +
+                            "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON mre.fk_item_ref_n = iref.id_item  " +
+                            "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
                             // Agregar la tabla de notas de partidas de requisición de materiales
                             // INNER JOIN erp.trn_mat_req_ety_nts AS mre_nts ON mre.id_mat_req = mre_nts.fid_mat_req AND mre.id_ety = mre_nts.fid_mat_req_ety  "
                             // Agregar la tabla de notas de requisición de materiales
@@ -420,6 +536,12 @@ public class STrnDBMaterialRequest {
                 oMatReqEty.setTotal(resEtys.getDouble("tot_r"));
                 oMatReqEty.setItemKey(resEtys.getString("item_key"));
                 oMatReqEty.setItemName(resEtys.getString("item_name"));
+                oMatReqEty.setUnitSymbol(resEtys.getString("unit_symbol"));
+                oMatReqEty.setUnitName(resEtys.getString("unit_name"));
+                oMatReqEty.setItemRefKey(resEtys.getString("item_ref_key"));
+                oMatReqEty.setItemRefName(resEtys.getString("item_ref_name"));
+                oMatReqEty.setIdCostCenter(resEtys.getInt("cc.pk_cc"));
+                oMatReqEty.setCostCenter(resEtys.getString("cc.id_cc") + " - " + resEtys.getString("cc.cc"));
 
                 oMatReqEty.getlEtyNotes().clear();
                 oMatReqEty.getlEtyNotes().addAll(this.getMaterialRequestEntryNotes(oMatReqEty.getIdMaterialRequest(), oMatReqEty.getIdEty()));
@@ -428,6 +550,54 @@ public class STrnDBMaterialRequest {
             }
             
             return etys;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return new ArrayList<>();
+    }
+
+    /**
+     * Obtiene los centros de costo asociados a una requisición de materiales.
+     *
+     * @param materialRequestId ID de la requisición de materiales.
+     * @return Una lista de objetos SWebCostCenter que representan los centros de costo asociados.
+     */
+    private ArrayList<SWebCostCenter> getCostCenters(final int materialRequestId) {
+        String costCenterQuery = "SELECT  " +
+                "    mrcc.*, cc.pk_cc, mrcc.per, cc.cc, cc.id_cc " +
+                "FROM " +
+                "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrcc " +
+                "        INNER JOIN " +
+                "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mrcc.id_cc = cc.pk_cc " +
+                "    WHERE mrcc.id_mat_req = " + materialRequestId + ";";
+
+        try {
+            // Conexión a la base de datos principal.
+            Connection conn = this.getConnection();
+
+            if (conn == null) {
+                return null;
+            }
+
+            Statement st = conn.createStatement();
+            ArrayList<SWebCostCenter> costCenters = new ArrayList<>();
+            ResultSet resCostCenters = st.executeQuery(costCenterQuery);
+            while (resCostCenters.next()) {
+                SWebCostCenter oCostCenter = new SWebCostCenter();
+                oCostCenter.setIdMatReq(resCostCenters.getInt("mrcc.id_mat_req"));
+                oCostCenter.setIdConsumeEntity(resCostCenters.getInt("mrcc.id_mat_ent_cons_ent"));
+                oCostCenter.setIdConsumeSubEntity(resCostCenters.getInt("mrcc.id_mat_subent_cons_ent"));
+                oCostCenter.setIdConsumeSubSubEntity(resCostCenters.getInt("mrcc.id_mat_subent_cons_subent"));
+                oCostCenter.setIdCostCenter(resCostCenters.getInt("mrcc.id_cc"));
+                oCostCenter.setPercentage(resCostCenters.getDouble("per"));
+                oCostCenter.setCostCenter(resCostCenters.getString("cc.id_cc") + " - " + resCostCenters.getString("cc.cc"));
+
+                costCenters.add(oCostCenter);
+            }
+            
+            return costCenters;
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);

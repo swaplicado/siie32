@@ -200,7 +200,7 @@ public class SViewEmployeeHireLogByPeriod extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, SDbConsts.FIELD_NAME, "Nombre empleado", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tpay.name", "Tipo pago", 60));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_hire", "Última alta"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_dis_n", "Última baja"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "emp.dt_ben", "Inicio prestaciones"));

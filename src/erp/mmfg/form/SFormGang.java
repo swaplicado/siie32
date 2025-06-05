@@ -226,7 +226,7 @@ public class SFormGang extends javax.swing.JDialog implements erp.lib.form.SForm
 
         i = 0;
         oColumnsEntries = new STableColumnForm[8];
-        oColumnsEntries[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 200);
+        oColumnsEntries[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 250);
         oColumnsEntries[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         oColumnsEntries[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         oColumnsEntries[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);

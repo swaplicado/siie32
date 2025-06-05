@@ -6,8 +6,12 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SHrsUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -24,6 +28,7 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFieldText;
 import sa.lib.gui.bean.SBeanFormDialog;
 
@@ -31,7 +36,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Sergio Flores
  */
-public class SPickerEmployee extends SBeanFormDialog implements ActionListener, KeyListener, MouseListener {
+public class SPickerEmployee extends SBeanFormDialog implements ActionListener, ItemListener, KeyListener, MouseListener {
     
     public static final int VAL_MODE = 1;
     
@@ -54,15 +59,19 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         ModesMap.put(MODE_WITNESS_1, "testigo 1");
         ModesMap.put(MODE_WITNESS_2, "testigo 2");
     }
-    
+
+    private boolean mbCompaniesEnabled;
     private ArrayList<Employee> maEmployees;
 
     /**
      * Creates new form SPickerEmployee
      * @param client
      */
-    public SPickerEmployee(SGuiClient client) {
+    public SPickerEmployee(SGuiClient client, boolean companiesEnabled) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Seleccionar empleado");
+        
+        mbCompaniesEnabled = companiesEnabled;
+        
         initComponents();
         initComponentsCustom();
     }
@@ -79,6 +88,9 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
+        jlCompany = new javax.swing.JLabel();
+        moKeyCompany = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel4 = new javax.swing.JPanel();
         jlEmployeeName = new javax.swing.JLabel();
         moTextEmployeeName = new sa.lib.gui.bean.SBeanFieldText();
         jspEmployees = new javax.swing.JScrollPane();
@@ -87,19 +99,30 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar empleado:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlCompany.setText("Empresa:");
+        jlCompany.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlCompany);
+
+        moKeyCompany.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel3.add(moKeyCompany);
+
+        jPanel2.add(jPanel3);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jlEmployeeName.setText("Nombre empleado:");
         jlEmployeeName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlEmployeeName);
+        jPanel4.add(jlEmployeeName);
 
         moTextEmployeeName.setText("TEXT");
         moTextEmployeeName.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel3.add(moTextEmployeeName);
+        jPanel4.add(moTextEmployeeName);
 
-        jPanel2.add(jPanel3);
+        jPanel2.add(jPanel4);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
@@ -118,48 +141,67 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JLabel jlCompany;
     private javax.swing.JLabel jlEmployeeName;
     private javax.swing.JList jlstEmployees;
     private javax.swing.JScrollPane jspEmployees;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCompany;
     private sa.lib.gui.bean.SBeanFieldText moTextEmployeeName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 560, 350);
         
+        moKeyCompany.setKeySettings(miClient, SGuiUtils.getLabelName(jlCompany), true);
+        moKeyCompany.setEnabled(mbCompaniesEnabled);
         moTextEmployeeName.setTextSettings(SGuiUtils.getLabelName(jlEmployeeName), 202, 0);
         
+        moFields.addField(moKeyCompany);
         moFields.addField(moTextEmployeeName);
         
         //moFields.setFormButton(jbSave); // prevent from sendig focus to Save button when user inputs an Enter
         
+        reloadCatalogues();
+        moKeyCompany.setValue(new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
+                
+        retrieveEmployees();
+    }
+    
+    private void retrieveEmployees() {
         try {
-            retrieveEmployees();
+            maEmployees = new ArrayList<>();
+            
+            if (moKeyCompany.getSelectedIndex() <= 0) {
+                moTextEmployeeName.setEnabled(false);
+            }
+            else {
+                moTextEmployeeName.setEnabled(true);
+                
+                int company = moKeyCompany.getSelectedItem().getPrimaryKey()[0];
+                boolean isThisCompany = company == miClient.getSession().getConfigCompany().getCompanyId();
+                
+                String sql = "SELECT e.id_emp, b.bp "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                        + (isThisCompany ? "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp " : "")
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
+                        + "WHERE e.b_act "
+                        + (isThisCompany ? "" : "AND e.fk_src_com = " + company + " ")
+                        + "ORDER BY b.bp, e.id_emp;";
+
+                try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                    while (resultSet.next()) {
+                        maEmployees.add(new Employee(resultSet.getInt(1), resultSet.getString(2)));
+                    }
+                }
+            }
+
+            moTextEmployeeName.resetField();
+            showEmployees();
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-    }
-    
-    private void retrieveEmployees() throws Exception {
-        maEmployees = new ArrayList<>();
-        
-        String sql = "SELECT e.id_emp, b.bp "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
-                + "WHERE e.b_act "
-                + "ORDER BY b.bp, e.id_emp;";
-        
-        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-            while (resultSet.next()) {
-                maEmployees.add(new Employee(resultSet.getInt(1), resultSet.getString(2)));
-            }
-        }
-        
-        moTextEmployeeName.resetField();
-        
-        showEmployees();
     }
     
     @SuppressWarnings("unchecked")
@@ -185,8 +227,43 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         }
     }
     
+    private void setEmployee(final String name) {
+        try {
+            if (mbCompaniesEnabled && name != null && !name.isEmpty()) {
+                SDbEmployee employee = SHrsUtils.getEmployeeByName(miClient, name);
+
+                if (employee != null) {
+                    int company = 0;
+
+                    if (moKeyCompany.getSelectedIndex() > 0) {
+                        company = moKeyCompany.getSelectedItem().getPrimaryKey()[0];
+                    }
+
+                    if (company != employee.getFkSourceCompanyId()) {
+                        moKeyCompany.setValue(new int[] { employee.getFkSourceCompanyId() }); // triggers item-state-changed event!
+                    }
+                }
+            }
+
+            moTextEmployeeName.setValue(name);
+            showEmployees();
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     private void actionPerformedEmployee() {
         jlstEmployees.requestFocusInWindow();
+    }
+    
+    private void itemStateChangedCompany() {
+        try {
+            retrieveEmployees();
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     private void keyTypedEmployee() {
@@ -221,6 +298,8 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
     public void addAllListeners() {
         moTextEmployeeName.addActionListener(this);
         
+        moKeyCompany.addItemListener(this);
+        
         moTextEmployeeName.addKeyListener(this);
         jlstEmployees.addKeyListener(this);
         
@@ -231,6 +310,8 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
     public void removeAllListeners() {
         moTextEmployeeName.removeActionListener(this);
         
+        moKeyCompany.removeItemListener(this);
+        
         moTextEmployeeName.removeKeyListener(this);
         jlstEmployees.removeKeyListener(this);
         
@@ -239,7 +320,7 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
 
     @Override
     public void reloadCatalogues() {
-        
+        miClient.getSession().populateCatalogue(moKeyCompany, SModConsts.CFGU_CO, SModConsts.MOD_HRS, null);
     }
 
     @Override
@@ -274,8 +355,7 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
                 break;
                 
             case SModConsts.HRSU_EMP:
-                moTextEmployeeName.setValue(value);
-                showEmployees();
+                setEmployee((String) value);
                 break;
                 
             default:
@@ -309,6 +389,17 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
         }
     }
 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyCompany) {
+                itemStateChangedCompany();
+            }
+        }
+    }
+    
     @Override
     public void keyTyped(KeyEvent e) {
         System.out.println("keyTyped: " + e.getKeyCode() + "/ source: " + e.getSource().getClass().getName());
@@ -370,7 +461,7 @@ public class SPickerEmployee extends SBeanFormDialog implements ActionListener, 
     public void mouseExited(MouseEvent e) {
 
     }
-    
+
     private class Employee {
         int Id;
         String Name;

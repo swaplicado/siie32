@@ -64,9 +64,11 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         jPanel6 = new javax.swing.JPanel();
         jlDepartmentSuperior = new javax.swing.JLabel();
         moKeyDepartmentSuperior = new sa.lib.gui.bean.SBeanFieldKey();
+        jLabel2 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jlEmployeeHead = new javax.swing.JLabel();
         moKeyEmployeeHead = new sa.lib.gui.bean.SBeanFieldKey();
+        jLabel1 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -120,16 +122,26 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
         moKeyDepartmentSuperior.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel6.add(moKeyDepartmentSuperior);
 
+        jLabel2.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel2.setText("(De este departamento)");
+        jLabel2.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jLabel2);
+
         jPanel2.add(jPanel6);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmployeeHead.setText("Titular depto.:");
+        jlEmployeeHead.setText("Titular:");
         jlEmployeeHead.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlEmployeeHead);
 
         moKeyEmployeeHead.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel13.add(moKeyEmployeeHead);
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("(De este departamento)");
+        jLabel1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel13.add(jLabel1);
 
         jPanel2.add(jPanel13);
 
@@ -213,6 +225,8 @@ public class SFormDepartment extends SBeanForm implements ActionListener {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;

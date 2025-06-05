@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -145,12 +147,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
     @SuppressWarnings("deprecation")
     private JasperPrint requestFillReport(int reportType, Map<String, Object> map) throws JRException, Exception {
-        String name = "";
-        File file = null;
-        JasperReport jasperReport = null;
-        JasperPrint jasperPrint = null;
-
-        /* Begin of special block of code (sflores, 2014-01-15)
+        /*
+         * Begin of special block of code (sflores, 2014-01-15)
          *
          * IMPORTANT:
          * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
@@ -194,38 +192,20 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             SCfdPaymentUtils.createTemporaryDataCfdi33_Crp10(moCompanyDatabase.getConnection(), mnSessionId, map.get("xml").toString());
         }
         else if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
-            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-            
-            if (((SDataEmployee) map.get("oUserBuyer")) != null && ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n() != null) {
-                BufferedImage userBuyer = gc.createCompatibleImage(((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);                
-                Graphics gUserBuyer = userBuyer.createGraphics();
-                gUserBuyer.drawImage(((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
-                map.put("oUserBuyerSign", userBuyer);
-                gUserBuyer.dispose();
-            }
-            
-            if (((SDataEmployee) map.get("oUserAuthorize")) != null && ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n() != null) {
-                BufferedImage userAuthorize = gc.createCompatibleImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getWidth(null), ((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage().getHeight(null), Transparency.TRANSLUCENT);
-                Graphics gUserAuthorize = userAuthorize.createGraphics();
-                gUserAuthorize.drawImage(((SDataEmployee) map.get("oUserAuthorize")).getXtaImageIconSignature_n().getImage(), 0, 0, null);
-                map.put("oUserAuthorizeSign", userAuthorize);
-                gUserAuthorize.dispose();
-            }
+            createUserSignaturesIntoPurchaseOrderReportParams(map);
         }
 
-        /* End of special block of code (sflores, 2014-01-15)
+        /*
+         * End of special block of code (sflores, 2014-01-15)
          */
 
-        name = SDataUtilities.getReportFileName(reportType);
-        if (!name.isEmpty()) {
-            file = new File(name);
-            jasperReport = (JasperReport) JRLoader.loadObject(file);
+        // extra freaky stuff:
+        
+        map.put("oSubreportConnection", moCompanyDatabase.getConnection()); // 2018-08-16, Sergio Flores: What is the purpose of this param?, WTF!
+        
+        // create JasperPrint object:
 
-            map.put("oSubreportConnection", moCompanyDatabase.getConnection()); // 2018-08-16, Sergio Flores: What is the purpose of this param?, WTF!
-            jasperPrint = JasperFillManager.fillReport(jasperReport, map, moCompanyDatabase.getConnection());
-        }
-
-        return jasperPrint;
+        return createJasperPrint(reportType, map, moCompanyDatabase.getConnection());
     }
 
     @SuppressWarnings("unchecked")
@@ -467,7 +447,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         return vTableRows;
     }
 
-     private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
+    private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
         int i = 0;
         int cols = 0;
         Vector<Vector<Object>> vectors = new Vector<>();
@@ -1044,5 +1024,54 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     @Override
     public void finalize() throws Throwable {
         closeSession();
+    }
+    
+    /*
+     * Static methods.
+     */
+    
+    /**
+     * Create images of user signatures into report parameters map of purchase orders.
+     * Printable images are not serializable, so create them where needed.
+     * @param map Report parameters map.
+     */
+    public static void createUserSignaturesIntoPurchaseOrderReportParams(final Map<String, Object> map) {
+        String[] mapKeys = new String[] { "oUserBuyer", "oUserAuthorize" };
+        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        
+        for (String mapKey : mapKeys) {
+            SDataEmployee employee = (SDataEmployee) map.get(mapKey);
+            if (employee != null) {
+                ImageIcon imageIcon = employee.getXtaImageIconSignature_n();
+                if (imageIcon != null) {
+                    BufferedImage bufferedImage = gc.createCompatibleImage(imageIcon.getImage().getWidth(null), imageIcon.getImage().getHeight(null), Transparency.TRANSLUCENT);                
+                    Graphics graphics = bufferedImage.createGraphics();
+                    graphics.drawImage(imageIcon.getImage(), 0, 0, null);
+                    map.put(mapKey, bufferedImage);
+                    graphics.dispose();
+                }
+            }
+        }
+    }
+
+    /**
+     * Create JasperPrint object for requested report type.
+     * IMPORTANT: Report *.jasper file must be accesible in folder "reps/", and required image files in folder "reps/img/<comapny_alias>/", both into root folder!
+     * @param reportType Report type. Constants defined in SDataConstantsSys.REP_...
+     * @param reportParams Report parameters.
+     * @param connection Database connection.
+     * @return JasperPrint object.
+     * @throws JRException
+     * @throws Exception 
+     */
+    public static JasperPrint createJasperPrint(final int reportType, final Map<String, Object> reportParams, final Connection connection) throws JRException, Exception {
+        JasperPrint jasperPrint = null;
+        String reportFileName = SDataUtilities.getReportFileName(reportType);
+        
+        if (!reportFileName.isEmpty()) {
+            jasperPrint = JasperFillManager.fillReport((JasperReport) JRLoader.loadObject(new File(reportFileName)), reportParams, connection);
+        }
+
+        return jasperPrint;
     }
 }

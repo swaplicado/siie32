@@ -71,12 +71,16 @@ public class SStockValuationUtils {
      */
     private static String getStockQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
         String sql = "SELECT  "
-                + "    stk.*, "
+                + "    stk.*,"
+                + "    d.num, "
                 + "    mre.fk_item_ref_n AS ref_ety, "
                 + "    mr.fk_item_ref_n ref_rm, "
                 + "    de.fid_mat_req_n, "
                 + "    de.fid_mat_req_ety_n,"
-                + "    de.fid_cc "
+                + "    de.fid_cc,"
+                + "    tp.tp_iog, "
+                + "    i.item_key, "
+                + "    i.item AS item_name "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
                 + "        INNER JOIN "
@@ -86,6 +90,12 @@ public class SStockValuationUtils {
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " de ON stk.fid_diog_year = de.id_year "
                 + "        AND stk.fid_diog_doc = de.id_doc "
                 + "        AND stk.fid_diog_ety = de.id_ety "
+                + "        INNER JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " i ON stk.id_item = i.id_item "
+                + "        INNER JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " tp ON d.fid_ct_iog = tp.id_ct_iog "
+                + "        AND d.fid_cl_iog = tp.id_cl_iog "
+                + "        AND d.fid_tp_iog = tp.id_tp_iog "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " mre ON de.fid_mat_req_n = mre.id_mat_req "
                 + "        AND de.fid_mat_req_ety_n = mre.id_ety "
@@ -159,9 +169,9 @@ public class SStockValuationUtils {
             oEntry.setCost_r(res.getDouble("debit"));
             oEntry.setFkStockValuationId(idValuation);
             oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
-            oEntry.setFkDiogYearInId(res.getInt("fid_diog_year"));
-            oEntry.setFkDiogDocInId(res.getInt("fid_diog_doc"));
-            oEntry.setFkDiogEntryInId(res.getInt("fid_diog_ety"));
+            oEntry.setFkDiogYearInId_n(res.getInt("fid_diog_year"));
+            oEntry.setFkDiogDocInId_n(res.getInt("fid_diog_doc"));
+            oEntry.setFkDiogEntryInId_n(res.getInt("fid_diog_ety"));
             oEntry.setFkItemId(res.getInt("id_item"));
             oEntry.setFkUnitId(res.getInt("id_unit"));
             oEntry.setFkLotId(res.getInt("id_lot"));
@@ -187,9 +197,9 @@ public class SStockValuationUtils {
                 + "ve.fk_stk_val, "
                 + "SUM(IF(ve.fk_ct_iog = 1, ve.qty_mov, ve.qty_mov * - 1)) AS qty, "
                 + "ve.dt_mov, "
-                + "ve.fk_diog_year_in , "
-                + "ve.fk_diog_doc_in , "
-                + "ve.fk_diog_ety_in, "
+                + "ve.fk_diog_year_in_n, "
+                + "ve.fk_diog_doc_in_n, "
+                + "ve.fk_diog_ety_in_n, "
                 + "ve.fk_item, "
                 + "ve.fk_unit, "
                 + "ve.fk_lot, "
@@ -199,10 +209,9 @@ public class SStockValuationUtils {
                 + "FROM "
                 + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
                 + "WHERE "
-                + "NOT ve.b_del AND ve.fk_diog_year_in = " + idYear + " "
+                + "NOT ve.b_del AND ve.fk_diog_year_in_n = " + idYear + " "
                 + "GROUP BY ve.fk_cob , ve.fk_wh , ve.fk_item , ve.fk_unit , ve.fk_lot , ve.cost_u , "
-                + "ve.fk_mat_req_n , ve.fk_mat_req_ety_n , "
-                + "ve.fk_diog_year_in , ve.fk_diog_doc_in , ve.fk_diog_ety_in, ve.fk_stk_val "
+                + "ve.fk_diog_year_in_n , ve.fk_diog_doc_in_n , ve.fk_diog_ety_in_n "
                 + "HAVING qty > 0 "
                 + "ORDER BY ve.dt_mov ASC , ve.fk_stk_val ASC";
       
@@ -217,9 +226,9 @@ public class SStockValuationUtils {
             oEntry.setCostUnitary(res.getDouble("cost_u"));
             oEntry.setPkStockValuationMvtId(res.getInt("id_stk_val_mvt"));
             oEntry.setFkStockValuationId(res.getInt("fk_stk_val"));
-            oEntry.setFkDiogYearInId(res.getInt("fk_diog_year_in"));
-            oEntry.setFkDiogDocInId(res.getInt("fk_diog_doc_in"));
-            oEntry.setFkDiogEntryInId(res.getInt("fk_diog_ety_in"));
+            oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
+            oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
+            oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
             oEntry.setFkItemId(res.getInt("fk_item"));
             oEntry.setFkUnitId(res.getInt("fk_unit"));
             oEntry.setFkLotId(res.getInt("fk_lot"));
@@ -303,9 +312,9 @@ public class SStockValuationUtils {
                         oConsumption.setFkItemId(res.getInt("id_item"));
                         oConsumption.setFkUnitId(res.getInt("id_unit"));
                         oConsumption.setFkLotId(res.getInt("id_lot"));
-                        oConsumption.setFkDiogYearInId(entry.getFkDiogYearInId());
-                        oConsumption.setFkDiogDocInId(entry.getFkDiogDocInId());
-                        oConsumption.setFkDiogEntryInId(entry.getFkDiogEntryInId());
+                        oConsumption.setFkDiogYearInId_n(entry.getFkDiogYearInId());
+                        oConsumption.setFkDiogDocInId_n(entry.getFkDiogDocInId());
+                        oConsumption.setFkDiogEntryInId_n(entry.getFkDiogEntryInId());
                         oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
                         oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
                         oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
@@ -332,13 +341,50 @@ public class SStockValuationUtils {
                 }
 
                 if (qtyToConsume > 0d) {
-//                    throw new Exception("No hay suficiente stock para consumir.");
-                    System.out.println("WARNING: No hay suficiente stock para consumir. ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
-                            + "ID_DOC = " + (res.getInt("fid_diog_doc")) + ", ID_ETY = " + res.getInt("fid_diog_ety"));
+                    SDbStockValuationMvt oConsumption = new SDbStockValuationMvt();
+                        
+                    oConsumption.setDateMove(res.getDate("dt"));
+                    oConsumption.setQuantityMovement(qtyToConsume);
+                    oConsumption.setCostUnitary(0d);
+                    oConsumption.setCost_r(SLibUtils.roundAmount(0d));
+                    oConsumption.setFkItemId(res.getInt("id_item"));
+                    oConsumption.setFkUnitId(res.getInt("id_unit"));
+                    oConsumption.setFkLotId(res.getInt("id_lot"));
+                    oConsumption.setFkDiogYearInId_n(0);
+                    oConsumption.setFkDiogDocInId_n(0);
+                    oConsumption.setFkDiogEntryInId_n(0);
+                    oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
+                    oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
+                    oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
+                    oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
+                    oConsumption.setFkStockValuationId(idValuation);
+                    oConsumption.setFkStockValuationMvtId_n(0);
+                    oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+
+                    oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
+                    oConsumption.setFkWarehouseId(res.getInt("id_wh"));
+                    oConsumption.setFkUserInsertId(session.getUser().getPkUserId());
+                    
+                    if (res.getInt("fid_mat_req_n") > 0) {
+                        oConsumption.setFkMaterialRequestId_n(res.getInt("fid_mat_req_n"));
+                        oConsumption.setFkMaterialRequestEntryId_n(res.getInt("fid_mat_req_ety_n"));
+                    }
+                    
+                    oConsumption.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                    oConsumption.setAuxDiogTypeDescription(res.getString("tp.tp_iog"));
+                    String log = "WARNING: Movimiento de consumo en $0. " +
+                            "No hay suficiente stock para consumir. Fecha mov: " + (res.getString("dt")) +
+                            ", num: " + res.getString("d.num") +
+                            ", Tipo: " + res.getString("tp.tp_iog") +
+                            " / ID_YEAR = " + (res.getInt("fid_diog_year")) + ", " +
+                            "ID_DOC = " + (res.getInt("fid_diog_doc")) +
+                            ", ID_ETY = " + res.getInt("fid_diog_ety") + ".";
+                    oConsumption.setLogMessage(log);
+
+                    lTempConsumptions.add(oConsumption);
                 }
-                else {
-                    lConsumptions.addAll(lTempConsumptions);
-                }
+                
+                lConsumptions.addAll(lTempConsumptions);
             }
         }
 

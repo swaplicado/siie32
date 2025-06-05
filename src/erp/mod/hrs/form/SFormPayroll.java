@@ -1212,7 +1212,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Número empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo empleado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON_CIRC, "Tipo régimen (empleado)"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Tipo régimen (empleado)"));
 
@@ -2283,7 +2283,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                 removeByImportation(false);
-                ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
+                ArrayList<SRowTimeClock> rows = dialog.getGridRows();
                 addPerceptAndDeductByImportation(rows, ppayroll.getRows());
 
                 computeReceipts();
@@ -2341,7 +2341,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             if (! receiptFound) {
-                throw new Exception("El empleado " + timeClockRow.getEmployee() + " no se pudo procesar, intente de nuevo la carga de prenómina.");
+                throw new Exception("El empleado " + timeClockRow.getEmployeeName() + " no se pudo procesar, intente de nuevo la carga de prenómina.");
             }
 
             double doubleOvertimeValue = ((Number) timeClockRow.getOvertime()).doubleValue();

@@ -11,6 +11,7 @@ import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DCfdi40Consts;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
@@ -64,6 +65,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
+import erp.mtrn.data.SConfigurationDpsOrderFiscalData;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -159,6 +161,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_ADD = 4; // CFD Addenda
     private static final int TAB_CFD_XML = 5; // CFD XML file
     private static final int TAB_ACC = 6; // costomized accounting
+    private static final int TAB_FIS_DATA = 7; // fiscal data purchase orders
     private static final int ACTION_NEW = 1; // acción de captura: nuevo
     private static final int ACTION_EDIT = 2; // acción de captura: modificación
     private static final int DECS_PCT = 4; // 0.01% is 0.0001
@@ -285,14 +288,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartner;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranch;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranchAddress;
-    private erp.lib.form.SFormField moFieldAccItem;
-    private erp.lib.form.SFormField moFieldAccItemRef_n;
-    private erp.lib.form.SFormField moFieldAccQuantity;
-    private erp.lib.form.SFormField moFieldAccUnit;
-    private erp.lib.form.SFormField moFieldAccIsSubtotalPctApplying;
-    private erp.lib.form.SFormField moFieldAccSubtotalPct;
-    private erp.lib.form.SFormField moFieldAccSubtotalCy;
-    private erp.lib.form.SFormField moFieldAccConcept;
+    private erp.lib.form.SFormField moFieldAccEntryItem;
+    private erp.lib.form.SFormField moFieldAccEntryItemRef_n;
+    private erp.lib.form.SFormField moFieldAccEntryQuantity;
+    private erp.lib.form.SFormField moFieldAccEntryUnit;
+    private erp.lib.form.SFormField moFieldAccEntryIsSubtotalPctApplying;
+    private erp.lib.form.SFormField moFieldAccEntrySubtotalPct;
+    private erp.lib.form.SFormField moFieldAccEntrySubtotalCy;
+    private erp.lib.form.SFormField moFieldAccEntryConcept;
+    private erp.lib.form.SFormField moFieldFisDataPaymentMethod;
+    private erp.lib.form.SFormField moFieldFisDataTaxRegimeIss;
+    private erp.lib.form.SFormField moFieldFisDataTaxRegimeRec;
+    private erp.lib.form.SFormField moFieldFisDataCfdiUsage;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     
     private erp.mtrn.data.SDataDps moParamDpsSource;
@@ -377,13 +384,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
-    private erp.mitm.data.SDataItem moAccItem;
+    private erp.mitm.data.SDataItem moAccEntryItem;
+    private SConfigurationDpsOrderFiscalData moConfDpsOrderFiscalData;
     //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-    private int mnAccCurrentAction;
-    private double mdAccSubtotal;
-    private double mdAccSubtotalCy;
-    private double mdAccSubtotalPct;
+    private int mnCustomAccCurrentAction;
     private boolean mbCustomAccPrepared;
+    private boolean mbCustomAccRendered;
+    private double mdCustomAccDpsSubtotal;
+    private double mdCustomAccDpsSubtotalCy;
+    private double mdCustomAccDpsSubtotalPct;
 
     /**
      * Creates new form DFormDps
@@ -444,7 +453,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsRebill = new javax.swing.JCheckBox();
         jPanel16 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
-        jcbNumberSeries = new javax.swing.JComboBox<>();
+        jcbNumberSeries = new javax.swing.JComboBox<SFormComponentItem>();
         jtfNumber = new javax.swing.JTextField();
         jtfNumberReference = new javax.swing.JTextField();
         jPanel18 = new javax.swing.JPanel();
@@ -476,13 +485,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel5 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlFkPaymentTypeId = new javax.swing.JLabel();
-        jcbFkPaymentTypeId = new javax.swing.JComboBox<>();
+        jcbFkPaymentTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel35 = new javax.swing.JPanel();
         jlCfdiPaymentWay = new javax.swing.JLabel();
-        jcbCfdiPaymentWay = new javax.swing.JComboBox<>();
+        jcbCfdiPaymentWay = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel32 = new javax.swing.JPanel();
         jlCfdiPaymentMethod = new javax.swing.JLabel();
-        jcbCfdiPaymentMethod = new javax.swing.JComboBox<>();
+        jcbCfdiPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel25 = new javax.swing.JPanel();
         jlConditionsPayment = new javax.swing.JLabel();
         jtfConditionsPayment = new javax.swing.JTextField();
@@ -497,16 +506,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFkDpsStatusAuthorizationRo = new javax.swing.JTextField();
         jPanel26 = new javax.swing.JPanel();
         jlFkLanguageId = new javax.swing.JLabel();
-        jcbFkLanguageId = new javax.swing.JComboBox<>();
+        jcbFkLanguageId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel33 = new javax.swing.JPanel();
         jlFkDpsNatureId = new javax.swing.JLabel();
-        jcbFkDpsNatureId = new javax.swing.JComboBox<>();
+        jcbFkDpsNatureId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel92 = new javax.swing.JPanel();
         jlFkFunctionalAreaId = new javax.swing.JLabel();
-        jcbFkFunctionalAreaId = new javax.swing.JComboBox<>();
+        jcbFkFunctionalAreaId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel31 = new javax.swing.JPanel();
         jlAccTag = new javax.swing.JLabel();
-        jcbAccTag = new javax.swing.JComboBox<>();
+        jcbAccTag = new javax.swing.JComboBox<String>();
         jPanel30 = new javax.swing.JPanel();
         jckIsAudited = new javax.swing.JCheckBox();
         jckIsAuthorized = new javax.swing.JCheckBox();
@@ -524,7 +533,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jcbFkCurrencyId = new javax.swing.JComboBox<>();
+        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCurrencyId = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
         jlExchangeRateSystem = new javax.swing.JLabel();
@@ -594,9 +603,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
-        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<>();
+        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jlTaxRegionId = new javax.swing.JLabel();
-        jcbTaxRegionId = new javax.swing.JComboBox<>();
+        jcbTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbTaxRegionId = new javax.swing.JButton();
         jbEditTaxRegion = new javax.swing.JButton();
         jpMarketing = new javax.swing.JPanel();
@@ -618,7 +627,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel38 = new javax.swing.JPanel();
         jlFkProductionOrderId_n = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
-        jcbFkProductionOrderId_n = new javax.swing.JComboBox<>();
+        jcbFkProductionOrderId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkProductionOrderId_n = new javax.swing.JButton();
         jpOtherMarketing = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
@@ -643,36 +652,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel64 = new javax.swing.JPanel();
         jlFkContactId_n = new javax.swing.JLabel();
         jPanel80 = new javax.swing.JPanel();
-        jcbFkContactId_n = new javax.swing.JComboBox<>();
+        jcbFkContactId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jpOtherLogistics = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel50 = new javax.swing.JPanel();
         jlFkIncotermId = new javax.swing.JLabel();
-        jcbFkIncotermId = new javax.swing.JComboBox<>();
+        jcbFkIncotermId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkIncotermId = new javax.swing.JButton();
         jPanel84 = new javax.swing.JPanel();
         jlFkSpotSrcId_n = new javax.swing.JLabel();
-        jcbFkSpotSrcId_n = new javax.swing.JComboBox<>();
+        jcbFkSpotSrcId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel85 = new javax.swing.JPanel();
         jlFkSpotDesId_n = new javax.swing.JLabel();
-        jcbFkSpotDesId_n = new javax.swing.JComboBox<>();
+        jcbFkSpotDesId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel51 = new javax.swing.JPanel();
         jlFkModeOfTransportationTypeId = new javax.swing.JLabel();
-        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<>();
+        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkModeOfTransportationTypeId = new javax.swing.JButton();
         jPanel52 = new javax.swing.JPanel();
         jlFkCarrierTypeId = new javax.swing.JLabel();
-        jcbFkCarrierTypeId = new javax.swing.JComboBox<>();
+        jcbFkCarrierTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel53 = new javax.swing.JPanel();
         jlFkCarrierId_n = new javax.swing.JLabel();
-        jcbFkCarrierId_n = new javax.swing.JComboBox<>();
+        jcbFkCarrierId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCarrierId_n = new javax.swing.JButton();
         jPanel86 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel54 = new javax.swing.JPanel();
         jlFkVehicleId_n = new javax.swing.JLabel();
-        jcbFkVehicleId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkVehicleId_n = new javax.swing.JButton();
         jPanel55 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
@@ -700,13 +709,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckCfdCceApplies = new javax.swing.JCheckBox();
         jPanel98 = new javax.swing.JPanel();
         jlCfdCceMoveReason = new javax.swing.JLabel();
-        jcbCfdCceMoveReason = new javax.swing.JComboBox<>();
+        jcbCfdCceMoveReason = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel99 = new javax.swing.JPanel();
         jlCfdCceOperationType = new javax.swing.JLabel();
-        jcbCfdCceOperationType = new javax.swing.JComboBox<>();
+        jcbCfdCceOperationType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel100 = new javax.swing.JPanel();
         jlCfdCceRequestKey = new javax.swing.JLabel();
-        jcbCfdCceRequestKey = new javax.swing.JComboBox<>();
+        jcbCfdCceRequestKey = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel101 = new javax.swing.JPanel();
         jlCfdCceCertificateOrigin = new javax.swing.JLabel();
         jtfCfdCceCertificateOrigin = new javax.swing.JTextField();
@@ -750,7 +759,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfAddCfdAddendaType = new javax.swing.JTextField();
         jPanel41 = new javax.swing.JPanel();
         jlAddCfdAddendaSubtype = new javax.swing.JLabel();
-        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<>();
+        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel69 = new javax.swing.JPanel();
         jlAddLorealFolioNotaRecepción = new javax.swing.JLabel();
         jtfAddLorealFolioNotaRecepción = new javax.swing.JTextField();
@@ -798,7 +807,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel76 = new javax.swing.JPanel();
         jPanel123 = new javax.swing.JPanel();
         jlAddAmc71SupplierGln = new javax.swing.JLabel();
-        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<String>();
         jlAddAmc71SupplierGlnHint = new javax.swing.JLabel();
         jPanel124 = new javax.swing.JPanel();
         jlAddAmc71SupplierNumber = new javax.swing.JLabel();
@@ -806,7 +815,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71SupplierNumberHint = new javax.swing.JLabel();
         jPanel125 = new javax.swing.JPanel();
         jlAddAmc71CompanyGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<String>();
         jlAddAmc71CompanyGlnHint = new javax.swing.JLabel();
         jPanel131 = new javax.swing.JPanel();
         jlAddAmc71CompanyContact = new javax.swing.JLabel();
@@ -814,7 +823,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71CompanyContactHint = new javax.swing.JLabel();
         jPanel126 = new javax.swing.JPanel();
         jlAddAmc71CompanyBranchGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<String>();
         jlAddAmc71CompanyBranchGlnHint = new javax.swing.JLabel();
         jPanel130 = new javax.swing.JPanel();
         jlAddAmc71ShipToName = new javax.swing.JLabel();
@@ -850,21 +859,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteBillOfLading = new javax.swing.JButton();
         jPanel95 = new javax.swing.JPanel();
         jlCfdiTaxRegimeIssuing = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<>();
+        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel1 = new javax.swing.JLabel();
         jlGlobalInf = new javax.swing.JLabel();
         jPanel93 = new javax.swing.JPanel();
         jlCfdiTaxRegimeReceptor = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<>();
+        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel2 = new javax.swing.JLabel();
         jlGblPeriodicity = new javax.swing.JLabel();
-        jcbGblPeriodicity = new javax.swing.JComboBox<>();
+        jcbGblPeriodicity = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel94 = new javax.swing.JPanel();
         jlCfdiCfdiUsage = new javax.swing.JLabel();
-        jcbCfdiCfdiUsage = new javax.swing.JComboBox<>();
+        jcbCfdiCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel3 = new javax.swing.JLabel();
         jlGblMonth = new javax.swing.JLabel();
-        jcbGblMonth = new javax.swing.JComboBox<>();
+        jcbGblMonth = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel114 = new javax.swing.JPanel();
         jlCfdiConfirmation = new javax.swing.JLabel();
         jtfCfdiConfirmation = new javax.swing.JTextField();
@@ -874,7 +883,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfGblYear = new javax.swing.JTextField();
         jPanel132 = new javax.swing.JPanel();
         jlExportation = new javax.swing.JLabel();
-        jcbExportation = new javax.swing.JComboBox<>();
+        jcbExportation = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel115 = new javax.swing.JPanel();
         jbCfdiRelatedDocs = new javax.swing.JButton();
         jtfCfdiFirstRelatedDps = new javax.swing.JTextField();
@@ -885,33 +894,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCustomAcc11 = new javax.swing.JPanel();
         jpCustomAcc111 = new javax.swing.JPanel();
         jpCustomAcc1111 = new javax.swing.JPanel();
-        jlAccItem = new javax.swing.JLabel();
-        jcbAccItem = new javax.swing.JComboBox();
-        jbPickAccItem = new javax.swing.JButton();
+        jlAccEntryItem = new javax.swing.JLabel();
+        jcbAccEntryItem = new javax.swing.JComboBox();
+        jbPickAccEntryItem = new javax.swing.JButton();
         jpCustomAcc1112 = new javax.swing.JPanel();
-        jlAccItemRef_n = new javax.swing.JLabel();
-        jcbAccItemRef_n = new javax.swing.JComboBox();
-        jbPickAccItemRef_n = new javax.swing.JButton();
+        jlAccEntryItemRef_n = new javax.swing.JLabel();
+        jcbAccEntryItemRef_n = new javax.swing.JComboBox();
+        jbPickAccEntryItemRef_n = new javax.swing.JButton();
         jpCustomAcc112 = new javax.swing.JPanel();
-        moCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
+        moAccEntryCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
         jpCustomAcc12 = new javax.swing.JPanel();
         jpCustomAcc121 = new javax.swing.JPanel();
-        jlAccQuantity = new javax.swing.JLabel();
-        jtfAccQuantity = new javax.swing.JTextField();
-        jlAccUnit = new javax.swing.JLabel();
-        jcbAccUnit = new javax.swing.JComboBox();
-        jbPickAccUnit = new javax.swing.JButton();
-        jckAccIsSubtotalPctApplying = new javax.swing.JCheckBox();
-        jtfAccSubtotalPct = new javax.swing.JTextField();
-        jtfAccSubtotal = new javax.swing.JTextField();
-        jtfAccSubtotalCur = new javax.swing.JTextField();
-        jtfAccSubtotalCy = new javax.swing.JTextField();
-        jtfAccSubtotalCyCur = new javax.swing.JTextField();
-        jbExeWizardAccSubtotal = new javax.swing.JButton();
+        jlAccEntryQuantity = new javax.swing.JLabel();
+        jtfAccEntryQuantity = new javax.swing.JTextField();
+        jlAccEntryUnit = new javax.swing.JLabel();
+        jcbAccEntryUnit = new javax.swing.JComboBox();
+        jbPickEntryAccUnit = new javax.swing.JButton();
+        jckAccEntryIsSubtotalPctApplying = new javax.swing.JCheckBox();
+        jtfAccEntrySubtotalPct = new javax.swing.JTextField();
+        jtfAccEntrySubtotal = new javax.swing.JTextField();
+        jtfAccEntrySubtotalCur = new javax.swing.JTextField();
+        jtfAccEntrySubtotalCy = new javax.swing.JTextField();
+        jtfAccEntrySubtotalCyCur = new javax.swing.JTextField();
+        jbExeWizardAccEntrySubtotal = new javax.swing.JButton();
         jpCustomAcc122 = new javax.swing.JPanel();
         jPanel139 = new javax.swing.JPanel();
-        jlAccConcept = new javax.swing.JLabel();
-        jtfAccConcept = new javax.swing.JTextField();
+        jlAccEntryConcept = new javax.swing.JLabel();
+        jtfAccEntryConcept = new javax.swing.JTextField();
         jPanel142 = new javax.swing.JPanel();
         jbCustomAccEntryNew = new javax.swing.JButton();
         jbCustomAccEntryCopy = new javax.swing.JButton();
@@ -920,12 +929,27 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCustomAccEntryOk = new javax.swing.JButton();
         jbCustomAccEntryCancel = new javax.swing.JButton();
         jpCustomAcc2 = new javax.swing.JPanel();
-        jlAccSubtotal = new javax.swing.JLabel();
-        jtfAccSubtotalSubtotalPct = new javax.swing.JTextField();
-        jtfAccSubtotalSubtotal = new javax.swing.JTextField();
-        jtfAccSubtotalSubtotalCur = new javax.swing.JTextField();
-        jtfAccSubtotalSubtotalCy = new javax.swing.JTextField();
-        jtfAccSubtotalSubtotalCyCur = new javax.swing.JTextField();
+        jlAccDpsSubtotal = new javax.swing.JLabel();
+        jtfAccDpsSubtotalPct = new javax.swing.JTextField();
+        jtfAccDpsSubtotalSubtotal = new javax.swing.JTextField();
+        jtfAccDpsSubtotalSubtotalCur = new javax.swing.JTextField();
+        jtfAccDpsSubtotalSubtotalCy = new javax.swing.JTextField();
+        jtfAccDpsSubtotalSubtotalCyCur = new javax.swing.JTextField();
+        jpFiscalData = new javax.swing.JPanel();
+        jPanel133 = new javax.swing.JPanel();
+        jPanel134 = new javax.swing.JPanel();
+        jPanel145 = new javax.swing.JPanel();
+        jlFisDataPaymentMethod = new javax.swing.JLabel();
+        jcbFisDataPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel137 = new javax.swing.JPanel();
+        jlFisDataTaxRegimeIssuing = new javax.swing.JLabel();
+        jcbFisDataTaxRegimeIssuing = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel138 = new javax.swing.JPanel();
+        jlFisDataTaxRegimeReceptor = new javax.swing.JLabel();
+        jcbFisDataTaxRegimeReceptor = new javax.swing.JComboBox<SFormComponentItem>();
+        jPanel140 = new javax.swing.JPanel();
+        jlFisDataCfdiUsage = new javax.swing.JLabel();
+        jcbFisDataCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
         jpControls = new javax.swing.JPanel();
         jpControlsPk = new javax.swing.JPanel();
         jtfPkRo = new javax.swing.JTextField();
@@ -3097,40 +3121,40 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpCustomAcc1111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAccItem.setText("Ítem partida:*");
-        jlAccItem.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpCustomAcc1111.add(jlAccItem);
+        jlAccEntryItem.setText("Ítem partida:*");
+        jlAccEntryItem.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc1111.add(jlAccEntryItem);
 
-        jcbAccItem.setPreferredSize(new java.awt.Dimension(450, 23));
-        jpCustomAcc1111.add(jcbAccItem);
+        jcbAccEntryItem.setPreferredSize(new java.awt.Dimension(450, 23));
+        jpCustomAcc1111.add(jcbAccEntryItem);
 
-        jbPickAccItem.setText("...");
-        jbPickAccItem.setFocusable(false);
-        jbPickAccItem.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpCustomAcc1111.add(jbPickAccItem);
+        jbPickAccEntryItem.setText("...");
+        jbPickAccEntryItem.setFocusable(false);
+        jbPickAccEntryItem.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc1111.add(jbPickAccEntryItem);
 
         jpCustomAcc111.add(jpCustomAcc1111);
 
         jpCustomAcc1112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAccItemRef_n.setText("Ítem referencia:");
-        jlAccItemRef_n.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpCustomAcc1112.add(jlAccItemRef_n);
+        jlAccEntryItemRef_n.setText("Ítem referencia:");
+        jlAccEntryItemRef_n.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc1112.add(jlAccEntryItemRef_n);
 
-        jcbAccItemRef_n.setPreferredSize(new java.awt.Dimension(450, 23));
-        jpCustomAcc1112.add(jcbAccItemRef_n);
+        jcbAccEntryItemRef_n.setPreferredSize(new java.awt.Dimension(450, 23));
+        jpCustomAcc1112.add(jcbAccEntryItemRef_n);
 
-        jbPickAccItemRef_n.setText("...");
-        jbPickAccItemRef_n.setFocusable(false);
-        jbPickAccItemRef_n.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpCustomAcc1112.add(jbPickAccItemRef_n);
+        jbPickAccEntryItemRef_n.setText("...");
+        jbPickAccEntryItemRef_n.setFocusable(false);
+        jbPickAccEntryItemRef_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc1112.add(jbPickAccEntryItemRef_n);
 
         jpCustomAcc111.add(jpCustomAcc1112);
 
         jpCustomAcc11.add(jpCustomAcc111, java.awt.BorderLayout.WEST);
 
         jpCustomAcc112.setLayout(new java.awt.BorderLayout());
-        jpCustomAcc112.add(moCostCenterPanel, java.awt.BorderLayout.CENTER);
+        jpCustomAcc112.add(moAccEntryCostCenterPanel, java.awt.BorderLayout.CENTER);
 
         jpCustomAcc11.add(jpCustomAcc112, java.awt.BorderLayout.CENTER);
 
@@ -3140,66 +3164,67 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpCustomAcc121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAccQuantity.setText("Cantidad: *");
-        jlAccQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpCustomAcc121.add(jlAccQuantity);
+        jlAccEntryQuantity.setText("Cantidad: *");
+        jlAccEntryQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc121.add(jlAccEntryQuantity);
 
-        jtfAccQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccQuantity.setText("0.0000");
-        jtfAccQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpCustomAcc121.add(jtfAccQuantity);
+        jtfAccEntryQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccEntryQuantity.setText("0.0000");
+        jtfAccEntryQuantity.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpCustomAcc121.add(jtfAccEntryQuantity);
 
-        jlAccUnit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlAccUnit.setText("Unidad partida:*");
-        jlAccUnit.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpCustomAcc121.add(jlAccUnit);
+        jlAccEntryUnit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAccEntryUnit.setText("Unidad partida:*");
+        jlAccEntryUnit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jlAccEntryUnit);
 
-        jcbAccUnit.setPreferredSize(new java.awt.Dimension(250, 23));
-        jpCustomAcc121.add(jcbAccUnit);
+        jcbAccEntryUnit.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpCustomAcc121.add(jcbAccEntryUnit);
 
-        jbPickAccUnit.setText("...");
-        jbPickAccUnit.setFocusable(false);
-        jbPickAccUnit.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpCustomAcc121.add(jbPickAccUnit);
+        jbPickEntryAccUnit.setText("...");
+        jbPickEntryAccUnit.setFocusable(false);
+        jbPickEntryAccUnit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc121.add(jbPickEntryAccUnit);
 
-        jckAccIsSubtotalPctApplying.setText("%");
-        jckAccIsSubtotalPctApplying.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpCustomAcc121.add(jckAccIsSubtotalPctApplying);
+        jckAccEntryIsSubtotalPctApplying.setText("%");
+        jckAccEntryIsSubtotalPctApplying.setToolTipText("Esta opción se puede cambiar solamente si no hay partidas");
+        jckAccEntryIsSubtotalPctApplying.setPreferredSize(new java.awt.Dimension(40, 23));
+        jpCustomAcc121.add(jckAccEntryIsSubtotalPctApplying);
 
-        jtfAccSubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotalPct.setText("000.00%");
-        jtfAccSubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
-        jpCustomAcc121.add(jtfAccSubtotalPct);
+        jtfAccEntrySubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccEntrySubtotalPct.setText("000.00%");
+        jtfAccEntrySubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
+        jpCustomAcc121.add(jtfAccEntrySubtotalPct);
 
-        jtfAccSubtotal.setEditable(false);
-        jtfAccSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotal.setText("0,000,000,000.00");
-        jtfAccSubtotal.setFocusable(false);
-        jtfAccSubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpCustomAcc121.add(jtfAccSubtotal);
+        jtfAccEntrySubtotal.setEditable(false);
+        jtfAccEntrySubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccEntrySubtotal.setText("0,000,000,000.00");
+        jtfAccEntrySubtotal.setFocusable(false);
+        jtfAccEntrySubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jtfAccEntrySubtotal);
 
-        jtfAccSubtotalCur.setEditable(false);
-        jtfAccSubtotalCur.setText("ERP");
-        jtfAccSubtotalCur.setFocusable(false);
-        jtfAccSubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpCustomAcc121.add(jtfAccSubtotalCur);
+        jtfAccEntrySubtotalCur.setEditable(false);
+        jtfAccEntrySubtotalCur.setText("ERP");
+        jtfAccEntrySubtotalCur.setFocusable(false);
+        jtfAccEntrySubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc121.add(jtfAccEntrySubtotalCur);
 
-        jtfAccSubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotalCy.setText("0,000,000,000.00");
-        jtfAccSubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpCustomAcc121.add(jtfAccSubtotalCy);
+        jtfAccEntrySubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccEntrySubtotalCy.setText("0,000,000,000.00");
+        jtfAccEntrySubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc121.add(jtfAccEntrySubtotalCy);
 
-        jtfAccSubtotalCyCur.setEditable(false);
-        jtfAccSubtotalCyCur.setText("CUR");
-        jtfAccSubtotalCyCur.setFocusable(false);
-        jtfAccSubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpCustomAcc121.add(jtfAccSubtotalCyCur);
+        jtfAccEntrySubtotalCyCur.setEditable(false);
+        jtfAccEntrySubtotalCyCur.setText("CUR");
+        jtfAccEntrySubtotalCyCur.setFocusable(false);
+        jtfAccEntrySubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc121.add(jtfAccEntrySubtotalCyCur);
 
-        jbExeWizardAccSubtotal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
-        jbExeWizardAccSubtotal.setToolTipText("Asignar remanente");
-        jbExeWizardAccSubtotal.setFocusable(false);
-        jbExeWizardAccSubtotal.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpCustomAcc121.add(jbExeWizardAccSubtotal);
+        jbExeWizardAccEntrySubtotal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbExeWizardAccEntrySubtotal.setToolTipText("Asignar remanente");
+        jbExeWizardAccEntrySubtotal.setFocusable(false);
+        jbExeWizardAccEntrySubtotal.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCustomAcc121.add(jbExeWizardAccEntrySubtotal);
 
         jpCustomAcc12.add(jpCustomAcc121);
 
@@ -3207,13 +3232,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel139.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAccConcept.setText("Concepto:*");
-        jlAccConcept.setPreferredSize(new java.awt.Dimension(90, 23));
-        jPanel139.add(jlAccConcept);
+        jlAccEntryConcept.setText("Concepto:*");
+        jlAccEntryConcept.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel139.add(jlAccEntryConcept);
 
-        jtfAccConcept.setText("TEXT");
-        jtfAccConcept.setPreferredSize(new java.awt.Dimension(450, 23));
-        jPanel139.add(jtfAccConcept);
+        jtfAccEntryConcept.setText("TEXT");
+        jtfAccEntryConcept.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel139.add(jtfAccEntryConcept);
 
         jpCustomAcc122.add(jPanel139, java.awt.BorderLayout.WEST);
 
@@ -3258,47 +3283,108 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpCustomAcc2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jlAccSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlAccSubtotal.setText("Subtotal:");
-        jlAccSubtotal.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpCustomAcc2.add(jlAccSubtotal);
+        jlAccDpsSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAccDpsSubtotal.setText("Subtotal:");
+        jlAccDpsSubtotal.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpCustomAcc2.add(jlAccDpsSubtotal);
 
-        jtfAccSubtotalSubtotalPct.setEditable(false);
-        jtfAccSubtotalSubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotalSubtotalPct.setText("000.00%");
-        jtfAccSubtotalSubtotalPct.setFocusable(false);
-        jtfAccSubtotalSubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
-        jpCustomAcc2.add(jtfAccSubtotalSubtotalPct);
+        jtfAccDpsSubtotalPct.setEditable(false);
+        jtfAccDpsSubtotalPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccDpsSubtotalPct.setText("000.00%");
+        jtfAccDpsSubtotalPct.setFocusable(false);
+        jtfAccDpsSubtotalPct.setPreferredSize(new java.awt.Dimension(60, 23));
+        jpCustomAcc2.add(jtfAccDpsSubtotalPct);
 
-        jtfAccSubtotalSubtotal.setEditable(false);
-        jtfAccSubtotalSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotalSubtotal.setText("0,000,000,000.00");
-        jtfAccSubtotalSubtotal.setFocusable(false);
-        jtfAccSubtotalSubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpCustomAcc2.add(jtfAccSubtotalSubtotal);
+        jtfAccDpsSubtotalSubtotal.setEditable(false);
+        jtfAccDpsSubtotalSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccDpsSubtotalSubtotal.setText("0,000,000,000.00");
+        jtfAccDpsSubtotalSubtotal.setFocusable(false);
+        jtfAccDpsSubtotalSubtotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc2.add(jtfAccDpsSubtotalSubtotal);
 
-        jtfAccSubtotalSubtotalCur.setEditable(false);
-        jtfAccSubtotalSubtotalCur.setText("ERP");
-        jtfAccSubtotalSubtotalCur.setFocusable(false);
-        jtfAccSubtotalSubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpCustomAcc2.add(jtfAccSubtotalSubtotalCur);
+        jtfAccDpsSubtotalSubtotalCur.setEditable(false);
+        jtfAccDpsSubtotalSubtotalCur.setText("ERP");
+        jtfAccDpsSubtotalSubtotalCur.setFocusable(false);
+        jtfAccDpsSubtotalSubtotalCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc2.add(jtfAccDpsSubtotalSubtotalCur);
 
-        jtfAccSubtotalSubtotalCy.setEditable(false);
-        jtfAccSubtotalSubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfAccSubtotalSubtotalCy.setText("0,000,000,000.00");
-        jtfAccSubtotalSubtotalCy.setFocusable(false);
-        jtfAccSubtotalSubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpCustomAcc2.add(jtfAccSubtotalSubtotalCy);
+        jtfAccDpsSubtotalSubtotalCy.setEditable(false);
+        jtfAccDpsSubtotalSubtotalCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAccDpsSubtotalSubtotalCy.setText("0,000,000,000.00");
+        jtfAccDpsSubtotalSubtotalCy.setFocusable(false);
+        jtfAccDpsSubtotalSubtotalCy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCustomAcc2.add(jtfAccDpsSubtotalSubtotalCy);
 
-        jtfAccSubtotalSubtotalCyCur.setEditable(false);
-        jtfAccSubtotalSubtotalCyCur.setText("CUR");
-        jtfAccSubtotalSubtotalCyCur.setFocusable(false);
-        jtfAccSubtotalSubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpCustomAcc2.add(jtfAccSubtotalSubtotalCyCur);
+        jtfAccDpsSubtotalSubtotalCyCur.setEditable(false);
+        jtfAccDpsSubtotalSubtotalCyCur.setText("CUR");
+        jtfAccDpsSubtotalSubtotalCyCur.setFocusable(false);
+        jtfAccDpsSubtotalSubtotalCyCur.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpCustomAcc2.add(jtfAccDpsSubtotalSubtotalCyCur);
 
         jpCustomAcc.add(jpCustomAcc2, java.awt.BorderLayout.SOUTH);
 
         jTabbedPane.addTab("Contabilización", jpCustomAcc);
+
+        jpFiscalData.setLayout(new java.awt.BorderLayout());
+
+        jPanel133.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos fiscales requeridos en el CFDI del proveedor:"));
+        jPanel133.setLayout(new java.awt.BorderLayout(0, 2));
+
+        jPanel134.setLayout(new java.awt.GridLayout(8, 2, 0, 2));
+
+        jPanel145.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataPaymentMethod.setText("Método de pago: *");
+        jlFisDataPaymentMethod.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel145.add(jlFisDataPaymentMethod);
+
+        jcbFisDataPaymentMethod.setToolTipText("Uso CFDI del receptor");
+        jcbFisDataPaymentMethod.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel145.add(jcbFisDataPaymentMethod);
+
+        jPanel134.add(jPanel145);
+
+        jPanel137.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataTaxRegimeIssuing.setText("Régimen fiscal del emisor: *");
+        jlFisDataTaxRegimeIssuing.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel137.add(jlFisDataTaxRegimeIssuing);
+
+        jcbFisDataTaxRegimeIssuing.setToolTipText("Régimen fiscal del emisor");
+        jcbFisDataTaxRegimeIssuing.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel137.add(jcbFisDataTaxRegimeIssuing);
+
+        jPanel134.add(jPanel137);
+
+        jPanel138.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataTaxRegimeReceptor.setText("Régimen fiscal del receptor: *");
+        jlFisDataTaxRegimeReceptor.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel138.add(jlFisDataTaxRegimeReceptor);
+
+        jcbFisDataTaxRegimeReceptor.setToolTipText("Régimen fiscal del emisor");
+        jcbFisDataTaxRegimeReceptor.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel138.add(jcbFisDataTaxRegimeReceptor);
+
+        jPanel134.add(jPanel138);
+
+        jPanel140.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFisDataCfdiUsage.setText("Uso del CFDI: *");
+        jlFisDataCfdiUsage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel140.add(jlFisDataCfdiUsage);
+
+        jcbFisDataCfdiUsage.setToolTipText("Uso CFDI del receptor");
+        jcbFisDataCfdiUsage.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel140.add(jcbFisDataCfdiUsage);
+
+        jPanel134.add(jPanel140);
+
+        jPanel133.add(jPanel134, java.awt.BorderLayout.NORTH);
+
+        jpFiscalData.add(jPanel133, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Datos fiscales", jpFiscalData);
 
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -3601,30 +3687,41 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // costomized-accounting fields:
         
-        moFieldAccItem = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccItem, jlAccItem);
-        moFieldAccItem.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccItem.setPickerButton(jbPickAccItem);
-        moFieldAccItemRef_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccItemRef_n, jlAccItemRef_n);
-        moFieldAccItemRef_n.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccItemRef_n.setPickerButton(jbPickAccItemRef_n);
-        moFieldAccQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccQuantity, jlAccQuantity);
-        moFieldAccQuantity.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
-        moFieldAccUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccUnit, jlAccUnit);
-        moFieldAccUnit.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccUnit.setPickerButton(jbPickAccUnit);
-        moFieldAccIsSubtotalPctApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckAccIsSubtotalPctApplying);
-        moFieldAccIsSubtotalPctApplying.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccSubtotalPct = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccSubtotalPct, jckAccIsSubtotalPctApplying);
-        moFieldAccSubtotalPct.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccSubtotalPct.setIsPercent(true);
-        moFieldAccSubtotalPct.setDecimalFormat(SLibUtils.DecimalFormatPercentage2D);
-        moFieldAccSubtotalCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccSubtotalCy, jlAccSubtotal);
-        moFieldAccSubtotalCy.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccSubtotalCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
-        moFieldAccConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAccConcept, jlAccConcept);
-        moFieldAccConcept.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
-        moFieldAccConcept.setLengthMax(100);
+        moFieldAccEntryItem = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccEntryItem, jlAccEntryItem);
+        moFieldAccEntryItem.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntryItem.setPickerButton(jbPickAccEntryItem);
+        moFieldAccEntryItemRef_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccEntryItemRef_n, jlAccEntryItemRef_n);
+        moFieldAccEntryItemRef_n.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntryItemRef_n.setPickerButton(jbPickAccEntryItemRef_n);
+        moFieldAccEntryQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccEntryQuantity, jlAccEntryQuantity);
+        moFieldAccEntryQuantity.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntryQuantity.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+        moFieldAccEntryUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAccEntryUnit, jlAccEntryUnit);
+        moFieldAccEntryUnit.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntryUnit.setPickerButton(jbPickEntryAccUnit);
+        moFieldAccEntryIsSubtotalPctApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckAccEntryIsSubtotalPctApplying);
+        moFieldAccEntryIsSubtotalPctApplying.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntrySubtotalPct = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccEntrySubtotalPct, jckAccEntryIsSubtotalPctApplying);
+        moFieldAccEntrySubtotalPct.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntrySubtotalPct.setIsPercent(true);
+        moFieldAccEntrySubtotalPct.setDecimalFormat(SLibUtils.DecimalFormatPercentage2D);
+        moFieldAccEntrySubtotalCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfAccEntrySubtotalCy, jlAccDpsSubtotal);
+        moFieldAccEntrySubtotalCy.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntrySubtotalCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldAccEntryConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAccEntryConcept, jlAccEntryConcept);
+        moFieldAccEntryConcept.setTabbedPaneIndex(TAB_ACC, jTabbedPane);
+        moFieldAccEntryConcept.setLengthMax(100);
+        
+        // fiscal data purchase order
+        
+        moFieldFisDataPaymentMethod = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataPaymentMethod, jlFisDataPaymentMethod);
+        moFieldFisDataPaymentMethod.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataTaxRegimeIss = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataTaxRegimeIssuing, jlFisDataTaxRegimeIssuing);
+        moFieldFisDataTaxRegimeIss.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataTaxRegimeRec = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataTaxRegimeReceptor, jlFisDataTaxRegimeReceptor);
+        moFieldFisDataTaxRegimeRec.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
+        moFieldFisDataCfdiUsage = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFisDataCfdiUsage, jlFisDataCfdiUsage);
+        moFieldFisDataCfdiUsage.setTabbedPaneIndex(TAB_FIS_DATA, jTabbedPane);
         
         mvFields = new Vector<>();
         mvFields.add(moFieldDate);
@@ -3725,14 +3822,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdiGblMonth);
         mvFields.add(moFieldCfdiGblYear);
         
-        mvFields.add(moFieldAccItem);
-        mvFields.add(moFieldAccItemRef_n);
-        mvFields.add(moFieldAccQuantity);
-        mvFields.add(moFieldAccUnit);
-        mvFields.add(moFieldAccIsSubtotalPctApplying);
-        mvFields.add(moFieldAccSubtotalPct);
-        mvFields.add(moFieldAccSubtotalCy);
-        mvFields.add(moFieldAccConcept);
+        mvFields.add(moFieldAccEntryItem);
+        mvFields.add(moFieldAccEntryItemRef_n);
+        mvFields.add(moFieldAccEntryQuantity);
+        mvFields.add(moFieldAccEntryUnit);
+        mvFields.add(moFieldAccEntryIsSubtotalPctApplying);
+        mvFields.add(moFieldAccEntrySubtotalPct);
+        mvFields.add(moFieldAccEntrySubtotalCy);
+        mvFields.add(moFieldAccEntryConcept);
+        
+        mvFields.add(moFieldFisDataPaymentMethod);
+        mvFields.add(moFieldFisDataTaxRegimeIss);
+        mvFields.add(moFieldFisDataTaxRegimeRec);
+        mvFields.add(moFieldFisDataCfdiUsage);
         
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
@@ -3886,10 +3988,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCustomAcc112.add(moPanelFkCostCenterId_n, BorderLayout.NORTH);
         */
         
-        moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
-        moCostCenterPanel.setRetrieveDataCostCenters(true);
+        moAccEntryCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
+        moAccEntryCostCenterPanel.setRetrieveDataCostCenters(true);
         
-        moCostCenterPanel.setAccountNameWidth(275);
+        moAccEntryCostCenterPanel.setAccountNameWidth(275);
         
         // Action listeners:
 
@@ -3948,10 +4050,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtbNotesFilter.addActionListener(this);
         jbSetTime.addActionListener(this);
         jtbSwitchCustomAcc.addActionListener(this);
-        jbPickAccItem.addActionListener(this);
-        jbPickAccItemRef_n.addActionListener(this);
-        jbPickAccUnit.addActionListener(this);
-        jbExeWizardAccSubtotal.addActionListener(this);
+        jbPickAccEntryItem.addActionListener(this);
+        jbPickAccEntryItemRef_n.addActionListener(this);
+        jbPickEntryAccUnit.addActionListener(this);
+        jbExeWizardAccEntrySubtotal.addActionListener(this);
         jbCustomAccEntryNew.addActionListener(this);
         jbCustomAccEntryCopy.addActionListener(this);
         jbCustomAccEntryEdit.addActionListener(this);
@@ -3971,8 +4073,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71SupplierGln.getEditor().getEditorComponent().addFocusListener(this);
         jcbAddAmc71CompanyGln.getEditor().getEditorComponent().addFocusListener(this);
         jcbAddAmc71CompanyBranchGln.getEditor().getEditorComponent().addFocusListener(this);
-        jtfAccSubtotalCy.addFocusListener(this);
-        jtfAccSubtotalPct.addFocusListener(this);
+        jtfAccEntrySubtotalCy.addFocusListener(this);
+        jtfAccEntrySubtotalPct.addFocusListener(this);
 
         // Item listeners:
 
@@ -3992,8 +4094,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71SupplierGln.addItemListener(this);
         jcbAddAmc71CompanyGln.addItemListener(this);
         jcbAddAmc71CompanyBranchGln.addItemListener(this);
-        jcbAccItem.addItemListener(this);
-        jckAccIsSubtotalPctApplying.addItemListener(this);
+        jcbAccEntryItem.addItemListener(this);
+        jckAccEntryIsSubtotalPctApplying.addItemListener(this);
         jckCfdCceApplies.addItemListener(this);
      
         // Change listeners:
@@ -4028,6 +4130,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.putActionMap(moPanelRecord, actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         
         mbIsDpsTimeReq = mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL;
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String sFiscalData = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD);
+            moConfDpsOrderFiscalData = mapper.readValue(sFiscalData, SConfigurationDpsOrderFiscalData.class);
+        }
+        catch (Exception e) {}
     }
     
     public void actionExportCsv() {
@@ -4092,6 +4201,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     mbFormSettingsOk = goAhead = false;
                                     actionCancel();
                                 }
+                                
+                                if (!isApplingFiscalData()) {
+                                    enableFiscalData(false);
+                                }
                             }
                         }
                     }
@@ -4107,6 +4220,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             actionCancel();
                         }
 
+                        if (!isApplingFiscalData()) {
+                            enableFiscalData(false);
+                        }
+                        
                         // import data from previous document:
                               
                         try {
@@ -4205,6 +4322,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      */
     private boolean isBizPartnerInt() {
         return moBizPartner != null && !moBizPartner.isDomestic(miClient);
+    }
+    
+    /**
+     * Checks if current business partner, has a generic fiscal Id.
+     * @return <code>true</code> if current business partner has a generic fiscal Id.
+     */
+    private boolean isBizPartnerGenericFiscalId() {
+        return moBizPartner != null && moBizPartner.isGenericFiscalId();
     }
     
     /**
@@ -4681,6 +4806,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         return json;
     }
+    
+    private void enableFiscalData(boolean enable) {
+        jTabbedPane.setEnabledAt(TAB_FIS_DATA, isApplingFiscalData());
+        jcbFisDataPaymentMethod.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataTaxRegimeIssuing.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataTaxRegimeReceptor.setEnabled(enable && isApplingFiscalData());
+        jcbFisDataCfdiUsage.setEnabled(enable && isApplingFiscalData());
+    }
 
     /**
      * Checks if number series are defined by system.
@@ -4815,6 +4948,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         return isUpdateNeeded;
+    }
+    
+    private boolean isApplingFiscalData() {
+        return moConfDpsOrderFiscalData != null && moConfDpsOrderFiscalData.getapplyFiscalData() == 1 && mbIsDpsOrder && !mbIsSales && !isBizPartnerInt();
     }
     
     private void isBolAlreadySelected(int[] pk) {
@@ -4986,6 +5123,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 moFieldCfdiConfirmation.setFieldValue(""); // confirmation is unique, cannot be copied when document is being created
                 moFieldCfdiGblYear.setFieldValue(0); // clear global year, cannot be copied when document is being created
+            }
+            
+            if (isApplingFiscalData()) {
+                moFieldFisDataPaymentMethod.setFieldValue(moConfDpsOrderFiscalData.getMetodoPago());
+                moFieldFisDataTaxRegimeIss.setFieldValue(moBizPartnerCategory.getTaxRegime()); 
+                moFieldFisDataTaxRegimeRec.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal()); 
+                moFieldFisDataCfdiUsage.setFieldValue(moConfDpsOrderFiscalData.getUsoCFDI());
             }
         }
     }
@@ -6095,6 +6239,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(false);
             
             enableCfdFields(false);   // disable CFD form tabs & fields
+            enableFiscalData(false);
             
             enableCustomAccControls(false, false);
             enableCustomAccFields(false, true);
@@ -6224,6 +6369,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkProductionOrderId_n.setEnabled(mbIsSales);
             
             enableCfdFields(true);    // enable CFD form tabs & fields
+            enableFiscalData(true);
             
             enableCustomAccControls(true, false);
             enableCustomAccFields(true, true);
@@ -7102,28 +7248,43 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private boolean isCustomAccEnableable() {
-        return mnFormStatus == SLibConstants.FORM_STATUS_EDIT && mnAccCurrentAction != 0 && jcbAccItem.getSelectedIndex() > 0;
+        return mnFormStatus == SLibConstants.FORM_STATUS_EDIT && mnCustomAccCurrentAction != 0 && jcbAccEntryItem.getSelectedIndex() > 0;
     }
     
-    private double getAccSubtotal() {
-        return SLibUtils.roundAmount(moFieldAccSubtotalCy.getDouble() * moDps.getExchangeRate());
+    private double getCustomAccEntrySubtotal() {
+        double customAccEntrySubtotal = 0;
+        double newCustomAccDpsSubtotayCy = SLibUtils.roundAmount((mdCustomAccDpsSubtotalCy + moFieldAccEntrySubtotalCy.getDouble()));
+        
+        // check if DPS subtotal in original currency has been reached:
+        
+        if (newCustomAccDpsSubtotayCy < moDps.getSubtotalCy_r()) {
+            // Original-currency DPS subtotal has not been reached yet:
+            customAccEntrySubtotal = SLibUtils.roundAmount(moFieldAccEntrySubtotalCy.getDouble() * moDps.getExchangeRate());
+        }
+        else if (SLibUtils.compareAmount(newCustomAccDpsSubtotayCy, moDps.getSubtotalCy_r())) {
+            // Original-currency DPS subtotal has been reached already, so assure that local-currency DPS subtotal must be reached as well:
+            customAccEntrySubtotal = SLibUtils.roundAmount(moDps.getSubtotal_r() - mdCustomAccDpsSubtotal);
+        }
+        
+        return customAccEntrySubtotal;
     }
 
     /**
-     * Calculate subtotal of customized accounting.
+     * Calculate DPS subtotal of customized accounting.
      * @param entryToExclude Entry to exclude. Can be <code>null</code>.
      */
-    private void calculateCustomAccSubtotal(final SDataDpsCustomAccEntry entryToExclude) {
-        mdAccSubtotal = 0d;
-        mdAccSubtotalCy = 0d;
-        mdAccSubtotalPct = 0d;
+    private void calculateCustomAccDpsSubtotal(final SDataDpsCustomAccEntry entryToExclude) {
+        mdCustomAccDpsSubtotal = 0d;
+        mdCustomAccDpsSubtotalCy = 0d;
+        mdCustomAccDpsSubtotalPct = 0d;
         
         for (STableRow row : moPaneGridCustomAcc.getGridRows()) {
             SDataDpsCustomAccEntry entry = (SDataDpsCustomAccEntry) row.getData();
+            
             if (entryToExclude == null || entryToExclude != entry) {
-                mdAccSubtotal = SLibUtils.roundAmount(mdAccSubtotal + entry.getSubtotal());
-                mdAccSubtotalCy = SLibUtils.roundAmount(mdAccSubtotalCy + entry.getSubtotalCy());
-                mdAccSubtotalPct = SLibUtils.round(mdAccSubtotalPct + entry.getSubtotalPct(), DECS_PCT);
+                mdCustomAccDpsSubtotal = SLibUtils.roundAmount(mdCustomAccDpsSubtotal + entry.getSubtotal());
+                mdCustomAccDpsSubtotalCy = SLibUtils.roundAmount(mdCustomAccDpsSubtotalCy + entry.getSubtotalCy());
+                mdCustomAccDpsSubtotalPct = SLibUtils.round(mdCustomAccDpsSubtotalPct + entry.getSubtotalPct(), DECS_PCT);
             }
         }
     }
@@ -7136,129 +7297,128 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCustomAccEntryOk.setEnabled(enableOkCancel);
         jbCustomAccEntryCancel.setEnabled(enableOkCancel);
         
-        moPaneGridCustomAcc.getTable().setEnabled(mnAccCurrentAction == 0);
-        moPaneGridCustomAcc.getTable().getTableHeader().setEnabled(mnAccCurrentAction == 0);
+        moPaneGridCustomAcc.getTable().setEnabled(mnCustomAccCurrentAction == 0);
+        moPaneGridCustomAcc.getTable().getTableHeader().setEnabled(mnCustomAccCurrentAction == 0);
     }
     
     private void enableCustomAccFields(final boolean enable, final boolean appliesToAccItem) {
         if (!enable) {
             if (appliesToAccItem) {
-                jcbAccItem.setEnabled(false);
+                jcbAccEntryItem.setEnabled(false);
                 
-                jbPickAccItem.setEnabled(false);
+                jbPickAccEntryItem.setEnabled(false);
             }
             
-            jcbAccItemRef_n.setEnabled(false);
-            jtfAccQuantity.setEnabled(false);
-            jcbAccUnit.setEnabled(false);
-            jckAccIsSubtotalPctApplying.setEnabled(false);
-            jtfAccSubtotalPct.setEnabled(false);
-            jtfAccSubtotalCy.setEnabled(false);
-            jtfAccConcept.setEnabled(false);
+            jcbAccEntryItemRef_n.setEnabled(false);
+            jtfAccEntryQuantity.setEnabled(false);
+            jcbAccEntryUnit.setEnabled(false);
+            jckAccEntryIsSubtotalPctApplying.setEnabled(false);
+            jtfAccEntrySubtotalPct.setEnabled(false);
+            jtfAccEntrySubtotalCy.setEnabled(false);
+            jtfAccEntryConcept.setEnabled(false);
             
-            jbPickAccItemRef_n.setEnabled(false);
-            jbPickAccUnit.setEnabled(false);
-            jbExeWizardAccSubtotal.setEnabled(false);
+            jbPickAccEntryItemRef_n.setEnabled(false);
+            jbPickEntryAccUnit.setEnabled(false);
+            jbExeWizardAccEntrySubtotal.setEnabled(false);
             
             //moPanelFkCostCenterId_n.enableFields(false); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-            moCostCenterPanel.setPanelEditable(false);
+            moAccEntryCostCenterPanel.setPanelEditable(false);
         }
         else {
             boolean enableable = isCustomAccEnableable();
-            boolean areThereEntries = !moPaneGridCustomAcc.getGridRows().isEmpty();
             
             if (appliesToAccItem) {
-                jcbAccItem.setEnabled(enableable);
+                jcbAccEntryItem.setEnabled(enableable);
                 
-                jbPickAccItem.setEnabled(enableable);
+                jbPickAccEntryItem.setEnabled(enableable);
             }
             
-            jcbAccItemRef_n.setEnabled(enableable);
-            jtfAccQuantity.setEnabled(enableable);
-            jcbAccUnit.setEnabled(enableable);
-            jckAccIsSubtotalPctApplying.setEnabled(enableable && !areThereEntries);
-            jtfAccSubtotalPct.setEnabled(enableable && jckAccIsSubtotalPctApplying.isSelected());
-            jtfAccSubtotalCy.setEnabled(enableable && !jckAccIsSubtotalPctApplying.isSelected());
-            jtfAccConcept.setEnabled(enableable);
+            jcbAccEntryItemRef_n.setEnabled(enableable);
+            jtfAccEntryQuantity.setEnabled(enableable);
+            jcbAccEntryUnit.setEnabled(enableable);
+            jckAccEntryIsSubtotalPctApplying.setEnabled(enableable && moPaneGridCustomAcc.getGridRows().isEmpty());
+            jtfAccEntrySubtotalPct.setEnabled(enableable && jckAccEntryIsSubtotalPctApplying.isSelected());
+            jtfAccEntrySubtotalCy.setEnabled(enableable && !jckAccEntryIsSubtotalPctApplying.isSelected());
+            jtfAccEntryConcept.setEnabled(enableable);
             
-            jbPickAccItemRef_n.setEnabled(enableable);
-            jbPickAccUnit.setEnabled(enableable);
-            jbExeWizardAccSubtotal.setEnabled(enableable);
+            jbPickAccEntryItemRef_n.setEnabled(enableable);
+            jbPickEntryAccUnit.setEnabled(enableable);
+            jbExeWizardAccEntrySubtotal.setEnabled(enableable);
             
             //moPanelFkCostCenterId_n.enableFields(enableable); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-            moCostCenterPanel.setPanelEditable(enableable);
+            moAccEntryCostCenterPanel.setPanelEditable(enableable);
         }
     }
     
     private void clearCustomAccFields(final boolean appliesToAccItem) {
         if (appliesToAccItem) {
-            moFieldAccItem.resetField();
-            itemStateChangedAccItem(false);
+            moFieldAccEntryItem.resetField();
+            itemStateChangedAccEntryItem(false);
         }
         
-        moFieldAccItemRef_n.resetField();
-        moFieldAccQuantity.resetField();
-        moFieldAccUnit.resetField();
-        moFieldAccIsSubtotalPctApplying.resetField();
-        itemStateChangedAccIsSubtotalPctApplying(false);
-        moFieldAccSubtotalPct.resetField();
-        moFieldAccSubtotalCy.resetField();
-        moFieldAccConcept.resetField();
+        moFieldAccEntryItemRef_n.resetField();
+        moFieldAccEntryQuantity.resetField();
+        moFieldAccEntryUnit.resetField();
+        moFieldAccEntryIsSubtotalPctApplying.resetField();
+        itemStateChangedAccEntryIsSubtotalPctApplying(false);
+        moFieldAccEntrySubtotalPct.resetField();
+        moFieldAccEntrySubtotalCy.resetField();
+        moFieldAccEntryConcept.resetField();
         
         //moPanelFkCostCenterId_n.resetPanel(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        moCostCenterPanel.initPanel();
+        moAccEntryCostCenterPanel.initPanel();
         
         if (isLocalCurrency()) {
-            jtfAccSubtotal.setText("");
+            jtfAccEntrySubtotal.setText("");
         }
         else {
-            jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
+            jtfAccEntrySubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(0));
         }
     }
     
     @SuppressWarnings("unchecked")
-    private void renderAccItem(final boolean clearFields) {
+    private void renderCustomAccEntryItem(final boolean clearFields) {
         if (clearFields) {
             clearCustomAccFields(false);
         }
         
-        if (moAccItem == null) {
+        if (moAccEntryItem == null) {
             enableCustomAccFields(false, false);
             
             // update units:
             
-            jcbAccUnit.removeAllItems();
+            jcbAccEntryUnit.removeAllItems();
         }
         else {
             enableCustomAccFields(true, false);
             
             // update units:
             
-            if (moAccItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA) {
-                SFormUtilities.populateComboBox(miClient, jcbAccUnit, SDataConstants.ITMU_UNIT, new Object[] { moAccItem.getDbmsDataUnit().getFkUnitTypeId(), moAccItem.getFkUnitAlternativeTypeId() });
+            if (moAccEntryItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA) {
+                SFormUtilities.populateComboBox(miClient, jcbAccEntryUnit, SDataConstants.ITMU_UNIT, new Object[] { moAccEntryItem.getDbmsDataUnit().getFkUnitTypeId(), moAccEntryItem.getFkUnitAlternativeTypeId() });
             }
             else {
-                SFormUtilities.populateComboBox(miClient, jcbAccUnit, SDataConstants.ITMU_UNIT, new int[] { moAccItem.getDbmsDataUnit().getFkUnitTypeId() });
+                SFormUtilities.populateComboBox(miClient, jcbAccEntryUnit, SDataConstants.ITMU_UNIT, new int[] { moAccEntryItem.getDbmsDataUnit().getFkUnitTypeId() });
             }
             
-            moFieldAccUnit.setKey(new int[] { moAccItem.getFkUnitId() });
+            moFieldAccEntryUnit.setKey(new int[] { moAccEntryItem.getFkUnitId() });
             
             // update percentage applying:
             
-            moFieldAccIsSubtotalPctApplying.setBoolean(moPaneGridCustomAcc.getGridRows().isEmpty() ? true : ((SDataDpsCustomAccEntry) moPaneGridCustomAcc.getGridRows().get(0).getData()).getIsSubtotalPctApplying());
-            itemStateChangedAccIsSubtotalPctApplying(false);
+            moFieldAccEntryIsSubtotalPctApplying.setBoolean(moPaneGridCustomAcc.getGridRows().isEmpty() ? true : ((SDataDpsCustomAccEntry) moPaneGridCustomAcc.getGridRows().get(0).getData()).getIsSubtotalPctApplying());
+            itemStateChangedAccEntryIsSubtotalPctApplying(false);
             
             // update cost center:
             
             //moPanelFkCostCenterId_n.enableFields(isCustomAccEnableable()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-            moCostCenterPanel.setPanelEditable(isCustomAccEnableable());
+            moAccEntryCostCenterPanel.setPanelEditable(isCustomAccEnableable());
             
             try {
                 //moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId())); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 SDataCostCenter costCenter = new SDataCostCenter();
-                costCenter.read(new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccItem.getPkItemId()) }, miClient.getSession().getStatement());
-                moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
-                jcbAccItem.requestFocus();
+                costCenter.read(new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccEntryItem.getPkItemId()) }, miClient.getSession().getStatement());
+                moAccEntryCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                jcbAccEntryItem.requestFocus();
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -7276,49 +7436,49 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             clearCustomAccFields(true);
         }
         else {
-            moFieldAccItem.setKey(new int[] { entry.getFkItemId() });
-            itemStateChangedAccItem(true);
-            moFieldAccItemRef_n.setKey(new int[] { entry.getFkItemRefId_n() });
-            moFieldAccQuantity.setDouble(entry.getQuantity());
-            moFieldAccUnit.setKey(new int[] { entry.getFkUnitId() });
-            moFieldAccIsSubtotalPctApplying.setBoolean(entry.getIsSubtotalPctApplying());
-            itemStateChangedAccIsSubtotalPctApplying(false);
-            moFieldAccSubtotalPct.setDouble(entry.getSubtotalPct());
-            moFieldAccSubtotalCy.setDouble(entry.getSubtotalCy());
-            moFieldAccConcept.setString(entry.getConcept());
+            moFieldAccEntryItem.setKey(new int[] { entry.getFkItemId() });
+            itemStateChangedAccEntryItem(true);
+            moFieldAccEntryItemRef_n.setKey(new int[] { entry.getFkItemRefId_n() });
+            moFieldAccEntryQuantity.setDouble(entry.getQuantity());
+            moFieldAccEntryUnit.setKey(new int[] { entry.getFkUnitId() });
+            moFieldAccEntryIsSubtotalPctApplying.setBoolean(entry.getIsSubtotalPctApplying());
+            itemStateChangedAccEntryIsSubtotalPctApplying(false);
+            moFieldAccEntrySubtotalPct.setDouble(entry.getSubtotalPct());
+            moFieldAccEntrySubtotalCy.setDouble(entry.getSubtotalCy());
+            moFieldAccEntryConcept.setString(entry.getConcept());
             
             SDataCostCenter costCenter = new SDataCostCenter();
             if (!entry.getFkCostCenterId_n().isEmpty()) {
                 costCenter.read(new Object[] { entry.getFkCostCenterId_n() }, miClient.getSession().getStatement());
             }
-            moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+            moAccEntryCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
             
             //moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(entry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : entry.getFkCostCenterId_n());
             //moPanelFkCostCenterId_n.refreshPanel();
             
             if (isLocalCurrency()) {
-                jtfAccSubtotal.setText("");
+                jtfAccEntrySubtotal.setText("");
             }
             else {
-                jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(entry.getSubtotal()));
+                jtfAccEntrySubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(entry.getSubtotal()));
             }
         }
         
         mbUpdatingForm = false;
     }
     
-    private void renderCustomAccSubtotal() {
-        calculateCustomAccSubtotal(null);
+    private void renderCustomAccDpsSubtotal() {
+        calculateCustomAccDpsSubtotal(null);
         
         if (isLocalCurrency() || mbResetingForm) {
-            jtfAccSubtotalSubtotal.setText("");
+            jtfAccDpsSubtotalSubtotal.setText("");
         }
         else {
-            jtfAccSubtotalSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdAccSubtotal));
+            jtfAccDpsSubtotalSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdCustomAccDpsSubtotal));
         }
         
-        jtfAccSubtotalSubtotalCy.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdAccSubtotalCy));
-        jtfAccSubtotalSubtotalPct.setText(SLibUtils.DecimalFormatPercentage2D.format(mdAccSubtotalPct));
+        jtfAccDpsSubtotalSubtotalCy.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(mdCustomAccDpsSubtotalCy));
+        jtfAccDpsSubtotalPct.setText(SLibUtils.DecimalFormatPercentage2D.format(mdCustomAccDpsSubtotalPct));
     }
     
     private void renderCfdiFirstRelatedDps() {
@@ -9200,6 +9360,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return canSwitchOn;
     }
     
+    /**
+     * This actions are time consuming!, Invoke this method only when really needed!
+     * @param invokeEntryCancel 
+     */
     @SuppressWarnings("unchecked")
     private void prepareCustomAcc(final boolean invokeEntryCancel) {
         if (!mbCustomAccPrepared) {
@@ -9210,20 +9374,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 // prepate tab settings:
 
-                jtfAccSubtotalCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                jtfAccEntrySubtotalCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
 
                 if (isLocalCurrency()) {
-                    jtfAccSubtotalCyCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                    jtfAccEntrySubtotalCyCur.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
                 }
                 else {
-                    jtfAccSubtotalCyCur.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
+                    jtfAccEntrySubtotalCyCur.setText(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moDps.getFkCurrencyId() }));
                 }
 
-                jtfAccSubtotalSubtotalCur.setText(jtfAccSubtotalCur.getText());
-                jtfAccSubtotalSubtotalCyCur.setText(jtfAccSubtotalCyCur.getText());
+                jtfAccDpsSubtotalSubtotalCur.setText(jtfAccEntrySubtotalCur.getText());
+                jtfAccDpsSubtotalSubtotalCyCur.setText(jtfAccEntrySubtotalCyCur.getText());
 
-                SFormUtilities.populateComboBox(miClient, jcbAccItem, SDataConstants.ITMU_ITEM);
-                SFormUtilities.populateComboBox(miClient, jcbAccItemRef_n, SDataConstants.ITMU_ITEM);
+                SFormUtilities.populateComboBox(miClient, jcbAccEntryItem, SDataConstants.ITMU_ITEM);
+                SFormUtilities.populateComboBox(miClient, jcbAccEntryItemRef_n, SDataConstants.ITMU_ITEM);
                 
                 if (invokeEntryCancel) {
                     actionCustomAccEntryCancel(true, true);
@@ -9264,6 +9428,44 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             mbUpdatingForm = false;
+        }
+    }
+    
+    private void renderCustomAcc(boolean onSetRegistry) {
+        if (!moDps.getDbmsDpsCustomAccEntries().isEmpty() && (onSetRegistry || !mbCustomAccPrepared)) {
+            // Prepare customized-accounting controls and render entries until required:
+
+            if (!onSetRegistry) {
+                // do all the GUI stuff:
+                
+                mbResetingForm = true; // same case as in method setRegistry()
+
+                prepareCustomAcc(false); // as well resets member mbCustomAccPrepared
+            }
+            
+            // render customized accounting entries:
+            
+            if (!mbCustomAccRendered) {
+                for (SDataDpsCustomAccEntry entry : moDps.getDbmsDpsCustomAccEntries()) {
+                    entry.setIsRegistryEdited(true); // assure that entry will be saved
+                    moPaneGridCustomAcc.addTableRow(new SDataDpsCustomAccEntryRow(entry));
+                }
+
+                moPaneGridCustomAcc.renderTableRows();
+                moPaneGridCustomAcc.setTableRowSelection(0);
+                
+                mbCustomAccRendered = true;
+            }
+
+            if (!onSetRegistry) {
+                // do all the GUI stuff:
+                
+                valueChangedCustomAcc();
+                
+                mbResetingForm = false; // same case as in method setRegistry()
+
+                renderCustomAccDpsSubtotal(); // is sensible to member flag mbResetingForm
+            }
         }
     }
     
@@ -9389,63 +9591,63 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void actionPickAccItem() {
+    private void actionPickAccEntryItem() {
         mbUpdatingForm = true;
         
-        if (miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccItem, null) == SLibConstants.FORM_RESULT_OK) {
-            itemStateChangedAccItem(true);
+        if (miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccEntryItem, null) == SLibConstants.FORM_RESULT_OK) {
+            itemStateChangedAccEntryItem(true);
         }
         
         mbUpdatingForm = false;
     }
     
-    private void actionPickAccItemRef_n() {
-        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccItemRef_n, null);
+    private void actionPickAccEntryItemRef_n() {
+        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldAccEntryItemRef_n, null);
     }
     
-    private void actionPickAccUnit() {
-        miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldAccUnit, new int[] { moAccItem.getDbmsDataItemGeneric().getFkUnitTypeId() });
+    private void actionPickAccEntryUnit() {
+        miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldAccEntryUnit, new int[] { moAccEntryItem.getDbmsDataItemGeneric().getFkUnitTypeId() });
     }
     
-    private void actionExeWizardAccSubtotal() {
+    private void actionExeWizardAccEntrySubtotal() {
         JComponent component;
         
-        calculateCustomAccSubtotal(mnAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
+        calculateCustomAccDpsSubtotal(mnCustomAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
         
-        if (jckAccIsSubtotalPctApplying.isSelected()) {
-            if (mdAccSubtotalPct >= 1d) {
-                moFieldAccSubtotalPct.setDouble(0d);
+        if (jckAccEntryIsSubtotalPctApplying.isSelected()) {
+            if (mdCustomAccDpsSubtotalPct >= 1d) {
+                moFieldAccEntrySubtotalPct.setDouble(0d);
             }
             else {
-                moFieldAccSubtotalPct.setDouble(SLibUtils.round(1d - mdAccSubtotalPct, DECS_PCT));
+                moFieldAccEntrySubtotalPct.setDouble(SLibUtils.round(1d - mdCustomAccDpsSubtotalPct, DECS_PCT));
             }
 
-            component = moFieldAccSubtotalPct.getComponent();
+            component = moFieldAccEntrySubtotalPct.getComponent();
             
-            focusLostAccSubtotalPct(); // triggers entry's subtotals calculation
+            focusLostAccEntrySubtotalPct(); // triggers entry's subtotals calculation
         }
         else {
-            if (mdAccSubtotalCy >= moDps.getSubtotalCy_r()) {
-                moFieldAccSubtotalCy.setDouble(0d);
+            if (mdCustomAccDpsSubtotalCy >= moDps.getSubtotalCy_r()) {
+                moFieldAccEntrySubtotalCy.setDouble(0d);
             }
             else {
-                moFieldAccSubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdAccSubtotalCy));
+                moFieldAccEntrySubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdCustomAccDpsSubtotalCy));
             }
             
-            component = moFieldAccSubtotalCy.getComponent();
+            component = moFieldAccEntrySubtotalCy.getComponent();
         }
         
         component.requestFocusInWindow();
     }
     
     private void startCustomAccEntryInput(final int currentAction) {
-        mnAccCurrentAction = currentAction;
+        mnCustomAccCurrentAction = currentAction;
         
         enableCustomAccControls(false, true);
         
-        jbPickAccItem.setEnabled(true);
-        jcbAccItem.setEnabled(true);
-        jcbAccItem.requestFocusInWindow();
+        jbPickAccEntryItem.setEnabled(true);
+        jcbAccEntryItem.setEnabled(true);
+        jcbAccEntryItem.requestFocusInWindow();
     }
     
     private void actionCustomAccEntryNew() {
@@ -9490,7 +9692,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moPaneGridCustomAcc.renderTableRows();
                 moPaneGridCustomAcc.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : index - 1);
                 
-                renderCustomAccSubtotal();
+                renderCustomAccDpsSubtotal();
             }
         }
     }
@@ -9504,14 +9706,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             // validate user input:
             
             ArrayList<SFormField> fields = new ArrayList<>();
-            fields.add(moFieldAccItem);
-            fields.add(moFieldAccItemRef_n);
-            fields.add(moFieldAccQuantity);
-            fields.add(moFieldAccUnit);
-            fields.add(moFieldAccIsSubtotalPctApplying);
-            fields.add(moFieldAccSubtotalPct);
-            fields.add(moFieldAccSubtotalCy);
-            fields.add(moFieldAccConcept);
+            fields.add(moFieldAccEntryItem);
+            fields.add(moFieldAccEntryItemRef_n);
+            fields.add(moFieldAccEntryQuantity);
+            fields.add(moFieldAccEntryUnit);
+            fields.add(moFieldAccEntryIsSubtotalPctApplying);
+            fields.add(moFieldAccEntrySubtotalPct);
+            fields.add(moFieldAccEntrySubtotalCy);
+            fields.add(moFieldAccEntryConcept);
             
             for (SFormField field : fields) {
                 if (!field.validateField()) {
@@ -9522,55 +9724,55 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             
-            boolean isCostCenterEmpty = moCostCenterPanel.getSelectedDataCostCenter() == null;
-            double accSubtotal = getAccSubtotal();
+            boolean isCostCenterEmpty = moAccEntryCostCenterPanel.getSelectedDataCostCenter() == null;
+            double customAccEntrySubtotal = getCustomAccEntrySubtotal();
             
             if (!error) {
-                if (moAccItem == null) {
+                if (moAccEntryItem == null) {
                     error = true;
-                    message = "El ítem relacionado con el campo '" + jlAccItem.getText() + "' no existe.";
-                    component = moFieldAccItem.getComponent();
+                    message = "El ítem relacionado con el campo '" + jlAccEntryItem.getText() + "' no existe.";
+                    component = moFieldAccEntryItem.getComponent();
                 }
-                else if (moAccItem.getIsPrepayment()) {
+                else if (moAccEntryItem.getIsPrepayment()) {
                     error = true;
-                    message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccItem.getText() + "', no puede ser 'anticipo'.";
-                    component = moFieldAccItem.getComponent();
+                    message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccEntryItem.getText() + "', no puede ser 'anticipo'.";
+                    component = moFieldAccEntryItem.getComponent();
                 }
                 else {
                     if (!isCostCenterEmpty) {
-                        String validation = SDataUtilities.validateCostCenter(miClient, moCostCenterPanel.getSelectedDataCostCenter(), moDps.getDate());
+                        String validation = SDataUtilities.validateCostCenter(miClient, moAccEntryCostCenterPanel.getSelectedDataCostCenter(), moDps.getDate());
 
                         if (!validation.isEmpty()) {
                             error = true;
                             message = validation;
-                            component = moCostCenterPanel.getTextNumberFirst();
+                            component = moAccEntryCostCenterPanel.getTextNumberFirst();
                         }
                     }
 
                     if (!error) {
                         // validate subtotal of customized accounting:
 
-                        calculateCustomAccSubtotal(mnAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
+                        calculateCustomAccDpsSubtotal(mnCustomAccCurrentAction == ACTION_EDIT ? (SDataDpsCustomAccEntry) moPaneGridCustomAcc.getSelectedTableRow().getData() : null);
 
-                        if (jckAccIsSubtotalPctApplying.isSelected() && SLibUtils.round(mdAccSubtotalPct + moFieldAccSubtotalPct.getDouble(), DECS_PCT) > 1d) {
+                        if (jckAccEntryIsSubtotalPctApplying.isSelected() && SLibUtils.round(mdCustomAccDpsSubtotalPct + moFieldAccEntrySubtotalPct.getDouble(), DECS_PCT) > 1d) {
                             error = true;
-                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jckAccIsSubtotalPctApplying.getText() + "':\n"
-                                    + "no puede ser mayor a " + SLibUtils.DecimalFormatPercentage2D.format(SLibUtils.round(1d - mdAccSubtotalPct, DECS_PCT)) + ", "
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jckAccEntryIsSubtotalPctApplying.getText() + "':\n"
+                                    + "no puede ser mayor a " + SLibUtils.DecimalFormatPercentage2D.format(SLibUtils.round(1d - mdCustomAccDpsSubtotalPct, DECS_PCT)) + ", "
                                     + "porque se excede el valor máximo " + SLibUtils.DecimalFormatPercentage2D.format(1d) + ".";
-                            component = moFieldAccSubtotalPct.getComponent().isEnabled() ? moFieldAccSubtotalPct.getComponent() : null;
+                            component = moFieldAccEntrySubtotalPct.getComponent().isEnabled() ? moFieldAccEntrySubtotalPct.getComponent() : null;
                         }
-                        else if (SLibUtils.roundAmount(mdAccSubtotalCy + moFieldAccSubtotalCy.getDouble()) > moDps.getSubtotalCy_r()) {
+                        else if (SLibUtils.roundAmount(mdCustomAccDpsSubtotalCy + moFieldAccEntrySubtotalCy.getDouble()) > moDps.getSubtotalCy_r()) {
                             error = true;
-                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccSubtotal.getText() + "':\n"
-                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdAccSubtotalCy)) + ", "
-                                    + "porque se excede el subtotal del documento en la moneda original $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + " " + jtfAccSubtotalCyCur.getText() + ".";
-                            component = moFieldAccSubtotalCy.getComponent();
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccDpsSubtotal.getText() + "':\n"
+                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotalCy_r() - mdCustomAccDpsSubtotalCy)) + ", "
+                                    + "porque se excede el subtotal del documento en la moneda original $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + " " + jtfAccEntrySubtotalCyCur.getText() + ".";
+                            component = moFieldAccEntrySubtotalCy.getComponent();
                         }
-                        else if (!isLocalCurrency() && SLibUtils.roundAmount(mdAccSubtotal + accSubtotal) > moDps.getSubtotal_r()) {
+                        else if (!isLocalCurrency() && SLibUtils.roundAmount(mdCustomAccDpsSubtotal + customAccEntrySubtotal) > moDps.getSubtotal_r()) {
                             error = true;
-                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccSubtotal.getText() + "':\n"
-                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotal_r() - mdAccSubtotal)) + ", "
-                                    + "porque se excede el subtotal del documento en la moneda local $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + " " + jtfAccSubtotalCur.getText() + ".";
+                            message = SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlAccDpsSubtotal.getText() + "':\n"
+                                    + "no puede ser mayor a $" + SLibUtils.getDecimalFormatAmount().format(SLibUtils.roundAmount(moDps.getSubtotal_r() - mdCustomAccDpsSubtotal)) + ", "
+                                    + "porque se excede el subtotal del documento en la moneda local $" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + " " + jtfAccEntrySubtotalCur.getText() + ".";
                             //component = ... there is not any field for local-currency subtotal
                         }
                     }
@@ -9592,9 +9794,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 // save entry:
 
                 SDataDpsCustomAccEntry entry;
-                SDataItem itemRef_n = jcbAccItemRef_n.getSelectedIndex() <= 0 ? null : (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccItemRef_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                SDataItem itemRef_n = jcbAccEntryItemRef_n.getSelectedIndex() <= 0 ? null : (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccEntryItemRef_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
 
-                switch (mnAccCurrentAction) {
+                switch (mnCustomAccCurrentAction) {
                     case ACTION_NEW:
                         entry = new SDataDpsCustomAccEntry();
                         break;
@@ -9609,17 +9811,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 //entry.setPkDpsYearId(...);
                 //entry.setPkDpsDocId(...);
                 //entry.setPkAccEntryId(...);
-                entry.setConcept(moFieldAccConcept.getString());
-                entry.setQuantity(moFieldAccQuantity.getDouble());
-                entry.setIsSubtotalPctApplying(moFieldAccIsSubtotalPctApplying.getBoolean());
-                entry.setSubtotalPct(moFieldAccSubtotalPct.getDouble());
-                entry.setSubtotal(accSubtotal);
-                entry.setSubtotalCy(moFieldAccSubtotalCy.getDouble());
+                entry.setConcept(moFieldAccEntryConcept.getString());
+                entry.setQuantity(moFieldAccEntryQuantity.getDouble());
+                entry.setIsSubtotalPctApplying(moFieldAccEntryIsSubtotalPctApplying.getBoolean());
+                entry.setSubtotalPct(moFieldAccEntrySubtotalPct.getDouble());
+                entry.setSubtotal(customAccEntrySubtotal);
+                entry.setSubtotalCy(moFieldAccEntrySubtotalCy.getDouble());
                 entry.setIsDeleted(false);
-                entry.setFkItemId(moFieldAccItem.getKeyAsIntArray()[0]);
-                entry.setFkUnitId(moFieldAccUnit.getKeyAsIntArray()[0]);
-                entry.setFkCostCenterId_n(isCostCenterEmpty ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX());
-                entry.setFkItemRefId_n(moFieldAccItemRef_n.getKeyAsIntArray()[0]);
+                entry.setFkItemId(moFieldAccEntryItem.getKeyAsIntArray()[0]);
+                entry.setFkUnitId(moFieldAccEntryUnit.getKeyAsIntArray()[0]);
+                entry.setFkCostCenterId_n(isCostCenterEmpty ? "" : moAccEntryCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX());
+                entry.setFkItemRefId_n(moFieldAccEntryItemRef_n.getKeyAsIntArray()[0]);
                 entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 //entry.setFkUserEditId(...);
                 //entry.setFkUserDeleteId(...);
@@ -9627,10 +9829,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 //entry.setUserEditTs(...);
                 //entry.setUserDeleteTs(...);
 
-                entry.setDbmsItemKey(moAccItem.getKey());
-                entry.setDbmsItem(moAccItem.getItem());
-                entry.setDbmsUnitSymbol(moAccItem.getDbmsDataUnit().getSymbol());
-                entry.setDbmsCostCenter_n(isCostCenterEmpty ? "" : moCostCenterPanel.getSelectedDataCostCenter().getCostCenter());
+                entry.setDbmsItemKey(moAccEntryItem.getKey());
+                entry.setDbmsItem(moAccEntryItem.getItem());
+                entry.setDbmsUnitSymbol(moAccEntryItem.getDbmsDataUnit().getSymbol());
+                entry.setDbmsCostCenter_n(isCostCenterEmpty ? "" : moAccEntryCostCenterPanel.getSelectedDataCostCenter().getCostCenter());
                 entry.setDbmsItemRefKey_n(itemRef_n == null ? "" : itemRef_n.getKey());
                 entry.setDbmsItemRef_n(itemRef_n == null ? "" : itemRef_n.getItem());
                 //entry.setDbmsUserNew(...);
@@ -9639,7 +9841,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                 // add or replace entry:
 
-                switch (mnAccCurrentAction) {
+                switch (mnCustomAccCurrentAction) {
                     case ACTION_NEW:
                         moPaneGridCustomAcc.addTableRow(new SDataDpsCustomAccEntryRow(entry));
                         moPaneGridCustomAcc.renderTableRows();
@@ -9655,7 +9857,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         // nothing
                 }
 
-                renderCustomAccSubtotal();
+                renderCustomAccDpsSubtotal();
                 actionCustomAccEntryCancel(false, false);
             }
         }
@@ -9663,7 +9865,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void actionCustomAccEntryCancel(final boolean forceCancel, final boolean renderSelectedEntry) {
         if (jbCustomAccEntryCancel.isEnabled() || forceCancel) {
-            mnAccCurrentAction = 0;
+            mnCustomAccCurrentAction = 0;
             
             enableCustomAccControls(true, false);
             enableCustomAccFields(false, true);
@@ -9717,17 +9919,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void focusLostAccSubtotalPct() {
-        moFieldAccSubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() * moFieldAccSubtotalPct.getDouble()));
-        focusLostAccSubtotalCy();
+    private void focusLostAccEntrySubtotalPct() {
+        moFieldAccEntrySubtotalCy.setDouble(SLibUtils.roundAmount(moDps.getSubtotalCy_r() * moFieldAccEntrySubtotalPct.getDouble()));
+        focusLostAccEntrySubtotalCy();
     }
     
-    private void focusLostAccSubtotalCy() {
+    private void focusLostAccEntrySubtotalCy() {
         if (isLocalCurrency()) {
-            jtfAccSubtotal.setText("");
+            jtfAccEntrySubtotal.setText("");
         }
         else {
-            jtfAccSubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(getAccSubtotal()));
+            jtfAccEntrySubtotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(getCustomAccEntrySubtotal()));
         }
     }
 
@@ -10136,38 +10338,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void itemStateChangedAccItem(final boolean clearFields) {
-        if (jcbAccItem.getSelectedIndex() <= 0) {
-            moAccItem = null;
+    private void itemStateChangedAccEntryItem(final boolean clearFields) {
+        if (jcbAccEntryItem.getSelectedIndex() <= 0) {
+            moAccEntryItem = null;
         }
         else {
-            moAccItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccItem.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+            moAccEntryItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldAccEntryItem.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
         }
 
-        renderAccItem(clearFields);
+        renderCustomAccEntryItem(clearFields);
     }
     
-    private void itemStateChangedAccIsSubtotalPctApplying(final boolean requestFocus) {
+    private void itemStateChangedAccEntryIsSubtotalPctApplying(final boolean requestFocus) {
         boolean enableable = isCustomAccEnableable();
         
-        if (jckAccIsSubtotalPctApplying.isSelected()) {
-            jtfAccSubtotalPct.setEnabled(enableable);
-            jtfAccSubtotalCy.setEnabled(false);
+        if (jckAccEntryIsSubtotalPctApplying.isSelected()) {
+            jtfAccEntrySubtotalPct.setEnabled(enableable);
+            jtfAccEntrySubtotalCy.setEnabled(false);
             
-            moFieldAccSubtotalCy.resetField();
+            moFieldAccEntrySubtotalCy.resetField();
             
             if (requestFocus) {
-                jtfAccSubtotalPct.requestFocusInWindow();
+                jtfAccEntrySubtotalPct.requestFocusInWindow();
             }
         }
         else {
-            jtfAccSubtotalPct.setEnabled(false);
-            jtfAccSubtotalCy.setEnabled(enableable);
+            jtfAccEntrySubtotalPct.setEnabled(false);
+            jtfAccEntrySubtotalCy.setEnabled(enableable);
             
-            moFieldAccSubtotalPct.resetField();
+            moFieldAccEntrySubtotalPct.resetField();
             
             if (requestFocus) {
-                jtfAccSubtotalCy.requestFocusInWindow();
+                jtfAccEntrySubtotalCy.requestFocusInWindow();
             }
         }
     }
@@ -10185,26 +10387,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void stateChangedTabbedPane() {
         if (jTabbedPane.getSelectedIndex() == TAB_ACC) { // customized-accounting tab
-            if (!moDps.getDbmsDpsCustomAccEntries().isEmpty() && !mbCustomAccPrepared) {
-                // Prepare customized-accounting controls and render entries until required:
-                
-                mbResetingForm = true; // same case as in method setRegistry()
-
-                prepareCustomAcc(false); // as well resets member mbCustomAccPrepared
-
-                for (SDataDpsCustomAccEntry entry : moDps.getDbmsDpsCustomAccEntries()) {
-                    entry.setIsRegistryEdited(true); // assure that entry will be saved
-                    moPaneGridCustomAcc.addTableRow(new SDataDpsCustomAccEntryRow(entry));
-                }
-
-                moPaneGridCustomAcc.renderTableRows();
-                moPaneGridCustomAcc.setTableRowSelection(0);
-                valueChangedCustomAcc();
-
-                mbResetingForm = false; // same case as in method setRegistry()
-                
-                renderCustomAccSubtotal(); // is sensible to member flag mbResetingForm
-            }
+            renderCustomAcc(false);
         }
     }
     
@@ -10655,9 +10838,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel130;
     private javax.swing.JPanel jPanel131;
     private javax.swing.JPanel jPanel132;
+    private javax.swing.JPanel jPanel133;
+    private javax.swing.JPanel jPanel134;
+    private javax.swing.JPanel jPanel137;
+    private javax.swing.JPanel jPanel138;
     private javax.swing.JPanel jPanel139;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel140;
     private javax.swing.JPanel jPanel142;
+    private javax.swing.JPanel jPanel145;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
@@ -10788,7 +10977,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryViewMatReqLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
-    private javax.swing.JButton jbExeWizardAccSubtotal;
+    private javax.swing.JButton jbExeWizardAccEntrySubtotal;
     private javax.swing.JButton jbExportCsv;
     private javax.swing.JButton jbFkCarrierId_n;
     private javax.swing.JButton jbFkCurrencyId;
@@ -10803,9 +10992,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbPickAccItem;
-    private javax.swing.JButton jbPickAccItemRef_n;
-    private javax.swing.JButton jbPickAccUnit;
+    private javax.swing.JButton jbPickAccEntryItem;
+    private javax.swing.JButton jbPickAccEntryItemRef_n;
+    private javax.swing.JButton jbPickEntryAccUnit;
     private javax.swing.JButton jbPickSystemNotes;
     private javax.swing.JButton jbPrepayments;
     private javax.swing.JButton jbRecordManualSelect;
@@ -10814,10 +11003,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbSalesSupervisor;
     private javax.swing.JButton jbSetTime;
     private javax.swing.JButton jbTaxRegionId;
-    private javax.swing.JComboBox jcbAccItem;
-    private javax.swing.JComboBox jcbAccItemRef_n;
+    private javax.swing.JComboBox jcbAccEntryItem;
+    private javax.swing.JComboBox jcbAccEntryItemRef_n;
+    private javax.swing.JComboBox jcbAccEntryUnit;
     private javax.swing.JComboBox<String> jcbAccTag;
-    private javax.swing.JComboBox jcbAccUnit;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyBranchGln;
     private javax.swing.JComboBox<String> jcbAddAmc71CompanyGln;
     private javax.swing.JComboBox<String> jcbAddAmc71SupplierGln;
@@ -10837,6 +11026,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegimeReceptor;
     private javax.swing.JComboBox jcbDriver;
     private javax.swing.JComboBox<SFormComponentItem> jcbExportation;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataCfdiUsage;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataPaymentMethod;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataTaxRegimeIssuing;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFisDataTaxRegimeReceptor;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
@@ -10857,7 +11050,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbNumberSeries;
     private javax.swing.JComboBox jcbPlate;
     private javax.swing.JComboBox<SFormComponentItem> jcbTaxRegionId;
-    private javax.swing.JCheckBox jckAccIsSubtotalPctApplying;
+    private javax.swing.JCheckBox jckAccEntryIsSubtotalPctApplying;
     private javax.swing.JCheckBox jckCfdCceApplies;
     private javax.swing.JCheckBox jckDateDoc;
     private javax.swing.JCheckBox jckDateStartCredit;
@@ -10883,13 +11076,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JFormattedTextField jftDateMaturityRo;
     private javax.swing.JFormattedTextField jftDateShipment_nRo;
     private javax.swing.JFormattedTextField jftDateStartCredit;
-    private javax.swing.JLabel jlAccConcept;
-    private javax.swing.JLabel jlAccItem;
-    private javax.swing.JLabel jlAccItemRef_n;
-    private javax.swing.JLabel jlAccQuantity;
-    private javax.swing.JLabel jlAccSubtotal;
+    private javax.swing.JLabel jlAccDpsSubtotal;
+    private javax.swing.JLabel jlAccEntryConcept;
+    private javax.swing.JLabel jlAccEntryItem;
+    private javax.swing.JLabel jlAccEntryItemRef_n;
+    private javax.swing.JLabel jlAccEntryQuantity;
+    private javax.swing.JLabel jlAccEntryUnit;
     private javax.swing.JLabel jlAccTag;
-    private javax.swing.JLabel jlAccUnit;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGln;
     private javax.swing.JLabel jlAddAmc71CompanyBranchGlnHint;
     private javax.swing.JLabel jlAddAmc71CompanyContact;
@@ -10965,6 +11158,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExportation;
     private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
+    private javax.swing.JLabel jlFisDataCfdiUsage;
+    private javax.swing.JLabel jlFisDataPaymentMethod;
+    private javax.swing.JLabel jlFisDataTaxRegimeIssuing;
+    private javax.swing.JLabel jlFisDataTaxRegimeReceptor;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkCarrierId_n;
     private javax.swing.JLabel jlFkCarrierTypeId;
@@ -11032,6 +11229,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jpEntriesControls;
     private javax.swing.JPanel jpEntriesControlsEast;
     private javax.swing.JPanel jpEntriesControlsWest;
+    private javax.swing.JPanel jpFiscalData;
     private javax.swing.JPanel jpHeader;
     private javax.swing.JPanel jpMarketing;
     private javax.swing.JPanel jpNotes;
@@ -11053,18 +11251,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JToggleButton jtbLinkTicket;
     private javax.swing.JToggleButton jtbNotesFilter;
     private javax.swing.JToggleButton jtbSwitchCustomAcc;
-    private javax.swing.JTextField jtfAccConcept;
-    private javax.swing.JTextField jtfAccQuantity;
-    private javax.swing.JTextField jtfAccSubtotal;
-    private javax.swing.JTextField jtfAccSubtotalCur;
-    private javax.swing.JTextField jtfAccSubtotalCy;
-    private javax.swing.JTextField jtfAccSubtotalCyCur;
-    private javax.swing.JTextField jtfAccSubtotalPct;
-    private javax.swing.JTextField jtfAccSubtotalSubtotal;
-    private javax.swing.JTextField jtfAccSubtotalSubtotalCur;
-    private javax.swing.JTextField jtfAccSubtotalSubtotalCy;
-    private javax.swing.JTextField jtfAccSubtotalSubtotalCyCur;
-    private javax.swing.JTextField jtfAccSubtotalSubtotalPct;
+    private javax.swing.JTextField jtfAccDpsSubtotalPct;
+    private javax.swing.JTextField jtfAccDpsSubtotalSubtotal;
+    private javax.swing.JTextField jtfAccDpsSubtotalSubtotalCur;
+    private javax.swing.JTextField jtfAccDpsSubtotalSubtotalCy;
+    private javax.swing.JTextField jtfAccDpsSubtotalSubtotalCyCur;
+    private javax.swing.JTextField jtfAccEntryConcept;
+    private javax.swing.JTextField jtfAccEntryQuantity;
+    private javax.swing.JTextField jtfAccEntrySubtotal;
+    private javax.swing.JTextField jtfAccEntrySubtotalCur;
+    private javax.swing.JTextField jtfAccEntrySubtotalCy;
+    private javax.swing.JTextField jtfAccEntrySubtotalCyCur;
+    private javax.swing.JTextField jtfAccEntrySubtotalPct;
     private javax.swing.JTextField jtfAddAmc71CompanyContact;
     private javax.swing.JTextField jtfAddAmc71ShipToAddress;
     private javax.swing.JTextField jtfAddAmc71ShipToCity;
@@ -11143,7 +11341,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfTicket;
     private javax.swing.JTextField jtfTotalCy_rRo;
     private javax.swing.JTextField jtfTotal_rRo;
-    private erp.gui.account.SBeanPanelAccount moCostCenterPanel;
+    private erp.gui.account.SBeanPanelAccount moAccEntryCostCenterPanel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -11355,21 +11553,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mdOldDiscountDocPercentage = 0;
         mbOldIsDiscountDocApplying = false;
 
-        mnAccCurrentAction = 0;
+        mnCustomAccCurrentAction = 0;
         mbCustomAccPrepared = false;
-        renderCustomAccSubtotal();
+        mbCustomAccRendered = false;
+        renderCustomAccDpsSubtotal();
         
         moDialogDpsTime = null;
         manDpsTime = null;
         
         moDialogCfdRelatedDocs = null;
         moCfdRelatedDocs = null;
-        
         jtaCfdiRelatedDocs.setText("");
+        jtfCfdiFirstRelatedDps.setText("");
         
         mbResetingForm = false;
         
-        moCostCenterPanel.initPanel();
+        moAccEntryCostCenterPanel.initPanel();
     }
 
     @Override
@@ -11418,6 +11617,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         catalogs.populateComboBox(jcbCfdCceOperationType, SDataConstantsSys.TRNS_CFD_CAT_INT_OPN_TP, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbCfdCceRequestKey, SDataConstantsSys.TRNS_CFD_CAT_INT_REQ_KEY, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbExportation, SDataConstantsSys.TRNS_CFD_CAT_EXP, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataPaymentMethod, SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataTaxRegimeIssuing, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataTaxRegimeReceptor, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
+        catalogs.populateComboBox(jcbFisDataCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
         
         moComboBoxGroupCfdCceGroupAddressee.clear();
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbCfdCceFkAddresseeBizPartner);
@@ -12189,13 +12392,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
 
-                        if (!validation.getIsError() && jtbSwitchCustomAcc.isSelected() ) {
+                        if (!validation.getIsError() && jtbSwitchCustomAcc.isSelected()) {
                             // validate costomized accounting:
 
                             if (!canSwitchOnCustomAcc()) {
                                 validation.setMessage("Realizar las correcciones indicadas para personalizar la contabilización del documento.");
                             }
-                            else if (mnAccCurrentAction != 0) {
+                            else if (mnCustomAccCurrentAction != 0) {
                                 validation.setMessage("Se debe completar la captura actual de partidas de personalización de contabilización del documento.");
                                 validation.setTabbedPaneIndex(TAB_ACC);
                             }
@@ -12204,26 +12407,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 validation.setTabbedPaneIndex(TAB_ACC);
                             }
                             else {
-                                calculateCustomAccSubtotal(null);
+                                calculateCustomAccDpsSubtotal(null);
+                                
+                                String suggestion = "\n"
+                                        + "Favor de revisar las partidas de personalización de contabilización, y modificar las que requieran ajustes.\n"
+                                        + "SUGERENCIA:\n"
+                                        + "Al modificar estas partidas, se puede optar por:\n"
+                                        + "a) usar la utilería del botón '" + jbExeWizardAccEntrySubtotal.getToolTipText() + "';\n"
+                                        + "b) capturar manualmente el subtotal, deseleccionando la casilla de captura en base a un porcentaje (%).*\n"
+                                        + "(* Esta opción es elegible solamente si no hay partidas.)";
 
-                                if (!SLibUtils.compareAmount(moDps.getSubtotalCy_r(), mdAccSubtotalCy)) {
-                                    validation.setMessage("El subtotal del documento en la moneda original "
-                                            + "(" + jtfAccSubtotalCyCur.getText() + "), "
-                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + ",\n"
-                                            + "no coincide con el subtotal de la personalización de contabilización, "
-                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdAccSubtotalCy) + ".\n"
-                                            + "SUGERENCIA:\n"
-                                            + "Usar la utilería '" + jbExeWizardAccSubtotal.getToolTipText() + "' disponible al modificar la partida que requiera el ajuste.");
+                                if (!SLibUtils.compareAmount(moDps.getSubtotalCy_r(), mdCustomAccDpsSubtotalCy)) {
+                                    validation.setMessage("El subtotal del documento en la moneda original, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotalCy_r()) + " " + jtfAccEntrySubtotalCyCur.getText() + " , no coincide\n"
+                                            + "con el correspondiente subtotal de la personalización de contabilización, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdCustomAccDpsSubtotalCy) + " " + jtfAccEntrySubtotalCyCur.getText() + ".\n"
+                                            + suggestion);
                                     validation.setTabbedPaneIndex(TAB_ACC);
                                 }
-                                else if (!isLocalCurrency() && !SLibUtils.compareAmount(moDps.getSubtotal_r(), mdAccSubtotal)) {
-                                    validation.setMessage("El subtotal del documento en la moneda local "
-                                            + "(" + jtfAccSubtotalCur.getText() + "), "
-                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + ",\n"
-                                            + "no coincide con el subtotal de la personalización de contabilización, "
-                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdAccSubtotal) + ".\n"
-                                            + "SUGERENCIA:\n"
-                                            + "Usar la utilería '" + jbExeWizardAccSubtotal.getToolTipText() + "' disponible al modificar la partida que requiera el ajuste.");
+                                else if (!isLocalCurrency() && !SLibUtils.compareAmount(moDps.getSubtotal_r(), mdCustomAccDpsSubtotal)) {
+                                    validation.setMessage("El subtotal del documento en la moneda local, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(moDps.getSubtotal_r()) + " " + jtfAccEntrySubtotalCur.getText() + ", no coincide\n"
+                                            + "con el correspondiente subtotal de la personalización de contabilización, "
+                                            + "$" + SLibUtils.getDecimalFormatAmount().format(mdCustomAccDpsSubtotal) + " " + jtfAccEntrySubtotalCur.getText() + ".\n"
+                                            + suggestion);
                                     validation.setTabbedPaneIndex(TAB_ACC);
                                 }
                             }
@@ -12382,7 +12589,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         // check if payment method should be taken from document:
-        if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
+        if (moDps.getDbmsDataDpsCfd() != null && !moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty() && mbIsSales) {
             moFieldCfdiPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
         }
         
@@ -12498,6 +12705,24 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateChangedFkPaymentTypeId(false);
         itemStateChangedFkCurrencyId(false); // do not calculate document's total
 
+        if (moDps.getDbmsDataDpsCfd() != null && isApplingFiscalData()) {
+            if (!moDps.getDbmsDataDpsCfd().getPaymentMethod().isEmpty()) {
+                moFieldFisDataPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing().isEmpty()) {
+                moFieldFisDataTaxRegimeIss.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
+                moFieldFisDataTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+            }
+            
+            if (!moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
+                moFieldFisDataCfdiUsage.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiUsage());
+            }
+        }
+        
         if (isCfdEmissionRequired()) {
             setAddendaData();
             
@@ -12659,6 +12884,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldCfdiBillOfLading.setFieldValue((moBillOfLading.getSeries().isEmpty() ? moBillOfLading.getNumber() : moBillOfLading.getSeries() + moBillOfLading.getNumber()) + " - " + 
                             SLibUtils.DateFormatDate.format(moBillOfLading.getDate()));
         }
+        
+        renderCustomAcc(true);
 
         mbResetingForm = false;
     }
@@ -12851,6 +13078,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setAuxAppPrepayCurCrossPayExchangeRate(0.0);
 
             boolean isCfdEmissionRequired = isCfdEmissionRequired(); // convenience variable
+            
+            if (isApplingFiscalData()) {
+                SDataDpsCfd dpsCfd = new SDataDpsCfd();
+                dpsCfd.setPaymentMethod(moFieldFisDataPaymentMethod.getFieldValue().toString());
+                dpsCfd.setTaxRegimeIssuing(moFieldFisDataTaxRegimeIss.getFieldValue().toString());
+                dpsCfd.setTaxRegimeReceptor(moFieldFisDataTaxRegimeRec.getFieldValue().toString());
+                dpsCfd.setCfdiUsage(moFieldFisDataCfdiUsage.getFieldValue().toString());
+                moDps.setDbmsDataDpsCfd(dpsCfd);
+            }
+            else {
+                moDps.setDbmsDataDpsCfd(null);
+            }
 
             if (isCfdEmissionRequired) {
                 SDataDpsCfd dpsCfd = new SDataDpsCfd();
@@ -13266,17 +13505,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (button == jbSetTime) {
                     actionSetTime();
                 }
-                else if (button == jbPickAccItem) {
-                    actionPickAccItem();
+                else if (button == jbPickAccEntryItem) {
+                    actionPickAccEntryItem();
                 }
-                else if (button == jbPickAccItemRef_n) {
-                    actionPickAccItemRef_n();
+                else if (button == jbPickAccEntryItemRef_n) {
+                    actionPickAccEntryItemRef_n();
                 }
-                else if (button == jbPickAccUnit) {
-                    actionPickAccUnit();
+                else if (button == jbPickEntryAccUnit) {
+                    actionPickAccEntryUnit();
                 }
-                else if (button == jbExeWizardAccSubtotal) {
-                    actionExeWizardAccSubtotal();
+                else if (button == jbExeWizardAccEntrySubtotal) {
+                    actionExeWizardAccEntrySubtotal();
                 }
                 else if (button == jbCustomAccEntryNew) {
                     actionCustomAccEntryNew();
@@ -13359,11 +13598,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (textField == jcbAddAmc71CompanyBranchGln.getEditor().getEditorComponent()) {
                 focusLostAddAmc71CompanyBranchGln();
             }
-            else if (textField == jtfAccSubtotalPct) {
-                focusLostAccSubtotalPct();
+            else if (textField == jtfAccEntrySubtotalPct) {
+                focusLostAccEntrySubtotalPct();
             }
-            else if (textField == jtfAccSubtotalCy) {
-                focusLostAccSubtotalCy();
+            else if (textField == jtfAccEntrySubtotalCy) {
+                focusLostAccEntrySubtotalCy();
             }
         }
     }
@@ -13392,8 +13631,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (checkBox == jckIsDiscountDocPercentage) {
                     itemStateChangedIsDiscountDocPercentage(true);
                 }
-                else if (checkBox == jckAccIsSubtotalPctApplying) {
-                    itemStateChangedAccIsSubtotalPctApplying(true);
+                else if (checkBox == jckAccEntryIsSubtotalPctApplying) {
+                    itemStateChangedAccEntryIsSubtotalPctApplying(true);
                 }
                 else if (checkBox == jckCfdCceApplies) {
                     itemStateChangeTypeExportation();
@@ -13433,8 +13672,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else if (comboBox == jcbAddAmc71CompanyBranchGln) {
                         itemStateChangedAddAmc71CompanyBranchGln();
                     }
-                    else if (comboBox == jcbAccItem) {
-                        itemStateChangedAccItem(true);
+                    else if (comboBox == jcbAccEntryItem) {
+                        itemStateChangedAccEntryItem(true);
                     }
                 }
             }

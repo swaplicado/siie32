@@ -11,11 +11,11 @@ import java.util.ArrayList;
  *
  * @author Isabel Servín
  */
-public class SItemConfigurationDps {
+public class SConfigurationItemDps {
     ArrayList<Integer> ifam;
     ArrayList<Integer> igen;
     
-    public SItemConfigurationDps() {
+    public SConfigurationItemDps() {
         this.ifam = new ArrayList<>();
         this.igen = new ArrayList<>();
     }

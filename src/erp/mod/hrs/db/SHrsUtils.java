@@ -3956,6 +3956,12 @@ public abstract class SHrsUtils {
         return file;  
     }
     
+    /**
+     * Print payroll.
+     * @param client
+     * @param payrollKey
+     * @throws Exception 
+     */
     public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws Exception {
         HashMap<String, Object> map = null;
         SDataBizPartner bizPartnerCompany = null;
@@ -3970,6 +3976,31 @@ public abstract class SHrsUtils {
         map.put("sEmiRfc", bizPartnerCompany.getFiscalId());
         
         client.getSession().printReport(SModConsts.HRSR_PRE_PAY, 0, null, map);
+    }
+    
+    /**
+     * Get employee by their name.
+     * @param client
+     * @param name
+     * @return
+     * @throws Exception 
+     */
+    public static SDbEmployee getEmployeeByName(final SGuiClient client, final String name) throws Exception {
+        SDbEmployee employee = null;
+        
+        String sql = "SELECT b.id_bp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = b.id_bp "
+                + "WHERE b.bp = '" + name + "' AND b.b_att_emp AND NOT b.b_del "
+                + "ORDER BY b.id_bp;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                employee = (SDbEmployee) client.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt(1) });
+            }
+        }
+        
+        return employee;
     }
     
     public static String getEmployeeNextNumber(Connection connection) throws Exception {

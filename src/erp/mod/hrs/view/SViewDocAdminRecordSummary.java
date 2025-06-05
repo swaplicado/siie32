@@ -112,9 +112,9 @@ public class SViewDocAdminRecordSummary extends SGridPaneView {
         
         msSql = "SELECT "
                 + "dar.fk_emp_offender AS " + SDbConsts.FIELD_ID + "1, "
-                + "emp.num, "
-                + "emp.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "bo.bp AS " + SDbConsts.FIELD_NAME + ", "
+                + "emp.num AS " + SDbConsts.FIELD_CODE + ", "
+                + "emp.b_act, "
                 + "dep.name AS _dep_name, "
                 + "pos.name AS _pos_name, "
                 + "COUNT(*) AS _count, "
@@ -125,7 +125,7 @@ public class SViewDocAdminRecordSummary extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = emp.fk_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS pos ON pos.id_pos = emp.fk_pos "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "GROUP BY dar.fk_emp_offender, bo.bp, emp.num, dep.name, pos.name "
+                + "GROUP BY dar.fk_emp_offender, bo.bp, emp.num, emp.b_act, dep.name, pos.name "
                 + "ORDER BY bo.bp, emp.num, dar.fk_emp_offender ";
     }
 
@@ -133,9 +133,10 @@ public class SViewDocAdminRecordSummary extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_dep_name", "Depto. empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Nombre empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "emp.b_act", "Activo empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_dep_name", "Departamento empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pos_name", "Puesto empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_count", "Actas administrativas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_count_done", "Formalizadas"));

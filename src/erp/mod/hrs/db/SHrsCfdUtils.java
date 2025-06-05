@@ -163,7 +163,7 @@ public abstract class SHrsCfdUtils {
                 receipt.setDateEnd(resultSet.getDate("dt_end"));
                 receipt.setNotes(resultSet.getString("nts"));
                 receipt.setFkPaymentTypeId(resultSet.getInt("fk_tp_pay"));
-                receipt.setEmployeeNumber(resultSet.getString("_emp_num"));
+                receipt.setEmployeeNumber(resultSet.getInt("_emp_num"));
                 receipt.setEmployeeName(resultSet.getString("_emp_name"));
                 receipt.setDepartmentId(resultSet.getInt("fk_dep"));
                 receipt.setDepartment(resultSet.getString("_dep_name"));

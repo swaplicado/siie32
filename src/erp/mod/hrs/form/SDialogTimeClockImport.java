@@ -6,8 +6,8 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
-import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.db.SRowPayrollEmployee;
+import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
 import erp.mod.hrs.link.utils.SUtilsJSON;
 import java.awt.BorderLayout;
@@ -36,9 +36,9 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     
     protected SDbAbsence moAbsence;
     private SGridPaneForm moGridImportedRows;
-    private List<SPrepayrollRow> lPpRows;
-    private HashMap<Integer, SRowPayrollEmployee> lReceiptRows;
-    private ArrayList<SRowTimeClock> lGridRows;
+    private List<SPrepayrollRow> moPrepayrollRows;
+    private HashMap<Integer, SRowPayrollEmployee> moReceiptRowsMap;
+    private ArrayList<SRowTimeClock> moGridRows;
     private String msStartDate;
     private String msEndDate;
     private String msCompanyKey;
@@ -146,13 +146,11 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Closes the dialog
-     */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
         mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
         dispose();
     }//GEN-LAST:event_closeDialog
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -188,12 +186,12 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Número empleado", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Nombre empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Faltas", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Hr. Extra", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Horas extra", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Domingos", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Festivos", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Descansos", 50));
@@ -215,15 +213,15 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     @SuppressWarnings("unchecked")
     private void showImportations() {
         Vector<SGridRow> rows = new Vector<>();
-        lGridRows = new ArrayList();
+        moGridRows = new ArrayList();
         
         try {
-            for (SPrepayrollRow ppRow : lPpRows) {
+            for (SPrepayrollRow ppRow : moPrepayrollRows) {
                 SRowTimeClock row = new SRowTimeClock();
                 
                 row.setEmployeeId(ppRow.getEmployee_id());
-                row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
-                row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
+                row.setEmployeeNumber(moReceiptRowsMap.get(ppRow.getEmployee_id()).getNumber());
+                row.setEmployeeName(moReceiptRowsMap.get(ppRow.getEmployee_id()).getName());
                 row.setAbsences(ppRow.getAbsences());
                 row.setOvertime(Double.parseDouble(ppRow.getDouble_overtime()));
                 row.setSundays(ppRow.getSundays());
@@ -231,7 +229,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setHolidays(ppRow.getHolidays());
                 
                 rows.add(row);
-                lGridRows.add(row);
+                moGridRows.add(row);
             }
 
             moGridImportedRows.populateGrid(rows);
@@ -293,11 +291,11 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     }
 
     public void setlPpRows(List<SPrepayrollRow> lPpRows) {
-        this.lPpRows = lPpRows;
+        this.moPrepayrollRows = lPpRows;
     }
 
     public void setlReceiptRows(HashMap<Integer, SRowPayrollEmployee> lReceiptRows) {
-        this.lReceiptRows = lReceiptRows;
+        this.moReceiptRowsMap = lReceiptRows;
     }
 
     public void setStartDate(String msStartDate) {
@@ -310,8 +308,8 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         moTextDateEnd.setText(msEndDate);
     }
 
-    public ArrayList<SRowTimeClock> getlGridRows() {
-        return lGridRows;
+    public ArrayList<SRowTimeClock> getGridRows() {
+        return moGridRows;
     }
 
     public void setPrepayrollMode(int mnPrepayrollMode) {
@@ -380,9 +378,9 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 if (save) {
                     List<String> dataLines = new ArrayList<>();
         
-                    for (SRowTimeClock lGridRow : lGridRows) {
-                        dataLines.add(lGridRow.getNumEmployee() + "," +
-                                        lGridRow.getEmployee().replaceAll(",", "") + "," +
+                    for (SRowTimeClock lGridRow : moGridRows) {
+                        dataLines.add(lGridRow.getEmployeeNumber() + "," +
+                                        lGridRow.getEmployeeName().replaceAll(",", "") + "," +
                                         lGridRow.getAbsences() + "," +
                                         lGridRow.getOvertime() + "," +
                                         lGridRow.getSundays() + "," +

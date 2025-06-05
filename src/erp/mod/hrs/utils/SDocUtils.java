@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -67,6 +69,8 @@ public abstract class SDocUtils {
     public static final String VAL_DOC_ADM_REC_LIAB = "liable";
     public static final String VAL_DOC_ADM_REC_REP = "represent";
     public static final String VAL_DOC_ADM_REC_WIT = "witness";
+    
+    public static final String MSG_WAIT_CREATION_FILE_CHOOSER = "La creación del diálogo para la selección de archivos demorará unos instantes.";
     
     /**
      * Compose descriptions of required precept subsections.
@@ -553,6 +557,11 @@ public abstract class SDocUtils {
         return file.getName().toLowerCase().endsWith(FILE_TYPE_PDF.toLowerCase());
     }
     
+    /**
+     * Get extension of file.
+     * @param file
+     * @return 
+     */
     public static String getExtensionFile (final File file) {
         String name = file.getName();
         int index = name.lastIndexOf(".");
@@ -622,5 +631,30 @@ public abstract class SDocUtils {
             oFile.setFileStorageName("");
             oFile.save(session);
         }
+    }
+    
+    /**
+     * Create file chooser for upload of digitalized documents.
+     * @return 
+     */
+    public static JFileChooser createFileChooserForUpload() {
+        JFileChooser moFileChooserUpload = new JFileChooser();
+        moFileChooserUpload.setAcceptAllFileFilterUsed(false);
+        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Documento PDF (*.pdf)", "pdf"));
+        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Archivo de imagen (*.bpm, *.gif, *.png, *.jpg, *.jpeg)", "bmp", "gif", "png", "jpg", "jpeg"));
+        moFileChooserUpload.setDialogTitle("Seleccionar archivo a cargar...");
+        return moFileChooserUpload;
+    }
+    
+    /**
+     * Create file chooser for download of digitalized documents.
+     * @return 
+     */
+    public static JFileChooser createFileChooserForDownload() {
+        JFileChooser moFileChooserDownload = new JFileChooser();
+        moFileChooserDownload.setAcceptAllFileFilterUsed(false);
+        moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        moFileChooserDownload.setDialogTitle("Seleccionar directorio para descargar archivo...");
+        return moFileChooserDownload;
     }
 }

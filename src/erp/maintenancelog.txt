@@ -1,4 +1,91 @@
 ================================================================================
+SIIE 3.2 272.15/ 2025-05-28
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de un indicador de "primera vez en suministro" en las vistas de RM pendientes de suministrar.
+2) Adición de validación de centros de costo en la forma de captura de RM.
+
+================================================================================
+SIIE 3.2 272.14/ 2025-05-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la conversión de tipo de dato del número de empleado en el diálogo de importación de bonos desde el dispositivo externo ("reloj checador").
+
+================================================================================
+SIIE 3.2 272.13/ 2025-05-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de redondeo de los montos en la importación de partidas de pólizas contables desde un archivo externo.
+2) Corrección en la validación del nivel de profundidad de centros de costo en las salidas de inventario.
+
+================================================================================
+SIIE 3.2 272.12/ 2025-05-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al cálculo del subtotal en moneda nacional para documentos en moneda extranjera en la personalización de la contabilización.
+2) Mejoramiento a la captura de documentos con personalización de contabilización.
+
+================================================================================
+SIIE 3.2 272.11/ 2025-05-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la conversión de tipo de dato del número de empleado en el diálogo de importación de registros de asistencia desde el dispositivo externo ("reloj checador").
+2) Clarificación del código fuente de la contabilización de nóminas con vistas a generar bitácoras de contabilización, para analizar la aplicación de las configuraciones de contabilización vigentes.
+
+================================================================================
+SIIE 3.2 272.10/ 2025-05-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la captura de documentos de consecuencias para incorporar empleados de otras empresas, y para postergar hasta cuando sea necesario la creación de los diálogos "abrir" y "guardar" archivos.
+
+================================================================================
+SIIE 3.2 272.9/ 2025-05-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al diálogo de emisión de CFDI de recibos de nómina por problema con el tipo de dato en la conversión de números de empleados.
+2) Mejoramiento a la interfaz de usuario de la gestión de catálogos de clientes y proveedores, para facilitar la captura de datos relacionados con la emisión de CFDI y generación de la DIOT.
+
+================================================================================
+SIIE 3.2 272.8/ 2025-05-12
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización de las vistas de seguimiento de RM abiertas y cerradas.
+2) Restringir la captura de archivos de soporte de OC cuando los totales no coincidan con la categoría seleccionada.
+
+================================================================================
+SIIE 3.2 272.7/ 2025-05-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección de valuación de consumos de insumos de almacén.
+2) Vista de seguimiento de consumos de valuación.
+
+================================================================================
+SIIE 3.2 272.6/ 2025-05-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Estandarización de vistas del módulo Recursos Humanos, en relación al texto y ancho de las columnas de nombre y número de empleado, y también departamento, siendo este último en relación al contexto de la vista.
+
+================================================================================
+SIIE 3.2 272.05/ 2025-05-12
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Se agrega al menu la vista de impuesto predial rústico (APSA).
+2) Se agregan constantes a la vista de impuesto predial rústico.
+
+================================================================================
+SIIE 3.2 272.4/ 2025-05-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para ordenes de compra.
+2) Se agregan los "Datos fiscales" en la impresión de ordenes de compra.
+
+================================================================================
+SIIE 3.2 272.3/ 2025-05-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la validación al elegir regimén fiscal en la forma de captura de proveedores al ser extranjeros.
+
+================================================================================
 SIIE 3.2 272.2/ 2025-05-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

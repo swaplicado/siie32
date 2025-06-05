@@ -4,8 +4,11 @@
  */
 package erp.mod.trn.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.gui.grid.SGridFilterPanelValMovType;
+import erp.gui.SModuleUtilities;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -15,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -26,6 +30,7 @@ import sa.lib.grid.SGridFilterDateRange;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -40,6 +45,10 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
     private SGridFilterDateRange moFilterDateRange;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
+    private JButton mjbSearchItemKey;
+    private JButton mjbViewDps;
+    private JButton mjbViewNotes;
+    private JButton mjbViewLinks;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
     
@@ -69,6 +78,20 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
+        mjbSearchItemKey = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query_doc.gif")), "Filtrar ítem", this);
+        
+        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
+        mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
+        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        mjbViewDps.setPreferredSize(new Dimension(23, 23));
+        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
+        mjbViewLinks.setPreferredSize(new Dimension(23, 23));
+        mjbViewDps.addActionListener(this);
+        mjbViewNotes.addActionListener(this);
+        mjbViewLinks.addActionListener(this);
+        mjbViewDps.setToolTipText("Ver documento");
+        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewLinks.setToolTipText("Ver vínculos del documento");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
         moTextToSearch = new JTextField("");
@@ -76,9 +99,19 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSearchItemKey);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JPopupMenu.Separator());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewLinks);
         
         mjbToSearch.setEnabled(true);
         mjbCleanSearch.setEnabled(true);
+        mjbSearchItemKey.setEnabled(true);
+        
+        mjbViewNotes.setEnabled(true);
+        mjbViewDps.setEnabled(true);
+        mjbViewLinks.setEnabled(true);
         
         msSeekQueryText = "";
     }
@@ -134,6 +167,95 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         actionGridReload();
     }
     
+    private void actionFilterItem() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                String sItemKey = gridRow.getRowCode();
+                moTextToSearch.setText(sItemKey);
+                actionSearch();
+            }
+        }
+    }
+    
+    private void actionViewDps() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                int gui = SDataConstants.MOD_PUR;    // GUI module
+                int[] dpsKey = gridRow.getRowPrimaryKey();
+                if (dpsKey[0] == 0) {
+                    miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
+                    return;
+                }
+                ((SClientInterface) miClient).getGuiModule(gui).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
+                ((SClientInterface) miClient).getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, dpsKey);
+            }
+        }
+    }
+
+    private void actionViewNotes() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                int[] dpsKey = gridRow.getRowPrimaryKey();
+                if (dpsKey[0] == 0) {
+                    miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
+                    return;
+                }
+                SModuleUtilities.showDocumentNotes((SClientInterface) miClient, SDataConstants.TRN_DPS, dpsKey);
+            }
+        }
+    }
+
+    private void actionViewLinks() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                int[] dpsKey = gridRow.getRowPrimaryKey();
+                if (dpsKey[0] == 0) {
+                    miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
+                    return;
+                }
+                SModuleUtilities.showDocumentLinks((SClientInterface) miClient, dpsKey);
+            }
+        }
+    }
+    
     private static Date getStartDateOfMonth(int year, int month) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month - 1, 1, 0, 0, 0);
@@ -166,7 +288,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         Object filter;
         Date[] dateRange = null;
 
-        moPaneSettings = new SGridPaneSettings(1);
+        moPaneSettings = new SGridPaneSettings(2);
 
         moPaneSettings.setUpdatableApplying(false);
         moPaneSettings.setDeletedApplying(false);
@@ -183,8 +305,9 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             where += (where.isEmpty() ? "" : "AND ") + msSeekQueryText;
         }
         
-        msSql = "SELECT val.id_stk_val AS " + SDbConsts.FIELD_ID + "1, "
-                + "'' AS " + SDbConsts.FIELD_CODE + ", "
+        msSql = "SELECT COALESCE(dps.id_year, 0) AS " + SDbConsts.FIELD_ID + "1, "
+                + "COALESCE(dps.id_doc, 0) AS " + SDbConsts.FIELD_ID + "2,"
+                + "i.item_key AS " + SDbConsts.FIELD_CODE + ", "
                 + "'' AS " + SDbConsts.FIELD_NAME + ", "
                 + "val.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
                 + "mvt.id_stk_val_mvt, "
@@ -213,6 +336,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "bp.bp, "
                 + "di_in.fid_dps_year_n, "
                 + "di_in.fid_dps_doc_n, "
+                + "COALESCE(dps.id_year, 0) AS dps_year, "
+                + "COALESCE(dps.id_doc, 0) AS dps_doc, "
                 + "CONCAT(di_out.num_ser, IF(LENGTH(di_out.num_ser) = 0, '', '-'), "
                 + " erp.lib_fix_int(di_out.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) "
                 + " AS dout_num, "
@@ -220,12 +345,14 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "di_out.dt AS di_out_dt, "
                 + "LPAD(mr.num, " + SDataConstantsSys.NUM_LEN_MAT_REQ + ", 0) AS mr_num, "
                 + "mr.dt AS mr_dt, "
+                + "CONCAT(mpe.code, ' - ', mpe.name) AS prov_ent, "
                 + "re.fid_item_n, "
                 + "ir.item_key AS itm_ref_key, "
                 + "ir.item AS itm_ref, "
                 + "re.fid_cc_n, "
                 + "fcc.cc, "
                 + "re.fid_acc, "
+                + "re.debit, "
                 + "re.units, "
                 + "vacc.prorat_per * 100 AS _percnt, "
                 + "facc.acc, "
@@ -252,8 +379,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS val ON mvt.fk_stk_val = val.id_stk_val "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON mvt.fk_item = i.id_item "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON mvt.fk_unit = u.id_unit "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di_in ON mvt.fk_diog_year_in = di_in.id_year "
-                + " AND mvt.fk_diog_doc_in = di_in.id_doc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS di_in ON mvt.fk_diog_year_in_n = di_in.id_year "
+                + " AND mvt.fk_diog_doc_in_n = di_in.id_doc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " AS tpii ON di_in.fid_ct_iog = tpii.id_ct_iog "
                 + " AND di_in.fid_cl_iog = tpii.id_cl_iog "
                 + " AND di_in.fid_tp_iog = tpii.id_tp_iog "
@@ -285,6 +412,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + " AND di_out.fid_cl_iog = tpio.id_cl_iog "
                 + " AND di_out.fid_tp_iog = tpio.id_tp_iog "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON mvt.fk_mat_req_n = mr.id_mat_req "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT) + " AS mpe ON mr.fk_mat_prov_ent = mpe.id_mat_prov_ent "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON val.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON val.fk_usr_upd = uu.id_usr "
                 + "WHERE "
@@ -309,38 +437,44 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> columns = new ArrayList<>();
+        SGridColumnView column = null;
 
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Fecha inicio Val."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha fin Val."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_mov", "Fecha Mvto. Alm."));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Inicio valuación"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Corte valuación"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_mov", "Fecha mov alm"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Clave"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "item", "Ítem"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "symbol", "Unidad"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "qty_mov", "Cantidad"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "cost_u", "Costo unitario"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "mvt_total", "Total Mvto."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "itm_ref_key", "Cod. Ref."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "itm_ref", "Itm Ref."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "units", "Cant. pond."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "_percnt", "% pond."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_cc_n", "Ctro. costo"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "qty_mov", "Cant mov almacén"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "cost_u", "Costo u mov almacén $"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "mvt_total", "Importe mov almacén $"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "itm_ref_key", "Clave concepto/gasto"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "itm_ref", "Concepto/gasto"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "_percnt", "% prorrateo"));
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_3D, "units", "Cant prorrateo");
+        column.setSumApplying(true);
+        columns.add(column);
+        column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "re.debit", "Importe prorrateo $");
+        column.setSumApplying(true);
+        columns.add(column);
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "prov_ent", "Cto suministro RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mr_num", "Folio RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_out_dt", "Fecha mov salida"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "dout_num", "Folio mov salida"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_out", "Tipo mov salida"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_in_dt", "Fecha mov entrada"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "din_num", "Folio mov entrada"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_in", "Tipo mov entrada"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "dps_type", "Tipo doc compra"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_num", "Folio doc compra"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc", "Fecha doc compra"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "bp", "Proveedor"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_cc_n", "No. centro costo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cc", "Centro costo"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_acc", "Cta. contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_acc", "No. cuenta contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "acc", "Cuenta contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fin_num", "Póliza contable"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "dout_num", "Fol. Mvto. Sal."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_out", "Tipo Mvto. Sal."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_out_dt", "Fecha Mvto. Sal."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mr_num", "Req. Mat."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha RM"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "din_num", "Fol. Mvto. Ent."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_in", "Tipo Mvto. Ent."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_in_dt", "Fecha Mvto. Ent."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "dps_type", "Doc. compra"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_num", "Num. Doc."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc", "Fecha Doc."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "bp", "Asoc. negocios"));
-        // ítem referencia
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -366,6 +500,18 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             }
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
+            }
+            else if (button == mjbSearchItemKey) {
+                actionFilterItem();
+            }
+            else if (button == mjbViewDps) {
+                actionViewDps();
+            }
+            else if (button == mjbViewNotes) {
+                actionViewNotes();
+            }
+            else if (button == mjbViewLinks) {
+                actionViewLinks();
             }
         }
     }

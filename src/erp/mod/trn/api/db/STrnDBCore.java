@@ -11,10 +11,12 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJSONUtils;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebAuthStep;
 import erp.mod.trn.api.data.SWebAuthorization;
+import erp.mod.trn.api.data.SWebCfd;
 import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
@@ -261,7 +263,10 @@ public class STrnDBCore {
                     + "                        AND (steps1.b_authorn OR steps1.b_reject) "
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
                     + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
+                    + "    cfd.*, "
                     + BASE_QUERY
+                    + "     LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS cfd " 
+                    + "     ON dps.id_year = cfd.id_year AND dps.id_doc = cfd.id_doc "
                     + "WHERE "
                     + "    NOT dps.b_del AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                     + "        AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
@@ -348,7 +353,7 @@ public class STrnDBCore {
                 }
             }
 
-            query += "GROUP BY id_year , id_doc "
+            query += "GROUP BY dps.id_year , dps.id_doc "
                     + "ORDER BY dps.dt ASC;";
 
             Statement st = conn.createStatement();
@@ -397,11 +402,14 @@ public class STrnDBCore {
                     + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
                     + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
+                    + "     cfd.*, "
                     + BASE_QUERY
+                    + "     LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS cfd " 
+                    + "     ON dps.id_year = cfd.id_year AND dps.id_doc = cfd.id_doc "
                     + "WHERE "
                     + "    dps.id_year = " + idYear + " "
                     + "    AND dps.id_doc = " + idDoc + " "
-                    + "GROUP BY id_year , id_doc;";
+                    + "GROUP BY dps.id_year , dps.id_doc;";
 
             Statement st = conn.createStatement();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
@@ -465,6 +473,36 @@ public class STrnDBCore {
             oDoc.setNotesAuth(res.getString("dta_notes"));
             oDoc.setUserInTurn(res.getString("user_in_turn"));
             oDoc.setAuthorizationPriority(res.getInt("auth_priority"));
+
+            /**
+             * Cfd Object
+             */
+            if (res.getInt("cfd.id_year") > 0 && res.getInt("cfd.id_doc") > 0) {
+                SWebCfd oCfd = new SWebCfd();
+                oCfd.setIdYear(res.getInt("cfd.id_year"));
+                oCfd.setIdDoc(res.getInt("cfd.id_doc"));
+                oCfd.setVersion(res.getString("cfd.ver"));
+                oCfd.setCfdType(res.getString("cfd.cfd_tp"));
+                oCfd.setPayWay(res.getString("cfd.pay_way"));
+                oCfd.setPayMethod(res.getString("cfd.pay_met"));
+                oCfd.setPayCondition(res.getString("cfd.pay_cond"));
+                oCfd.setExportation(res.getString("cfd.exportation"));
+                oCfd.setGblPeriodicity(res.getString("cfd.gbl_periodicity"));
+                oCfd.setGblMonths(res.getString("cfd.gbl_months"));
+                oCfd.setGblYear(res.getString("cfd.gbl_year"));
+                oCfd.setZipIss(res.getString("cfd.zip_iss"));
+                oCfd.setConf(res.getString("cfd.conf"));
+                oCfd.setTaxRegimeIss(res.getString("cfd.tax_regime_iss"));
+                oCfd.setTaxRegimeRec(res.getString("cfd.tax_regime_rec"));
+                oCfd.setCfdUse(res.getString("cfd.cfd_use"));
+                oCfd.setRelationType(res.getString("cfd.relation_tp"));
+                oCfd.setRelatedUuid(res.getString("cfd.related_uuid"));
+                
+                oDoc.setoCfd(oCfd);
+            }
+            else {
+                oDoc.setoCfd(new SWebCfd());
+            }
 
             return oDoc;
         } catch (SQLException ex) {
@@ -730,6 +768,7 @@ public class STrnDBCore {
             }
             
             SWebAuthorization oAuth = new SWebAuthorization();
+            int authorizationType = tableName == SModConsts.TRN_DPS ? SAuthorizationUtils.AUTH_TYPE_DPS : SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 
             // Construcción dinámica de la consulta según la tabla y claves primarias:
             String whereClause = "s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
@@ -788,7 +827,7 @@ public class STrnDBCore {
 
             // Consulta para obtener el estado de autorización:
             String queryStatus = "SELECT "
-                    + "CFG_GET_ST_AUTHORN(2, "
+                    + "CFG_GET_ST_AUTHORN(" + authorizationType + ", "
                     + "'" + SModConsts.TablesMap.get(tableName) + "', "
                     + idPrimaryKey1 + ", "
                     + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
@@ -806,7 +845,7 @@ public class STrnDBCore {
                     + "FROM "
                     + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS tb "
                     + "WHERE "
-                    + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(2, "
+                    + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(" + authorizationType + ", "
                     + "'" + SModConsts.TablesMap.get(tableName) + "', "
                     + idPrimaryKey1 + ", "
                     + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "

@@ -2630,6 +2630,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             validation.setMessage("Debe agregar al menos un ítem para solicitar.");
         }
         
+        if (validation.isValid() && moGridMatReqCC.getModel().getRowCount() <= 0) { 
+            validation.setMessage("Debe indicar al menos un centro de costo.");
+        }
+        
         if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP) {
             if (moKeyWhs.getSelectedIndex() == 0) {
                 validation.setMessage("Debe seleccionar un almacén");

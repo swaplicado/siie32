@@ -4884,7 +4884,7 @@
                                 <Property name="verticalGap" type="int" value="0"/>
                               </Layout>
                               <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlAccItem">
+                                <Component class="javax.swing.JLabel" name="jlAccEntryItem">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="&#xcd;tem partida:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -4892,14 +4892,14 @@
                                     </Property>
                                   </Properties>
                                 </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbAccItem">
+                                <Component class="javax.swing.JComboBox" name="jcbAccEntryItem">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[450, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
-                                <Component class="javax.swing.JButton" name="jbPickAccItem">
+                                <Component class="javax.swing.JButton" name="jbPickAccEntryItem">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="..."/>
                                     <Property name="focusable" type="boolean" value="false"/>
@@ -4917,7 +4917,7 @@
                                 <Property name="verticalGap" type="int" value="0"/>
                               </Layout>
                               <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlAccItemRef_n">
+                                <Component class="javax.swing.JLabel" name="jlAccEntryItemRef_n">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="&#xcd;tem referencia:"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -4925,14 +4925,14 @@
                                     </Property>
                                   </Properties>
                                 </Component>
-                                <Component class="javax.swing.JComboBox" name="jcbAccItemRef_n">
+                                <Component class="javax.swing.JComboBox" name="jcbAccEntryItemRef_n">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[450, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
-                                <Component class="javax.swing.JButton" name="jbPickAccItemRef_n">
+                                <Component class="javax.swing.JButton" name="jbPickAccEntryItemRef_n">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="..."/>
                                     <Property name="focusable" type="boolean" value="false"/>
@@ -4954,7 +4954,7 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                           <SubComponents>
-                            <Component class="erp.gui.account.SBeanPanelAccount" name="moCostCenterPanel">
+                            <Component class="erp.gui.account.SBeanPanelAccount" name="moAccEntryCostCenterPanel">
                               <Constraints>
                                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                                   <BorderConstraints direction="Center"/>
@@ -4985,7 +4985,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlAccQuantity">
+                            <Component class="javax.swing.JLabel" name="jlAccEntryQuantity">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cantidad: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -4993,7 +4993,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccQuantity">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntryQuantity">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="0.0000"/>
@@ -5002,7 +5002,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jlAccUnit">
+                            <Component class="javax.swing.JLabel" name="jlAccEntryUnit">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="0"/>
                                 <Property name="text" type="java.lang.String" value="Unidad partida:*"/>
@@ -5011,14 +5011,14 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JComboBox" name="jcbAccUnit">
+                            <Component class="javax.swing.JComboBox" name="jcbAccEntryUnit">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbPickAccUnit">
+                            <Component class="javax.swing.JButton" name="jbPickEntryAccUnit">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="..."/>
                                 <Property name="focusable" type="boolean" value="false"/>
@@ -5027,15 +5027,16 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckAccIsSubtotalPctApplying">
+                            <Component class="javax.swing.JCheckBox" name="jckAccEntryIsSubtotalPctApplying">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="%"/>
+                                <Property name="toolTipText" type="java.lang.String" value="Esta opci&#xf3;n se puede cambiar solamente si no hay partidas"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[40, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccSubtotalPct">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntrySubtotalPct">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="000.00%"/>
@@ -5044,7 +5045,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccSubtotal">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntrySubtotal">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
@@ -5055,7 +5056,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccSubtotalCur">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntrySubtotalCur">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="text" type="java.lang.String" value="ERP"/>
@@ -5065,7 +5066,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccSubtotalCy">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntrySubtotalCy">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="0,000,000,000.00"/>
@@ -5074,7 +5075,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfAccSubtotalCyCur">
+                            <Component class="javax.swing.JTextField" name="jtfAccEntrySubtotalCyCur">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="text" type="java.lang.String" value="CUR"/>
@@ -5084,7 +5085,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbExeWizardAccSubtotal">
+                            <Component class="javax.swing.JButton" name="jbExeWizardAccEntrySubtotal">
                               <Properties>
                                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                                   <Image iconType="3" name="/erp/img/icon_std_wizard.gif"/>
@@ -5114,7 +5115,7 @@
                                 <Property name="verticalGap" type="int" value="0"/>
                               </Layout>
                               <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlAccConcept">
+                                <Component class="javax.swing.JLabel" name="jlAccEntryConcept">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="Concepto:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -5122,7 +5123,7 @@
                                     </Property>
                                   </Properties>
                                 </Component>
-                                <Component class="javax.swing.JTextField" name="jtfAccConcept">
+                                <Component class="javax.swing.JTextField" name="jtfAccEntryConcept">
                                   <Properties>
                                     <Property name="text" type="java.lang.String" value="TEXT"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -5223,7 +5224,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlAccSubtotal">
+                    <Component class="javax.swing.JLabel" name="jlAccDpsSubtotal">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="Subtotal:"/>
@@ -5232,7 +5233,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfAccSubtotalSubtotalPct">
+                    <Component class="javax.swing.JTextField" name="jtfAccDpsSubtotalPct">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
@@ -5243,7 +5244,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfAccSubtotalSubtotal">
+                    <Component class="javax.swing.JTextField" name="jtfAccDpsSubtotalSubtotal">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
@@ -5254,7 +5255,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfAccSubtotalSubtotalCur">
+                    <Component class="javax.swing.JTextField" name="jtfAccDpsSubtotalSubtotalCur">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="ERP"/>
@@ -5264,7 +5265,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfAccSubtotalSubtotalCy">
+                    <Component class="javax.swing.JTextField" name="jtfAccDpsSubtotalSubtotalCy">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
@@ -5275,7 +5276,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="jtfAccSubtotalSubtotalCyCur">
+                    <Component class="javax.swing.JTextField" name="jtfAccDpsSubtotalSubtotalCyCur">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="CUR"/>
@@ -5285,6 +5286,166 @@
                         </Property>
                       </Properties>
                     </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jpFiscalData">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Datos fiscales">
+                    <Property name="tabTitle" type="java.lang.String" value="Datos fiscales"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanel133">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Datos fiscales requeridos en el CFDI del proveedor:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="Center"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+                    <Property name="verticalGap" type="int" value="2"/>
+                  </Layout>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel134">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="North"/>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="2"/>
+                        <Property name="rows" type="int" value="8"/>
+                        <Property name="verticalGap" type="int" value="2"/>
+                      </Layout>
+                      <SubComponents>
+                        <Container class="javax.swing.JPanel" name="jPanel145">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFisDataPaymentMethod">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="M&#xe9;todo de pago: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFisDataPaymentMethod">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" value="Uso CFDI del receptor"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[400, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel137">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFisDataTaxRegimeIssuing">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="R&#xe9;gimen fiscal del emisor: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFisDataTaxRegimeIssuing">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" value="R&#xe9;gimen fiscal del emisor"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[400, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel138">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFisDataTaxRegimeReceptor">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="R&#xe9;gimen fiscal del receptor: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFisDataTaxRegimeReceptor">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" value="R&#xe9;gimen fiscal del emisor"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[400, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel140">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlFisDataCfdiUsage">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Uso del CFDI: *"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[175, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFisDataCfdiUsage">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" value="Uso CFDI del receptor"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[400, 23]"/>
+                                </Property>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                              </AuxValues>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                      </SubComponents>
+                    </Container>
                   </SubComponents>
                 </Container>
               </SubComponents>

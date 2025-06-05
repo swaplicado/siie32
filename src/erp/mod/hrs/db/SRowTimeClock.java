@@ -14,8 +14,8 @@ import sa.lib.grid.SGridRow;
 public class SRowTimeClock implements SGridRow {
 
     protected int mnEmployeeId;
-    protected String msNumEmployee;
-    protected String msEmployee;
+    protected String msEmployeeNumber;
+    protected String msEmployeeName;
     protected int mnAbsences;
     protected double mdOvertime;
     protected int mnSundays;
@@ -24,8 +24,8 @@ public class SRowTimeClock implements SGridRow {
 
     public SRowTimeClock() {
         mnEmployeeId = 0;
-        msNumEmployee = "";
-        msEmployee = "";
+        msEmployeeNumber = "";
+        msEmployeeName = "";
         mnAbsences = 0;
         mdOvertime = 0;
         mnSundays = 0;
@@ -41,20 +41,20 @@ public class SRowTimeClock implements SGridRow {
         this.mnEmployeeId = mnEmployeeId;
     }
 
-    public String getNumEmployee() {
-        return msNumEmployee;
+    public String getEmployeeNumber() {
+        return msEmployeeNumber;
     }
 
-    public void setNumEmployee(String mnNumEmployee) {
-        this.msNumEmployee = mnNumEmployee;
+    public void setEmployeeNumber(String mnEmployeeNumber) {
+        this.msEmployeeNumber = mnEmployeeNumber;
     }
 
-    public String getEmployee() {
-        return msEmployee;
+    public String getEmployeeName() {
+        return msEmployeeName;
     }
 
-    public void setEmployee(String msEmployee) {
-        this.msEmployee = msEmployee;
+    public void setEmployeeName(String msEmployeeName) {
+        this.msEmployeeName = msEmployeeName;
     }
 
     public int getAbsences() {
@@ -138,10 +138,10 @@ public class SRowTimeClock implements SGridRow {
         
         switch(row) {
             case 0:
-                value = msNumEmployee;
+                value = msEmployeeNumber;
                 break;
             case 1:
-                value = msEmployee;
+                value = msEmployeeName;
                 break;
             case 2:
                 value = mnAbsences;

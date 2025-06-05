@@ -97,10 +97,10 @@ public class SDbSupplierFileDps extends SDbRegistryUser {
     
     public String getSupplierFileDpsTypeDecode() {
         switch (msSupplierFileDpsType) {
-            case "Q" : return "Proveedor";
-            case "Q+": return "Otro proveedor +$";
-            case "Q-": return "Otro proveedor -$";
-            case "T": return "Ficha técnica";
+            case SDbSupplierFile.QUA: return "Proveedor";
+            case SDbSupplierFile.QUA_EXP: return "Otro proveedor +$";
+            case SDbSupplierFile.QUA_CHE: return "Otro proveedor -$";
+            case SDbSupplierFile.TEC: return "Ficha técnica";
         }
         
         return "";

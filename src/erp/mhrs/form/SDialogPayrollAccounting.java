@@ -113,23 +113,39 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private SDbPayroll moPayroll;
     private SDbAccountingPayroll moAccountingPayroll;
     
-    private HashMap<Integer, String> moAccountStrIdsMap; // key: numeric ID of account; value: string ID of account
-    private HashMap<Integer, String> moCostCenterStrIdsMap; // key: numeric ID of cost center; value: string ID of cost center
-    private HashMap<String, SDataAccount> moAccountsMap; // key: string ID of account; value: account
-    private HashMap<String, SDataAccount> moLedgerAccountsMap; // key: string ID of ledger account; value: ledger account
+    /** Hash Map: key = numeric ID of account; value = string ID of account. */
+    private HashMap<Integer, String> moAccountStrIdsMap;
+    /** Hash Map: key = numeric ID of cost center; value = string ID of cost center. */
+    private HashMap<Integer, String> moCostCenterStrIdsMap;
+    /** Hash Map: key = string ID of account; value = account. */
+    private HashMap<String, SDataAccount> moAccountsMap;
+    /** Hash Map: key = string ID of ledger account; value = ledger account. */
+    private HashMap<String, SDataAccount> moLedgerAccountsMap;
     
-    private HashMap<Integer, Integer> moDepartmentsPackCostCentersMap; // key: ID of department; value: ID of pack of cost centers
-    private HashMap<Integer, Integer> moEmployeesPackCostCentersMap; // key: ID of employee; value: ID of pack of cost centers
-    private HashMap<Integer, SDbPackCostCenters> moPackCostCentersMap; // key: ID of pack of cost centers; value: pack of cost centers
-    private HashMap<Integer, SDbPackExpenses> moPackExpensesMap; // key: ID of pack of expenses; value: pack of expenses
-    private HashMap<Integer, Department> moDepartmentsMap; // key: ID of department; value: department
-    private HashMap<Integer, Employee> moEmployeesMap; // key: ID of employee; value: employee
-    private HashMap<Integer, Integer> moEmployeesDepartmentsMap; // key: ID of employee; value: ID of department
-    private HashMap<Integer, SDbCfgAccountingDepartment> moDepartmentsCfgAccountingMap; // key: ID of department; value: configuration of accounting
-    private HashMap<Integer, Boolean> moAccountsCostCenterRequiredMap; // key: numeric ID of account; value: flag for cost center required
-    private HashMap<Integer, Boolean> moAccountsBizPartnerRequiredMap; // key: numeric ID of account; value: flag for business partner required
-    private HashMap<String, Integer> moRecordsLastEntryIdMap; // key: PK of record as string; value: last entry ID for record
-    private HashMap<String, Integer> moRecordsLastSortingPositionMap; // key: PK of record as string; value: last sorting position for record
+    /** Hash Map: key = ID of department; value = ID of pack of cost centers. */
+    private HashMap<Integer, Integer> moDepartmentsPackCostCentersMap;
+    /** Hash Map: key = ID of employee; value = ID of pack of cost centers. */
+    private HashMap<Integer, Integer> moEmployeesPackCostCentersMap;
+    /** Hash Map: key = ID of pack of cost centers; value = pack of cost centers. */
+    private HashMap<Integer, SDbPackCostCenters> moPackCostCentersMap;
+    /** Hash Map: key = ID of pack of expenses; value = pack of expenses. */
+    private HashMap<Integer, SDbPackExpenses> moPackExpensesMap;
+    /** Hash Map: key = ID of department; value = department. */
+    private HashMap<Integer, Department> moDepartmentsMap;
+    /** Hash Map: key = ID of employee; value = employee. */
+    private HashMap<Integer, Employee> moEmployeesMap;
+    /** Hash Map: key = ID of employee; value = ID of department. */
+    private HashMap<Integer, Integer> moEmployeesDepartmentsMap;
+    /** Hash Map: key = ID of department; value = configuration of accounting. */
+    private HashMap<Integer, SDbCfgAccountingDepartment> moDepartmentsCfgAccountingMap;
+    /** Hash Map: key = numeric ID of account; value = flag for cost center required. */
+    private HashMap<Integer, Boolean> moAccountsCostCenterRequiredMap;
+    /** Hash Map: key = numeric ID of account; value = flag for business partner required. */
+    private HashMap<Integer, Boolean> moAccountsBizPartnerRequiredMap;
+    /** Hash Map: key = PK of record as string; value = last entry ID for record. */
+    private HashMap<String, Integer> moRecordsLastEntryIdMap;
+    /** Hash Map: key = PK of record as string; value = last sorting position for record. */
+    private HashMap<String, Integer> moRecordsLastSortingPositionMap;
     
     /** Creates new form SDialogPayrollAccounting
      * @param client
@@ -749,7 +765,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             moAccountingPayroll = SHrsFinUtils.getLastAccountingPayroll(miClient.getSession(), moPayroll.getPkPayrollId());
             
             if (moAccountingPayroll != null) {
-                moAccountingPayroll.getChildReceipts().clear(); // preserve from being altered all payroll receipts already bookkept
+                moAccountingPayroll.getChildReceipts().clear(); // preserve from being altered all payroll receipts already accounted!
             }
         }
         
@@ -760,23 +776,25 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
         
         maRecordEmployeeses = new ArrayList<>();
+        
+        // iterate through all selected employees to be accounted:
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
             SRowEmployee rowEmployee = (SRowEmployee) moTablePaneEmpSelected.getTableRow(i);
-            Object[] recordKey = (Object[]) rowEmployee.getData(); // record primary key is in Data member, WTF!
-            boolean add = true;
-            ArrayList<Integer> employeeIds = null;
+            Object[] employeeRecordKey = (Object[]) rowEmployee.getData(); // XXX record primary key is in Data member, WTF!
+            boolean addReccord = true;
+            ArrayList<Integer> recordEmployeeIds = null;
 
             for (RecordEmployees recordEmployees : maRecordEmployeeses) {
-                if (SLibUtilities.compareKeys(recordEmployees.Record.getPrimaryKey(), recordKey)) {
-                    add = false;
-                    employeeIds = recordEmployees.EmployeeIds;
+                if (SLibUtilities.compareKeys(recordEmployees.Record.getPrimaryKey(), employeeRecordKey)) {
+                    addReccord = false;
+                    recordEmployeeIds = recordEmployees.EmployeeIds;
                     break;
                 }
             }
             
-            if (add) {
-                SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, recordKey, SLibConstants.EXEC_MODE_VERBOSE);
+            if (addReccord) {
+                SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, employeeRecordKey, SLibConstants.EXEC_MODE_VERBOSE);
                 
                 if (!jckAccountingGradual.isSelected()) {
                     for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
@@ -788,11 +806,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     }
                 }
 
-                employeeIds = new ArrayList<>();
-                maRecordEmployeeses.add(new RecordEmployees(record, employeeIds));
+                recordEmployeeIds = new ArrayList<>();
+                maRecordEmployeeses.add(new RecordEmployees(record, recordEmployeeIds));
             }
             
-            employeeIds.add(((int[]) rowEmployee.getPrimaryKey())[0]);
+            recordEmployeeIds.add(((int[]) rowEmployee.getPrimaryKey())[0]);
 
             SDataFormerPayrollEmp formerPayrollEmp = new SDataFormerPayrollEmp();
             formerPayrollEmp.setPkPayrollId(moPayroll.getPkPayrollId());
@@ -817,11 +835,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             formerPayrollEmp.setIsDeleted(false);
             formerPayrollEmp.setFkBizPartnerId_n(rowEmployee.getFkBizPartnerId());
             formerPayrollEmp.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
-            formerPayrollEmp.setFkYearId((Integer) recordKey[0]);
-            formerPayrollEmp.setFkPeriodId((Integer) recordKey[1]);
-            formerPayrollEmp.setFkBookkeepingCenterId((Integer) recordKey[2]);
-            formerPayrollEmp.setFkRecordTypeId((String) recordKey[3]);
-            formerPayrollEmp.setFkNumberId((Integer) recordKey[4]);
+            formerPayrollEmp.setFkYearId((Integer) employeeRecordKey[0]);
+            formerPayrollEmp.setFkPeriodId((Integer) employeeRecordKey[1]);
+            formerPayrollEmp.setFkBookkeepingCenterId((Integer) employeeRecordKey[2]);
+            formerPayrollEmp.setFkRecordTypeId((String) employeeRecordKey[3]);
+            formerPayrollEmp.setFkNumberId((Integer) employeeRecordKey[4]);
 
             moFormerPayroll.getDbmsDataFormerPayrollEmps().add(formerPayrollEmp);
             
@@ -1109,6 +1127,12 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         return total;
     }
     
+    /**
+     * Get a new list of IDs from intersection of the elements to check into the list of elements.
+     * @param elementsToCheck
+     * @param listOfElements
+     * @return 
+     */
     private ArrayList<Integer> getIntersection(final ArrayList<Integer> elementsToCheck, final ArrayList<Integer> listOfElements) {
         ArrayList<Integer> intersection = new ArrayList<>();
         
@@ -1121,6 +1145,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         return intersection;
     }
     
+    /**
+     * Get for given employees the sum of their earnings and deductions in current payroll.
+     * @param employeeIds
+     * @return Sum of earnings and deductions as a <code>double[]</code>: index 0 = sum of earnings; index 1 = sum of deductions.
+     */
     private double[] getEmployeesAmounts(final ArrayList<Integer> employeeIds) {
         double ear = 0;
         double ded = 0;
@@ -1220,7 +1249,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     /**
      * Compute record entry.
      * NOTE: Invoke this method after computeFormerPayrollMove().
-     * @param accountingRecordType
+     * @param conceptAccountingType
      * @param record
      * @param accountId
      * @param costCenterId
@@ -1235,14 +1264,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
      * @param amount
      * @return 
      */
-    private SDataRecordEntry computeRecordEntry(final int accountingRecordType, final SDataRecord record, final int accountId, 
+    private SDataRecordEntry computeRecordEntry(final int conceptAccountingType, final SDataRecord record, final int accountId, 
             final int costCenterId, final int itemId, final int bizPartnerId, final int bizPartnerBranchId, final int[] taxKey, 
             final int conceptType, final String conceptName, final String referenceName, final String referenceCode, final double amount) {
         double debit = 0;
         double credit = 0;
         String entryConcept = "";
 
-        switch (accountingRecordType) {
+        switch (conceptAccountingType) {
             case SModSysConsts.HRSS_TP_ACC_GBL: // global link
                 entryConcept = moPayroll.composePayrollNumber() + "; " + conceptName;
                 break;
@@ -1394,7 +1423,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
     /**
      * Compute concept for accounting dynamic.
-     * @param accountingRecordType Accounting record type: global, department or employee. (Constants declared in class <code>SModSysConsts</code>: HRSS_TP_ACC_...)
+     * @param conceptAccountingType Concept accounting types: global, department or employee. (Constants declared in class <code>SModSysConsts</code>: HRSS_TP_ACC_...)
      * @param conceptType Concept type: earning or deduction. (Constants declared in this class: CONCEPT_TYPE_...)
      * @param conceptDepartmentId Concept's department ID. Can be zero.
      * @param conceptEmployeeId Concept's employee ID. Can be zero.
@@ -1406,11 +1435,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
      * @param record Journal voucher.
      * @throws Exception 
      */
-    private void computeConceptAccountingDynamic(final int accountingRecordType, final int conceptType, final Statement statement, final Statement statementAux, 
+    private void computeConceptAccountingDynamic(final int conceptAccountingType, final int conceptType, final Statement statement, final Statement statementAux, 
             final String sql, final String sqlEmployeeIds, final ArrayList<Integer> employeeIdsWithPackCostCenters, final SDataRecord record) throws Exception {
-        int conceptId = 0; // earning or deduction ID
-        String conceptName = ""; // name of earning or deduction
-        String conceptNameAbbr = ""; // abbreviated name of earning or deduction
+        int conceptId = 0; // ID of current earning or deduction
+        String conceptName = ""; // name of current earning or deduction
+        String conceptNameAbbr = ""; // abbreviated name of current earning or deduction
         String sqlEmployeeIdsWithPackCostCenters = StringUtils.join(employeeIdsWithPackCostCenters, ",");
         
         ResultSet resultSet = statement.executeQuery(sql);
@@ -1433,7 +1462,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             int effItemId = 0;
             int[] effTaxKey = new int[] { resultSet.getInt("_tax_bas_id"), resultSet.getInt("_tax_tax_id") };
             
-            switch (accountingRecordType) {
+            switch (conceptAccountingType) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
                     effDepartmentId = 0;
                     effEmployeeId = 0;
@@ -1467,7 +1496,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             boolean isCustomEffBizPartner = false;
             
             if (isBizPartnerRequiredForAccount(accountId)) {
-                switch (accountingRecordType) {
+                switch (conceptAccountingType) {
                     case SModSysConsts.HRSS_TP_ACC_GBL:
                     case SModSysConsts.HRSS_TP_ACC_DEP:
                         effBizPartnerId = resultSet.getInt("_bp_id");
@@ -1487,6 +1516,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     isCustomEffBizPartner = true;
                                 }
                                 break;
+                                
                             case CONCEPT_TYPE_DED:
                                 SDbCfgAccountingEmployeeDeduction caed = SHrsFinUtils.retrieveCfgAccountingEmployeeDeduction(miClient.getSession(), effEmployeeId, conceptId);
                                 if (caed != null) {
@@ -1496,6 +1526,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     isCustomEffBizPartner = true;
                                 }
                                 break;
+                                
                             default:
                                 // nothing
                         }
@@ -1504,15 +1535,15 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         
                         if (!isCustomEffBizPartner) {
                             SDbCfgAccountingDepartment cfgAccountingDepartment = getCfgAccountingForDepartment(effDepartmentId);
-                            if (cfgAccountingDepartment.getFkBizPartnerId_n() == 0) {
-                                // configuration of department does not have a business partner, use employee by default:
-                                effBizPartnerId = resultSet.getInt("_emp_id");
-                                effBizPartnerBranchId = resultSet.getInt("_empb_id");
-                            }
-                            else {
+                            if (cfgAccountingDepartment.getFkBizPartnerId_n() != 0) {
                                 // configuration of department has been set with a business partner:
                                 effBizPartnerId = resultSet.getInt("_bp_id");
                                 effBizPartnerBranchId = resultSet.getInt("_bpb_id");
+                            }
+                            else {
+                                // configuration of department does not have a business partner, by default use employee instead:
+                                effBizPartnerId = resultSet.getInt("_emp_id");
+                                effBizPartnerBranchId = resultSet.getInt("_empb_id");
                             }
                         }
                         break;
@@ -1542,13 +1573,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     payrollAmounts.add(new PayrollAmount(effDepartmentId, effEmployeeId, effPackCostCentersId, amount));
                 }
 
-                // get amount for each employee who requires a pack of cost centers, only when is adequate:
+                // get amount for each employee who has a pack of cost centers, only if it's needed:
 
                 for (int employeeId : employeeIdsWithPackCostCenters) {
                     boolean proceedWithEmployeeAmount = 
-                            accountingRecordType == SModSysConsts.HRSS_TP_ACC_GBL || // in global type there is only one iteration per each earning or deduction, so proceed
-                            accountingRecordType == SModSysConsts.HRSS_TP_ACC_EMP || // in employee type there is only one iteration per employee, so proceed 
-                            (accountingRecordType == SModSysConsts.HRSS_TP_ACC_DEP && effDepartmentId == getEmployeeDepartmentId(employeeId)); // in department type proceed only if current iteration is of employee's department
+                            conceptAccountingType == SModSysConsts.HRSS_TP_ACC_GBL || // in global type there is only one iteration per each earning or deduction, so proceed
+                            conceptAccountingType == SModSysConsts.HRSS_TP_ACC_EMP || // in employee type there is only one iteration per employee, so proceed 
+                            (conceptAccountingType == SModSysConsts.HRSS_TP_ACC_DEP && effDepartmentId == getEmployeeDepartmentId(employeeId)); // in department type proceed only if current iteration is of employee's department
                     
                     if (proceedWithEmployeeAmount) {
                         amount = getConceptAmount(conceptType, conceptId, statementAux, sqlEmployeeIds, "", effDepartmentId, employeeId);
@@ -1589,7 +1620,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 String formerReferenceCode = "";
 
                 if (payrollAmount.isEmployeeWithSuitablePackCostCenters()) {
-                    // employee with suitable pack of cost centers (consider that ID of department is zero!):
+                    // employee with suitable pack of cost centers (notice that ID of department is zero!):
                     
                     Employee employee = getEmployee(payrollAmount.EmployeeId);
                     
@@ -1616,7 +1647,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 else {
                     // nominal case:
                     
-                    switch (accountingRecordType) {
+                    switch (conceptAccountingType) {
                         case SModSysConsts.HRSS_TP_ACC_GBL:
                             // default values already set
                             break;
@@ -1652,7 +1683,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 if (payrollAmount.PackCostCentersId == SModSysConsts.HRS_PACK_CC_NA) {
                     // direct amount, cost centers are not needed:
 
-                    record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId,
+                    record.getDbmsRecordEntries().add(computeRecordEntry(conceptAccountingType, record, accountId,
                             0, 0, effBizPartnerId, effBizPartnerBranchId, effTaxKey,
                             conceptType, conceptNameAbbr, referenceName, referenceCode, payrollAmount.Amount));
                 }
@@ -1663,7 +1694,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     double[] proratedAmounts = SLibProrationUtils.prorateAmount(payrollAmount.Amount, packCostCenters.getProrationPercentages());
 
                     for (int i = 0; i < packCostCenters.getChildCostCenters().size(); i++) {
-                        record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId,
+                        record.getDbmsRecordEntries().add(computeRecordEntry(conceptAccountingType, record, accountId,
                                 packCostCenters.getChildCostCenters().get(i).getPkCostCenterId(), effItemId, effBizPartnerId, effBizPartnerBranchId, effTaxKey,
                                 conceptType, conceptNameAbbr, referenceName, referenceCode, proratedAmounts[i]));
                     }
@@ -1677,23 +1708,24 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
     
     /**
-     * Validate and complete accounting after at the end of the original or dynamic processing.
+     * Validate accounting, and complete by saving it at the end of the original or dynamic processing.
      * @throws Exception 
      */
     private void validateAndCompleteAccounting() throws Exception {
         // Validate payroll accounting:
+        
+        double totalNetToBeAccounted = SLibUtils.roundAmount(mdTotalDebit - mdTotalCredit);
 
         if (jckAccountingGradual.isSelected()) {
-            if (SLibUtils.roundAmount(mdTotalDebit - mdTotalCredit) != SLibUtils.roundAmount(mdTotalNetSelected)) {
-                
+            if (!SLibUtils.compareAmount(totalNetToBeAccounted, mdTotalNetSelected)) {
                 throw new Exception("¡Hay una diferencia entre el total neto a contabilizar, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalNetSelected) +", y "
-                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalDebit - mdTotalCredit) +"!");
+                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(totalNetToBeAccounted) +"!");
             }
         }
         else {
-            if (SLibUtils.roundAmount(mdTotalDebit - mdTotalCredit) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
+            if (!SLibUtils.compareAmount(totalNetToBeAccounted, moPayroll.getAuxTotalNet())) {
                 throw new Exception("¡Hay una diferencia entre el total neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
-                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(mdTotalDebit - mdTotalCredit) +"!");
+                        + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(totalNetToBeAccounted) +"!");
             }
         }
 
@@ -2048,7 +2080,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                             ResultSet resultSetRec = statementRec.executeQuery(sql);
                             while (resultSetRec.next()) {
-                                int accountingRecordType = resultSetRec.getInt("f_tp_acc_rec");
+                                int conceptAccountingType = resultSetRec.getInt("f_tp_acc_rec");
                                 referenceId = resultSetRec.getInt("f_id_ref");
                                 referenceName = resultSetRec.getString("f_ref");
                                 referenceCode = resultSetRec.getString("f_ref_cve");
@@ -2064,7 +2096,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 int bpId = bizPartner == null ? 0 : bizPartner.getPkBizPartnerId();
                                 int bpbId = bizPartner == null ? 0 : bizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId();
 
-                                record.getDbmsRecordEntries().add(computeRecordEntry(accountingRecordType, record, accountId, 
+                                record.getDbmsRecordEntries().add(computeRecordEntry(conceptAccountingType, record, accountId, 
                                         costCenterId, itemId, bpId, bpbId, new int[] { taxBasicId, taxTaxId }, 
                                         conceptType, conceptAbbr, referenceName, referenceCode, amount));
 
@@ -2108,14 +2140,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement(); Statement statementAux = miClient.getSession().getStatement().getConnection().createStatement();) {
                 prepareRecordEmployeesForAccounting(); // prepare journal voucher for employees for accounting
 
-                ArrayList<Integer> employeeIdsWithPackCostCentersInPayroll = SHrsFinUtils.getEmployeeIdsWithSuitablePackCostCenters(miClient.getSession(), moPayroll.getPkPayrollId(), moPayroll.getDateEnd()); // get employees with custom suitable pack of cost centers
+                ArrayList<Integer> employeeIdsWithPackCostCentersInPayroll = SHrsFinUtils.getEmployeeIdsWithSuitablePackCostCenters(miClient.getSession(), moPayroll.getPkPayrollId(), moPayroll.getDateEnd()); // get employees with suitable pack of cost centers
                 
                 // process all selected journal vouchers and its employees:
                 
                 for (RecordEmployees recordEmployees : maRecordEmployeeses) {
                     String sql = "";
                     String sqlRecordEmployeeIds = StringUtils.join(recordEmployees.EmployeeIds, ",");
-                    SDataRecord record = recordEmployees.Record;
+                    SDataRecord record = recordEmployees.Record; // convenience variable
                     ArrayList<Integer> employeeIdsWithPackCostCentersInRecord = getIntersection(employeeIdsWithPackCostCentersInPayroll, recordEmployees.EmployeeIds);
                     
                     // get last entry ID for current record:
@@ -2140,7 +2172,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         switch (conceptType) {
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
-                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, "
+                                        + "0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
                                         + "cac.fk_acc AS _acc_id, "
                                         + "cac.fk_bp_n AS _bp_id, "
                                         + "bpbc.id_bpb AS _bpb_id, "
@@ -2165,7 +2198,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
-                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "0 AS _dep_id, '' AS _dep_name, '' AS _dep_code, "
+                                        + "0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
                                         + "cac.fk_acc AS _acc_id, "
                                         + "cac.fk_bp_n AS _bp_id, "
                                         + "bpbc.id_bpb AS _bpb_id, "
@@ -2203,7 +2237,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         switch (conceptType) {
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
-                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, "
+                                        + "0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
                                         + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN cad.fk_bp_n ELSE cac.fk_bp_n END AS _bp_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN bpbd.id_bpb ELSE bpbc.id_bpb END AS _bpb_id, "
@@ -2232,7 +2267,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
-                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, 0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, "
+                                        + "0 AS _emp_id, '' AS _emp_name, '' AS _emp_num, 0 AS _empb_id, "
                                         + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN cad.fk_bp_n ELSE cac.fk_bp_n END AS _bp_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN bpbd.id_bpb ELSE bpbc.id_bpb END AS _bpb_id, "
@@ -2274,7 +2310,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         switch (conceptType) {
                             case CONCEPT_TYPE_EAR:
                                 sql = "SELECT e.id_ear AS _cpt_id, e.code AS _cpt_code, e.name AS _cpt_name, e.name_abbr AS _cpt_name_abbr, "
-                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, bpbe.id_bpb AS _empb_id, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, "
+                                        + "emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, bpbe.id_bpb AS _empb_id, "
                                         + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN cad.fk_bp_n ELSE cac.fk_bp_n END AS _bp_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN bpbd.id_bpb ELSE bpbc.id_bpb END AS _bpb_id, "
@@ -2306,7 +2343,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 
                             case CONCEPT_TYPE_DED:
                                 sql = "SELECT d.id_ded AS _cpt_id, d.code AS _cpt_code, d.name AS _cpt_name, d.name_abbr AS _cpt_name_abbr, "
-                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, bpbe.id_bpb AS _empb_id, "
+                                        + "dep.id_dep AS _dep_id, dep.name AS _dep_name, dep.code AS _dep_code, "
+                                        + "emp.id_emp AS _emp_id, bp.bp AS _emp_name, emp.num AS _emp_num, bpbe.id_bpb AS _empb_id, "
                                         + "CASE WHEN cac.fk_acc <> " + SDataConstantsSys.NA + " THEN cac.fk_acc WHEN cad.fk_acc <> " + SDataConstantsSys.NA + " THEN cad.fk_acc ELSE tea.fk_acc END AS _acc_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN cad.fk_bp_n ELSE cac.fk_bp_n END AS _bp_id, "
                                         + "CASE WHEN cad.fk_bp_n IS NOT NULL THEN bpbd.id_bpb ELSE bpbc.id_bpb END AS _bpb_id, "
@@ -2364,15 +2402,17 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
         else {
             if (exceptions.size() == 1) {
-                throw new Exception(exceptions.get(0)); // throw exception with a simple message
+                // throw exception with a simple message:
+                throw new Exception(exceptions.get(0));
             }
             else {
+                // show multiple exception:
                 SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, 
                         "Inconvenientes y omisiones de configuración de contabilización", 
                         "Lista de inconvenientes y omisiones de configuración de contabilización:");
                 messages.appendMessages(exceptions);
                 messages.setVisible(true);
-                throw new Exception("Favor de corregir los " + exceptions.size() + " inconvenientes u omisiones de configuración de contabilización de nóminas mencionados.");
+                throw new Exception("Favor de resolver los " + exceptions.size() + " inconvenientes u omisiones mencionados de la configuración de contabilización de nóminas.");
             }
         }
     }
@@ -2598,7 +2638,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
         else if (empAvailable > 0 && (!jckAccountingGradual.isSelected() || miClient.showMsgBoxConfirm("Se optó por contabilizar gradualmente esta nómina.\n"
                 + "¿Está seguro que se desea dejar para otra ocasión la contabilización "
-                + (empAvailable == 1 ? "del recibo pendiente" : "de los " + empAvailable + " recibos pendientes") + " de seleccionar?") != JOptionPane.YES_OPTION)) {
+                + (empAvailable == 1 ? "del recibo pendiente de ser seleccionado" : "de los " + empAvailable + " recibos pendientes de ser seleccionados") + "?") != JOptionPane.YES_OPTION)) {
             miClient.showMsgBoxWarning("Seleccionar " + (empAvailable == 1 ? "el recibo que queda pendiente" : "los " + empAvailable + " recibos que quedan pendientes") + " de contabilizar.");
             moTablePaneEmpAvailable.requestFocus();
         }
@@ -2756,6 +2796,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
     
+    /**
+     * Accounting record (journal voucher) and their list of employees' IDs.
+     */
     private class RecordEmployees {
         
         SDataRecord Record;
@@ -2767,6 +2810,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
     
+    /**
+     * Payroll amount for a given department, employee and pack of cost centers.
+     */
     private class PayrollAmount {
         
         int DepartmentId;
@@ -2786,6 +2832,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
     
+    /**
+     * Lite department.
+     */
     private class Department {
         
         int DepartmentId;
@@ -2799,12 +2848,15 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
     
+    /**
+     * Lite employee.
+     */
     private class Employee {
         
         int EmployeeId;
         String Name;
         String Number;
-        int BranchId;
+        int BranchId; // headquarters of employee as a business partter
         
         public Employee(final int employeeId, final String name, final String number, final int branchId) {
             EmployeeId = employeeId;

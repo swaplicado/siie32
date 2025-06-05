@@ -3295,14 +3295,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     }
     
     private void actionCostCenter() {
-        int maxLevel = SFinUtils.getCostCenterMaxLevel(miClient.getSession());
         if (moDialogCostCenter == null) {
             moDialogCostCenter = new SDialogCostCenterPicker(miClient);
         }
         moDialogCostCenter.setVisible(true);
         if (moDialogCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moCostCenter = (SDataCostCenter) moDialogCostCenter.getValue(SDataConstants.FIN_CC);
-            if (moCostCenter.getLevel() == maxLevel) {
+            if (moCostCenter != null && SFinUtils.isCostCenterMaxLevel(miClient.getSession(), moCostCenter.getPkCostCenterIdXXX())) {
                 String desc[] = ((String) moDialogCostCenter.getValue(SDialogCostCenterPicker.DESCRIPTION)).split("/");
                 jtfCostCenter.setText(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX() + " - " + desc[0] + (desc.length > 2 ? "/ ... /" : "/") + desc[desc.length-1]);
                 jtfCostCenter.setCaretPosition(0);

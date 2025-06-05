@@ -48,7 +48,8 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
     
     private SDbDocAdminRecord moRegistry;
     private SDbEmployee moOffender;
-    private SPickerEmployee moPickerEmployee;
+    private SPickerEmployee moPickerEmployeeOffender;
+    private SPickerEmployee moPickerEmployeeOther;
     private SPickerPreceptSubsections moPickerPreceptSubsections;
     private HashMap<Integer, String> moEmployeesMap;
     private int mnCfgParamHrsDepartmentId;
@@ -794,7 +795,8 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
 
         moFields.setFormButton(jbSave);
         
-        moPickerEmployee = new SPickerEmployee(miClient);
+        moPickerEmployeeOffender = new SPickerEmployee(miClient, false);
+        moPickerEmployeeOther = new SPickerEmployee(miClient, true);
         moPickerPreceptSubsections = new SPickerPreceptSubsections(miClient);
         moEmployeesMap = new HashMap<>();
         
@@ -825,15 +827,18 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
             mbCanShowForm = false;
         }
         else if (mnPrivilegeLevel == SUtilConsts.LEV_CAPTURE && ((SDataUser) miClient.getSession().getUser()).getFkBizPartnerId_n() == 0) {
-            msCanShowFormMessage = "Tu usuario no tiene asignado un asociado de negocios.";
+            msCanShowFormMessage = "Tu usuario no tiene asignado un asociado de negocios.\n"
+                    + "Contacta al administrador del sistema, y reinicia tu sesión para actualizar la nueva configuración.";
             mbCanShowForm = false;
         }
         else if (mnCfgParamHrsDepartmentId == 0) {
-            msCanShowFormMessage = "No se ha configurado cuál es el departamento de RRHH.";
+            msCanShowFormMessage = "No se ha configurado en esta empresa cuál es el departamento de RRHH.\n"
+                    + "Contacta al administrador del sistema, y reinicia tu sesión para actualizar la nueva configuración.";
             mbCanShowForm = false;
         }
         else if (mnCfgParamHrsRepCompanyId == 0) {
-            msCanShowFormMessage = "No se ha configurado quién es el representante patronal.";
+            msCanShowFormMessage = "No se ha configurado en esta empresa quién es el representante patronal.\n"
+                    + "Contacta al administrador del sistema, y reinicia tu sesión para actualizar la nueva configuración.";
             mbCanShowForm = false;
         }
         
@@ -975,14 +980,14 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
         jtaPreceptSubsections.setCaretPosition(0);
     }
     
-    private void actionPerformedPickEmployee(final int employeeMode, final JTextField employee, final boolean showOffenderData) {
-        moPickerEmployee.resetForm();
-        moPickerEmployee.setValue(SPickerEmployee.VAL_MODE, employeeMode);
-        moPickerEmployee.setValue(SModConsts.HRSU_EMP, employee.getText());
-        moPickerEmployee.setVisible(true);
+    private void actionPerformedPickEmployee(final int employeeMode, final SPickerEmployee picker, final JTextField employee, final boolean showOffenderData) {
+        picker.resetForm();
+        picker.setValue(SPickerEmployee.VAL_MODE, employeeMode);
+        picker.setValue(SModConsts.HRSU_EMP, employee.getText());
+        picker.setVisible(true);
         
-        if (moPickerEmployee.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            showEmployee(employeeMode, (int) moPickerEmployee.getValue(SModConsts.HRSU_EMP), showOffenderData);
+        if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+            showEmployee(employeeMode, (int) picker.getValue(SModConsts.HRSU_EMP), showOffenderData);
         }
     }
 
@@ -1318,22 +1323,22 @@ public class SFormDocAdminRecord extends SBeanForm implements ActionListener, Fo
             JButton button = (JButton) e.getSource();
             
             if (button == jbPickEmployeeOffender) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_OFFENDER, jtfEmployeeOffender, true);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_OFFENDER, moPickerEmployeeOffender, jtfEmployeeOffender, true);
             }
             else if (button == jbPickEmployeeBoss) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_BOSS, jtfEmployeeBoss, false);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_BOSS, moPickerEmployeeOther, jtfEmployeeBoss, false);
             }
             else if (button == jbPickEmployeeHumanResources) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_REP_COM, jtfEmployeeHumanResources, false);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_REP_COM, moPickerEmployeeOther, jtfEmployeeHumanResources, false);
             }
             else if (button == jbPickEmployeeUnion_n) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_REP_UNI, jtfEmployeeUnion_n, false);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_REP_UNI, moPickerEmployeeOther, jtfEmployeeUnion_n, false);
             }
             else if (button == jbPickEmployeeWitness1) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_1, jtfEmployeeWitness1, false);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_1, moPickerEmployeeOther, jtfEmployeeWitness1, false);
             }
             else if (button == jbPickEmployeeWitness2) {
-                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_2, jtfEmployeeWitness2, false);
+                actionPerformedPickEmployee(SPickerEmployee.MODE_WITNESS_2, moPickerEmployeeOther, jtfEmployeeWitness2, false);
             }
             else if (button == jbPickPreceptSubsections) {
                 actionPerformedPickPreceptSubsections();
