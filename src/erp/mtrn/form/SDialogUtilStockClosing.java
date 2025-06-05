@@ -210,7 +210,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
                 mnFkWarehouseId = resulSet.getInt("id_wh");
                     stockMoves = STrnUtilities.obtainStockWarehouse(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
                     iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", stockMoves, withCost);
-                    mvDbmsDiogs.add(iog);                                
+                    mvDbmsDiogs.add(iog);
             }
         }
         catch (java.sql.SQLException e) {

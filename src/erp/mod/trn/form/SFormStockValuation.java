@@ -186,6 +186,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         jbPickRecord.addActionListener(this);
     }
     
+    /**
+     * Muestra los datos de la póliza contable actual en los campos correspondientes.
+     */
     private void renderCurrentRecord() {
         if (moCurrentRecord == null) {
             jtfRecordDate.setText("");
@@ -200,6 +203,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         }
     }
     
+    /**
+     * Abre un diálogo para seleccionar una póliza contable y actualiza los campos correspondientes.
+     */
     private void actionPickRecord() {
         Object key = null;
         String message = "";
@@ -326,6 +332,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                     int anio1 = cal1.get(Calendar.YEAR);
                     int anio2 = cal2.get(Calendar.YEAR);
                     
+                    // validar que la fecha de corte sea del mismo año que la fecha de corte de la valuación anterior
                     if (anio1 != anio2) {
                         validation.setMessage("La fecha de corte debe ser del mismo año que la fecha de corte de la valuación anterior.");
                         validation.setComponent(moDateDateEnd);
@@ -333,6 +340,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                 }
 
                 if (validation.isValid()) {
+                    /**
+                     * Validar si en el periodo de la valuación existen movimientos de inventario sin asociar a una factura.
+                     */
                     String res = SStockValuationUtils.periodHasDiogsWithoutInvoice(miClient.getSession(), dateStart, moDateDateEnd.getValue());
                     if (! res.isEmpty()) {
                         if (miClient.showMsgBoxConfirm(res + "\n ¿Desea continuar?") != JOptionPane.YES_OPTION) {
@@ -342,6 +352,10 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                 }
 
                 if (validation.isValid()) {
+                    /**
+                     * Validar si existen valuaciones pasadas que no son válidas.
+                     * Si existen, preguntar si se desea eliminar y reevaluar todo desde la última fecha.
+                     */
                     String res = SStockValuationUtils.arePastValuationsValid(miClient.getSession(), moDateDateEnd.getValue());
                     if (! res.isEmpty()) {
                         if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {

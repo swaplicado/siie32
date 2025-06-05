@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Para cambiar este encabezado de licencia, consulte Propiedades del proyecto.
+ * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
+ * y abra la plantilla en el editor.
  */
 package erp.mod.trn.db;
 
@@ -27,31 +27,28 @@ import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Utilerías para la generación de pólizas contables a partir de los consumos de la valuación de inventario.
+ * Incluye métodos para crear partidas contables de gastos y almacén, así como para construir conceptos contables.
+ * 
  * @author Edwin Carmona
  */
 public class SStockValuationRecordUtils {
     
-    private static final int TYPE_PUR = 1;
-    private static final int TYPE_INV = 2;
+    private static final int TYPE_PUR = 1; // Tipo de movimiento: gasto
+    private static final int TYPE_INV = 2; // Tipo de movimiento: inventario
     private static final DecimalFormat SimpleQuanityFormatValue0D = new DecimalFormat("##0");
     private static final DecimalFormat SimpleQuanityFormatValue1D = new DecimalFormat("##0.0");
     
     /**
-     * The function "makeDiogsFromConsumptions" creates record entries for expenses and warehouse
-     * transactions based on a list of stock valuation movements.
+     * Genera las partidas contables (póliza) a partir de los consumos de la valuación de inventario.
+     * Por cada consumo se generan partidas de gasto (debit) y de almacén (credit).
      * 
-     * @param session The session parameter is an instance of the SGuiSession class, which represents
-     * the user session in the application.
-     * @param recordPk - recordPk: an array of integers representing the primary key of the record to
-     * be created. The array should contain the year ID, period ID, bookkeeping center ID, record type
-     * ID, and number ID.
-     * @param dtStart The dtStart parameter is of type Date and represents the start date for the stock
-     * valuation.
-     * @param lConsumptions An ArrayList of SDbStockValuationMvt objects, which represents the list of
-     * stock valuation movements to be processed.
-     * @return The method is returning a boolean value, which is set to true.
-     * @throws java.lang.Exception
+     * @param session Sesión de usuario.
+     * @param recordPk Llave primaria de la póliza contable.
+     * @param dtStart Fecha de inicio de la valuación.
+     * @param lConsumptions Lista de movimientos de consumo de inventario.
+     * @return true si la operación fue exitosa.
+     * @throws java.lang.Exception Si ocurre un error al guardar alguna partida o configuración.
      */
     public static boolean makeRecordEntriesFromConsumptions(SGuiSession session, final Object[] recordPk, final Date dtStart, ArrayList<SDbStockValuationMvt> lConsumptions) throws Exception {
         SDataRecordEntry oDataRecordEntry;
@@ -412,52 +409,33 @@ public class SStockValuationRecordUtils {
     }
     
     /**
-     * This function creates a record entry for a stock valuation transaction in a financial system.
+     * Crea una partida contable para un movimiento de valuación de inventario.
      * 
-     * @param session The session object represents the current user session in the system.
-     * @param movType The movType parameter is an integer that represents the type of movement. It is
-     * used to determine whether the record entry is a debit or credit entry.
-     * @param recordPk An array containing the primary key values for the record entry. The values are:
-     * [yearId, periodId, bookkeepingCenterId, recordTypeId, numberId].
-     * @param oItem The parameter "oItem" is an object of type SDataItem, which represents an item or
-     * product in the system. It contains information such as the item's name, ID, and other
-     * attributes.
-     * @param dQuantity The quantity of the item being recorded.
-     * @param dPercent The percentage of the item being recorded.
-     * @param dQuantityPercent The quantity percentage of the item being recorded.
-     * @param dCost The parameter `dCost` represents the cost of the item.
-     * @param oUnit oUnit is an object of type SDataUnit, which represents a unit of measurement for an
-     * item. It contains information such as the unit's symbol and conversion factors to other units.
-     * @param sConfigConceptText The parameter `sConceptText` is a string that represents the concept or
-     * description of the record entry. It is used to provide additional information about the entry,
-     * such as the purpose or reason for the transaction.
-     * @param oAccount An object of type SDataAccount, which represents the accounting account
-     * associated with the record entry.
-     * @param nIdCc The parameter "nIdCc" represents the ID of the cost center associated with the
-     * record entry.
-     * @param sIdCc The parameter "sIdCc" is a String variable that represents the ID of a cost center.
-     * @param sortPosition The sortPosition parameter is used to specify the sorting position of the
-     * record entry. It determines the order in which the record entries will be displayed or
-     * processed.
-     * @param pkDiog - pkDiog[0]: Year ID of the document
-     * @param nItemRef The parameter `nItemRef` is an integer that represents the reference item for
-     * the record entry. It is used to link the record entry to a specific item in the system.
-     * @param fkSystemMove The parameter fkSystemMove is an array of two integers. The first integer
-     * represents the foreign key of the system move class, and the second integer represents the
-     * foreign key of the system move type.
-     * @param fkSystemAccount The parameter fkSystemAccount is an array that contains two integers. The
-     * first integer represents the ID of the system account class, and the second integer represents
-     * the ID of the system account type.
-     * @param fkSystemMoveType The parameter fkSystemMoveType is an array of two integers. The first
-     * integer represents the foreign key of the system move category, and the second integer
-     * represents the foreign key of the system move type.
-     * @param pkWhs The parameter pkWhs is an array that contains the following information:
-     * @param stkValuationId The parameter stkValuationId is an integer that represents the ID of the
-     * stock valuation.
-     * @param stkValuationMvtId The parameter "stkValuationMvtId" represents the ID of the stock
-     * valuation movement. It is used to link the stock valuation movement to the record entry in the
-     * database.
-     * @return The method is returning an instance of the SDataRecordEntry class.
+     * @param session Sesión de usuario.
+     * @param movType Tipo de movimiento (gasto o inventario).
+     * @param recordPk Llave primaria de la póliza.
+     * @param oItem Objeto del ítem.
+     * @param dQuantity Cantidad del movimiento.
+     * @param dPercent Porcentaje de prorrateo.
+     * @param dQuantityPercent Cantidad prorrateada.
+     * @param dCost Costo del movimiento.
+     * @param oUnit Unidad del ítem.
+     * @param sConfigConceptText Texto de configuración para el concepto.
+     * @param oAccount Cuenta contable.
+     * @param nIdCc ID del centro de costo.
+     * @param sIdCc Clave del centro de costo.
+     * @param sortPosition Posición de orden en la póliza.
+     * @param pkDiog Llave primaria del documento de inventario.
+     * @param nItemRef Referencia del ítem.
+     * @param fkSystemMove Clave de sistema para el tipo de movimiento.
+     * @param fkSystemAccount Clave de sistema para la cuenta.
+     * @param fkSystemMoveType Clave de sistema para el tipo de movimiento.
+     * @param pkWhs Llave primaria del almacén.
+     * @param stkValuationId ID de la valuación de inventario.
+     * @param stkValuationMvtId ID del movimiento de valuación.
+     * @param bookkeepingNumber Número de póliza.
+     * @return Objeto SDataRecordEntry creado y guardado.
+     * @throws Exception Si ocurre un error al guardar la partida o el vínculo.
      */
     private static SDataRecordEntry createRecordEntry(SGuiSession session, 
             final int movType, final Object[] recordPk, final SDataItem oItem, final double dQuantity, final double dPercent, 
@@ -578,16 +556,14 @@ public class SStockValuationRecordUtils {
     }
 
     /**
-     * This function retrieves the concept for a given item, quantity, percentage, quantity percentage,
-     * unit symbol, and text.
+     * Construye el concepto contable para una partida de valuación de inventario.
      *
-     * @param itemName The name of the item.
-     * @param qty The quantity of the item.
-     * @param percent The percentage of the item.
-     * @param qtyPerc The quantity percentage of the item.
-     * @param unitSymbol The symbol of the unit of measurement.
-     * @param conceptConfigtext The text associated with the concept.
-     * @return The method is returning a string that represents the concept.
+     * @param itemName Nombre del ítem.
+     * @param qty Cantidad.
+     * @param percent Porcentaje de prorrateo.
+     * @param unitSymbol Símbolo de la unidad.
+     * @param conceptConfigtext Texto adicional de configuración.
+     * @return Concepto contable generado.
      */
     private static String getConcept(final String itemName, final double qty, final double percent, final String unitSymbol, final String conceptConfigtext) {
         StringBuilder concept = new StringBuilder();
