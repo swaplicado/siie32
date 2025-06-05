@@ -1,7 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Para cambiar este encabezado de licencia, consulte Propiedades del proyecto.
+ * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
+ * y abra la plantilla en el editor.
  */
 package erp.mod.trn.db;
 
@@ -20,15 +20,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Utilerías para la valuación de inventario.
+ * Contiene métodos estáticos para obtener configuraciones, crear, consumir y eliminar movimientos de valuación,
+ * así como validar y actualizar información relacionada con la valuación de inventario.
+ * 
  * @author Edwin Carmona
  */
 public class SStockValuationUtils {
@@ -37,14 +44,12 @@ public class SStockValuationUtils {
     static final int CREDIT = 2;
     
     /**
-     * The function retrieves a stock valuation configuration object from a JSON string.
+     * Obtiene el objeto de configuración de valuación de inventario a partir de un string JSON.
      * 
-     * @param statement The "statement" parameter is an object of type "Statement". It is used as a
-     * parameter to retrieve a configuration value from a system parameter using the
-     * "SCfgUtils.getParamValue()" method. The retrieved configuration value is then deserialized into
-     * an object of type "SStockConfiguration" using the Jackson
-     * @return The method is returning an object of type SStockConfiguration.
+     * @param statement Objeto Statement para ejecutar la consulta de configuración.
+     * @return Objeto de configuración de valuación de inventario.
      * @throws com.fasterxml.jackson.core.JsonProcessingException
+     * @throws Exception 
      */
     public static SStockValuationConfiguration getStockValuationConfig(final Statement statement) throws JsonProcessingException, Exception {
         String sCfg = SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_TRN_STK_MAT_VAL);
@@ -55,19 +60,14 @@ public class SStockValuationUtils {
     }
     
     /**
-     * The function returns a SQL query to retrieve stock results based on certain parameters.
+     * Devuelve una consulta SQL para obtener los resultados de stock según los parámetros recibidos.
      * 
-     * @param statement The `statement` parameter is an instance of the `Statement` class, which is
-     * used to execute SQL statements and retrieve results from a database.
-     * @param diogCategory The diogCategory parameter represents the category of inventory movements.
-     * It is an integer value that determines whether the inventory movements are for incoming or
-     * outgoing transactions. The value 1 represents incoming transactions, while the value 2
-     * represents outgoing transactions.
-     * @param startDate The start date of the stock result query. It specifies the beginning of the
-     * date range for which you want to retrieve stock results.
-     * @param cutDate The cutDate parameter is the date used to determine the end of the time period
-     * for the stock query.
-     * @return The method is returning a SQL query string.
+     * @param statement Objeto Statement para ejecutar la consulta.
+     * @param diogCategory Categoría del movimiento de inventario (entrada o salida).
+     * @param startDate Fecha de inicio del periodo.
+     * @param cutDate Fecha de corte del periodo.
+     * @return Consulta SQL como cadena.
+     * @throws Exception 
      */
     private static String getStockQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
         String sql = "SELECT  "
@@ -75,85 +75,123 @@ public class SStockValuationUtils {
                 + "    d.num, "
                 + "    mre.fk_item_ref_n AS ref_ety, "
                 + "    mr.fk_item_ref_n ref_rm, "
-                + "    de.fid_mat_req_n, "
-                + "    de.fid_mat_req_ety_n,"
                 + "    de.fid_cc,"
                 + "    tp.tp_iog, "
                 + "    i.item_key, "
-                + "    i.item AS item_name "
+                + "    i.item AS item_name,"
+                + "    dps.num AS dps_num, "
+                + "    dps.dt AS dps_date, "
+                + "    dps.fid_ct_dps, "
+                + "    dps.fid_cl_dps, "
+                + "    dps.fid_tp_dps, "
+                + "    dps_ety.price_u_real_r, "
+                + "    dps_ety.stot_r, "
+                + "    supp.id_des_year, "
+                + "    supp.id_des_doc, "
+                + "    supp.id_des_ety, "
+                + "    dps_ety_des.price_u_real_r AS ety_des_price_real "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " d ON stk.fid_diog_year = d.id_year "
                 + "        AND stk.fid_diog_doc = d.id_doc "
+                + "        AND NOT d.b_del "
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " de ON stk.fid_diog_year = de.id_year "
                 + "        AND stk.fid_diog_doc = de.id_doc "
                 + "        AND stk.fid_diog_ety = de.id_ety "
+                + "        AND NOT de.b_del "
                 + "        INNER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " i ON stk.id_item = i.id_item "
                 + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " tp ON d.fid_ct_iog = tp.id_ct_iog "
-                + "        AND d.fid_cl_iog = tp.id_cl_iog "
-                + "        AND d.fid_tp_iog = tp.id_tp_iog "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " tp ON stk.fid_ct_iog = tp.id_ct_iog "
+                + "        AND stk.fid_cl_iog = tp.id_cl_iog "
+                + "        AND stk.fid_tp_iog = tp.id_tp_iog "
                 + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " mre ON de.fid_mat_req_n = mre.id_mat_req "
-                + "        AND de.fid_mat_req_ety_n = mre.id_ety "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " mre ON stk.fid_mat_req_n = mre.id_mat_req "
+                + "        AND stk.fid_mat_req_ety_n = mre.id_ety "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " mr ON d.fid_mat_req_n = mr.id_mat_req "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON stk.fid_dps_year_n = dps.id_year AND stk.fid_dps_doc_n = dps.id_doc "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " dps_ety ON stk.fid_dps_year_n = dps_ety.id_year "
+                + "        AND stk.fid_dps_doc_n = dps_ety.id_doc "
+                + "        AND stk.fid_dps_ety_n = dps_ety.id_ety "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON stk.fid_dps_year_n = supp.id_src_year "
+                + "        AND stk.fid_dps_doc_n = supp.id_src_doc "
+                + "        AND stk.fid_dps_ety_n = supp.id_src_ety "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dps_ety_des ON supp.id_des_year = dps_ety_des.id_year "
+                + "        AND supp.id_des_doc = dps_ety_des.id_doc "
+                + "        AND supp.id_des_ety = dps_ety_des.id_ety "
                 + "WHERE "
-                + "    NOT d.b_del AND NOT de.b_del AND NOT stk.b_del "
+                + "    NOT stk.b_del "
                 + "    AND stk.id_year = YEAR('" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "') "
                 + "    AND stk.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(startDate) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
                 + "    AND stk.fid_ct_iog = " + diogCategory + " ";
 
         SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(statement);
         ArrayList<int[]> iogTpmovs;
-        if (diogCategory == SModSysConsts.TRNS_CT_IOG_IN) {
-            iogTpmovs = oCfg.getIogTpmovsIn();
-            sql += "AND stk.mov_in > 0 ";
-        }
-        else {
-            iogTpmovs = oCfg.getIogTpmovsOut();
-            sql += "AND stk.mov_out > 0 ";
-        }
+
+        // Determinar si son movimientos de entrada o salida
+        boolean isIn = diogCategory == SModSysConsts.TRNS_CT_IOG_IN;
+        iogTpmovs = isIn ? oCfg.getIogTpmovsIn() : oCfg.getIogTpmovsOut();
+        sql += isIn ? "AND stk.mov_in > 0 " : "AND stk.mov_out > 0 ";
 
         if (iogTpmovs.isEmpty()) {
             throw new Exception("No existe configuración de movimientos de almacén para la valuación");
         }
 
-        sql += "AND (";
-
+        // Optimización: Agrupar por fid_cl_iog para reducir condiciones OR
+        Map<Integer, List<Integer>> groupedTpmovs = new HashMap<>();
         for (int[] iogTpmov : iogTpmovs) {
-            sql += "(stk.fid_cl_iog = " + iogTpmov[1] + " AND stk.fid_tp_iog = " + iogTpmov[2] + ") OR";
+            groupedTpmovs.computeIfAbsent(iogTpmov[1], k -> new ArrayList<>()).add(iogTpmov[2]);
         }
 
-        sql = sql.substring(0, sql.length() - 2);
+        // Construir condiciones SQL optimizadas
+        if (!groupedTpmovs.isEmpty()) {
+            sql += "AND (";
+            boolean firstGroup = true;
 
-        sql += ") "
-                + "ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC";
+            for (Map.Entry<Integer, List<Integer>> entry : groupedTpmovs.entrySet()) {
+                if (!firstGroup) {
+                    sql += " OR ";
+                }
+                firstGroup = false;
+
+                int fidClIog = entry.getKey();
+                List<Integer> tpIogs = entry.getValue();
+
+                if (tpIogs.size() == 1) {
+                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", 
+                                       fidClIog, tpIogs.get(0));
+                } else {
+                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog IN (%s))", 
+                                       fidClIog, tpIogs.stream()
+                                                      .map(String::valueOf)
+                                                      .collect(Collectors.joining(",")));
+                }
+            }
+
+            sql += ") ";
+        }
+
+        sql += "ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC";
 
         return sql;
     }
     
     /**
-     * The function creates stock valuation entries based on a given category, start date, cut date,
-     * and valuation ID.
+     * Crea movimientos de valuación de inventario según la categoría, fechas y el ID de valuación.
      * 
-     * @param session The session parameter is an instance of the SGuiSession class, which represents
-     * the user session in the application.
-     * @param diogCategory The diogCategory parameter represents the category of the document related
-     * to the stock movement. It is used to filter the stock result query and retrieve only the entries
-     * with the specified category.
-     * @param startDate The start date is the date from which the stock valuation entries should be
-     * created. It is used to filter the results of the query that retrieves the stock movements.
-     * @param cutDate The cutDate parameter is the date until which the stock valuation entries will be
-     * created. It is used to filter the results of the SQL query that retrieves the stock information.
-     * Only the stock movements that occurred before or on the cutDate will be considered for creating
-     * the entries.
-     * @param idValuation The idValuation parameter is an integer value representing the ID of the
-     * stock valuation.
-     * @throws java.lang.Exception
+     * @param session Sesión de usuario para ejecutar consultas.
+     * @param diogCategory Categoría del documento de inventario.
+     * @param startDate Fecha de inicio.
+     * @param cutDate Fecha de corte.
+     * @param idValuation ID de la valuación.
+     * @throws Exception 
      */
     public static void createEntries(SGuiSession session, final int diogCategory, final Date startDate, final Date cutDate, final int idValuation) throws Exception {
         String sql = SStockValuationUtils.getStockQuery(session.getStatement().getConnection().createStatement(), diogCategory, startDate, cutDate);
@@ -172,24 +210,60 @@ public class SStockValuationUtils {
             oEntry.setFkDiogYearInId_n(res.getInt("fid_diog_year"));
             oEntry.setFkDiogDocInId_n(res.getInt("fid_diog_doc"));
             oEntry.setFkDiogEntryInId_n(res.getInt("fid_diog_ety"));
+            oEntry.setFkDpsYearInId_n(res.getInt("stk.fid_dps_year_n"));
+            oEntry.setFkDpsDocInId_n(res.getInt("stk.fid_dps_doc_n"));
+            oEntry.setFkDpsEntryInId_n(res.getInt("stk.fid_dps_ety_n"));
             oEntry.setFkItemId(res.getInt("id_item"));
             oEntry.setFkUnitId(res.getInt("id_unit"));
             oEntry.setFkLotId(res.getInt("id_lot"));
             oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
             oEntry.setFkWarehouseId(res.getInt("id_wh"));
             oEntry.setFkUserInsertId(session.getUser().getPkUserId());
+            oEntry.setAuxTypeDpsIn(new int[] { res.getInt("fid_ct_dps"), 
+                                                res.getInt("fid_cl_dps"), 
+                                                res.getInt("fid_tp_dps") });
+
+            if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] && 
+                oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] && 
+                oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                    if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                        oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                        oEntry.setTemporalPrice(true);
+                        String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
+                                + "con número de documento " + res.getInt("d.num") + " y "
+                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", " 
+                                + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                        SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
+                    }
+                    else if (oEntry.getCostUnitary() != res.getDouble("ety_des_price_real")) {
+                            oEntry.setCostUnitary(res.getDouble("ety_des_price_real"));
+                            oEntry.setCost_r(SLibUtils.round(oEntry.getQuantityMovement() * oEntry.getCostUnitary(), 8));
+                            oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
+                            oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
+                            oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                        }
+            }
+            else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0] && 
+                oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1] && 
+                oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
+                    if (oEntry.getCostUnitary() != res.getDouble("dps_ety.price_u_real_r")) {
+                        oEntry.setCostUnitary(res.getDouble("dps_ety.price_u_real_r"));
+                        oEntry.setCost_r(SLibUtils.round(oEntry.getQuantityMovement() * oEntry.getCostUnitary(), 8));
+                    }
+            }
             
             oEntry.save(session);
         }
     }
 
     /**
-     * This function retrieves a list of stock valuation movement entries that have not been consumed.
+     * Obtiene una lista de movimientos de valuación de inventario que no han sido consumidos.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which represents the user
-     * session in the application. It is used to access the database connection and execute the SQL
-     * query.
-     * @return The method is returning an ArrayList of SDbStockValuationMvt objects.
+     * @param session Sesión de usuario.
+     * @param idYear Año de la valuación.
+     * @return Lista de movimientos no consumidos.
+     * @throws Exception 
      */
     private static ArrayList<SDbStockValuationMvt> getNotConsumedEntries(SGuiSession session, final int idYear) throws Exception {
         String sql = "SELECT "
@@ -200,16 +274,37 @@ public class SStockValuationUtils {
                 + "ve.fk_diog_year_in_n, "
                 + "ve.fk_diog_doc_in_n, "
                 + "ve.fk_diog_ety_in_n, "
+                + "ve.fk_dps_year_in_n, "
+                + "ve.fk_dps_doc_in_n, "
+                + "ve.fk_dps_ety_in_n, "
                 + "ve.fk_item, "
                 + "ve.fk_unit, "
                 + "ve.fk_lot, "
                 + "ve.cost_u, "
                 + "ve.fk_cob,"
-                + "ve.fk_wh "
-                + "FROM "
-                + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
+                + "ve.fk_wh, "
+                + "dps.fid_ct_dps, "
+                + "dps.fid_cl_dps, "
+                + "dps.fid_tp_dps, "
+                + "supp.id_des_year, "
+                + "supp.id_des_doc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS diog_ety "
+                + "         ON ve.fk_diog_year_in_n = diog_ety.id_year "
+                + "        AND ve.fk_diog_doc_in_n = diog_ety.id_doc " 
+                + "        AND ve.fk_diog_ety_in_n = diog_ety.id_ety "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
+                + "        ON ve.fk_dps_year_in_n = dps.id_year "
+                + "        AND ve.fk_dps_doc_in_n = dps.id_doc "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON ve.fk_dps_year_in_n = supp.id_src_year "
+                + "        AND ve.fk_dps_doc_in_n = supp.id_src_doc "
+                + "        AND ve.fk_dps_ety_in_n = supp.id_src_ety "
                 + "WHERE "
-                + "NOT ve.b_del AND ve.fk_diog_year_in_n = " + idYear + " "
+                + "NOT ve.b_del "
+//                + "AND ve.fk_diog_year_in_n = " + idYear + " "
                 + "GROUP BY ve.fk_cob , ve.fk_wh , ve.fk_item , ve.fk_unit , ve.fk_lot , ve.cost_u , "
                 + "ve.fk_diog_year_in_n , ve.fk_diog_doc_in_n , ve.fk_diog_ety_in_n "
                 + "HAVING qty > 0 "
@@ -229,12 +324,29 @@ public class SStockValuationUtils {
             oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
             oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
             oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
+            oEntry.setFkDpsYearInId_n(res.getInt("fk_dps_year_in_n"));
+            oEntry.setFkDpsDocInId_n(res.getInt("fk_dps_doc_in_n"));
+            oEntry.setFkDpsEntryInId_n(res.getInt("fk_dps_ety_in_n"));
             oEntry.setFkItemId(res.getInt("fk_item"));
             oEntry.setFkUnitId(res.getInt("fk_unit"));
             oEntry.setFkLotId(res.getInt("fk_lot"));
             oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
             oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
             oEntry.setFkWarehouseId(res.getInt("fk_wh"));
+
+            if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
+                    res.getInt("dps.fid_tp_dps") > 0) {
+                oEntry.setAuxTypeDpsIn(new int[] {
+                                                    res.getInt("dps.fid_ct_dps"), 
+                                                    res.getInt("dps.fid_cl_dps"), 
+                                                    res.getInt("dps.fid_tp_dps") 
+                                                });
+                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                        oEntry.setTemporalPrice(true);
+                }
+            }
 
             entries.add(oEntry);
         }
@@ -243,22 +355,15 @@ public class SStockValuationUtils {
     }
     
     /**
-     * The function consumes stock valuation entries based on certain criteria and returns a list of
-     * consumed entries.
+     * Consume movimientos de valuación de inventario según los criterios y devuelve la lista de consumos.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which represents the user
-     * session in the application.
-     * @param diogCategory The diogCategory parameter represents the category of the document related
-     * to the stock movement. It is an integer value that determines the type of document, such as a
-     * purchase order, sales order, or inventory adjustment.
-     * @param startDate The start date is the date from which the stock valuation movement entries
-     * should be considered for consumption.
-     * @param cutDate The cutDate parameter is the date until which the stock valuation entries should
-     * be considered. It is used to filter the entries based on their date.
-     * @param idValuation The parameter `idValuation` is an integer that represents the ID of the stock
-     * valuation.
-     * @return The method is returning an ArrayList of SDbStockValuationMvt objects.
-     * @throws java.lang.Exception
+     * @param session Sesión de usuario.
+     * @param diogCategory Categoría del documento de inventario.
+     * @param startDate Fecha de inicio.
+     * @param cutDate Fecha de corte.
+     * @param idValuation ID de la valuación.
+     * @return Lista de consumos realizados.
+     * @throws Exception 
      */
     public static ArrayList<SDbStockValuationMvt> consumeEntries(SGuiSession session, final int diogCategory, final Date startDate, final Date cutDate, final int idValuation) throws Exception {
         String sql = SStockValuationUtils.getStockQuery(session.getStatement().getConnection().createStatement(), diogCategory, startDate, cutDate);
@@ -309,15 +414,26 @@ public class SStockValuationUtils {
                         oConsumption.setQuantityMovement(consumeQuantity);
                         oConsumption.setCostUnitary(entry.getCostUnitary());
                         oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+
+                        if (entry.isTemporalPrice()) {
+                            oConsumption.setTemporalPrice(true);
+                        }
+
                         oConsumption.setFkItemId(res.getInt("id_item"));
                         oConsumption.setFkUnitId(res.getInt("id_unit"));
                         oConsumption.setFkLotId(res.getInt("id_lot"));
-                        oConsumption.setFkDiogYearInId_n(entry.getFkDiogYearInId());
-                        oConsumption.setFkDiogDocInId_n(entry.getFkDiogDocInId());
-                        oConsumption.setFkDiogEntryInId_n(entry.getFkDiogEntryInId());
+                        oConsumption.setFkDiogYearInId_n(entry.getFkDiogYearInId_n());
+                        oConsumption.setFkDiogDocInId_n(entry.getFkDiogDocInId_n());
+                        oConsumption.setFkDiogEntryInId_n(entry.getFkDiogEntryInId_n());
+                        oConsumption.setFkDpsYearInId_n(entry.getFkDpsYearInId_n());
+                        oConsumption.setFkDpsDocInId_n(entry.getFkDpsDocInId_n());
+                        oConsumption.setFkDpsEntryInId_n(entry.getFkDpsEntryInId_n());
                         oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
                         oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
                         oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
+                        oConsumption.setFkDpsYearOutId_n(res.getInt("stk.fid_dps_year_n"));
+                        oConsumption.setFkDpsDocOutId_n(res.getInt("stk.fid_dps_doc_n"));
+                        oConsumption.setFkDpsEntryOutId_n(res.getInt("stk.fid_dps_ety_n"));
                         oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
                         oConsumption.setFkStockValuationId(idValuation);
                         oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
@@ -356,6 +472,9 @@ public class SStockValuationUtils {
                     oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
                     oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
                     oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
+                    oConsumption.setFkDpsYearInId_n(res.getInt("stk.fid_dps_year_n"));
+                    oConsumption.setFkDpsDocInId_n(res.getInt("stk.fid_dps_doc_n"));
+                    oConsumption.setFkDpsEntryInId_n(res.getInt("stk.fid_dps_ety_n"));
                     oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
                     oConsumption.setFkStockValuationId(idValuation);
                     oConsumption.setFkStockValuationMvtId_n(0);
@@ -392,41 +511,32 @@ public class SStockValuationUtils {
     }
     
     /**
-     * The function `deleteValuation` deletes a valuation record and related records from the database.
+     * Elimina una valuación y sus registros relacionados en la base de datos.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which represents the user
-     * session in the application. It is used to access the database connection and execute SQL
-     * queries.
-     * @param idValuation The idValuation parameter is an integer that represents the ID of the
-     * valuation to be deleted.
-     * @return The method is returning a boolean value of true.
-     * @throws java.sql.SQLException
+     * @param session Sesión de usuario.
+     * @param idValuation ID de la valuación a eliminar.
+     * @return true si la operación fue exitosa.
+     * @throws SQLException 
      */
     public static boolean deleteValuation(SGuiSession session, final int idValuation) throws SQLException {
-        String sql = "SELECT  " +
-                    "    * " +
-                    "FROM " +
-                    "  " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " " +
-                    "WHERE " +
-                    "    fk_stk_val = " + idValuation + ";";
+        /**
+         * Eliminar pólizas
+         */
+        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS va "
+                + "ON re.id_year = va.fk_fin_rec_year "
+                + "AND re.id_per = va.fk_fin_rec_per "
+                + "AND re.id_bkc = va.fk_fin_rec_bkc "
+                + "AND re.id_tp_rec = va.fk_fin_rec_tp_rec "
+                + "AND re.id_num = va.fk_fin_rec_num "
+                + "AND re.id_ety = va.fk_fin_rec_ety "
+                + "SET re.b_del = 1, re.sort_pos = 0 "
+                + "WHERE va.fk_stk_val = " + idValuation + ";";
+        session.getStatement().getConnection().createStatement().executeUpdate(sql);
         
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        String delRecEtys = "";
-        while (res.next()) {
-            delRecEtys = "UPDATE "
-                    + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " "
-                    + "SET b_del = 1,"
-                    + "sort_pos = 0 "
-                    + "WHERE (id_year = " + res.getInt("fk_fin_rec_year") + ") "
-                                                + "AND (id_per = " + res.getInt("fk_fin_rec_per") + ") "
-                                                + "AND (id_bkc = " + res.getInt("fk_fin_rec_bkc") + ") "
-                                                + "AND (id_tp_rec = '" + res.getString("fk_fin_rec_tp_rec") + "') "
-                                                + "AND (id_num = " + res.getInt("fk_fin_rec_num") + ") "
-                                                + "AND (id_ety = " + res.getInt("fk_fin_rec_ety") + ");";
-            
-            session.getStatement().getConnection().createStatement().executeUpdate(delRecEtys);
-        }
-        
+        /**
+         * Eliminar registros de valuación vs pólizas
+         */
         String sqlDelLinks = "UPDATE " +
                             SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " " +
                             "SET b_del = 1 " +
@@ -435,22 +545,55 @@ public class SStockValuationUtils {
                             
         session.getStatement().getConnection().createStatement().executeUpdate(sqlDelLinks);
         
+        /**
+         * Eliminar revisiones de ajuste de precios temporales
+         */
+        String sqlDelRevs = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS mvt1 " +
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS mvt2  " +
+                            "    ON mvt1.fk_stk_val_mvt_rev_n = mvt2.id_stk_val_mvt " +
+                            "    AND NOT mvt2.b_del " +
+                            "    AND mvt2.fk_stk_val = " + idValuation + " " +
+                            "SET  " +
+                            "    mvt1.b_rev = 0, " +
+                            "    mvt1.fk_stk_val_mvt_n = NULL " +
+                            "WHERE NOT mvt1.b_del;";
+        
+        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelRevs);
+        
+        /**
+         * Eliminar movimientos de valuación
+         */
         String sqlDelEtys = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " SET b_del = 1 "
                 + "WHERE fk_stk_val = " + idValuation + ";";
         
         session.getStatement().getConnection().createStatement().executeUpdate(sqlDelEtys);
+
+        /**
+         * Eliminar Diogs y stk de ajustes
+         */
+        String sqlDelDiogs = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS diog "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_DIOG_ADJ) + " AS piv ON "
+                + "             (diog.id_year = piv.id_year AND diog.id_doc = piv.id_doc) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS stk ON "
+                + "             (piv.id_year = stk.fid_diog_year AND piv.id_doc = stk.fid_diog_doc) "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS diog_ety ON "
+                + "             (diog_ety.id_year = piv.id_year AND diog_ety.id_doc = piv.id_doc) "
+                + "SET diog.b_del = 1,"
+                + "diog_ety.b_del = 1, "
+                + "stk.b_del = 1 "
+                + "WHERE NOT diog.b_del AND NOT diog_ety.b_del AND NOT stk.b_del AND piv.id_stk_val = " + idValuation + ";";
+        
+        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelDiogs);
         
         return true;
     }
     
     /**
-     * The function checks if a stock valuation can be created based on a given date.
+     * Verifica si se puede crear un movimiento de inventario (DIOG) para una fecha dada según la valuación.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which represents the user
-     * session in the application. It is used to access the database connection and execute SQL
-     * queries.
-     * @param dtDiog The dtDiog parameter is a Date object representing the date of the document.
-     * @return The method is returning a boolean value.
+     * @param session Sesión de usuario.
+     * @param dtDiog Fecha del documento.
+     * @return true si se puede crear, false en caso contrario.
      */
     public static boolean canCreateDiogByValuation(SGuiSession session, final Date dtDiog) {
         try {
@@ -470,6 +613,14 @@ public class SStockValuationUtils {
         return false;
     }
     
+    /**
+     * Revalúa una lista de valuaciones de inventario.
+     * 
+     * @param client Cliente de la sesión.
+     * @param lValuations Lista de valuaciones a revaluar.
+     * @return Cadena vacía si fue exitoso, mensaje de error en caso contrario.
+     * @throws SQLException 
+     */
     public static String revaluateValuations(SGuiClient client, ArrayList<SDbStockValuation> lValuations) throws SQLException {
         try {
             client.getSession().getStatement().getConnection().setAutoCommit(false);
@@ -503,6 +654,13 @@ public class SStockValuationUtils {
         return "";
     }
     
+    /**
+     * Elimina las valuaciones a partir de una fecha de corte.
+     * 
+     * @param client Cliente de la sesión.
+     * @param endDate Fecha de corte.
+     * @return Lista de valuaciones eliminadas.
+     */
     public static ArrayList<SDbStockValuation> deleteValuations(SGuiClient client, Date endDate) {
         try {
             client.getSession().getStatement().getConnection().setAutoCommit(false);
@@ -553,6 +711,14 @@ public class SStockValuationUtils {
         return null;
     }
     
+    /**
+     * Verifica si se pueden eliminar las valuaciones a partir de una fecha de corte.
+     * 
+     * @param client Cliente de la sesión.
+     * @param endDate Fecha de corte.
+     * @return Mensaje de error si no se puede eliminar, cadena vacía si es posible.
+     * @throws Exception 
+     */
     public static String canDeleteValuations(SClientInterface client, Date endDate) throws Exception {
         Date firstInvalidValuationDate = SStockValuationUtils.getFirstInvalidValuationDate(client.getSession(), endDate);
         
@@ -573,9 +739,6 @@ public class SStockValuationUtils {
         ResultSet res = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
         String result = "";
         while (res.next()) {
-//            oVal = new SDbStockValuation();
-//            oVal.read(session, new int[] { res.getInt("id_stk_val") });
-            
             if (! SDataUtilities.isPeriodOpen(client, res.getDate("dt"))) {
                 result += "La valuación del '" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' al "
                             + "'" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' no se puede reevaluar porque la póliza: "
@@ -587,8 +750,17 @@ public class SStockValuationUtils {
         return result;
     }
     
+    /**
+     * Obtiene la fecha de la primera valuación inválida anterior a la fecha de corte.
+     * 
+     * @param session Sesión de usuario.
+     * @param endDate Fecha de corte.
+     * @return Fecha de la primera valuación inválida, o null si todas son válidas.
+     * @throws SQLException
+     * @throws Exception 
+     */
     public static Date getFirstInvalidValuationDate(SGuiSession session, Date endDate) throws SQLException, Exception {
-        String sql = "SELECT id_stk_val, dt_sta "
+        String sql = "SELECT id_stk_val, dt_sta  "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
                 + "WHERE NOT b_del "
                 + "AND dt_end < '" + SLibUtils.DbmsDateFormatDate.format(endDate) + "' "
@@ -610,9 +782,9 @@ public class SStockValuationUtils {
      * Recorre las valuaciones anteriores a la actual y determina si alguna no es válida.
      * Si alguna no es válida, en el string de retorno se muestra el detalle de qué valuaciones no son válidas.
      * 
-     * @param session
-     * @param endDate
-     * @return
+     * @param session Sesión de usuario.
+     * @param endDate Fecha de corte.
+     * @return Detalle de las valuaciones no válidas.
      * @throws SQLException
      * @throws Exception 
      */
@@ -657,15 +829,13 @@ public class SStockValuationUtils {
     }
     
     /**
-     * Determina si la valuación con el ID recibida es válida.
-     * Consulta en la BD si hay un DIOG que se haya actualizado después del timestamp de la fecha de última 
-     * actualización de la valuación.
-     * Si hay movimientos de almacén que cumplan con este criterio los devuelve en la lista, si la lista está vacía 
-     * significa que la valuación es válida.
+     * Determina si la valuación con el ID recibido es válida.
+     * Consulta si hay un DIOG actualizado después del timestamp de la última actualización de la valuación.
+     * Si hay movimientos que cumplen el criterio, los devuelve en la lista; si la lista está vacía, la valuación es válida.
      * 
-     * @param session
-     * @param idValuation
-     * @return
+     * @param session Sesión de usuario.
+     * @param idValuation ID de la valuación.
+     * @return Lista de movimientos de almacén que invalidan la valuación.
      * @throws Exception 
      */
     public static ArrayList<SDataDiog> isValuationDiogsValidById(SGuiSession session, final int idValuation) throws Exception {
@@ -694,15 +864,13 @@ public class SStockValuationUtils {
     }
     
     /**
-     * Determina si la valuación con el ID recibida es válida.
-     * Consulta en la BD si hay una Requisición de Materiales que se haya actualizado después del timestamp de la fecha de última 
-     * actualización de la valuación.
-     * Si hay requisiciones que cumplan con este criterio las devuelve en la lista, si la lista está vacía 
-     * significa que la valuación es válida.
+     * Determina si la valuación con el ID recibido es válida.
+     * Consulta si hay una Requisición de Materiales actualizada después del timestamp de la última actualización de la valuación.
+     * Si hay requisiciones que cumplen el criterio, las devuelve en la lista; si la lista está vacía, la valuación es válida.
      * 
-     * @param session
-     * @param idValuation
-     * @return
+     * @param session Sesión de usuario.
+     * @param idValuation ID de la valuación.
+     * @return Lista de requisiciones que invalidan la valuación.
      * @throws Exception 
      */
     public static ArrayList<SDbMaterialRequest> isValuationMatReqValidById(SGuiSession session, final int idValuation) throws Exception {
@@ -729,7 +897,64 @@ public class SStockValuationUtils {
         
         return lMatReqs;
     }
+
+    /**
+     * Verifica si en el periodo existen movimientos de entrada sin factura asociada.
+     * 
+     * @param session Sesión de usuario.
+     * @param startDate Fecha de inicio.
+     * @param cutDate Fecha de corte.
+     * @return Mensaje con los movimientos sin factura, o vacío si no existen.
+     * @throws SQLException 
+     */
+    public static String periodHasDiogsWithoutInvoice(SGuiSession session, Date startDate, Date cutDate) throws SQLException {
+        String sql = "SELECT d.id_year, d.id_doc, d.dt, d.num, d.fid_dps_year_n, d.fid_dps_doc_n, "
+                + "dps.num, dps.dt "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON (d.fid_dps_year_n = dps.id_year AND d.fid_dps_doc_n = dps.id_doc) "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON d.fid_dps_year_n = supp.id_src_year "
+                + "        AND d.fid_dps_doc_n = supp.id_src_doc "
+                + "WHERE NOT d.b_del "
+                + "AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(startDate) + "' "
+                + "AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
+                + "AND d.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND COALESCE(supp.id_des_year, 0) = 0 "
+                + "ORDER BY d.dt ASC, d.num ASC;";
+
+        String sResult = "";
+        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
+        while (res.next()) {
+            sResult += "Folio: " + res.getString("d.num") + ", fecha: "
+                    + SLibUtils.DateFormatDate.format(res.getDate("d.dt")) 
+                    +  " y pedido con folio:" + res.getString("dps.num") + ", fecha: " 
+                    + SLibUtils.DateFormatDate.format(res.getDate("dps.dt")) + ".\n";
+        }
+        if (! sResult.isEmpty()) {
+            sResult = "Los movimientos de entrada al almacén: \n" + sResult
+                    + "no tienen una factura asociada.\n";
+        }
+
+        return sResult;
+    }
     
+    /**
+     * Actualiza el costo y la cantidad de una fila en la tabla TRN_STK según los parámetros recibidos.
+     * 
+     * @param session Sesión de usuario.
+     * @param idYear Año.
+     * @param idItem ID del ítem.
+     * @param idUnit ID de la unidad.
+     * @param idLot ID del lote.
+     * @param idCob ID de la sucursal.
+     * @param idWh ID del almacén.
+     * @param idMov ID del movimiento.
+     * @param dCost Costo a actualizar.
+     * @param opType Tipo de operación (DEBIT/CREDIT).
+     * @throws SQLException 
+     */
     private static void updateTrnStockRowCost(SGuiSession session, final int idYear,
                                                                 final int idItem, 
                                                                 final int idUnit, 
@@ -761,25 +986,16 @@ public class SStockValuationUtils {
        session.getStatement().getConnection().createStatement().executeUpdate(sql);
     }
     
-
     /**
-     * The function updates the cost and quantity of a row in the TRN_STK table based on the given
-     * parameters.
+     * Actualiza el costo y la cantidad de una fila en la tabla TRN_STK según los datos del documento de inventario.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which represents the user
-     * session in the system. It is used to access the database connection and execute SQL queries.
-     * @param idDiogYear The year of the document.
-     * @param idDiogDoc The idDiogDoc parameter represents the ID of the document in the inventory
-     * movement.
-     * @param idDiogEty The parameter idDiogEty represents the ID of the document entry in the
-     * inventory movement document (diog) table. It is used to identify the specific entry in the diog
-     * table for which the stock row cost needs to be updated.
-     * @param dCost The parameter "dCost" represents the cost value that needs to be updated in the
-     * TrnStock table.
-     * @param dQty dQty is the quantity of the item being updated in the transaction stock row.
-     * @param opType The "opType" parameter is an integer that represents the type of operation to be
-     * performed. It is used to determine how the stock row cost should be updated. The specific values
-     * and their meanings would depend on the implementation of the "updateTrnStockRowCost" method.
+     * @param session Sesión de usuario.
+     * @param idDiogYear Año del documento.
+     * @param idDiogDoc ID del documento.
+     * @param idDiogEty ID de la partida del documento.
+     * @param dCost Costo a actualizar.
+     * @param opType Tipo de operación (DEBIT/CREDIT).
+     * @throws SQLException 
      */
     public static void updateTrnStockRowCostByDiog(SGuiSession session, 
                                                             final int idDiogYear, 
