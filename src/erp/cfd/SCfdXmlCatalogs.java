@@ -32,8 +32,8 @@ import sa.lib.xml.SXmlUtils;
  */
 public class SCfdXmlCatalogs {
     
-    private SGuiSession moSession;
-    private HashMap<Integer, ArrayList<SCfdXmlCatalogEntry>> mhmCatalogs = new HashMap<>();
+    private final SGuiSession moSession;
+    private final HashMap<Integer, ArrayList<SCfdXmlCatalogEntry>> mhmCatalogs = new HashMap<>();
 
     public SCfdXmlCatalogs(SGuiSession session) throws Exception {
         moSession = session;

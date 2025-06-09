@@ -26,6 +26,7 @@ import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataCurrency;
 import erp.mitm.data.SDataUnit;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataUserDnsDps;
@@ -380,7 +381,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                         message += "\nEl documento tiene pendiente la autorización vía web.";
                     }
                     if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
-                        Vector<Object> params = new Vector<Object>();
+                        Vector<Object> params = new Vector<>();
 
                         params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                         params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
@@ -397,6 +398,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
                             }
                             else {
+                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(miClient, ((int[])moTablePane.getSelectedTableRow().getPrimaryKey()));
                                 miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                             }
                         }
@@ -411,7 +413,6 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
     private void actionRejectDoc() {
         boolean reject = true;
-        SDataDps dps = null;
         
         try {
             if (mjbReject.isEnabled()) {
@@ -425,7 +426,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                     }
                     if (miClient.showMsgBoxConfirm(message) == JOptionPane.YES_OPTION) {
                         try {
-                            dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                            SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
                             if (mbHasRightRejectOwn) {
                                 if (miClient.getSession().getUser().getPkUserId() == dps.getFkUserNewId()) {
@@ -438,6 +439,8 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                             }
 
                             if (reject) {
+                                boolean sendMail = dps.getIsAuthorized();
+                                
                                 Vector<Object> params = new Vector<>();
 
                                 params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
@@ -455,6 +458,9 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
                                     }
                                     else {
+                                        if (sendMail) {
+                                            SAuthorizationUtils.sendAutomaticProviderAuthornMails(miClient, ((int[])moTablePane.getSelectedTableRow().getPrimaryKey()));
+                                        }
                                         miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                                     }
                                 }

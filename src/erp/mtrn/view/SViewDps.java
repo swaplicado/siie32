@@ -222,7 +222,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         
         try {
             String authWebConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB);
-            mbIsAuthWebAvailable = SLibUtils.parseInt(authWebConfig) == 1 && mbIsCategoryPur && mbIsOrd;
+            mbIsAuthWebAvailable = SLibUtils.parseInt(authWebConfig) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT && mbIsCategoryPur && mbIsOrd;
         } 
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -3012,7 +3012,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             break;
                             
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                            STrnUtilities.sendDps(miClient, mnTabTypeAux01, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true);
+                            STrnUtilities.sendDpsOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true);
                             break;
                             
                         default:
