@@ -132,6 +132,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_TP_VEH_TANK_CAR = "TRN_TP_VEH_TANK_CAR";
     public static final String CFG_PARAM_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
     public static final String CFG_PARAM_TRN_DPS_US = "TRN_DPS_US";
+    public static final String CFG_PARAM_TRN_DPS_CON_AETH = "TRN_DPS_CON_AETH";
     public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD = "TRN_FISCAL_DATA_PUR_ORD";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
