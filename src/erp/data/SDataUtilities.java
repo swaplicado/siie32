@@ -2839,6 +2839,8 @@ public abstract class SDataUtilities {
     /** Gets Jasper Report file name.
      *
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
+     * @return 
+     * @throws java.lang.Exception 
      */
     public static java.lang.String getReportFileName(int reportType) throws java.lang.Exception {
         String name = "";

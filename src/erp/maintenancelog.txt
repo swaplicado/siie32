@@ -1,4 +1,23 @@
 ================================================================================
+SIIE 3.2 273.1/ 2025-06-09
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) En importación de Requisiciones de materiales a Dps se valida longitud del concepto de la partida, en 
+    caso de ser muy extenso se agrega una nota a la partida con el concepto completo.
+
+================================================================================
+SIIE 3.2 273.0/ 2025-06-04
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación del envío automático de correo al autorizar una OC desde SIIE o desde la app web.
+
+================================================================================
+SIIE 3.2 272.16/ 2025-06-04
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección al leer una cuenta contable y centro de costo en las partidas de pólizas contables cuando se copian de otra partida.
+
+================================================================================
 SIIE 3.2 272.15/ 2025-05-28
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
