@@ -483,12 +483,25 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         }
         
         SDataMaterialRequestEntryLinkRow oTableRow;
+        boolean bConceptTruncated;
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             oTableRow = (SDataMaterialRequestEntryLinkRow) moTablePane.getTableRow(i);
             if (oTableRow.getQuantityToLinkV() > 0d) {
                 SDataDpsEntry oEntry = new SDataDpsEntry();
-                oEntry.setConceptKey(oTableRow.getItem().getKey());
-                oEntry.setConcept(oTableRow.getItem().getName());
+                // truncar conceptKey a 35 caracteres
+                String conceptKey = oTableRow.getItem().getKey();
+                if (conceptKey.length() > 35) {
+                    conceptKey = conceptKey.substring(0, 35);
+                }
+                oEntry.setConceptKey(conceptKey);
+                // truncar concept a 130 caracteres
+                bConceptTruncated = false;
+                String concept = oTableRow.getItem().getName();
+                if (concept.length() > 130) {
+                    concept = concept.substring(0, 130);
+                    bConceptTruncated = true;
+                }
+                oEntry.setConcept(concept);
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
                 oEntry.setFkItemId(oTableRow.getMaterialRequestEntry().getFkItemId());
                 oEntry.setFkUnitId(oTableRow.getMaterialRequestEntry().getFkUnitId());
@@ -552,23 +565,40 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oDpsMatReqLink.setFkMaterialRequestEntryId(oTableRow.getMaterialRequestEntry().getPkEntryId());
 
                 oEntry.setDbmsDpsEntryMatRequest(oDpsMatReqLink);
+
+                // agregar nota a la partida con el concepto completo si fue truncado
+                if (bConceptTruncated) {
+                    SDataDpsEntryNotes oConceptNote = new SDataDpsEntryNotes();
+                    String concepNote = "Concepto: " + oTableRow.getItem().getName();
+                    if (concepNote.length() > 1023) {
+                        concepNote = concepNote.substring(0, 1023);
+                    }
+                    oConceptNote.setNotes(concepNote);
+                    oConceptNote.setIsAllDocs(true);
+                    oConceptNote.setIsPrintable(true);
+                    oConceptNote.setIsCfd(false);
+                    oConceptNote.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                    oConceptNote.setFkUserEditId(SDataConstantsSys.USRX_USER_NA);
+                    oConceptNote.setFkUserDeleteId(SDataConstantsSys.USRX_USER_NA);
+                    oEntry.getDbmsEntryNotes().add(oConceptNote);
+                }
                 
                 // Notas de las partidas para indicar visualmente el link con la requisición
-                SDataDpsEntryNotes oNote = new SDataDpsEntryNotes();
+                SDataDpsEntryNotes oRmNote = new SDataDpsEntryNotes();
                 String note = "Fol. Req.: " + moMaterialRequest.getNumber() + ", "
                             + "Sol.: " + moPanelMatRequest.getAuxUserRequesterName() + ", "
                             + "Ent. Cons.: " + (oTableRow.getMaterialRequestEntry().getConsumptionInfo().isEmpty() ? 
                                             moMaterialRequest.getConsumptionInfo() : 
                                             oTableRow.getMaterialRequestEntry().getConsumptionInfo());
-                oNote.setNotes(note);
-                oNote.setIsAllDocs(true);
-                oNote.setIsPrintable(true);
-                oNote.setIsCfd(false);
-                oNote.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-                oNote.setFkUserEditId(SDataConstantsSys.USRX_USER_NA);
-                oNote.setFkUserDeleteId(SDataConstantsSys.USRX_USER_NA);
+                oRmNote.setNotes(note);
+                oRmNote.setIsAllDocs(true);
+                oRmNote.setIsPrintable(true);
+                oRmNote.setIsCfd(false);
+                oRmNote.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+                oRmNote.setFkUserEditId(SDataConstantsSys.USRX_USER_NA);
+                oRmNote.setFkUserDeleteId(SDataConstantsSys.USRX_USER_NA);
                 
-                oEntry.getDbmsEntryNotes().add(oNote);
+                oEntry.getDbmsEntryNotes().add(oRmNote);
 
                 if (mlEtys != null) {
                     mlEtys.add(oEntry);

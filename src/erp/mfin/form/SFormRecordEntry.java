@@ -1995,6 +1995,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moFinRecordEntry.AccountMajor = moAccountPanel.getSelectedDataAccountLedger();
         
         moFinRecordEntry.IsCheckAppliying = jckIsCheckApplying.isSelected();
+        if (jckIsCheckApplying.isSelected()) {
+            moFinRecordEntry.CheckIndex = (Integer) jcbFkCheckId_n.getSelectedIndex();
+        }
         moFinRecordEntry.IsBizPartnerRequired = mbIsBizPartnerRequired;
         moFinRecordEntry.IsCurrentAccountDiogAccount = mbIsCurrentAccountDiogAccount;
         moFinRecordEntry.IsTaxRequired = mbIsTaxRequired;
@@ -3064,17 +3067,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moPanelFkCostCenterId_n.refreshPanel();
         */
         
-        if (moRecordEntry.getAccount() == null) {
-            SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moRecordEntry.getFkAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
-            moRecordEntry.setAccount(account);
-        }
+        SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moRecordEntry.getFkAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
+        moRecordEntry.setAccount(account);
         moAccountPanel.setSelectedAccount(new SAccount(moRecordEntry.getAccount(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount()));
         
         if (!moRecordEntry.getFkCostCenterIdXXX_n().isEmpty()) {
-            if (moRecordEntry.getCostCenter() == null) {
-                SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { moRecordEntry.getFkCostCenterIdXXX_n() }, SLibConstants.EXEC_MODE_SILENT);
-                moRecordEntry.setCostCenter(costCenter);
-            }
+            SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { moRecordEntry.getFkCostCenterIdXXX_n() }, SLibConstants.EXEC_MODE_SILENT);
+            moRecordEntry.setCostCenter(costCenter);
             moCostCenterPanel.setSelectedAccount(new SAccount(moRecordEntry.getCostCenter(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
         }
         

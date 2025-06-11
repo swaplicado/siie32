@@ -7,7 +7,6 @@ package erp.mod.cfg.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -1841,7 +1840,7 @@ public abstract class SAuthorizationUtils {
                         body.append("<p><b>Comentarios:</b> ").append(SLibUtils.textToHtml(comment)).append("</p>");
                     }
                     body.append("<p>Ingresa ").append(SLibUtils.textToHtml("aquí"))
-                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>");
+                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex\">Portal de autorizaciones</a> para revisar, y, en su caso, autorizar esta orden.</p>");
                     break;
 
                 case AUTH_MAIL_AUTH_DONE:
@@ -1865,7 +1864,7 @@ public abstract class SAuthorizationUtils {
                         Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
                     }
                     body.append("<p>Ingresa ").append(SLibUtils.textToHtml("aquí"))
-                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">Portal de autorizaciones</a></p>");
+                            .append(" al <a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex\">Portal de autorizaciones</a></p>");
 
                     // Update recipients for authorized or rejected cases
                     String sCfg = SCfgUtils.getParamValue(session.getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
@@ -1916,7 +1915,7 @@ public abstract class SAuthorizationUtils {
             // Append common email footer
             body.append("<p>").append(SLibUtils.textToHtml("También")).append(" puedes accesar al portal introduciendo esta ")
                     .append(SLibUtils.textToHtml("dirección")).append(" en tu navegador:</p>")
-                    .append("<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dps\">https://aeth.siieapp.com/portal-autorizaciones/public/dps</a>")
+                    .append("<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex\">https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex</a>")
                     .append("<p>Recuerda: tu usuario y ").append(SLibUtils.textToHtml("contraseña"))
                     .append(" del portal son los mismos que tu cuenta SIIE.</p>")
                     .append("<span style='font-size:10px'>").append(STrnUtilities.composeMailFooter("")).append("</span>")
@@ -1972,6 +1971,19 @@ public abstract class SAuthorizationUtils {
             SMail mail = new SMail(mailSender, subject, body.toString(), toRecipientsCleaned, ccRecipientsCleaned, bccRecipientsCleaned);
             mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
             mail.send();
+        }
+    }
+    
+    /**
+     * Enviar correo de autorización / rechazo a los proveedores, solo cuando este habilitado el envío automático de correo
+     * 
+     * @param client
+     * @param pkDps
+     * @throws Exception 
+     */
+    public static void sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
+        if (SLibUtils.parseInt(SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT) {
+            STrnUtilities.sendDpsOrder(client, pkDps, false);
         }
     }
     

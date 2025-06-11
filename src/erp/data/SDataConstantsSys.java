@@ -126,11 +126,13 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_STK_SUP_ZERO = "TRN_STK_SUP_ZERO";
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
     public static final String CFG_PARAM_TRN_DPS_AUTH_USR_GRP = "TRN_DPS_AUTH_USR_GRP";
+    public static final String CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND = "TRN_DPS_AUTH_MAIL_SEND";
     public static final String CFG_PARAM_TRN_ITEM_TANK_CAR = "TRN_ITEM_TANK_CAR";
     public static final String CFG_PARAM_TRN_ITEM_ACIDITY = "TRN_ITEM_ACIDITY";
     public static final String CFG_PARAM_TRN_TP_VEH_TANK_CAR = "TRN_TP_VEH_TANK_CAR";
     public static final String CFG_PARAM_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
     public static final String CFG_PARAM_TRN_DPS_US = "TRN_DPS_US";
+    public static final String CFG_PARAM_TRN_DPS_CON_AETH = "TRN_DPS_CON_AETH";
     public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD = "TRN_FISCAL_DATA_PUR_ORD";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
@@ -157,6 +159,11 @@ public abstract class SDataConstantsSys {
     
     public static final int CFGX_IVM_FIFO = 1;
     
+    public static final int CFG_PARAM_TRN_DPS_AUTH_WEB_INACT = 0;
+    public static final int CFG_PARAM_TRN_DPS_AUTH_WEB_ACT = 1;
+    
+    public static final int CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_INACT = 0;
+    public static final int CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT = 1;
     
     /* XXX 2019-08-16 Sergio Flores: Not used yet.
     public static final int USRS_TP_LEV_NO_PERMISSION = 0;

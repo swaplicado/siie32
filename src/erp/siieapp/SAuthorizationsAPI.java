@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SClientApi;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -18,6 +19,7 @@ import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_MAIL_AUTH_PEND;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_DPS;
 import static erp.mod.cfg.utils.SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mtrn.data.SDataDps;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -35,14 +37,19 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Adrián Avilés, Edwin Carmona
+ * @author Adrián Avilés, Edwin Carmona, Isabel Servín
  */
 public class SAuthorizationsAPI {
 
-    private SGuiSession oSession;
+    private final SGuiSession oSession;
 
     public SAuthorizationsAPI(SGuiSession session) {
         oSession = session;
+    }
+    
+    private SClientApi createClientApi(int userId) {
+        SClientApi clientApi = new SClientApi(oSession, userId);
+        return clientApi;
     }
 
     /**
@@ -71,6 +78,7 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
+                        
                     case AUTH_TYPE_DPS:
                         if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
@@ -79,6 +87,7 @@ public class SAuthorizationsAPI {
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
                                         userId);
                                 SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk), actionUserName, comments);
+                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
                             }
                             catch (Exception ex) {
                                 Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,6 +128,9 @@ public class SAuthorizationsAPI {
                             }
                         }
                         break;
+                        
+                    default:
+                        // nothing
                 }
             }
             
@@ -140,7 +152,7 @@ public class SAuthorizationsAPI {
      * @return 
      */
     public String rejectResource(int typeResource, Object pk, int userId, String comment) {
-        String res = "";
+        String res;
         try {
             String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
             res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
@@ -156,18 +168,30 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
+                        
                     case AUTH_TYPE_DPS:
                         try {
+                            SDataDps dps = new SDataDps();
+                            dps.read((int[]) pk, oSession.getStatement());
+                            boolean sendProvMail = dps.getIsAuthorized();
+                            
                             System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
                             updateDpsAuthStatus(pk,
                                     SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT,
                                     userId);
                             SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
+                            
+                            if (sendProvMail) {
+                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
+                            }
                         }
                         catch (Exception ex) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
+                        
+                    default:
+                        // nothing
                 }
             }
             
