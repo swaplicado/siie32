@@ -6,7 +6,6 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDiog;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -420,13 +419,13 @@ public class SDbStockValuation extends SDbRegistryUser {
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
                 // Crear movimientos de ajuste de inventario
-                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.makeStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.createStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Creando entries...");
                 // Crear entradas de inventario
-                SStockValuationUtils.createEntries(session, SModSysConsts.TRNS_CT_IOG_IN, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                SStockValuationUtils.createValuationEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
 
                 // Consumir salidas de inventario
-                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, SModSysConsts.TRNS_CT_IOG_OUT, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Guardando consumos...");
                 for (SDbStockValuationMvt consumption : lConsumptions) {
                     consumption.save(session);
@@ -448,7 +447,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 }
                 lConsumptions.addAll(0, lMvtAdjs);
                 System.out.println("Ajustando inventario...");
-                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.makeStockAdjusts(session, mtDateStart, lMvtAdjs);
+                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateStart, lMvtAdjs);
                 SDbStockValuationDiogAdjust oValDiogAdj;
                 for (SDataDiog oDiog : lDiogs) {
                     oValDiogAdj = new SDbStockValuationDiogAdjust(mnPkStockValuationId, oDiog.getPkYearId(), oDiog.getPkDocId());

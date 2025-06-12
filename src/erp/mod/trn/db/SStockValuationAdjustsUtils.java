@@ -43,7 +43,7 @@ public abstract class SStockValuationAdjustsUtils {
      * @throws SQLException
      * @throws Exception
      */
-    public static List<SDbStockValuationMvt> makeStockValuationAdjusts(SGuiSession session, Date dateStart, Date dateEnd, final int idValuation) throws SQLException, Exception {
+    public static List<SDbStockValuationMvt> createStockValuationAdjusts(SGuiSession session, Date dateStart, Date dateEnd, final int idValuation) throws SQLException, Exception {
         List<SDbStockValuationMvt> lStkValMvtToRev = new ArrayList<>();
         List<SDbStockValuationMvt> lStkValMvtAdjusts = new ArrayList<>();
 
@@ -165,7 +165,7 @@ public abstract class SStockValuationAdjustsUtils {
      * 
      * @throws java.sql.SQLException
      */
-    public static List<SDataDiog> makeStockAdjusts(SGuiSession session, Date dateStart, List<SDbStockValuationMvt> lMvtAdjusts) throws SQLException {
+    public static List<SDataDiog> createDiogAdjusts(SGuiSession session, Date dateStart, List<SDbStockValuationMvt> lMvtAdjusts) throws SQLException {
         HashMap<String, SDataDiog> mDiogs = new HashMap<>();
         // Obtener el entero año a partir de la fecha de inicio con Calendar:
         int pkYear = SLibTimeUtils.digestYear(dateStart)[0];
