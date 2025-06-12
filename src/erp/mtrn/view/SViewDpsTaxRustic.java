@@ -6,7 +6,6 @@
 package erp.mtrn.view;
 
 import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
@@ -15,7 +14,6 @@ import erp.lib.table.STableSetting;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
-import sa.lib.SLibUtils;
 
 /**
  *
@@ -29,6 +27,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
     private static final int[] tax_rus_prod_dep = new int[] { 7, 2 };
     private static final int[] tax_rus_pia = new int[] { 7, 3 };
     private static final int[] tax_rus_isr = new int[] { 2, 10 };
+    private int tax_reg_apsa = 14; 
 
    /**
      * Constructor for querying all documents at once.
@@ -136,7 +135,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
                     "INNER JOIN ERP.BPSU_BPB_ADD AS AD ON BPB.ID_BPB = AD.ID_BPB " +
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                     "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                    "WHERE DET.ID_TAX_BAS = " + SLibUtils.parseInt(erp.mcfg.data.SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_RUS_TAX)) + " " + sqlWherePeriod ;
+                    "WHERE E.FID_TAX_REG = " + tax_reg_apsa + " " + sqlWherePeriod + " GROUP BY D.ID_DOC; " ;
         } catch (Exception ex) {
             Logger.getLogger(SViewDpsTaxRustic.class.getName()).log(Level.SEVERE, null, ex);
         }

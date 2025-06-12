@@ -1995,6 +1995,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moFinRecordEntry.AccountMajor = moAccountPanel.getSelectedDataAccountLedger();
         
         moFinRecordEntry.IsCheckAppliying = jckIsCheckApplying.isSelected();
+        if (jckIsCheckApplying.isSelected()) {
+            moFinRecordEntry.CheckIndex = (Integer) jcbFkCheckId_n.getSelectedIndex();
+        }
         moFinRecordEntry.IsBizPartnerRequired = mbIsBizPartnerRequired;
         moFinRecordEntry.IsCurrentAccountDiogAccount = mbIsCurrentAccountDiogAccount;
         moFinRecordEntry.IsTaxRequired = mbIsTaxRequired;
