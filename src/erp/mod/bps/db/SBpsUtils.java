@@ -379,7 +379,7 @@ public abstract class SBpsUtils {
         return address;
     }
     
-    public static SDataBizPartnerBranchContact getBizParterContact (SGuiSession session, int bp) throws Exception {
+    public static SDataBizPartnerBranchContact getBizParterContact(SGuiSession session, int bp) throws Exception {
         SDataBizPartnerBranchContact con = null;
         int[] conPk = null;
         

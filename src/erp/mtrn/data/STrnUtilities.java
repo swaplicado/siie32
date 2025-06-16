@@ -14,6 +14,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.gui.session.SSessionCustom;
+import erp.gui.session.SSessionCustomApi;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -44,6 +45,7 @@ import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
+import erp.server.SSessionServer;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1901,10 +1903,10 @@ public abstract class STrnUtilities {
         }
     }
      
-    public static String getMailToSendForOrder(final SClientInterface client, final int[] keyDoc) throws Exception {
-        String mailToSend = "";
-        SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, keyDoc, SLibConstants.EXEC_MODE_SILENT);
-        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+    public static String getMailToSendForOrder(final SClientInterface client, final SDataDps oDps) throws Exception {
+        String mailToSend;
+        SDataBizPartner bizPartner = new SDataBizPartner();
+        bizPartner.read(new int[] { oDps.getFkBizPartnerId_r() }, client.getSession().getStatement());
         
         mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
         
@@ -1944,7 +1946,7 @@ public abstract class STrnUtilities {
      * @return CFDI mail sending confirmation.
      * @throws RemoteException, Exception
      */
-    public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
+     public static boolean confirmSend(final SClientInterface client, final String title, final SDataCfd cfd, final SDataDps dps, final int idBizPartner, final int idBizPartnerBranch) throws RemoteException, Exception {
         boolean send = false;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro       
         SSrvLock lock = null;        
@@ -1956,7 +1958,7 @@ public abstract class STrnUtilities {
         SServerRequest request = null;
         SServerResponse response = null;
         SDialogCfdSending dlgCfdSending = null;
-        SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, SLibConstants.EXEC_MODE_SILENT);
+        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { idBizPartner }, SLibConstants.EXEC_MODE_SILENT);
         
         dlgCfdSending = new SDialogCfdSending((SGuiClient) client, title, cfd, dps, bizPartner, idBizPartnerBranch);
         dlgCfdSending.setVisible(true);
@@ -2006,23 +2008,29 @@ public abstract class STrnUtilities {
     }
    
     /**
-     * Sends a DPS by mail.
+     * Sends a DPS, wich is an order, by mail.
      * @param client ERP Client interface.
-     * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
      * @param dpsKey DPS primary Key.
      * @param confirmSending Confirm sending required.
      * @throws java.lang.Exception
      */
-    public static void sendDps(final SClientInterface client, final int dpsCategory, final int[] dpsKey, boolean confirmSending) throws Exception {
-        boolean send = true;
-            
-        if (confirmSending) {
-            SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
-            send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
+    public static void sendDpsOrder(final SClientInterface client, final int[] dpsKey, boolean confirmSending) throws Exception {
+        SDataDps dps = new SDataDps();
+        dps.read(dpsKey, client.getSession().getStatement());
+        
+        if (dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN &&
+                dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+            client.showMsgBoxWarning("No se puede enviar el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
         }
-
-        if (send) {
-            sendMailOrder(client, dpsCategory, dpsKey);
+        else {
+            boolean send = true;
+            
+            if (confirmSending && client.isGui()) {
+                send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
+            }
+            if (send) {
+                sendMailOrder(client, dps);
+            }
         }
     }
     
@@ -2032,32 +2040,34 @@ public abstract class STrnUtilities {
      * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
      * @param dpsKey DPS primary Key.
      */
-    private static void sendMailOrder(final SClientInterface client, final int dpsCategory, final int[] dpsKey) {
+    private static void sendMailOrder(final SClientInterface client, SDataDps oDps) {
         String addressee = "";
         String msg = "";
         String userMail = "";
-        String bizPartnerMail = "";
-        SDataDps oDps = null;
+        String bizPartnerMail;
         boolean canSend = true;
-        SMailSender sender = null;
-        SMail mail = null;
-        ArrayList<String> toRecipients = null;
-        File pdf = null;
-        SDbMms mms = null;     
-        SDataBizPartner bizPartnerUserSend = null;
+        SMailSender sender;
+        SMail mail;
+        ArrayList<String> toRecipients;
+        File pdf;
+        SDbMms mms;     
+        SDataBizPartner bizPartnerUserSend;
 
         try {
-            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            int dpsCategory = oDps.getFkDpsCategoryId();
+            if (client.isGui()) {
+                client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            }
             mms = getMms(client, dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
-            oDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
             
-            bizPartnerMail = getMailToSendForOrder(client, dpsKey);
+            bizPartnerMail = getMailToSendForOrder(client, oDps);
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
             }
             else {
                 if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
-                    bizPartnerUserSend = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                    bizPartnerUserSend = new SDataBizPartner();
+                    bizPartnerUserSend.read(new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, client.getSession().getStatement());
                     //Si es un pedido mandar el correo del institucional
                     if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
                         userMail = ((SDataUser) client.getSession().getUser()).getEmail();
@@ -2079,8 +2089,14 @@ public abstract class STrnUtilities {
                     canSend = false;
                 }
                 else {
-                    mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients);
+                    if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                        String body = "Le informamos que la orden de compra adjunta ha sido " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + 
+                                ".<br>Atentamente,<br>" + client.getSessionXXX().getCurrentCompanyName() + "." + "<br>" + composeMailFooter("");
+                        mms.setTextBody(body);
+                    }
                 }
+                mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients);
+                mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {
                     pdf = new File("temp", oDps.getNumberSeries() + (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
@@ -2098,7 +2114,12 @@ public abstract class STrnUtilities {
                     }
 
                     pdf.delete();
-                    client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
+                    if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                        client.showMsgBoxInformation("La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e");
+                    }
+                    else {
+                        client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
+                    }
                 }
             }
         }
@@ -2106,7 +2127,9 @@ public abstract class STrnUtilities {
             SLibUtilities.renderException(STrnUtilities.class.getName(), e);
         }
         finally {
-            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            if (client.isGui()) {
+                client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         }
     }
 
@@ -2593,8 +2616,8 @@ public abstract class STrnUtilities {
      * @return Configuration registry.
      */
     public static SDbMms getMms(final SClientInterface client, final int mmsType) {
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql;
+        ResultSet resultSet;
         SDbMms mms = null;
 
         try {
@@ -2655,7 +2678,7 @@ public abstract class STrnUtilities {
         }
 
         sql = "INSERT INTO trn_dps_snd_log VALUES(" + dps.getPkYearId() + ", " + dps.getPkDocId() + ", " +
-                id_snd + ", '" + SLibUtils.DbmsDateFormatDate.format(client.getSession().getCurrentDate()) + "', '" + sendTo + "', " + isSend + ", " + client.getSession().getUser().getPkUserId() + ", NOW())";
+                id_snd + ", NOW(), '" + sendTo + "', " + isSend + ", " + client.getSession().getUser().getPkUserId() + ", NOW())";
 
         client.getSession().getStatement().execute(sql);
 
@@ -2719,42 +2742,44 @@ public abstract class STrnUtilities {
     
     public static void createReportOrder(final SClientInterface client, final File file, final SDataDps dps, final int pnPrintMode) {
         Cursor cursor = null;
-        String sUserBuyer = "";
-        String sUserAuthorize = "";
-        int nFkEmiAddressFormatTypeId_n = 0;
-        int nFkRecAddressFormatTypeId_n = 0;
+        String sUserBuyer;
+        String sUserAuthorize;
+        int nFkEmiAddressFormatTypeId_n;
+        int nFkRecAddressFormatTypeId_n;
         boolean bincludeCountry = false;
-        String[] addressOficial = null;
-        String[] addressDelivery = null;
-        String[] addressDeliveryCompany = null;
+        String[] addressOficial;
+        String[] addressDelivery;
+        String[] addressDeliveryCompany;
         String payMet = "";
         String taxRegimeIss = "";
         String taxRegimeRec = "";
         String cfdiUsage = "";
-        Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
-        SDataBizPartnerBranch oCompanyBranch = null;
-        SDataBizPartnerBranch oBizPartnerBranch = null;
-        SDataBizPartnerBranchAddress oAddress = null;
-        SDataUser oUserBuyer = null;
-        SDataUser oUserAuthorize = null;
-        SDataBizPartner bizPartner = null;
-        SDataBizPartner bizPartnerUserBuyer = null;
-        SDataBizPartner bizPartnerUserAuthorize = null;
+        Map<String, Object> map;
+        JasperPrint jasperPrint;
+        JasperViewer jasperViewer;
+        SDataBizPartnerBranch oCompanyBranch;
+        SDataBizPartnerBranch oBizPartnerBranch;
+        SDataBizPartnerBranchAddress oAddress;
+        SDataUser oUserBuyer;
+        SDataUser oUserAuthorize;
+        SDataBizPartner bizPartner;
+        SDataBizPartner bizPartnerUserBuyer;
+        SDataBizPartner bizPartnerUserAuthorize;
         SDataEmployee employeeUserBuyer = null;
         SDataEmployee employeeUserAuthorize = null;
-        boolean isPurchase = false;
-        boolean isPending = false;
-        boolean isReject = false;
+        boolean isPurchase;
+        boolean isPending;
+        boolean isReject;
         boolean applyFiscalData;
-        FileOutputStream outputStreamPdf = null;
+        FileOutputStream outputStreamPdf;
         
         SCfdXmlCatalogs xmlCatalogs;
         
         try {
-            cursor = client.getFrame().getCursor();
-            client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            if (client.isGui()) {
+                cursor = client.getFrame().getCursor();
+                client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            }
             
             map = client.createReportParams();
             
@@ -2762,10 +2787,12 @@ public abstract class STrnUtilities {
             isPending = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
             isReject = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT;
             
-            oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-            oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-            oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(),
-                dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+            oCompanyBranch = new SDataBizPartnerBranch();
+            oCompanyBranch.read(new int[] { dps.getFkCompanyBranchId() }, client.getSession().getStatement());
+            oBizPartnerBranch = new SDataBizPartnerBranch();
+            oBizPartnerBranch.read(new int[] { dps.getFkBizPartnerBranchId() }, client.getSession().getStatement());
+            oAddress = new SDataBizPartnerBranchAddress();
+            oAddress.read(new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, client.getSession().getStatement());
             
             if (oBizPartnerBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
                 nFkRecAddressFormatTypeId_n = oBizPartnerBranch.getFkAddressFormatTypeId_n();
@@ -2787,19 +2814,23 @@ public abstract class STrnUtilities {
                 SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
             addressDeliveryCompany = oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkEmiAddressFormatTypeId_n,
                 SDataBizPartnerBranchAddress.ADDRESS_3ROWS, bincludeCountry);
-            oUserBuyer = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() }, SLibConstants.EXEC_MODE_SILENT);
-            oUserAuthorize = (SDataUser) SDataUtilities.readRegistry(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() }, SLibConstants.EXEC_MODE_SILENT);
+            oUserBuyer = new SDataUser();
+            oUserBuyer.read(new int[] { dps.getFkUserNewId() }, client.getSession().getStatement());
+            oUserAuthorize = new SDataUser();
+            oUserAuthorize.read(new int[] { dps.getFkUserAuthorizedId() }, client.getSession().getStatement());
 
-            sUserBuyer = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() });
-            sUserAuthorize = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() });
+            sUserBuyer = getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserNewId() });
+            sUserAuthorize = getCatalogueDescription(client, SDataConstants.USRU_USR, new int[] { dps.getFkUserAuthorizedId() });
             
             if (oUserBuyer.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
-                bizPartnerUserBuyer = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserBuyer.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                bizPartnerUserBuyer = new SDataBizPartner();
+                bizPartnerUserBuyer.read(new int[] { oUserBuyer.getFkBizPartnerId_n() }, client.getSession().getStatement());
                 employeeUserBuyer = bizPartnerUserBuyer.getDbmsDataEmployee();
             }
                         
             if (oUserAuthorize.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
-                bizPartnerUserAuthorize = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserAuthorize.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
+                bizPartnerUserAuthorize = new SDataBizPartner();
+                bizPartnerUserAuthorize.read(new int[] { oUserAuthorize.getFkBizPartnerId_n() }, client.getSession().getStatement());
                 employeeUserAuthorize = bizPartnerUserAuthorize.getDbmsDataEmployee();
             }
             
@@ -2808,10 +2839,16 @@ public abstract class STrnUtilities {
                 map.put("oUserAuthorize", employeeUserAuthorize);
             }
             
-            bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT); 
+            bizPartner = new SDataBizPartner();
+            bizPartner.read(new int[] { dps.getFkBizPartnerId_r() }, client.getSession().getStatement());
             applyFiscalData = isPurchase && bizPartner.isDomestic(client) && dps.getDbmsDataDpsCfd() != null;
             if (applyFiscalData) {
-                xmlCatalogs = ((SSessionCustom) client.getSession().getSessionCustom()).getCfdXmlCatalogs();
+                if (client.isGui()) {
+                    xmlCatalogs = ((SSessionCustom) client.getSession().getSessionCustom()).getCfdXmlCatalogs();
+                }
+                else {
+                    xmlCatalogs = ((SSessionCustomApi) client.getSession().getSessionCustom()).getCfdXmlCatalogs();
+                }
                 payMet = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, dps.getDbmsDataDpsCfd().getPaymentMethod());
                 taxRegimeIss = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
                 taxRegimeRec = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
@@ -2820,7 +2857,7 @@ public abstract class STrnUtilities {
             
             map.put("nIdYear", dps.getPkYearId());
             map.put("nIdDoc", dps.getPkDocId());
-            map.put("sTitle", SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(),
+            map.put("sTitle", getCatalogueDescription(client, SDataConstants.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(),
             dps.getFkDpsClassId(), dps.getFkDpsTypeId() }));
             map.put("bIsSupplier", isPurchase);
             map.put("sAddressLine1", addressOficial[0]);
@@ -2844,7 +2881,27 @@ public abstract class STrnUtilities {
             map.put("sTaxRegimeRec", taxRegimeRec);
             map.put("sCfdiUsage", cfdiUsage);
 
-            jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
+            if (client.isGui()) {
+                jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
+            }
+            else {
+                ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "\"batch/copy-reps.bat\"");
+                pb.redirectErrorStream(true); // redirige la salida del batch a la consola
+                Process process = pb.start();
+                
+                // Leer salida del proceso
+                /* Perservar para pruebas
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    System.out.println(linea);
+                }
+                */
+                process.waitFor();
+                
+                SSessionServer.createUserSignaturesIntoPurchaseOrderReportParams(map);
+                jasperPrint = SSessionServer.createJasperPrint(SDataConstantsSys.REP_TRN_DPS_ORDER, map, client.getSession().getDatabase().getConnection());
+            }
             
             switch (pnPrintMode) {
                 case SDataConstantsPrint.PRINT_MODE_VIEWER:
@@ -2867,7 +2924,9 @@ public abstract class STrnUtilities {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
         }
         finally {
-            client.getFrame().setCursor(cursor);
+            if (client.isGui()) {
+                client.getFrame().setCursor(cursor);
+            }
         }
     }
 
@@ -4090,7 +4149,7 @@ public abstract class STrnUtilities {
         return count;
     }
     
-     public static boolean isServiceOrder(SClientInterface miClient, int idYearDps, int idDocDps) throws SQLException {
+    public static boolean isServiceOrder(SClientInterface miClient, int idYearDps, int idDocDps) throws SQLException {
         ResultSet resultSet;
         Statement statement = null;
         String sql = "";
@@ -4112,7 +4171,6 @@ public abstract class STrnUtilities {
         else {
             return false;
         }
-            
     }
      
     public static boolean requieredItemGen(SClientInterface miClient, int idItem) throws SQLException {
@@ -4715,5 +4773,16 @@ public abstract class STrnUtilities {
             client.showMsgBoxWarning(e.getMessage());
         }
         return false;
+    }
+
+    private static String getCatalogueDescription(SClientInterface client, int catalogue, int[] pk) throws Exception {
+        String description = "";
+        String sql = SDataReadDescriptions.createQueryForCatalogue(catalogue, pk, SLibConstants.DESCRIPTION_NAME);
+        
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            description = resultSet.getString(1);
+        }
+        return description;
     }
 }

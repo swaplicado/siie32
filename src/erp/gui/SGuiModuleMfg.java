@@ -49,7 +49,7 @@ import javax.swing.JSeparator;
 
 /**
  *
- * @author Sergio Flores, César Orozco, Sergio Flores
+ * @author Sergio Flores, César Orozco, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -336,8 +336,9 @@ public class SGuiModuleMfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         boolean hasAccessMenuCatalogs = miClient.getSessionXXX().getUser().hasPrivilege(new int[] { SDataConstantsSys.PRV_MFG_MISC, SDataConstantsSys.PRV_MFG_BOM, SDataConstantsSys.PRV_MFG_LT });
         boolean hasRightBom = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_BOM).HasRight;
         boolean hasRightLeadtime = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_LT).HasRight;
-        
-        jmCatalogs.setEnabled(hasAccessMenuCatalogs);
+        boolean hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MFG_REP).HasRight;
+
+        jmCatalogs.setEnabled(hasAccessMenuCatalogs || hasRightReports);
         jmiCatBom.setEnabled(hasRightBom);
         jmiCatManufacturingLine.setEnabled(hasRightBom);
         jmiCatManufacturingLineConfig.setEnabled(hasRightBom);
