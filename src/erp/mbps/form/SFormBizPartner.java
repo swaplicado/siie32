@@ -1091,7 +1091,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jlLeadTimeHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlLeadTimeHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlLeadTimeHint.setToolTipText("Plazo de entrega en días promedio del asociado de negocios");
+        jlLeadTimeHint.setToolTipText("Plazo de entrega en días naturales promedio del asociado de negocios");
         jlLeadTimeHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel10.add(jlLeadTimeHint);
 
