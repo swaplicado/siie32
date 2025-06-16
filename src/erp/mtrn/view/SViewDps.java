@@ -1902,7 +1902,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sSignatureName", companyContact == null ? null : SLibUtils.textToAscii(companyContactName));
                             map.put("sSuprAgt", supr == null ? null : SLibUtils.textToAscii(supr.getFirstname() + " " + supr.getLastname()));
                             map.put("sAgt", agt == null ? null : SLibUtils.textToAscii(agt.getFirstname() + " " + agt.getLastname()));
-                            if (SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_CON_AETH)) == 1) {
+                            if (SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT)) == 1) {
                                 map.put("sAcro", acro);
                                 if (agt != null) {
                                     if (agt.getPkBizPartnerId() == idBpGOM ) {
