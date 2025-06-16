@@ -422,8 +422,6 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
                     
                     moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
-                    
-                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 274.1/ 2025-06-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Modificación del % de acidez en la vista de DPS después del timbrado, junto con la información de comercialización.
+2) Cambio en el formato de impresión de OC para mostrar la leyenda "(No definido)" cuando algún dato fiscal se encuentre en blanco.
+3) Se elimina la constante "SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED" y es reemplazada por "SUtilConsts.ACTION_CLOSE" para lo referente a la vista de seguimiento de RM.
+4) Se quita la recarga de las vistas al momento de abrir la vista del cardex de documentos de las RM. 
+
+================================================================================
 SIIE 3.2 274.0/ 2025-06-16
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

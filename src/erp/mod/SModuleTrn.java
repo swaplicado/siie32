@@ -746,9 +746,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
                 switch (subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED: title = "Seguimiento compras RM cerradas (detalle)";
+                    case SUtilConsts.ACTION_CLOSE: title = "Seguimiento compras RM cerradas (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Seguimiento compras RM abiertas (detalle)";
+                    case SUtilConsts.ACTION_OPEN: title = "Seguimiento compras RM abiertas (detalle)";
                         break;
                     default:
                         // nothing

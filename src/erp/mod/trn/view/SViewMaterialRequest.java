@@ -471,7 +471,6 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     
                     moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
-                    
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
