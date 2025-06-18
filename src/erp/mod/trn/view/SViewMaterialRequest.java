@@ -440,7 +440,9 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     moDialogSegregations.setFormParams(key);
                     moDialogSegregations.setVisible(true);
                     
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                    if (moDialogSegregations.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

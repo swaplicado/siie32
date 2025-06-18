@@ -284,7 +284,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     moDialogSupply.setFormParams(key, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);
                     moDialogSupply.setVisible(true);
                     
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                    if (moDialogSupply.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -441,7 +443,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     moDialogSegregations.setFormParams(key);
                     moDialogSegregations.setVisible(true);
                     
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                    if (moDialogSegregations.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
