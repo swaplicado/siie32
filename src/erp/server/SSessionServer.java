@@ -1047,7 +1047,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     BufferedImage bufferedImage = gc.createCompatibleImage(imageIcon.getImage().getWidth(null), imageIcon.getImage().getHeight(null), Transparency.TRANSLUCENT);                
                     Graphics graphics = bufferedImage.createGraphics();
                     graphics.drawImage(imageIcon.getImage(), 0, 0, null);
-                    map.put(mapKey, bufferedImage);
+                    map.put(mapKey + "Sign", bufferedImage);
                     graphics.dispose();
                 }
             }
