@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 274.3/ 2025-06-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al nombre de los parámetros de las imágenes de las firmas de los usuarios comprador y autorizador en la preparación de la impresión de pedidos de compras.
+
+================================================================================
 SIIE 3.2 274.2/ 2025-06-17
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
