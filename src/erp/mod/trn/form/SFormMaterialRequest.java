@@ -2684,6 +2684,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             }
             else if (button == jbSaveAndSend) {
                 if (miClient.showMsgBoxConfirm("¿Esta seguro de enviar la requisición?") == JOptionPane.OK_OPTION) {
+                    try {
+                        if (moRegistry.getPkMatRequestId() != 0) {
+                            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ moRegistry.getPkMatRequestId() }, true);
+                        }
+                    }
+                    catch (Exception ex) {}
                     actionSave(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
                 }
             }

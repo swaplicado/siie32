@@ -712,7 +712,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         boolean needAuthJoin = false;
         Object filter;
         int usrId = miClient.getSession().getUser().getPkUserId();
-        boolean admin = miClient.getSession().getUser().isAdministrator() || miClient.getSession().getUser().isSupervisor();
+        boolean admin = true;
         
         moPaneSettings = new SGridPaneSettings(1);
 
