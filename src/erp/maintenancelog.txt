@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 275.0/ 2025-06-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de la funcionalidad para enviar directamente las requisiciones a compras cuando todos los ítems tengan dicha configuración.
+2) Corrección en los casos de tipos de cambio en la vista de documentos de soporte.
+
+================================================================================
 SIIE 3.2 274.4/ 2025-06-19
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

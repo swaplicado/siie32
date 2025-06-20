@@ -6,6 +6,7 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SRowMaterialRequestItemSupply;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -499,7 +500,7 @@ public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements
                 "   WHERE v.b_del = 0 " +
                 "   AND cfg_get_st_authorn(1, 'trn_mat_req', v.id_mat_req, NULL, NULL, NULL, NULL) != 5 " +
                 "   AND NOT v.b_clo_prov " +
-                "   AND v.tp_req = 'R' " +
+                "   AND v.tp_req = '" + SModSysConsts.TRNS_MAT_REQ_TP_R + "' " +
                 "   GROUP BY i.id_item, u.id_unit HAVING per < 1 " +
                 "   ORDER BY i.id_item, u.id_unit) AS req " +
                 "ON stk.id_item = req.id_item AND stk.id_unit = req.id_unit " +

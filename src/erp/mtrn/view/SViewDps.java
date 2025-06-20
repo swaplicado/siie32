@@ -3100,7 +3100,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     ((SGuiClient) miClient).getSession().getModule(SModConsts.MOD_TRN_N).showForm(SModConsts.TRNX_SUP_FILE_DPS_PROC, SLibConstants.UNDEFINED, params);
                     miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                     miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
-                    
                 }
             }
         }

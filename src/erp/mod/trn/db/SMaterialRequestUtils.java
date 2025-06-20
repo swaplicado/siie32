@@ -5,11 +5,13 @@
  */
 package erp.mod.trn.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -437,9 +439,30 @@ public abstract class SMaterialRequestUtils {
                             inv += ((boolean) params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV)) ? "AND a.b_inv " : "AND NOT a.b_inv ";
                         }
                         
+                        String item = "";
+                        String igen = "";
+                        try {
+                            SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
+                            ObjectMapper mapper = new ObjectMapper();
+                            String sItemPurchase = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_MAT_REQ_PUR);
+                            moConfMaterialRequestItemPurchase = mapper.readValue(sItemPurchase, SConfMaterialRequestItemPurchase.class);
+                            
+                            for (int i : moConfMaterialRequestItemPurchase.item) {
+                                item += (item.isEmpty() ? "" : ", ") + i;
+                            }
+                            for (int i : moConfMaterialRequestItemPurchase.igen) {
+                                igen += (igen.isEmpty() ? "" : ", ") + i;
+                            }
+                        }
+                        catch(Exception e) {
+                            client.showMsgBoxError(e.getMessage());
+                        }
+                    
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
-                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, "
+                                + "a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "IF(a.id_item IN (" + item + ") OR a.fid_igen IN (" + igen + "), 1, 0) AS " + SDbConsts.FIELD_PICK + "4, "
                                 + "a.b_inv AS " + ITEM_INV + ", "
                                 + "0 AS " + ITEM_SAL + ", "
                                 + "0 AS " + ITEM_ASS + ", "
@@ -467,6 +490,7 @@ public abstract class SMaterialRequestUtils {
                         sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "0 AS " + SDbConsts.FIELD_PICK + "4, "
                                 + "a.b_inv AS " + ITEM_INV + ", "
                                 + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_SAL + ", 1, 0) AS " + ITEM_SAL + ", "
                                 + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_ASS + ", 1, 0) AS " + ITEM_ASS + ", "
@@ -479,8 +503,9 @@ public abstract class SMaterialRequestUtils {
                                 + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " ";
                 }
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
-                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 450));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Parte"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_L, "Directo a compras"));
                 settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
                 
                 picker.setPickerSettings(client, type, subtype, settings);

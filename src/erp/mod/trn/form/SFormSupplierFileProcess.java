@@ -55,6 +55,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -165,17 +166,23 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jlReference = new javax.swing.JLabel();
         moTextDocReference = new sa.lib.gui.bean.SBeanFieldText();
         jpDocRow8 = new javax.swing.JPanel();
+        jlDocCur = new javax.swing.JLabel();
+        moKeyDocCur = new sa.lib.gui.bean.SBeanFieldKey();
+        jlDocCurCur = new javax.swing.JLabel();
+        jpDocRow9 = new javax.swing.JPanel();
         jlDocCurTotal = new javax.swing.JLabel();
         moDecDocCurTotal = new sa.lib.gui.bean.SBeanFieldDecimal();
         moTextDocCurTotalCur = new sa.lib.gui.bean.SBeanFieldText();
-        jpDocRow9 = new javax.swing.JPanel();
+        jlDocCurTotalCur = new javax.swing.JLabel();
+        jpDocRow10 = new javax.swing.JPanel();
         jlDocExchageRate = new javax.swing.JLabel();
         moDecDocExchangeRate = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jpDocRow10 = new javax.swing.JPanel();
+        jpDocRow11 = new javax.swing.JPanel();
         jlDocTotal = new javax.swing.JLabel();
         moDecDocTotal = new sa.lib.gui.bean.SBeanFieldDecimal();
         moTextDocTotalCur = new sa.lib.gui.bean.SBeanFieldText();
-        jpDocRow11 = new javax.swing.JPanel();
+        jlDocTotalCur = new javax.swing.JLabel();
+        jpDocRow12 = new javax.swing.JPanel();
         jlDocDpsAuth = new javax.swing.JLabel();
         moTextDocDpsAuth = new sa.lib.gui.bean.SBeanFieldText();
         jpDataSupp = new javax.swing.JPanel();
@@ -211,10 +218,12 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jpSuppTotalRow1 = new javax.swing.JPanel();
         jlSuppCur = new javax.swing.JLabel();
         moKeySuppCur = new sa.lib.gui.bean.SBeanFieldKey();
+        jlSuppCurCur = new javax.swing.JLabel();
         jpSuppTotalRow2 = new javax.swing.JPanel();
         jlSuppCurTotal = new javax.swing.JLabel();
         moDecSuppCurTotal = new sa.lib.gui.bean.SBeanFieldDecimal();
         moTextSuppCurTotalCur = new sa.lib.gui.bean.SBeanFieldText();
+        jlSuppCurTotalCur = new javax.swing.JLabel();
         jpSuppTotalRow3 = new javax.swing.JPanel();
         jlSuppExchangeRateDoc = new javax.swing.JLabel();
         moDecSuppExchangeRateDoc = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -223,6 +232,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jlSuppTotalDoc = new javax.swing.JLabel();
         moDecSuppTotalDoc = new sa.lib.gui.bean.SBeanFieldDecimal();
         moTextSuppTotalDocCur = new sa.lib.gui.bean.SBeanFieldText();
+        jlSuppTotalDocCur = new javax.swing.JLabel();
         jpSuppTotalRow5 = new javax.swing.JPanel();
         jlSuppExchangeRateLoc = new javax.swing.JLabel();
         moDecSuppExchangeRateLoc = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -230,6 +240,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jlSuppTotal = new javax.swing.JLabel();
         moDecSuppTotal = new sa.lib.gui.bean.SBeanFieldDecimal();
         moTextSuppTotalCur = new sa.lib.gui.bean.SBeanFieldText();
+        jlSuppTotalCur = new javax.swing.JLabel();
         jpGridSuppFiles = new javax.swing.JPanel();
         jpGridEntries = new javax.swing.JPanel();
 
@@ -341,57 +352,84 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpDocRow8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDocCurTotal.setText("Tolal documento:");
-        jlDocCurTotal.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpDocRow8.add(jlDocCurTotal);
+        jlDocCur.setText("Moneda ped.:");
+        jlDocCur.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpDocRow8.add(jlDocCur);
 
-        moDecDocCurTotal.setEnabled(false);
-        jpDocRow8.add(moDecDocCurTotal);
+        moKeyDocCur.setEnabled(false);
+        moKeyDocCur.setPreferredSize(new java.awt.Dimension(140, 23));
+        jpDocRow8.add(moKeyDocCur);
 
-        moTextDocCurTotalCur.setEnabled(false);
-        moTextDocCurTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
-        jpDocRow8.add(moTextDocCurTotalCur);
+        jlDocCurCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDocCurCur.setText("MP");
+        jlDocCurCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpDocRow8.add(jlDocCurCur);
 
         jpDataDoc.add(jpDocRow8);
 
         jpDocRow9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDocExchageRate.setText("Tipo cambio:");
-        jlDocExchageRate.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpDocRow9.add(jlDocExchageRate);
+        jlDocCurTotal.setText("Tolal ped. MP:");
+        jlDocCurTotal.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpDocRow9.add(jlDocCurTotal);
 
-        moDecDocExchangeRate.setEnabled(false);
-        jpDocRow9.add(moDecDocExchangeRate);
+        moDecDocCurTotal.setEnabled(false);
+        jpDocRow9.add(moDecDocCurTotal);
+
+        moTextDocCurTotalCur.setEnabled(false);
+        moTextDocCurTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDocRow9.add(moTextDocCurTotalCur);
+
+        jlDocCurTotalCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDocCurTotalCur.setText("MP");
+        jlDocCurTotalCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpDocRow9.add(jlDocCurTotalCur);
 
         jpDataDoc.add(jpDocRow9);
 
         jpDocRow10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDocTotal.setText("Tolal:");
-        jlDocTotal.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpDocRow10.add(jlDocTotal);
+        jlDocExchageRate.setText("TC ML/MP:");
+        jlDocExchageRate.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpDocRow10.add(jlDocExchageRate);
 
-        moDecDocTotal.setEnabled(false);
-        jpDocRow10.add(moDecDocTotal);
-
-        moTextDocTotalCur.setText("MXN");
-        moTextDocTotalCur.setEnabled(false);
-        moTextDocTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
-        jpDocRow10.add(moTextDocTotalCur);
+        moDecDocExchangeRate.setEnabled(false);
+        jpDocRow10.add(moDecDocExchangeRate);
 
         jpDataDoc.add(jpDocRow10);
 
         jpDocRow11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDocDpsAuth.setText("Est. autorización:");
+        jlDocTotal.setText("Tolal ped. ML:");
+        jlDocTotal.setPreferredSize(new java.awt.Dimension(90, 23));
+        jpDocRow11.add(jlDocTotal);
+
+        moDecDocTotal.setEnabled(false);
+        jpDocRow11.add(moDecDocTotal);
+
+        moTextDocTotalCur.setText("MXN");
+        moTextDocTotalCur.setEnabled(false);
+        moTextDocTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDocRow11.add(moTextDocTotalCur);
+
+        jlDocTotalCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDocTotalCur.setText("ML");
+        jlDocTotalCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpDocRow11.add(jlDocTotalCur);
+
+        jpDataDoc.add(jpDocRow11);
+
+        jpDocRow12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDocDpsAuth.setText("Estatus aut.:");
         jlDocDpsAuth.setPreferredSize(new java.awt.Dimension(90, 23));
-        jpDocRow11.add(jlDocDpsAuth);
+        jpDocRow12.add(jlDocDpsAuth);
 
         moTextDocDpsAuth.setEnabled(false);
         moTextDocDpsAuth.setPreferredSize(new java.awt.Dimension(140, 23));
-        jpDocRow11.add(moTextDocDpsAuth);
+        jpDocRow12.add(moTextDocDpsAuth);
 
-        jpDataDoc.add(jpDocRow11);
+        jpDataDoc.add(jpDocRow12);
 
         jpData.add(jpDataDoc, java.awt.BorderLayout.WEST);
 
@@ -434,16 +472,18 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jlSuppBp.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow1.add(jlSuppBp);
 
-        moKeySuppBp.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeySuppBp.setPreferredSize(new java.awt.Dimension(278, 23));
         jpSuppInfoRow1.add(moKeySuppBp);
 
         jpDataSuppInfo.add(jpSuppInfoRow1);
 
         jpSuppInfoRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppNum.setText("Folio archivo:");
+        jlSuppNum.setText("Folio soporte:*");
         jlSuppNum.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow2.add(jlSuppNum);
+
+        moTextSuppNum.setPreferredSize(new java.awt.Dimension(125, 23));
         jpSuppInfoRow2.add(moTextSuppNum);
 
         jbSuppNumPicker.setText("...");
@@ -467,25 +507,25 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jlNotRegSuppBp.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow4.add(jlNotRegSuppBp);
 
-        moTextNoRegSuppBp.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextNoRegSuppBp.setPreferredSize(new java.awt.Dimension(278, 23));
         jpSuppInfoRow4.add(moTextNoRegSuppBp);
 
         jpDataSuppInfo.add(jpSuppInfoRow4);
 
         jpSuppInfoRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotes.setText("Comentarios arch.:");
+        jlNotes.setText("Comentarios sop.:");
         jlNotes.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow6.add(jlNotes);
 
-        moTextNotes.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextNotes.setPreferredSize(new java.awt.Dimension(278, 23));
         jpSuppInfoRow6.add(moTextNotes);
 
         jpDataSuppInfo.add(jpSuppInfoRow6);
 
         jpSuppInfoRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFile.setText("Archivo:");
+        jlFile.setText("Nombre archivo:*");
         jlFile.setPreferredSize(new java.awt.Dimension(115, 23));
         jpSuppInfoRow7.add(jlFile);
 
@@ -506,18 +546,23 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpSuppTotalRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppCur.setText("Moneda archivo:");
+        jlSuppCur.setText("Moneda sop.:*");
         jlSuppCur.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow1.add(jlSuppCur);
 
-        moKeySuppCur.setPreferredSize(new java.awt.Dimension(165, 23));
+        moKeySuppCur.setPreferredSize(new java.awt.Dimension(140, 23));
         jpSuppTotalRow1.add(moKeySuppCur);
+
+        jlSuppCurCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlSuppCurCur.setText("MS");
+        jlSuppCurCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpSuppTotalRow1.add(jlSuppCurCur);
 
         jpSuppTotals.add(jpSuppTotalRow1);
 
         jpSuppTotalRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppCurTotal.setText("Total archivo:");
+        jlSuppCurTotal.setText("Total sop. MS:*");
         jlSuppCurTotal.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow2.add(jlSuppCurTotal);
 
@@ -528,11 +573,16 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moTextSuppCurTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jpSuppTotalRow2.add(moTextSuppCurTotalCur);
 
+        jlSuppCurTotalCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlSuppCurTotalCur.setText("MS");
+        jlSuppCurTotalCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpSuppTotalRow2.add(jlSuppCurTotalCur);
+
         jpSuppTotals.add(jpSuppTotalRow2);
 
         jpSuppTotalRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppExchangeRateDoc.setText("TC documento:");
+        jlSuppExchangeRateDoc.setText("TC MP/MS:*");
         jlSuppExchangeRateDoc.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow3.add(jlSuppExchangeRateDoc);
 
@@ -540,7 +590,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jpSuppTotalRow3.add(moDecSuppExchangeRateDoc);
 
         jlInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
-        jlInfo.setToolTipText("Se habilita cuando el pedido y la cotización sean extranjeras");
+        jlInfo.setToolTipText("Se habilita sólo si es necesario");
         jlInfo.setPreferredSize(new java.awt.Dimension(23, 23));
         jpSuppTotalRow3.add(jlInfo);
 
@@ -548,7 +598,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpSuppTotalRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppTotalDoc.setText("Total documento:");
+        jlSuppTotalDoc.setText("Total sop. MP:");
         jlSuppTotalDoc.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow4.add(jlSuppTotalDoc);
 
@@ -559,11 +609,16 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moTextSuppTotalDocCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jpSuppTotalRow4.add(moTextSuppTotalDocCur);
 
+        jlSuppTotalDocCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlSuppTotalDocCur.setText("MP");
+        jlSuppTotalDocCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpSuppTotalRow4.add(jlSuppTotalDocCur);
+
         jpSuppTotals.add(jpSuppTotalRow4);
 
         jpSuppTotalRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppExchangeRateLoc.setText("TC pesos:");
+        jlSuppExchangeRateLoc.setText("TC ML/MP:");
         jlSuppExchangeRateLoc.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow5.add(jlSuppExchangeRateLoc);
 
@@ -574,7 +629,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         jpSuppTotalRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSuppTotal.setText("Tolal:");
+        jlSuppTotal.setText("Tolal sop. ML:");
         jlSuppTotal.setPreferredSize(new java.awt.Dimension(100, 23));
         jpSuppTotalRow6.add(jlSuppTotal);
 
@@ -585,6 +640,11 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moTextSuppTotalCur.setEnabled(false);
         moTextSuppTotalCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jpSuppTotalRow6.add(moTextSuppTotalCur);
+
+        jlSuppTotalCur.setForeground(java.awt.SystemColor.textInactiveText);
+        jlSuppTotalCur.setText("ML");
+        jlSuppTotalCur.setPreferredSize(new java.awt.Dimension(20, 23));
+        jpSuppTotalRow6.add(jlSuppTotalCur);
 
         jpSuppTotals.add(jpSuppTotalRow6);
 
@@ -625,11 +685,15 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private javax.swing.JButton jbTechnical;
     private javax.swing.JLabel jlDocBp;
     private javax.swing.JLabel jlDocCob;
+    private javax.swing.JLabel jlDocCur;
+    private javax.swing.JLabel jlDocCurCur;
     private javax.swing.JLabel jlDocCurTotal;
+    private javax.swing.JLabel jlDocCurTotalCur;
     private javax.swing.JLabel jlDocDate;
     private javax.swing.JLabel jlDocDpsAuth;
     private javax.swing.JLabel jlDocExchageRate;
     private javax.swing.JLabel jlDocTotal;
+    private javax.swing.JLabel jlDocTotalCur;
     private javax.swing.JLabel jlDocType;
     private javax.swing.JLabel jlFile;
     private javax.swing.JLabel jlFiscalId;
@@ -640,12 +704,16 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlSuppBp;
     private javax.swing.JLabel jlSuppCur;
+    private javax.swing.JLabel jlSuppCurCur;
     private javax.swing.JLabel jlSuppCurTotal;
+    private javax.swing.JLabel jlSuppCurTotalCur;
     private javax.swing.JLabel jlSuppExchangeRateDoc;
     private javax.swing.JLabel jlSuppExchangeRateLoc;
     private javax.swing.JLabel jlSuppNum;
     private javax.swing.JLabel jlSuppTotal;
+    private javax.swing.JLabel jlSuppTotalCur;
     private javax.swing.JLabel jlSuppTotalDoc;
+    private javax.swing.JLabel jlSuppTotalDocCur;
     private javax.swing.JPanel jpData;
     private javax.swing.JPanel jpDataDoc;
     private javax.swing.JPanel jpDataSupp;
@@ -657,6 +725,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private javax.swing.JPanel jpDocRow1;
     private javax.swing.JPanel jpDocRow10;
     private javax.swing.JPanel jpDocRow11;
+    private javax.swing.JPanel jpDocRow12;
     private javax.swing.JPanel jpDocRow2;
     private javax.swing.JPanel jpDocRow3;
     private javax.swing.JPanel jpDocRow4;
@@ -692,6 +761,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSuppExchangeRateLoc;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSuppTotal;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecSuppTotalDoc;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDocCur;
     private sa.lib.gui.bean.SBeanFieldKey moKeySuppBp;
     private sa.lib.gui.bean.SBeanFieldKey moKeySuppCur;
     private sa.lib.gui.bean.SBeanFieldText moTextCob;
@@ -762,6 +832,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moTextDocSer.setTextSettings(SGuiUtils.getLabelName(jlDocType), 25, 0);
         moTextDocNum.setTextSettings(SGuiUtils.getLabelName(jlDocType), 32, 0);
         moTextDocReference.setTextSettings(SGuiUtils.getLabelName(jlDocType), 25, 0);
+        moKeyDocCur.setKeySettings(miClient, SGuiUtils.getLabelName(jlDocCur), false);
         moDecDocCurTotal.setDecimalSettings(SGuiUtils.getLabelName(jlDocCurTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecDocExchangeRate.setDecimalSettings(SGuiUtils.getLabelName(jlDocExchageRate), SGuiConsts.GUI_TYPE_DEC_EXC_RATE, false);
         moDecDocTotal.setDecimalSettings(SGuiUtils.getLabelName(jlDocTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
@@ -834,16 +905,13 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
                 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo archivo", 100));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo soporte", 100));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nombre archivo"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Asociado negocios", 150));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio archivo"));
-//                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Total mon $"));
-//                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-//                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "TC"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Total $"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Extemporaneo"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio soporte"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Total MP $"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda ped."));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Extemporáneo"));
                 
                 return columns;
             }
@@ -877,13 +945,12 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Concepto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Concepto", 430));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Cantidad"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Precio u. $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_3D, "Total $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                //columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Vincular"));
                 columns.add(col);
                 
                 return columns;
@@ -1010,9 +1077,6 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
 
         try {
             rate = SDataUtilities.obtainExchangeRate((SClientInterface) miClient, idCurrency, moDateDocDate.getValue());
-            if (rate == 0d) {
-                miClient.showMsgBoxInformation("No hay un tipo de cambio para la fecha del documento y moneda seleccionada.");
-            }
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -1060,7 +1124,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             }
         }
         if (validation.isValid() && !mbIsExistingFile && (moFile == null || jtfFile.getText().isEmpty())) {
-            validation.setMessage("No se ha indicado un archivo de soporte.");
+            validation.setMessage("No se ha seleccionado un archivo de soporte.");
             validation.setComponent(jtfFile);
         }
         if (validation.isValid() && !mbIsExistingFile && !moFile.exists()) {
@@ -1157,6 +1221,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 }
             }
             if (add) {
+                mbIsCapturingFile = true;
+                
                 cleanSuppComponets();
                 mbIsExistingFile = false;
                 jbHiggerQ.setEnabled(false);
@@ -1176,8 +1242,6 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 jbSelectAll.setEnabled(true);
                 jbDeselectAll.setEnabled(true);
                 populateGridDpsEntries();
-
-                mbIsCapturingFile = true;
             }
             else {
                 miClient.showMsgBoxInformation("No se puede agregar más de un archivo de soporte de proveedor.");
@@ -1187,6 +1251,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     
     private void actionHiggerQ() {
         if (jbHiggerQ.isEnabled()) {
+            mbIsCapturingFile = true;
+            
             cleanSuppComponets();
             mbIsExistingFile = false;
             jbPickedQ.setEnabled(false);
@@ -1200,14 +1266,14 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
                 row.setVinculed(false);
             }
-            populateGridDpsEntries();
-            
-            mbIsCapturingFile = true;
+            populateGridDpsEntries();            
         }
     }
     
     private void actionLowerQ() {
         if (jbLowerQ.isEnabled()) {
+            mbIsCapturingFile = true;
+            
             cleanSuppComponets();
             mbIsExistingFile = false;
             jbPickedQ.setEnabled(false);
@@ -1221,14 +1287,14 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
                 row.setVinculed(false);
             }
-            populateGridDpsEntries();
-            
-            mbIsCapturingFile = true;
+            populateGridDpsEntries();            
         }
     }
     
     private void actionTechnical() {
         if (jbTechnical.isEnabled()) {
+            mbIsCapturingFile = true;
+            
             cleanSuppComponets();
             mbIsExistingFile = false;
             jbPickedQ.setEnabled(false);
@@ -1246,9 +1312,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             for (SRowSupplierFileDpsEntry row : maDpsEntriesRows) { 
                 row.setVinculed(false);
             }
-            populateGridDpsEntries();
-            
-            mbIsCapturingFile = true;
+            populateGridDpsEntries();            
         }
     }
     
@@ -1293,6 +1357,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             if (jbAddRow.isEnabled()) {
                 SGuiValidation validation = validateFile(); 
                 if (validation.isValid()) {
+                    mbIsCapturingFile = false;
                     enableSuppComponets(false);
                     SDbSupplierFile file;
                     if (mbIsExistingFile) {
@@ -1361,7 +1426,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                         fileDps.setTotalCyQuotation(moDecSuppCurTotal.getValue());
                         fileDps.setFkCurrencyDpsId(moDocCur.getPkCurrencyId());
                         fileDps.setFkCurrencyQuotationId(moSuppCur.getPkCurrencyId());
-                        fileDps.setXtaDpsCurKey(moSuppCur.getKey());
+                        fileDps.setXtaDpsCurKey(moDocCur.getKey());
                         fileDps.setNotes(moTextNotes.getValue());
                     }
                     file.setSuppFileDps(fileDps);
@@ -1384,10 +1449,13 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                     jbLowerQ.setEnabled(true);
                     jbTechnical.setEnabled(true);
 
-                    jbPickedQ.requestFocus();
+                    jbHiggerQ.requestFocus();
+                    
+                    moGridSuppFiles.setSelectedGridRow(maSuppFilesRows.size() - 1);
 
                     mbIsCapturingFile = false;
                     mbIsEditingFile = false;
+                    moDecSuppExchangeRateDoc.setEnabled(false);
                 }
                 else {
                     miClient.showMsgBoxInformation(validation.getMessage());
@@ -1533,6 +1601,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                             moTextNoRegSuppBp.setEnabled(true);
                             break;
                     }
+                    itemStateChangedKeySuppCur(true);
                     itemStateChangeNoRegSuppBp();
                 }
                 catch (Exception e) {
@@ -1617,63 +1686,71 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         focusSuppCurTotal();
     }
     
-    private void itemStateChangedKeySuppCur() {
+    private void itemStateChangedKeySuppCur(boolean edit) {
         moDecSuppExchangeRateDoc.setEnabled(false);
         moSuppCur = (SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, 
-                moKeySuppCur.getValue(), SLibConstants.EXEC_MODE_SILENT);
-        double exRateDoc = moRegistry.getDps().getExchangeRate();
+            moKeySuppCur.getValue(), SLibConstants.EXEC_MODE_SILENT);
         if (moSuppCur != null) {
             moTextSuppCurTotalCur.setValue(moSuppCur.getKey());
-            // Si ambas monedas son iguales
-            if (moDocCur.getPkCurrencyId() == moKeySuppCur.getValue()[0]) {
-                mdExchangeRateDoc = 1.0;
-                if (isLocalCurrency(moDocCur.getPkCurrencyId())){
-                    mdExchangeRateLoc = 1.0;
-                }
-                else {
-                    //mdExchangeRateLoc = getExchangeRate(moDocCur.getPkCurrencyId());
-                    mdExchangeRateLoc = exRateDoc;
-                }
-            }
-            else {
-                // Si la moneda del DPS es local y la moneda del soporte es extranjera
-                if (isLocalCurrency(moDocCur.getPkCurrencyId()) && !isLocalCurrency(moSuppCur.getPkCurrencyId())) {
-                    //mdExchangeRateDoc = getExchangeRate(moSuppCur.getPkCurrencyId());
-                    mdExchangeRateDoc = exRateDoc;
-                    if (mdExchangeRateDoc == 0.0) {
-                        moDecSuppTotalDoc.setValue(0d);
-                        mdExchangeRateLoc = 0d;
-                        moDecSuppTotal.setValue(0d);
-                    }
-                    else {
+            if (mbIsCapturingFile) {
+                double exRateDoc = moRegistry.getDps().getExchangeRate();
+                // Si ambas monedas son iguales
+                if (moDocCur.getPkCurrencyId() == moKeySuppCur.getValue()[0]) {
+                    mdExchangeRateDoc = 1.0;
+                    if (isLocalCurrency(moDocCur.getPkCurrencyId())){
                         mdExchangeRateLoc = 1.0;
                     }
-                }
-                // Si la moneda del DPS es extranjera y la moneda del soporte es local
-                else if (!isLocalCurrency(moDocCur.getPkCurrencyId()) && isLocalCurrency(moSuppCur.getPkCurrencyId())) {
-                    //double exR = getExchangeRate(moDocCur.getPkCurrencyId());
-                    if (exRateDoc > 0) {
-                        mdExchangeRateDoc = 1 / exRateDoc;
+                    else {
                         mdExchangeRateLoc = exRateDoc;
                     }
+                }
+                else {
+                    // Si la moneda del DPS es local y la moneda del soporte es extranjera
+                    if (isLocalCurrency(moDocCur.getPkCurrencyId()) && !isLocalCurrency(moSuppCur.getPkCurrencyId())) {
+                        mdExchangeRateDoc = getExchangeRate(moSuppCur.getPkCurrencyId());
+                        if (mdExchangeRateDoc == 0.0) {
+                            mdExchangeRateDoc = (edit ? moDecSuppExchangeRateDoc.getValue() : mdExchangeRateDoc);
+                            moDecSuppExchangeRateDoc.setEnabled(true);
+                        }
+                        else {
+                            if (edit) {
+                                if (!SLibUtils.compareAmount(mdExchangeRateDoc, moDecSuppExchangeRateDoc.getValue())){
+                                    mdExchangeRateDoc = moDecSuppExchangeRateDoc.getValue();
+                                    moDecSuppExchangeRateDoc.setEnabled(true);
+                                }
+                            }
+                        }
+                        mdExchangeRateLoc = 1.0;
+                    }
+                    // Si la moneda del DPS es extranjera y la moneda del soporte es local
+                    else if (!isLocalCurrency(moDocCur.getPkCurrencyId()) && isLocalCurrency(moSuppCur.getPkCurrencyId())) {
+                        if (exRateDoc > 0) {
+                            mdExchangeRateDoc = 1 / exRateDoc;
+                            mdExchangeRateLoc = exRateDoc;
+                        }
+                        else {
+                            moDecSuppTotalDoc.setValue(0d);
+                            mdExchangeRateLoc = 0d;
+                            moDecSuppTotal.setValue(0d);
+                        }
+                    }
+                    // Ambas son monedas extranjeras
                     else {
-                        moDecSuppTotalDoc.setValue(0d);
-                        mdExchangeRateLoc = 0d;
-                        moDecSuppTotal.setValue(0d);
+                        moDecSuppExchangeRateDoc.setEnabled(true);
+                        mdExchangeRateLoc = moDecSuppExchangeRateLoc.getValue();
+                        mdExchangeRateDoc = (edit ? moDecSuppExchangeRateDoc.getValue() : 0d);
                     }
                 }
-                // Ambas son monedas extranjeras
-                else {
-                    moDecSuppExchangeRateDoc.setEnabled(true);
-                    //mdExchangeRateLoc = getExchangeRate(moDocCur.getPkCurrencyId());
-                    mdExchangeRateLoc = exRateDoc;
-                }
+                moDecSuppExchangeRateDoc.setValue(mdExchangeRateDoc);
+                moDecSuppExchangeRateLoc.setValue(mdExchangeRateLoc);
             }
-            moDecSuppExchangeRateDoc.setValue(mdExchangeRateDoc);
-            moDecSuppExchangeRateLoc.setValue(mdExchangeRateLoc);
+            if (moDecSuppCurTotal.getValue() != 0) {
+                focusSuppCurTotal();
+            }
         }
-        if (moDecSuppCurTotal.getValue() != 0) {
-            focusSuppCurTotal();
+        else {
+            moDecSuppExchangeRateDoc.setValue(0d);
+            moTextSuppCurTotalCur.setValue("");
         }
     }
     
@@ -1738,6 +1815,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeySuppBp, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyDocCur, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeySuppCur, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
     }
 
@@ -1746,6 +1824,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moRegistry = (SDbSupplierFileProcess) registry;
         SDbDps dps = moRegistry.getDps();
         
+        mbIsCapturingFile = false;
+        mbIsEditingFile = false;
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
         
@@ -1775,6 +1855,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moTextDocSer.setValue(dps.getNumberSeries());
         moTextDocNum.setValue(dps.getNumber());
         moTextDocReference.setValue(dps.getNumberReference());
+        moKeyDocCur.setValue(new int[] { dps.getFkCurrencyId() });
         moDecDocCurTotal.setValue(dps.getTotalCy_r());
         moTextDocCurTotalCur.setValue(moDocCur.getKey());
         moDecDocExchangeRate.setValue(dps.getExchangeRate());
@@ -1944,7 +2025,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
             
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 if (comboBox == moKeySuppCur) {
-                    itemStateChangedKeySuppCur();
+                    itemStateChangedKeySuppCur(false);
                 }
             }
         }
