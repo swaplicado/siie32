@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -323,17 +324,8 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                 }
 
                 if (validation.isValid()) {
-                    Calendar cal1 = Calendar.getInstance();
-                    cal1.setTime(dateStart);
-
-                    Calendar cal2 = Calendar.getInstance();
-                    cal2.setTime(moDateDateEnd.getValue());
-
-                    int anio1 = cal1.get(Calendar.YEAR);
-                    int anio2 = cal2.get(Calendar.YEAR);
-                    
                     // validar que la fecha de corte sea del mismo año que la fecha de corte de la valuación anterior
-                    if (anio1 != anio2) {
+                    if (SLibTimeUtils.digestYear(dateStart)[0] != SLibTimeUtils.digestYear(moDateDateEnd.getValue())[0]) {
                         validation.setMessage("La fecha de corte debe ser del mismo año que la fecha de corte de la valuación anterior.");
                         validation.setComponent(moDateDateEnd);
                     }

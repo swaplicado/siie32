@@ -426,8 +426,13 @@ public class SStockValuationRecordUtils {
      * @param pkDiog Llave primaria del documento de inventario.
      * @param nItemRef Referencia del ítem.
      * @param fkSystemMove Clave de sistema para el tipo de movimiento.
+     *                      SModSysConsts.FINS_TP_SYS_MOV_PUR
+     *                      
      * @param fkSystemAccount Clave de sistema para la cuenta.
+     *                      SModSysConsts.FINS_TP_SYS_ACC_NA_NA
      * @param fkSystemMoveType Clave de sistema para el tipo de movimiento.
+     *                      SDataConstantsSys.FINS_TP_SYS_MOV_NA
+     *                      SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD
      * @param pkWhs Llave primaria del almacén.
      * @param stkValuationId ID de la valuación de inventario.
      * @param stkValuationMvtId ID del movimiento de valuación.

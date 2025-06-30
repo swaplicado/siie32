@@ -82,57 +82,59 @@ public abstract class SStockValuationAdjustsUtils {
                 + "        AND oc.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
                 + "        AND oc.fid_tp_dps =  " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ";";
         
-        ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        SDbStockValuationMvt oMvtAdjust = null;
-        SDbStockValuationMvt oMvtRevised = null;
-        while (resultSet.next()) {
-            oMvtRevised = new SDbStockValuationMvt();
-            oMvtRevised.setPkStockValuationMvtId(resultSet.getInt("id_stk_val_mvt"));
-            oMvtRevised.setRevised(true);
-            
-            if (resultSet.getDouble("fac_e.price_u_real_r") != resultSet.getDouble("mvt.cost_u")) {
-                oMvtAdjust = new SDbStockValuationMvt();
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet resultSet = st.executeQuery(sql)) {
+            SDbStockValuationMvt oMvtAdjust = null;
+            SDbStockValuationMvt oMvtRevised = null;
+            while (resultSet.next()) {
+                oMvtRevised = new SDbStockValuationMvt();
+                oMvtRevised.setPkStockValuationMvtId(resultSet.getInt("id_stk_val_mvt"));
+                oMvtRevised.setRevised(true);
 
-                oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
-                oMvtAdjust.setQuantityMovement(0d);
-                oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
-                oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
-                                                    - resultSet.getDouble("mvt.cost_r"), 8));
-                oMvtAdjust.setFkStockValuationId(idValuation);
-                oMvtAdjust.setFkStockValuationMvtId_n(resultSet.getInt("fk_stk_val_mvt_n"));
-                oMvtAdjust.setFkDiogCategoryId(resultSet.getInt("fk_ct_iog"));
-                oMvtAdjust.setFkDiogYearInId_n(resultSet.getInt("fk_diog_year_in_n"));
-                oMvtAdjust.setFkDiogDocInId_n(resultSet.getInt("fk_diog_doc_in_n"));
-                oMvtAdjust.setFkDiogEntryInId_n(resultSet.getInt("fk_diog_ety_in_n"));
-                oMvtAdjust.setFkDpsYearInId_n(resultSet.getInt("fact_e_id_year"));
-                oMvtAdjust.setFkDpsDocInId_n(resultSet.getInt("fact_e_id_doc"));
-                oMvtAdjust.setFkDpsEntryInId_n(resultSet.getInt("fact_e_id_ety"));
-                oMvtAdjust.setFkDiogYearOutId_n(resultSet.getInt("fk_diog_year_out_n"));
-                oMvtAdjust.setFkDiogDocOutId_n(resultSet.getInt("fk_diog_doc_out_n"));
-                oMvtAdjust.setFkDiogEntryOutId_n(resultSet.getInt("fk_diog_ety_out_n"));
-                oMvtAdjust.setFkMaterialRequestId_n(resultSet.getInt("fk_mat_req_n"));
-                oMvtAdjust.setFkMaterialRequestEntryId_n(resultSet.getInt("fk_mat_req_ety_n"));
-                oMvtAdjust.setFkStockValuationMvtRevisionId_n(resultSet.getInt("id_stk_val_mvt"));
-                oMvtAdjust.setFkItemId(resultSet.getInt("fk_item"));
-                oMvtAdjust.setFkUnitId(resultSet.getInt("fk_unit"));
-                oMvtAdjust.setFkLotId(resultSet.getInt("fk_lot"));
-                oMvtAdjust.setFkCompanyBranchId(resultSet.getInt("fk_cob"));
-                oMvtAdjust.setFkWarehouseId(resultSet.getInt("fk_wh"));
+                if (resultSet.getDouble("fac_e.price_u_real_r") != resultSet.getDouble("mvt.cost_u")) {
+                    oMvtAdjust = new SDbStockValuationMvt();
 
-                oMvtAdjust.save(session);
+                    oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
+                    oMvtAdjust.setQuantityMovement(0d);
+                    oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
+                    oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
+                                                        - resultSet.getDouble("mvt.cost_r"), 8));
+                    oMvtAdjust.setFkStockValuationId(idValuation);
+                    oMvtAdjust.setFkStockValuationMvtId_n(resultSet.getInt("fk_stk_val_mvt_n"));
+                    oMvtAdjust.setFkDiogCategoryId(resultSet.getInt("fk_ct_iog"));
+                    oMvtAdjust.setFkDiogYearInId_n(resultSet.getInt("fk_diog_year_in_n"));
+                    oMvtAdjust.setFkDiogDocInId_n(resultSet.getInt("fk_diog_doc_in_n"));
+                    oMvtAdjust.setFkDiogEntryInId_n(resultSet.getInt("fk_diog_ety_in_n"));
+                    oMvtAdjust.setFkDpsYearInId_n(resultSet.getInt("fact_e_id_year"));
+                    oMvtAdjust.setFkDpsDocInId_n(resultSet.getInt("fact_e_id_doc"));
+                    oMvtAdjust.setFkDpsEntryInId_n(resultSet.getInt("fact_e_id_ety"));
+                    oMvtAdjust.setFkDiogYearOutId_n(resultSet.getInt("fk_diog_year_out_n"));
+                    oMvtAdjust.setFkDiogDocOutId_n(resultSet.getInt("fk_diog_doc_out_n"));
+                    oMvtAdjust.setFkDiogEntryOutId_n(resultSet.getInt("fk_diog_ety_out_n"));
+                    oMvtAdjust.setFkMaterialRequestId_n(resultSet.getInt("fk_mat_req_n"));
+                    oMvtAdjust.setFkMaterialRequestEntryId_n(resultSet.getInt("fk_mat_req_ety_n"));
+                    oMvtAdjust.setFkStockValuationMvtRevisionId_n(resultSet.getInt("id_stk_val_mvt"));
+                    oMvtAdjust.setFkItemId(resultSet.getInt("fk_item"));
+                    oMvtAdjust.setFkUnitId(resultSet.getInt("fk_unit"));
+                    oMvtAdjust.setFkLotId(resultSet.getInt("fk_lot"));
+                    oMvtAdjust.setFkCompanyBranchId(resultSet.getInt("fk_cob"));
+                    oMvtAdjust.setFkWarehouseId(resultSet.getInt("fk_wh"));
 
-                lStkValMvtAdjusts.add(oMvtAdjust);
-                oMvtRevised.setFkStockValuationMvtRevisionId_n(oMvtAdjust.getPkStockValuationMvtId());
+                    oMvtAdjust.save(session);
+
+                    lStkValMvtAdjusts.add(oMvtAdjust);
+                    oMvtRevised.setFkStockValuationMvtRevisionId_n(oMvtAdjust.getPkStockValuationMvtId());
+                }
+                else {
+                    oMvtRevised.setFkStockValuationMvtRevisionId_n(0);
+                }
+
+                SStockValuationAdjustsUtils.updateStockValuationMvt(session, oMvtRevised);
+                lStkValMvtToRev.add(oMvtRevised);
             }
-            else {
-                oMvtRevised.setFkStockValuationMvtRevisionId_n(0);
-            }
-            
-            SStockValuationAdjustsUtils.updateStockValuationMvt(session, oMvtRevised);
-            lStkValMvtToRev.add(oMvtRevised);
+
+            return lStkValMvtAdjusts;
         }
-        
-        return lStkValMvtAdjusts;
     }
 
     /**
@@ -151,8 +153,9 @@ public abstract class SStockValuationAdjustsUtils {
                 + "WHERE "
                 + "    id_stk_val_mvt = " + oStkValMvtRev.getPkStockValuationMvtId() + ";";
 
-        
-        session.getStatement().getConnection().createStatement().executeUpdate(sql);
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sql);
+        }
     }
 
     /**

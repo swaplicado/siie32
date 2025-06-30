@@ -89,23 +89,24 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        ResultSet resultSet;
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
 
         msSql = "SELECT * " + getSqlFromWhere(pk);
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+        try (ResultSet resultSet = session.getStatement().executeQuery(msSql)) {
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+            }
+            else {
+                mnPkStockValuationId = resultSet.getInt("id_stk_val");
+                mnPkDiogIdYear = resultSet.getInt("id_year");
+                mnPkDiogIdDoc = resultSet.getInt("id_doc");
+            }
+
+            mnQueryResultId = SDbConsts.READ_OK;
+            resultSet.close();
         }
-        else {
-            mnPkStockValuationId = resultSet.getInt("id_stk_val");
-            mnPkDiogIdYear = resultSet.getInt("id_year");
-            mnPkDiogIdDoc = resultSet.getInt("id_doc");
-        }
-        
-        mnQueryResultId = SDbConsts.READ_OK;
     }
 
     @Override
