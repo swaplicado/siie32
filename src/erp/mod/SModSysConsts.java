@@ -796,7 +796,7 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_ESTIMATED = 104; // comprado
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
     public static final int TRNX_MAT_REQ_RECLASS = 107; // reclasificación contable
-    public static final int TRNX_MAT_REQ_FOLL_PUR_CLOSED = 100; // Seguimiento
+    //public static final int TRNX_MAT_REQ_FOLL_PUR_CLOSED = 100; // Seguimiento // se cambia por la constante SUtilConsts.ACTION_CLOSE
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";

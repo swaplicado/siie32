@@ -284,7 +284,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     moDialogSupply.setFormParams(key, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);
                     moDialogSupply.setVisible(true);
                     
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                    if (moDialogSupply.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -441,7 +443,9 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     moDialogSegregations.setFormParams(key);
                     moDialogSegregations.setVisible(true);
                     
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                    if (moDialogSegregations.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -619,8 +623,6 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     
                     moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
-                    
-                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -1020,7 +1022,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_2D, "per_x_sumi", "% x suministrar"));
         }
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL || mnGridSubtype == SLibConsts.UNDEFINED) {
+        if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP && (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL || mnGridSubtype == SLibConsts.UNDEFINED)) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON_CIRC, "count_sum", "Primera vez suministro", 70));
         }
         

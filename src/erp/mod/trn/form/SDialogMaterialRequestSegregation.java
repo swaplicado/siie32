@@ -6,6 +6,7 @@ package erp.mod.trn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -45,7 +46,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public class SDialogMaterialRequestSegregation extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
     
@@ -255,7 +256,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-       actionSave();
+       dispose();
     }//GEN-LAST:event_closeDialog
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -486,6 +487,8 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
             moTextEntity.setValue(moMaterialRequest.getAuxProvEntName());
 
             showMaterialRequestEntries();
+            
+            mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -580,6 +583,8 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
         
         showMaterialRequestEntries();
+        
+        mnFormResult = SLibConstants.FORM_RESULT_OK;
     }
     
     /**
@@ -659,6 +664,8 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         }
         
         showMaterialRequestEntries();
+        
+        mnFormResult = SLibConstants.FORM_RESULT_OK;
     }
     
     public void setFormParams(final int[] pk) {

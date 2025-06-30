@@ -2087,10 +2087,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
             }
             else if (item == jmiReqFollowingPurOpen) {
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SUtilConsts.ACTION_OPEN, null);
             }
             else if (item == jmiReqFollowingPurClosed) {
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED, null);
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SUtilConsts.ACTION_CLOSE, null);
             }
             else if (item == jmiReqAll) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_REQ, SModConsts.TRNX_MAT_REQ_ALL, null);

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -78,7 +79,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED) {
+        if (mnGridSubtype == SUtilConsts.ACTION_CLOSE) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
     }
@@ -202,7 +203,7 @@ public class SViewFollowingPurchaseMaterialRequest extends SGridPaneView impleme
         moPaneSettings.setUpdatableApplying(false);
         moPaneSettings.setSystemApplying(false);
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED) {
+        if (mnGridSubtype == SUtilConsts.ACTION_CLOSE) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
             where += "AND " + SGridUtils.getSqlFilterDate("r.dt", (SGuiDate) filter);
             having += "(r.b_clo_pur OR per_pur = 1) ";
