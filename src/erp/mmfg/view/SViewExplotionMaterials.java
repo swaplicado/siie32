@@ -5,17 +5,16 @@
 
 package erp.mmfg.view;
 
-import javax.swing.JButton;
-
 import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.lib.SLibConstants;
-import erp.lib.data.SDataSqlUtilities;
+import javax.swing.JButton;
 
 /**
  *
@@ -122,8 +121,9 @@ public class SViewExplotionMaterials extends erp.lib.table.STableTab implements 
             }
         }
 
-        msSql = "SELECT m.id_exp_year, m.id_exp, CONCAT(MIN(m.id_ord_year), '-',erp.lib_fix_int(MIN(o.num),6), ', ', o.ref) AS ord_ini, " +
-                "CONCAT(MAX(m.id_ord_year), '-',erp.lib_fix_int(MAX(o.num),6), ', ', (SELECT ref FROM mfg_ord WHERE id_year =  MAX(m.id_ord_year) AND id_ord = MAX(m.id_ord))) AS ord_end, " +
+        msSql = "SELECT m.id_exp_year, m.id_exp, " +
+                "CONCAT(MIN(m.id_ord_year), '-', erp.lib_fix_int(MIN(o.num), 6), ', ', o.ref) AS ord_ini, " +
+                "CONCAT(MAX(m.id_ord_year), '-', erp.lib_fix_int(MAX(o.num), 6), ', ', (SELECT ref FROM mfg_ord WHERE id_year =  MAX(m.id_ord_year) AND id_ord = MAX(m.id_ord))) AS ord_end, " +
                 "e.*, un.usr, ue.usr, ud.usr " +
                 "FROM mfg_exp AS e " +
                 "INNER JOIN mfg_exp_ord AS m ON e.id_year = m.id_exp_year AND e.id_exp = m.id_exp " +
