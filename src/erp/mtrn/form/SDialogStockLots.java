@@ -27,7 +27,7 @@ import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
-import erp.mod.qlt.db.SQltUtils;
+import erp.mod.qlt.utils.SQltUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.STrnStockLotRow;

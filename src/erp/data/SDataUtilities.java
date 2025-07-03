@@ -3348,7 +3348,7 @@ public abstract class SDataUtilities {
     public static boolean isCatalogueQlt(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_QLT && catalogue < SDataConstants.GLOBAL_CAT_XXX ||
                 catalogue >= SDataConstants.MOD_QLT && catalogue < SDataConstants.MOD_XXX ||
-                catalogue >= SModConsts.QLT_LOT_APR && catalogue <= SModConsts.QLT_ANALYSIS_ITEM;
+                catalogue >= SModConsts.QLT_LOT_APR && catalogue <= SModConsts.QLTX_QLT_DPS_ETY;
     }
     
     /**

@@ -48,21 +48,36 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlUnitSymbol = new javax.swing.JLabel();
         moTextUnitSymbol = new sa.lib.gui.bean.SBeanFieldText();
+        jLabel1 = new javax.swing.JLabel();
+        moTextUnitSymbolEnglish = new sa.lib.gui.bean.SBeanFieldText();
         jPanel8 = new javax.swing.JPanel();
         jlUnitName = new javax.swing.JLabel();
         moTextUnitName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel10 = new javax.swing.JPanel();
+        jlUnitNameEnglish = new javax.swing.JLabel();
+        moTextUnitNameEnglish = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel12 = new javax.swing.JPanel();
+        jlMethod = new javax.swing.JLabel();
+        moTextMethod = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel13 = new javax.swing.JPanel();
+        jlMethodEnglish = new javax.swing.JLabel();
+        moTextMethodEnglish = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
         jlAnalysisShortName = new javax.swing.JLabel();
         moTextShortName = new sa.lib.gui.bean.SBeanFieldText();
+        jLabel2 = new javax.swing.JLabel();
+        moTextShortNameAnalysisEnglish = new sa.lib.gui.bean.SBeanFieldText();
         jPanel7 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel11 = new javax.swing.JPanel();
+        jlNameEnglish = new javax.swing.JLabel();
+        moTextNameEnglish = new sa.lib.gui.bean.SBeanFieldText();
         jPanel9 = new javax.swing.JPanel();
         jlAnalysisType = new javax.swing.JLabel();
         moKeyAnalysisType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -71,14 +86,22 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUnitSymbol.setText("Símbolo unidad:*");
         jlUnitSymbol.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(jlUnitSymbol);
+
+        moTextUnitSymbol.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(moTextUnitSymbol);
+
+        jLabel1.setText("Inglés:");
+        jPanel4.add(jLabel1);
+
+        moTextUnitSymbolEnglish.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel4.add(moTextUnitSymbolEnglish);
 
         jPanel2.add(jPanel4);
 
@@ -88,17 +111,58 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         jlUnitName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlUnitName);
 
-        moTextUnitName.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextUnitName.setPreferredSize(new java.awt.Dimension(290, 23));
         jPanel8.add(moTextUnitName);
 
         jPanel2.add(jPanel8);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUnitNameEnglish.setText("Nombre unidad inglés:*");
+        jlUnitNameEnglish.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel10.add(jlUnitNameEnglish);
+
+        moTextUnitNameEnglish.setPreferredSize(new java.awt.Dimension(290, 23));
+        jPanel10.add(moTextUnitNameEnglish);
+
+        jPanel2.add(jPanel10);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlMethod.setText("Método análisis:*");
+        jlMethod.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jlMethod);
+
+        moTextMethod.setPreferredSize(new java.awt.Dimension(290, 23));
+        jPanel12.add(moTextMethod);
+
+        jPanel2.add(jPanel12);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlMethodEnglish.setText("Método análisis inglés:*");
+        jlMethodEnglish.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel13.add(jlMethodEnglish);
+
+        moTextMethodEnglish.setPreferredSize(new java.awt.Dimension(290, 23));
+        jPanel13.add(moTextMethodEnglish);
+
+        jPanel2.add(jPanel13);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAnalysisShortName.setText("Nombre corto análisis:*");
         jlAnalysisShortName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlAnalysisShortName);
+
+        moTextShortName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(moTextShortName);
+
+        jLabel2.setText("Inglés:");
+        jPanel6.add(jLabel2);
+
+        moTextShortNameAnalysisEnglish.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel6.add(moTextShortNameAnalysisEnglish);
 
         jPanel2.add(jPanel6);
 
@@ -108,10 +172,21 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         jlName.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(290, 23));
         jPanel7.add(moTextName);
 
         jPanel2.add(jPanel7);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNameEnglish.setText("Nombre análisis inglés:*");
+        jlNameEnglish.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel11.add(jlNameEnglish);
+
+        moTextNameEnglish.setPreferredSize(new java.awt.Dimension(290, 23));
+        jPanel11.add(moTextNameEnglish);
+
+        jPanel2.add(jPanel11);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -119,7 +194,7 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         jlAnalysisType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlAnalysisType);
 
-        moKeyAnalysisType.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyAnalysisType.setPreferredSize(new java.awt.Dimension(260, 23));
         jPanel9.add(moKeyAnalysisType);
 
         jbAnalysisType.setText("...");
@@ -134,9 +209,14 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -145,30 +225,51 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
     private javax.swing.JButton jbAnalysisType;
     private javax.swing.JLabel jlAnalysisShortName;
     private javax.swing.JLabel jlAnalysisType;
+    private javax.swing.JLabel jlMethod;
+    private javax.swing.JLabel jlMethodEnglish;
     private javax.swing.JLabel jlName;
+    private javax.swing.JLabel jlNameEnglish;
     private javax.swing.JLabel jlUnitName;
+    private javax.swing.JLabel jlUnitNameEnglish;
     private javax.swing.JLabel jlUnitSymbol;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAnalysisType;
+    private sa.lib.gui.bean.SBeanFieldText moTextMethod;
+    private sa.lib.gui.bean.SBeanFieldText moTextMethodEnglish;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
+    private sa.lib.gui.bean.SBeanFieldText moTextNameEnglish;
     private sa.lib.gui.bean.SBeanFieldText moTextShortName;
+    private sa.lib.gui.bean.SBeanFieldText moTextShortNameAnalysisEnglish;
     private sa.lib.gui.bean.SBeanFieldText moTextUnitName;
+    private sa.lib.gui.bean.SBeanFieldText moTextUnitNameEnglish;
     private sa.lib.gui.bean.SBeanFieldText moTextUnitSymbol;
+    private sa.lib.gui.bean.SBeanFieldText moTextUnitSymbolEnglish;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
+        SGuiUtils.setWindowBounds(this, 560, 350);
 
-        moTextUnitSymbol.setTextSettings(jlUnitSymbol.getText(), 15, 1);
-        moTextUnitName.setTextSettings(jlName.getText(), 150, 1);
-        moTextShortName.setTextSettings(SGuiUtils.getLabelName(jlAnalysisShortName.getText()), 10, 1);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100, 1);
+        moTextUnitSymbol.setTextSettings(jlUnitSymbol.getText(), 10, 0);
+        moTextUnitSymbolEnglish.setTextSettings(jlUnitSymbol.getText(), 10, 0);
+        moTextUnitName.setTextSettings(jlName.getText(), 100, 0);
+        moTextUnitNameEnglish.setTextSettings(jlUnitNameEnglish.getText(), 100, 0);
+        moTextMethod.setTextSettings(jlMethod.getText(), 100, 0);
+        moTextMethodEnglish.setTextSettings(jlMethodEnglish.getText(), 100, 0);
+        moTextShortName.setTextSettings(SGuiUtils.getLabelName(jlAnalysisShortName.getText()), 10, 0);
+        moTextShortNameAnalysisEnglish.setTextSettings(SGuiUtils.getLabelName(jlAnalysisShortName.getText()), 10, 0);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100, 0);
+        moTextNameEnglish.setTextSettings(SGuiUtils.getLabelName(jlNameEnglish.getText()), 100, 0);
         moKeyAnalysisType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAnalysisType), true);
 
         moFields.addField(moTextUnitSymbol);
+        moFields.addField(moTextUnitSymbolEnglish);
         moFields.addField(moTextUnitName);
-        
+        moFields.addField(moTextUnitNameEnglish);
+        moFields.addField(moTextMethod);
+        moFields.addField(moTextMethodEnglish);
         moFields.addField(moTextShortName);
+        moFields.addField(moTextShortNameAnalysisEnglish);
         moFields.addField(moTextName);
+        moFields.addField(moTextNameEnglish);
         
         moFields.addField(moKeyAnalysisType);
 
@@ -228,9 +329,15 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         }
 
         moTextUnitSymbol.setValue(moRegistry.getUnitSymbol());
+        moTextUnitSymbolEnglish.setValue(moRegistry.getUnitSymbolEnglish());
         moTextUnitName.setValue(moRegistry.getUnitName());
+        moTextUnitNameEnglish.setValue(moRegistry.getUnitNameEnglish());
+        moTextMethod.setValue(moRegistry.getMethodName());
+        moTextMethodEnglish.setValue(moRegistry.getMethodNameEnglish());
         moTextShortName.setValue(moRegistry.getAnalysysShortName());
+        moTextShortNameAnalysisEnglish.setValue(moRegistry.getAnalysysShortNameEnglish());
         moTextName.setValue(moRegistry.getAnalysisName());
+        moTextNameEnglish.setValue(moRegistry.getAnalysisNameEnglish());
         
         moKeyAnalysisType.setValue(new int[] { moRegistry.getFkAnalysisTypeId() });
 
@@ -244,10 +351,16 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
         SDbQltyAnalysis registry = (SDbQltyAnalysis) moRegistry.clone();
         
         registry.setUnitSymbol(moTextUnitSymbol.getValue());
+        registry.setUnitSymbolEnglish(moTextUnitSymbolEnglish.getValue());
         registry.setUnitName(moTextUnitName.getValue());
+        registry.setUnitNameEnglish(moTextUnitNameEnglish.getValue());
+        registry.setMethodName(moTextMethod.getValue());
+        registry.setMethodNameEnglish(moTextMethodEnglish.getValue());
         registry.setAnalysysShortName(moTextShortName.getValue());
+        registry.setAnalysysShortNameEnglish(moTextShortNameAnalysisEnglish.getValue());
         registry.setAnalysisName(moTextName.getValue());
-        registry.setFkAnalysisTypeId(1);
+        registry.setAnalysisNameEnglish(moTextNameEnglish.getValue());
+        registry.setFkAnalysisTypeId(moKeyAnalysisType.getValue()[0]);
 
         return registry;
     }
@@ -276,6 +389,5 @@ public class SFormAnalysis extends SBeanForm implements ActionListener, ItemList
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

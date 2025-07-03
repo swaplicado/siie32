@@ -34,7 +34,7 @@ import erp.mod.trn.db.SDbMaintConfig;
 import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
-import erp.mod.trn.db.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEtyMatConsEntCostCenter;

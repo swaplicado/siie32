@@ -13,17 +13,21 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbStockValuation;
-import erp.mod.trn.db.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -183,6 +187,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         jbPickRecord.addActionListener(this);
     }
     
+    /**
+     * Muestra los datos de la póliza contable actual en los campos correspondientes.
+     */
     private void renderCurrentRecord() {
         if (moCurrentRecord == null) {
             jtfRecordDate.setText("");
@@ -197,6 +204,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         }
     }
     
+    /**
+     * Abre un diálogo para seleccionar una póliza contable y actualiza los campos correspondientes.
+     */
     private void actionPickRecord() {
         Object key = null;
         String message = "";
@@ -314,6 +324,30 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
                 }
 
                 if (validation.isValid()) {
+                    // validar que la fecha de corte sea del mismo año que la fecha de corte de la valuación anterior
+                    if (SLibTimeUtils.digestYear(dateStart)[0] != SLibTimeUtils.digestYear(moDateDateEnd.getValue())[0]) {
+                        validation.setMessage("La fecha de corte debe ser del mismo año que la fecha de corte de la valuación anterior.");
+                        validation.setComponent(moDateDateEnd);
+                    }
+                }
+
+                if (validation.isValid()) {
+                    /**
+                     * Validar si en el periodo de la valuación existen movimientos de inventario sin asociar a una factura.
+                     */
+                    String res = SStockValuationUtils.periodHasDiogsWithoutInvoice(miClient.getSession(), dateStart, moDateDateEnd.getValue());
+                    if (! res.isEmpty()) {
+                        if (miClient.showMsgBoxConfirm(res + "\n ¿Desea continuar?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage("Debe asociar los movimientos de inventario a una factura antes de continuar.");
+                        }
+                    }
+                }
+
+                if (validation.isValid()) {
+                    /**
+                     * Validar si existen valuaciones pasadas que no son válidas.
+                     * Si existen, preguntar si se desea eliminar y reevaluar todo desde la última fecha.
+                     */
                     String res = SStockValuationUtils.arePastValuationsValid(miClient.getSession(), moDateDateEnd.getValue());
                     if (! res.isEmpty()) {
                         if (miClient.showMsgBoxConfirm(res + "\n ¿Desea reevaluar todo desde la última fecha?") == JOptionPane.YES_OPTION) {

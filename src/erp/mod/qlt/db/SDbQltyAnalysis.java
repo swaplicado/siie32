@@ -26,9 +26,16 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
     protected String msUnitName;
     protected String msAnalysysShortName;
     protected String msAnalysisName;
+    protected String msMethodName;
+    protected String msUnitSymbolEnglish;
+    protected String msUnitNameEnglish;
+    protected String msAnalysysShortNameEnglish;
+    protected String msAnalysisNameEnglish;
+    protected String msMethodNameEnglish;
 
     /*
     protected boolean mbDeleted;
+    protected boolean mbSystem;
     */
     
     protected int mnFkAnalysisTypeId;
@@ -51,6 +58,12 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
     public void setUnitName(String s) { msUnitName = s; }
     public void setAnalysysShortName(String s) { msAnalysysShortName = s; }
     public void setAnalysisName(String s) { msAnalysisName = s; }
+    public void setMethodName(String s) { msMethodName = s; }
+    public void setUnitSymbolEnglish(String s) { msUnitSymbolEnglish = s; }
+    public void setUnitNameEnglish(String s) { msUnitNameEnglish = s; }
+    public void setAnalysysShortNameEnglish(String s) { msAnalysysShortNameEnglish = s; }
+    public void setAnalysisNameEnglish(String s) { msAnalysisNameEnglish = s; }
+    public void setMethodNameEnglish(String s) { msMethodNameEnglish = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkAnalysisTypeId(int n) { mnFkAnalysisTypeId = n; }
@@ -64,6 +77,12 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
     public String getUnitName() { return msUnitName; }
     public String getAnalysysShortName() { return msAnalysysShortName; }
     public String getAnalysisName() { return msAnalysisName; }
+    public String getMethodName() { return msMethodName; }
+    public String getUnitSymbolEnglish() { return msUnitSymbolEnglish; }
+    public String getUnitNameEnglish() { return msUnitNameEnglish; }
+    public String getAnalysysShortNameEnglish() { return msAnalysysShortNameEnglish; }
+    public String getAnalysisNameEnglish() { return msAnalysisNameEnglish; }
+    public String getMethodNameEnglish() { return msMethodNameEnglish; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkAnalysisTypeId() { return mnFkAnalysisTypeId; }
@@ -97,6 +116,12 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
         msUnitName = "";
         msAnalysysShortName = "";
         msAnalysisName = "";
+        msMethodName = "";
+        msUnitSymbolEnglish = "";
+        msUnitNameEnglish = "";
+        msAnalysysShortNameEnglish = "";
+        msAnalysisNameEnglish = "";
+        msMethodNameEnglish = "";
         mbDeleted = false;
         mbSystem = false;
         mnFkAnalysisTypeId = 0;
@@ -150,6 +175,12 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
             msUnitName = resultSet.getString("unit_name");
             msAnalysysShortName = resultSet.getString("analysis_short_name");
             msAnalysisName = resultSet.getString("analysis_name");
+            msMethodName = resultSet.getString("method_name");
+            msUnitSymbolEnglish = resultSet.getString("unit_symbol_eng");
+            msUnitNameEnglish = resultSet.getString("unit_name_eng");
+            msAnalysysShortNameEnglish = resultSet.getString("analysis_short_name_eng");
+            msAnalysisNameEnglish = resultSet.getString("analysis_name_eng");
+            msMethodNameEnglish = resultSet.getString("method_name_eng");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkAnalysisTypeId = resultSet.getInt("fk_tp_analysis_id");
@@ -184,31 +215,43 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
                         "'" + msUnitName + "', " + 
                         "'" + msAnalysysShortName + "', " + 
                         "'" + msAnalysisName + "', " + 
+                        "'" + msMethodName + "', " + 
+                        "'" + msUnitSymbolEnglish + "', " + 
+                        "'" + msUnitNameEnglish + "', " + 
+                        "'" + msAnalysysShortNameEnglish + "', " + 
+                        "'" + msAnalysisNameEnglish + "', " + 
+                        "'" + msMethodNameEnglish + "', " + 
                         (mbDeleted ? 1 : 0) + ", " + 
                         (mbSystem ? 1 : 0) + ", " + 
                         mnFkAnalysisTypeId + ", " + 
                         mnFkUserInsertId + ", " + 
                         mnFkUserUpdateId + ", " + 
                         "NOW()" + ", " + 
-                        "NOW()" + " " + 
+                        "NOW()" + " " +             
                         ")";
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-//                    "id_analysis = " + mnPkAnalysisId + ", " +
+                    // "id_analysis = " + mnPkAnalysisId + ", " +
                     "unit_symbol = '" + msUnitSymbol + "', " +
                     "unit_name = '" + msUnitName + "', " +
                     "analysis_short_name = '" + msAnalysysShortName + "', " +
                     "analysis_name = '" + msAnalysisName + "', " +
+                    "method_name = '" + msMethodName + "', " +
+                    "unit_symbol_eng = '" + msUnitSymbolEnglish + "', " +
+                    "unit_name_eng = '" + msUnitNameEnglish + "', " +
+                    "analysis_short_name_eng = '" + msAnalysysShortNameEnglish + "', " +
+                    "analysis_name_eng = '" + msAnalysisNameEnglish + "', " +
+                    "method_name_eng = '" + msMethodNameEnglish + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-//                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    // "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_analysis_id = " + mnFkAnalysisTypeId + ", " +
-//                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    // "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-//                    "ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + " " +
+//                    "ts_usr_ins = " + "NOW()" + " " +
+                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
 
@@ -226,6 +269,12 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
         registry.setUnitName(this.getUnitName());
         registry.setAnalysysShortName(this.getAnalysysShortName());
         registry.setAnalysisName(this.getAnalysisName());
+        registry.setMethodName(this.getMethodName());
+        registry.setUnitSymbolEnglish(this.getUnitSymbolEnglish());
+        registry.setUnitNameEnglish(this.getUnitNameEnglish());
+        registry.setAnalysysShortNameEnglish(this.getAnalysysShortNameEnglish());
+        registry.setAnalysisNameEnglish(this.getAnalysisNameEnglish());
+        registry.setMethodNameEnglish(this.getMethodNameEnglish());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkAnalysisTypeId(this.getFkAnalysisTypeId());

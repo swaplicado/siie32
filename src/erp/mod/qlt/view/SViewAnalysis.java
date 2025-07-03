@@ -55,6 +55,12 @@ public class SViewAnalysis extends SGridPaneView implements ActionListener {
                 + "v.analysis_name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.unit_symbol, "
                 + "v.unit_name, "
+                + "v.method_name, "
+                + "v.unit_symbol_eng, "
+                + "v.unit_name_eng, "
+                + "v.analysis_short_name_eng, "
+                + "v.analysis_name_eng, "
+                + "v.method_name_eng, "
                 + "CONCAT(ta.code, '-', ta.name) AS analysis_type, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -78,10 +84,16 @@ public class SViewAnalysis extends SGridPaneView implements ActionListener {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, "Nombre corto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, SDbConsts.FIELD_CODE, "Nombre corto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Análisis"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "v.unit_symbol", "Unidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "v.unit_name", "Nombre unidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.unit_name", "Nombre unidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "method_name", "Método"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "analysis_short_name_eng", "Nombre corto inglés"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "analysis_name_eng", "Análisis inglés"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "v.unit_symbol_eng", "Unidad inglés"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.unit_name_eng", "Nombre unidad inglés"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "method_name_eng", "Método inglés"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "analysis_type", "Tipo análisis"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

@@ -26,13 +26,16 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmQlt;
     private javax.swing.JMenuItem jmiQltLot;
+    private javax.swing.JMenuItem jmiQltCoA;
     private javax.swing.JMenu jmQltLab;
     private javax.swing.JMenuItem jmQltLabAnalysis;
+    private javax.swing.JMenuItem jmQltDatasheetTemplates;
     private javax.swing.JMenuItem jmQltDpsAnalysis;
     private javax.swing.JMenuItem jmQltDpsAnalysisDetail;
     private javax.swing.JMenu jmQltCfg;
-    private javax.swing.JMenuItem jmQltItemsVsAnalysisDetail;
-    private javax.swing.JMenuItem jmQltItemsVsAnalysis;
+//    private javax.swing.JMenuItem jmQltItemsVsAnalysisDetail;
+//    private javax.swing.JMenuItem jmQltItemsVsAnalysis;
+    private javax.swing.JMenuItem jmQltDatasheetTemplateLink;
     
     private SFormAnalysisItem moFormAnalysisItem;
     
@@ -46,34 +49,46 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
     private void initComponents() {
         jmQlt = new JMenu("Calidad");
         jmiQltLot = new JMenuItem("Lotes aprobados");
+        jmiQltCoA = new JMenuItem("Generar certificado");
         jmQltLab = new JMenu("Laboratorio");
         jmQltLabAnalysis = new JMenuItem("Análisis de laboratorio");
+        jmQltDatasheetTemplates = new JMenuItem("Fichas técnicas");
         jmQltDpsAnalysis = new JMenuItem("Documentos vs análisis");
         jmQltDpsAnalysisDetail = new JMenuItem("Documentos vs análisis a detalle");
         jmQltCfg = new JMenu("Configuración");
-        jmQltItemsVsAnalysis = new JMenuItem("Items vs análisis");
-        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
+        jmQltDatasheetTemplateLink = new JMenuItem("Fichas técnicas e ítems");
+//        jmQltItemsVsAnalysis = new JMenuItem("Items vs análisis");
+//        jmQltItemsVsAnalysisDetail = new JMenuItem("Ítems vs análisis a detalle");
         
         jmQlt.add(jmiQltLot);
+        jmQlt.add(jmiQltCoA);
         jmQltLab.add(jmQltLabAnalysis);
+        jmQltLab.add(jmQltDatasheetTemplates);
         jmQltLab.add(jmQltDpsAnalysis);
         jmQltLab.add(jmQltDpsAnalysisDetail);
-        jmQltCfg.add(jmQltItemsVsAnalysis);
-        jmQltCfg.add(jmQltItemsVsAnalysisDetail);
+//        jmQltCfg.add(jmQltItemsVsAnalysis);
+//        jmQltCfg.add(jmQltItemsVsAnalysisDetail);
+        jmQltCfg.add(jmQltDatasheetTemplateLink);
 
         jmiQltLot.setEnabled(true);
+        jmiQltCoA.setEnabled(true);
         jmQltLabAnalysis.setEnabled(true);
+        jmQltDatasheetTemplates.setEnabled(true);
         jmQltDpsAnalysis.setEnabled(true);
         jmQltDpsAnalysisDetail.setEnabled(true);
-        jmQltItemsVsAnalysis.setEnabled(true);
-        jmQltItemsVsAnalysisDetail.setEnabled(true);
+//        jmQltItemsVsAnalysis.setEnabled(true);
+//        jmQltItemsVsAnalysisDetail.setEnabled(true);
+        jmQltDatasheetTemplateLink.setEnabled(true);
 
         jmiQltLot.addActionListener(this);
+        jmiQltCoA.addActionListener(this);
         jmQltLabAnalysis.addActionListener(this);
+        jmQltDatasheetTemplates.addActionListener(this);
         jmQltDpsAnalysis.addActionListener(this);
         jmQltDpsAnalysisDetail.addActionListener(this);
-        jmQltItemsVsAnalysis.addActionListener(this);
-        jmQltItemsVsAnalysisDetail.addActionListener(this);
+//        jmQltItemsVsAnalysis.addActionListener(this);
+//        jmQltItemsVsAnalysisDetail.addActionListener(this);
+        jmQltDatasheetTemplateLink.addActionListener(this);
         
         jmQlt.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
         jmQltLab.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_QLT_LOT_APR).HasRight);
@@ -145,7 +160,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
 
                 case SDataConstants.QLT_ANALYSIS_ITEM:
                     oViewClass = erp.mqlt.view.SViewAnalysisItem.class;
-                    sViewTitle = "Análisis vs ítems a detalle";
+                    sViewTitle = "Fichas técnicas de ítems a detalle";
                     break;
                     
                 case SDataConstants.QLTX_DPS_ETY_ANALYSIS:
@@ -155,7 +170,7 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
                     
                 case SDataConstants.QLTX_ITEM_ANALYSIS:
                     oViewClass = erp.mqlt.view.SViewItemAnalysis.class;
-                    sViewTitle = "Items configurados";
+                    sViewTitle = "Fichas técnicas de ítems";
                     break;
                     
                 case SDataConstants.QLTX_DOCUMENT_ANALYSIS:
@@ -259,15 +274,24 @@ public class SGuiModuleQlt extends erp.lib.gui.SGuiModule implements java.awt.ev
             if (item == jmiQltLot) {
                 miClient.getSession().showView(SModConsts.QLT_LOT_APR, SLibConsts.UNDEFINED, null);
             }
+            if (item == jmiQltCoA) {
+                miClient.getSession().showView(SModConsts.QLTX_QLT_DPS_ETY, SLibConsts.UNDEFINED, null);
+            }
             else if (item == jmQltLabAnalysis) {
                 miClient.getSession().showView(SModConsts.QLT_ANALYSIS, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmQltItemsVsAnalysis) {
-                showView(SDataConstants.QLTX_ITEM_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            else if (item == jmQltDatasheetTemplates) {
+                miClient.getSession().showView(SModConsts.QLT_DATASHEET_TEMPLATE, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmQltItemsVsAnalysisDetail) {
-                showView(SDataConstants.QLT_ANALYSIS_ITEM, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+            else if (item == jmQltDatasheetTemplateLink) {
+                miClient.getSession().showView(SModConsts.QLT_DATASHEET_TEMPLATE_LINK, SLibConsts.UNDEFINED, null);
             }
+//            else if (item == jmQltItemsVsAnalysis) {
+//                showView(SDataConstants.QLTX_ITEM_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+//            }
+//            else if (item == jmQltItemsVsAnalysisDetail) {
+//                showView(SDataConstants.QLT_ANALYSIS_ITEM, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
+//            }
             else if (item == jmQltDpsAnalysis) {
                 showView(SDataConstants.QLTX_DOCUMENT_ANALYSIS, SDataConstants.UNDEFINED, SDataConstants.UNDEFINED);
             }

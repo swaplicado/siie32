@@ -45,7 +45,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaterialRequest;
-import erp.mod.trn.db.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogEntryRow;

@@ -5,13 +5,20 @@
 
 package erp.mod;
 
+import erp.mod.qlt.db.SDbDatasheetTemplate;
+import erp.mod.qlt.db.SDbDatasheetTemplateLink;
 import erp.mod.qlt.db.SDbLotApproved;
 import erp.mod.qlt.db.SDbQltyAnalysis;
 import erp.mod.qlt.db.SDbQltyAnalysisType;
 import erp.mod.qlt.form.SFormAnalysis;
+import erp.mod.qlt.form.SFormDatasheetTemplate;
+import erp.mod.qlt.form.SFormDatasheetTemplateLink;
 import erp.mod.qlt.form.SFormQltLotApproved;
 import erp.mod.qlt.view.SViewAnalysis;
+import erp.mod.qlt.view.SViewDatasheetTemplate;
+import erp.mod.qlt.view.SViewDatasheetTemplateLink;
 import erp.mod.qlt.view.SViewQltLotApproved;
+import erp.mod.qlt.view.SViewQualityCoADpsEntry;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
@@ -38,6 +45,8 @@ public class SModuleQlt extends SGuiModule {
     
     private SFormQltLotApproved moFormQualityLot;
     private SFormAnalysis moFormAnalysis;
+    private SFormDatasheetTemplate moFormDataSheetTemplate;
+    private SFormDatasheetTemplateLink moFormDataSheetTemplateLink;
 
     public SModuleQlt(SGuiClient client) {
         super(client, SModConsts.MOD_QLT_N, SLibConsts.UNDEFINED);
@@ -62,6 +71,12 @@ public class SModuleQlt extends SGuiModule {
                 break;
             case SModConsts.QLT_ANALYSIS:
                 registry = new SDbQltyAnalysis();
+                break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE:
+                registry = new SDbDatasheetTemplate();
+                break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE_LINK:
+                registry = new SDbDatasheetTemplateLink();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -88,6 +103,12 @@ public class SModuleQlt extends SGuiModule {
                         + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
                         + "ORDER BY analysis_name ASC ";
                 break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE:
+                settings = new SGuiCatalogueSettings("Fichas técnicas", 1);
+                sql = "SELECT id_datasheet_template AS " + SDbConsts.FIELD_ID + "1, CONCAT(template_name,' - ',template_standard,' - ',template_version)  AS " + SDbConsts.FIELD_ITEM + " "
+                        + " FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
+                        + "ORDER BY template_name ASC ";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -107,8 +128,17 @@ public class SModuleQlt extends SGuiModule {
             case SModConsts.QLT_LOT_APR:
                 view = new SViewQltLotApproved(miClient, "Lotes aprobados");
                 break;
+            case SModConsts.QLTX_QLT_DPS_ETY:
+                view = new SViewQualityCoADpsEntry(miClient, "Facturas y certificados");
+                break;
             case SModConsts.QLT_ANALYSIS:
                 view = new SViewAnalysis(miClient, "Análisis de laboratorio");
+                break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE:
+                view = new SViewDatasheetTemplate(miClient, "Fichas ténicas");
+                break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE_LINK:
+                view = new SViewDatasheetTemplateLink(miClient, "Fichas ténicas e ítems");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -178,6 +208,14 @@ public class SModuleQlt extends SGuiModule {
                 if (moFormAnalysis == null) moFormAnalysis = new SFormAnalysis(miClient, "Análisis de laboratorio");
                 form = moFormAnalysis;
                 break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE:
+                if (moFormDataSheetTemplate == null) moFormDataSheetTemplate = new SFormDatasheetTemplate(miClient, "Ficha técnica");
+                form = moFormDataSheetTemplate;
+                break;
+            case SModConsts.QLT_DATASHEET_TEMPLATE_LINK:
+                if (moFormDataSheetTemplateLink == null) moFormDataSheetTemplateLink = new SFormDatasheetTemplateLink(miClient, "Ficha técnica e ítem");
+                form = moFormDataSheetTemplateLink;
+                break;
             
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -188,6 +226,16 @@ public class SModuleQlt extends SGuiModule {
 
     @Override
     public SGuiReport getReport(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SGuiReport guiReport = null;
+
+        switch (type) {
+            case SModConsts.QLTR_COA_RESULT:
+                guiReport = new SGuiReport("reps/qlt_coa.jasper", "CoA");
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        return guiReport;
     }
 }

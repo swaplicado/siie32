@@ -3950,8 +3950,13 @@ public abstract class STrnUtilities {
         diogEntry.setPkEntryId(SLibConstants.UNDEFINED);
         diogEntry.setQuantity(stockMove.getQuantity());
         if (! withCost) {
-            diogEntry.setValueUnitary(0);
-            diogEntry.setValue(0);
+            if (stockMove.getQuantity() == 0d) {
+                diogEntry.setValueUnitary(0d);
+            }
+            else {
+                diogEntry.setValueUnitary(stockMove.getValue() / stockMove.getQuantity());
+            }
+            diogEntry.setValue(stockMove.getValue());
         }
         else {
             diogEntry.setValueUnitary(stockMove.getUnitaryCost());
@@ -4025,7 +4030,7 @@ public abstract class STrnUtilities {
         iog.setNumberSeries(numberSeries);
         iog.setNumber("");
         if (! withCost) {
-            iog.setValue_r(0d);
+            iog.setValue_r(dTotalValue);
             iog.setCostAsigned(0);
         }
         else {

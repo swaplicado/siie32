@@ -1,12 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Para cambiar esta licencia, consulte el archivo LICENSE en la raíz del proyecto.
+ * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
+ * y abra la plantilla en el editor.
  */
 package erp.mod.trn.db;
 
+import erp.mod.trn.utils.SStockValuationLogUtils;
+import erp.mod.trn.utils.SStockValuationAdjustsUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationRecordUtils;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
+import erp.mtrn.data.SDataDiog;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -27,13 +31,19 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Clase que representa la valuación de inventario.
+ * Permite calcular, guardar, leer y eliminar valoraciones de inventario,
+ * así como agrupar y calcular costos de movimientos de inventario.
+ * 
  * @author Edwin Carmona
  */
 public class SDbStockValuation extends SDbRegistryUser {
     
+    // Llave primaria de la valuación de inventario
     protected int mnPkStockValuationId;
+    // Fecha de inicio de la valuación
     protected Date mtDateStart;
+    // Fecha de fin de la valuación
     protected Date mtDateEnd;
     //protected boolean mbDeleted;
     //protected int mnFkUserInsertId;
@@ -41,22 +51,28 @@ public class SDbStockValuation extends SDbRegistryUser {
     //protected Date mtTsUserInsert;
     //protected Date mtTsUserUpdate;
     
+    // Llave auxiliar para la póliza contable asociada
     protected Object[] moAuxRecordPk;
+    // Bandera auxiliar para eliminar todas las valoraciones
     protected boolean mbAuxIsAllDelete;
+    // Bandera auxiliar para insertar todas las valoraciones
     protected boolean mbAuxIsAllInsert;
 
+    /**
+     * Constructor de la clase.
+     */
     public SDbStockValuation() {
         super(SModConsts.TRN_STK_VAL);
     }
     
     /**
-     * The function computes the start date based on the end date and some conditions.
+     * Calcula la fecha de inicio de la valuación con base en la fecha de corte y ciertas condiciones.
      * 
-     * @param session The session parameter is an object of type SGuiSession, which is used to
-     * establish a connection to the database and execute SQL queries.
-     * @param cutoffDate
-     * @return 
-     * @throws java.sql.SQLException 
+     * @param session Sesión de la GUI para ejecutar consultas SQL.
+     * @param cutoffDate Fecha de corte para la valuación.
+     * @return Fecha de inicio calculada.
+     * @throws java.sql.SQLException
+     * @throws java.lang.Exception 
      */
     public static Date computeStartDate(SGuiSession session, Date cutoffDate) throws SQLException, Exception {
         ResultSet resultSet;
@@ -69,36 +85,36 @@ public class SDbStockValuation extends SDbRegistryUser {
                 + "AND YEAR(dt_end) = " + (new SimpleDateFormat("yyyy")).format(cutoffDate) + " "
                 + "ORDER BY dt_end DESC";
         
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(msSql);
-        if (resultSet.next()) {
-            tDateStart = resultSet.getDate(1);
-        }
-        else {
-            Calendar cal = Calendar.getInstance();
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (res.next()) {
+                tDateStart = res.getDate(1);
+            }
+            else {
+                Calendar cal = Calendar.getInstance();
 
-            // Establecer la fecha en el objeto Calendar
-            cal.setTime(cutoffDate);
+                // Establecer la fecha en el objeto Calendar
+                cal.setTime(cutoffDate);
 
-            // Establecer el mes y el día del primer día del año
-            cal.set(Calendar.MONTH, Calendar.JANUARY);
-            cal.set(Calendar.DAY_OF_MONTH, 1);
+                // Establecer el mes y el día del primer día del año
+                cal.set(Calendar.MONTH, Calendar.JANUARY);
+                cal.set(Calendar.DAY_OF_MONTH, 1);
 
-            // Obtener el primer día del año como objeto Date
-            tDateStart = cal.getTime();
+                // Obtener el primer día del año como objeto Date
+                tDateStart = cal.getTime();
+            }
         }
 
         return tDateStart;
     }
     
     /**
-     * The function checks if there are any non-deleted stock valuations after a given end date.
+     * Verifica si existen valoraciones de inventario no eliminadas posteriores a una fecha dada.
      * 
-     * @param session The session parameter is an instance of the SGuiSession class, which represents
-     * the user's session in the application. It is used to access the database connection and execute
-     * SQL queries.
-     * @param dtEnd The dtEnd parameter is a Date object that represents the end date for the
-     * valuation.
-     * @return The method is returning a boolean value.
+     * @param session Sesión de la GUI para ejecutar consultas SQL.
+     * @param dtEnd Fecha de fin de la valuación.
+     * @return true si se puede eliminar la valuación, false en caso contrario.
+     * @throws java.sql.SQLException 
      */
     private boolean canDeleteValuation(SGuiSession session, final Date dtEnd) throws SQLException {
         String sql = "SELECT id_stk_val FROM " + 
@@ -107,14 +123,21 @@ public class SDbStockValuation extends SDbRegistryUser {
                 + "AND dt_sta > '" + SLibUtils.DbmsDateFormatDate.format(dtEnd) + "' "
                 + "AND year(dt_sta) = year('" + SLibUtils.DbmsDateFormatDate.format(dtEnd) + "');";
         
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        
-        return ! res.next();
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(sql)) {
+                boolean canDelete = ! res.next();
+            return canDelete;
+        }
     }
     
-    // Método para agrupar y sumar los valores mdQuantityConsumption y mdCost_r
+    /**
+     * Agrupa y suma los valores de cantidad consumida y costo real de los movimientos de inventario.
+     * 
+     * @param stockValuations Lista de movimientos de valuación de inventario.
+     * @return Lista agrupada y sumada de movimientos de valuación.
+     */
     private List<SDbStockValuationMvt> groupAndSumStockValuations(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por mtDateMove, mnFkItemId, mnFkUnitId, mnFkMaterialRequestItemRef_n, mnFkStockValuationId
+        // Agrupar por fecha de movimiento, id de ítem, id de unidad, id de sucursal, id de almacén y id de valuación
         Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
                 .collect(Collectors.groupingBy(valuation ->
                         valuation.getDateMove() + "_" +
@@ -129,7 +152,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 .map(group -> {
                     SDbStockValuationMvt summedValuation = new SDbStockValuationMvt();
 
-                    // Sumar mdQuantityConsumption y mdCost_r
+                    // Sumar cantidad consumida y costo real
                     double sumQuantityConsumption = group.stream()
                             .mapToDouble(SDbStockValuationMvt::getQuantityMovement)
                             .sum();
@@ -139,9 +162,9 @@ public class SDbStockValuation extends SDbRegistryUser {
 
                     // Configurar el nuevo objeto SDbStockValuationMvt
                     summedValuation.setDateMove(group.get(0).getDateMove());  // Tomar la fecha del primer elemento del grupo
-                    summedValuation.setFkItemId(group.get(0).getFkItemId());  // Tomar el ID del item del primer elemento del grupo
+                    summedValuation.setFkItemId(group.get(0).getFkItemId());  // Tomar el ID del ítem del primer elemento del grupo
                     summedValuation.setFkUnitId(group.get(0).getFkUnitId());  // Tomar el ID de la unidad del primer elemento del grupo
-                    summedValuation.setFkStockValuationId(group.get(0).getFkStockValuationId());  // Tomar el ID de la valoración del stock del primer elemento del grupo
+                    summedValuation.setFkStockValuationId(group.get(0).getFkStockValuationId());  // Tomar el ID de la valuación del primer elemento del grupo
                     summedValuation.setQuantityMovement(sumQuantityConsumption);
                     summedValuation.setCost_r(SLibUtils.roundAmount(sumCostR));
                     summedValuation.setFkCompanyBranchId(group.get(0).getFkCompanyBranchId());
@@ -154,27 +177,25 @@ public class SDbStockValuation extends SDbRegistryUser {
     
     
     /**
-     * The function takes a list of SDbStockValuationMvt objects, groups them based on certain
-     * criteria, and returns a new list of SDbStockValuationMvt objects with the average cost unitary
-     * value for each group.
+     * Agrupa los movimientos por DIOG (documento de inventario) y calcula el costo unitario promedio.
      * 
-     * @param stockValuations An ArrayList of SDbStockValuationMvt objects.
-     * @return The method is returning a List of SDbStockValuationMvt objects.
+     * @param stockValuations Lista de movimientos de valuación de inventario.
+     * @return Lista agrupada con el costo unitario promedio por grupo.
      */
     private List<SDbStockValuationMvt> groupByDiogEtyAndAverage(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por mtDateMove, mnFkItemId, mnFkUnitId, mnFkMaterialRequestItemRef_n, mnFkStockValuationId
+        // Agrupar por año, documento y entrada de DIOG
         Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
                 .collect(Collectors.groupingBy(valuation ->
                         valuation.getFkDiogYearOutId_n() + "_" +
                         valuation.getFkDiogDocOutId_n() + "_" +
                         valuation.getFkDiogEntryOutId_n()));
 
-        // Crear nuevos objetos SDbStockValuationMvt con los valores sumados
+        // Crear nuevos objetos SDbStockValuationMvt con el costo unitario promedio
         return groupedValuations.values().stream()
                 .map(group -> {
                     SDbStockValuationMvt averaged = new SDbStockValuationMvt();
 
-                    // Sumar mdQuantityConsumption y mdCost_r
+                    // Calcular el costo unitario promedio
                     OptionalDouble avCostUnitary = group.stream()
                             .mapToDouble(SDbStockValuationMvt::getCostUnitary)
                             .average();
@@ -190,21 +211,26 @@ public class SDbStockValuation extends SDbRegistryUser {
                 .collect(Collectors.toList());
     }
     
-    
+    /**
+     * Agrupa los movimientos por DIOG y calcula el costo unitario como suma de costos entre suma de cantidades.
+     * 
+     * @param stockValuations Lista de movimientos de valuación de inventario.
+     * @return Lista agrupada con el costo unitario calculado por grupo.
+     */
     private List<SDbStockValuationMvt> groupByDiogEtyAndCalculateCost(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por mtDateMove, mnFkItemId, mnFkUnitId, mnFkMaterialRequestItemRef_n, mnFkStockValuationId
+        // Agrupar por año, documento y entrada de DIOG
         Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
                 .collect(Collectors.groupingBy(valuation ->
                         valuation.getFkDiogYearOutId_n() + "_" +
                         valuation.getFkDiogDocOutId_n() + "_" +
                         valuation.getFkDiogEntryOutId_n()));
 
-        // Crear nuevos objetos SDbStockValuationMvt con los valores sumados
+        // Crear nuevos objetos SDbStockValuationMvt con el costo unitario calculado
         return groupedValuations.values().stream()
                 .map(group -> {
                     SDbStockValuationMvt averaged = new SDbStockValuationMvt();
 
-                    // Sumar mdQuantityConsumption y mdCost_r
+                    // Sumar costo real y cantidad
                     double costR = group.stream()
                             .mapToDouble(SDbStockValuationMvt::getCost_r)
                             .sum();
@@ -223,6 +249,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 .collect(Collectors.toList());
     }
     
+    // Métodos setter y getter para los atributos de la clase
     public void setPkStockValuationId(int n) { mnPkStockValuationId = n; }
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
@@ -297,9 +324,11 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnPkStockValuationId = 0;
 
         msSql = "SELECT COALESCE(MAX(id_stk_val), 0) + 1 FROM " + getSqlTable() + " ";
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (resultSet.next()) {
-            mnPkStockValuationId = resultSet.getInt(1);
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (res.next()) {
+                mnPkStockValuationId = res.getInt(1);
+            }
         }
     }
 
@@ -311,40 +340,53 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.READ_ERROR;
 
         msSql = "SELECT * " + getSqlFromWhere(pk);
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
-        }
-        else {
-            mnPkStockValuationId = resultSet.getInt("id_stk_val");
-            mtDateStart = resultSet.getDate("dt_sta");
-            mtDateEnd = resultSet.getDate("dt_end");
-            mbDeleted = resultSet.getBoolean("b_del");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
-            mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-            
-            msSql = "SELECT * FROM trn_stk_val_acc WHERE fk_stk_val = " + mnPkStockValuationId + " "
-                    + "AND NOT b_del LIMIT 1;";
-            
-            ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(msSql);
-            if (res.next()) {
-                moAuxRecordPk = new Object[] {
-                                                res.getInt("fk_fin_rec_year"),
-                                                res.getInt("fk_fin_rec_per"),
-                                                res.getInt("fk_fin_rec_bkc"),
-                                                res.getString("fk_fin_rec_tp_rec"),
-                                                res.getInt("fk_fin_rec_num")
-                                            };
-
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (!res.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
-            mbRegistryNew = false;
+            else {
+                mnPkStockValuationId = res.getInt("id_stk_val");
+                mtDateStart = res.getDate("dt_sta");
+                mtDateEnd = res.getDate("dt_end");
+                mbDeleted = res.getBoolean("b_del");
+                mnFkUserInsertId = res.getInt("fk_usr_ins");
+                mnFkUserUpdateId = res.getInt("fk_usr_upd");
+                mtTsUserInsert = res.getTimestamp("ts_usr_ins");
+                mtTsUserUpdate = res.getTimestamp("ts_usr_upd");
+                
+                msSql = "SELECT * FROM trn_stk_val_acc WHERE fk_stk_val = " + mnPkStockValuationId + " "
+                        + "AND NOT b_del LIMIT 1;";
+                
+                try (java.sql.Statement st2 = session.getStatement().getConnection().createStatement();
+                     ResultSet res2 = st2.executeQuery(msSql)) {
+                    if (res2.next()) {
+                        moAuxRecordPk = new Object[] {
+                                                    res2.getInt("fk_fin_rec_year_n"),
+                                                    res2.getInt("fk_fin_rec_per_n"),
+                                                    res2.getInt("fk_fin_rec_bkc_n"),
+                                                    res2.getString("fk_fin_rec_tp_rec_n"),
+                                                    res2.getInt("fk_fin_rec_num_n")
+                                                };
+
+                    }
+                }
+                mbRegistryNew = false;
+            }
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
     }
 
+    /**
+     * Guarda la valuación de inventario en la base de datos.
+     * Si es un registro nuevo, lo inserta; si no, lo actualiza.
+     * Además, realiza los procesos de creación de movimientos, consumos, agrupaciones, ajustes y generación de pólizas.
+     * 
+     * @param session Sesión de la GUI para ejecutar consultas SQL.
+     * @throws SQLException
+     * @throws Exception
+     */
     @Override
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
@@ -390,10 +432,14 @@ public class SDbStockValuation extends SDbRegistryUser {
             
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
+                // Crear movimientos de ajuste de inventario
+                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.createStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Creando entries...");
-                SStockValuationUtils.createEntries(session, SModSysConsts.TRNS_CT_IOG_IN, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                // Crear entradas de inventario
+                SStockValuationUtils.createValuationEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
 
-                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, SModSysConsts.TRNS_CT_IOG_OUT, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                // Consumir salidas de inventario
+                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Guardando consumos...");
                 for (SDbStockValuationMvt consumption : lConsumptions) {
                     consumption.save(session);
@@ -402,23 +448,26 @@ public class SDbStockValuation extends SDbRegistryUser {
                     }
                 }
                 
-                // The above code is grouping a list of consumptions and then updating the cost of
-                // stock rows based on the grouped data. It first creates an empty ArrayList called
-                // lGrouped. Then, it adds the grouped data to the lGrouped list using the
-                // groupByDiogEtyAndCalculateCost method. Finally, it iterates over each row in the lGrouped
-                // list and updates the cost of the stock row using the updateTrnStockRowCostByDiog
-                // method.
                 System.out.println("Agrupando consumos...");
                 ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
                 lGrouped.addAll(groupByDiogEtyAndCalculateCost(lConsumptions));
                 System.out.println("Actualizando costos en stock...");
                 for (SDbStockValuationMvt oRow : lGrouped) {
-                     SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
+                    SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
                                             oRow.getFkDiogDocOutId_n(), 
                                             oRow.getFkDiogEntryOutId_n(), 
                                             oRow.getCostUnitary(),
                                             SStockValuationUtils.CREDIT);
                 }
+                lConsumptions.addAll(0, lMvtAdjs);
+                System.out.println("Ajustando inventario...");
+                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateStart, lMvtAdjs);
+                SDbStockValuationDiogAdjust oValDiogAdj;
+                for (SDataDiog oDiog : lDiogs) {
+                    oValDiogAdj = new SDbStockValuationDiogAdjust(mnPkStockValuationId, oDiog.getPkYearId(), oDiog.getPkDocId());
+                    oValDiogAdj.save(session);
+                }
+                
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
                 System.out.println("Terminado.");
@@ -444,8 +493,15 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
     
+    /**
+     * Elimina (marca como eliminado) la valuación de inventario.
+     * Solo elimina si no existen valoraciones posteriores o si la bandera auxiliar lo permite.
+     * 
+     * @param session Sesión de la GUI para ejecutar consultas SQL.
+     * @throws SQLException 
+     */
     @Override
-    public void delete(final SGuiSession session) throws SQLException {
+    public void delete(final SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
@@ -465,6 +521,9 @@ public class SDbStockValuation extends SDbRegistryUser {
                 SStockValuationUtils.deleteValuation(session, mnPkStockValuationId);
                 session.getStatement().execute(msSql);
             }
+            else {
+                throw new Exception("No se puede eliminar esta valuación, existen valuaciones posteriores.");
+            }
 
             session.getStatement().getConnection().commit();
         }
@@ -472,11 +531,21 @@ public class SDbStockValuation extends SDbRegistryUser {
             session.getStatement().getConnection().rollback();
             Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
             throw new SQLException(ex);
+        } catch (Exception ex) {
+            session.getStatement().getConnection().rollback();
+            Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Exception(ex);
         }
         
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
+    /**
+     * Crea una copia del registro de valuación de inventario.
+     * 
+     * @return Copia del registro.
+     * @throws CloneNotSupportedException 
+     */
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
         SDbStockValuation registry = new SDbStockValuation();
