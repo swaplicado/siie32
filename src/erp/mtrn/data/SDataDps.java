@@ -5097,8 +5097,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         /**
          * Sección de envío de correo de parámetros de calidad en contratos de venta
          */
-        String qualityBody = "";
         if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+            String qualityBody = "";
             SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
             qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                             mvDbmsDpsEntries,
@@ -5129,7 +5129,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     SMailSender sender = null;
                     Object images = null;
                     Date sentDate = null;
-                    STrnUtilities.sendMail(client, mmsType, qualityBody, "Análisis de calidad. Folio: " + getDpsNumber(), toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                    STrnUtilities.sendMail(client, mmsType, qualityBody, 
+                                    (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                    toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
                     toRecipients.clear();
                 }
                 catch (Exception ex) {

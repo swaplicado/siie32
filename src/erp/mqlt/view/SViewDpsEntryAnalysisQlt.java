@@ -34,7 +34,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
         
         addTaskBarUpperComponent(moTabFilterDeleted);
         
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[28];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[24];
 
         int i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo Doc.", STableConstants.WIDTH_CODE_DOC);
@@ -50,14 +50,10 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_symbol", "Un. ana.", STableConstants.WIDTH_UNIT_SYMBOL);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "qa.unit_name", "Nom. un. ana.", STableConstants.WIDTH_ITEM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_min", "Aplica mín", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ai.min_value", "Mínimo normativo", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "v.min_value", "Mínimo", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_max", "Aplica máx", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ai.max_value", "Máximo normativo", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "v.max_value", "Máximo", STableConstants.WIDTH_QUANTITY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_required", "Requerido", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_lim_mod", "Param mod", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_req_mod", "Req. mod", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_req", "Requerido", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "usr_ins", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "v.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -124,15 +120,11 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "    u.symbol, "
                 + "    v.b_min, "
                 + "    v.b_max, "
-                + "    v.b_required, "
+                + "    v.b_req, "
                 + "    v.b_max, "
-                + "    ai.min_value, "
                 + "    v.min_value, "
-                + "    ai.max_value, "
                 + "    v.max_value, "
                 + "    v.sort_pos, "
-                + "    v.b_lim_mod, "
-                + "    v.b_req_mod, "
                 + "    v.b_del, "
                 + "    v.ts_new, "
                 + "    v.ts_edit, "
@@ -159,9 +151,9 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "        INNER JOIN "
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.ITMU_UNIT) + " u ON ety.fid_unit = u.id_unit "
                 + "        INNER JOIN "
-                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " v ON d.id_year = v.fid_dps_year_n "
-                + "        AND d.id_doc = v.fid_dps_doc_n "
-                + "        AND ety.id_ety = v.fid_dps_ety_n "
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " v ON d.id_year = v.fid_dps_year "
+                + "        AND d.id_doc = v.fid_dps_doc "
+                + "        AND ety.id_ety = v.fid_dps_ety "
                 + "         INNER JOIN " 
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps "
                 + "         AND d.fid_cl_dps = dt.id_cl_dps "
@@ -170,10 +162,7 @@ public class SViewDpsEntryAnalysisQlt extends erp.lib.table.STableTab {
                 + "         AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1] + " "
                 + "         AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " "
                 + "        INNER JOIN "
-                + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS_ITEM) + " ai ON v.fid_analysis_id = ai.id_analysis "
-                + "        AND v.fid_item_id = ai.id_item "
-                + "        INNER JOIN "
-                + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " qa ON v.fid_analysis_id = qa.id_analysis "
+                + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " qa ON v.fid_analysis = qa.id_analysis "
                 + "        INNER JOIN "
                 + "    " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " qta ON qa.fk_tp_analysis_id = qta.id_tp_analysis "
                 + "        INNER JOIN "

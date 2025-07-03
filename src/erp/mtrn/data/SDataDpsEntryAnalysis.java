@@ -9,8 +9,10 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.data.SDataConstants;
+import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.util.Date;
+import sa.gui.util.SUtilConsts;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -21,19 +23,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
 
     protected int mnPkEntryAnalysisId;
     protected int mnSortPosition;
+    protected String msOriginalSpecification;
+    protected String msSpecification;
+    protected String msOriginalMinValue;
+    protected String msOriginalMaxValue;
     protected String msMinValue;
     protected String msMaxValue;
     protected boolean mbIsMin;
     protected boolean mbIsMax;
     protected boolean mbIsRequired;
-    protected boolean mbIsLimitModified;
-    protected boolean mbIsRequiredModified;
+    protected boolean mbIsForDps;
+    protected boolean mbIsForCoA;
+    protected boolean mbWasAdded;
     protected boolean mbIsDeleted;
-    protected int mnFkDpsYearId_n;
-    protected int mnFkDpsDocId_n;
-    protected int mnFkDpsEtyId_n;
+    protected int mnFkDpsYearId;
+    protected int mnFkDpsDocId;
+    protected int mnFkDpsEtyId;
     protected int mnFkAnalysisId;
     protected int mnFkItemId;
+    protected int mnFkDatasheetTemplateId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -42,6 +50,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     protected java.util.Date mtUserDeleteTs;
 
     protected boolean mbRowEdited;
+    protected int mnAuxLogTypeDeliveryId_n;
     protected boolean mbAuxNewVersion;
     protected String msAnalysisName;
     protected String msAnalysisUnit;
@@ -54,19 +63,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
 
     public void setPkEntryAnalysisId(int n) { mnPkEntryAnalysisId = n; }
     public void setSortPosition(int n) { mnSortPosition = n; }
+    public void setOriginalSpecification(String s) { msOriginalSpecification = s; }
+    public void setSpecification(String s) { msSpecification = s; }
+    public void setOriginalMinValue(String s) { msOriginalMinValue = s; }
+    public void setOriginalMaxValue(String s) { msOriginalMaxValue = s; }
     public void setMinValue(String s) { msMinValue = s; }
     public void setMaxValue(String s) { msMaxValue = s; }
     public void setIsMin(boolean b) { mbIsMin = b; }
     public void setIsMax(boolean b) { mbIsMax = b; }
     public void setIsRequired(boolean b) { mbIsRequired = b; }
-    public void setIsLimitModified(boolean b) { mbIsLimitModified = b; }
-    public void setIsRequiredModified(boolean b) { mbIsRequiredModified = b; }
+    public void setIsForDps(boolean b) { mbIsForDps = b; }
+    public void setIsForCoA(boolean b) { mbIsForCoA = b; }
+    public void setWasAdded(boolean b) { mbWasAdded = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
-    public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
-    public void setFkDpsDocId_n(int n) { mnFkDpsDocId_n = n; }
-    public void setFkDpsEtyId_n(int n) { mnFkDpsEtyId_n = n; }
+    public void setFkDpsYearId(int n) { mnFkDpsYearId = n; }
+    public void setFkDpsDocId(int n) { mnFkDpsDocId = n; }
+    public void setFkDpsEtyId(int n) { mnFkDpsEtyId = n; }
     public void setFkAnalysisId(int n) { mnFkAnalysisId = n; }
     public void setFkItemId(int n) { mnFkItemId = n; }
+    public void setFkDatasheetTemplateId_n(int n) { mnFkDatasheetTemplateId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -74,6 +89,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
     
+    public void setAuxLogTypeDeliveryId_n(int n) { mnAuxLogTypeDeliveryId_n = n; }
     public void setAuxNewVersion(boolean b) { mbAuxNewVersion = b; }
     public void setAuxAnalysisName(String s) { msAnalysisName = s; }
     public void setAuxAnalysisUnit(String s) { msAnalysisUnit = s; }
@@ -81,19 +97,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
 
     public int getPkEntryAnalysisId() { return mnPkEntryAnalysisId; }
     public int getSortPosition() { return mnSortPosition; }
+    public String getOriginalSpecification() { return msOriginalSpecification; }
+    public String getSpecification() { return msSpecification; }
+    public String getOriginalMinValue() { return msOriginalMinValue; }
+    public String getOriginalMaxValue() { return msOriginalMaxValue; }
     public String getMinValue() { return msMinValue; }
     public String getMaxValue() { return msMaxValue; }
     public boolean isMin() { return mbIsMin; }
     public boolean isMax() { return mbIsMax; }
     public boolean isRequired() { return mbIsRequired; }
-    public boolean isLimitModified() { return mbIsLimitModified; }
-    public boolean isRequiredModified() { return mbIsRequiredModified; }
+    public boolean isForDps() { return mbIsForDps; }
+    public boolean isForCoA() { return mbIsForCoA; }
+    public boolean wasAdded() { return mbWasAdded; }
     public boolean getIsDeleted() { return mbIsDeleted; }
-    public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
-    public int getFkDpsDocId_n() { return mnFkDpsDocId_n; }
-    public int getFkDpsEtyId_n() { return mnFkDpsEtyId_n; }
+    public int getFkDpsYearId() { return mnFkDpsYearId; }
+    public int getFkDpsDocId() { return mnFkDpsDocId; }
+    public int getFkDpsEtyId() { return mnFkDpsEtyId; }
     public int getFkAnalysisId() { return mnFkAnalysisId; }
     public int getFkItemId() { return mnFkItemId; }
+    public int getFkDatasheetTemplateId_n() { return mnFkDatasheetTemplateId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -101,9 +123,56 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
     
+    public int getAuxLogTypeDeliveryId_n() { return mnAuxLogTypeDeliveryId_n; }
     public String getAuxAnalysisName() { return msAnalysisName; }
     public String getAuxAnalysisUnit() { return msAnalysisUnit; }
     public String getAuxAnalysisType() { return msAnalysisType; }
+
+    public void readAuxData(java.sql.Statement statement) {
+        try {
+            if (mnFkDatasheetTemplateId_n > 0) {
+                String sql = "SELECT " +
+                            "    fk_log_tp_dly_n " +
+                            "FROM " +
+                            "    " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " " +
+                            "WHERE " +
+                            "    id_datasheet_template = " + mnFkDatasheetTemplateId_n + " ";
+
+                ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    mnAuxLogTypeDeliveryId_n = resultSet.getInt("fk_log_tp_dly_n");
+                }
+            }
+            else {
+                mnAuxLogTypeDeliveryId_n = 0;
+            }
+
+            String sql = "SELECT * "
+                + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
+                + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
+                + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
+                + "WHERE qa.id_analysis = " + mnFkAnalysisId;
+        
+        
+            ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
+            if (resultSet.next()) {
+
+                if (mnAuxLogTypeDeliveryId_n <= 1) {
+                    msAnalysisName = resultSet.getString("analysis_name");
+                    msAnalysisUnit = resultSet.getString("unit_symbol");
+                    msAnalysisType = resultSet.getString("name");
+                }
+                else {
+                    msAnalysisName = resultSet.getString("analysis_name_eng");
+                    msAnalysisUnit = resultSet.getString("unit_symbol_eng");
+                    msAnalysisType = resultSet.getString("name");
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+    }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -121,19 +190,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
 
         mnPkEntryAnalysisId = 0;
         mnSortPosition = 0;
+        msOriginalSpecification = "";
+        msSpecification = "";
+        msOriginalMinValue = "";
+        msOriginalMaxValue = "";
         msMinValue = "";
         msMaxValue = "";
         mbIsMin = false;
         mbIsMax = false;
         mbIsRequired = false;
-        mbIsLimitModified = false;
-        mbIsRequiredModified = false;
+        mbIsForDps = false;
+        mbIsForCoA = false;
+        mbWasAdded = false;
         mbIsDeleted = false;
-        mnFkDpsYearId_n = 0;
-        mnFkDpsDocId_n = 0;
-        mnFkDpsEtyId_n = 0;
+        mnFkDpsYearId = 0;
+        mnFkDpsDocId = 0;
+        mnFkDpsEtyId = 0;
         mnFkAnalysisId = 0;
         mnFkItemId = 0;
+        mnFkDatasheetTemplateId_n = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -142,6 +217,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
         mtUserDeleteTs = null;
 
         mbRowEdited = false;
+        mnAuxLogTypeDeliveryId_n = 0;
         mbAuxNewVersion = false;
         msAnalysisName = "";
         msAnalysisUnit = "";
@@ -153,7 +229,6 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
         int[] key = (int[]) pk;
         java.lang.String sql = "";
         java.sql.ResultSet resultSet = null;
-        java.sql.ResultSet resultSetAux = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -169,19 +244,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
             else {
                 mnPkEntryAnalysisId = resultSet.getInt("id_ety_analysis");
                 mnSortPosition = resultSet.getInt("sort_pos");
+                msOriginalSpecification = resultSet.getString("orig_specification");
+                msSpecification = resultSet.getString("specification");
+                msOriginalMinValue = resultSet.getString("orig_min_value");
+                msOriginalMaxValue = resultSet.getString("orig_max_value");
                 msMinValue = resultSet.getString("min_value");
                 msMaxValue = resultSet.getString("max_value");
                 mbIsMin = resultSet.getBoolean("b_min");
                 mbIsMax = resultSet.getBoolean("b_max");
-                mbIsRequired = resultSet.getBoolean("b_required");
-                mbIsLimitModified = resultSet.getBoolean("b_lim_mod");
-                mbIsRequiredModified = resultSet.getBoolean("b_req_mod");
+                mbIsRequired = resultSet.getBoolean("b_req");
+                mbIsForDps = resultSet.getBoolean("b_dps");
+                mbIsForCoA = resultSet.getBoolean("b_coa");
+                mbWasAdded = resultSet.getBoolean("b_added");
                 mbIsDeleted = resultSet.getBoolean("b_del");
-                mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
-                mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
-                mnFkDpsEtyId_n = resultSet.getInt("fid_dps_ety_n");
-                mnFkAnalysisId = resultSet.getInt("fid_analysis_id");
-                mnFkItemId = resultSet.getInt("fid_item_id");
+                mnFkDpsYearId = resultSet.getInt("fid_dps_year");
+                mnFkDpsDocId = resultSet.getInt("fid_dps_doc");
+                mnFkDpsEtyId = resultSet.getInt("fid_dps_ety");
+                mnFkAnalysisId = resultSet.getInt("fid_analysis");
+                mnFkItemId = resultSet.getInt("fid_item");
+                mnFkDatasheetTemplateId_n = resultSet.getInt("fid_dtsht_tmplte_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -193,18 +274,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
             
-            sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
-                    + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
-                    + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
-                    + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
-                    + "WHERE qa.id_analysis = " + mnFkAnalysisId;
-            
-            resultSetAux = statement.getConnection().createStatement().executeQuery(sql);
-            if (resultSetAux.next()) {
-                msAnalysisName = resultSetAux.getString("analysis_name");
-                msAnalysisUnit = resultSetAux.getString("unit_symbol");
-                msAnalysisType = resultSetAux.getString("name");
-            }
+           this.readAuxData(statement);
         }
         catch (java.sql.SQLException e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
@@ -236,22 +306,31 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                     mnPkEntryAnalysisId = resPk.getInt("new_id");
                 }
                 
+                mnFkUserEditId = SUtilConsts.USR_NA_ID;
+                mnFkUserDeleteId = SUtilConsts.USR_NA_ID;
+                
                 sql = "INSERT INTO " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " VALUES (" +
                         mnPkEntryAnalysisId + ", " + 
                         mnSortPosition + ", " + 
+                        "'" + msOriginalSpecification + "', " +
+                        "'" + msSpecification + "', " +
+                        "'" + msOriginalMinValue + "', " +
+                        "'" + msOriginalMaxValue + "', " +
                         "'" + msMinValue + "', " + 
                         "'" + msMaxValue + "', " + 
                         (mbIsMin ? 1 : 0) + ", " + 
                         (mbIsMax ? 1 : 0) + ", " + 
-                        (mbIsRequired ? 1 : 0) + ", " + 
-                        (mbIsLimitModified ? 1 : 0) + ", " + 
-                        (mbIsRequiredModified ? 1 : 0) + ", " + 
+                        (mbIsRequired ? 1 : 0) + ", " +
+                        (mbIsForDps ? 1 : 0) + ", " +
+                        (mbIsForCoA ? 1 : 0) + ", " +
+                        (mbWasAdded ? 1 : 0) + ", " +
                         (mbIsDeleted ? 1 : 0) + ", " + 
-                        mnFkDpsYearId_n + ", " + 
-                        mnFkDpsDocId_n + ", " + 
-                        mnFkDpsEtyId_n + ", " + 
+                        mnFkDpsYearId + ", " + 
+                        mnFkDpsDocId + ", " + 
+                        mnFkDpsEtyId + ", " + 
                         mnFkAnalysisId + ", " + 
                         mnFkItemId + ", " + 
+                        (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
                         mnFkUserNewId + ", " + 
                         mnFkUserEditId + ", " + 
                         mnFkUserDeleteId + ", " + 
@@ -264,19 +343,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 sql = "UPDATE " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " SET " +
 //                        "id_ety_analysis = " + mnPkEntryAnalysisId + ", " +
                         "sort_pos = " + mnSortPosition + ", " +
+                        "orig_specification = '" + msOriginalSpecification + "', " +
+                        "specification = '" + msSpecification + "', " +
+                        "orig_min_value = '" + msOriginalMinValue + "', " +
+                        "orig_max_value = '" + msOriginalMaxValue + "', " +
                         "min_value = '" + msMinValue + "', " +
                         "max_value = '" + msMaxValue + "', " +
                         "b_min = " + (mbIsMin ? 1 : 0) + ", " +
                         "b_max = " + (mbIsMax ? 1 : 0) + ", " +
-                        "b_required = " + (mbIsRequired ? 1 : 0) + ", " +
-                        "b_lim_mod = " + (mbIsLimitModified ? 1 : 0) + ", " +
-                        "b_req_mod = " + (mbIsRequiredModified ? 1 : 0) + ", " +
+                        "b_req = " + (mbIsRequired ? 1 : 0) + ", " +
+                        "b_dps = " + (mbIsForDps ? 1 : 0) + ", " +
+                        "b_coa = " + (mbIsForCoA ? 1 : 0) + ", " +
+                        "b_added = " + (mbWasAdded ? 1 : 0) + ", " +
                         "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
-                        "fid_dps_year_n = " + mnFkDpsYearId_n + ", " +
-                        "fid_dps_doc_n = " + mnFkDpsDocId_n + ", " +
-                        "fid_dps_ety_n = " + mnFkDpsEtyId_n + ", " +
-                        "fid_analysis_id = " + mnFkAnalysisId + ", " +
-                        "fid_item_id = " + mnFkItemId + ", " +
+                        "fid_dps_year = " + mnFkDpsYearId + ", " +
+                        "fid_dps_doc = " + mnFkDpsDocId + ", " +
+                        "fid_dps_ety = " + mnFkDpsEtyId + ", " +
+                        "fid_analysis = " + mnFkAnalysisId + ", " +
+                        "fid_item = " + mnFkItemId + ", " +
+                        "fid_dtsht_tmplte_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
 //                        "fid_usr_new = " + mnFkUserNewId + ", " +
                         "fid_usr_edit = " + mnFkUserEditId + ", ";
 
@@ -320,19 +405,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
         
         registry.setPkEntryAnalysisId(this.getPkEntryAnalysisId());
         registry.setSortPosition(this.getSortPosition());
+        registry.setOriginalSpecification(this.getOriginalSpecification());
+        registry.setSpecification(this.getSpecification());
+        registry.setOriginalMinValue(this.getOriginalMinValue());
+        registry.setOriginalMaxValue(this.getOriginalMaxValue());
         registry.setMinValue(this.getMinValue());
         registry.setMaxValue(this.getMaxValue());
         registry.setIsMin(this.isMin());
         registry.setIsMax(this.isMax());
         registry.setIsRequired(this.isRequired());
-        registry.setIsLimitModified(this.isLimitModified());
-        registry.setIsRequiredModified(this.isRequiredModified());
+        registry.setIsForDps(this.isForDps());
+        registry.setIsForCoA(this.isForCoA());
+        registry.setWasAdded(this.wasAdded());
         registry.setIsDeleted(this.getIsDeleted());
-        registry.setFkDpsYearId_n(this.getFkDpsYearId_n());
-        registry.setFkDpsDocId_n(this.getFkDpsDocId_n());
-        registry.setFkDpsEtyId_n(this.getFkDpsEtyId_n());
+        registry.setFkDpsYearId(this.getFkDpsYearId());
+        registry.setFkDpsDocId(this.getFkDpsDocId());
+        registry.setFkDpsEtyId(this.getFkDpsEtyId());
         registry.setFkAnalysisId(this.getFkAnalysisId());
         registry.setFkItemId(this.getFkItemId());
+        registry.setFkDatasheetTemplateId_n(this.getFkDatasheetTemplateId_n());
         registry.setFkUserNewId(this.getFkUserNewId());
         registry.setFkUserEditId(this.getFkUserEditId());
         registry.setFkUserDeleteId(this.getFkUserDeleteId());
@@ -364,7 +455,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
 
     @Override
     public boolean isRowSystem() {
-        return false;
+        return mbIsRequired;
     }
 
     @Override
@@ -394,16 +485,25 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 value = msAnalysisName;
                 break;
             case 2:
-                value = msAnalysisUnit;
+                value = msSpecification;
                 break;
             case 3:
-                value = msMinValue;
+                value = msAnalysisUnit;
                 break;
+            // case 3:
+            //     value = msMinValue;
+            //     break;
+            // case 4:
+            //     value = msMaxValue;
+            //     break;
             case 4:
-                value = msMaxValue;
+                value = mbIsRequired;
                 break;
             case 5:
-                value = mbIsRequired;
+                value = mbIsForDps;
+                break;
+            case 6:
+                value = mbIsForCoA;
                 break;
                 
             default:
@@ -415,17 +515,20 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     @Override
     public void setRowValueAt(Object value, int col) {
         switch (col) {
-            case 3:
-                msMinValue = (String) value;
-                mbIsLimitModified = true;
+            case 2:
+                msSpecification = (String) value;
                 break;
-            case 4:
-                msMaxValue = (String) value;
-                mbIsLimitModified = true;
-                break;
+            // case 3:
+            //     msMinValue = (String) value;
+            //     break;
+            // case 4:
+            //     msMaxValue = (String) value;
+            //     break;
             case 5:
-                mbIsRequired = (Boolean) value;
-                mbIsRequiredModified = true;
+                mbIsForDps = mbIsRequired ? true : (Boolean) value;
+                break;
+            case 6:
+                mbIsForCoA = (Boolean) value;
                 break;
             
             default:

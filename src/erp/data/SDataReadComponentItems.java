@@ -1965,6 +1965,13 @@ public abstract class SDataReadComponentItems {
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_ANALYSIS) + " WHERE b_del = 0 ORDER BY analysis_name ";
                 text = "análisis de laboratorio";
                 break;
+                
+            case SModConsts.QLT_DATASHEET_TEMPLATE:
+                lenPk = 1;
+                sql = "SELECT id_datasheet_template AS " + SDbConsts.FIELD_ID + "1, CONCAT(template_name,' - ',template_standard,' - ',template_version) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " WHERE b_del = 0 ORDER BY template_name ";
+                text = "ficha ténica";
+                break;
 
             default:
                 break;

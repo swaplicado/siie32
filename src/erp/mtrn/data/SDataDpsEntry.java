@@ -1198,10 +1198,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                             + "FROM "
                             + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " "
                             + "WHERE "
-                            + "fid_dps_year_n = " + mnPkYearId + " AND "
-                            + "fid_dps_doc_n = " + mnPkDocId + " AND "
-                            + "fid_dps_ety_n = " + mnPkEntryId + " AND "
-                            + "fid_item_id = " + mnFkItemId + " "
+                            + "fid_dps_year = " + mnPkYearId + " AND "
+                            + "fid_dps_doc = " + mnPkDocId + " AND "
+                            + "fid_dps_ety = " + mnPkEntryId + " AND "
+                            + "fid_item = " + mnFkItemId + " "
                             + "ORDER BY sort_pos ASC, id_ety_analysis ASC;";
         
                     mlDbmsDpsEntryAnalysis = new ArrayList<>();
@@ -1594,14 +1594,14 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     // Save quality configurations
                     if (mlDbmsDpsEntryAnalysis.size() > 0) {
                         String sql = "DELETE FROM trn_dps_ety_analysis " +
-                                "WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND fid_dps_ety_n = " + mnPkEntryId + ";";
+                                "WHERE fid_dps_year = " + mnPkYearId + " AND fid_dps_doc = " + mnPkDocId + " AND fid_dps_ety = " + mnPkEntryId + ";";
                         statement.execute(sql);
                         
                         for (SDataDpsEntryAnalysis oEtyAnalysis : mlDbmsDpsEntryAnalysis) {
-                            if (oEtyAnalysis.getFkDpsYearId_n() == SLibConsts.UNDEFINED) {
-                                oEtyAnalysis.setFkDpsYearId_n(mnPkYearId);
-                                oEtyAnalysis.setFkDpsDocId_n(mnPkDocId);
-                                oEtyAnalysis.setFkDpsEtyId_n(mnPkEntryId);    
+                            if (oEtyAnalysis.getFkDpsYearId() == SLibConsts.UNDEFINED) {
+                                oEtyAnalysis.setFkDpsYearId(mnPkYearId);
+                                oEtyAnalysis.setFkDpsDocId(mnPkDocId);
+                                oEtyAnalysis.setFkDpsEtyId(mnPkEntryId);    
                             }
                             
                             oEtyAnalysis.setIsRegistryNew(true);
