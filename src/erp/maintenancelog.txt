@@ -1,15 +1,12 @@
 ================================================================================
 SIIE 3.2 276.0/ 2025-07-03
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
-1) Integración de certificados de calidad en siie.
+1) Integración de certificados de calidad en SIIE.
 
 ================================================================================
-
 SIIE 3.2 275.1/ 2025-06-30
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
 1) Refactorización de código en valuación de consumos de inventarios, después de inspección.
 
