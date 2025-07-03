@@ -3950,7 +3950,12 @@ public abstract class STrnUtilities {
         diogEntry.setPkEntryId(SLibConstants.UNDEFINED);
         diogEntry.setQuantity(stockMove.getQuantity());
         if (! withCost) {
-            diogEntry.setValueUnitary(stockMove.getValue() / stockMove.getQuantity());
+            if (stockMove.getQuantity() == 0d) {
+                diogEntry.setValueUnitary(0d);
+            }
+            else {
+                diogEntry.setValueUnitary(stockMove.getValue() / stockMove.getQuantity());
+            }
             diogEntry.setValue(stockMove.getValue());
         }
         else {

@@ -5,6 +5,10 @@
  */
 package erp.mod.trn.db;
 
+import erp.mod.trn.utils.SStockValuationLogUtils;
+import erp.mod.trn.utils.SStockValuationAdjustsUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationRecordUtils;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDiog;
 import java.sql.ResultSet;
@@ -81,22 +85,24 @@ public class SDbStockValuation extends SDbRegistryUser {
                 + "AND YEAR(dt_end) = " + (new SimpleDateFormat("yyyy")).format(cutoffDate) + " "
                 + "ORDER BY dt_end DESC";
         
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(msSql);
-        if (resultSet.next()) {
-            tDateStart = resultSet.getDate(1);
-        }
-        else {
-            Calendar cal = Calendar.getInstance();
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (res.next()) {
+                tDateStart = res.getDate(1);
+            }
+            else {
+                Calendar cal = Calendar.getInstance();
 
-            // Establecer la fecha en el objeto Calendar
-            cal.setTime(cutoffDate);
+                // Establecer la fecha en el objeto Calendar
+                cal.setTime(cutoffDate);
 
-            // Establecer el mes y el día del primer día del año
-            cal.set(Calendar.MONTH, Calendar.JANUARY);
-            cal.set(Calendar.DAY_OF_MONTH, 1);
+                // Establecer el mes y el día del primer día del año
+                cal.set(Calendar.MONTH, Calendar.JANUARY);
+                cal.set(Calendar.DAY_OF_MONTH, 1);
 
-            // Obtener el primer día del año como objeto Date
-            tDateStart = cal.getTime();
+                // Obtener el primer día del año como objeto Date
+                tDateStart = cal.getTime();
+            }
         }
 
         return tDateStart;
@@ -117,9 +123,11 @@ public class SDbStockValuation extends SDbRegistryUser {
                 + "AND dt_sta > '" + SLibUtils.DbmsDateFormatDate.format(dtEnd) + "' "
                 + "AND year(dt_sta) = year('" + SLibUtils.DbmsDateFormatDate.format(dtEnd) + "');";
         
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        
-        return ! res.next();
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(sql)) {
+                boolean canDelete = ! res.next();
+            return canDelete;
+        }
     }
     
     /**
@@ -316,9 +324,11 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnPkStockValuationId = 0;
 
         msSql = "SELECT COALESCE(MAX(id_stk_val), 0) + 1 FROM " + getSqlTable() + " ";
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (resultSet.next()) {
-            mnPkStockValuationId = resultSet.getInt(1);
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (res.next()) {
+                mnPkStockValuationId = res.getInt(1);
+            }
         }
     }
 
@@ -330,35 +340,39 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.READ_ERROR;
 
         msSql = "SELECT * " + getSqlFromWhere(pk);
-        resultSet = session.getStatement().executeQuery(msSql);
-        if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
-        }
-        else {
-            mnPkStockValuationId = resultSet.getInt("id_stk_val");
-            mtDateStart = resultSet.getDate("dt_sta");
-            mtDateEnd = resultSet.getDate("dt_end");
-            mbDeleted = resultSet.getBoolean("b_del");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
-            mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-            
-            msSql = "SELECT * FROM trn_stk_val_acc WHERE fk_stk_val = " + mnPkStockValuationId + " "
-                    + "AND NOT b_del LIMIT 1;";
-            
-            ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(msSql);
-            if (res.next()) {
-                moAuxRecordPk = new Object[] {
-                                                res.getInt("fk_fin_rec_year"),
-                                                res.getInt("fk_fin_rec_per"),
-                                                res.getInt("fk_fin_rec_bkc"),
-                                                res.getString("fk_fin_rec_tp_rec"),
-                                                res.getInt("fk_fin_rec_num")
-                                            };
-
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet res = st.executeQuery(msSql)) {
+            if (!res.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
-            mbRegistryNew = false;
+            else {
+                mnPkStockValuationId = res.getInt("id_stk_val");
+                mtDateStart = res.getDate("dt_sta");
+                mtDateEnd = res.getDate("dt_end");
+                mbDeleted = res.getBoolean("b_del");
+                mnFkUserInsertId = res.getInt("fk_usr_ins");
+                mnFkUserUpdateId = res.getInt("fk_usr_upd");
+                mtTsUserInsert = res.getTimestamp("ts_usr_ins");
+                mtTsUserUpdate = res.getTimestamp("ts_usr_upd");
+                
+                msSql = "SELECT * FROM trn_stk_val_acc WHERE fk_stk_val = " + mnPkStockValuationId + " "
+                        + "AND NOT b_del LIMIT 1;";
+                
+                try (java.sql.Statement st2 = session.getStatement().getConnection().createStatement();
+                     ResultSet res2 = st2.executeQuery(msSql)) {
+                    if (res2.next()) {
+                        moAuxRecordPk = new Object[] {
+                                                    res2.getInt("fk_fin_rec_year_n"),
+                                                    res2.getInt("fk_fin_rec_per_n"),
+                                                    res2.getInt("fk_fin_rec_bkc_n"),
+                                                    res2.getString("fk_fin_rec_tp_rec_n"),
+                                                    res2.getInt("fk_fin_rec_num_n")
+                                                };
+
+                    }
+                }
+                mbRegistryNew = false;
+            }
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -487,7 +501,7 @@ public class SDbStockValuation extends SDbRegistryUser {
      * @throws SQLException 
      */
     @Override
-    public void delete(final SGuiSession session) throws SQLException {
+    public void delete(final SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
@@ -507,6 +521,9 @@ public class SDbStockValuation extends SDbRegistryUser {
                 SStockValuationUtils.deleteValuation(session, mnPkStockValuationId);
                 session.getStatement().execute(msSql);
             }
+            else {
+                throw new Exception("No se puede eliminar esta valuación, existen valuaciones posteriores.");
+            }
 
             session.getStatement().getConnection().commit();
         }
@@ -514,6 +531,10 @@ public class SDbStockValuation extends SDbRegistryUser {
             session.getStatement().getConnection().rollback();
             Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
             throw new SQLException(ex);
+        } catch (Exception ex) {
+            session.getStatement().getConnection().rollback();
+            Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Exception(ex);
         }
         
         mnQueryResultId = SDbConsts.SAVE_OK;

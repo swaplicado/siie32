@@ -3,7 +3,7 @@
  * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
  * y abra la plantilla en el editor.
  */
-package erp.mod.trn.db;
+package erp.mod.trn.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,12 @@ import erp.data.SDataUtilities;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbStockValuation;
+import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.db.SStockValuationConfiguration;
 import erp.mtrn.data.SDataDiog;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
@@ -40,8 +44,8 @@ import sa.lib.gui.SGuiSession;
  */
 public class SStockValuationUtils {
     
-    static final int DEBIT = 1;
-    static final int CREDIT = 2;
+    public static final int DEBIT = 1;
+    public static final int CREDIT = 2;
     
     /**
      * Obtiene el objeto de configuración de valuación de inventario a partir de un string JSON.
@@ -52,7 +56,10 @@ public class SStockValuationUtils {
      * @throws Exception 
      */
     public static SStockValuationConfiguration getStockValuationConfig(final Statement statement) throws JsonProcessingException, Exception {
-        String sCfg = SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_TRN_STK_MAT_VAL);
+        String sCfg;
+        try (Statement st = statement.getConnection().createStatement()) {
+            sCfg = SCfgUtils.getParamValue(st, SDataConstantsSys.CFG_PARAM_TRN_STK_MAT_VAL);
+        }
         ObjectMapper mapper = new ObjectMapper();
         SStockValuationConfiguration oCfg = mapper.readValue(sCfg, SStockValuationConfiguration.class);
         
@@ -70,6 +77,10 @@ public class SStockValuationUtils {
      * @throws Exception 
      */
     private static String getStockMovementsQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
+        SStockValuationConfiguration oCfg;
+        try (Statement st = statement.getConnection().createStatement()) {
+            oCfg = SStockValuationUtils.getStockValuationConfig(st);
+        }
         String sql = "SELECT  "
                 + "    stk.*,"
                 + "    d.num, "
@@ -132,12 +143,9 @@ public class SStockValuationUtils {
                 + "    AND stk.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(startDate) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
                 + "    AND stk.fid_ct_iog = " + diogCategory + " ";
 
-        SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(statement);
-        ArrayList<int[]> iogTpmovs;
-
         // Determinar si son movimientos de entrada o salida
         boolean isIn = diogCategory == SModSysConsts.TRNS_CT_IOG_IN;
-        iogTpmovs = isIn ? oCfg.getIogTpmovsIn() : oCfg.getIogTpmovsOut();
+        ArrayList<int[]> iogTpmovs = isIn ? oCfg.getIogTpmovsIn() : oCfg.getIogTpmovsOut();
         sql += isIn ? "AND stk.mov_in > 0 " : "AND stk.mov_out > 0 ";
 
         if (iogTpmovs.isEmpty()) {
@@ -156,22 +164,23 @@ public class SStockValuationUtils {
             boolean firstGroup = true;
 
             for (Map.Entry<Integer, List<Integer>> entry : groupedTpmovs.entrySet()) {
-                if (!firstGroup) {
-                    sql += " OR ";
-                }
-                firstGroup = false;
-
                 int fidClIog = entry.getKey();
                 List<Integer> tpIogs = entry.getValue();
 
-                if (tpIogs.size() == 1) {
-                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", 
-                                       fidClIog, tpIogs.get(0));
-                } else {
-                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog IN (%s))", 
-                                       fidClIog, tpIogs.stream()
-                                                      .map(String::valueOf)
-                                                      .collect(Collectors.joining(",")));
+                for (Integer tpIog : tpIogs) {
+                    // Verifica si es el caso especial
+                    boolean isSpecial = (diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0] && fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1] && tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2]);
+                    if (!firstGroup) {
+                        sql += " OR ";
+                    }
+                    firstGroup = false;
+
+                    if (isSpecial) {
+                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d AND NOT d.b_sys)", fidClIog, tpIog);
+                    }
+                    else {
+                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", fidClIog, tpIog);
+                    }
                 }
             }
 
@@ -193,66 +202,68 @@ public class SStockValuationUtils {
      * @throws Exception 
      */
     public static void createValuationEntries(SGuiSession session, final Date startDate, final Date cutDate, final int idValuation) throws Exception {
-        String sql = SStockValuationUtils.getStockMovementsQuery(session.getStatement().getConnection().createStatement(), SModSysConsts.TRNS_CT_IOG_IN, startDate, cutDate);
-        
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        SDbStockValuationMvt oEntry;
-        while (res.next()) {
-            oEntry = new SDbStockValuationMvt();
+        String sql;
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_IN, startDate, cutDate);
+            ResultSet res = st.executeQuery(sql);
+            SDbStockValuationMvt oEntry;
+            while (res.next()) {
+                oEntry = new SDbStockValuationMvt();
 
-            oEntry.setDateMove(res.getDate("dt"));
-            oEntry.setQuantityMovement(res.getDouble("mov_in"));
-            oEntry.setCostUnitary(res.getDouble("cost_u"));
-            oEntry.setCost_r(res.getDouble("debit"));
-            oEntry.setFkStockValuationId(idValuation);
-            oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
-            oEntry.setFkDiogYearInId_n(res.getInt("fid_diog_year"));
-            oEntry.setFkDiogDocInId_n(res.getInt("fid_diog_doc"));
-            oEntry.setFkDiogEntryInId_n(res.getInt("fid_diog_ety"));
-            oEntry.setFkDpsYearInId_n(res.getInt("stk.fid_dps_year_n"));
-            oEntry.setFkDpsDocInId_n(res.getInt("stk.fid_dps_doc_n"));
-            oEntry.setFkDpsEntryInId_n(res.getInt("stk.fid_dps_ety_n"));
-            oEntry.setFkItemId(res.getInt("id_item"));
-            oEntry.setFkUnitId(res.getInt("id_unit"));
-            oEntry.setFkLotId(res.getInt("id_lot"));
-            oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
-            oEntry.setFkWarehouseId(res.getInt("id_wh"));
-            oEntry.setFkUserInsertId(session.getUser().getPkUserId());
-            oEntry.setAuxTypeDpsIn(new int[] { res.getInt("fid_ct_dps"), 
-                                                res.getInt("fid_cl_dps"), 
-                                                res.getInt("fid_tp_dps") });
+                oEntry.setDateMove(res.getDate("dt"));
+                oEntry.setQuantityMovement(res.getDouble("mov_in"));
+                oEntry.setCostUnitary(res.getDouble("cost_u"));
+                oEntry.setCost_r(res.getDouble("debit"));
+                oEntry.setFkStockValuationId(idValuation);
+                oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
+                oEntry.setFkDiogYearInId_n(res.getInt("fid_diog_year"));
+                oEntry.setFkDiogDocInId_n(res.getInt("fid_diog_doc"));
+                oEntry.setFkDiogEntryInId_n(res.getInt("fid_diog_ety"));
+                oEntry.setFkDpsYearInId_n(res.getInt("stk.fid_dps_year_n"));
+                oEntry.setFkDpsDocInId_n(res.getInt("stk.fid_dps_doc_n"));
+                oEntry.setFkDpsEntryInId_n(res.getInt("stk.fid_dps_ety_n"));
+                oEntry.setFkItemId(res.getInt("id_item"));
+                oEntry.setFkUnitId(res.getInt("id_unit"));
+                oEntry.setFkLotId(res.getInt("id_lot"));
+                oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
+                oEntry.setFkWarehouseId(res.getInt("id_wh"));
+                oEntry.setFkUserInsertId(session.getUser().getPkUserId());
+                oEntry.setAuxTypeDpsIn(new int[] { res.getInt("fid_ct_dps"), 
+                                                    res.getInt("fid_cl_dps"), 
+                                                    res.getInt("fid_tp_dps") });
 
-            if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] && 
-                oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] && 
-                oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                    if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
-                        oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
-                        oEntry.setTemporalPrice(true);
-                        String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
-                                + "con número de documento " + res.getInt("d.num") + " y "
-                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
-                                + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", " 
-                                + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
-                        SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
-                    }
-                    else if (oEntry.getCostUnitary() != res.getDouble("ety_des_price_real")) {
-                            oEntry.setCostUnitary(res.getDouble("ety_des_price_real"));
-                            oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-                            oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
-                            oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
-                            oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] && 
+                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] && 
+                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                        if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                            oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                            oEntry.setTemporalPrice(true);
+                            String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
+                                    + "con número de documento " + res.getInt("d.num") + " y "
+                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                    + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", " 
+                                    + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                            SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
                         }
+                        else if (oEntry.getCostUnitary() != res.getDouble("ety_des_price_real")) {
+                                oEntry.setCostUnitary(res.getDouble("ety_des_price_real"));
+                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
+                                oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
+                                oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
+                                oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                            }
+                }
+                else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0] && 
+                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1] && 
+                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
+                        if (oEntry.getCostUnitary() != res.getDouble("dps_ety.price_u_real_r")) {
+                            oEntry.setCostUnitary(res.getDouble("dps_ety.price_u_real_r"));
+                            oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
+                        }
+                }
+
+                oEntry.save(session);
             }
-            else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0] && 
-                oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1] && 
-                oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
-                    if (oEntry.getCostUnitary() != res.getDouble("dps_ety.price_u_real_r")) {
-                        oEntry.setCostUnitary(res.getDouble("dps_ety.price_u_real_r"));
-                        oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-                    }
-            }
-            
-            oEntry.save(session);
         }
     }
 
@@ -308,48 +319,48 @@ public class SStockValuationUtils {
                 + "ve.fk_diog_year_in_n, ve.fk_diog_doc_in_n, ve.fk_diog_ety_in_n "
                 + "HAVING qty > 0 "
                 + "ORDER BY ve.dt_mov ASC, ve.fk_stk_val ASC";
-      
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        SDbStockValuationMvt oEntry;
         ArrayList<SDbStockValuationMvt> entries = new ArrayList<>();
-        while (res.next()) {
-            oEntry = new SDbStockValuationMvt();
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            SDbStockValuationMvt oEntry;
+            while (res.next()) {
+                oEntry = new SDbStockValuationMvt();
 
-            oEntry.setDateMove(res.getDate("dt_mov"));
-            oEntry.setQuantityMovement(res.getDouble("qty"));
-            oEntry.setCostUnitary(res.getDouble("cost_u"));
-            oEntry.setPkStockValuationMvtId(res.getInt("id_stk_val_mvt"));
-            oEntry.setFkStockValuationId(res.getInt("fk_stk_val"));
-            oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
-            oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
-            oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
-            oEntry.setFkDpsYearInId_n(res.getInt("fk_dps_year_in_n"));
-            oEntry.setFkDpsDocInId_n(res.getInt("fk_dps_doc_in_n"));
-            oEntry.setFkDpsEntryInId_n(res.getInt("fk_dps_ety_in_n"));
-            oEntry.setFkItemId(res.getInt("fk_item"));
-            oEntry.setFkUnitId(res.getInt("fk_unit"));
-            oEntry.setFkLotId(res.getInt("fk_lot"));
-            oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
-            oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
-            oEntry.setFkWarehouseId(res.getInt("fk_wh"));
+                oEntry.setDateMove(res.getDate("dt_mov"));
+                oEntry.setQuantityMovement(res.getDouble("qty"));
+                oEntry.setCostUnitary(res.getDouble("cost_u"));
+                oEntry.setPkStockValuationMvtId(res.getInt("id_stk_val_mvt"));
+                oEntry.setFkStockValuationId(res.getInt("fk_stk_val"));
+                oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
+                oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
+                oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
+                oEntry.setFkDpsYearInId_n(res.getInt("fk_dps_year_in_n"));
+                oEntry.setFkDpsDocInId_n(res.getInt("fk_dps_doc_in_n"));
+                oEntry.setFkDpsEntryInId_n(res.getInt("fk_dps_ety_in_n"));
+                oEntry.setFkItemId(res.getInt("fk_item"));
+                oEntry.setFkUnitId(res.getInt("fk_unit"));
+                oEntry.setFkLotId(res.getInt("fk_lot"));
+                oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
+                oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
+                oEntry.setFkWarehouseId(res.getInt("fk_wh"));
 
-            if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
-                    res.getInt("dps.fid_tp_dps") > 0) {
-                oEntry.setAuxTypeDpsIn(new int[] {
-                                                    res.getInt("dps.fid_ct_dps"), 
-                                                    res.getInt("dps.fid_cl_dps"), 
-                                                    res.getInt("dps.fid_tp_dps") 
-                                                });
-                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
-                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
-                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                        oEntry.setTemporalPrice(true);
+                if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
+                        res.getInt("dps.fid_tp_dps") > 0) {
+                    oEntry.setAuxTypeDpsIn(new int[] {
+                                                res.getInt("dps.fid_ct_dps"), 
+                                                res.getInt("dps.fid_cl_dps"), 
+                                                res.getInt("dps.fid_tp_dps") 
+                                            });
+                    if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                        oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                        oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                            oEntry.setTemporalPrice(true);
+                    }
                 }
+
+                entries.add(oEntry);
             }
-
-            entries.add(oEntry);
         }
-
         return entries;
     }
     
@@ -364,14 +375,16 @@ public class SStockValuationUtils {
      * @throws Exception 
      */
     public static ArrayList<SDbStockValuationMvt> consumeEntries(SGuiSession session, final Date startDate, final Date cutDate, final int idValuation) throws Exception {
-        String sql = SStockValuationUtils.getStockMovementsQuery(session.getStatement().getConnection().createStatement(), SModSysConsts.TRNS_CT_IOG_OUT, startDate, cutDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        HashMap<String, ArrayList<SDbStockValuationMvt>> mapEntriesPending = SStockValuationUtils.getNotConsumedValuationEntriesGrouped(session);
+        String sql;
         ArrayList<SDbStockValuationMvt> lConsumptions = new ArrayList<>();
-        ArrayList<SDbStockValuationMvt> lTempConsumptions = new ArrayList<>();
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_OUT, startDate, cutDate);
+            ResultSet res = st.executeQuery(sql);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startDate);
+            HashMap<String, ArrayList<SDbStockValuationMvt>> mapEntriesPending = SStockValuationUtils.getNotConsumedValuationEntriesGrouped(session);
+            ArrayList<SDbStockValuationMvt> lTempConsumptions = new ArrayList<>();
 
-        try (ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
             while (res.next()) {
                 double qtyDiogEty = res.getDouble("mov_out");
                 double qtyToConsume = qtyDiogEty;
@@ -384,68 +397,70 @@ public class SStockValuationUtils {
 //                    int r = 0;
 //                }
                 ArrayList<SDbStockValuationMvt> lEntriesPending = mapEntriesPending.get(res.getInt("id_item") + "-" + res.getInt("id_unit"));
-                for (SDbStockValuationMvt entry : lEntriesPending) {
-                    if (entry.isAuxConsumed()) {
-                        continue;
-                    }
-                    double consumeQuantity = 0d;
-                    double entryAvailableQuantity = entry.getQuantityMovement() - entry.getAuxConsumption();
-                    if (qtyToConsume >= entryAvailableQuantity) {
-                        entry.setAuxConsumed(true);
-                        entry.setAuxConsumption(entry.getAuxConsumption() + entryAvailableQuantity);
-                        consumeQuantity = entryAvailableQuantity;
-                        qtyToConsume = qtyToConsume - entryAvailableQuantity;
-                    }
-                    else {
-                        entry.setAuxConsumption(entry.getAuxConsumption() + qtyToConsume);
-                        consumeQuantity = qtyToConsume;
-                        qtyToConsume = 0d;
-                    }
+                if (lEntriesPending != null && !lEntriesPending.isEmpty()) {
+                    for (SDbStockValuationMvt entry : lEntriesPending) {
+                        if (entry.isAuxConsumed()) {
+                            continue;
+                        }
+                        double consumeQuantity = 0d;
+                        double entryAvailableQuantity = entry.getQuantityMovement() - entry.getAuxConsumption();
+                        if (qtyToConsume >= entryAvailableQuantity) {
+                            entry.setAuxConsumed(true);
+                            entry.setAuxConsumption(entry.getAuxConsumption() + entryAvailableQuantity);
+                            consumeQuantity = entryAvailableQuantity;
+                            qtyToConsume = qtyToConsume - entryAvailableQuantity;
+                        }
+                        else {
+                            entry.setAuxConsumption(entry.getAuxConsumption() + qtyToConsume);
+                            consumeQuantity = qtyToConsume;
+                            qtyToConsume = 0d;
+                        }
 
-                    SDbStockValuationMvt oConsumption = new SDbStockValuationMvt();
+                        SDbStockValuationMvt oConsumption = new SDbStockValuationMvt();
 
-                    oConsumption.setDateMove(res.getDate("dt"));
-                    oConsumption.setQuantityMovement(consumeQuantity);
-                    oConsumption.setCostUnitary(entry.getCostUnitary());
-                    oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+                        oConsumption.setDateMove(res.getDate("dt"));
+                        oConsumption.setQuantityMovement(consumeQuantity);
+                        oConsumption.setCostUnitary(entry.getCostUnitary());
+                        oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
 
-                    if (entry.isTemporalPrice()) {
-                        oConsumption.setTemporalPrice(true);
-                    }
+                        if (entry.isTemporalPrice()) {
+                            oConsumption.setTemporalPrice(true);
+                        }
 
-                    oConsumption.setFkItemId(res.getInt("id_item"));
-                    oConsumption.setFkUnitId(res.getInt("id_unit"));
-                    oConsumption.setFkLotId(res.getInt("id_lot"));
-                    oConsumption.setFkDiogYearInId_n(entry.getFkDiogYearInId_n());
-                    oConsumption.setFkDiogDocInId_n(entry.getFkDiogDocInId_n());
-                    oConsumption.setFkDiogEntryInId_n(entry.getFkDiogEntryInId_n());
-                    oConsumption.setFkDpsYearInId_n(entry.getFkDpsYearInId_n());
-                    oConsumption.setFkDpsDocInId_n(entry.getFkDpsDocInId_n());
-                    oConsumption.setFkDpsEntryInId_n(entry.getFkDpsEntryInId_n());
-                    oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
-                    oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
-                    oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
-                    oConsumption.setFkDpsYearOutId_n(res.getInt("stk.fid_dps_year_n"));
-                    oConsumption.setFkDpsDocOutId_n(res.getInt("stk.fid_dps_doc_n"));
-                    oConsumption.setFkDpsEntryOutId_n(res.getInt("stk.fid_dps_ety_n"));
-                    oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
-                    oConsumption.setFkStockValuationId(idValuation);
-                    oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
-                    oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+                        oConsumption.setFkItemId(res.getInt("id_item"));
+                        oConsumption.setFkUnitId(res.getInt("id_unit"));
+                        oConsumption.setFkLotId(res.getInt("id_lot"));
+                        oConsumption.setFkDiogYearInId_n(entry.getFkDiogYearInId_n());
+                        oConsumption.setFkDiogDocInId_n(entry.getFkDiogDocInId_n());
+                        oConsumption.setFkDiogEntryInId_n(entry.getFkDiogEntryInId_n());
+                        oConsumption.setFkDpsYearInId_n(entry.getFkDpsYearInId_n());
+                        oConsumption.setFkDpsDocInId_n(entry.getFkDpsDocInId_n());
+                        oConsumption.setFkDpsEntryInId_n(entry.getFkDpsEntryInId_n());
+                        oConsumption.setFkDiogYearOutId_n(res.getInt("fid_diog_year"));
+                        oConsumption.setFkDiogDocOutId_n(res.getInt("fid_diog_doc"));
+                        oConsumption.setFkDiogEntryOutId_n(res.getInt("fid_diog_ety"));
+                        oConsumption.setFkDpsYearOutId_n(res.getInt("stk.fid_dps_year_n"));
+                        oConsumption.setFkDpsDocOutId_n(res.getInt("stk.fid_dps_doc_n"));
+                        oConsumption.setFkDpsEntryOutId_n(res.getInt("stk.fid_dps_ety_n"));
+                        oConsumption.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
+                        oConsumption.setFkStockValuationId(idValuation);
+                        oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
+                        oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
 
-                    oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
-                    oConsumption.setFkWarehouseId(res.getInt("id_wh"));
-                    oConsumption.setFkUserInsertId(session.getUser().getPkUserId());
+                        oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
+                        oConsumption.setFkWarehouseId(res.getInt("id_wh"));
+                        oConsumption.setFkUserInsertId(session.getUser().getPkUserId());
 
-                    if (res.getInt("fid_mat_req_n") > 0) {
-                        oConsumption.setFkMaterialRequestId_n(res.getInt("fid_mat_req_n"));
-                        oConsumption.setFkMaterialRequestEntryId_n(res.getInt("fid_mat_req_ety_n"));
-                    }
+                        if (res.getInt("fid_mat_req_n") > 0) {
+                            oConsumption.setFkMaterialRequestId_n(res.getInt("fid_mat_req_n"));
+                            oConsumption.setFkMaterialRequestEntryId_n(res.getInt("fid_mat_req_ety_n"));
+                        }
 
-                    lTempConsumptions.add(oConsumption);
+                        lTempConsumptions.add(oConsumption);
 
-                    if (qtyToConsume == 0d) {
-                        break;
+                        if (qtyToConsume == 0d) {
+                            break;
+                        }
                     }
                 }
 
@@ -512,31 +527,51 @@ public class SStockValuationUtils {
      * @throws SQLException 
      */
     public static boolean deleteValuation(SGuiSession session, final int idValuation) throws SQLException {
-        /**
-         * Eliminar pólizas
-         */
-        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS va "
-                + "ON re.id_year = va.fk_fin_rec_year "
-                + "AND re.id_per = va.fk_fin_rec_per "
-                + "AND re.id_bkc = va.fk_fin_rec_bkc "
-                + "AND re.id_tp_rec = va.fk_fin_rec_tp_rec "
-                + "AND re.id_num = va.fk_fin_rec_num "
-                + "AND re.id_ety = va.fk_fin_rec_ety "
-                + "SET re.b_del = 1, re.sort_pos = 0 "
-                + "WHERE va.fk_stk_val = " + idValuation + ";";
-        session.getStatement().getConnection().createStatement().executeUpdate(sql);
-        
-        /**
-         * Eliminar registros de valuación vs pólizas
-         */
-        String sqlDelLinks = "UPDATE " +
-                            SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " " +
-                            "SET b_del = 1 " +
-                            "WHERE " +
-                            "    fk_stk_val = " + idValuation + ";";
-                            
-        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelLinks);
+        Connection conn = session.getStatement().getConnection();
+
+        try (Statement st = conn.createStatement()) {
+            // Paso 0: Eliminar la tabla temporal si existe
+            String sqlDropTempTable = "DROP TEMPORARY TABLE IF EXISTS tmp_keys_to_delete";
+            st.execute(sqlDropTempTable);
+    
+            // Paso 1: Crear tabla temporal
+            String sqlCreateTempTable = "CREATE TEMPORARY TABLE tmp_keys_to_delete ("
+                    + "id_year INT, "
+                    + "id_per INT, "
+                    + "id_bkc INT, "
+                    + "id_tp_rec VARCHAR(10), "
+                    + "id_num INT, "
+                    + "id_ety INT"
+                    + ")";
+            st.execute(sqlCreateTempTable);
+
+            // Paso 2: Insertar llaves foráneas desde trn_stk_val_acc
+            String sqlInsertTemp = "INSERT INTO tmp_keys_to_delete (id_year, id_per, id_bkc, id_tp_rec, id_num, id_ety) "
+                    + "SELECT fk_fin_rec_year_n, fk_fin_rec_per_n, fk_fin_rec_bkc_n, "
+                    + "       fk_fin_rec_tp_rec_n, fk_fin_rec_num_n, fk_fin_rec_ety_n "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " "
+                    + "WHERE fk_stk_val = " + idValuation + " AND fk_fin_rec_year_n IS NOT NULL";
+            st.executeUpdate(sqlInsertTemp);
+
+            // Paso 3: Romper relación (poner NULL y marcar como borrado)
+            String sqlUpdateValAcc = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " "
+                    + "SET b_del = 1, "
+                    + "    fk_fin_rec_year_n = NULL, "
+                    + "    fk_fin_rec_per_n = NULL, "
+                    + "    fk_fin_rec_bkc_n = NULL, "
+                    + "    fk_fin_rec_tp_rec_n = NULL, "
+                    + "    fk_fin_rec_num_n = NULL, "
+                    + "    fk_fin_rec_ety_n = NULL "
+                    + "WHERE fk_stk_val = " + idValuation;
+            st.executeUpdate(sqlUpdateValAcc);
+
+            // Paso 4: Eliminar pólizas
+            String sqlDeleteRecEty = "DELETE re FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re " +
+                "JOIN tmp_keys_to_delete AS tmp " +
+                "ON re.id_year = tmp.id_year AND re.id_per = tmp.id_per AND re.id_bkc = tmp.id_bkc " +
+                "AND re.id_tp_rec = tmp.id_tp_rec AND re.id_num = tmp.id_num AND re.id_ety = tmp.id_ety";
+            st.executeUpdate(sqlDeleteRecEty);
+        }
         
         /**
          * Eliminar revisiones de ajuste de precios temporales
@@ -551,7 +586,9 @@ public class SStockValuationUtils {
                             "    mvt1.fk_stk_val_mvt_n = NULL " +
                             "WHERE NOT mvt1.b_del;";
         
-        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelRevs);
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlDelRevs);
+        }
         
         /**
          * Eliminar movimientos de valuación
@@ -559,7 +596,9 @@ public class SStockValuationUtils {
         String sqlDelEtys = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " SET b_del = 1 "
                 + "WHERE fk_stk_val = " + idValuation + ";";
         
-        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelEtys);
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlDelEtys);
+        }
 
         /**
          * Eliminar Diogs y stk de ajustes
@@ -576,7 +615,9 @@ public class SStockValuationUtils {
                 + "stk.b_del = 1 "
                 + "WHERE NOT diog.b_del AND NOT diog_ety.b_del AND NOT stk.b_del AND piv.id_stk_val = " + idValuation + ";";
         
-        session.getStatement().getConnection().createStatement().executeUpdate(sqlDelDiogs);
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlDelDiogs);
+        }
         
         return true;
     }
@@ -589,15 +630,13 @@ public class SStockValuationUtils {
      * @return true si se puede crear, false en caso contrario.
      */
     public static boolean canCreateDiogByValuation(SGuiSession session, final Date dtDiog) {
-        try {
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
             String sql = "SELECT id_stk_val "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " "
                     + "WHERE NOT b_del "
                     + "AND '" + SLibUtils.DbmsDateFormatDate.format(dtDiog) + "' BETWEEN dt_sta AND dt_end;";
-            
-            ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-            
-            return ! res.next();
+            ResultSet res = st.executeQuery(sql);
+            return !res.next();
         }
         catch (SQLException ex) {
             Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, null, ex);
@@ -719,28 +758,30 @@ public class SStockValuationUtils {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS val "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS vacc ON (val.id_stk_val = vacc.fk_stk_val) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON ("
-                + "vacc.fk_fin_rec_year = r.id_year AND "
-                + "vacc.fk_fin_rec_per = r.id_per AND "
-                + "vacc.fk_fin_rec_bkc = r.id_bkc AND "
-                + "vacc.fk_fin_rec_tp_rec = r.id_tp_rec AND "
-                + "vacc.fk_fin_rec_num = r.id_num) "
+                + "vacc.fk_fin_rec_year_n = r.id_year AND "
+                + "vacc.fk_fin_rec_per_n = r.id_per AND "
+                + "vacc.fk_fin_rec_bkc_n = r.id_bkc AND "
+                + "vacc.fk_fin_rec_tp_rec_n = r.id_tp_rec AND "
+                + "vacc.fk_fin_rec_num_n = r.id_num) "
                 + "WHERE NOT val.b_del AND NOT vacc.b_del "
                 + "AND val.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' "
                 + "AND YEAR(val.dt_sta) = YEAR('" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "') "
                 + "ORDER BY val.dt_end ASC";
         
-        ResultSet res = client.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
-        String result = "";
-        while (res.next()) {
-            if (! SDataUtilities.isPeriodOpen(client, res.getDate("dt"))) {
-                result += "La valuación del '" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' al "
-                            + "'" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' no se puede reevaluar porque la póliza: "
-                            + "'" + res.getString("r.id_tp_rec") + "', num: " + (res.getInt("r.id_num")) + ", "
-                            + "fecha: '" + SLibUtils.DateFormatDate.format(res.getDate("dt")) + "' está en un periodo cerrado.";
+        try (Statement st = client.getSession().getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            String sResult = "";
+            while (res.next()) {
+                if (! SDataUtilities.isPeriodOpen(client, res.getDate("dt"))) {
+                    sResult += "La valuación del '" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' al "
+                                + "'" + SLibUtils.DbmsDateFormatDate.format(firstInvalidValuationDate) + "' no se puede reevaluar porque la póliza: "
+                                + "'" + res.getString("r.id_tp_rec") + "', num: " + (res.getInt("r.id_num")) + ", "
+                                + "fecha: '" + SLibUtils.DateFormatDate.format(res.getDate("dt")) + "' está en un periodo cerrado.";
+                }
             }
+
+            return sResult;
         }
-        
-        return result;
     }
     
     /**
@@ -759,15 +800,15 @@ public class SStockValuationUtils {
                 + "AND dt_end < '" + SLibUtils.DbmsDateFormatDate.format(endDate) + "' "
                 + "AND YEAR(dt_sta) = YEAR('" + SLibUtils.DbmsDateFormatDate.format(endDate) + "') "
                 + "ORDER BY dt_end ASC";
-
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (res.next()) {
-            if (! isValuationDiogsValidById(session, res.getInt("id_stk_val")).isEmpty() || 
-                ! isValuationMatReqValidById(session, res.getInt("id_stk_val")).isEmpty()) {
-                return res.getDate("dt_sta");
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            while (res.next()) {
+                if (!isValuationDiogsValidById(session, res.getInt("id_stk_val")).isEmpty() ||
+                    !isValuationMatReqValidById(session, res.getInt("id_stk_val")).isEmpty()) {
+                    return res.getDate("dt_sta");
+                }
             }
         }
-        
         return null;
     }
     
@@ -788,37 +829,39 @@ public class SStockValuationUtils {
                 + "AND dt_end < '" + SLibUtils.DbmsDateFormatDate.format(endDate) + "' "
                 + "AND YEAR(dt_sta) = YEAR('" + SLibUtils.DbmsDateFormatDate.format(endDate) + "') "
                 + "ORDER BY dt_end ASC";
-
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        ArrayList<SDataDiog> lDiogs = null;
-        ArrayList<SDbMaterialRequest> lMatReqs = null;
-        String result = "";
-        while (res.next()) {
-            lDiogs = isValuationDiogsValidById(session, res.getInt("id_stk_val"));
-            if (! lDiogs.isEmpty()) {
-                for (SDataDiog oDiog : lDiogs) {
-                    result += "El movimiento de almacén: " + oDiog.getDbmsDiogCategory() + "-"
-                            + oDiog.getDbmsDiogClass() + "-"
-                            + oDiog.getDbmsDiogType() + " "
-                            + "Numero: " + oDiog.getNumber() + " "
-                            + "Fecha: '" + SLibUtils.DateFormatDate.format(oDiog.getDate()) + "' "
-                            + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
-                            + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
-                }
-            }
-            
-            lMatReqs = isValuationMatReqValidById(session, res.getInt("id_stk_val"));
-            if (! lMatReqs.isEmpty()) {
-                for (SDbMaterialRequest oMatReq : lMatReqs) {
-                    result += "La requisición con folio: " + oMatReq.getNumber() + ", "
-                            + "Fecha: '" + SLibUtils.DateFormatDate.format(oMatReq.getDate()) + "' "
-                            + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
-                            + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
-                }
-            }
-        }
         
-        return result;
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            ArrayList<SDataDiog> lDiogs = null;
+            ArrayList<SDbMaterialRequest> lMatReqs = null;
+            String sResult = "";
+            while (res.next()) {
+                lDiogs = isValuationDiogsValidById(session, res.getInt("id_stk_val"));
+                if (! lDiogs.isEmpty()) {
+                    for (SDataDiog oDiog : lDiogs) {
+                        sResult += "El movimiento de almacén: " + oDiog.getDbmsDiogCategory() + "-"
+                                + oDiog.getDbmsDiogClass() + "-"
+                                + oDiog.getDbmsDiogType() + " "
+                                + "Numero: " + oDiog.getNumber() + " "
+                                + "Fecha: '" + SLibUtils.DateFormatDate.format(oDiog.getDate()) + "' "
+                                + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
+                                + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
+                    }
+                }
+
+                lMatReqs = isValuationMatReqValidById(session, res.getInt("id_stk_val"));
+                if (! lMatReqs.isEmpty()) {
+                    for (SDbMaterialRequest oMatReq : lMatReqs) {
+                        sResult += "La requisición con folio: " + oMatReq.getNumber() + ", "
+                                + "Fecha: '" + SLibUtils.DateFormatDate.format(oMatReq.getDate()) + "' "
+                                + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
+                                + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
+                    }
+                }
+            }
+
+            return sResult;
+        }
     }
     
     /**
@@ -844,16 +887,18 @@ public class SStockValuationUtils {
                     + "        AND (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oVal.getTsUserUpdate()) + "' " 
                     + "        OR de.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oVal.getTsUserUpdate()) + "')"
                     + "AND NOT d.b_del AND NOT de.b_del;";
-            
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        ArrayList<SDataDiog> lDiogs = new ArrayList<>();
-        while (res.next()) {
-            SDataDiog oDiog = new SDataDiog();
-            oDiog.read(new int [] { res.getInt("id_year"), res.getInt("id_doc") }, session.getStatement().getConnection().createStatement());
-            lDiogs.add(oDiog);
-        }
         
-        return lDiogs;
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            ArrayList<SDataDiog> lDiogs = new ArrayList<>();
+            while (res.next()) {
+                SDataDiog oDiog = new SDataDiog();
+                oDiog.read(new int [] { res.getInt("id_year"), res.getInt("id_doc") }, session.getStatement().getConnection().createStatement());
+                lDiogs.add(oDiog);
+            }
+
+            return lDiogs;
+        }
     }
     
     /**
@@ -879,15 +924,15 @@ public class SStockValuationUtils {
                     "    NOT v.b_del AND NOT vm.b_del " +
                     "    AND v.id_stk_val = " + idValuation + " " +
                     "    AND mr.ts_usr_chg >= v.ts_usr_upd;";
-            
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
         ArrayList<SDbMaterialRequest> lMatReqs = new ArrayList<>();
-        while (res.next()) {
-            SDbMaterialRequest oMatReq = new SDbMaterialRequest();
-            oMatReq.read(session, new int[] { res.getInt("id_mat_req") });
-            lMatReqs.add(oMatReq);
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            while (res.next()) {
+                SDbMaterialRequest oMatReq = new SDbMaterialRequest();
+                oMatReq.read(session, new int[] { res.getInt("id_mat_req") });
+                lMatReqs.add(oMatReq);
+            }
         }
-        
         return lMatReqs;
     }
 
@@ -918,16 +963,18 @@ public class SStockValuationUtils {
                 + "ORDER BY d.dt ASC, d.num ASC;";
 
         String sResult = "";
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (res.next()) {
-            sResult += "Folio: " + res.getString("d.num") + ", fecha: "
-                    + SLibUtils.DateFormatDate.format(res.getDate("d.dt")) 
-                    +  " y pedido con folio:" + res.getString("dps.num") + ", fecha: " 
-                    + SLibUtils.DateFormatDate.format(res.getDate("dps.dt")) + ".\n";
-        }
-        if (! sResult.isEmpty()) {
-            sResult = "Los movimientos de entrada al almacén: \n" + sResult
-                    + "no tienen una factura asociada.\n";
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            while (res.next()) {
+                sResult += "Folio: " + res.getString("d.num") + ", fecha: "
+                        + SLibUtils.DateFormatDate.format(res.getDate("d.dt")) 
+                        +  " y pedido con folio:" + res.getString("dps.num") + ", fecha: " 
+                        + SLibUtils.DateFormatDate.format(res.getDate("dps.dt")) + ".\n";
+            }
+            if (! sResult.isEmpty()) {
+                sResult = "Los movimientos de entrada al almacén: \n" + sResult
+                        + "no tienen una factura asociada.\n";
+            }
         }
 
         return sResult;
@@ -975,8 +1022,9 @@ public class SStockValuationUtils {
                 + "(id_cob = " + idCob + ") and "
                 + "(id_wh = " + idWh + ") and "
                 + "(id_mov = " + idMov + ");";
-
-       session.getStatement().getConnection().createStatement().executeUpdate(sql);
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sql);
+        }
     }
     
     /**
@@ -1002,18 +1050,21 @@ public class SStockValuationUtils {
                 + "AND fid_diog_doc = " + idDiogDoc + " "
                 + "AND fid_diog_ety = " + idDiogEty + " "
                 + "AND NOT b_del;";
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (res.next()) {
-            updateTrnStockRowCost(session,
-                            res.getInt("id_year"), 
-                            res.getInt("id_item"), 
-                            res.getInt("id_unit"), 
-                            res.getInt("id_lot"), 
-                            res.getInt("id_cob"), 
-                            res.getInt("id_wh"), 
-                            res.getInt("id_mov"),
-                            dCost,
-                            opType);
+        
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            while (res.next()) {
+                updateTrnStockRowCost(session,
+                                res.getInt("id_year"), 
+                                res.getInt("id_item"), 
+                                res.getInt("id_unit"), 
+                                res.getInt("id_lot"), 
+                                res.getInt("id_cob"), 
+                                res.getInt("id_wh"), 
+                                res.getInt("id_mov"),
+                                dCost,
+                                opType);
+            }
         }
     }
     
@@ -1061,48 +1112,50 @@ public class SStockValuationUtils {
                 + "HAVING qty > 0 "
                 + "ORDER BY ve.dt_mov ASC, ve.fk_stk_val ASC";
 
-        ResultSet res = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        SDbStockValuationMvt oEntry;
-        HashMap<String, ArrayList<SDbStockValuationMvt>> groupedEntries = new HashMap<>();
-        while (res.next()) {
-            oEntry = new SDbStockValuationMvt();
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            SDbStockValuationMvt oEntry;
+            HashMap<String, ArrayList<SDbStockValuationMvt>> groupedEntries = new HashMap<>();
+            while (res.next()) {
+                oEntry = new SDbStockValuationMvt();
 
-            oEntry.setDateMove(res.getDate("dt_mov"));
-            oEntry.setQuantityMovement(res.getDouble("qty"));
-            oEntry.setCostUnitary(res.getDouble("cost_u"));
-            oEntry.setPkStockValuationMvtId(res.getInt("id_stk_val_mvt"));
-            oEntry.setFkStockValuationId(res.getInt("fk_stk_val"));
-            oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
-            oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
-            oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
-            oEntry.setFkDpsYearInId_n(res.getInt("fk_dps_year_in_n"));
-            oEntry.setFkDpsDocInId_n(res.getInt("fk_dps_doc_in_n"));
-            oEntry.setFkDpsEntryInId_n(res.getInt("fk_dps_ety_in_n"));
-            oEntry.setFkItemId(res.getInt("fk_item"));
-            oEntry.setFkUnitId(res.getInt("fk_unit"));
-            oEntry.setFkLotId(res.getInt("fk_lot"));
-            oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
-            oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
-            oEntry.setFkWarehouseId(res.getInt("fk_wh"));
+                oEntry.setDateMove(res.getDate("dt_mov"));
+                oEntry.setQuantityMovement(res.getDouble("qty"));
+                oEntry.setCostUnitary(res.getDouble("cost_u"));
+                oEntry.setPkStockValuationMvtId(res.getInt("id_stk_val_mvt"));
+                oEntry.setFkStockValuationId(res.getInt("fk_stk_val"));
+                oEntry.setFkDiogYearInId_n(res.getInt("fk_diog_year_in_n"));
+                oEntry.setFkDiogDocInId_n(res.getInt("fk_diog_doc_in_n"));
+                oEntry.setFkDiogEntryInId_n(res.getInt("fk_diog_ety_in_n"));
+                oEntry.setFkDpsYearInId_n(res.getInt("fk_dps_year_in_n"));
+                oEntry.setFkDpsDocInId_n(res.getInt("fk_dps_doc_in_n"));
+                oEntry.setFkDpsEntryInId_n(res.getInt("fk_dps_ety_in_n"));
+                oEntry.setFkItemId(res.getInt("fk_item"));
+                oEntry.setFkUnitId(res.getInt("fk_unit"));
+                oEntry.setFkLotId(res.getInt("fk_lot"));
+                oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
+                oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
+                oEntry.setFkWarehouseId(res.getInt("fk_wh"));
 
-            if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
-                    res.getInt("dps.fid_tp_dps") > 0) {
-                oEntry.setAuxTypeDpsIn(new int[] {
-                                            res.getInt("dps.fid_ct_dps"), 
-                                            res.getInt("dps.fid_cl_dps"), 
-                                            res.getInt("dps.fid_tp_dps") 
-                                        });
-                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
-                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
-                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                        oEntry.setTemporalPrice(true);
+                if (res.getInt("dps.fid_ct_dps") > 0 && res.getInt("dps.fid_cl_dps") > 0 && 
+                        res.getInt("dps.fid_tp_dps") > 0) {
+                    oEntry.setAuxTypeDpsIn(new int[] {
+                                                res.getInt("dps.fid_ct_dps"), 
+                                                res.getInt("dps.fid_cl_dps"), 
+                                                res.getInt("dps.fid_tp_dps") 
+                                            });
+                    if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                        oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                        oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                            oEntry.setTemporalPrice(true);
+                    }
                 }
+
+                String key = oEntry.getFkItemId() + "-" + oEntry.getFkUnitId();
+                groupedEntries.computeIfAbsent(key, k -> new ArrayList<>()).add(oEntry);
             }
 
-            String key = oEntry.getFkItemId() + "-" + oEntry.getFkUnitId();
-            groupedEntries.computeIfAbsent(key, k -> new ArrayList<>()).add(oEntry);
+            return groupedEntries;
         }
-
-        return groupedEntries;
     }
 }

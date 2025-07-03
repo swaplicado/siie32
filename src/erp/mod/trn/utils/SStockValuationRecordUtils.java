@@ -3,7 +3,7 @@
  * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
  * y abra la plantilla en el editor.
  */
-package erp.mod.trn.db;
+package erp.mod.trn.utils;
 
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -18,6 +18,10 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
+import erp.mod.trn.db.SDbStockValuationAccount;
+import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.db.SMaterialRequestUtils;
+import erp.mod.trn.db.SStockValuationConfiguration;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -426,8 +430,12 @@ public class SStockValuationRecordUtils {
      * @param pkDiog Llave primaria del documento de inventario.
      * @param nItemRef Referencia del ítem.
      * @param fkSystemMove Clave de sistema para el tipo de movimiento.
+     *                      SModSysConsts.FINS_TP_SYS_MOV_PUR
      * @param fkSystemAccount Clave de sistema para la cuenta.
+     *                      SModSysConsts.FINS_TP_SYS_ACC_NA_NA
      * @param fkSystemMoveType Clave de sistema para el tipo de movimiento.
+     *                      SDataConstantsSys.FINS_TP_SYS_MOV_NA
+     *                      SDataConstantsSys.FINS_TP_SYS_MOV_PUR_GOOD
      * @param pkWhs Llave primaria del almacén.
      * @param stkValuationId ID de la valuación de inventario.
      * @param stkValuationMvtId ID del movimiento de valuación.
@@ -535,12 +543,12 @@ public class SStockValuationRecordUtils {
         SDbStockValuationAccount oRecEtyAcc = new SDbStockValuationAccount();
             
         oRecEtyAcc.setProrationPercentage(dPercent);
-        oRecEtyAcc.setFkFinRecYearId(oRecordEntry.getPkYearId());
-        oRecEtyAcc.setFkFinRecPerId(oRecordEntry.getPkPeriodId());
-        oRecEtyAcc.setFkFinRecBkcId(oRecordEntry.getPkBookkeepingCenterId());
-        oRecEtyAcc.setFkFinRecTpRecId(oRecordEntry.getPkRecordTypeId());
-        oRecEtyAcc.setFkFinRecNum(oRecordEntry.getPkNumberId());
-        oRecEtyAcc.setFkFinRecEty(oRecordEntry.getPkEntryId());
+        oRecEtyAcc.setFkFinRecYearId_n(oRecordEntry.getPkYearId());
+        oRecEtyAcc.setFkFinRecPeriodId_n(oRecordEntry.getPkPeriodId());
+        oRecEtyAcc.setFkFinBookKeepingCenterId_n(oRecordEntry.getPkBookkeepingCenterId());
+        oRecEtyAcc.setFkFinRecordTypeId_n(oRecordEntry.getPkRecordTypeId());
+        oRecEtyAcc.setFkFinRecNumberId_n(oRecordEntry.getPkNumberId());
+        oRecEtyAcc.setFkFinRecEntryId_n(oRecordEntry.getPkEntryId());
         oRecEtyAcc.setFkStockValuationId(stkValuationId);
         oRecEtyAcc.setFkValuationMvtId(stkValuationMvtId);
 
