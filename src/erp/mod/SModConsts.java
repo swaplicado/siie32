@@ -461,9 +461,10 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
     public static final int TRN_STK_SEG_X = 2023065;
-    public static final int TRN_STK_VAL = 2023068;
-    public static final int TRN_STK_VAL_MVT = 2023069;
-    public static final int TRN_STK_VAL_ACC = 2023070;
+    public static final int TRN_STK_VAL = 2023086;
+    public static final int TRN_STK_VAL_MVT = 2023087;
+    public static final int TRN_STK_VAL_ACC = 2023088;
+    public static final int TRN_STK_VAL_DIOG_ADJ = 2023089;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
@@ -588,6 +589,7 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_ETY_ACI_PER = 2024096;
     public static final int TRNX_DPS_ACC_TAG = 2024097;
     public static final int TRNX_STK_VAL_UPD = 2024098;
+    public static final int TRNX_STK_VAL_IN_CARDEX = 2024099;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1308,6 +1310,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_VAL, "trn_stk_val");
         TablesMap.put(TRN_STK_VAL_MVT, "trn_stk_val_mvt");
         TablesMap.put(TRN_STK_VAL_ACC, "trn_stk_val_acc");
+        TablesMap.put(TRN_STK_VAL_DIOG_ADJ, "trn_stk_val_diog_adj");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");

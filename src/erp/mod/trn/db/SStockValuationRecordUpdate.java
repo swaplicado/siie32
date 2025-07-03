@@ -9,6 +9,7 @@ package erp.mod.trn.db;
  *
  * @author Edwin Carmona
  */
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
@@ -31,7 +32,7 @@ public class SStockValuationRecordUpdate {
         try {
             // ejecutar query
             String sqlSelect = "SELECT  " +
-                    "DISTINCT vmvt.*, vacc.fk_fin_rec_bkc ";
+                    "DISTINCT vmvt.*, vacc.fk_fin_rec_bkc_n ";
 
             String sqlRecEtySelect = "SELECT DISTINCT vacc.*, fre.* ";
 
@@ -42,16 +43,16 @@ public class SStockValuationRecordUpdate {
                     "        INNER JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS v ON (vmvt.fk_stk_val = v.id_stk_val) " +
                     "        INNER JOIN " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS fre ON (vacc.fk_fin_rec_year = fre.id_year " +
-                    "        AND vacc.fk_fin_rec_per = fre.id_per " +
-                    "        AND vacc.fk_fin_rec_bkc = fre.id_bkc " +
-                    "        AND vacc.fk_fin_rec_tp_rec = fre.id_tp_rec " +
-                    "        AND vacc.fk_fin_rec_num = fre.id_num " +
-                    "        AND vacc.fk_fin_rec_ety = fre.id_ety) " +
+                    "    " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS fre ON (vacc.fk_fin_rec_year_n = fre.id_year " +
+                    "        AND vacc.fk_fin_rec_per_n = fre.id_per " +
+                    "        AND vacc.fk_fin_rec_bkc_n = fre.id_bkc " +
+                    "        AND vacc.fk_fin_rec_tp_rec_n = fre.id_tp_rec " +
+                    "        AND vacc.fk_fin_rec_num_n = fre.id_num " +
+                    "        AND vacc.fk_fin_rec_ety_n = fre.id_ety) " +
                     "WHERE " +
                     "    NOT vacc.b_del AND NOT vmvt.b_del AND NOT v.b_del " +
-                    "        AND vacc.fk_fin_rec_year = " + iYear + " " +
-                    "        AND vacc.fk_fin_rec_per = " + iMonth + " ";
+                    "        AND vacc.fk_fin_rec_year_n = " + iYear + " " +
+                    "        AND vacc.fk_fin_rec_per_n = " + iMonth + " ";
             
             String whereMvt = "AND vmvt.id_stk_val_mvt = ";
             String orderBy = "ORDER BY fre.id_ety ASC;";
@@ -108,7 +109,7 @@ public class SStockValuationRecordUpdate {
                         vPurAccConfigs = purCfgs.get(idItem);
                     } else {
                         vPurAccConfigs = SFinAccountUtilities.obtainItemAccountConfigs(idItem,
-                                res.getInt("vacc.fk_fin_rec_bkc"),
+                                res.getInt("vacc.fk_fin_rec_bkc_n"),
                                 firstDateOfMonth,
                                 oCfg.getFinTpAccItemAsset(),
                                 true,
@@ -132,12 +133,12 @@ public class SStockValuationRecordUpdate {
                     oStockValuationAccount = new SDbStockValuationAccount();
                     oStockValuationAccount.setPkStockValuationAccountId(resEty.getInt("vacc.id_stk_val_acc"));
                     oStockValuationAccount.setDeleted(resEty.getBoolean("vacc.b_del"));
-                    oStockValuationAccount.setFkFinRecYearId(resEty.getInt("vacc.fk_fin_rec_year"));
-                    oStockValuationAccount.setFkFinRecPerId(resEty.getInt("vacc.fk_fin_rec_per"));
-                    oStockValuationAccount.setFkFinRecBkcId(resEty.getInt("vacc.fk_fin_rec_bkc"));
-                    oStockValuationAccount.setFkFinRecTpRecId(resEty.getString("vacc.fk_fin_rec_tp_rec"));
-                    oStockValuationAccount.setFkFinRecNum(resEty.getInt("vacc.fk_fin_rec_num"));
-                    oStockValuationAccount.setFkFinRecEty(resEty.getInt("vacc.fk_fin_rec_ety"));
+                    oStockValuationAccount.setFkFinRecYearId_n(resEty.getInt("vacc.fk_fin_rec_year_n"));
+                    oStockValuationAccount.setFkFinRecPeriodId_n(resEty.getInt("vacc.fk_fin_rec_per_n"));
+                    oStockValuationAccount.setFkFinBookKeepingCenterId_n(resEty.getInt("vacc.fk_fin_rec_bkc_n"));
+                    oStockValuationAccount.setFkFinRecordTypeId_n(resEty.getString("vacc.fk_fin_rec_tp_rec_n"));
+                    oStockValuationAccount.setFkFinRecNumberId_n(resEty.getInt("vacc.fk_fin_rec_num_n"));
+                    oStockValuationAccount.setFkFinRecEntryId_n(resEty.getInt("vacc.fk_fin_rec_ety_n"));
                     oStockValuationAccount.setProrationPercentage(resEty.getDouble("vacc.prorat_per"));
                     oStockValuationAccount.setFkStockValuationId(resEty.getInt("vacc.fk_stk_val"));
                     oStockValuationAccount.setFkValuationMvtId(resEty.getInt("vacc.fk_stk_val_mvt"));

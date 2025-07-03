@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.db;
+package erp.mod.trn.utils;
 
+import erp.mod.trn.db.SDbStockValuationMvt;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
