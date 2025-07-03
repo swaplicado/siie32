@@ -22,27 +22,27 @@ import sa.lib.gui.SGuiSession;
 public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
     
     protected int mnPkStockValuationId;
-    protected int mnPkDiogIdYear;
-    protected int mnPkDiogIdDoc;
+    protected int mnPkDiogYearId;
+    protected int mnPkDiogDocId;
 
     public SDbStockValuationDiogAdjust() {
         super(SModConsts.TRN_STK_VAL_DIOG_ADJ);
     }
 
-    public SDbStockValuationDiogAdjust(int mnPkStockValuationId, int mnPkDiogIdYear, int mnPkDiogIdDoc) {
+    public SDbStockValuationDiogAdjust(int mnPkStockValuationId, int mnPkDiogYearId, int mnPkDiogDocId) {
         super(SModConsts.TRN_STK_VAL_DIOG_ADJ);
         this.mnPkStockValuationId = mnPkStockValuationId;
-        this.mnPkDiogIdYear = mnPkDiogIdYear;
-        this.mnPkDiogIdDoc = mnPkDiogIdDoc;
+        this.mnPkDiogYearId = mnPkDiogYearId;
+        this.mnPkDiogDocId = mnPkDiogDocId;
     }
     
     public void setPkStockValuationId(int n) { mnPkStockValuationId = n; }
-    public void setPkDiogIdYear(int n) { mnPkDiogIdYear = n; }
-    public void setPkDiogIdDoc(int n) { mnPkDiogIdDoc = n; }
+    public void setPkDiogYearId(int n) { mnPkDiogYearId = n; }
+    public void setPkDiogDocId(int n) { mnPkDiogDocId = n; }
     
     public int getPkStockValuationtId() { return mnPkStockValuationId; }
-    public int getPkDiogIdYear() { return mnPkDiogIdYear; }
-    public int getPkDiogIdDoc() { return mnPkDiogIdDoc; }
+    public int getPkDiogYearId() { return mnPkDiogYearId; }
+    public int getPkDiogDocId() { return mnPkDiogDocId; }
 
     @Override
     public void setPrimaryKey(int[] key) {
@@ -59,8 +59,8 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
         initBaseRegistry();
         
         mnPkStockValuationId = 0;
-        mnPkDiogIdYear = 0;
-        mnPkDiogIdDoc = 0;
+        mnPkDiogYearId = 0;
+        mnPkDiogDocId = 0;
     }
 
     @Override
@@ -71,8 +71,8 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
     @Override
     public String getSqlWhere() {
         return "WHERE id_stk_val = " + mnPkStockValuationId 
-                + " AND id_year = " + mnPkDiogIdYear
-                + " AND id_doc = " + mnPkDiogIdDoc;
+                + " AND id_year = " + mnPkDiogYearId
+                + " AND id_doc = " + mnPkDiogDocId;
     }
 
     @Override
@@ -100,8 +100,8 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
             }
             else {
                 mnPkStockValuationId = resultSet.getInt("id_stk_val");
-                mnPkDiogIdYear = resultSet.getInt("id_year");
-                mnPkDiogIdDoc = resultSet.getInt("id_doc");
+                mnPkDiogYearId = resultSet.getInt("id_year");
+                mnPkDiogDocId = resultSet.getInt("id_doc");
             }
 
             mnQueryResultId = SDbConsts.READ_OK;
@@ -117,8 +117,8 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
         if (mbRegistryNew) {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkStockValuationId + ", " + 
-                    mnPkDiogIdYear + ", " +
-                    mnPkDiogIdDoc + " " +
+                    mnPkDiogYearId + ", " +
+                    mnPkDiogDocId + " " +
                     ")" ;
         }
         else {
@@ -156,8 +156,8 @@ public class SDbStockValuationDiogAdjust extends SDbRegistryUser {
         SDbStockValuationDiogAdjust registry = new SDbStockValuationDiogAdjust();
         
         registry.setPkStockValuationId(this.getPkStockValuationtId());
-        registry.setPkDiogIdYear(this.getPkDiogIdYear());
-        registry.setPkDiogIdDoc(this.getPkDiogIdDoc());
+        registry.setPkDiogYearId(this.getPkDiogYearId());
+        registry.setPkDiogDocId(this.getPkDiogDocId());
         
         registry.setRegistryNew(this.isRegistryNew());
 

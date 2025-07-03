@@ -13,7 +13,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbStockValuation;
-import erp.mod.trn.db.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;

@@ -6,6 +6,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -14,13 +15,14 @@ import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
  * @author Edwin Carmona
  */
-public class SDbStockValuationMvt extends SDbRegistryUser {
+public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, Serializable {
     
     protected int mnPkStockValuationMvtId;
     protected Date mtDate;
@@ -66,6 +68,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     protected int mnAuxFkCostCenterId;
     protected String msAuxItemDescription;
     protected String msAuxDiogTypeDescription;
+    protected String msAuxDiogData;
+    protected String msAuxMaterialRequestData;
     protected String sLogMessage;
     protected int[] maAuxTypeDpsIn;
     protected int[] maAuxTypeDpsOut;
@@ -115,6 +119,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     public void setAuxFkCostCenterId(int n) { mnAuxFkCostCenterId = n; }
     public void setAuxItemDescription(String s) { msAuxItemDescription = s; }
     public void setAuxDiogTypeDescription(String s) { msAuxDiogTypeDescription = s; }
+    public void setAuxDiogData(String s) { msAuxDiogData = s; }
+    public void setAuxMaterialRequestData(String s) { msAuxMaterialRequestData = s; }
     public void setLogMessage(String s) { sLogMessage = s; }
     public void setAuxTypeDpsIn(int[] typeDpsIn) { maAuxTypeDpsIn = typeDpsIn; }
     public void setAuxTypeDpsOut(int[] typeDpsOut) { maAuxTypeDpsOut = typeDpsOut; }
@@ -160,6 +166,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
     public int getAuxFkCostCenter() { return mnAuxFkCostCenterId; }
     public String getAuxItemDescription() { return msAuxItemDescription; }
     public String getAuxDiogTypeDescription() { return msAuxDiogTypeDescription; }
+    public String getAuxDiogData() { return msAuxDiogData; }
+    public String getAuxMaterialRequestData() { return msAuxMaterialRequestData; }
     public String getLogMessage() { return sLogMessage; }
     public int[] getAuxTypeDpsIn() { return maAuxTypeDpsIn; }
     public int[] getAuxTypeDpsOut() { return maAuxTypeDpsOut; }
@@ -235,6 +243,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
         mdAuxConsumption = 0d;
         msAuxItemDescription = "";
         msAuxDiogTypeDescription = "";
+        msAuxDiogData = "";
+        msAuxMaterialRequestData = "";
         maAuxTypeDpsIn = new int[] { 0, 0, 0 };
         maAuxTypeDpsOut = new int[] { 0, 0, 0 };
     }
@@ -293,13 +303,13 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
             mnFkDiogCategoryId = resultSet.getInt("fk_ct_iog");
             mnFkDiogYearInId_n = resultSet.getInt("fk_diog_year_in_n");
             mnFkDiogDocInId_n = resultSet.getInt("fk_diog_doc_in_n");
-            mnFkDiogEntryInId_n = resultSet.getInt("fk_diog_entry_in_n");
+            mnFkDiogEntryInId_n = resultSet.getInt("fk_diog_ety_in_n");
             mnFkDpsYearInId_n = resultSet.getInt("fk_dps_year_in_n");
             mnFkDpsDocInId_n = resultSet.getInt("fk_dps_doc_in_n");
             mnFkDpsEntryInId_n = resultSet.getInt("fk_dps_ety_in_n");
             mnFkDiogYearOutId_n = resultSet.getInt("fk_diog_year_out_n");
             mnFkDiogDocOutId_n = resultSet.getInt("fk_diog_doc_out_n");
-            mnFkDiogEntryOutId_n = resultSet.getInt("fk_diog_entry_out_n");
+            mnFkDiogEntryOutId_n = resultSet.getInt("fk_diog_ety_out_n");
             mnFkDpsYearOutId_n = resultSet.getInt("fk_dps_year_out_n");
             mnFkDpsDocOutId_n = resultSet.getInt("fk_dps_doc_out_n");
             mnFkDpsEntryOutId_n = resultSet.getInt("fk_dps_ety_out_n");
@@ -388,13 +398,13 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
                     "fk_ct_iog = " + mnFkDiogCategoryId + ", " +
                     "fk_diog_year_in_n = " + (mnFkDiogYearInId_n > 0 ? mnFkDiogYearInId_n : "null") + ", " +
                     "fk_diog_doc_in_n = " + (mnFkDiogDocInId_n > 0 ? mnFkDiogDocInId_n : "null") + ", " +
-                    "fk_diog_entry_in_n = " + (mnFkDiogEntryInId_n > 0 ? mnFkDiogEntryInId_n : "null") + ", " +
+                    "fk_diog_ety_in_n = " + (mnFkDiogEntryInId_n > 0 ? mnFkDiogEntryInId_n : "null") + ", " +
                     "fk_dps_year_in_n = " + (mnFkDpsYearInId_n > 0 ? mnFkDpsYearInId_n : "null") + ", " +
                     "fk_dps_doc_in_n = " + (mnFkDpsDocInId_n > 0 ? mnFkDpsDocInId_n : "null") + ", " +
                     "fk_dps_ety_in_n = " + (mnFkDpsEntryInId_n > 0 ? mnFkDpsEntryInId_n : "null") + ", " +
                     "fk_diog_year_out_n = " + (mnFkDiogYearOutId_n > 0 ? mnFkDiogYearOutId_n : "null") + ", " +
                     "fk_diog_doc_out_n = " + (mnFkDiogDocOutId_n > 0 ? mnFkDiogDocOutId_n : "null") + ", " +
-                    "fk_diog_entry_out_n = " + (mnFkDiogEntryOutId_n > 0 ? mnFkDiogEntryOutId_n : "null") + ", " +
+                    "fk_diog_ety_out_n = " + (mnFkDiogEntryOutId_n > 0 ? mnFkDiogEntryOutId_n : "null") + ", " +
                     "fk_dps_year_out_n = " + (mnFkDpsYearOutId_n > 0 ? mnFkDpsYearOutId_n : "null") + ", " +
                     "fk_dps_doc_out_n = " + (mnFkDpsDocOutId_n > 0 ? mnFkDpsDocOutId_n : "null") + ", " +
                     "fk_dps_ety_out_n = " + (mnFkDpsEntryOutId_n > 0 ? mnFkDpsEntryOutId_n : "null") + ", " +
@@ -468,5 +478,80 @@ public class SDbStockValuationMvt extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+
+    @Override
+    public int[] getRowPrimaryKey() {
+        return new int[] { mnPkStockValuationMvtId };
+    }
+
+    @Override
+    public String getRowCode() {
+        return String.valueOf(mnPkStockValuationMvtId);
+    }
+
+    @Override
+    public String getRowName() {
+        return SLibUtils.DateFormatDate.format(mtDate) + " - " + msAuxItemDescription + " - " + msAuxDiogTypeDescription;
+    }
+
+    @Override
+    public boolean isRowSystem() {
+        return false; // This registry is not a system one.
+    }
+
+    @Override
+    public boolean isRowDeletable() {
+        return false;
+    }
+
+    @Override
+    public boolean isRowEdited() {
+        return false; // This registry is not editable.
+    }
+
+    @Override
+    public void setRowEdited(boolean edited) {
+        // This registry is not editable, so this method does nothing.
+        // If it were editable, it would set the edited flag to true or false.
+        // However, this class is not designed to be edited directly in a grid.
+    }
+
+    @Override
+    public Object getRowValueAt(int col) {
+        Object value = null;
+
+        switch (col) {
+            case 0:
+                value = mtDate;
+                break;
+            case 1:
+                value = msAuxItemDescription;
+                break;
+            case 2:
+                value = msAuxDiogTypeDescription;
+                break;
+            case 3:
+                value = msAuxDiogTypeDescription;
+                break;
+            case 4:
+                value = mdQuantityMovement;
+                break;
+            case 5:
+                value = mdCostUnitary;
+                break;
+            case 6:
+                value = mdCost_r;
+                break;
+            default:
+                break;
+        }
+
+        return value;
+    }
+
+    @Override
+    public void setRowValueAt(Object value, int col) {
+        
     }
 }

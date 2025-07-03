@@ -9,6 +9,7 @@ package erp.mod.trn.db;
  *
  * @author Edwin Carmona
  */
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
@@ -132,12 +133,12 @@ public class SStockValuationRecordUpdate {
                     oStockValuationAccount = new SDbStockValuationAccount();
                     oStockValuationAccount.setPkStockValuationAccountId(resEty.getInt("vacc.id_stk_val_acc"));
                     oStockValuationAccount.setDeleted(resEty.getBoolean("vacc.b_del"));
-                    oStockValuationAccount.setFkFinRecYearId(resEty.getInt("vacc.fk_fin_rec_year_n"));
-                    oStockValuationAccount.setFkFinRecPerId(resEty.getInt("vacc.fk_fin_rec_per_n"));
-                    oStockValuationAccount.setFkFinRecBkcId(resEty.getInt("vacc.fk_fin_rec_bkc_n"));
-                    oStockValuationAccount.setFkFinRecTpRecId(resEty.getString("vacc.fk_fin_rec_tp_rec_n"));
-                    oStockValuationAccount.setFkFinRecNum(resEty.getInt("vacc.fk_fin_rec_num_n"));
-                    oStockValuationAccount.setFkFinRecEty(resEty.getInt("vacc.fk_fin_rec_ety_n"));
+                    oStockValuationAccount.setFkFinRecYearId_n(resEty.getInt("vacc.fk_fin_rec_year_n"));
+                    oStockValuationAccount.setFkFinRecPeriodId_n(resEty.getInt("vacc.fk_fin_rec_per_n"));
+                    oStockValuationAccount.setFkFinBookKeepingCenterId_n(resEty.getInt("vacc.fk_fin_rec_bkc_n"));
+                    oStockValuationAccount.setFkFinRecordTypeId_n(resEty.getString("vacc.fk_fin_rec_tp_rec_n"));
+                    oStockValuationAccount.setFkFinRecNumberId_n(resEty.getInt("vacc.fk_fin_rec_num_n"));
+                    oStockValuationAccount.setFkFinRecEntryId_n(resEty.getInt("vacc.fk_fin_rec_ety_n"));
                     oStockValuationAccount.setProrationPercentage(resEty.getDouble("vacc.prorat_per"));
                     oStockValuationAccount.setFkStockValuationId(resEty.getInt("vacc.fk_stk_val"));
                     oStockValuationAccount.setFkValuationMvtId(resEty.getInt("vacc.fk_stk_val_mvt"));

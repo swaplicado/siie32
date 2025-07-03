@@ -10,12 +10,19 @@ import erp.data.SDataConstantsSys;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.utils.SStockValuationConsumptionUtils;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPopupMenu;
@@ -49,8 +56,11 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
     private JButton mjbViewDps;
     private JButton mjbViewNotes;
     private JButton mjbViewLinks;
+    private JButton mjbViewCardex;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
+
+    private SDbStockValuationMvt moStockValuationMvt;
     
     /**
      * @param client GUI client.
@@ -79,10 +89,11 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
         mjbSearchItemKey = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query_doc.gif")), "Filtrar ítem", this);
+        mjbViewCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Filtrar ítem", this);
         
-        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
+        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_REM));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
-        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
         mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
@@ -104,6 +115,9 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewLinks);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JPopupMenu.Separator());
+        // Se comenta esta línea por funcionalidad pendiente Edwin Carmona 2025-07-03
+        // getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewCardex);
         
         mjbToSearch.setEnabled(true);
         mjbCleanSearch.setEnabled(true);
@@ -112,8 +126,41 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbViewNotes.setEnabled(true);
         mjbViewDps.setEnabled(true);
         mjbViewLinks.setEnabled(true);
+
+        mjbViewCardex.setEnabled(true);
         
         msSeekQueryText = "";
+    }
+
+    private SDbStockValuationMvt readMvt(int[] mvtKey) {
+        moStockValuationMvt = new SDbStockValuationMvt();
+        try {
+            moStockValuationMvt.read(miClient.getSession(), mvtKey);
+            if (moStockValuationMvt.getQueryResultId() != SDbConsts.READ_OK) {
+                miClient.showMsgBoxError("Error al consultar el movimiento de valuación de inventarios: " + moStockValuationMvt.getQueryResult());
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return moStockValuationMvt;
+    }
+
+    private int[] getDpsPrimaryKey(int[] mvtKey) {
+        moStockValuationMvt = readMvt(mvtKey);
+        if (moStockValuationMvt == null) {
+            return null;
+        }
+
+        int[] dpsKey = new int[] { 
+            moStockValuationMvt.getFkDpsYearInId_n(), 
+            moStockValuationMvt.getFkDpsDocInId_n() 
+        };
+
+        return dpsKey;
     }
     
     private void actionSearch() {
@@ -203,8 +250,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             }
             else {
                 int gui = SDataConstants.MOD_PUR;    // GUI module
-                int[] dpsKey = gridRow.getRowPrimaryKey();
-                if (dpsKey[0] == 0) {
+                int dpsKey[] = getDpsPrimaryKey(gridRow.getRowPrimaryKey());
+                if (dpsKey == null || dpsKey[0] == 0) {
                     miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
                     return;
                 }
@@ -225,8 +272,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
             else {
-                int[] dpsKey = gridRow.getRowPrimaryKey();
-                if (dpsKey[0] == 0) {
+                int dpsKey[] = getDpsPrimaryKey(gridRow.getRowPrimaryKey());
+                if (dpsKey == null || dpsKey[0] == 0) {
                     miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
                     return;
                 }
@@ -246,13 +293,43 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
             else {
-                int[] dpsKey = gridRow.getRowPrimaryKey();
-                if (dpsKey[0] == 0) {
+                int dpsKey[] = getDpsPrimaryKey(gridRow.getRowPrimaryKey());
+                if (dpsKey == null || dpsKey[0] == 0) {
                     miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
                     return;
                 }
                 SModuleUtilities.showDocumentLinks((SClientInterface) miClient, dpsKey);
             }
+        }
+    }
+
+    private void actionViewCardex() {
+        try {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                        SDbStockValuationMvt mvt = readMvt(gridRow.getRowPrimaryKey());
+                        if (mvt == null) {
+                            return;
+                        }
+
+                        List<SDbStockValuationMvt> cardexMvt = SStockValuationConsumptionUtils.getCardexMvt(
+                                miClient.getSession().getStatement(),
+                                mvt.getFkDiogYearInId_n(),
+                                mvt.getFkDiogDocInId_n(),
+                                mvt.getFkDiogEntryInId_n()
+                        );
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SViewStockValuationConsumptions.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -288,7 +365,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         Object filter;
         Date[] dateRange = null;
 
-        moPaneSettings = new SGridPaneSettings(2);
+        moPaneSettings = new SGridPaneSettings(1);
 
         moPaneSettings.setUpdatableApplying(false);
         moPaneSettings.setDeletedApplying(false);
@@ -305,8 +382,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             where += (where.isEmpty() ? "" : "AND ") + msSeekQueryText;
         }
         
-        msSql = "SELECT COALESCE(dps.id_year, 0) AS " + SDbConsts.FIELD_ID + "1, "
-                + "COALESCE(dps.id_doc, 0) AS " + SDbConsts.FIELD_ID + "2,"
+        msSql = "SELECT mvt.id_stk_val_mvt AS " + SDbConsts.FIELD_ID + "1, "
                 + "i.item_key AS " + SDbConsts.FIELD_CODE + ", "
                 + "'' AS " + SDbConsts.FIELD_NAME + ", "
                 + "val.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
@@ -512,6 +588,9 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             }
             else if (button == mjbViewLinks) {
                 actionViewLinks();
+            }
+            else if (button == mjbViewCardex) {
+                actionViewCardex();
             }
         }
     }

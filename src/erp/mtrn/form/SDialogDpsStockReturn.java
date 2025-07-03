@@ -19,7 +19,7 @@ import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
-import erp.mod.trn.db.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDps;

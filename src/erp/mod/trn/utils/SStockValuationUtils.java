@@ -3,7 +3,7 @@
  * Para cambiar esta plantilla de archivo, elija Herramientas | Plantillas
  * y abra la plantilla en el editor.
  */
-package erp.mod.trn.db;
+package erp.mod.trn.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,12 @@ import erp.data.SDataUtilities;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbStockValuation;
+import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.db.SStockValuationConfiguration;
 import erp.mtrn.data.SDataDiog;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
@@ -40,8 +44,8 @@ import sa.lib.gui.SGuiSession;
  */
 public class SStockValuationUtils {
     
-    static final int DEBIT = 1;
-    static final int CREDIT = 2;
+    public static final int DEBIT = 1;
+    public static final int CREDIT = 2;
     
     /**
      * Obtiene el objeto de configuración de valuación de inventario a partir de un string JSON.
@@ -160,22 +164,23 @@ public class SStockValuationUtils {
             boolean firstGroup = true;
 
             for (Map.Entry<Integer, List<Integer>> entry : groupedTpmovs.entrySet()) {
-                if (!firstGroup) {
-                    sql += " OR ";
-                }
-                firstGroup = false;
-
                 int fidClIog = entry.getKey();
                 List<Integer> tpIogs = entry.getValue();
 
-                if (tpIogs.size() == 1) {
-                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", 
-                                       fidClIog, tpIogs.get(0));
-                } else {
-                    sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog IN (%s))", 
-                                       fidClIog, tpIogs.stream()
-                                                      .map(String::valueOf)
-                                                      .collect(Collectors.joining(",")));
+                for (Integer tpIog : tpIogs) {
+                    // Verifica si es el caso especial
+                    boolean isSpecial = (diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0] && fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1] && tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2]);
+                    if (!firstGroup) {
+                        sql += " OR ";
+                    }
+                    firstGroup = false;
+
+                    if (isSpecial) {
+                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d AND NOT d.b_sys)", fidClIog, tpIog);
+                    }
+                    else {
+                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", fidClIog, tpIog);
+                    }
                 }
             }
 
@@ -522,40 +527,50 @@ public class SStockValuationUtils {
      * @throws SQLException 
      */
     public static boolean deleteValuation(SGuiSession session, final int idValuation) throws SQLException {
-        /**
-         * Eliminar registros de valuación vs pólizas
-         */
-        String sqlDelLinks = "UPDATE " +
-                            SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " " +
-                            "SET b_del = 1, " +
-                            "fk_fin_rec_year_n = NULL, " +
-                            "fk_fin_rec_per_n = NULL, " +
-                            "fk_fin_rec_bkc_n = NULL, " +
-                            "fk_fin_rec_tp_rec_n = NULL, " +
-                            "fk_fin_rec_num_n = NULL, " +
-                            "fk_fin_rec_ety_n = NULL " +
-                            "WHERE " +
-                            "    fk_stk_val = " + idValuation + ";";
-                            
-        try (Statement st = session.getStatement().getConnection().createStatement()) {
-            st.executeUpdate(sqlDelLinks);
-        }
-        
-        /**
-         * Eliminar pólizas
-         */
-        String sql = "DELETE re FROM "
-                + "" + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS va "
-                + "ON re.id_year = va.fk_fin_rec_year_n "
-                + "AND re.id_per = va.fk_fin_rec_per_n "
-                + "AND re.id_bkc = va.fk_fin_rec_bkc_n "
-                + "AND re.id_tp_rec = va.fk_fin_rec_tp_rec_n "
-                + "AND re.id_num = va.fk_fin_rec_num_n "
-                + "AND re.id_ety = va.fk_fin_rec_ety_n "
-                + "WHERE va.fk_stk_val = " + idValuation + ";";
-        try (Statement st = session.getStatement().getConnection().createStatement()) {
-            st.executeUpdate(sql);
+        Connection conn = session.getStatement().getConnection();
+
+        try (Statement st = conn.createStatement()) {
+            // Paso 0: Eliminar la tabla temporal si existe
+            String sqlDropTempTable = "DROP TEMPORARY TABLE IF EXISTS tmp_keys_to_delete";
+            st.execute(sqlDropTempTable);
+    
+            // Paso 1: Crear tabla temporal
+            String sqlCreateTempTable = "CREATE TEMPORARY TABLE tmp_keys_to_delete ("
+                    + "id_year INT, "
+                    + "id_per INT, "
+                    + "id_bkc INT, "
+                    + "id_tp_rec VARCHAR(10), "
+                    + "id_num INT, "
+                    + "id_ety INT"
+                    + ")";
+            st.execute(sqlCreateTempTable);
+
+            // Paso 2: Insertar llaves foráneas desde trn_stk_val_acc
+            String sqlInsertTemp = "INSERT INTO tmp_keys_to_delete (id_year, id_per, id_bkc, id_tp_rec, id_num, id_ety) "
+                    + "SELECT fk_fin_rec_year_n, fk_fin_rec_per_n, fk_fin_rec_bkc_n, "
+                    + "       fk_fin_rec_tp_rec_n, fk_fin_rec_num_n, fk_fin_rec_ety_n "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " "
+                    + "WHERE fk_stk_val = " + idValuation + " AND fk_fin_rec_year_n IS NOT NULL";
+            st.executeUpdate(sqlInsertTemp);
+
+            // Paso 3: Romper relación (poner NULL y marcar como borrado)
+            String sqlUpdateValAcc = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " "
+                    + "SET b_del = 1, "
+                    + "    fk_fin_rec_year_n = NULL, "
+                    + "    fk_fin_rec_per_n = NULL, "
+                    + "    fk_fin_rec_bkc_n = NULL, "
+                    + "    fk_fin_rec_tp_rec_n = NULL, "
+                    + "    fk_fin_rec_num_n = NULL, "
+                    + "    fk_fin_rec_ety_n = NULL "
+                    + "WHERE fk_stk_val = " + idValuation;
+            st.executeUpdate(sqlUpdateValAcc);
+
+            // Paso 4: Eliminar pólizas
+            String sqlDeleteRecEty = "DELETE re FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re " +
+                "JOIN tmp_keys_to_delete AS tmp " +
+                "ON re.id_year = tmp.id_year AND re.id_per = tmp.id_per AND re.id_bkc = tmp.id_bkc " +
+                "AND re.id_tp_rec = tmp.id_tp_rec AND re.id_num = tmp.id_num AND re.id_ety = tmp.id_ety";
+            st.executeUpdate(sqlDeleteRecEty);
         }
         
         /**

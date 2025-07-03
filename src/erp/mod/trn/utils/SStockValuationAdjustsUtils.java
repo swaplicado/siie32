@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.db;
+package erp.mod.trn.utils;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnStockMove;
