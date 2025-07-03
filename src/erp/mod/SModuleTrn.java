@@ -233,6 +233,13 @@ public class SModuleTrn extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_tp_maint_mov = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.TRNS_ST_MAT_REQ:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() {}
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_st_mat_req = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.TRN_DPS:
                 registry = new SDbDps();
                 break;
@@ -750,9 +757,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
                 switch (subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED: title = "Seguimiento compras RM cerradas (detalle)";
+                    case SUtilConsts.ACTION_CLOSE: title = "Seguimiento compras RM cerradas (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "Seguimiento compras RM abiertas (detalle)";
+                    case SUtilConsts.ACTION_OPEN: title = "Seguimiento compras RM abiertas (detalle)";
                         break;
                     default:
                         // nothing

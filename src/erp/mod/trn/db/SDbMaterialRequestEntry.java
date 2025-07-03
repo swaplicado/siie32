@@ -5,6 +5,9 @@
  */
 package erp.mod.trn.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
@@ -67,6 +70,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     protected SDbMaterialConsumptionEntity moDbmsMatConsEntity;
     protected SDbMaterialConsumptionSubentity moDbmsMatConsSubentity;
     protected SDbMaterialRequestPriority moDbmsMatReqPty;
+    
+    protected SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
 
     public SDbMaterialRequestEntry() {
         super(SModConsts.TRN_MAT_REQ_ETY);
@@ -104,6 +109,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
     public void setAuxQuantityOld(double d) { mdAuxQuantityOld = d; }
     
     public void setHasLinks(boolean b) { mbHasLinks = b; }
+    
+    public void setConfMaterialRequestItemPurchase(SConfMaterialRequestItemPurchase o) { moConfMaterialRequestItemPurchase = o; }
     
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public int getPkEntryId() { return mnPkEntryId; }
@@ -220,6 +227,11 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             moDbmsMatReqPty.read(session, new int[] { mnFkMatRequestPriorityId_n });
         }
         
+        if (moConfMaterialRequestItemPurchase == null) {
+            ObjectMapper mapper = new ObjectMapper();
+            String sItemPurchase = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_MAT_REQ_PUR);
+            moConfMaterialRequestItemPurchase = mapper.readValue(sItemPurchase, SConfMaterialRequestItemPurchase.class);
+        }
         mbHasLinks = SMaterialRequestUtils.hasLinksMaterialRequestEntry(session, getPrimaryKey());
     }
             
@@ -276,6 +288,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
         moDbmsMatReqPty = null;
         
         mbHasLinks = false;
+        
+        moConfMaterialRequestItemPurchase = null;
     }
 
     @Override
@@ -670,6 +684,8 @@ public class SDbMaterialRequestEntry extends SDbRegistryUser implements SGridRow
             case 13: value = moDbmsMatConsSubentity != null ? moDbmsMatConsSubentity.getCode() : ""; break;
             case 14: value = mtDateRequest_n != null ? mtDateRequest_n : null; break;
             case 15: value = moDbmsMatReqPty != null ? moDbmsMatReqPty.getName(): ""; break;
+            case 16: value = moConfMaterialRequestItemPurchase.getitem().contains(moDataItem.getPkItemId()) || 
+                    moConfMaterialRequestItemPurchase.getigen().contains(moDataItem.getFkItemGenericId()); break;
         }
         
         return value;

@@ -3503,7 +3503,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jtfAcidityPercentage.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(SLibUtils.parseDouble(jtfAcidityPercentage.getText()) / 100));
             }
         }
-        catch (Exception e) {}
+        catch (NumberFormatException e) {}
     }
 
     private void renderBasicSettings() {
@@ -4990,6 +4990,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void actionEditLogistics() {
         moFormComEntry.formReset();
         moFormComEntry.formRefreshCatalogues();
+        moFormComEntry.setValue(SFormDpsComEntry.PARAM_IS_SALES, moParamDps.isForSales());
+        moFormComEntry.setValue(SFormDpsComEntry.PARAM_CONF_ITEM_ACIDITY_PER, moConfItemAcidityPercentage);
         moFormComEntry.setRegistry(moDpsEntry);
         moFormComEntry.setVisible(true);
         
@@ -5006,6 +5008,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldSealQuality.setFieldValue(dpsEntry.getSealQuality());
             moFieldSealSecurity.setFieldValue(dpsEntry.getSealSecurity());
             moFieldVgm.setFieldValue(dpsEntry.getVgm());
+            jtfAcidityPercentage.setText(dpsEntry.getAcidityPercentage_n() == null ? "" : miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(dpsEntry.getAcidityPercentage_n()));
             
             jbOk.setEnabled(true); // allow post-emission-edition changes to be saved
             
@@ -6803,7 +6806,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                         Double.parseDouble(jtfAcidityPercentage.getText().replaceAll("%", ""));
                     }
                 }
-                catch (Exception e) {
+                catch (NumberFormatException e) {
                     validation.setMessage("El campo acidez(%) no tiene un formato numérico válido.");
                     validation.setComponent(jtfAcidityPercentage);
                 }

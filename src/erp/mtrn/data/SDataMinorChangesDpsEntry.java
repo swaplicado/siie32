@@ -10,7 +10,7 @@ import java.util.Vector;
 
 /**
  * Cambios menores para partidas de documentos que ya no son modificables.
- * @author Adrián Avilés, Sergio Flores
+ * @author Adrián Avilés, Sergio Flores, Isabel Servín
  */
 public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
 
@@ -24,6 +24,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
     protected java.lang.String msTicket;
     protected java.lang.String msContainerTank;
     protected java.lang.String msVgm;
+    protected Double mdAcidityPercentage_n;
     protected int mnFkVehicleTypeId_n;
     protected int mnFkUserEditId;
     
@@ -45,6 +46,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
     public void setTicket(java.lang.String s) { msTicket = s; }
     public void setContainerTank(java.lang.String s) { msContainerTank = s; }
     public void setVgm(java.lang.String s) { msVgm = s; }
+    public void setAcidityPercentage_n(Double d) { mdAcidityPercentage_n = d; }
     public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     
@@ -58,6 +60,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
     public java.lang.String getTicket() { return msTicket; }
     public java.lang.String getContainerTank() { return msContainerTank; }
     public java.lang.String getVgm() { return msVgm; }
+    public Double getAcidityPercentage_n() { return mdAcidityPercentage_n; }
     public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     
@@ -89,6 +92,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
         msTicket = "";
         msContainerTank = "";
         msVgm = "";
+        mdAcidityPercentage_n = null;
         mnFkVehicleTypeId_n = 0;
         mnFkUserEditId = 0;
         
@@ -106,6 +110,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
         msTicket = dpsEntry.getTicket();
         msContainerTank = dpsEntry.getContainerTank();
         msVgm = dpsEntry.getVgm();
+        mdAcidityPercentage_n = dpsEntry.getAcidityPercentage_n();
         mnFkVehicleTypeId_n = dpsEntry.getFkVehicleTypeId_n();
         mnFkUserEditId = dpsEntry.getFkUserEditId();
         
@@ -133,6 +138,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
                     + "ticket = '" + msTicket + "', "
                     + "cont_tank = '" + msContainerTank + "', "
                     + "vgm = '" + msVgm + "', "
+                    + "acidity_per_n = " + (mdAcidityPercentage_n == null ? "NULL" : mdAcidityPercentage_n) + ", "
                     + "fid_tp_veh_n = " + (mnFkVehicleTypeId_n != 0 ? mnFkVehicleTypeId_n : "NULL") + ", "
                     + "fid_usr_edit = " + mnFkUserEditId + ", "
                     + "ts_edit = NOW() "
@@ -147,6 +153,7 @@ public class SDataMinorChangesDpsEntry extends erp.lib.data.SDataRegistry {
                     + "OR ticket <> '" + msTicket + "' "
                     + "OR cont_tank <> '" + msContainerTank + "' "
                     + "OR vgm <> '" + msVgm + "' "
+                    + "OR acidity_per_n <> " + (mdAcidityPercentage_n == null ? "NULL" : mdAcidityPercentage_n) + " "
                     + "OR ((fid_tp_veh_n IS NULL AND " + (mnFkVehicleTypeId_n != 0) + ") OR (fid_tp_veh_n IS NOT NULL AND fid_tp_veh_n <> " + mnFkVehicleTypeId_n + ")));";
                     
             try (Statement statement = connection.createStatement()) {

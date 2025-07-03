@@ -67,7 +67,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Isabel Servín
  */
 public class SDialogMaterialRequestSupply extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
     
@@ -373,7 +373,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-       actionSave();
+        dispose();
     }//GEN-LAST:event_closeDialog
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -519,6 +519,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         try {
             moKeyMaintUser.setSelectedIndex(0);
             moKeyWarehouseCompanyBranch.setSelectedIndex(0);
+            mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         }
         catch (NullPointerException ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
@@ -913,6 +914,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
            showMaterialRequestEntries(bReset);
            miClient.showMsgBoxInformation("Movimientos guardados correctamente");
         }
+        
+        mnFormResult = SGuiConsts.FORM_RESULT_OK;
     }
     
     private void populateMaintUserSupervisor() {

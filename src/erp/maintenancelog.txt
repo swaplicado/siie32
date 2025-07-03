@@ -6,6 +6,47 @@ Edwin Omar CARMONA FIGUEROA
 1) Integración de certificados de calidad en siie.
 
 ================================================================================
+
+SIIE 3.2 275.0/ 2025-06-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de la funcionalidad para enviar directamente las requisiciones a compras cuando todos los ítems tengan dicha configuración.
+2) Corrección en los casos de tipos de cambio en la vista de documentos de soporte.
+
+================================================================================
+SIIE 3.2 274.4/ 2025-06-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección al enviar una RM previamente rechazada nuevamente a autorización.
+
+================================================================================
+SIIE 3.2 274.3/ 2025-06-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al nombre de los parámetros de las imágenes de las firmas de los usuarios comprador y autorizador en la preparación de la impresión de pedidos de compras.
+
+================================================================================
+SIIE 3.2 274.2/ 2025-06-17
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Modificación a la forma de suministrado para que no se recargue la vista cuando se cierra.
+
+================================================================================
+SIIE 3.2 274.1/ 2025-06-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Modificación del % de acidez en la vista de DPS después del timbrado, junto con la información de comercialización.
+2) Cambio en el formato de impresión de OC para mostrar la leyenda "(No definido)" cuando algún dato fiscal se encuentre en blanco.
+3) Se elimina la constante "SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED" y es reemplazada por "SUtilConsts.ACTION_CLOSE" para lo referente a la vista de seguimiento de RM.
+4) Se quita la recarga de las vistas al momento de abrir la vista del cardex de documentos de las RM. 
+
+================================================================================
+SIIE 3.2 274.0/ 2025-06-16
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de la variable "CFG_PARAM_TRN_DPS_CON_AETH" a "TRN_DPS_CON_CUSTOM_FMT"
+
+================================================================================
 SIIE 3.2 273.4/ 2025-06-11
 Edwin Omar CARMONA FIGUEROA
 

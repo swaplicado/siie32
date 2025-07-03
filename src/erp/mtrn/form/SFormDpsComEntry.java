@@ -1,27 +1,38 @@
 package erp.mtrn.form;
 
 import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.data.SDataDpsEntry;
+import java.awt.event.FocusEvent;
 import java.util.Vector;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
+import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiUtils;
 
 /**
- * Modificación de información de comercialización.
- * @author Adrián Avilés
+ * Modificación de información de comercialización y % de acidez.
+ * @author Adrián Avilés, Isabel Servín
  */
-public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
+    public static final int PARAM_IS_SALES = 1;
+    public static final int PARAM_CONF_ITEM_ACIDITY_PER = 2;
+    
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
+    private boolean mbIsSales;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldFkVehicleTypeId_n;
@@ -33,8 +44,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldTicket;
     private erp.lib.form.SFormField moFieldVgm;
     private erp.mtrn.data.SDataDpsEntry moDpsEntry;
+    private SConfigurationItemDps moConfItemAcidityPercentage;
 
-   
     public SFormDpsComEntry(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -58,7 +69,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel19 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
         jPanel20 = new javax.swing.JPanel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
         jPanel8 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
@@ -71,6 +82,10 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         jlContainerTank = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jtfContTank = new javax.swing.JTextField();
+        jPanel22 = new javax.swing.JPanel();
+        jlAcidityPercentage = new javax.swing.JLabel();
+        jPanel21 = new javax.swing.JPanel();
+        jtfAcidityPercentage = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jlQualitySeal = new javax.swing.JLabel();
@@ -105,7 +120,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel2.setLayout(new java.awt.GridLayout(8, 1));
+        jPanel2.setLayout(new java.awt.GridLayout(10, 1));
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -170,9 +185,25 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel2.add(jPanel6);
 
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAcidityPercentage.setText("Acidez (%)");
+        jlAcidityPercentage.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel22.add(jlAcidityPercentage);
+
+        jPanel2.add(jPanel22);
+
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfAcidityPercentage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfAcidityPercentage.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel21.add(jtfAcidityPercentage);
+
+        jPanel2.add(jPanel21);
+
         jPanel1.add(jPanel2);
 
-        jPanel3.setLayout(new java.awt.GridLayout(8, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(10, 1));
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -282,7 +313,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         moFieldSecuritySeal.setLengthMax(50);
         moFieldVgm = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfVgm, jlVgm);
         moFieldVgm.setLengthMax(15);
-
+        
         mvFields = new Vector<>();
         mvFields.add(moFieldFkVehicleTypeId_n);
         mvFields.add(moFieldDriver);
@@ -292,10 +323,11 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldQualitySeal);
         mvFields.add(moFieldSecuritySeal);
         mvFields.add(moFieldVgm);
-
+        
+        jtfAcidityPercentage.addFocusListener(this);
+        
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        
     }
 
     private void windowActivated() {
@@ -328,6 +360,16 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
+    
+    private void focusLostAcidityPercentage() {
+        try {
+            if (!jtfAcidityPercentage.getText().isEmpty()) {
+                Double.parseDouble(jtfAcidityPercentage.getText());
+                jtfAcidityPercentage.setText(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(SLibUtils.parseDouble(jtfAcidityPercentage.getText()) / 100));
+            }
+        }
+        catch (NumberFormatException e) {}
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -343,6 +385,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -353,6 +397,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
+    private javax.swing.JLabel jlAcidityPercentage;
     private javax.swing.JLabel jlContainerTank;
     private javax.swing.JLabel jlDriver;
     private javax.swing.JLabel jlFkVehicleTypeId_n;
@@ -362,6 +407,7 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlTicket;
     private javax.swing.JLabel jlVgm;
     private javax.swing.JPanel jpControls1;
+    private javax.swing.JTextField jtfAcidityPercentage;
     private javax.swing.JTextField jtfContTank;
     private javax.swing.JTextField jtfDriver;
     private javax.swing.JTextField jtfPlate;
@@ -387,6 +433,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+        
+        jtfAcidityPercentage.setText("");
     }
 
     @Override
@@ -407,6 +455,23 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
                 validation.setIsError(true);
                 validation.setComponent(mvFields.get(i).getComponent());
                 break;
+            }
+        }
+        
+        if (!validation.getIsError() && jtfAcidityPercentage.isEnabled() && jtfAcidityPercentage.getText().isEmpty()) {
+            validation.setMessage("Debe indicar un valor para el campo " + SGuiUtils.getLabelName(jlAcidityPercentage));
+            validation.setComponent(jtfAcidityPercentage);
+        }
+        
+        if (!validation.getIsError()) {
+            try {
+                if (!jtfAcidityPercentage.getText().isEmpty()) {
+                    Double.parseDouble(jtfAcidityPercentage.getText().replaceAll("%", ""));
+                }
+            }
+            catch (NumberFormatException e) {
+                validation.setMessage("El campo acidez(%) no tiene un formato numérico válido.");
+                validation.setComponent(jtfAcidityPercentage);
             }
         }
         
@@ -447,6 +512,14 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         moFieldQualitySeal.setFieldValue(moDpsEntry.getSealQuality());
         moFieldSecuritySeal.setFieldValue(moDpsEntry.getSealSecurity());
         moFieldVgm.setFieldValue(moDpsEntry.getVgm());
+        jtfAcidityPercentage.setText(moDpsEntry.getAcidityPercentage_n() == null ? "" : miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(moDpsEntry.getAcidityPercentage_n()));
+        
+        SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { moDpsEntry.getFkItemId() }, SLibConstants.EXEC_MODE_SILENT);
+        
+        boolean enableAcidity = mbIsSales && (moConfItemAcidityPercentage.getifam().contains(item.getDbmsDataItemGeneric().getDbmsFkItemFamilyId()) 
+                || moConfItemAcidityPercentage.getigen().contains(item.getFkItemGenericId()));
+        jtfAcidityPercentage.setEnabled(enableAcidity);
+        jtfAcidityPercentage.setFocusable(enableAcidity);
         
         mbResetingForm = false;
     }
@@ -471,6 +544,8 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
         moDpsEntry.setSealQuality(moFieldQualitySeal.getString());
         moDpsEntry.setSealSecurity(moFieldSecuritySeal.getString());
         moDpsEntry.setVgm(moFieldVgm.getString());
+        moDpsEntry.setAcidityPercentage_n(jtfAcidityPercentage.getText().isEmpty() ? null : SLibUtils.round(SLibUtils.parseDouble(jtfAcidityPercentage.getText()) / 100, 6));
+        
         moDpsEntry.setIsRegistryEdited(true);
 
         return moDpsEntry;
@@ -478,7 +553,15 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void setValue(int type, Object value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (type) {
+            case PARAM_IS_SALES:
+                mbIsSales = (boolean) value;
+                break;
+            case PARAM_CONF_ITEM_ACIDITY_PER:
+                moConfItemAcidityPercentage = (SConfigurationItemDps) value;
+                break;
+            default:
+        }
     }
 
     @Override
@@ -501,6 +584,20 @@ public class SFormDpsComEntry extends javax.swing.JDialog implements erp.lib.for
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {}
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JTextField) {
+            JTextField textField = (JTextField) e.getSource();
+            
+            if (textField == jtfAcidityPercentage) {
+                focusLostAcidityPercentage();
             }
         }
     }

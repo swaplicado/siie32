@@ -242,8 +242,6 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                     
                     moDialogDocsCardex.setFormParams(key[0], 0);
                     moDialogDocsCardex.setVisible(true);
-                    
-                    miClient.getSession().notifySuscriptors(mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

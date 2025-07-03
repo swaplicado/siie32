@@ -4,18 +4,21 @@
  */
 package erp.mod.trn.form;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.form.SFormCapturingNotes;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mcfg.data.SCfgUtils;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.SModuleItm;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.db.SConfMaterialRequestItemPurchase;
 import erp.mod.trn.db.SDbMaterialCostCenterGroup;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
@@ -33,6 +36,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
@@ -135,11 +139,17 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private double mdPriceUnitaryEty;
     
     private JButton jbDocsCardex;
+    private JButton jbOnlySave;
     private JButton jbSaveAndSend;
     
     private int mnItemRefCt;
     private int mnItemRefPickerSeccSelected;
     private int mnItemRefPickerSeccSelectedEty;
+    
+    private SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
+    
+    private String msMatReqStPur;
+    private String msMatReqStProv;
     
     /**
      * Creates new form SFormMaterialRequest
@@ -219,6 +229,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jlItem = new javax.swing.JLabel();
         moTextItemKey = new sa.lib.gui.bean.SBeanFieldText();
         moTextItemName = new sa.lib.gui.bean.SBeanFieldText();
+        jlDirectPurchaseItem = new javax.swing.JLabel();
         jbPickItem = new javax.swing.JButton();
         jPanel30 = new javax.swing.JPanel();
         moBoolNewItem = new sa.lib.gui.bean.SBeanFieldBoolean();
@@ -227,6 +238,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyItemRefEty = new sa.lib.gui.bean.SBeanFieldKey();
         jbPickItemRefEty = new javax.swing.JButton();
         moTextItemRefEty = new sa.lib.gui.bean.SBeanFieldText();
+        jbPickItemFake = new javax.swing.JButton();
         jPanel44 = new javax.swing.JPanel();
         jlQtyUsr = new javax.swing.JLabel();
         moDecQtyUsr = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -525,8 +537,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         moTextItemName.setEditable(false);
         moTextItemName.setEnabled(false);
-        moTextItemName.setPreferredSize(new java.awt.Dimension(665, 23));
+        moTextItemName.setPreferredSize(new java.awt.Dimension(640, 23));
         jPanel29.add(moTextItemName);
+
+        jlDirectPurchaseItem.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDirectPurchaseItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
+        jlDirectPurchaseItem.setToolTipText("Directo a compras");
+        jlDirectPurchaseItem.setPreferredSize(new java.awt.Dimension(20, 23));
+        jPanel29.add(jlDirectPurchaseItem);
 
         jbPickItem.setText("...");
         jbPickItem.setToolTipText("Seleccionar ítem");
@@ -560,6 +578,11 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         moTextItemRefEty.setPreferredSize(new java.awt.Dimension(215, 23));
         jPanel30.add(moTextItemRefEty);
+
+        jbPickItemFake.setText("...");
+        jbPickItemFake.setEnabled(false);
+        jbPickItemFake.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel30.add(jbPickItemFake);
 
         jpItem.add(jPanel30);
 
@@ -939,6 +962,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JButton jbItemStk;
     private javax.swing.JButton jbNewEty;
     private javax.swing.JButton jbPickItem;
+    private javax.swing.JButton jbPickItemFake;
     private javax.swing.JButton jbPickItemRef;
     private javax.swing.JButton jbPickItemRefEty;
     private javax.swing.JButton jbPickUnitUsr;
@@ -956,6 +980,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JLabel jlDateDeliveryEty;
     private javax.swing.JLabel jlDateReq;
     private javax.swing.JLabel jlDateReqEty;
+    private javax.swing.JLabel jlDirectPurchaseItem;
     private javax.swing.JLabel jlDocNature;
     private javax.swing.JLabel jlEtyNotes;
     private javax.swing.JLabel jlInfo;
@@ -1133,7 +1158,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         
         moFieldKeyConsEntityEty = new SGuiFieldKeyGroup(miClient);
 
-        moFields.setFormButton(jbSave);
+        moFields.setFormButton(jbOnlySave);
         
         moFormMatReqCC = new SFormMaterialRequestCostCenter(miClient, getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP ? SModConsts.TRNX_MAT_REQ_STK_SUP : SLibConsts.UNDEFINED, "Requisición de materiales y centros de costo");
         
@@ -1197,6 +1222,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subctro. consumo"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Prioridad"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_L, "Directo a compras"));
                 
                 return columns;
             }
@@ -1206,10 +1232,15 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         mvFormGrids.add(moGridMatReqList);
         jpEntries.add(moGridMatReqList, BorderLayout.CENTER);
         
+        jbOnlySave = new JButton();
+        jbOnlySave.setText("Guardar");
+        jbOnlySave.setPreferredSize(new java.awt.Dimension(75, 23));
         jbSaveAndSend = new JButton();
         jbSaveAndSend.setText("Guardar y solicitar");
         jbSaveAndSend.setPreferredSize(new java.awt.Dimension(200, 23));
         jpCommandRight.remove(jbCancel);
+        jpCommandRight.remove(jbSave);
+        jpCommandRight.add(jbOnlySave);
         jpCommandRight.add(jbSaveAndSend);
         jpCommandRight.add(jbCancel);
         
@@ -1243,6 +1274,18 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la partida de la RM");
+    
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String sItemPurchase = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_MAT_REQ_PUR);
+            moConfMaterialRequestItemPurchase = mapper.readValue(sItemPurchase, SConfMaterialRequestItemPurchase.class);
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+        
+        msMatReqStPur = (String) miClient.getSession().readField(SModConsts.TRNS_ST_MAT_REQ, new int[] { SModSysConsts.TRNS_ST_MAT_REQ_PUR }, SDbRegistry.FIELD_NAME);
+        msMatReqStProv = (String) miClient.getSession().readField(SModConsts.TRNS_ST_MAT_REQ, new int[] { SModSysConsts.TRNS_ST_MAT_REQ_PROV }, SDbRegistry.FIELD_NAME);
     }
     
     private void populateMatReqCC() {
@@ -1359,7 +1402,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moGridMatReqCC.setRowButtonsEnabled(enable);
             moGridMatReqCC.setEnabled(enable);
 
-            jbSave.setEnabled(enable);
+            //jbSave.setEnabled(enable);
+            jbOnlySave.setEnabled(enable);
             jbSaveAndSend.setEnabled(false);
         }
         else {
@@ -1381,7 +1425,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moGridMatReqCC.setRowButtonsEnabled(enable);
             moGridMatReqCC.setEnabled(enable);
 
-            jbSave.setEnabled(enable);
+            //jbSave.setEnabled(enable);
+            jbOnlySave.setEnabled(enable);
             jbSaveAndSend.setEnabled(enable);
         }
     }
@@ -1410,6 +1455,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         msEtyNotes = "";
         moKeyItemRefEty.setSelectedIndex(0);
         moItemRefEty = null;
+        jlDirectPurchaseItem.setIcon(null);
     }
     
     private void enableEntryControls(boolean enable) {
@@ -1560,6 +1606,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moTextItemRefEty.setText(ety.getDataItemRef()!= null ? ety.getDataItemRef().getKey() + " - " + ety.getDataItemRef().getItem() : "");
             moTextItemRefEty.setVisible(true);
             moTextItemRefEty.setCaretPosition(0);
+            jbPickItemFake.setVisible(true);
             
             for (SDbMaterialRequestEntryNote note : ety.getChildNotes()) {
                 if (note.getIsDescription()) {
@@ -1570,6 +1617,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                     msEtyNotes = note.getNotes();
                     moTextEtyNotes.setEnabled(!(msEtyNotes.contains("\n") || msEtyNotes.contains("\r\n")));
                 }
+            }
+            
+            if (moConfMaterialRequestItemPurchase.getitem().contains(ety.getDataItem().getPkItemId()) ||
+                    moConfMaterialRequestItemPurchase.getigen().contains(ety.getDataItem().getFkItemGenericId())) {
+                jlDirectPurchaseItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png")));
+            }
+            else {
+                jlDirectPurchaseItem.setIcon(null);
             }
         }
         else {
@@ -1597,6 +1652,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             msEtyNotes = "";
             moKeyItemRefEty.setSelectedIndex(0);
             moTextItemRefEty.setText("");
+            jlDirectPurchaseItem.setIcon(null);
         }
         isCapturingData = false;
         enableEntryControls(false);
@@ -1655,7 +1711,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             ch.setFkItemId(moItemEty.getPkItemId());
             ety.getChildItemChange().add(ch);
             ety.setNewItem(false);
-            jbSave.setEnabled(true);
+            //jbSave.setEnabled(true);
+            jbOnlySave.setEnabled(true);
         }
         
         return ety;
@@ -1669,7 +1726,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 return resultSet.getInt(1);
             }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
         return 0;
@@ -1683,7 +1740,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 return new int[] { resultSet.getInt(1) };
             }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
         return new int[] { 0 };
@@ -1725,7 +1782,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 }
             }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
     }
@@ -1790,6 +1847,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                             ety.setTotal_r(is.mdQty);
                             ety.setFkItemId(is.mnItemId);
                             ety.setFkUnitId(is.mnUnitId);
+                            ety.setConfMaterialRequestItemPurchase(moConfMaterialRequestItemPurchase);
                             maMatReqEntries.add(ety);
                         }
                         populateMatReqEntries();
@@ -1883,7 +1941,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moUnitEty.read(new int[] { moItemEty.getFkUnitId() }, miClient.getSession().getStatement());
         moTextUnitUsr.setValue(moUnitEty.getSymbol());
         moTextUnit.setValue(moUnitEty.getSymbol());
-        moKeyItemRefEty.setValue(moKeyItemRef.getValue()[0] != 0 ? new int[] { 0 } : new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
+        moKeyItemRefEty.setValue(moKeyItemRef.getSelectedIndex() != 0 && moKeyItemRef.getValue()[0] != 0 ? new int[] { 0 } : new int[] { moItemEty.getDbmsFkDefaultItemRefId_n() });
+        if (moConfMaterialRequestItemPurchase.getitem().contains(moItemEty.getPkItemId()) ||
+                        moConfMaterialRequestItemPurchase.getigen().contains(moItemEty.getFkItemGenericId())) {
+            jlDirectPurchaseItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png")));
+        }
+        else {
+            jlDirectPurchaseItem.setIcon(null);
+        }
         obtainItemPrice();
     }
     
@@ -2222,12 +2287,19 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 enableEntryControls(false);
                 jbEditEty.setEnabled(true);
                 jbDeleteEty.setEnabled(true);
+                moKeyItemRefEty.setVisible(false);
+                jbPickItemRefEty.setVisible(false);
             }
         }
     }
     
     private void actionSave(int statusReq) {
         mnStatusReqId = statusReq;
+        actionSave();
+    }
+    
+    @Override
+    public void actionSave() {
         super.actionSave();
     }
     
@@ -2257,7 +2329,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else {
                 miClient.showMsgBoxInformation((iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "Autorizado" : "Rechazado") + 
                         " con éxito");
-                jbSave.setEnabled(true);
+                //jbSave.setEnabled(true);
+                jbOnlySave.setEnabled(true);
                 super.actionSave();
             }
         }
@@ -2333,7 +2406,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbItemStk.addActionListener(this);
         moTextReqNotes.addFocusListener(this);
         moTextEtyNotes.addFocusListener(this);
-        jbSave.addActionListener(this);
+        //jbSave.addActionListener(this);
+        jbOnlySave.addActionListener(this);
         jbSaveAndSend.addActionListener(this);
         moBoolNewItem.addItemListener(this);
         moTextItemKey.addFocusListener(this);
@@ -2362,7 +2436,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbItemStk.removeActionListener(this);
         moTextReqNotes.removeFocusListener(this);
         moTextEtyNotes.removeFocusListener(this);
-        jbSave.removeActionListener(this);
+        //jbSave.removeActionListener(this);
+        jbOnlySave.removeActionListener(this);
         jbSaveAndSend.removeActionListener(this);
         moBoolNewItem.removeItemListener(this);
         moTextItemKey.removeFocusListener(this);
@@ -2520,7 +2595,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_SUP || 
             getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR ||
             getFormSubtype() == SModConsts.TRNX_MAT_REQ_EST) {
-            jbSave.setEnabled(getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR);
+            //jbSave.setEnabled(getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR);
+            jbOnlySave.setEnabled(getFormSubtype() == SModConsts.TRNX_MAT_REQ_PEND_PUR);
             jbSaveAndSend.setEnabled(false);
             hasLinkMatReq = !SMaterialRequestUtils.hasLinksMaterialRequest(miClient.getSession(), moRegistry.getPrimaryKey()).isEmpty();
         }
@@ -2544,6 +2620,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moKeyWhs);
         }
         
+        jlDirectPurchaseItem.setIcon(null);
         addAllListeners();
         populateMatReqEntries();
         enableEntryControls(false);
@@ -2641,6 +2718,32 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             }
         }
         
+        if (validation.isValid()) {
+            int directItemPurchase = 0;
+            for (SDbMaterialRequestEntry ety : maMatReqEntries) {
+                if (moConfMaterialRequestItemPurchase.getigen().contains(ety.getDataItem().getFkItemGenericId()) ||
+                        moConfMaterialRequestItemPurchase.getitem().contains(ety.getDataItem().getPkItemId())) {
+                    directItemPurchase++;
+                }
+            }
+            if (directItemPurchase == maMatReqEntries.size()) {
+                if (miClient.showMsgBoxConfirm("Todos los ítems de la requisición se van directo a compras.\n"
+                                + "Cuando la requisición se autorice quedará con el estatus '" + msMatReqStPur + "'.\n"
+                                + "¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                    validation.setMessage("Favor de revisar las partidas de la requisición.");
+                    validation.setComponent(jbNewEty);
+                }
+            }
+            else if (directItemPurchase > 0) {
+                if (miClient.showMsgBoxConfirm("Solamente algunos ítems de la requisición van directo a compras (" + directItemPurchase + " de " + maMatReqEntries.size() + ").\n"
+                                + "Cuando la requisición se autorice quedará con el estatus '" + msMatReqStProv + "'.\n"
+                                + "¿Desea continuar?") != JOptionPane.OK_OPTION) {
+                    validation.setMessage("Favor de revisar las partidas de la requisición.");
+                    validation.setComponent(jbNewEty);
+                }
+            } 
+        }
+        
         return validation;
     }
 
@@ -2679,11 +2782,17 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else if (button == jbCancelEty) {
                 actionCancelEty();
             }
-            else if (button == jbSave) {
+            else if (button == jbOnlySave) {
                 actionSave(SModSysConsts.TRNS_ST_MAT_REQ_NEW);
             }
             else if (button == jbSaveAndSend) {
                 if (miClient.showMsgBoxConfirm("¿Esta seguro de enviar la requisición?") == JOptionPane.OK_OPTION) {
+                    try {
+                        if (moRegistry.getPkMatRequestId() != 0) {
+                            SAuthorizationUtils.processAuthorizations(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ moRegistry.getPkMatRequestId() }, true);
+                        }
+                    }
+                    catch (Exception ex) {}
                     actionSave(SModSysConsts.TRNS_ST_MAT_REQ_AUTH);
                 }
             }

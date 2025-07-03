@@ -5,7 +5,9 @@
  */
 package erp.mod.trn.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -92,6 +94,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected boolean mbAuxLastPurClosedSta;
     
     protected SDataItem moDbmsItemRef;
+    
+    protected SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
 
     public SDbMaterialRequest() {
         super(SModConsts.TRN_MAT_REQ);
@@ -307,6 +311,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         msAuxNotes = "";
         
         moDbmsItemRef = null;
+        
+        moConfMaterialRequestItemPurchase = null;
     }
 
     @Override
@@ -708,18 +714,40 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             // Si el estatus de autorización esta "Autorizado" o "NA", y el estatus de requisición esta "En autorización"
             if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_AUTHORIZED || mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_NA){
                 // Si es de resurtido este pasa a "En compras"
-                if ("R".equals(msTypeRequest)) {
+                if (SModSysConsts.TRNS_MAT_REQ_TP_R.equals(msTypeRequest)) {
                     mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PUR;
                     prov += "b_clo_prov = 1 ";
                     pur += "b_clo_pur = 0 ";
                 }
-                // Si es de consumo este pasa a "En suministro"
+                // Si es de consumo este se valida si va a "En suministro" o a "En compras" dependiendo de la configuración de ítems
                 else {
-                    mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV;
-                    prov += "b_clo_prov = 0 ";
-                    pur += "b_clo_pur = 1 ";
+                    ObjectMapper mapper = new ObjectMapper();
+                    String sItemPurchase = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_MAT_REQ_PUR);
+                    moConfMaterialRequestItemPurchase = mapper.readValue(sItemPurchase, SConfMaterialRequestItemPurchase.class);
+                    
+                    int directItemPurchase = 0;
+                    for (SDbMaterialRequestEntry ety : maChildEntries) {
+                        if (moConfMaterialRequestItemPurchase.getigen().contains(ety.getDataItem().getFkItemGenericId()) ||
+                                moConfMaterialRequestItemPurchase.getitem().contains(ety.getDataItem().getPkItemId())) {
+                            directItemPurchase++;
+                        }
+                    }
+                    
+                    // Si todos los ítems estan configurados para enviarse directo a compras
+                    if (directItemPurchase == maChildEntries.size()) {
+                        mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PUR;
+                        prov += "b_clo_prov = 1 ";
+                        pur += "b_clo_pur = 0 ";
+                    }
+                    // Si no todos o ningún ítem esta configurado, se manda a suministro
+                    else {
+                        mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_PROV;
+                        prov += "b_clo_prov = 0 ";
+                        pur += "b_clo_pur = 1 ";
+                    }
                 }
             }
+            
             // Si el estatus de autorización esta "Rechazado", y el estatus de requisición esta "En autorización", este pasa a "Cancelado"
             else if (mnAuxReqAuthStatusId == SAuthorizationUtils.AUTH_STATUS_REJECTED) {
                 mnFkMatRequestStatusId = SModSysConsts.TRNS_ST_MAT_REQ_NEW;

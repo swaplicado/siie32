@@ -262,9 +262,45 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
+                    <Component class="javax.swing.JLabel" name="jlDocCur">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Moneda ped.:"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[90, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDocCur">
+                      <Properties>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[140, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlDocCurCur">
+                      <Properties>
+                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="MP"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[20, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jpDocRow9">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlDocCurTotal">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Tolal documento:"/>
+                        <Property name="text" type="java.lang.String" value="Tolal ped. MP:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[90, 23]"/>
                         </Property>
@@ -283,9 +319,20 @@
                         </Property>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JLabel" name="jlDocCurTotalCur">
+                      <Properties>
+                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="MP"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[20, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JPanel" name="jpDocRow9">
+                <Container class="javax.swing.JPanel" name="jpDocRow10">
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                     <Property name="alignment" type="int" value="0"/>
@@ -294,7 +341,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlDocExchageRate">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo cambio:"/>
+                        <Property name="text" type="java.lang.String" value="TC ML/MP:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[90, 23]"/>
                         </Property>
@@ -307,7 +354,7 @@
                     </Component>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JPanel" name="jpDocRow10">
+                <Container class="javax.swing.JPanel" name="jpDocRow11">
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                     <Property name="alignment" type="int" value="0"/>
@@ -316,7 +363,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlDocTotal">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Tolal:"/>
+                        <Property name="text" type="java.lang.String" value="Tolal ped. ML:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[90, 23]"/>
                         </Property>
@@ -336,9 +383,20 @@
                         </Property>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JLabel" name="jlDocTotalCur">
+                      <Properties>
+                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="ML"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[20, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JPanel" name="jpDocRow11">
+                <Container class="javax.swing.JPanel" name="jpDocRow12">
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                     <Property name="alignment" type="int" value="0"/>
@@ -347,7 +405,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlDocDpsAuth">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Est. autorizaci&#xf3;n:"/>
+                        <Property name="text" type="java.lang.String" value="Estatus aut.:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[90, 23]"/>
                         </Property>
@@ -485,7 +543,7 @@
                                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeySuppBp">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[278, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -500,13 +558,18 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppNum">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Folio archivo:"/>
+                                    <Property name="text" type="java.lang.String" value="Folio soporte:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[115, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
                                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextSuppNum">
+                                  <Properties>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[125, 23]"/>
+                                    </Property>
+                                  </Properties>
                                 </Component>
                                 <Component class="javax.swing.JButton" name="jbSuppNumPicker">
                                   <Properties>
@@ -554,7 +617,7 @@
                                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNoRegSuppBp">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[278, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -569,7 +632,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlNotes">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Comentarios arch.:"/>
+                                    <Property name="text" type="java.lang.String" value="Comentarios sop.:"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[115, 23]"/>
                                     </Property>
@@ -578,7 +641,7 @@
                                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNotes">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[250, 23]"/>
+                                      <Dimension value="[278, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -593,7 +656,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlFile">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Archivo:"/>
+                                    <Property name="text" type="java.lang.String" value="Nombre archivo:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[115, 23]"/>
                                     </Property>
@@ -642,7 +705,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppCur">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Moneda archivo:"/>
+                                    <Property name="text" type="java.lang.String" value="Moneda sop.:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -651,7 +714,18 @@
                                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeySuppCur">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[165, 23]"/>
+                                      <Dimension value="[140, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JLabel" name="jlSuppCurCur">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                                    </Property>
+                                    <Property name="text" type="java.lang.String" value="MS"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[20, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -666,7 +740,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppCurTotal">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Total archivo:"/>
+                                    <Property name="text" type="java.lang.String" value="Total sop. MS:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -685,6 +759,17 @@
                                     </Property>
                                   </Properties>
                                 </Component>
+                                <Component class="javax.swing.JLabel" name="jlSuppCurTotalCur">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                                    </Property>
+                                    <Property name="text" type="java.lang.String" value="MS"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[20, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
                               </SubComponents>
                             </Container>
                             <Container class="javax.swing.JPanel" name="jpSuppTotalRow3">
@@ -696,7 +781,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppExchangeRateDoc">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="TC documento:"/>
+                                    <Property name="text" type="java.lang.String" value="TC MP/MS:*"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -712,7 +797,7 @@
                                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                                       <Image iconType="3" name="/erp/img/icon_view_info.png"/>
                                     </Property>
-                                    <Property name="toolTipText" type="java.lang.String" value="Se habilita cuando el pedido y la cotizaci&#xf3;n sean extranjeras"/>
+                                    <Property name="toolTipText" type="java.lang.String" value="Se habilita s&#xf3;lo si es necesario"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[23, 23]"/>
                                     </Property>
@@ -729,7 +814,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppTotalDoc">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Total documento:"/>
+                                    <Property name="text" type="java.lang.String" value="Total sop. MP:"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -748,6 +833,17 @@
                                     </Property>
                                   </Properties>
                                 </Component>
+                                <Component class="javax.swing.JLabel" name="jlSuppTotalDocCur">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                                    </Property>
+                                    <Property name="text" type="java.lang.String" value="MP"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[20, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
                               </SubComponents>
                             </Container>
                             <Container class="javax.swing.JPanel" name="jpSuppTotalRow5">
@@ -759,7 +855,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppExchangeRateLoc">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="TC pesos:"/>
+                                    <Property name="text" type="java.lang.String" value="TC ML/MP:"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -781,7 +877,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JLabel" name="jlSuppTotal">
                                   <Properties>
-                                    <Property name="text" type="java.lang.String" value="Tolal:"/>
+                                    <Property name="text" type="java.lang.String" value="Tolal sop. ML:"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[100, 23]"/>
                                     </Property>
@@ -798,6 +894,17 @@
                                     <Property name="enabled" type="boolean" value="false"/>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[35, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JLabel" name="jlSuppTotalCur">
+                                  <Properties>
+                                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                                    </Property>
+                                    <Property name="text" type="java.lang.String" value="ML"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[20, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
