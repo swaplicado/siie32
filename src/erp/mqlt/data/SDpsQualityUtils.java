@@ -7,14 +7,12 @@ package erp.mqlt.data;
 
 import erp.data.SDataConstants;
 import erp.mod.SModConsts;
-import erp.mod.qlt.db.SQltUtils;
+import erp.mod.qlt.utils.SQltUtils;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryAnalysis;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.gui.util.SUtilConsts;
@@ -81,9 +79,9 @@ public class SDpsQualityUtils {
                 oEtyAnalysis.setIsForCoA(resultSet.getBoolean("qdtr.b_coa"));
                 oEtyAnalysis.setFkAnalysisId(resultSet.getInt("qdtr.id_analysis"));
                 oEtyAnalysis.setFkItemId(idItem);
-                oEtyAnalysis.setFkDatasheetTemplateId_n(resultSet.getInt(idTemplate));
+                oEtyAnalysis.setFkDatasheetTemplateId_n(idTemplate);
                 
-                sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
+                sql = "SELECT * "
                         + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                         + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
                         + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
@@ -91,9 +89,16 @@ public class SDpsQualityUtils {
 
                 ResultSet resultSetAux = session.getDatabase().getConnection().createStatement().executeQuery(sql);
                 if (resultSetAux.next()) {
-                    oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("analysis_name"));
-                    oEtyAnalysis.setAuxAnalysisUnit(resultSetAux.getString("unit_symbol"));
-                    oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("name"));
+                    if (idLogTpDelivery <= 1) {
+                        oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("analysis_name"));
+                        oEtyAnalysis.setAuxAnalysisUnit(resultSetAux.getString("unit_symbol"));
+                        oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("name"));
+                    }
+                    else {
+                        oEtyAnalysis.setAuxAnalysisName(resultSetAux.getString("analysis_name_eng"));
+                        oEtyAnalysis.setAuxAnalysisUnit(resultSetAux.getString("unit_symbol_eng"));
+                        oEtyAnalysis.setAuxAnalysisType(resultSetAux.getString("name"));
+                    }
                 }
                 
                 oEtyAnalysis.setFkUserNewId(session.getUser().getPkUserId());

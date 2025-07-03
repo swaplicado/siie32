@@ -95,7 +95,7 @@ public class SDbCoAResultRow extends SDbRegistryUser implements java.io.Serializ
 
         moAuxAnalysis.read(session, new int[] { mnFkAnalysisId });
 
-        if (mnAuxFkTemplateId_n > 0) {
+        if (mnAuxFkTemplateId_n > 0 && mnAuxFkLogTypeId_n == 0) {
             String sql = "SELECT " +
                         "    fk_log_tp_dly_n " +
                         "FROM " +
@@ -300,9 +300,11 @@ public class SDbCoAResultRow extends SDbRegistryUser implements java.io.Serializ
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
-
+        
+        registry.setAuxFkLogTypeId_n(this.getAuxFkLogTypeId_n());
         registry.setAuxAnalysis(this.getAuxAnalysis());
-
+        registry.setAuxFkTemplateId_n(this.getAuxFkTemplateId_n());
+        
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }

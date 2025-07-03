@@ -226,6 +226,16 @@ public class SModuleQlt extends SGuiModule {
 
     @Override
     public SGuiReport getReport(final int type, final int subtype, final SGuiParams params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SGuiReport guiReport = null;
+
+        switch (type) {
+            case SModConsts.QLTR_COA_RESULT:
+                guiReport = new SGuiReport("reps/qlt_coa.jasper", "CoA");
+                break;
+            default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        return guiReport;
     }
 }

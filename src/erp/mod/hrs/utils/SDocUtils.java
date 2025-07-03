@@ -25,6 +25,7 @@ import erp.mod.hrs.db.SRowPreceptSubsection;
 import erp.mod.hrs.form.SDialogDocImage;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +59,8 @@ public abstract class SDocUtils {
     public static final String BUCKET_DOC_BREACH = "docBreach";
     public static final String BUCKET_DOC_ADM_REC = "docAdminRecord";
     public static final String BUCKET_DOC_DPS_SUPPLIER = "docDpsSupplier";
+    public static final String BUCKET_DOC_QLT_COA = "docQltCoA";
+    public static final String BUCKET_DOC_QLT_COA_FILE = "docQltCoAFile";
     
     public static final String FILE_TYPE_IMG = "IMG";
     public static final String FILE_TYPE_PDF = "PDF";
@@ -208,6 +211,40 @@ public abstract class SDocUtils {
             }
         }
         
+        return objectId.toHexString();
+    }
+    
+    public static String uploadFileFromBytes(final SGuiSession session, 
+                                       final String bucketName, 
+                                       final String fileType, 
+                                       final String fileName, 
+                                       final byte[] fileData) throws Exception {
+        if (fileData == null || fileData.length == 0) {
+            throw new Exception("El parámetro fileData no puede ser nulo o vacío.");
+        }
+
+        String uri = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_DOC_MONGO_URI);
+        String db = ((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDatabase();
+        ObjectId objectId;
+
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoDatabase database = client.getDatabase(db);
+            GridFSBucket bucket = GridFSBuckets.create(database, bucketName);
+            HashMap<String, String> metadata = new HashMap<>();
+            metadata.put(META_TYPE, fileType);
+            metadata.put(META_USER, session.getUser().getName());
+            GridFSUploadOptions uploadOptions = new GridFSUploadOptions()
+                    .metadata(new Document(metadata));
+
+            System.out.println("Cargando archivo desde bytes '" + fileName + "'...");
+
+            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData)) {
+                objectId = bucket.uploadFromStream(fileName, inputStream, uploadOptions);
+
+                System.out.println("El ObjectId del archivo cargado es '" + objectId.toHexString() + "' (" + objectId.toString() + ")!");
+            }
+        }
+
         return objectId.toHexString();
     }
     

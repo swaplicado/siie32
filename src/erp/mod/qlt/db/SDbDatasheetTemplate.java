@@ -161,6 +161,7 @@ public class SDbDatasheetTemplate extends SDbRegistryUser implements java.io.Ser
             resultSet = session.getStatement().getConnection().createStatement().executeQuery(msSql);
             while (resultSet.next()) {
                 SDbDatasheetTemplateRow row = new SDbDatasheetTemplateRow();
+                row.setAuxLogTypeDeliveryId_n(mnFkLogTypeDeliveryId_n);
                 row.read(session, new int[] { mnPkDatasheetTemplateId, resultSet.getInt("id_analysis") });
                 lDatasheetTemplateRows.add(row);
             }

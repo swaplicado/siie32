@@ -43,6 +43,8 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     protected Date mtTsUserUpdate;
     */
     
+    protected int mnAuxLogTypeDeliveryId_n;
+    protected String msAnalysisMethodName;
     protected String msAnalysisName;
     protected String msAnalysisUnit;
     protected String msAnalysisType;
@@ -62,6 +64,8 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     public void setIsForDps(boolean b) { mbIsForDps = b; }
     public void setIsForCoA(boolean b) { mbIsForCoA = b; }
     
+    public void setAuxLogTypeDeliveryId_n(int n) { mnAuxLogTypeDeliveryId_n = n; }
+    public void setAuxAnalysisMethodName(String s) { msAnalysisMethodName = s; }
     public void setAuxAnalysisName(String s) { msAnalysisName = s; }
     public void setAuxAnalysisUnit(String s) { msAnalysisUnit = s; }
     public void setAuxAnalysisType(String s) { msAnalysisType = s; }
@@ -77,12 +81,14 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
     public boolean isForDps() { return mbIsForDps; }
     public boolean isForCoA() { return mbIsForCoA; }
     
+    public int getAuxLogTypeDeliveryId_n() { return mnAuxLogTypeDeliveryId_n; }
+    public String getAuxAnalysisMethodName() { return msAnalysisMethodName; }
     public String getAuxAnalysisName() { return msAnalysisName; }
     public String getAuxAnalysisUnit() { return msAnalysisUnit; }
     public String getAuxAnalysisType() { return msAnalysisType; }
 
-    public void readAnalysisAuxData(java.sql.Statement statement) {
-        String sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
+    public void readAuxData(java.sql.Statement statement) {
+        String sql = "SELECT * "
                 + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
                 + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
@@ -91,9 +97,18 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
         try {
             ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (resultSet.next()) {
-                msAnalysisName = resultSet.getString("analysis_name");
-                msAnalysisUnit = resultSet.getString("unit_symbol");
-                msAnalysisType = resultSet.getString("name");
+                if (mnAuxLogTypeDeliveryId_n <= 1) {
+                    msAnalysisMethodName = resultSet.getString("method_name");
+                    msAnalysisName = resultSet.getString("analysis_name");
+                    msAnalysisUnit = resultSet.getString("unit_symbol");
+                    msAnalysisType = resultSet.getString("name");
+                }
+                else {
+                    msAnalysisMethodName = resultSet.getString("method_name_eng");
+                    msAnalysisName = resultSet.getString("analysis_name_eng");
+                    msAnalysisUnit = resultSet.getString("unit_symbol_eng");
+                    msAnalysisType = resultSet.getString("name");
+                }
             }
         }
         catch (Exception e) {
@@ -137,6 +152,11 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+
+        msAnalysisMethodName = "";
+        msAnalysisName = "";
+        msAnalysisUnit = "";
+        msAnalysisType = "";
     }
 
     @Override
@@ -185,7 +205,7 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
             mbRegistryNew = false;
             
 //            moAuxAnalysisType.read(session, new int[] { mnFkAnalysisTypeId });
-            this.readAnalysisAuxData(session.getStatement());
+            this.readAuxData(session.getStatement());
         }
 
         mnQueryResultId = SDbConsts.READ_OK;
@@ -269,6 +289,8 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setAuxLogTypeDeliveryId_n(this.getAuxLogTypeDeliveryId_n());
+        registry.setAuxAnalysisMethodName(this.getAuxAnalysisMethodName());
         registry.setAuxAnalysisName(this.getAuxAnalysisName());
         registry.setAuxAnalysisUnit(this.getAuxAnalysisUnit());
         registry.setAuxAnalysisType(this.getAuxAnalysisType());
@@ -323,20 +345,22 @@ public class SDbDatasheetTemplateRow extends SDbRegistryUser implements java.io.
             case 0:
                 return mnSortPosition;
             case 1:
-                return msAnalysisName;
+                return msAnalysisMethodName;
             case 2:
-                return msSpecification;
+                return msAnalysisName;
             case 3:
-                return msMinValue;
+                return msSpecification;
             case 4:
-                return msMaxValue;
+                return msMinValue;
             case 5:
-                return mbMin;
+                return msMaxValue;
             case 6:
-                return mbMax;
+                return mbMin;
             case 7:
-                return mbIsForDps;
+                return mbMax;
             case 8:
+                return mbIsForDps;
+            case 9:
                 return mbIsForCoA;
             default:
                 return null;

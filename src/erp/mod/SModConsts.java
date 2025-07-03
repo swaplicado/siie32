@@ -963,7 +963,9 @@ public abstract class SModConsts {
     public static final int QLT_COA_RESULT = 2073008;
     public static final int QLT_COA_RESULT_ROW = 2073009;
     
-    public static final int QLTX_QLT_DPS_ETY = 2074001;
+    public static final int QLTR_COA_RESULT = 2074008;
+    
+    public static final int QLTX_QLT_DPS_ETY = 2075001;
     
     public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 

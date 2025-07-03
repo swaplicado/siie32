@@ -250,8 +250,8 @@ public class SDbQltyAnalysis extends SDbRegistryUser implements java.io.Serializ
                     "fk_tp_analysis_id = " + mnFkAnalysisTypeId + ", " +
                     // "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    "ts_usr_ins = " + "NOW()" + ", " +
-                    // "ts_usr_upd = " + "NOW()" + ", " +
+//                    "ts_usr_ins = " + "NOW()" + " " +
+                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
 

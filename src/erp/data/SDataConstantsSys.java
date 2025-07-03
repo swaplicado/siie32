@@ -435,6 +435,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_HRS_REP = 109901;
 
     public static final int PRV_QLT_LOT_APR = 110001;
+    public static final int PRV_QLT_COA = 110011;
     public static final int PRV_QLT_REP = 110901;
 
     public static final int ROL_CAT_CFG = 201000;

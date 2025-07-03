@@ -373,10 +373,11 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Orden"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Método"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Análisis"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Especificación"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Valor mínimo"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Valor máximo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Valor mínimo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Valor máximo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Mínimo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Máximo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Certificado"));
@@ -499,6 +500,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         try {
             moGridParameterRows.clearGridRows();
             for (SDbDatasheetTemplateRow oDatasheetRow : mlDatasheetRows) {
+                oDatasheetRow.setAuxLogTypeDeliveryId_n(moBooleanIsDomestic.getValue() ? 1 : 2);
                 rows.add(oDatasheetRow);
             }
 
@@ -588,6 +590,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         moDatasheetRow.setMinValue(moTextMin.getValue());
         moDatasheetRow.setMax(moBooleanMax.getValue());
         moDatasheetRow.setMaxValue(moTextMax.getValue());
+        moDatasheetRow.setAuxLogTypeDeliveryId_n(moBooleanIsDomestic.getValue() ? 1 : 2);
 
         if (bExists) {
             // remover anterior del panel:
@@ -597,7 +600,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
             moGridParameterRows.removeGridRow(index);
         }
 
-        moDatasheetRow.readAnalysisAuxData(miClient.getSession().getStatement());
+        moDatasheetRow.readAuxData(miClient.getSession().getStatement());
         moGridParameterRows.addGridRow(moDatasheetRow);
         moGridParameterRows.renderGridRows();
         moGridParameterRows.clearSortKeys();
@@ -709,6 +712,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         
         mlDatasheetRows = new ArrayList<>();
         for (SDbDatasheetTemplateRow oDataRow : moDatasheetTemplate.getDatasheetTemplateRows()) {
+            oDataRow.setAuxLogTypeDeliveryId_n(moDatasheetTemplate.getFkLogTypeDeliveryId_n());
             mlDatasheetRows.add((SDbDatasheetTemplateRow) oDataRow.clone());
         }
         
@@ -731,6 +735,7 @@ public class SFormDatasheetTemplate extends sa.lib.gui.bean.SBeanForm implements
         List<SDbDatasheetTemplateRow> rows = new ArrayList<>();
         for (int i = 0; i < moGridParameterRows.getTable().getRowCount(); i++) {
             SDbDatasheetTemplateRow oRow = (SDbDatasheetTemplateRow) moGridParameterRows.getGridRow(i);
+            oRow.setAuxLogTypeDeliveryId_n(moDatasheetTemplate.getFkLogTypeDeliveryId_n());
             rows.add(oRow);
         }
 

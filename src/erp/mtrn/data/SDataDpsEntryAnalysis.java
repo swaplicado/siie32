@@ -9,8 +9,10 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.data.SDataConstants;
+import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.util.Date;
+import sa.gui.util.SUtilConsts;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -48,6 +50,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     protected java.util.Date mtUserDeleteTs;
 
     protected boolean mbRowEdited;
+    protected int mnAuxLogTypeDeliveryId_n;
     protected boolean mbAuxNewVersion;
     protected String msAnalysisName;
     protected String msAnalysisUnit;
@@ -86,6 +89,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
     
+    public void setAuxLogTypeDeliveryId_n(int n) { mnAuxLogTypeDeliveryId_n = n; }
     public void setAuxNewVersion(boolean b) { mbAuxNewVersion = b; }
     public void setAuxAnalysisName(String s) { msAnalysisName = s; }
     public void setAuxAnalysisUnit(String s) { msAnalysisUnit = s; }
@@ -119,23 +123,50 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
     
+    public int getAuxLogTypeDeliveryId_n() { return mnAuxLogTypeDeliveryId_n; }
     public String getAuxAnalysisName() { return msAnalysisName; }
     public String getAuxAnalysisUnit() { return msAnalysisUnit; }
     public String getAuxAnalysisType() { return msAnalysisType; }
 
-    public void readAnalysisAuxData(java.sql.Statement statement) {
-        String sql = "SELECT qa.unit_symbol, qa.analysis_name, qtp.name "
+    public void readAuxData(java.sql.Statement statement) {
+        try {
+            if (mnFkDatasheetTemplateId_n > 0) {
+                String sql = "SELECT " +
+                            "    fk_log_tp_dly_n " +
+                            "FROM " +
+                            "    " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " " +
+                            "WHERE " +
+                            "    id_datasheet_template = " + mnFkDatasheetTemplateId_n + " ";
+
+                ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
+                if (resultSet.next()) {
+                    mnAuxLogTypeDeliveryId_n = resultSet.getInt("fk_log_tp_dly_n");
+                }
+            }
+            else {
+                mnAuxLogTypeDeliveryId_n = 0;
+            }
+
+            String sql = "SELECT * "
                 + "FROM " + SDataConstants.TablesMap.get(SDataConstants.QLT_ANALYSIS) + " AS qa "
                 + "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.QLT_TP_ANALYSIS) + " AS qtp "
                 + "ON qa.fk_tp_analysis_id = qtp.id_tp_analysis "
                 + "WHERE qa.id_analysis = " + mnFkAnalysisId;
         
-        try {
+        
             ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
             if (resultSet.next()) {
-                msAnalysisName = resultSet.getString("analysis_name");
-                msAnalysisUnit = resultSet.getString("unit_symbol");
-                msAnalysisType = resultSet.getString("name");
+
+                if (mnAuxLogTypeDeliveryId_n <= 1) {
+                    msAnalysisName = resultSet.getString("analysis_name");
+                    msAnalysisUnit = resultSet.getString("unit_symbol");
+                    msAnalysisType = resultSet.getString("name");
+                }
+                else {
+                    msAnalysisName = resultSet.getString("analysis_name_eng");
+                    msAnalysisUnit = resultSet.getString("unit_symbol_eng");
+                    msAnalysisType = resultSet.getString("name");
+                }
             }
         }
         catch (Exception e) {
@@ -186,6 +217,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
         mtUserDeleteTs = null;
 
         mbRowEdited = false;
+        mnAuxLogTypeDeliveryId_n = 0;
         mbAuxNewVersion = false;
         msAnalysisName = "";
         msAnalysisUnit = "";
@@ -242,7 +274,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
             
-           this.readAnalysisAuxData(statement);
+           this.readAuxData(statement);
         }
         catch (java.sql.SQLException e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
@@ -273,6 +305,9 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 if (resPk.next()) {
                     mnPkEntryAnalysisId = resPk.getInt("new_id");
                 }
+                
+                mnFkUserEditId = SUtilConsts.USR_NA_ID;
+                mnFkUserDeleteId = SUtilConsts.USR_NA_ID;
                 
                 sql = "INSERT INTO " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_ANALYSIS) + " VALUES (" +
                         mnPkEntryAnalysisId + ", " + 

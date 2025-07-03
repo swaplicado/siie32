@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.qlt.db;
+package erp.mod.qlt.utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +14,9 @@ import java.util.logging.Logger;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.qlt.db.SDbCoAResult;
+import erp.mod.qlt.db.SDbCoAResultRow;
+import erp.mod.qlt.db.SDbDatasheetTemplate;
 import erp.mod.trn.db.SDbDpsEntryAnalysis;
 import erp.mtrn.data.SDataDpsEntryAnalysis;
 import erp.mtrn.data.STrnStockMove;
@@ -65,6 +68,14 @@ public abstract class SQltUtils {
         return exists;
     }
     
+    /**
+     * Obtiene el ID de la plantilla de ficha técnica asociada a un ítem.
+     * 
+     * @param statement La declaración SQL utilizada para ejecutar consultas.
+     * @param nItemId El ID del ítem para el cual se busca la plantilla.
+     * @param logTypeDeliveryId El ID del tipo de entrega del registro de calidad.
+     * @return El ID de la plantilla de ficha técnica asociada al ítem, o 0 si no se encuentra ninguna.
+     */
     public static int obtainDatasheetTemplateByItemLink(Statement statement, final int nItemId, final int logTypeDeliveryId) {
         try {
             String sql = "";
@@ -108,6 +119,14 @@ public abstract class SQltUtils {
         return 0;
     }
 
+    /**
+     * Determina si un ítem debe ser configurado según las reglas de calidad.
+     * 
+     * @param statement La declaración SQL utilizada para ejecutar consultas.
+     * @param nItemId El ID del ítem a verificar.
+     * @return true si el ítem debe ser configurado, false en caso contrario.
+     * @throws SQLException Si ocurre un error al ejecutar la consulta SQL.
+     */
     public static boolean mustBeConfigured(Statement statement, int nItemId) throws SQLException {
         String sql = "";
         ResultSet resultSet = null;
@@ -136,6 +155,16 @@ public abstract class SQltUtils {
         return false;
     }
 
+    /**
+     * Convierte una entrada de análisis de calidad del nuevo modelo a un modelo antiguo.
+     * Esta función es útil para migrar datos de un modelo a otro, asegurando que los datos
+     * se mantengan consistentes entre las versiones.
+     * 
+     * @param statement La declaración SQL utilizada para ejecutar consultas.
+     * @param oAnalysisEntry La entrada de análisis del nuevo modelo que se convertirá.
+     * @return Una nueva instancia de SDataDpsEntryAnalysis que representa la entrada de análisis en el modelo antiguo.
+     * 
+     */
     public static SDataDpsEntryAnalysis newAnalysisEntryToOldAnalysisEntry(java.sql.Statement statement, SDbDpsEntryAnalysis oAnalysisEntry) {
         SDataDpsEntryAnalysis oNewAnalysisEntry = new SDataDpsEntryAnalysis();
 
@@ -167,12 +196,23 @@ public abstract class SQltUtils {
         oNewAnalysisEntry.setUserEditTs(oAnalysisEntry.getUserEditTs());
         oNewAnalysisEntry.setUserDeleteTs(oAnalysisEntry.getUserDeleteTs());
 
-        oNewAnalysisEntry.readAnalysisAuxData(statement);
+        oNewAnalysisEntry.readAuxData(statement);
         
         return oNewAnalysisEntry;
     }
     
-    public static SDbCoAResult getCoAResults(SGuiSession session, final int idYear, final int idDoc, final int idEntry) {
+    /**
+     * Obtiene el último resultado de CoA para un documento y entrada específicos.
+     * 
+     * @param session La sesión del cliente.
+     * @param idYear El año del documento.
+     * @param idDoc El ID del documento.
+     * @param idEntry El ID de la entrada del documento.
+     * @param bCanCreate Indica si se puede crear un nuevo resultado de CoA si no existe uno.
+     * 
+     * @return Un objeto SDbCoAResult con el resultado del CoA, o null si no se encuentra uno y no se puede crear.
+     */
+    public static SDbCoAResult getCoAResults(SGuiSession session, final int idYear, final int idDoc, final int idEntry, final boolean bCanCreate) {
         String sql = "SELECT id_coa_result FROM " + 
                     SModConsts.TablesMap.get(SModConsts.QLT_COA_RESULT) + 
                     " WHERE fk_dps_year = " + idYear + 
@@ -189,6 +229,10 @@ public abstract class SQltUtils {
                 oCoAResult = new SDbCoAResult();
                 oCoAResult.read(session, new int[] { coaResultSet.getInt("id_coa_result") });
                 return oCoAResult;
+            }
+            
+            if (! bCanCreate) {
+                return null;
             }
             
             String searchContractMysql = "SELECT  " +
@@ -220,12 +264,14 @@ public abstract class SQltUtils {
                 return null;
             }
 
-            String sqlEtyAnalysis = "SELECT * FROM " +
-                    SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY_ANALYSIS) +
-                    " WHERE fid_dps_year = " + idContractYear +
-                    " AND fid_dps_doc = " + idContractDoc +
-                    " AND fid_dps_ety = " + idContractEntry +
-                    " AND b_del = 0 ORDER BY sort_pos ASC;";
+            String sqlEtyAnalysis = "SELECT ea.*, dtt.fk_log_tp_dly_n FROM " +
+                    SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY_ANALYSIS) + " AS ea " +
+                    "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " AS dtt " + 
+                    "    ON ea.fid_dtsht_tmplte_n = dtt.id_datasheet_template " +
+                    " WHERE ea.fid_dps_year = " + idContractYear +
+                    " AND ea.fid_dps_doc = " + idContractDoc +
+                    " AND ea.fid_dps_ety = " + idContractEntry +
+                    " AND ea.b_del = 0 ORDER BY sort_pos ASC;";
 
             oCoAResult = new SDbCoAResult();
             
@@ -255,6 +301,7 @@ public abstract class SQltUtils {
                 coaResultRow.setCoA(resultSetEtyAnalysis.getBoolean("b_coa"));
                 coaResultRow.setFkAnalysisId(resultSetEtyAnalysis.getInt("fid_analysis"));
                 if (resultSetEtyAnalysis.getInt("fid_dtsht_tmplte_n") > 0) {
+                    oCoAResult.setFkLogTypeDeliveryId(resultSetEtyAnalysis.getInt("fk_log_tp_dly_n"));
                     oCoAResult.setFkDatasheetTemplateId_n(resultSetEtyAnalysis.getInt("fid_dtsht_tmplte_n"));
                     coaResultRow.setAuxFkTemplateId_n(oCoAResult.getFkDatasheetTemplateId_n());
                 }

@@ -41,7 +41,7 @@ import erp.mitm.data.SDataUnitType;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
-import erp.mod.qlt.db.SQltUtils;
+import erp.mod.qlt.utils.SQltUtils;
 import erp.mod.trn.db.SDbDpsEntryAnalysis;
 import erp.mod.log.db.SDbTankCar;
 import erp.mod.trn.db.SDbScaleTicket;
@@ -3009,6 +3009,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
                         if (miForm.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                             SDbDpsEntryAnalysis oRegistry = (SDbDpsEntryAnalysis) miForm.getRegistry();
+                            oRegistry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                             SDataDpsEntryAnalysis oCopy = SQltUtils.newAnalysisEntryToOldAnalysisEntry(miClient.getSession().getStatement(), oRegistry);
                             moModel.getGridRows().add(oCopy);
                             moModel.renderGridRows();
@@ -4288,14 +4289,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void renderQualityAnalysisConfiguration() {
         this.mlDpsEntryAnalysis = new ArrayList<>();
         
-        int idTemplate = 0;
         int idLogTpDelivery = moParamBizPartner.isDomestic(miClient) ? 1 : 2;
         if (moDpsEntry.getIsRegistryNew()) {
             if (moItem != null) {
                 // Obtener configuraciones en base al ítem (versión más nueva)
-                idTemplate = SQltUtils.obtainDatasheetTemplateByItemLink(miClient.getSession().getStatement(), moItem.getPkItemId(), idLogTpDelivery);
-                
-                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId(), idTemplate);
+                this.mlDpsEntryAnalysis = SDpsQualityUtils.getAnalysisByItem(miClient.getSession(), moItem.getPkItemId(), idLogTpDelivery);
             }
             else {
                 this.mlDpsEntryAnalysis = new ArrayList<>();

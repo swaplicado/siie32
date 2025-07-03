@@ -218,10 +218,11 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
         moTextTemplateName.setTextSettings(SGuiUtils.getLabelName(jlTemplateName), 150);
         moTextTemplateEstandard.setTextSettings(SGuiUtils.getLabelName(jlTemplateEstandard), 150);
         
-        moFields.addField(moDtDate);
-        moFields.addField(moTextVersion);
-        moFields.addField(moTextTemplateName);
-        moFields.addField(moTextTemplateEstandard);
+        moTextVersion.setEnabled(false);
+        moTextTemplateName.setEnabled(false);
+        moTextTemplateEstandard.setEnabled(false);
+        
+        moBooleanIsDomestic.setEnabled(false);
         
         moGridParameterRows = new SGridPaneForm(miClient, SModConsts.QLT_DATASHEET_TEMPLATE_ROW, SLibConsts.UNDEFINED, "Parámetros de la ficha") {
             @Override
@@ -264,9 +265,6 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
         }
     }
 
-    /**
-     * Mostrar registros en la tabla superior
-     */
     private void showDatasheetRows() {
         Vector<SGridRow> rows = new Vector<>();
 
@@ -289,9 +287,6 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
         }
     }
     
-    /**
-     * Liberar
-     */
     private void actionDeleteRow() {
         if (moGridParameterRows.getSelectedGridRow() == null) {
             miClient.showMsgBoxWarning("No ha seleccionado ningún registro.");
@@ -308,6 +303,20 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
                 moGridParameterRows.clearGridRows();
             }
         }
+    }
+
+    private void enableOrDisableFields(boolean enable) {
+        moDtDate.setEnabled(enable);
+        moTextVersion.setEnabled(enable);
+        moTextTemplateName.setEnabled(enable);
+        moTextTemplateEstandard.setEnabled(enable);
+        moBooleanIsDomestic.setEnabled(enable);
+        
+        moGridParameterRows.setEnabled(enable);
+        jbEditRow.setEnabled(enable);
+        jbDeleteRow.setEnabled(enable);
+        jbEdit.setEnabled(enable);
+        jbSave.setEnabled(enable);
     }
     
     @Override
@@ -360,6 +369,7 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
         
         showDatasheetRows();
         setFormEditable(true);
+        enableOrDisableFields(! moCoAResult.isClosed());
         addAllListeners();
     }
 
@@ -392,7 +402,7 @@ public class SFormCoACapture extends sa.lib.gui.bean.SBeanForm implements ListSe
 
     @Override
     public Object getValue(final int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new Object();
     }
 
     @Override

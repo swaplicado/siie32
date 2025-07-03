@@ -26,12 +26,16 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
     protected int mnPkCoAResultId;
     protected Date mtDate;
     protected String msCaptureStatus;
-    
+    protected String msExternalDocumentId;
+    protected String msExternalFileId;
+    protected boolean mbClosed;
+
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
     */
     
+    protected int mnFkLogTypeDeliveryId;
     protected int mnFkDatasheetTemplateId_n;
     protected int mnFkSourceDpsYearId_n;
     protected int mnFkSourceDpsDocId_n;
@@ -39,14 +43,19 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
     protected int mnFkDpsYearId;
     protected int mnFkDpsDocId;
     protected int mnFkDpsEtyId;
-    
+    protected int mnFkUserCoAGenId;
+
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
+    */
+    protected Date mtTsCoAGenerated;
+    /*
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
     
+    protected int mnAuxFkNewUserCoAGenId;
     protected SDbDatasheetTemplate moAuxDatasheetTemplate;
     protected List<SDbCoAResultRow> lCoAResultRows;
 
@@ -57,6 +66,10 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
     public void setPkCoAResultId(int n) { mnPkCoAResultId = n; }
     public void setDate(Date t) { mtDate = t; }
     public void setCaptureStatus(String s) { msCaptureStatus = s; }
+    public void setExternalDocumentId(String s) { msExternalDocumentId = s; }
+    public void setExternalFileId(String s) { msExternalFileId = s; }
+    public void setClosed(boolean b) { mbClosed = b; }
+    public void setFkLogTypeDeliveryId(int n) { mnFkLogTypeDeliveryId = n; }
     public void setFkDatasheetTemplateId_n(int n) { mnFkDatasheetTemplateId_n = n; }
     public void setFkSourceDpsYearId_n(int n) { mnFkSourceDpsYearId_n = n; }
     public void setFkSourceDpsDocId_n(int n) { mnFkSourceDpsDocId_n = n; }
@@ -64,12 +77,19 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
     public void setFkDpsYearId(int n) { mnFkDpsYearId = n; }
     public void setFkDpsDocId(int n) { mnFkDpsDocId = n; }
     public void setFkDpsEtyId(int n) { mnFkDpsEtyId = n; }
+    public void setFkUserCoAGenId(int n) { mnFkUserCoAGenId = n; }
+    public void setTsCoAGenerated(Date t) { mtTsCoAGenerated = t; }
 
+    public void setAuxFkNewUserCoAGenId(int n) { mnAuxFkNewUserCoAGenId = n; }
     public void setAuxDatasheetTemplate(SDbDatasheetTemplate o) { moAuxDatasheetTemplate = o; }
 
     public int getPkCoAResultId() { return mnPkCoAResultId; }
     public Date getDate() { return mtDate; }
     public String getCaptureStatus() { return msCaptureStatus; }
+    public String getExternalDocumentId() { return msExternalDocumentId; }
+    public String getExternalFileId() { return msExternalFileId; }
+    public boolean isClosed() { return mbClosed; }
+    public int getFkLogTypeDeliveryId() { return mnFkLogTypeDeliveryId; }
     public int getFkDatasheetTemplateId_n() { return mnFkDatasheetTemplateId_n; }
     public int getFkSourceDpsYearId_n() { return mnFkSourceDpsYearId_n; }
     public int getFkSourceDpsDocId_n() { return mnFkSourceDpsDocId_n; }
@@ -77,7 +97,10 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
     public int getFkDpsYearId() { return mnFkDpsYearId; }
     public int getFkDpsDocId() { return mnFkDpsDocId; }
     public int getFkDpsEtyId() { return mnFkDpsEtyId; }
+    public int getFkUserCoAGenId() { return mnFkUserCoAGenId; }
+    public Date getTsCoAGenerated() { return mtTsCoAGenerated; }
 
+    public int getAuxFkNewUserCoAGenId() { return mnAuxFkNewUserCoAGenId; }
     public SDbDatasheetTemplate getAuxDatasheetTemplate() { return moAuxDatasheetTemplate; }
     public List<SDbCoAResultRow> getCoAResultRows() { return lCoAResultRows; }
     
@@ -103,8 +126,12 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         mnPkCoAResultId = 0;
         mtDate = null;
         msCaptureStatus = null;
+        msExternalDocumentId = null;
+        msExternalFileId = null;
+        mbClosed = false;
         mbDeleted = false;
         mbSystem = false;
+        mnFkLogTypeDeliveryId = 0;
         mnFkDatasheetTemplateId_n = 0;
         mnFkSourceDpsYearId_n = 0;
         mnFkSourceDpsDocId_n = 0;
@@ -112,11 +139,14 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         mnFkDpsYearId = 0;
         mnFkDpsDocId = 0;
         mnFkDpsEtyId = 0;
+        mnFkUserCoAGenId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
+        mtTsCoAGenerated = null;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
+        mnAuxFkNewUserCoAGenId = 0;
         moAuxDatasheetTemplate = null;
         lCoAResultRows = new ArrayList<>();
     }
@@ -161,8 +191,12 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
             mnPkCoAResultId = resultSet.getInt("id_coa_result");
             mtDate = resultSet.getDate("dt_date");
             msCaptureStatus = resultSet.getString("capt_status");
+            msExternalDocumentId = resultSet.getString("ext_doc_id");
+            msExternalFileId = resultSet.getString("ext_file_id");
+            mbClosed = resultSet.getBoolean("b_closed");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
+            mnFkLogTypeDeliveryId = resultSet.getInt("fk_tp_log_delivery");
             mnFkDatasheetTemplateId_n = resultSet.getInt("fk_datasheet_template_n");
             mnFkSourceDpsYearId_n = resultSet.getInt("fk_dps_src_year_n");
             mnFkSourceDpsDocId_n = resultSet.getInt("fk_dps_src_doc_n");
@@ -170,10 +204,14 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
             mnFkDpsYearId = resultSet.getInt("fk_dps_year");
             mnFkDpsDocId = resultSet.getInt("fk_dps_doc");
             mnFkDpsEtyId = resultSet.getInt("fk_dps_ety");
+            mnFkUserCoAGenId = resultSet.getInt("fk_usr_coa_gen");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
+            mtTsCoAGenerated = resultSet.getTimestamp("ts_coa_gen");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+
+            mnAuxFkNewUserCoAGenId = mnFkUserCoAGenId;
 
             mbRegistryNew = false;
 //            moAuxAnalysisType.read(session, new int[] { mnFkAnalysisTypeId });
@@ -187,6 +225,8 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
             resultSet = session.getStatement().getConnection().createStatement().executeQuery(msSql);
             while (resultSet.next()) {
                 SDbCoAResultRow row = new SDbCoAResultRow();
+                row.setAuxFkLogTypeId_n(mnFkLogTypeDeliveryId);
+                row.setAuxFkTemplateId_n(mnFkDatasheetTemplateId_n);
                 row.read(session, new int[] { mnPkCoAResultId, resultSet.getInt("id_coa_result_row") });
                 lCoAResultRows.add(row);
             }
@@ -212,6 +252,7 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
+            mnFkUserCoAGenId = SUtilConsts.USR_NA_ID;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
@@ -219,17 +260,23 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
                         mnPkCoAResultId + ", " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " + 
                         "'" + msCaptureStatus + "', " +
+                        "'" + ((msExternalDocumentId == null || msExternalDocumentId.isEmpty()) ? "" : msExternalDocumentId) + "', " +
+                        "'" + ((msExternalFileId == null || msExternalFileId.isEmpty()) ? "" : msExternalFileId) + "', " +
+                        (mbClosed ? 1 : 0) + ", " +
                         (mbDeleted ? 1 : 0) + ", " + 
                         (mbSystem ? 1 : 0) + ", " + 
-                        mnFkDatasheetTemplateId_n + ", " + 
-                        mnFkSourceDpsYearId_n + ", " + 
-                        mnFkSourceDpsDocId_n + ", " + 
-                        mnFkSourceDpsEtyId_n + ", " + 
+                        mnFkLogTypeDeliveryId + ", " +
+                        (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
+                        (mnFkSourceDpsYearId_n == 0 ? "NULL" : mnFkSourceDpsYearId_n) + ", " +
+                        (mnFkSourceDpsDocId_n == 0 ? "NULL" : mnFkSourceDpsDocId_n) + ", " +
+                        (mnFkSourceDpsEtyId_n == 0 ? "NULL" : mnFkSourceDpsEtyId_n) + ", " +
                         mnFkDpsYearId + ", " + 
                         mnFkDpsDocId + ", " + 
                         mnFkDpsEtyId + ", " + 
+                        mnFkUserCoAGenId + ", " +
                         mnFkUserInsertId + ", " + 
-                        mnFkUserUpdateId + ", " + 
+                        mnFkUserUpdateId + ", " +                         
+                        "NOW()" + ", " + 
                         "NOW()" + ", " + 
                         "NOW()" + " " +
                         ")";
@@ -241,17 +288,23 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
 //                    "id_coa_result = " + mnPkCoAResultId + ", " +
                     "dt_date = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "', " +
                     "capt_status = '" + msCaptureStatus + "', " +
+                    "ext_doc_id = '" + ((msExternalDocumentId == null || msExternalDocumentId.isEmpty()) ? "" : msExternalDocumentId) + "', " +
+                    "ext_file_id = '" + ((msExternalFileId == null || msExternalFileId.isEmpty()) ? "" : msExternalFileId) + "', " +
+                    "b_closed = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fk_datasheet_template_n = " + mnFkDatasheetTemplateId_n + ", " +
-                    "fk_dps_src_year_n = " + mnFkSourceDpsYearId_n + ", " +
-                    "fk_dps_src_doc_n = " + mnFkSourceDpsDocId_n + ", " +
-                    "fk_dps_src_ety_n = " + mnFkSourceDpsEtyId_n + ", " +
+                    "fk_tp_log_delivery = " + mnFkLogTypeDeliveryId + ", " +
+                    "fk_datasheet_template_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
+                    "fk_dps_src_year_n = " + (mnFkSourceDpsYearId_n == 0 ? "NULL" : mnFkSourceDpsYearId_n) + ", " +
+                    "fk_dps_src_doc_n = " + (mnFkSourceDpsDocId_n == 0 ? "NULL" : mnFkSourceDpsDocId_n) + ", " +
+                    "fk_dps_src_ety_n = " + (mnFkSourceDpsEtyId_n == 0 ? "NULL" : mnFkSourceDpsEtyId_n) + ", " +
                     "fk_dps_year = " + mnFkDpsYearId + ", " +
                     "fk_dps_doc = " + mnFkDpsDocId + ", " +
                     "fk_dps_ety = " + mnFkDpsEtyId + ", " +
+                    ((mnFkUserCoAGenId != mnAuxFkNewUserCoAGenId) ? ("fk_usr_coa_gen = " + mnAuxFkNewUserCoAGenId + ", ") : ("")) +
 //                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    ((mnFkUserCoAGenId != mnAuxFkNewUserCoAGenId) ? ("ts_coa_gen = " + "NOW()" + ", ") : ("")) +
 //                    "ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
@@ -280,8 +333,12 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         registry.setPkCoAResultId(this.getPkCoAResultId());
         registry.setDate(this.getDate());
         registry.setCaptureStatus(this.getCaptureStatus());
+        registry.setExternalDocumentId(this.getExternalDocumentId());
+        registry.setExternalFileId(this.getExternalFileId());
+        registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
+        registry.setFkLogTypeDeliveryId(this.getFkLogTypeDeliveryId());
         registry.setFkDatasheetTemplateId_n(this.getFkDatasheetTemplateId_n());
         registry.setFkSourceDpsYearId_n(this.getFkSourceDpsYearId_n());
         registry.setFkSourceDpsDocId_n(this.getFkSourceDpsDocId_n());
@@ -289,8 +346,10 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         registry.setFkDpsYearId(this.getFkDpsYearId());
         registry.setFkDpsDocId(this.getFkDpsDocId());
         registry.setFkDpsEtyId(this.getFkDpsEtyId());
+        registry.setFkUserCoAGenId(this.getFkUserCoAGenId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
+        registry.setTsCoAGenerated(this.getTsCoAGenerated());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
@@ -306,6 +365,7 @@ public class SDbCoAResult extends SDbRegistryUser implements java.io.Serializabl
         }
 
         registry.setRegistryNew(this.isRegistryNew());
+        
         return registry;
     }
 }

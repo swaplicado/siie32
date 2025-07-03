@@ -5097,8 +5097,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         /**
          * Sección de envío de correo de parámetros de calidad en contratos de venta
          */
-        String qualityBody = "";
         if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+            String qualityBody = "";
             SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
             qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                             mvDbmsDpsEntries,
