@@ -431,7 +431,6 @@ public class SStockValuationRecordUtils {
      * @param nItemRef Referencia del ítem.
      * @param fkSystemMove Clave de sistema para el tipo de movimiento.
      *                      SModSysConsts.FINS_TP_SYS_MOV_PUR
-     *                      
      * @param fkSystemAccount Clave de sistema para la cuenta.
      *                      SModSysConsts.FINS_TP_SYS_ACC_NA_NA
      * @param fkSystemMoveType Clave de sistema para el tipo de movimiento.
