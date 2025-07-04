@@ -385,6 +385,7 @@ public abstract class SModConsts {
     public static final int TRNS_ST_MAT_REQ = 2021302;
     public static final int TRNS_ST_MAT_PROV = 2021303;
     public static final int TRNS_ST_MAT_PUR = 2021304;
+    public static final int TRNS_TP_PERIOD = 2021361;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -437,6 +438,8 @@ public abstract class SModConsts {
     public static final int TRN_SUP_FILE_DPS_ETY = 2023508;
     public static final int TRN_SCA_TIC_DPS = 2023390;
     public static final int TRN_SCA_TIC_DPS_ETY = 2023391;
+    public static final int TRN_INIT = 2023361;
+    public static final int TRN_INIT_DPS = 2023366;
     public static final int TRN_DIOG = 2023029;
     public static final int TRN_DIOG_NTS = 2023030;
     public static final int TRN_DIOG_ETY = 2023031;
@@ -1243,6 +1246,7 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_ST_MAT_REQ, "erp.trns_st_mat_req");
         TablesMap.put(TRNS_ST_MAT_PROV, "erp.trns_st_mat_prov");
         TablesMap.put(TRNS_ST_MAT_PUR, "erp.trns_st_mat_pur");
+        TablesMap.put(TRNS_TP_PERIOD, "erp.trns_tp_period");
 
         TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
         TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");
@@ -1294,6 +1298,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_SUP_FILE_DPS_ETY, "trn_sup_file_dps_ety");
         TablesMap.put(TRN_SCA_TIC_DPS, "trn_sca_tic_dps");
         TablesMap.put(TRN_SCA_TIC_DPS_ETY, "trn_sca_tic_dps_ety");
+        TablesMap.put(TRN_INIT, "trn_init");
+        TablesMap.put(TRN_INIT_DPS, "trn_init_dps");
         TablesMap.put(TRN_DIOG, "trn_diog");
         TablesMap.put(TRN_DIOG_NTS, "trn_diog_nts");
         TablesMap.put(TRN_DIOG_ETY, "trn_diog_ety");

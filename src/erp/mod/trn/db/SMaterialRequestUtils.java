@@ -462,7 +462,7 @@ public abstract class SMaterialRequestUtils {
                                 + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, "
                                 + "a.item AS " + SDbConsts.FIELD_PICK + "2, "
                                 + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
-                                + "IF(a.id_item IN (" + item + ") OR a.fid_igen IN (" + igen + "), 1, 0) AS " + SDbConsts.FIELD_PICK + "4, "
+                                + "IF(a.id_item IN (" + (item.isEmpty() ? 0 : item ) + ") OR a.fid_igen IN (" + (igen.isEmpty() ? 0 : igen) + "), 1, 0) AS " + SDbConsts.FIELD_PICK + "4, "
                                 + "a.b_inv AS " + ITEM_INV + ", "
                                 + "0 AS " + ITEM_SAL + ", "
                                 + "0 AS " + ITEM_ASS + ", "
@@ -1215,17 +1215,17 @@ public abstract class SMaterialRequestUtils {
                 "    itm.part_num, " +
                 "    uni.symbol," +
                 "    GROUP_CONCAT(COALESCE(IF(length(iog.num_ser) > 0, CONCAT('SUM ', iog.num_ser, '-', iog.num), CONCAT('SUM ', iog.num)), '')) AS sum, " +
-                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
+                "    GROUP_CONCAT(DISTINCT IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_EST[2] + ", " +
                 "        CONCAT('COT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
                 "        '')) AS cot, " +
-                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                "    GROUP_CONCAT(DISTINCT IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ", " +
                 "        CONCAT('PED ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +
                 "        '')) AS ped, " +
-                "    GROUP_CONCAT(IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                "    GROUP_CONCAT(DISTINCT IF(dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
                 "            AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
                 "            AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + ", " +
                 "        CONCAT('FACT ', (IF(length(dps.num_ser) > 0, CONCAT(dps.num_ser, '-'), '')), dps.num), " +

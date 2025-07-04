@@ -88,6 +88,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenuItem jmiCatFunctionalAreaBudgets;
     private javax.swing.JMenuItem jmiCatPriceCommercialLog;
+    private javax.swing.JMenuItem jmiCatInitiatives;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates; 
     private javax.swing.JMenuItem jmiEstimatesDetail;
@@ -294,6 +295,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
+        int levelRightInitiatives;
 
         SConfigurationItemDps confItemAcidityPercentage;
         SConfigurationItemDps confItemTankCar;
@@ -308,6 +310,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
         jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
+        jmiCatInitiatives = new JMenuItem("Iniciativas");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -322,6 +325,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatFunctionalAreaBudgets);
         jmCat.addSeparator();
         jmCat.add(jmiCatPriceCommercialLog);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatInitiatives);
         
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de compras");
@@ -702,6 +707,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog.addActionListener(this);
         jmiCatFunctionalAreaBudgets.addActionListener(this);
         jmiCatPriceCommercialLog.addActionListener(this);
+        jmiCatInitiatives.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesDetail.addActionListener(this);        
         jmiEstimatesLinkPend.addActionListener(this);
@@ -861,6 +867,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         levelRightDocOrder = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
         levelRightDocTransaction = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
         levelRightScaleTic = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_SCA_TIC).Level;
+        levelRightInitiatives = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_INIT).Level;
         
         try {
             hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
@@ -890,6 +897,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmiCatFunctionalAreaBudgets.setEnabled(hasRightCreditConfig && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
+        jmiCatInitiatives.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
         jmEst.setEnabled(hasRightDocEstimate);
 
         jmCon.setEnabled(hasRightDocEstimate);
@@ -1709,6 +1717,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatPriceCommercialLog) {
                 miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatInitiatives) {
+                miClient.getSession().showView(SModConsts.TRN_INIT, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

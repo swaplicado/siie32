@@ -288,6 +288,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected String msAuxFileXmlName;
     protected int[] manAuxDpsTime;
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
+    protected int mnAuxInitiativeId; // case of application of initiative
     protected double mdAuxAppPrepayCurCrossPayExchangeRate; // case of an application of prepayment with currency crossing: payment's exchange rate
     protected boolean mbXtaTestLinks;
     protected boolean mbXtaHasSuppFiles;
@@ -2117,6 +2118,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
     public void setAuxDpsTime (int[] o) { manAuxDpsTime = o; } 
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
+    public void setAuxInitiativeId(int n) { mnAuxInitiativeId = n; }
     public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
     public void setAuxTestLinks(boolean b) { mbXtaTestLinks = b; }
     public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
@@ -2134,7 +2136,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
     public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }																		   
-    public void setDbmsDataCfdBol(erp.mtrn.data.SDataCfd o) { moDbmsDataCfdBol = o; }																		   
+    public void setDbmsDataCfdBol(erp.mtrn.data.SDataCfd o) { moDbmsDataCfdBol = o; }
     
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -2157,6 +2159,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
     public int[] getAuxDpsTime() { return manAuxDpsTime; }
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
+    public int getAuxInitiativeId() { return mnAuxInitiativeId; }
     public double getAuxAppPrepayCurCrossPayExchangeRate() { return mdAuxAppPrepayCurCrossPayExchangeRate; }
     public boolean getXtaTestLinks() { return mbXtaTestLinks; }
     public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
@@ -2179,7 +2182,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.util.Date getOldDate() { return mtOldDate; }
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
-
+    
     public erp.mtrn.data.SDataDpsEntry getDbmsDpsEntry(int[] pk) {
         SDataDpsEntry entryFound = null;
 
@@ -2433,6 +2436,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msAuxFileXmlName = "";
         manAuxDpsTime = null;
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
+        mnAuxInitiativeId = 0;
         mdAuxAppPrepayCurCrossPayExchangeRate = 0;
         mbXtaTestLinks = true;
         mbXtaHasSuppFiles = false;
@@ -2450,7 +2454,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataDpsCfd = null;
         moDbmsDataAddenda = null;
         moDbmsDataPdf = null;					 
-        moDbmsDataCfdBol = null;					 
+        moDbmsDataCfdBol = null;		
         
         mtOldDate = null;
         msXtaTotalCyAsText = "";
@@ -2686,6 +2690,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     else {
                         mvDbmsScaleTickets.add(entry);
                     }
+                }
+                
+                // Read aswell initiatives:
+                
+                sSql = "SELECT id_init " + 
+                        "FROM trn_init_dps " +
+                        "WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    mnAuxInitiativeId = oResultSet.getInt(1);
                 }
 
                 // Check if document class requires an accounting record:
@@ -4441,6 +4455,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
+                }
+                
+                // Save initiatives
+                
+                sSql = "DELETE FROM trn_init_dps WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
+                oStatement.execute(sSql);
+                
+                if (mnAuxInitiativeId != 0) {
+                    sSql = "INSERT INTO trn_init_dps VALUES(" + mnAuxInitiativeId + ", " + mnPkYearId + ", " + mnPkDocId + ");";
+                    oStatement.execute(sSql);
                 }
                         
                 mbIsRegistryNew = false;

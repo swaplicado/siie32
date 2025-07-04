@@ -214,7 +214,7 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
         jbSelect.addActionListener(this);
         jbClose.addActionListener(this);
     }
-    
+     
     private SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         

@@ -5,9 +5,14 @@
 
 package erp.mod;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiItem;
+
 /**
  *
- * @author Sergio Flores, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public abstract class SModSysConsts {
 
@@ -732,6 +737,14 @@ public abstract class SModSysConsts {
     public static final String TRNS_MAT_REQ_TP_R = "R"; // Resurtido
     public static final String TRNS_MAT_REQ_TP_C = "C"; // Consumo
     
+    public static final int TRNS_TP_PERIOD_NA = 0; // not applicable
+    public static final int TRNS_TP_PERIOD_MON = 1; // monthly
+    public static final int TRNS_TP_PERIOD_BIM = 2; // bimonthly
+    public static final int TRNS_TP_PERIOD_QUA = 3; // quartely
+    public static final int TRNS_TP_PERIOD_TRI = 4; // triannual
+    public static final int TRNS_TP_PERIOD_BIA = 6; // biannual
+    public static final int TRNS_TP_PERIOD_ANN = 12; // annual
+    
     public static final int TRNX_TP_VAL_MVT_ALL = 0;
     public static final int TRNX_TP_VAL_MVT_ENTRY = 1;
     public static final int TRNX_TP_VAL_MVT_CONS = 2;
@@ -797,6 +810,13 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
     public static final int TRNX_MAT_REQ_RECLASS = 107; // reclasificación contable
     //public static final int TRNX_MAT_REQ_FOLL_PUR_CLOSED = 100; // Seguimiento // se cambia por la constante SUtilConsts.ACTION_CLOSE
+    
+    public static final int TRNX_TP_PERIOD_EVENT_ID = 1; 
+    public static final int TRNX_TP_PERIOD_REC_ID = 2; 
+    public static final String TRNX_TP_PERIOD_EVENT_DESC = "POR EVENTO"; 
+    public static final String TRNX_TP_PERIOD_REC_DESC = "RECURRENTE"; 
+    public static final ArrayList<SGuiItem> TRNX_TP_PERIOD_CATALOG;
+    public static final HashMap<Integer, String> TRNX_TP_PERIOD_CODES;
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";
@@ -1135,4 +1155,15 @@ public abstract class SModSysConsts {
     public static final int HRSX_REC_SCHE_CAT_NA = 0;           // Not applicable
     public static final int HRSX_REC_SCHE_CAT_WAGES = 1;        // Wages & salaries, retirees and others
     public static final int HRSX_REC_SCHE_CAT_ASSIMILATED = 2;  // All assimilated types
+    
+    static {
+        TRNX_TP_PERIOD_CATALOG = new ArrayList<>();
+        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- Tipo iniciativa -"));
+        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_EVENT_ID }, TRNX_TP_PERIOD_EVENT_DESC));
+        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_REC_ID }, TRNX_TP_PERIOD_REC_DESC));
+        
+        TRNX_TP_PERIOD_CODES = new HashMap<>();
+        TRNX_TP_PERIOD_CODES.put(TRNX_TP_PERIOD_EVENT_ID, "E");
+        TRNX_TP_PERIOD_CODES.put(TRNX_TP_PERIOD_REC_ID, "R");
+    }
 }

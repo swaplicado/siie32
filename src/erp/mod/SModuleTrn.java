@@ -24,6 +24,7 @@ import erp.mod.trn.db.SDbFunctionalAreaBudget;
 import erp.mod.trn.db.SDbFunctionalAreaBudgets;
 import erp.mod.trn.db.SDbIdentifiedCostCalculation;
 import erp.mod.trn.db.SDbIdentifiedCostLot;
+import erp.mod.trn.db.SDbInitiative;
 import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemCost;
@@ -55,6 +56,7 @@ import erp.mod.trn.form.SFormConfWarehouseVsProvEntity;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
 import erp.mod.trn.form.SFormIdentifiedCostCalculation;
+import erp.mod.trn.form.SFormInitiative;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemCost;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
@@ -102,6 +104,7 @@ import erp.mod.trn.view.SViewFollowingPurchaseMaterialRequest;
 import erp.mod.trn.view.SViewFunctionalAreaBudgets;
 import erp.mod.trn.view.SViewFunctionalAreaExpenses;
 import erp.mod.trn.view.SViewIdentifiedCostCalculation;
+import erp.mod.trn.view.SViewInitiative;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
@@ -180,6 +183,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormInventoryValuation moFormInventoryValuationUpdCost;
     private SFormIdentifiedCostCalculation moFormIdentifiedCostCalculation;
     private SFormMmsConfig moFormMmsConfiguration;
+    private SFormInitiative moFormInitiative;
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
     private SFormItemCost moFormItemCost;
@@ -248,6 +252,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_DPS_ETY_PRC:
                 registry = new SDbDpsEntryPrice();
+                break;
+            case SModConsts.TRN_INIT:
+                registry = new SDbInitiative();
                 break;
             case SModConsts.TRN_DPS_ETY_ANALYSIS:
                 registry = new SDbDpsEntryAnalysis();
@@ -379,6 +386,13 @@ public class SModuleTrn extends SGuiModule {
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
+            case SModConsts.TRNS_TP_PERIOD:
+                settings = new SGuiCatalogueSettings("Periodicidad", 1);
+                sql = "SELECT id_tp_period AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY sort ";
+                break;
             case SModConsts.TRNS_ST_MAT_REQ:
                 settings = new SGuiCatalogueSettings("Estatus de requisición", 1);
                 sql = "SELECT id_st_mat_req AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
@@ -573,6 +587,9 @@ public class SModuleTrn extends SGuiModule {
                     default:
                         // nothing
                 }
+                break;
+            case SModConsts.TRN_INIT:
+                view = new SViewInitiative(miClient, "Iniciativas");
                 break;
             case SModConsts.TRN_CFD:
                 switch (subtype) {
@@ -1019,6 +1036,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MMS_CFG:
                 if (moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");
                 form = moFormMmsConfiguration;
+                break;
+            case SModConsts.TRN_INIT:
+                if (moFormInitiative == null) moFormInitiative = new SFormInitiative(miClient, "Iniciativa");
+                form = moFormInitiative;
                 break;
             case SModConsts.TRN_DVY:
                 if (moFormDelivery == null) moFormDelivery = new SFormDelivery(miClient, "Entrega");

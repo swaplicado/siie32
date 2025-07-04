@@ -1641,6 +1641,14 @@ public abstract class SDataReadComponentItems {
                 }
 
                 break;
+            case SDataConstants.TRN_INIT:
+                lenPk = 1;
+                sql = "SELECT i.id_init AS f_id_1, CONCAT(i.name, ' (', i.code, ')') AS f_item " +
+                        "FROM trn_init AS i " +
+                        "WHERE NOT b_del " + 
+                        "ORDER BY i.name, i.id_init";
+                text = "iniciativas";
+                break;
             case SDataConstants.TRN_DNS_DIOG:
                 lenPk = 1;
                 sql = "SELECT s.id_dns AS f_id_1, CONCAT(s.dns, ' (', cl.cl_iog, ')') AS f_item " +

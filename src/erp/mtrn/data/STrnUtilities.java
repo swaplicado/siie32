@@ -4790,4 +4790,56 @@ public abstract class STrnUtilities {
         }
         return description;
     }
+    
+    public static Date getDateNow(SClientInterface client) {
+        try {
+            String sql = "SELECT NOW();";
+            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return resultSet.getTimestamp(1);
+            }
+        }
+        catch(SQLException e) {
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return null;
+    }
+    
+    public static double getInitiativeComBudget(SClientInterface client, int pk) {
+        try {
+            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) FROM trn_dps AS d " +
+                    "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc " +
+                    "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                    "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
+                    "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " " +
+                    "AND id.id_init = " + pk;
+            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return resultSet.getDouble(1);
+            }
+        }
+        catch (SQLException e) { 
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return 0d;
+    }
+    
+    public static double getInitiativeSpentBudget(SClientInterface client, int pk) {
+        try {
+            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) FROM trn_dps AS d " +
+                    "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc " +
+                    "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
+                    "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
+                    "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " " +
+                    "AND id.id_init = " + pk;
+            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return resultSet.getDouble(1);
+            }
+        }
+        catch (SQLException e) {
+            client.showMsgBoxWarning(e.getMessage());
+        }
+        return 0d;
+    }
 }

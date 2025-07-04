@@ -168,7 +168,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moTablePane.reset();
 
         STableField[] aoKeyFields = new STableField[3];
-        maoTableColumns = new STableColumn[28];
+        maoTableColumns = new STableColumn[30];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_year");
@@ -186,7 +186,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 200);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave AN", 50);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal AN", 100);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "de.concept_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "de.concept_key", "Clave concepto partida", STableConstants.WIDTH_ITEM_KEY);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "de.concept", "Concepto partida", 300);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item", "Ítem", 300);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uo.symbol", "Unidad", STableConstants.WIDTH_CODE_COB);
@@ -381,15 +383,41 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             sqlWhereDpsTypes = "AND " + (dpsTypeKeys.length == 1 ? sqlWhereDpsTypes : "(" + sqlWhereDpsTypes + ")") + " ";
         }
         
-        msSql = "SELECT de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, dt.code, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS _dnum, cob.code, bp.bp, bpc.bp_key, bpb.bpb, " +
-                "rbkc.code, rcob.code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as _rper, " +
+        msSql = "SELECT " +
+                "de.id_year, " +
+                "de.id_doc, " +
+                "de.id_ety, " +
+                "d.dt, " +
+                "dt.code, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS _dnum, " +
+                "cob.code, " +
+                "bp.bp, " +
+                "bpc.bp_key, " +
+                "bpb.bpb, " +
+                "rbkc.code, " +
+                "rcob.code, " +
+                "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as _rper, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as _rnum, " +
                 "@factor := " + (isViewForItemBizPartnerAll() ? "1.0" : "IF(d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + ", -1.0, 1.0)") + " AS _factor, " +
-                "de.id_ety, de.concept_key, de.sort_pos, it.item, it.item_key, uo.symbol, c.cur_key, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS _cur_key, " +
+                "de.id_ety, " +
+                "de.concept_key, " +
+                "de.concept, " +
+                "de.sort_pos, " +
+                "it.item, " +
+                "it.item_key, " +
+                "uo.symbol, " +
+                "c.cur_key, '"  + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + "' AS _cur_key, " +
                 "de.orig_qty * @factor AS _orig_qty, " +
-                "de.price_u_cur * @factor AS _price_u_cur, de.stot_cur_r * @factor AS _stot_cur_r, de.tax_charged_cur_r * @factor AS _tax_charged_cur_r, de.tax_retained_cur_r * @factor AS _tax_retained_cur_r, de.tot_cur_r * @factor AS _tot_cur_r, " +
-                "de.price_u * @factor AS _price_u, de.stot_r * @factor AS _stot_r, de.tax_charged_r * @factor AS _tax_charged_r, de.tax_retained_r * @factor AS _tax_retained_r, de.tot_r * @factor AS _tot_r " +
+                "de.price_u_cur * @factor AS _price_u_cur, " +
+                "de.stot_cur_r * @factor AS _stot_cur_r, " +
+                "de.tax_charged_cur_r * @factor AS _tax_charged_cur_r, " +
+                "de.tax_retained_cur_r * @factor AS _tax_retained_cur_r, " +
+                "de.tot_cur_r * @factor AS _tot_cur_r, " +
+                "de.price_u * @factor AS _price_u, " +
+                "de.stot_r * @factor AS _stot_r, " +
+                "de.tax_charged_r * @factor AS _tax_charged_r, " +
+                "de.tax_retained_r * @factor AS _tax_retained_r, " +
+                "de.tot_r * @factor AS _tot_r " +
                 "FROM trn_dps AS d " +
                 "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                 "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +

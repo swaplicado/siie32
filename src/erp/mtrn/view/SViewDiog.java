@@ -22,6 +22,7 @@ import erp.lib.table.STableSetting;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.data.STrnUtilities;
+import erp.mtrn.form.SFormDiog;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
 import erp.table.STabFilterDocumentType;
@@ -32,6 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -52,6 +54,8 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
     private erp.table.STabFilterDocumentType moTabFilterTypeDocument;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
+    
+    private boolean mbHasRigLastDaysMovs;
 
     public SViewDiog(erp.client.SClientInterface client, java.lang.String tabTitle) {
         this(client, tabTitle, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
@@ -142,6 +146,8 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         
         addTaskBarUpperComponent(moTabFilterTypeDocument);
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        
+        mbHasRigLastDaysMovs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_LAST_DAYS_MOVS).HasRight;
         
         levelRightInOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_INT).Level;
         levelRightOutOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_INT).Level;
@@ -277,8 +283,19 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
                     }
                     else {
-                        if (miClient.getGuiModule(SDataConstants.MOD_INV).deleteRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_DELETE_OK) {
-                            miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
+                        if (mbHasRigLastDaysMovs) {
+                            if (miClient.getGuiModule(SDataConstants.MOD_INV).deleteRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_DELETE_OK) {
+                                miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
+                            }
+                        }
+                        else if (!mbHasRigLastDaysMovs && (SLibTimeUtils.isSameDate(STrnUtilities.getDateNow(miClient), diog.getUserNewTs()) || 
+                                SLibTimeUtils.getHoursDiff(STrnUtilities.getDateNow(miClient), diog.getUserNewTs()) < SFormDiog.CANT_MAX_HRS_MOVS)) {
+                            if (miClient.getGuiModule(SDataConstants.MOD_INV).deleteRegistry(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_DELETE_OK) {
+                                miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("No se pueden eliminar movimientos de almacén con fecha distinta a la actual que fueron creados hace mas de " + SFormDiog.CANT_MAX_HRS_MOVS + " horas.");
                         }
                     }
                 }

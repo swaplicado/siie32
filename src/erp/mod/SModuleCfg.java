@@ -168,10 +168,14 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_FUNC:
                 settings = new SGuiCatalogueSettings("Área funcional", 1, 1, SLibConsts.DATA_TYPE_TEXT);
-                sql = "SELECT id_func AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " " +
-                        "WHERE NOT b_del " +
-                        "ORDER BY name, id_func ";
+                sql = "SELECT fa.id_func AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " AS fa ";
+                if (subtype != 0) {
+                    sql += "INNER JOIN usr_usr_func AS fau ON " +
+                            "fau.id_func = fa.id_func AND fau.id_usr = " + subtype + " ";
+                }
+                sql += "WHERE NOT b_del " +
+                        "ORDER BY name, fa.id_func ";
                 break;
             case SModConsts.CFGU_SCA:
                 settings = new SGuiCatalogueSettings("Báscula", 1);

@@ -88,6 +88,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 
@@ -99,6 +100,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
     public static final String TXT_DEC_INC = "Ver más decimales";
     public static final String TXT_DEC_DEC = "Ver menos decimales";
+    public static final int CANT_MAX_HRS_MOVS = 12;
     private int mnColQty;
 
     private int mnFormType;
@@ -164,6 +166,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForFinish;
     private erp.mtrn.form.SDialogProdOrderStockFinish moDialogProdOrderStockFinishForReturn;
      
+    private Date mtDateNow;
+    private boolean mbHasRigLastDaysMovs;
+    
     private boolean mbImportExternalDoc;
 
     /** Creates new form SFormDiog
@@ -1078,8 +1083,11 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && (moParamDpsSource != null || moProdOrderSource != null)) {
                         actionEntryImport();
                     }
-                    else if (jftDate.isEditable()) {
+                    else if (jftDate.isEnabled()) {
                         jftDate.requestFocus();
+                    }
+                    else if (jtfEntryTextToFind.isEditable()) {
+                        jtfEntryTextToFind.requestFocus();
                     }
                     else {
                         jbCancel.requestFocus();
@@ -1228,7 +1236,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         boolean enable = false;
 
         if (mnFormStatus != SLibConstants.FORM_STATUS_EDIT) {
-            jftDate.setEditable(false);
+            jftDate.setEnabled(false);
             jftDate.setFocusable(false);
             jbDate.setEnabled(false);
 
@@ -1262,9 +1270,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         else {
             enable = !STrnUtilities.isIogTypeForProdOrderWp(manParamIogTypeKey) && !STrnUtilities.isIogTypeForProdOrderFg(manParamIogTypeKey);
 
-            jftDate.setEditable(true);
-            jftDate.setFocusable(true);
-            jbDate.setEnabled(true);
+            jftDate.setEnabled(mbHasRigLastDaysMovs);
+            jftDate.setFocusable(mbHasRigLastDaysMovs);
+            jbDate.setEnabled(mbHasRigLastDaysMovs);
 
             jckIsShipmentRequired.setEnabled(STrnUtilities.isIogTypeForTransfer(manParamIogTypeKey));
 
@@ -1385,9 +1393,9 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private void updateNoEntriesRelatedControls() {
         boolean enable = mnFormStatus == SLibConstants.FORM_STATUS_EDIT && moPaneDiogEntries.getTableGuiRowCount() == 0 && moDiog == null;
 
-        jftDate.setEditable(enable);
-        jftDate.setFocusable(enable);
-        jbDate.setEnabled(enable);
+        jftDate.setEnabled(enable && mbHasRigLastDaysMovs);
+        jftDate.setFocusable(enable && mbHasRigLastDaysMovs);
+        jbDate.setEnabled(enable && mbHasRigLastDaysMovs);
 
         jbWarehouseClear.setEnabled(enable);
         jbWarehouseSource.setEnabled(enable);
@@ -3461,16 +3469,21 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void actionEdit() {
-        mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
+        if (mbHasRigLastDaysMovs || SLibTimeUtils.isSameDate(mtDateNow, moDiog.getUserNewTs()) || SLibTimeUtils.getHoursDiff(mtDateNow, moDiog.getUserNewTs()) < CANT_MAX_HRS_MOVS) {
+            mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
 
-        jbEdit.setEnabled(false);
+            jbEdit.setEnabled(false);
 
-        jbOk.setEnabled(true);
-        jbCancel.setEnabled(true);
+            jbOk.setEnabled(true);
+            jbCancel.setEnabled(true);
 
-        setUpControls();
+            setUpControls();
 
-        jftDate.requestFocus();
+            jtfEntryTextToFind.requestFocus();
+        }
+        else {
+            miClient.showMsgBoxInformation("No se pueden modificar movimientos de almacén con fecha distinta a la actual que fueron creados hace mas de " + CANT_MAX_HRS_MOVS + " horas.");
+        }
     }
 
     private void actionEditHelp() {
@@ -3690,8 +3703,11 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         // Initialize form fields:
-
-        moFieldDate.setDate(miClient.getSessionXXX().getWorkingDate());
+        
+        mtDateNow = STrnUtilities.getDateNow(miClient);
+        mbHasRigLastDaysMovs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_LAST_DAYS_MOVS).HasRight;
+        
+        moFieldDate.setFieldValue(miClient.getSessionXXX().getSystemDate());
         jtfDiogType.setText("");
         jtfNumber.setText("");
 
@@ -3802,7 +3818,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             else if (STrnUtilities.needsIogTypeProdOrderDestiny(manParamIogTypeKey) && SLibUtilities.compareKeys(moFieldProdOrderSource.getKeyAsIntArray(), moFieldProdOrderDestiny.getKeyAsIntArray())) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlProdOrderDestiny.getText() + "'.\nLa orden de producción origen y la orden de producción destino deben ser distintas.");
                 validation.setComponent(jcbProdOrderDestiny);
-            }         
+            }      
             else {
                 msg = validateAppropriateWarehouses();
 
@@ -3889,7 +3905,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         moDiog = (SDataDiog) registry;
         setParamIogTypeKey(moDiog.getDiogTypeKey());
-
+        
         // Form controls:
 
         jcbSeries.setEditable(true);

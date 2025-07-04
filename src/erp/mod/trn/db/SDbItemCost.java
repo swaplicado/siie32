@@ -12,7 +12,6 @@ import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
-import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
@@ -60,8 +59,8 @@ public class SDbItemCost extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     @Override
-    public void setPrimaryKey(int[] key) {
-        mnPkCostId = key[0];
+    public void setPrimaryKey(int[] pk) {
+        mnPkCostId = pk[0];
     }
 
     @Override
@@ -92,12 +91,12 @@ public class SDbItemCost extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_cost = " + mnPkCostId;
+        return "WHERE id_cost = " + mnPkCostId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_cost = " + pk[0];
+        return "WHERE id_cost = " + pk[0] + " ";
     }
 
     @Override
@@ -191,7 +190,7 @@ public class SDbItemCost extends SDbRegistryUser {
     }
 
     @Override
-    public SDbRegistry clone() throws CloneNotSupportedException {
+    public SDbItemCost clone() throws CloneNotSupportedException {
         SDbItemCost registry = new SDbItemCost();
         
         registry.setPkCostId(this.getPkCostId());
@@ -206,6 +205,7 @@ public class SDbItemCost extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setRegistryNew(this.isRegistryNew());
+        
         return registry;
     }
 }

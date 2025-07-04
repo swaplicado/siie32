@@ -301,6 +301,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
+    public static final int PRV_PUR_INIT = 103061;
     public static final int PRV_PUR_SCA_CFG = 103101;
     public static final int PRV_PUR_SCA_TIC = 103102;
     public static final int PRV_PUR_SCA_TIC_REP = 103106;
@@ -362,6 +363,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_WH_SEC = 105016;
     public static final int PRV_INV_STOCK = 105017;
     public static final int PRV_INV_AUDIT = 105018;
+    public static final int PRV_INV_LAST_DAYS_MOVS = 105019;
     public static final int PRV_INV_MFG_RM_ASG = 105051;
     public static final int PRV_INV_MFG_RM_DEV = 105052;
     public static final int PRV_INV_MFG_WP_ASG = 105053;
