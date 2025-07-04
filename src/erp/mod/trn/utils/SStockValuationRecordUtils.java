@@ -18,7 +18,7 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
-import erp.mod.trn.db.SDbStockValuationAccount;
+import erp.mod.trn.db.SDbStockValuationAccounting;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SStockValuationConfiguration;
@@ -540,17 +540,17 @@ public class SStockValuationRecordUtils {
             throw new Exception("Error al guardar el movimiento contable.");
         }
         
-        SDbStockValuationAccount oRecEtyAcc = new SDbStockValuationAccount();
+        SDbStockValuationAccounting oRecEtyAcc = new SDbStockValuationAccounting();
             
         oRecEtyAcc.setProrationPercentage(dPercent);
         oRecEtyAcc.setFkFinRecYearId_n(oRecordEntry.getPkYearId());
         oRecEtyAcc.setFkFinRecPeriodId_n(oRecordEntry.getPkPeriodId());
-        oRecEtyAcc.setFkFinBookKeepingCenterId_n(oRecordEntry.getPkBookkeepingCenterId());
-        oRecEtyAcc.setFkFinRecordTypeId_n(oRecordEntry.getPkRecordTypeId());
+        oRecEtyAcc.setFkFinRecBookkeepingCenterId_n(oRecordEntry.getPkBookkeepingCenterId());
+        oRecEtyAcc.setFkFinRecRecordTypeId_n(oRecordEntry.getPkRecordTypeId());
         oRecEtyAcc.setFkFinRecNumberId_n(oRecordEntry.getPkNumberId());
         oRecEtyAcc.setFkFinRecEntryId_n(oRecordEntry.getPkEntryId());
         oRecEtyAcc.setFkStockValuationId(stkValuationId);
-        oRecEtyAcc.setFkValuationMvtId(stkValuationMvtId);
+        oRecEtyAcc.setFkStockValuationMvtId(stkValuationMvtId);
 
         oRecEtyAcc.save(session);
         

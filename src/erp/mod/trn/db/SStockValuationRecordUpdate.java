@@ -9,11 +9,11 @@ package erp.mod.trn.db;
  *
  * @author Edwin Carmona
  */
-import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mod.SModConsts;
+import erp.mod.trn.utils.SStockValuationUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -62,11 +61,11 @@ public class SStockValuationRecordUpdate {
             SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(session.getStatement().getConnection().createStatement());
             java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> vPurAccConfigs;
             ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
-            ArrayList<SDbStockValuationAccount> lMvtRecordEntries = new ArrayList<>();
-            ArrayList<SDbStockValuationAccount> lMvtRecordEntriesCopy = new ArrayList<>();
-            ArrayList<SDbStockValuationAccount> lMvtRecordEntriesToUpdate = new ArrayList<>();
+            ArrayList<SDbStockValuationAccounting> lMvtRecordEntries = new ArrayList<>();
+            ArrayList<SDbStockValuationAccounting> lMvtRecordEntriesCopy = new ArrayList<>();
+            ArrayList<SDbStockValuationAccounting> lMvtRecordEntriesToUpdate = new ArrayList<>();
             Date firstDateOfMonth = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(iYear, iMonth, 1));
-            SDbStockValuationAccount oStockValuationAccount;
+            SDbStockValuationAccounting oStockValuationAccounting;
             SDataRecordEntry oRecordEntry;
             int idMatReq = 0;
             int idMatReqEty = 0;
@@ -130,18 +129,18 @@ public class SStockValuationRecordUpdate {
 
                 lMvtRecordEntries.clear();
                 while (resEty.next()) {
-                    oStockValuationAccount = new SDbStockValuationAccount();
-                    oStockValuationAccount.setPkStockValuationAccountId(resEty.getInt("vacc.id_stk_val_acc"));
-                    oStockValuationAccount.setDeleted(resEty.getBoolean("vacc.b_del"));
-                    oStockValuationAccount.setFkFinRecYearId_n(resEty.getInt("vacc.fk_fin_rec_year_n"));
-                    oStockValuationAccount.setFkFinRecPeriodId_n(resEty.getInt("vacc.fk_fin_rec_per_n"));
-                    oStockValuationAccount.setFkFinBookKeepingCenterId_n(resEty.getInt("vacc.fk_fin_rec_bkc_n"));
-                    oStockValuationAccount.setFkFinRecordTypeId_n(resEty.getString("vacc.fk_fin_rec_tp_rec_n"));
-                    oStockValuationAccount.setFkFinRecNumberId_n(resEty.getInt("vacc.fk_fin_rec_num_n"));
-                    oStockValuationAccount.setFkFinRecEntryId_n(resEty.getInt("vacc.fk_fin_rec_ety_n"));
-                    oStockValuationAccount.setProrationPercentage(resEty.getDouble("vacc.prorat_per"));
-                    oStockValuationAccount.setFkStockValuationId(resEty.getInt("vacc.fk_stk_val"));
-                    oStockValuationAccount.setFkValuationMvtId(resEty.getInt("vacc.fk_stk_val_mvt"));
+                    oStockValuationAccounting = new SDbStockValuationAccounting();
+                    oStockValuationAccounting.setPkStockValuationAccountingId(resEty.getInt("vacc.id_stk_val_acc"));
+                    oStockValuationAccounting.setDeleted(resEty.getBoolean("vacc.b_del"));
+                    oStockValuationAccounting.setFkFinRecYearId_n(resEty.getInt("vacc.fk_fin_rec_year_n"));
+                    oStockValuationAccounting.setFkFinRecPeriodId_n(resEty.getInt("vacc.fk_fin_rec_per_n"));
+                    oStockValuationAccounting.setFkFinRecBookkeepingCenterId_n(resEty.getInt("vacc.fk_fin_rec_bkc_n"));
+                    oStockValuationAccounting.setFkFinRecRecordTypeId_n(resEty.getString("vacc.fk_fin_rec_tp_rec_n"));
+                    oStockValuationAccounting.setFkFinRecNumberId_n(resEty.getInt("vacc.fk_fin_rec_num_n"));
+                    oStockValuationAccounting.setFkFinRecEntryId_n(resEty.getInt("vacc.fk_fin_rec_ety_n"));
+                    oStockValuationAccounting.setProrationPercentage(resEty.getDouble("vacc.prorat_per"));
+                    oStockValuationAccounting.setFkStockValuationId(resEty.getInt("vacc.fk_stk_val"));
+                    oStockValuationAccounting.setFkStockValuationMvtId(resEty.getInt("vacc.fk_stk_val_mvt"));
 
                     oRecordEntry = new SDataRecordEntry();
                     oRecordEntry.setPkYearId(resEty.getInt("fre.id_year"));
@@ -166,9 +165,9 @@ public class SStockValuationRecordUpdate {
                     oRecordEntry.setFkItemId_n(resEty.getInt("fre.fid_item_n"));
                     oRecordEntry.setFkItemAuxId_n(resEty.getInt("fre.fid_item_aux_n"));
 
-                    oStockValuationAccount.setAuxRecordEntry(oRecordEntry);
+                    oStockValuationAccounting.setAuxRecordEntry(oRecordEntry);
 
-                    lMvtRecordEntries.add(oStockValuationAccount);
+                    lMvtRecordEntries.add(oStockValuationAccounting);
                 }
 
                 // copia de lMvtRecordEntries:
@@ -179,7 +178,7 @@ public class SStockValuationRecordUpdate {
                 double dQuantity = res.getDouble("vmvt.qty_mov");
                 double dQuantitySum = 0d;
                 for (SFinAccountConfigEntry oPurConfig : lPurAccConfigs) {
-                    for (SDbStockValuationAccount oMvtRecordEntry : lMvtRecordEntriesCopy) {
+                    for (SDbStockValuationAccounting oMvtRecordEntry : lMvtRecordEntriesCopy) {
                         if (oMvtRecordEntry.getAuxRecordEntry().getFkAccountIdXXX().equals(oPurConfig.getAccountId()) &&
                             oMvtRecordEntry.getAuxRecordEntry().getFkCostCenterIdXXX_n().equals(oPurConfig.getCostCenterId())) {
                                 oMvtRecordEntry.setProrationPercentage(oPurConfig.getPercentage());
@@ -201,7 +200,7 @@ public class SStockValuationRecordUpdate {
 
                 // Actualización de los registros de la tabla de partidas de valuación de
                 // existencias y de los registros contables:
-                for (SDbStockValuationAccount oMvtRecordEntryToUpdate : lMvtRecordEntriesToUpdate) {
+                for (SDbStockValuationAccounting oMvtRecordEntryToUpdate : lMvtRecordEntriesToUpdate) {
                     String query = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " SET units = '" + oMvtRecordEntryToUpdate.getAuxQuantity()
                             + "' WHERE (id_year = '" + oMvtRecordEntryToUpdate.getAuxRecordEntry().getPkYearId()
                             + "') and (id_per = '" + oMvtRecordEntryToUpdate.getAuxRecordEntry().getPkPeriodId()
@@ -214,7 +213,7 @@ public class SStockValuationRecordUpdate {
 
                     String query2 = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " SET prorat_per = '"
                             + oMvtRecordEntryToUpdate.getProrationPercentage() + "' WHERE (id_stk_val_acc = '"
-                            + oMvtRecordEntryToUpdate.getPkStockValuationAccountId() + "');";
+                            + oMvtRecordEntryToUpdate.getPkStockValuationAccountingId() + "');";
 
                     session.getStatement().getConnection().createStatement().executeUpdate(query2);
                 }

@@ -55,7 +55,6 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected int mnFkLotId;
     protected int mnFkCompanyBranchId;
     protected int mnFkWarehouseId;
-
     //protected int mnFkUserInsertId;
     //protected int mnFkUserUpdateId;
     //protected Date mtTsUserInsert;
