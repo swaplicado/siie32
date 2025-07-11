@@ -13,9 +13,11 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.cfg.swapms.utils.SExportUtils;
 import erp.musr.form.SFormExportUser;
 import erp.siieapp.SUserExportUtils;
 import java.awt.Dimension;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -33,8 +35,10 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbSiieAppExport;
     private javax.swing.JButton jbSiieAppSync;
+    private javax.swing.JButton jbExportData;
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+    private String msAppUrls;
 
     public SViewUser(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.USRU_USR);
@@ -44,6 +48,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     private void initComponents() {
         int i;
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
+        msAppUrls = "";
 
         moTabFilterDeleted = new STabFilterDeleted(this);
 
@@ -55,7 +60,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         addTaskBarUpperComponent(jbCopy);
 
         try {
-            if (!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS).isEmpty()) {
+           msAppUrls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS);
+            if (! msAppUrls.isEmpty()) {
                 jbSiieAppExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
                 jbSiieAppExport.setPreferredSize(new Dimension(23, 23));
                 jbSiieAppExport.addActionListener(this);
@@ -69,6 +75,21 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 jbSiieAppSync.setToolTipText("Sincronizar usuarios con SIIE App");
 
                 addTaskBarUpperComponent(jbSiieAppSync);
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
+        }
+
+        try {
+            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
+            if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
+                jbExportData = new JButton(miClient.getImageIcon(SLibConstants.ICON_BP_EXPORT));
+                jbExportData.setPreferredSize(new Dimension(23, 23));
+                jbExportData.addActionListener(this);
+                jbExportData.setToolTipText("Exportar datos de usuarios");
+
+                addTaskBarUpperComponent(jbExportData);
             }
         }
         catch (Exception e) {
@@ -195,6 +216,23 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
     }
 
+    private void actionExportData() {
+        if (jbExportData != null && jbExportData.isEnabled()) {
+            boolean bSyncAll = false;
+            try {
+                String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SExportUtils.EXPORT_SYNC_USERS, bSyncAll);
+                if (sResponse != null && sResponse.isEmpty()) {
+                    miClient.showMsgBoxInformation("Datos exportados correctamente");
+                }
+                else {
+                    miClient.showMsgBoxInformation("No se han encontrado datos para exportar." + sResponse);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void createSqlQuery() {
         java.lang.String sqlWhere = "";
@@ -237,6 +275,9 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             }
             else if (button == jbSiieAppSync) {
                 actionSiieAppSync();
+            }
+            else if (button == jbExportData) {
+                actionExportData();
             }
         }
     }
