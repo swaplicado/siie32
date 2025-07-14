@@ -14,7 +14,9 @@ import erp.lib.form.SFormOptionPickerInterface;
 import erp.mtrn.data.SDataUserConfigurationTransaction;
 import erp.mtrn.form.SFormUserConfigurationTransaction;
 import erp.musr.data.SDataUser;
+import erp.musr.data.SDataUserGroup;
 import erp.musr.form.SFormUser;
+import erp.musr.form.SFormUserGroup;
 import erp.musr.form.SFormUserRight;
 import erp.redis.form.SFormRedisSessions;
 import javax.swing.JMenu;
@@ -37,8 +39,10 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiUserRightPrivilege;
     private javax.swing.JMenuItem jmiUserConfigurationTransaction;
     private javax.swing.JMenuItem jmiUserFunctionalArea;
+    private javax.swing.JMenuItem jmiUserGroup;
 
     private erp.musr.form.SFormUser moFormUser;
+    private erp.musr.form.SFormUserGroup moFormUserGroup;
     private erp.musr.form.SFormUpdatedUser moFormUpdatedUser;
     private erp.musr.form.SFormUserRight moFormUserRolePrivilege;
     private erp.mtrn.form.SFormUserConfigurationTransaction moFormUserConfigurationTransaction;
@@ -67,6 +71,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightPrivilege = new JMenuItem("Privilegios de usuarios");
         jmiUserConfigurationTransaction = new JMenuItem("Configuración de usuarios para transacciones");
         jmiUserFunctionalArea = new JMenuItem("Usuarios vs. áreas funcionales");
+        jmiUserGroup = new JMenuItem("Grupos de usuario");
 
         jmMenuUser.add(jmiUser);
         jmMenuUser.add(jmiRedisSessions);
@@ -81,6 +86,8 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmMenuUser.addSeparator();
         jmMenuUser.add(jmiUserConfigurationTransaction);
         jmMenuUser.add(jmiUserFunctionalArea);
+        jmMenuUser.addSeparator();
+        jmMenuUser.add(jmiUserGroup);
 
         jmiUser.addActionListener(this);
         jmiRedisSessions.addActionListener(this);
@@ -92,6 +99,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightPrivilege.addActionListener(this);
         jmiUserConfigurationTransaction.addActionListener(this);
         jmiUserFunctionalArea.addActionListener(this);
+        jmiUserGroup.addActionListener(this);
 
         moFormUser = null;
         moFormLock = null;
@@ -113,6 +121,7 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
         jmiUserRightPrivilege.setEnabled(hasRightUser);
         jmiUserConfigurationTransaction.setEnabled(hasRightUser);
         jmiUserFunctionalArea.setEnabled(hasRightUser && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
+        jmiUserGroup.setEnabled(hasRightUser);
 
         moPickerUsers = null;
     }
@@ -133,6 +142,15 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                         moRegistry = new SDataUser();
                     }
                     miForm = moFormUser;
+                    break;
+                case SDataConstants.USRU_USR_GRP:
+                    if (moFormUserGroup == null) {
+                        moFormUserGroup = new SFormUserGroup(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataUserGroup();
+                    }
+                    miForm = moFormUserGroup;
                     break;
                 case SDataConstants.USRU_USR_REDIS:
                     moFormRedisSessions = new SFormRedisSessions(miClient);
@@ -196,6 +214,10 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.USRU_USR:
                     oViewClass = erp.musr.view.SViewUser.class;
                     sViewTitle = "Usuarios";
+                    break;
+                case SDataConstants.USRU_USR_GRP:
+                    oViewClass = erp.musr.view.SViewUserGroup.class;
+                    sViewTitle = "Grupos de usuario";
                     break;
                 case SDataConstants.USRU_ACCESS_CO:
                     oViewClass = erp.musr.view.SViewAccessCompany.class;
@@ -315,6 +337,9 @@ public class SGuiGlobalCataloguesUsr extends erp.lib.gui.SGuiModule implements j
 
             if (item == jmiUser) {
                 showView(SDataConstants.USRU_USR);
+            }
+            else if (item == jmiUserGroup) {
+                showView(SDataConstants.USRU_USR_GRP);
             }
             else if (item == jmiRedisSessions) {
                 showForm(SDataConstants.USRU_USR_REDIS, null);

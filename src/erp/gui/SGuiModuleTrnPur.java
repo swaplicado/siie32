@@ -889,7 +889,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             SLibUtils.printException(this, e);
         }
 
-        jmCat.setEnabled(hasRightDnsDps || hasRightDnsDiog || hasRightBizPartnerBlocking || hasRightItemConfig);
+        jmCat.setEnabled(hasRightDnsDps || hasRightDnsDiog || hasRightBizPartnerBlocking || hasRightItemConfig || levelRightInitiatives >= SUtilConsts.LEV_READ);
         jmiCatDpsDncDocumentNumberSeries.setEnabled(hasRightDnsDps);
         jmiCatDiogDncDocumentNumberSeries.setEnabled(hasRightDnsDiog);
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);

@@ -5,31 +5,60 @@
  */
 package erp.mod.trn.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.view.SViewFilter;
 import java.util.ArrayList;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
  * @author Isabel Servín
  */
 public class SViewInitiative extends SGridPaneView {
+    
+    private SViewFilter moFilterFunc;
+    private SViewFilter moFilterUsr;
 
     public SViewInitiative(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_INIT, SLibConsts.UNDEFINED, title);
-        setRowButtonsEnabled(true, true, true, false, true);
+        initComponentsCustom();
+    }
+    
+    private void initComponentsCustom() {
+        int levelRightInitiatives = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight(((SClientInterface) miClient), SDataConstantsSys.PRV_PUR_INIT).Level;
+        setRowButtonsEnabled(
+                levelRightInitiatives > SUtilConsts.LEV_READ, 
+                levelRightInitiatives > SUtilConsts.LEV_READ, 
+                levelRightInitiatives > SUtilConsts.LEV_READ, 
+                false, 
+                levelRightInitiatives == SUtilConsts.LEV_MANAGER
+        );
+        
+        moFilterFunc = new SViewFilter(miClient, this);
+        moFilterFunc.initFilter(new int[] { SModConsts.CFGU_FUNC });
+        
+        moFilterUsr = new SViewFilter(miClient, this);
+        moFilterUsr.initFilter(new int[] { SModConsts.USRU_USR, levelRightInitiatives <= SUtilConsts.LEV_AUTHOR ? SViewFilter.FILTER_STP_CUR_USER : SViewFilter.FILTER_STP_INIT_USER });
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunc);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterUsr);
     }
 
     @Override
     public void prepareSqlQuery() {
-        String sql = "";
+        String where = "";
         Object filter;
 
         moPaneSettings = new SGridPaneSettings(1);
@@ -38,7 +67,17 @@ public class SViewInitiative extends SGridPaneView {
 
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
+            where += (where.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue();
+        if (filter != null && !((String) filter).isEmpty()) {
+            where += (where.isEmpty() ? "" : "AND ") + "v.fk_func IN (" + filter + ") ";
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.USRU_USR)).getValue();
+        if (filter != null && !((String) filter).isEmpty()) {
+            where += (where.isEmpty() ? "" : "AND ") + "v.fk_usr_ins IN (" + filter + ") ";
         }
 
         msSql = "SELECT "
@@ -70,13 +109,13 @@ public class SViewInitiative extends SGridPaneView {
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
-                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.name, v.id_init ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));

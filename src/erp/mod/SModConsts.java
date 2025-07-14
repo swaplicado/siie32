@@ -128,6 +128,8 @@ public abstract class SModConsts {
     public static final int USRU_ROL_USR = 1022007;
     public static final int USRU_ROL_CO = 1022008;
     public static final int USRU_USR = 1022009;
+    public static final int USRU_USR_GRP = 1022010;
+    public static final int USRU_USR_GRP_USR = 1022011;
 
     public static final int USR_USR_GUI = 1023001;
     public static final int USR_USR_FUNC = 1023011;
@@ -165,6 +167,7 @@ public abstract class SModConsts {
     public static final int BPSU_BP_ATT = 1042003;
     public static final int BPSU_BP_BA = 1042004;
     public static final int BPSU_BP_NTS = 1042005;
+    public static final int BPSU_BP_UPD_LOG = 1042100;
     public static final int BPSU_BPB = 1042006;
     public static final int BPSU_BPB_NTS = 1042007;
     public static final int BPSU_BPB_ADD = 1042008;
@@ -1028,6 +1031,8 @@ public abstract class SModConsts {
         TablesMap.put(USRU_ROL_USR, "erp.usru_rol_usr");
         TablesMap.put(USRU_ROL_CO, "erp.usru_rol_co");
         TablesMap.put(USRU_USR, "erp.usru_usr");
+        TablesMap.put(USRU_USR_GRP, "erp.usru_usr_grp");
+        TablesMap.put(USRU_USR_GRP_USR, "erp.usru_usr_grp_usr");
 
         TablesMap.put(USR_USR_GUI, "usr_usr_gui");
         TablesMap.put(USR_USR_FUNC, "usr_usr_func");
@@ -1057,6 +1062,7 @@ public abstract class SModConsts {
         TablesMap.put(BPSU_BP_ATT, "erp.bpsu_bp_att");
         TablesMap.put(BPSU_BP_BA, "erp.bpsu_bp_ba");
         TablesMap.put(BPSU_BP_NTS, "erp.bpsu_bp_nts");
+        TablesMap.put(BPSU_BP_UPD_LOG, "erp.bpsu_bp_upd_log");
         TablesMap.put(BPSU_BPB, "erp.bpsu_bpb");
         TablesMap.put(BPSU_BPB_NTS, "erp.bpsu_bpb_nts");
         TablesMap.put(BPSU_BPB_ADD, "erp.bpsu_bpb_add");

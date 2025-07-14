@@ -67,6 +67,10 @@ import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SConfigurationDpsOrderFiscalData;
+import erp.mtrn.data.SConfigurationPurposeCfdUse;
+import erp.mtrn.data.SConfigurationPurposeConfUserGroup;
+import erp.mtrn.data.SConfigurationPurposeConfUserGroupDetail;
+import erp.mtrn.data.SConfigurationPurposeDpsNature;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -101,6 +105,7 @@ import erp.mtrn.data.cfd.SAddendaAmc71CompanyBranch;
 import erp.mtrn.data.cfd.SAddendaAmc71Manager;
 import erp.mtrn.data.cfd.SAddendaAmc71Supplier;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
+import erp.musr.data.SUserUtils;
 import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -394,6 +399,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private java.lang.String msXmlUuid;
     private erp.mitm.data.SDataItem moAccEntryItem;
     private SConfigurationDpsOrderFiscalData moConfDpsOrderFiscalData;
+    private SConfigurationPurposeDpsNature moConfPurposeDpsNature;
+    private SConfigurationPurposeCfdUse moConfPurposeCfdUse;
+    private SConfigurationPurposeConfUserGroup moConfPurposeConfUserGroup;
     //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     private int mnCustomAccCurrentAction;
     private boolean mbCustomAccPrepared;
@@ -401,7 +409,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private double mdCustomAccDpsSubtotal;
     private double mdCustomAccDpsSubtotalCy;
     private double mdCustomAccDpsSubtotalPct;
-
+    
+    private ArrayList<Integer> maUserGroupsIds;
+    private boolean mbFisDataCfdiUsageUserChange;
+    private String msCfdiUsageSelected;
+    
     /**
      * Creates new form DFormDps
      * @param client Client interface.
@@ -4320,6 +4332,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbAddAmc71CompanyBranchGln.getEditor().getEditorComponent().addFocusListener(this);
         jtfAccEntrySubtotalCy.addFocusListener(this);
         jtfAccEntrySubtotalPct.addFocusListener(this);
+        jcbFisDataCfdiUsage.addFocusListener(this);
 
         // Item listeners:
 
@@ -4335,6 +4348,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkIncotermId.addItemListener(this);
         jcbFkCarrierTypeId.addItemListener(this);
         jcbFkVehicleTypeId_n.addItemListener(this);
+        jcbFkDpsNatureId.addItemListener(this);
         jcbAddCfdAddendaSubtype.addItemListener(this);
         jcbAddAmc71SupplierGln.addItemListener(this);
         jcbAddAmc71CompanyGln.addItemListener(this);
@@ -4343,7 +4357,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbInitInitiative.addItemListener(this);
         jckAccEntryIsSubtotalPctApplying.addItemListener(this);
         jckCfdCceApplies.addItemListener(this);
-     
+        
         // Change listeners:
         
         jTabbedPane.addChangeListener(this);
@@ -4380,7 +4394,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sFiscalData = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD);
+            String sDpsNat = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_PURP_DPS_NAT);
+            String sCfdUse = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_PURP_CFD_USE);
+            String sConfUsrGrp = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE);
             moConfDpsOrderFiscalData = mapper.readValue(sFiscalData, SConfigurationDpsOrderFiscalData.class);
+            moConfPurposeDpsNature = mapper.readValue(sDpsNat, SConfigurationPurposeDpsNature.class);
+            moConfPurposeCfdUse = mapper.readValue(sCfdUse, SConfigurationPurposeCfdUse.class);
+            moConfPurposeConfUserGroup = mapper.readValue(sConfUsrGrp, SConfigurationPurposeConfUserGroup.class);
         }
         catch (Exception e) {}
     }
@@ -5383,8 +5403,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (isApplingFiscalData()) {
                 moFieldFisDataPaymentMethod.setFieldValue(moConfDpsOrderFiscalData.getMetodoPago());
                 moFieldFisDataTaxRegimeIss.setFieldValue(moBizPartnerCategory.getTaxRegime()); 
-                moFieldFisDataTaxRegimeRec.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal()); 
-                moFieldFisDataCfdiUsage.setFieldValue(moConfDpsOrderFiscalData.getUsoCFDI());
+                moFieldFisDataTaxRegimeRec.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
+                itemStateChangedFkDpsNatureId();
             }
         }
     }
@@ -7010,6 +7030,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         renderAddendaJsonData();
         
         mbUpdatingForm = false; // allow item state change events to be processed
+    }
+    
+    private String getCfdiUsageByPurpose() {
+        for (int groupId : maUserGroupsIds) {
+            for(SConfigurationPurposeConfUserGroupDetail confPurpDet : moConfPurposeConfUserGroup.getcfg()){
+                if (confPurpDet.getusrGrp().contains(groupId) && confPurpDet.getdpsNat().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0])) {
+                    return confPurpDet.getcfdUse();
+                }
+            }
+        }
+        return "";
     }
 
     private void prepareDpsEntryComplementary(erp.mtrn.data.SDataDpsEntry oDpsEntryAdjustment, erp.mtrn.data.SDataDpsEntry oDpsEntryComplementary) {
@@ -10506,6 +10537,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkVehicleId_n.setEnabled(enableVehicle);
         jbFkVehicleId_n.setEnabled(enableVehicle);
     }
+    
+    private void itemStateChangedFkDpsNatureId() {
+        if (isApplingFiscalData()) {
+            String usage = getCfdiUsageByPurpose();
+            if (usage.isEmpty()) {
+                if (!mbFisDataCfdiUsageUserChange) {
+                    if (!moConfDpsOrderFiscalData.getUsoCFDI().isEmpty()){
+                        moFieldFisDataCfdiUsage.setFieldValue(moConfDpsOrderFiscalData.getUsoCFDI());
+                    }
+                    else {
+                        moFieldFisDataCfdiUsage.setFieldValue(msCfdiUsageSelected);
+                    }
+                }
+            }
+            else {
+                if (!mbFisDataCfdiUsageUserChange) {
+                    moFieldFisDataCfdiUsage.setFieldValue(usage);
+                }
+                else if (!moFieldFisDataCfdiUsage.getFieldValue().toString().equals(usage) && miClient.showMsgBoxConfirm("La naturaleza doc. seleccionada tiene configurado el Uso de CFDI '" + usage + "'.\n"
+                        + "¿Desea asignar este valor al campo '" + jlFisDataCfdiUsage.getText() + "'?") == JOptionPane.OK_OPTION) {
+                        moFieldFisDataCfdiUsage.setFieldValue(usage);
+                        msCfdiUsageSelected = usage;
+                } 
+            }
+            msCfdiUsageSelected = moFieldFisDataCfdiUsage.getFieldValue().toString();
+        }
+    }
 
     private void itemStateChangedAddCfdAddendaSubtype() {
         if (jcbAddCfdAddendaSubtype.isEnabled() && jcbAddCfdAddendaSubtype.getSelectedIndex() > 0 && moFieldAddCfdAddendaSubtype.getKeyAsIntArray()[0] == SCfdConsts.ADD_SORIANA_EXT) {
@@ -11906,6 +11964,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbResetingForm = false;
         
         moAccEntryCostCenterPanel.initPanel();
+        
+        maUserGroupsIds = miClient.getSessionXXX().getUser().getUserGroupsIds();
+        mbFisDataCfdiUsageUserChange = false;
+        msCfdiUsageSelected = "";
     }
 
     @Override
@@ -12473,14 +12535,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
                     
+                    // Validación ordenes de compra
+                    
                     if (!validation.getIsError() && !mbIsSales && mbIsDpsOrder) {
-                        if (moBizPartnerCategory.getTaxRegime().isEmpty() && jcbFisDataTaxRegimeIssuing.getSelectedIndex() > 0) {
-                            if(miClient.showMsgBoxConfirm("El campo 'Régimen fiscal del emisor' que corresponde a los datos fiscales, tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString()
-                                        + "'.\nEl proveedor en el catálogo no tiene un regimén fiscal asignado, por lo que hay que asegurarse de que este valor sea correcto.\n"
-                                        + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
-                                validation.setComponent(jcbFisDataTaxRegimeIssuing);
-                                validation.setTabbedPaneIndex(TAB_FIS_DATA);
+                        
+                        if (isApplingFiscalData()) {
+                            if (moBizPartnerCategory.getTaxRegime().isEmpty() && jcbFisDataTaxRegimeIssuing.getSelectedIndex() > 0) {
+                                if(miClient.showMsgBoxConfirm("El campo '" + jlFisDataTaxRegimeIssuing.getText() + "' que corresponde a los datos fiscales, tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString()
+                                            + "'.\nEl proveedor en el catálogo no tiene un regimén fiscal asignado, por lo que hay que asegurarse de que este valor sea correcto.\n"
+                                            + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
+                                    validation.setComponent(jcbFisDataTaxRegimeIssuing);
+                                    validation.setTabbedPaneIndex(TAB_FIS_DATA);
+                                }
+                            }
+
+                            if (!validation.getIsError()) {
+                                if (moConfPurposeDpsNature.getfixAsset().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0]) &&
+                                        !moConfPurposeCfdUse.getfixAsset().contains(moFieldFisDataCfdiUsage.getFieldValue().toString())) {
+                                    if (miClient.showMsgBoxConfirm("El campo '" + jlFisDataCfdiUsage.getText() + "' que corresponde a los datos fiscales, no coincide con el propósito de '" + jlFkDpsNatureId.getText() + "' seleccionada.\n"
+                                            + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataCfdiUsage.getText());
+                                        validation.setComponent(jcbFisDataCfdiUsage);
+                                        validation.setTabbedPaneIndex(TAB_FIS_DATA);
+                                    }
+                                }
                             }
                         }
                     }
@@ -12869,6 +12948,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         moDps = (SDataDps) registry;
         
+        if (!moDps.getIsRegistryNew()) {
+            maUserGroupsIds = SUserUtils.getUserGroupsIds(miClient.getSession().getStatement(), moDps.getFkUserNewId());
+        }
+        
+        mbFisDataCfdiUsageUserChange = !moDps.getIsRegistryNew();
+        
         // set form field values:
 
         moFieldDate.setFieldValue(moDps.getDate());
@@ -12902,7 +12987,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 mbIsNumberEditable = false;     // there is no way to validate any number change for there is not a current company branch selected in user session
             }
         }
-
+                
         moFieldDaysOfCredit.setFieldValue(moDps.getDaysOfCredit());
         moFieldIsDiscountDocApplying.setFieldValue(moDps.getIsDiscountDocApplying());
         moFieldIsDiscountDocPercentage.setFieldValue(moDps.getIsDiscountDocPercentage());
@@ -13074,6 +13159,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             
             if (!moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
                 moFieldFisDataCfdiUsage.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdiUsage());
+                msCfdiUsageSelected = moFieldFisDataCfdiUsage.getFieldValue().toString();
             }
         }
         
@@ -13971,6 +14057,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 focusLostAccEntrySubtotalCy();
             }
         }
+        else if (e.getSource() instanceof javax.swing.JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbFisDataCfdiUsage) {
+                mbFisDataCfdiUsageUserChange = true;
+                msCfdiUsageSelected = moFieldFisDataCfdiUsage.getFieldValue().toString();
+            }
+        }
     }
 
     @Override
@@ -14025,6 +14119,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                     else if (comboBox == jcbFkVehicleTypeId_n) {
                         itemStateChangedFkVehicleTypeId_n();
+                    }
+                    else if (comboBox == jcbFkDpsNatureId) {
+                        itemStateChangedFkDpsNatureId();
                     }
                     else if (comboBox == jcbAddCfdAddendaSubtype) {
                         itemStateChangedAddCfdAddendaSubtype();

@@ -158,7 +158,7 @@ public class SDbUserGui extends SDbRegistryUser implements SGuiUserGui {
 
             mbRegistryNew = false;
         }
-
+        
         mnQueryResultId = SDbConsts.READ_OK;
     }
 

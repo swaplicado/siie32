@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -83,6 +84,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected boolean mbExtraIsSpecialRoleAdmor;
 
     protected int mnAuxCompanyId;
+    
+    protected ArrayList<Integer> maUserGroupsIds;
 
     public SDataUser() {
         super(SDataConstants.USRU_USR);
@@ -101,6 +104,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         moPrivilegeUser = new HashMap<>();
         moRightsUser = new HashMap<>();
         moRightsCompany = new HashMap<>();
+        
+        maUserGroupsIds = new ArrayList<>();
 
         reset();
     }
@@ -164,6 +169,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setAuxCompanyId(int n) { mnAuxCompanyId = n; }
     
     public int getAuxCompanyId() { return mnAuxCompanyId; }
+    
+    public ArrayList<Integer> getUserGroupsIds() { return maUserGroupsIds; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -222,6 +229,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         mbExtraIsSpecialRoleAdmor = false;
 
         mnAuxCompanyId = 0;
+        
+        maUserGroupsIds.clear();
     }
 
     @Override
@@ -411,6 +420,10 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 // Prepare all user privileges in hash maps:
 
                 prepareUserRights(statement);
+                
+                // Read user groups
+                
+                maUserGroupsIds = SUserUtils.getUserGroupsIds(statement, mnPkUserId);
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

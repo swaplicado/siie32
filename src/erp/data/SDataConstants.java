@@ -128,9 +128,11 @@ public abstract class SDataConstants {
     public static final int USRU_ROL_USR = 202014;
     public static final int USRU_ROL_CO = 202015;
     public static final int USRU_USR = 202018;
-    public static final int USRU_USR_REDIS_LOCKS = 20219;
-    public static final int USRU_USR_UPDATED = 202020;
-    public static final int USRU_USR_REDIS = 202021;
+    public static final int USRU_USR_GRP = 202019;
+    public static final int USRU_USR_GRP_USR = 202120;
+    public static final int USRU_USR_REDIS_LOCKS = 20250;
+    public static final int USRU_USR_UPDATED = 202051;
+    public static final int USRU_USR_REDIS = 202052;
 
     public static final int USRX_RIGHT = 202501;
     public static final int USRX_RIGHT_PRV = 202502;
@@ -820,7 +822,9 @@ public abstract class SDataConstants {
         TablesMap.put(USRU_ROL_USR, "erp.usru_rol_usr");
         TablesMap.put(USRU_ROL_CO, "erp.usru_rol_co");
         TablesMap.put(USRU_USR, "erp.usru_usr");
-
+        TablesMap.put(USRU_USR_GRP, "erp.usru_usr_grp");
+        TablesMap.put(USRU_USR_GRP_USR, "erp.usru_usr_grp_usr");
+        
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
         TablesMap.put(LOCU_STA, "erp.locu_sta");
         TablesMap.put(LOCS_BOL_COUNTY, "erp.locs_bol_county");
