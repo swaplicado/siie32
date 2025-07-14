@@ -262,7 +262,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                 mnFkDpsEtyId = resultSet.getInt("fid_dps_ety");
                 mnFkAnalysisId = resultSet.getInt("fid_analysis");
                 mnFkItemId = resultSet.getInt("fid_item");
-                mnFkDatasheetTemplateId_n = resultSet.getInt("fid_dtsht_tmplte_n");
+                mnFkDatasheetTemplateId_n = resultSet.getInt("fid_datasheet_template_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -361,7 +361,7 @@ public class SDataDpsEntryAnalysis extends erp.lib.data.SDataRegistry implements
                         "fid_dps_ety = " + mnFkDpsEtyId + ", " +
                         "fid_analysis = " + mnFkAnalysisId + ", " +
                         "fid_item = " + mnFkItemId + ", " +
-                        "fid_dtsht_tmplte_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
+                        "fid_datasheet_template_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
 //                        "fid_usr_new = " + mnFkUserNewId + ", " +
                         "fid_usr_edit = " + mnFkUserEditId + ", ";
 

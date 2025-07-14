@@ -226,7 +226,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
             mnFkDpsEntryId = resultSet.getInt("fid_dps_ety");
             mnFkAnalysisId = resultSet.getInt("fid_analysis");
             mnFkItemId = resultSet.getInt("fid_item");
-            mnFkDatasheetTemplateId_n = resultSet.getInt("fid_dtsht_tmplte_n");
+            mnFkDatasheetTemplateId_n = resultSet.getInt("fid_datasheet_template_n");
             mnFkUserNewId = resultSet.getInt("fid_usr_new");
             mnFkUserEditId = resultSet.getInt("fid_usr_edit");
             mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -318,7 +318,7 @@ public class SDbDpsEntryAnalysis extends SDbRegistryUser {
                     // "fid_dps_ety_n = " + mnFkDpsEntryId_n + ", " +
                     "fid_analysis_id = " + mnFkAnalysisId + ", " +
                     "fid_item_id = " + mnFkItemId + ", " +
-                    "fid_dtsht_tmplte_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
+                    "fid_datasheet_template_n = " + (mnFkDatasheetTemplateId_n == 0 ? "NULL" : mnFkDatasheetTemplateId_n) + ", " +
                     "fid_usr_edit = " + mnFkUserEditId + ", " +
                     "fid_usr_del = " + mnFkUserDeleteId + ", " +
                     "ts_edit = " + "NOW()" + ", " +

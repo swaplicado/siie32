@@ -267,7 +267,7 @@ public abstract class SQltUtils {
             String sqlEtyAnalysis = "SELECT ea.*, dtt.fk_log_tp_dly_n FROM " +
                     SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY_ANALYSIS) + " AS ea " +
                     "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.QLT_DATASHEET_TEMPLATE) + " AS dtt " + 
-                    "    ON ea.fid_dtsht_tmplte_n = dtt.id_datasheet_template " +
+                    "    ON ea.fid_datasheet_template_n = dtt.id_datasheet_template " +
                     " WHERE ea.fid_dps_year = " + idContractYear +
                     " AND ea.fid_dps_doc = " + idContractDoc +
                     " AND ea.fid_dps_ety = " + idContractEntry +
@@ -300,9 +300,9 @@ public abstract class SQltUtils {
                 coaResultRow.setForDps(resultSetEtyAnalysis.getBoolean("b_dps"));
                 coaResultRow.setCoA(resultSetEtyAnalysis.getBoolean("b_coa"));
                 coaResultRow.setFkAnalysisId(resultSetEtyAnalysis.getInt("fid_analysis"));
-                if (resultSetEtyAnalysis.getInt("fid_dtsht_tmplte_n") > 0) {
+                if (resultSetEtyAnalysis.getInt("fid_datasheet_template_n") > 0) {
                     oCoAResult.setFkLogTypeDeliveryId(resultSetEtyAnalysis.getInt("fk_log_tp_dly_n"));
-                    oCoAResult.setFkDatasheetTemplateId_n(resultSetEtyAnalysis.getInt("fid_dtsht_tmplte_n"));
+                    oCoAResult.setFkDatasheetTemplateId_n(resultSetEtyAnalysis.getInt("fid_datasheet_template_n"));
                     coaResultRow.setAuxFkTemplateId_n(oCoAResult.getFkDatasheetTemplateId_n());
                 }
                 coaResultRow.readAuxData(session);
