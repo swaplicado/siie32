@@ -212,7 +212,7 @@ public abstract class SStockValuationAdjustsUtils {
                 oDiog.setFkBookkeepingYearId_n(0);
                 oDiog.setFkBookkeepingNumberId_n(0);
                 oDiog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT);
-                oDiog.setFkMaintUserId_n(1);
+                oDiog.setFkMaintUserId_n(0);
                 oDiog.setFkMaintUserSupervisorId(1);
                 oDiog.setFkMaintReturnUserId_n(0);
                 oDiog.setFkMaintReturnUserSupervisorId(1);
