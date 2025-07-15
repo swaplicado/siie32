@@ -128,9 +128,11 @@ public abstract class SDataConstants {
     public static final int USRU_ROL_USR = 202014;
     public static final int USRU_ROL_CO = 202015;
     public static final int USRU_USR = 202018;
-    public static final int USRU_USR_REDIS_LOCKS = 20219;
-    public static final int USRU_USR_UPDATED = 202020;
-    public static final int USRU_USR_REDIS = 202021;
+    public static final int USRU_USR_GRP = 202019;
+    public static final int USRU_USR_GRP_USR = 202120;
+    public static final int USRU_USR_REDIS_LOCKS = 20250;
+    public static final int USRU_USR_UPDATED = 202051;
+    public static final int USRU_USR_REDIS = 202052;
 
     public static final int USRX_RIGHT = 202501;
     public static final int USRX_RIGHT_PRV = 202502;
@@ -175,6 +177,8 @@ public abstract class SDataConstants {
     public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
+    public static final int BPSU_BP_DT = 204028;
+    public static final int BPSU_BP_DT_RE = 204029;
     public static final int BPSU_BP_ADDEE = 204031;
     public static final int BPSU_SCA_BP = 204091;
     public static final int BPSU_SCA_BP_MAP = 204092;    
@@ -198,6 +202,7 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_EMP_REL = 204571; // employee relatives
     public static final int BPSX_BP_INT_SUP = 204608; //international suppliers
     public static final int BPSX_BP_INT_CUS = 204609; //international customers
+    public static final int BPSX_BP_CUS_SUP = 204610;
 
     public static final int BPSX_BP_X_SUP_CUS = 204514;
     public static final int BPSX_BP_X_CDR_DBR = 204515;
@@ -820,7 +825,9 @@ public abstract class SDataConstants {
         TablesMap.put(USRU_ROL_USR, "erp.usru_rol_usr");
         TablesMap.put(USRU_ROL_CO, "erp.usru_rol_co");
         TablesMap.put(USRU_USR, "erp.usru_usr");
-
+        TablesMap.put(USRU_USR_GRP, "erp.usru_usr_grp");
+        TablesMap.put(USRU_USR_GRP_USR, "erp.usru_usr_grp_usr");
+        
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
         TablesMap.put(LOCU_STA, "erp.locu_sta");
         TablesMap.put(LOCS_BOL_COUNTY, "erp.locs_bol_county");

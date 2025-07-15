@@ -1,4 +1,26 @@
 ================================================================================
+SIIE 3.2 280.2/ 2025-07-15
+Edwin Omar CARMONA FIGUEROA
+
+--------------------------------------------------------------------------------
+- Corrección de llave foránea nula en usuario de mantenimiento en diogs de ajuste de valuación.
+
+================================================================================
+SIIE 3.2 280.1/ 2025-07-15
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Creación de la vista de actualización de datos de proveedores y actualización de datos de proveedores (Datos fiscales)
+2) Forma de actualización  de datos de proveedores (Datos fiscales)
+
+================================================================================
+SIIE 3.2 280.0/ 2025-07-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación e implementación de los filtros de Áreas funcionales y Usuarios en la vista de iniciativas.
+2) Implementación de permisos para la vista de iniciativas.
+3) Selección automática de Uso de CFDI en ordenes de compra a través de configuraciones de sistema.
+
+================================================================================
 SIIE 3.2 278.1/ 2025-07-11
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -13,7 +35,7 @@ Isabel Danae GARCÍA SERVÍN
 4) Implementación del permiso para capturar movimientos de almacén con fecha diferente a la actual.
 4) Corrección de documentos repetidos en el cardex de documentos relacionados para RM.
 
-================================================================================
+================================================================================ 
 SIIE 3.2 276.1/ 2025-07-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

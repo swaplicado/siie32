@@ -1,6 +1,9 @@
 package erp.musr.data;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.gui.SGuiSession;
@@ -31,5 +34,26 @@ public class SUserUtils {
         catch (Exception e) {
             Logger.getLogger(SUserUtils.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+    
+    /**
+     * Devuelve los grupos de usuario a los que pertenece un usuario a partir de su Id
+     * @param statement
+     * @param userId
+     * @return 
+     */
+    public static ArrayList<Integer> getUserGroupsIds(Statement statement, int userId) {
+        ArrayList<Integer> userGroups = new ArrayList<>();
+        try {
+            String sql = "SELECT id_usr_grp FROM erp.usru_usr_grp_usr WHERE id_usr = " + userId + " ORDER BY id_usr_grp";
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                userGroups.add(resultSet.getInt(1));
+            }
+        }
+        catch (SQLException e) {
+            Logger.getLogger(SUserUtils.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return userGroups;
     }
 }

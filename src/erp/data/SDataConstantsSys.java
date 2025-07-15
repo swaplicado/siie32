@@ -140,6 +140,9 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
     public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
     public static final String CFG_PARAM_SWAP_SERVICE_CONFIG = "SWAP_SERVICE_CONFIG";
+    public static final String CFG_PARAM_SIIE_PURP_DPS_NAT = "SIIE_PURP_DPS_NAT";
+    public static final String CFG_PARAM_SIIE_PURP_CFD_USE = "SIIE_PURP_CFD_USE";
+    public static final String CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE = "SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
@@ -1322,6 +1325,8 @@ public abstract class SDataConstantsSys {
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
     public static final int TRNU_TP_DPS_ANN_NA = 1;
+    
+    public static final String TRNU_DPS_NAT_FIX_ASSET = "fix_asset";
     
     public static final int TRNX_TP_DPS_EST = 100;
     public static final int TRNX_TP_DPS_EST_EST = 101;
