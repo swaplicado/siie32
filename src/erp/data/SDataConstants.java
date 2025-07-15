@@ -177,6 +177,8 @@ public abstract class SDataConstants {
     public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
+    public static final int BPSU_BP_DT = 204028;
+    public static final int BPSU_BP_DT_RE = 204029;
     public static final int BPSU_BP_ADDEE = 204031;
     public static final int BPSU_SCA_BP = 204091;
     public static final int BPSU_SCA_BP_MAP = 204092;    
@@ -200,6 +202,7 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_EMP_REL = 204571; // employee relatives
     public static final int BPSX_BP_INT_SUP = 204608; //international suppliers
     public static final int BPSX_BP_INT_CUS = 204609; //international customers
+    public static final int BPSX_BP_CUS_SUP = 204610;
 
     public static final int BPSX_BP_X_SUP_CUS = 204514;
     public static final int BPSX_BP_X_CDR_DBR = 204515;

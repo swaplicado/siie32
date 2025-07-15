@@ -20,6 +20,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
+import erp.mbps.form.SFormBizPartnerUpdate;
 import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
@@ -37,6 +38,7 @@ import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
 import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.data.SDataBizPartnerBlocking;
+import erp.mbps.data.SDataBizPartner;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
@@ -88,6 +90,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenuItem jmiCatFunctionalAreaBudgets;
     private javax.swing.JMenuItem jmiCatPriceCommercialLog;
+    private javax.swing.JMenuItem jmiCatBizPartherUpdate;
+    private javax.swing.JMenuItem jmiCatBizPartherUpdateLog;
     private javax.swing.JMenuItem jmiCatInitiatives;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates; 
@@ -254,6 +258,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepDpsBizPartner moDialogRepDpsBizPartner;
     private erp.mtrn.form.SDialogRepDpsWithBalance moDialogRepDpsWithBalance;
     private erp.mtrn.form.SDialogRepSalesPurchases moDialogRepSalesPurchases;
+    private erp.mbps.form.SFormBizPartnerUpdate moFormBizPartnerSupplierData;
     private erp.mtrn.form.SDialogRepSalesPurchasesByConcept moDialogRepSalesPurchasesByConcept;
     private erp.mtrn.form.SDialogRepSalesPurchasesByLocality moDialogRepSalesPurchasesByLocality;
     private erp.mtrn.form.SDialogRepSalesPurchasesComparative moDialogRepSalesPurchasesComparative;
@@ -310,6 +315,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
         jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
+        jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
+        jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
         jmiCatInitiatives = new JMenuItem("Iniciativas");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
@@ -325,6 +332,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmiCatFunctionalAreaBudgets);
         jmCat.addSeparator();
         jmCat.add(jmiCatPriceCommercialLog);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatBizPartherUpdate);
+        jmCat.add(jmiCatBizPartherUpdateLog);
         jmCat.addSeparator();
         jmCat.add(jmiCatInitiatives);
         
@@ -707,6 +717,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog.addActionListener(this);
         jmiCatFunctionalAreaBudgets.addActionListener(this);
         jmiCatPriceCommercialLog.addActionListener(this);
+        jmiCatBizPartherUpdate.addActionListener(this);
+        jmiCatBizPartherUpdateLog.addActionListener(this);
         jmiCatInitiatives.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesDetail.addActionListener(this);        
@@ -897,6 +909,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmiCatFunctionalAreaBudgets.setEnabled(hasRightCreditConfig && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
+        jmiCatBizPartherUpdate.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
+        jmiCatBizPartherUpdateLog.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
         jmiCatInitiatives.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
         jmEst.setEnabled(hasRightDocEstimate);
 
@@ -1173,6 +1187,20 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm.setValue(1, SDataConstantsSys.BPSS_CT_BP_SUP);
                     break;
+                case SDataConstants.BPSX_BP_CUS_SUP:
+                    if (moFormBizPartnerSupplierData == null) {
+                        moFormBizPartnerSupplierData = new SFormBizPartnerUpdate(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataBizPartner();
+                        moFormBizPartnerSupplierData.setRegistry(moRegistry);
+                    }
+                    miForm = moFormBizPartnerSupplierData;
+                    miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
+                    miForm.setFormVisible(true);
+                    int formResult = miForm.getFormResult();
+                    result = (formResult == SLibConstants.FORM_RESULT_OK) ? SLibConstants.DB_ACTION_SAVE_OK : SLibConstants.DB_ACTION_ANNUL_OK;
+                    break;
                 case SDataConstants.TRN_DPS:
                     if (moFormDps == null) {
                         moFormDps = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
@@ -1333,6 +1361,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 case SDataConstants.TRN_BP_BLOCK:
                     oViewClass = erp.mtrn.view.SViewBizPartnerBlocking.class;
                     sViewTitle = "Bloqueo proveedores";
+                    break;
+                    
+                case SDataConstants.BPSU_BP_DT:
+                    oViewClass = erp.mbps.view.SViewBizPartnerUpdate.class;
+                    sViewTitle = "Datos de proveedores";
+                    break;
+                    
+                case SDataConstants.BPSU_BP_DT_RE:
+                    oViewClass = erp.mbps.view.SViewBizPartnerUpdateLog.class;
+                    sViewTitle = "Actualizaciones datos proveedores";
                     break;
 
                 case SDataConstants.FIN_CC_ITEM:
@@ -1717,6 +1755,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatPriceCommercialLog) {
                 miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatBizPartherUpdate) {         
+               showView(SDataConstants.BPSU_BP_DT, SDataConstantsSys.BPSS_CT_BP_SUP);
+            }
+            else if (item == jmiCatBizPartherUpdateLog) {      
+               showView(SDataConstants.BPSU_BP_DT_RE, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiCatInitiatives) {
                 miClient.getSession().showView(SModConsts.TRN_INIT, SLibConstants.UNDEFINED, null);

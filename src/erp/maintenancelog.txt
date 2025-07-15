@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 280.1/ 2025-07-15
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Creación de la vista de actualización de datos de proveedores y actualización de datos de proveedores (Datos fiscales)
+2) Forma de actualización  de datos de proveedores (Datos fiscales)
+
+================================================================================
 SIIE 3.2 280.0/ 2025-07-14
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
