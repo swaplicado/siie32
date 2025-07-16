@@ -589,7 +589,7 @@ public class SModuleTrn extends SGuiModule {
                 }
                 break;
             case SModConsts.TRN_INIT:
-                view = new SViewInitiative(miClient, "Iniciativas");
+                view = new SViewInitiative(miClient, "Propuestas");
                 break;
             case SModConsts.TRN_CFD:
                 switch (subtype) {
@@ -665,36 +665,36 @@ public class SModuleTrn extends SGuiModule {
                 switch(subtype) {
                     case SModSysConsts.TRNX_MAT_REQ_PET:
                         switch (params.getType()) {
-                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis RM nuevas"; break;
-                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis RM en autorización"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_NEW: title = "Mis requisiciones nuevas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Mis requisiciones en autorización"; break;
                             case SModSysConsts.TRNS_ST_MAT_REQ_PROV: 
                                 switch (params.getSubtype()) {
-                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PROV: title = "Mis RM en suministro"; break;
-                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PUR: title = "Mis RM en compras"; break;
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PROV: title = "Mis requisiciones en suministro"; break;
+                                    case SModSysConsts.TRNX_ST_MAT_REQ_PROV_PUR: title = "Mis requisiciones en compras"; break;
                                 }
                                 break;
-                            case SLibConsts.UNDEFINED: title = "Todas mis RM"; break;
-                            case SModConsts.TRN_MAT_CONS_ENT_USR: title = "RM mis c. consumo"; break;
-                            case SModConsts.TRN_MAT_PROV_ENT_USR: title = "RM mis c. suministro"; break;
+                            case SLibConsts.UNDEFINED: title = "Todas mis requisiciones"; break;
+                            case SModConsts.TRN_MAT_CONS_ENT_USR: title = "Requisiciones mis c. consumo"; break;
+                            case SModConsts.TRN_MAT_PROV_ENT_USR: title = "Requisiciones mis c. suministro"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_REV:
                         switch (params.getType()) {
-                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "RM x autorizar"; break;
-                            case SModSysConsts.TRNX_MAT_REQ_AUTHO: title = "RM autorizadas"; break;
-                            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "RM rechazadas"; break;
+                            case SModSysConsts.TRNS_ST_MAT_REQ_AUTH: title = "Requisiciones x autorizar"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_AUTHO: title = "Requisiciones autorizadas"; break;
+                            case SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH: title = "Requisiciones rechazadas"; break;
                         }
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_ADM:
-                        title = "Todas las RM x autorizar (admor.)";
+                        title = "Todas las requisiciones x autorizar (admor.)";
                         break;
                     default:
-                        title = "Todas las RM"; break;
+                        title = "Todas las requisiciones"; break;
                 }
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_ACC:
-                title = "Todas las RM (reclasificación ctb.)";
+                title = "Todas las requisiciones (reclasificación ctb.)";
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_STK_VAL:
@@ -711,13 +711,13 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM consumo x suministrar (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "Requisiciones consumo x suministrar (detalle)";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM consumo suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones consumo suministradas";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM consumo suministradas (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "Requisiciones consumo suministradas (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM consumo x suministrar";
+                    case SLibConsts.UNDEFINED: title = "Requisiciones consumo x suministrar";
                         break;
                     default:
                         // nothing
@@ -726,13 +726,13 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM resurtido x suministrar a (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "Requisiciones resurtido x suministrar a (detalle)";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "RM resutido suministradas";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED: title = "Requisiciones resutido suministradas";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "RM resurtido suministradas (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL: title = "Requisiciones resurtido suministradas (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM resurtido x suministrar";
+                    case SLibConsts.UNDEFINED: title = "Requisiciones resurtido x suministrar";
                         break;
                     default:
                         // nothing
@@ -741,9 +741,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM x pedir (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "Requisiciones x pedir (detalle)";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM x pedir";
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x pedir";
                         break;
                     default:
                         // nothing
@@ -752,20 +752,20 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_CLO_PUR:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "RM pedidas (detalle)";
+                    case SModSysConsts.TRNX_MAT_REQ_DETAIL: title = "Requisiciones pedidas (detalle)";
                        break;
                     default:
-                        title = "RM pedidas";
+                        title = "Requisiciones pedidas";
                 }
                 view = new SViewMaterialRequestPending(miClient, SModConsts.TRNX_MAT_REQ_CLO_PUR, subtype, title, params);
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
-                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "RM x solicitar cotización";
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "Requisiciones x solicitar cotización";
                         break;
-                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "RM solicitada cotización";
+                    case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "Requisiciones solicitada cotización";
                         break;
-                    case SLibConsts.UNDEFINED: title = "RM x solicitar cotización";
+                    case SLibConsts.UNDEFINED: title = "Requisiciones x solicitar cotización";
                         break;
                     default:
                         // nothing
@@ -774,9 +774,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
                 switch (subtype) {
-                    case SUtilConsts.ACTION_CLOSE: title = "Seguimiento compras RM cerradas (detalle)";
+                    case SUtilConsts.ACTION_CLOSE: title = "Seguimiento compras requisiciones cerradas (detalle)";
                         break;
-                    case SUtilConsts.ACTION_OPEN: title = "Seguimiento compras RM abiertas (detalle)";
+                    case SUtilConsts.ACTION_OPEN: title = "Seguimiento compras requisiciones abiertas (detalle)";
                         break;
                     default:
                         // nothing
@@ -990,7 +990,7 @@ public class SModuleTrn extends SGuiModule {
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo requisición", 20));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Estatus"));
-                settings = new SGuiOptionPickerSettings("Selecciona una RM para copiar", sql, gridColumns, 1);
+                settings = new SGuiOptionPickerSettings("Selecciona una Requisiciones para copiar", sql, gridColumns, 1);
                 moPickerMatReq = new SBeanOptionPicker();
                 moPickerMatReq.setPickerSettings(miClient, type, SLibConsts.UNDEFINED, settings);
                 picker = moPickerMatReq;
@@ -1038,7 +1038,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormMmsConfiguration;
                 break;
             case SModConsts.TRN_INIT:
-                if (moFormInitiative == null) moFormInitiative = new SFormInitiative(miClient, "Iniciativa");
+                if (moFormInitiative == null) moFormInitiative = new SFormInitiative(miClient, "Propuesta");
                 form = moFormInitiative;
                 break;
             case SModConsts.TRN_DVY:
@@ -1098,34 +1098,34 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_STK_SUP:
             case SModConsts.TRNX_MAT_REQ_EST:
                 if (moFormMaterialReq == null) { 
-                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición", type);
                 }
                 else {
-                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición de materiales");
+                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición");
                 }
                 form = moFormMaterialReq;
                 break;
             case SModConsts.TRNX_MAT_REQ_ACC:
                 if (moFormMaterialReq == null) { 
-                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición de materiales (reclasificación contable)", subtype);
+                    moFormMaterialReq = new SFormMaterialRequest(miClient, "Requisición (reclasificación contable)", subtype);
                 }
                 else {
-                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subtype, "Requisición de materiales (reclasificación contable)");
+                    moFormMaterialReq.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, subtype, "Requisición (reclasificación contable)");
                 }
                 form = moFormMaterialReq;
                 break;
             case SModConsts.TRNX_MAT_REQ_PEND_SUP:
             case SModConsts.TRNX_MAT_REQ_PEND_PUR:
                 if (moFormMaterialReqSup == null) { 
-                    moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición de materiales", type);
+                    moFormMaterialReqSup = new SFormMaterialRequest(miClient, "Requisición", type);
                 }
                 else {
-                    moFormMaterialReqSup.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición de materiales");
+                    moFormMaterialReqSup.setFormSettings(miClient, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAT_REQ, type, "Requisición");
                 }
                 form = moFormMaterialReqSup;
                 break;
             case SModConsts.TRN_MAT_REQ_CC:
-                if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición de materiales y centros de costo");
+                if (moFormMaterialRequestCostCenter == null) moFormMaterialRequestCostCenter = new SFormMaterialRequestCostCenter(miClient, subtype, "Requisición y centros de costo");
                 form = moFormMaterialRequestCostCenter;
                 break;
             case SModConsts.TRN_STK_VAL:
@@ -1195,7 +1195,7 @@ public class SModuleTrn extends SGuiModule {
                 guiReport = new SGuiReport("reps/trn_cont_marg.jasper", "Reporte margen de contribución");
                 break;
             case SModConsts.TRN_MAT_REQ:
-                guiReport = new SGuiReport("reps/trn_mat_req.jasper", "Requisición de materiales");
+                guiReport = new SGuiReport("reps/trn_mat_req.jasper", "Requisición");
                 break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");

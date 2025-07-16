@@ -1561,7 +1561,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
 
                 moRequisitionEntry = mvRequisitionEntries.get(i);
                 if (moRequisitionEntry == null) {
-                    miClient.showMsgBoxWarning("No se pudo leer la entrada de la requisición de materiales.");
+                    miClient.showMsgBoxWarning("No se pudo leer la entrada de la requisición.");
                     b = false;
                     break;
                 }

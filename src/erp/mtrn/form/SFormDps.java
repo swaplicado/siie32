@@ -1906,12 +1906,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpEntriesControlsWest.add(jsEntry4);
 
         jbEntryImportFromMatRequest.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_b.gif"))); // NOI18N
-        jbEntryImportFromMatRequest.setToolTipText("Importar partidas de requisición de materiales");
+        jbEntryImportFromMatRequest.setToolTipText("Importar partidas de una requisición");
         jbEntryImportFromMatRequest.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryImportFromMatRequest);
 
         jbEntryViewMatReqLinks.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_link_b.gif"))); // NOI18N
-        jbEntryViewMatReqLinks.setToolTipText("Ver vínculos de requisición de materiales de la partida");
+        jbEntryViewMatReqLinks.setToolTipText("Ver vínculos de requisiciones de la partida");
         jbEntryViewMatReqLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewMatReqLinks);
 
@@ -3447,7 +3447,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpInitiatives.setLayout(new java.awt.BorderLayout());
 
-        jPanel135.setBorder(javax.swing.BorderFactory.createTitledBorder("Iniciativa para documentos de compras:"));
+        jPanel135.setBorder(javax.swing.BorderFactory.createTitledBorder("Propuesta para documentos de compras:"));
         jPanel135.setLayout(new java.awt.BorderLayout(0, 2));
 
         jPanel152.setLayout(new java.awt.BorderLayout());
@@ -3456,7 +3456,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel146.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitInitiative.setText("Iniciativa:");
+        jlInitInitiative.setText("Propuesta:");
         jlInitInitiative.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel146.add(jlInitInitiative);
 
@@ -3468,7 +3468,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel141.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitType.setText("Tipo iniciativa:");
+        jlInitType.setText("Tipo propuesta:");
         jlInitType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel141.add(jlInitType);
 
@@ -3560,7 +3560,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlBudgetHint.setToolTipText("Presupuesto que requerirá la iniciativa");
+        jlBudgetHint.setToolTipText("Presupuesto que requerirá la propuesta");
         jlBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel149.add(jlBudgetHint);
 
@@ -3587,7 +3587,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlComBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlComBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlComBudgetHint.setToolTipText("Suma del total de pedidos de la iniciativa");
+        jlComBudgetHint.setToolTipText("Suma del total de pedidos de la propuesta");
         jlComBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel150.add(jlComBudgetHint);
 
@@ -3614,7 +3614,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint.setToolTipText("Suma del total de facturas de la iniciativa");
+        jlSpentBudgetHint.setToolTipText("Suma del total de facturas de la propuesta");
         jlSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel151.add(jlSpentBudgetHint);
 
@@ -3626,7 +3626,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpInitiatives.add(jPanel135, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane.addTab("Iniciativa", jpInitiatives);
+        jTabbedPane.addTab("Propuesta", jpInitiatives);
 
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -12021,7 +12021,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         catalogs.populateComboBox(jcbFisDataTaxRegimeReceptor, SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, miClient.getSession().getSystemDate());
         catalogs.populateComboBox(jcbFisDataCfdiUsage, SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, miClient.getSession().getSystemDate());
         
-        // Iniciativas:
+        // Propuestas:
         
         SFormUtilities.populateComboBox(miClient, jcbInitInitiative, SDataConstants.TRN_INIT);
         

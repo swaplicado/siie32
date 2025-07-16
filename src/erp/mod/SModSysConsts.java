@@ -1158,7 +1158,7 @@ public abstract class SModSysConsts {
     
     static {
         TRNX_TP_PERIOD_CATALOG = new ArrayList<>();
-        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- Tipo iniciativa -"));
+        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- Tipo propuesta -"));
         TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_EVENT_ID }, TRNX_TP_PERIOD_EVENT_DESC));
         TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_REC_ID }, TRNX_TP_PERIOD_REC_DESC));
         

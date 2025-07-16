@@ -16,9 +16,9 @@ import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataDpsMaterialRequest;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryNotes;
+import erp.mtrn.data.SDataDpsMaterialRequest;
 import erp.mtrn.data.SDataMaterialRequestEntryLinkRow;
 import erp.mtrn.data.STrnFunctionalAreaUtils;
 import java.awt.BorderLayout;
@@ -300,7 +300,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
     }
     
     private void resetPanelFinder() {
-        moTextFinderDocumentType.setValue("REQUISICIÓN DE MATERIALES");
+        moTextFinderDocumentType.setValue("REQUISICIÓN");
         moTextFinderDocumentType.setEnabled(false);
         jcbFinderUser.setSelectedIndex(-1);
         jcbFinderConsEntity.setSelectedIndex(-1);
@@ -553,7 +553,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                     oEntry.setWeightDelivery(!oTableRow.getItem().getDbmsDataItemGeneric().getIsWeightDeliveryApplying() ? 0d : oEntry.getQuantity() * oTableRow.getItem().getWeightDelivery());
                 }
 
-                // Links con requisición de materiales
+                // Links con requisición
                 SDataDpsMaterialRequest oDpsMatReqLink = new SDataDpsMaterialRequest();
                 oDpsMatReqLink.setQuantity(oEntry.getQuantity());
                 oDpsMatReqLink.setValue(oEntry.getPriceUnitary());

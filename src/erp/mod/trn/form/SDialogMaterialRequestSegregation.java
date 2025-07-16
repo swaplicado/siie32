@@ -111,7 +111,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
         jpSegRows = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Apartados de la requisición de materiales");
+        setTitle("Apartados de la requisición");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -122,7 +122,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
         jpBenefit.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición de materiales:"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición:"));
         jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -151,7 +151,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEntity.setText("Centro:");
+        jlEntity.setText("Entidad:");
         jlEntity.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel15.add(jlEntity);
 

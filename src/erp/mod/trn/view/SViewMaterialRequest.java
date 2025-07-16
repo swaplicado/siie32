@@ -108,8 +108,8 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         hasMatReqProvRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_PROV).HasRight;
         hasMatReqReclassRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ACC).HasRight;
         
-        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva RM de resurtido", this);
-        jbCopyReqPicker = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif")), "Copia de RM a partir de otra", this);
+        jbNewSupReq = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NEW_MAIN), "Nueva requisición de resurtido", this);
+        jbCopyReqPicker = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link.gif")), "Copia de requisición a partir de otra", this);
         jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir", this);
         jbAuthCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver cárdex de autorizaciones", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Ver bitácora de cambios", this);
@@ -117,7 +117,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         jbHardAuthorize = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up_c.gif")), "Autorización forzada", this);
         jbReject = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_down.gif")), "Rechazar", this);
         jbSegregate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Apartar/Liberar", this);
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la requisición", this);
         jbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
         jbAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")), "Ver comentarios de autorización de pedidos de compras", this);
         jbEditNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit_ro.gif")), "Modificar notas", this);
@@ -168,7 +168,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
-        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la RM");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la requisición");
         
         if (mnGridMode != SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
             jbRowNew.setEnabled(false);
@@ -216,7 +216,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
     private void actionNewSupReq() {
         if (jbNewSupReq.isEnabled()) {
             try {
-                SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición de materiales", SModConsts.TRNX_MAT_REQ_STK_SUP);
+                SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición", SModConsts.TRNX_MAT_REQ_STK_SUP);
                 form.setRegistry(new SDbMaterialRequest());
                 form.setVisible(true);
                 if (form.validateForm().isValid()) {
@@ -241,7 +241,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), (int[]) picker.getOption());
                     SDbMaterialRequest reqCopy = req.cloneToCopy();
-                    SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición de materiales", SLibConsts.UNDEFINED);
+                    SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición", SLibConsts.UNDEFINED);
                     form.setRegistry(reqCopy);
                     form.setVisible(true);
                     if (form.validateForm().isValid()) {
@@ -564,7 +564,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 try {
                     SDbMaterialRequest req = new SDbMaterialRequest();
                     req.read(miClient.getSession(), gridRow.getRowPrimaryKey());
-                    String message = "No se puede modificar las notas de la RM seleccionada debido a:";
+                    String message = "No se puede modificar las notas de la requisición seleccionada debido a:";
                     if (req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PUR || req.getFkMatRequestStatusId() == SModSysConsts.TRNS_ST_MAT_REQ_PROV) {
                         boolean canEdit = true;
                         // Se puede cambiar el comentario si la orden de compra no esta pendiente de autorizar o autorizada.
@@ -583,7 +583,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                         while (resultSet.next()) {
                             canEdit = false;
-                            message += "\n- El estatus de autorización del pedido de compras con folio " + resultSet.getString("invoice") + ", relacionado con la RM, es " + resultSet.getString("stat") + ".";
+                            message += "\n- El estatus de autorización del pedido de compras con folio " + resultSet.getString("invoice") + ", relacionado con la requisición, es " + resultSet.getString("stat") + ".";
                         }
                         if (canEdit) {
                             SFormCapturingNotes form = new SFormCapturingNotes((SClientInterface) miClient);
@@ -613,7 +613,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                         }
                     }
                     else {
-                        miClient.showMsgBoxInformation(message + "\n- La RM no está en compras o en suministro.");
+                        miClient.showMsgBoxInformation(message + "\n- La requisición no está en compras o en suministro.");
                     }
                 }
                 catch (Exception e) {
@@ -649,7 +649,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                             boolean hasRefs = STrnStockSegregationUtils.hasSegregationsRefs(miClient.getSession().getStatement().getConnection(), 
                                                                                             mr.getChildEntries());
                             if (hasRefs) {
-                                throw new Exception("No se puede eliminar la RM, tiene apartados en almacén");
+                                throw new Exception("No se puede eliminar la requisición, tiene apartados en almacén");
                             }
                             if (miClient.getSession().getModule(mnModuleType, mnModuleSubtype).deleteRegistry(mnGridType, gridRow.getRowPrimaryKey()) == SDbConsts.SAVE_OK) {
                                 updates = true;
@@ -685,7 +685,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                if (miClient.showMsgBoxConfirm("¿Está seguro/a que desea cancelar la RM?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
+                if (miClient.showMsgBoxConfirm("¿Está seguro/a que desea cancelar la requisición?\nEsta acción no se puede deshacer.") == JOptionPane.OK_OPTION) {
                     try {
                         int[] key = (int[]) gridRow.getRowPrimaryKey();
 
@@ -859,7 +859,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             // Verificar si el subtipo de la cuadrícula es TRNX_MAT_REQ_ADM
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ADM) {
-                // Condiciones que aplican cuando la vista es RM administrador
+                // Condiciones que aplican cuando la vista es requisición administrador
                 needAuthJoin = false;
             }
         }

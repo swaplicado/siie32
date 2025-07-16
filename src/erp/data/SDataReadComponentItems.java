@@ -1647,7 +1647,7 @@ public abstract class SDataReadComponentItems {
                         "FROM trn_init AS i " +
                         "WHERE NOT b_del " + 
                         "ORDER BY i.name, i.id_init";
-                text = "iniciativas";
+                text = "propuesta";
                 break;
             case SDataConstants.TRN_DNS_DIOG:
                 lenPk = 1;

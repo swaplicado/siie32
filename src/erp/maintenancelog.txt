@@ -1,7 +1,13 @@
 ================================================================================
+SIIE 3.2 280.3/ 2025-07-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio de las etiquetas de "Requisiciones de materiales" y "RM" por simplemente "Requisiciones".
+2) Cambio en las etiquetas de "Iniciativas" por "Propuestas".
+
+================================================================================
 SIIE 3.2 280.2/ 2025-07-15
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
 - Corrección de llave foránea nula en usuario de mantenimiento en diogs de ajuste de valuación.
 

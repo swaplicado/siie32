@@ -10,7 +10,6 @@ import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public abstract class SMatRequestAuthorizationUtils {
     }
     
     /**
-     * Obtiene las entidades de consumo relacionadas con la requisición de materiales.
+     * Obtiene las entidades de consumo relacionadas con la requisición.
      * Contempla las entidades tanto a nivel encabezado como de las partidas
      * 
      * @param oMatReq
@@ -75,7 +74,7 @@ public abstract class SMatRequestAuthorizationUtils {
     }
     
     /**
-     * Determina si la configuración recibida aplica para la requisición de materiales actual.
+     * Determina si la configuración recibida aplica para la requisición actual.
      * 
      * @param session
      * @param idMatReq
@@ -218,7 +217,7 @@ public abstract class SMatRequestAuthorizationUtils {
         try {
             oResultSet = oStatement.executeQuery(sQuery);
             while (oResultSet.next()) {
-                sBody += "<p>" + SLibUtils.textToHtml("Requisición de materiales") + ": <b>" + String.format("%0" + 6 + "d", oResultSet.getInt("num"))+ "</b>" +
+                sBody += "<p>" + SLibUtils.textToHtml("requisición") + ": <b>" + String.format("%0" + 6 + "d", oResultSet.getInt("num"))+ "</b>" +
                         " del " + SLibUtils.textToHtml(SLibUtils.DateFormatDate.format(oResultSet.getDate("dt"))) + 
                         " (<b>" + SLibUtils.textToHtml(oResultSet.getString("usr")) + "</b>)</p>";
             }

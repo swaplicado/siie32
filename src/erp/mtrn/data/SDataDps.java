@@ -4569,7 +4569,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                                 
                                 int accItemTypeId = getAccItemTypeId(entry.getFkDpsAdjustmentTypeId());
-                                // Se toma en cuenta la configuración de la cuenta contable de la RM solo si la naturaleza del doc es ACTIVO
+                                // Se toma en cuenta la configuración de la cuenta contable de la requisición solo si la naturaleza del doc es ACTIVO
                                 if (accItemTypeId == SDataConstantsSys.FINS_TP_ACC_ITEM_ASSET) {
                                     if (entry.getDbmsDpsEntryMatRequestLink() != null) {
                                         accountConfigs = new Vector<>();

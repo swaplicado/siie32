@@ -12,7 +12,6 @@ import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.utils.SStockValuationConsumptionUtils;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -533,9 +532,9 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "re.debit", "Importe prorrateo $");
         column.setSumApplying(true);
         columns.add(column);
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "prov_ent", "Cto suministro RM"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mr_num", "Folio RM"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "prov_ent", "Cto suministro requisición"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mr_num", "Folio requisición"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha requisición"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_out_dt", "Fecha mov salida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "dout_num", "Folio mov salida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_out", "Tipo mov salida"));

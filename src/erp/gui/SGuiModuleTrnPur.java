@@ -20,6 +20,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
+import erp.mbps.data.SDataBizPartner;
 import erp.mbps.form.SFormBizPartnerUpdate;
 import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataCostCenterItem;
@@ -38,7 +39,6 @@ import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
 import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.data.SDataBizPartnerBlocking;
-import erp.mbps.data.SDataBizPartner;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
@@ -317,7 +317,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
         jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
-        jmiCatInitiatives = new JMenuItem("Iniciativas");
+        jmiCatInitiatives = new JMenuItem("Propuestas");
+        
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);

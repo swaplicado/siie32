@@ -79,7 +79,7 @@ public class SStockValuationRecordUpdate {
                 System.out.println("Actualizando renglón " + counter + ", id_mvt: " + idMvt);
                 lPurAccConfigs.clear();
                 /**
-                 * Si el consumo tiene asociada una Requisición de materiales
+                 * Si el consumo tiene asociada una requisición
                  */
                 idMatReq = res.getInt("vmvt.fk_mat_req_n");
                 idMatReqEty = res.getInt("vmvt.fk_mat_req_ety_n");

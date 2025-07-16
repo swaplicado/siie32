@@ -2016,7 +2016,7 @@ public abstract class SDataUtilities {
             // C.2. If explotion of materials record exist, then send message to the user: (Message: Explotion of materials has asigned a requisition)
 
             if (bExpMat) {
-                sMsg = "La explosión de materiales '" + sExplotionMaterials + "' ya tiene requisición de materiales '" + sRequisition + "'.";
+                sMsg = "La explosión de materiales '" + sExplotionMaterials + "' ya tiene una requisición '" + sRequisition + "'.";
             }
             else {
                 // C.3. If explotion of materials record doesn´t exist, then it can be created:

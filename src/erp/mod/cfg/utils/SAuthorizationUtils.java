@@ -1722,7 +1722,7 @@ public abstract class SAuthorizationUtils {
         }
         int entriesWithoutReq = fileProcess.getDpsEntriesWithoutMaterialRequest(client.getSession());
         if (send && !fileProcess.getMaterialRequests().isEmpty() && entriesWithoutReq > 0) {
-            if (client.showMsgBoxConfirm("El documento tiene " + entriesWithoutReq + " partida" + (entriesWithoutReq > 1 ? "s" : "") + " que no estan asociadas a una requisicion de materiales.\n¿Desea enviar a autorización web de todas formas?") != JOptionPane.OK_OPTION) {
+            if (client.showMsgBoxConfirm("El documento tiene " + entriesWithoutReq + " partida" + (entriesWithoutReq > 1 ? "s" : "") + " que no estan asociadas a una requisición.\n¿Desea enviar a autorización web de todas formas?") != JOptionPane.OK_OPTION) {
                 send = false;
             }                                                
         }

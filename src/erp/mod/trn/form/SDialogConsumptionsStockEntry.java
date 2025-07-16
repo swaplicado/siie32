@@ -6,8 +6,6 @@ package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
-import erp.mod.trn.db.SMaterialRequestUtils;
-import erp.mod.trn.db.SRowMaterialRequestDocs;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -58,7 +56,7 @@ public class SDialogConsumptionsStockEntry extends SBeanFormDialog implements Li
         jpAuthorizationRoute = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Documentos relacionados con la RM");
+        setTitle("Documentos relacionados con la requisición");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -100,7 +98,7 @@ public class SDialogConsumptionsStockEntry extends SBeanFormDialog implements Li
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
 
-        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_STK_VAL_IN_CARDEX, SLibConsts.UNDEFINED, "Vínculos de la RM") {
+        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_STK_VAL_IN_CARDEX, SLibConsts.UNDEFINED, "Vínculos de la requisición") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);

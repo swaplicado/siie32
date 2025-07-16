@@ -431,7 +431,7 @@ public abstract class SFinAccountUtilities {
     }
     
     /**
-     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición de materiales.
+     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición.
      *
      * @param connection
      * @param oMatRequestDpsEtyLink
@@ -440,21 +440,21 @@ public abstract class SFinAccountUtilities {
      */
     public static ArrayList<SFinAccountConfigEntry> getMatReqEtyFixedAssetAccountConfigs(Connection connection, SDataDpsMaterialRequest oMatRequestDpsEtyLink) throws Exception {
         if (oMatRequestDpsEtyLink == null) {
-            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (No se encontró vínculo con la Requisición de materiales)");
+            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (No se encontró vínculo con la requisición)");
         }
         
-        // Lee la partida de la requisición de materiales y obtiene centro de costo y cuenta contable
+        // Lee la partida de la requisición y obtiene centro de costo y cuenta contable
         ArrayList<SFinAccountConfigEntry> lConfigs = getFixedAssetAccountConfigsByMatReqEty(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId(), oMatRequestDpsEtyLink.getFkMaterialRequestEntryId());
         if (lConfigs.size() > 0) {
             return lConfigs;
         }
 
-        // Lee el encabezado de la requisición de materiales y obtiene centro de costo y cuenta contable
+        // Lee el encabezado de la requisición y obtiene centro de costo y cuenta contable
         return getFixedAssetAccountConfigsByMatReq(connection, oMatRequestDpsEtyLink.getFkMaterialRequestId());
     }
     
     /**
-     * Método para obtener la configuración de cuenta contable de activos fijos de la partida de la requisición de materiales.
+     * Método para obtener la configuración de cuenta contable de activos fijos de la partida de la requisición.
      *
      * @param connection
      * @param idMatReq
@@ -463,7 +463,7 @@ public abstract class SFinAccountUtilities {
      * @throws Exception
      */
     public static ArrayList<SFinAccountConfigEntry> getFixedAssetAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
-        // Proceso para obtener la información de la partida de la requisición de materiales
+        // Proceso para obtener la información de la partida de la requisición
         String sql = "SELECT " +
                 "re.fk_cc_n, cc.id_cc, cc.cc, se.code, se.name, se.fk_acc_fa, acc.id_acc, '1' AS per " +
             "FROM " +
@@ -482,7 +482,7 @@ public abstract class SFinAccountUtilities {
     }
 
     /**
-     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición de materiales.
+     * Método para obtener la configuración de cuenta contable de activos fijos de la requisición.
      * 
      * @param connection
      * @param idMatReq
@@ -490,7 +490,7 @@ public abstract class SFinAccountUtilities {
      * @throws Exception
      */
     public static ArrayList<SFinAccountConfigEntry> getFixedAssetAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
-        // Proceso para obtener la información del encabezado de la requisición de materiales
+        // Proceso para obtener la información del encabezado de la requisición
         String sql = "SELECT " +
                 "rcc.id_cc AS pk_cc, cc.id_cc, cc.cc, se.fk_acc_fa, rcc.per, acc.id_acc " +
             "FROM " +
@@ -510,7 +510,7 @@ public abstract class SFinAccountUtilities {
     }
     
     /**
-     * Método para obtener la configuración de cuenta contable de consumo de almacén por partida de la requisición de materiales por partida.
+     * Método para obtener la configuración de cuenta contable de consumo de almacén por partida de la requisición por partida.
      * 
      * @param connection
      * @param idMatReq
@@ -519,7 +519,7 @@ public abstract class SFinAccountUtilities {
      * @throws Exception
      */
     public static ArrayList<SFinAccountConfigEntry> getConsumptionWhsAccountConfigsByMatReqEty(Connection connection, int idMatReq, int idMatReqEty) throws Exception {
-        // Proceso para obtener la información de la partida de la requisición de materiales
+        // Proceso para obtener la información de la partida de la requisición
         String sql = "SELECT " +
                 "re.fk_cc_n, cc.id_cc, cc.cc, se.code, se.name, se.fk_acc_cons_whs, acc.id_acc, '1' AS per " +
             "FROM " +
@@ -538,7 +538,7 @@ public abstract class SFinAccountUtilities {
     }
 
     /**
-     * Método para obtener la configuración de cuenta contable de consumo de almacén por encabezado de la requisición de materiales.
+     * Método para obtener la configuración de cuenta contable de consumo de almacén por encabezado de la requisición.
      *
      * @param connection
      * @param idMatReq
@@ -546,7 +546,7 @@ public abstract class SFinAccountUtilities {
      * @throws Exception
      */
     public static ArrayList<SFinAccountConfigEntry> getConsumptionWhsAccountConfigsByMatReq(Connection connection, int idMatReq) throws Exception {
-        // Proceso para obtener la información del encabezado de la requisición de materiales
+        // Proceso para obtener la información del encabezado de la requisición
         String sql = "SELECT " +
                 "rcc.id_cc AS pk_cc, cc.id_cc, cc.cc, se.fk_acc_cons_whs, rcc.per, acc.id_acc " +
             "FROM " +

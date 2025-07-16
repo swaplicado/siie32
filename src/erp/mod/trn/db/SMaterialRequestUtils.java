@@ -1060,16 +1060,16 @@ public abstract class SMaterialRequestUtils {
         }
         
         if (i == moMaterialRequest.getChildEntries().size()) {
-            return "Considere que se pueden modificar todas las partidas de la RM.";
+            return "Considere que se pueden modificar todas las partidas de la requisición.";
         }
         else if (i == 0) {
-            return "Considere que no se puede modificar ninguna partida de la RM.";
+            return "Considere que no se puede modificar ninguna partida de la requisición.";
         }
         else {
             if (i == 1) {
-                return "Considere que sólo se puede modificar " + i + " partida de " + moMaterialRequest.getChildEntries().size() + " de la RM.";
+                return "Considere que sólo se puede modificar " + i + " partida de " + moMaterialRequest.getChildEntries().size() + " de la requisición.";
             }
-            return "Considere que sólo se pueden modificar " + i + " partidas de " + moMaterialRequest.getChildEntries().size() + " de la RM.";
+            return "Considere que sólo se pueden modificar " + i + " partidas de " + moMaterialRequest.getChildEntries().size() + " de la requisición.";
         }
     }
     
@@ -1166,7 +1166,7 @@ public abstract class SMaterialRequestUtils {
     }
     
     /**
-     * Determina si la partida de una RM ya ha sido agregada a una solicitud de cotización.
+     * Determina si la partida de una requisición ya ha sido agregada a una solicitud de cotización.
      * Basándose en la tabla @see SModConsts.TRN_MAT_REQ_ST_LOG
      * 
      * @param session
