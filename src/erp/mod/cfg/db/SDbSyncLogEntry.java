@@ -9,9 +9,6 @@ import java.util.Date;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
@@ -21,41 +18,29 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SDbSyncLog extends SDbRegistryUser {
+public class SDbSyncLogEntry extends SDbRegistryUser {
 
     protected int mnPkSyncLogId;
-    protected String msSyncType;
-    protected String msRequestBody;
-    protected Date msRequestTimestamp;
+    protected int mnPkSyncLogEntryId;
     protected String msResponseCode;
     protected String msResponseBody;
-    protected Date msResponseTimestamp;
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
+    protected String msReferenceId;
     
-    protected List<SDbSyncLogEntry> mlSyncLogEntries;
-    
-    public SDbSyncLog() {
-        super(SModConsts.CFGU_SYNC_LOG);
+    public SDbSyncLogEntry() {
+        super(SModConsts.CFGU_SYNC_LOG_ENTRY);
     }
 
     public void setIdSyncLog(int n) { this.mnPkSyncLogId = n; }
-    public void setSyncType(String s) { this.msSyncType = s; }
-    public void setRequestBody(String s) { this.msRequestBody = s; }
-    public void setRequestTimestamp(Date t) { this.msRequestTimestamp = t; }
+    public void setIdSyncLogEntry(int n) { this.mnPkSyncLogEntryId = n; }
     public void setResponseCode(String s) { this.msResponseCode = s; }
     public void setResponseBody(String s) { this.msResponseBody = s; }
-    public void setResponseTimestamp(Date t) { this.msResponseTimestamp = t; }
+    public void setReferenceId(String s) { this.msReferenceId = s; }
 
     public int getIdSyncLog() { return this.mnPkSyncLogId; }
-    public String getSyncType() { return this.msSyncType; }
-    public String getRequestBody() { return this.msRequestBody; }
-    public Date getRequestTimestamp() { return this.msRequestTimestamp; }
+    public int getIdSyncLogEntry() { return this.mnPkSyncLogEntryId; }
     public String getResponseCode() { return this.msResponseCode; }
     public String getResponseBody() { return this.msResponseBody; }
-    public Date getResponseTimestamp() { return this.msResponseTimestamp; }
-
-    public List<SDbSyncLogEntry> getSyncLogEntries() { return mlSyncLogEntries; }
+    public String getReferenceId() { return this.msReferenceId; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -72,16 +57,11 @@ public class SDbSyncLog extends SDbRegistryUser {
         initBaseRegistry();
 
         mnPkSyncLogId = 0;
-        msSyncType = "";
-        msRequestBody = "";
-        msRequestTimestamp = null;
+        mnPkSyncLogEntryId = 0;
         msResponseCode = "";
         msResponseBody = "";
-        msResponseTimestamp = null;
-        mnFkUserInsertId = 0;
+        msReferenceId = "";
         mtTsUserInsert = null;
-
-        mlSyncLogEntries = new ArrayList<>();
     }
 
     @Override
@@ -91,24 +71,26 @@ public class SDbSyncLog extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_sync_log = " + mnPkSyncLogId + " ";
+        return "WHERE id_sync_log = " + mnPkSyncLogId + " AND id_ety = " + mnPkSyncLogEntryId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_sync_log = " + pk[0] + " ";
+        return "WHERE id_sync_log = " + pk[0] + " " +
+               "AND id_ety = " + (pk.length > 1 ? pk[1] : 0) + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkSyncLogId = 0;
+        mnPkSyncLogEntryId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_sync_log), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_ety), 0) + 1 FROM " + getSqlTable() + "  " +
+                "WHERE id_sync_log = " + mnPkSyncLogId + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkSyncLogId = resultSet.getInt(1);
+            mnPkSyncLogEntryId = resultSet.getInt(1);
         }
     }
 
@@ -125,27 +107,13 @@ public class SDbSyncLog extends SDbRegistryUser {
         }
         else {
             mnPkSyncLogId = resultSet.getInt("id_sync_log");
-            msSyncType = resultSet.getString("sync_type");
-            msRequestBody = resultSet.getString("request_body");
-            msRequestTimestamp = resultSet.getTimestamp("request_timestamp");
+            mnPkSyncLogEntryId = resultSet.getInt("id_ety");
             msResponseCode = resultSet.getString("response_code");
             msResponseBody = resultSet.getString("response_body");
-            msResponseTimestamp = resultSet.getTimestamp("response_timestamp");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
+            msReferenceId = resultSet.getString("reference_id");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
 
             mbRegistryNew = false;
-
-            // Read sync log entries:
-            mlSyncLogEntries.clear();
-            msSql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_SYNC_LOG_ENTRY) + " " +
-                    "WHERE id_sync_log = " + mnPkSyncLogId + " ORDER BY id_sync_log_entry ";
-            ResultSet resultSetEntries = session.getStatement().executeQuery(msSql);
-            while (resultSetEntries.next()) {
-                SDbSyncLogEntry oSyncLogEntry = new SDbSyncLogEntry();
-                oSyncLogEntry.read(session, new int[] { resultSetEntries.getInt("id_sync_log_entry") });
-                mlSyncLogEntries.add(oSyncLogEntry);
-            }
         }
         mnQueryResultId = SDbConsts.READ_OK;
     }
@@ -156,9 +124,6 @@ public class SDbSyncLog extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         // limitar msRequestBody y msResponseBody a 64 KB, para evitar problemas de tamaño en la base de datos:
-        if (msRequestBody != null && msRequestBody.length() > 65536) {
-            msRequestBody = msRequestBody.substring(0, 65536);
-        }
         if (msResponseBody != null && msResponseBody.length() > 65536) {
             msResponseBody = msResponseBody.substring(0, 65536);
         }
@@ -170,36 +135,23 @@ public class SDbSyncLog extends SDbRegistryUser {
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkSyncLogId + ", " +
-                    "'" + msSyncType + "', " +
-                    "'" + msRequestBody + "', " +
-                    "'" + SLibUtils.DbmsDateFormatDatetime.format(msRequestTimestamp) + "', " +
+                    mnPkSyncLogEntryId + ", " +
                     "'" + msResponseCode + "', " +
                     "'" + msResponseBody + "', " +
-                    "'" + SLibUtils.DbmsDateFormatDatetime.format(msResponseTimestamp) + "', " +
-                    mnFkUserInsertId + ", " +
+                    "'" + msReferenceId + "', " +
                     "NOW()" + ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    "sync_type = '" + msSyncType + "', " +
-                    "request_body = '" + msRequestBody + "', " +
-                    "request_timestamp = '" + SLibUtils.DbmsDateFormatDatetime.format(msRequestTimestamp) + "', " +
                     "response_code = '" + msResponseCode + "', " +
                     "response_body = '" + msResponseBody + "', " +
-                    "response_timestamp = '" + SLibUtils.DbmsDateFormatDatetime.format(msResponseTimestamp) + "' " +
+                    "reference_id = '" + msReferenceId + "' " +
                     // ts_usr_ins is not updated, as it is the timestamp of the first insert
                     // ts_usr_upd is not updated, as it is the timestamp of the last update
                     getSqlWhere();
         }
 
         session.getStatement().execute(msSql);
-
-        // Save sync log entries:
-        for (SDbSyncLogEntry oSyncLogEntry : mlSyncLogEntries) {
-            oSyncLogEntry.setIdSyncLog(mnPkSyncLogId);
-            oSyncLogEntry.save(session);
-        }
-
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }

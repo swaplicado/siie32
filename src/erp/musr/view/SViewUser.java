@@ -20,9 +20,11 @@ import java.awt.Dimension;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
@@ -84,10 +86,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         try {
             String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
             if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                jbExportData = new JButton(miClient.getImageIcon(SLibConstants.ICON_BP_EXPORT));
-                jbExportData.setPreferredSize(new Dimension(23, 23));
-                jbExportData.addActionListener(this);
-                jbExportData.setToolTipText("Exportar datos de usuarios");
+                jbExportData = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
 
                 addTaskBarUpperComponent(jbExportData);
             }

@@ -276,10 +276,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 try {
                     String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
                     if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                        jbExportData = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
-                        jbExportData.setPreferredSize(new Dimension(23, 23));
-                        jbExportData.addActionListener(this);
-                        jbExportData.setToolTipText("Exportar datos de proveedores");
+                        jbExportData = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
 
                         addTaskBarUpperSeparator();
                         addTaskBarUpperComponent(jbExportData);
