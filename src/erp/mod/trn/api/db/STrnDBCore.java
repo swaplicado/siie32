@@ -21,7 +21,6 @@ import erp.mod.trn.api.data.SWebDpsEty;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
 import erp.mod.trn.api.data.SWebItemHistory;
-import sa.lib.SLibUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibUtils;
 
 /**
  * Clase que gestiona consultas relacionadas con documentos (DPS) desde la base
@@ -752,7 +752,7 @@ public class STrnDBCore {
     }
 
     /**
-     * Obtiene la autorización de un documento o requisición de materiales.
+     * Obtiene la autorización de un documento o requisición.
      *
      * @param tableName Nombre de la tabla (e.g., SModConsts.TRN_DPS o SModConsts.TRN_MAT_REQ).
      * @param idPrimaryKey1 Primera clave primaria (obligatoria para TRN_DPS, opcional para TRN_MAT_REQ).

@@ -142,7 +142,7 @@ public class SStockValuationRecordUtils {
             nItemReference = 0;
             ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
             /**
-             * Si el consumo tiene asociada una Requisición de materiales
+             * Si el consumo tiene asociada una requisición
              */
             if (oConsumption.getAuxMaterialRequestEntryPk() != null) {
                 if (oConsumption.getAuxMaterialRequestEntryPk()[1] > 0) {

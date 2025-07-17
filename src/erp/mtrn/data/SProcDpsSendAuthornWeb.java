@@ -177,13 +177,13 @@ public class SProcDpsSendAuthornWeb extends Thread {
                 try {
                     moSuppFileProc.readMaterialRequests(miClient.getSession());
                     for (SDbMaterialRequest mat : moSuppFileProc.getMaterialRequests()) {
-                        // Leer en memoria el archivo de la RM
-                        String name = miClient.getSession().getDatabase().getDbName() + "-RM-" + mat.getPkMatRequestId() + ".pdf";
+                        // Leer en memoria el archivo de la requisición
+                        String name = miClient.getSession().getDatabase().getDbName() + "-REQ-" + mat.getPkMatRequestId() + ".pdf";
 
                         if(!CloudStorageManager.storagedFileExists(name)) {
-                            // Guardar en el log la RM que se subió
+                            // Guardar en el log la requisición que se subió
                             HashMap<String, Object> params = SMaterialRequestUtils.createMatReqParamsMapPdf((SGuiClient) miClient, mat.getPkMatRequestId());
-                            SGuiReport report = new SGuiReport("reps/trn_mat_req.jasper", "Requisición de materiales");
+                            SGuiReport report = new SGuiReport("reps/trn_mat_req.jasper", "Requisición");
                             File matReqFile = new File(report.getFileName());
                             JasperReport jasperReport = (JasperReport) JRLoader.loadObject(matReqFile);
                             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, miClient.getSession().getStatement().getConnection());
@@ -192,11 +192,11 @@ public class SProcDpsSendAuthornWeb extends Thread {
                             extStoLog.setPkMatRequestId(mat.getPkMatRequestId());
                             extStoLog.save(miClient.getSession());
 
-                            // Subir los formato de impresión de la requisición de materiales a la nube
+                            // Subir los formato de impresión de la requisición a la nube
                             CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
                             if (oGcsFile == null) {
                                 hasError = true; // Marcar error si falla la subida
-                                msError += "Error al enviar los archivos de RM, intente de nuevo o contacte a soporte técnico.";
+                                msError += "Error al enviar los archivos de la requisición, intente de nuevo o contacte a soporte técnico.";
                                 break;
                             }
                         }
@@ -204,7 +204,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
                 }
                 catch (Exception e) {
                     hasError = true;
-                    msError += "Error al enviar los archivos de RM, intente de nuevo o contacte a soporte técnico. " + e.getMessage() + " ";
+                    msError += "Error al enviar los archivos de la requisición, intente de nuevo o contacte a soporte técnico. " + e.getMessage() + " ";
                 }
             }
 

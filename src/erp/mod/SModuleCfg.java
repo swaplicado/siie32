@@ -142,7 +142,7 @@ public class SModuleCfg extends SGuiModule {
                             "WHERE NOT b_del " + (subtype == SLibConsts.UNDEFINED ? "" : "AND fid_ct_ent = " + subtype) + " " +
                             "ORDER BY id_cob, id_ent, ent ";
                 }
-                else { // Requisicion de materiales, relacionado a entidad de consumo
+                else { // Requisición relacionada a entidad de consumo
                     settings = new SGuiCatalogueSettings("Almacén", 2, 1);
                     sql = "SELECT v.id_cob AS " + SDbConsts.FIELD_ID + "1, v.id_ent AS " + SDbConsts.FIELD_ID + "2, v.ent AS " + SDbConsts.FIELD_ITEM + ", " +
                             "v.id_cob AS " + SDbConsts.FIELD_FK + "1 " +

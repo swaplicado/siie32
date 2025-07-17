@@ -339,7 +339,7 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_out", "Tipo Mvto. Sal."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "di_out_dt", "Fecha Mvto. Sal."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "mr_num", "Req. Mat."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "mr_dt", "Fecha requisición"));
         // ítem referencia
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "itm_ref_key", "Cod. Ref."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "itm_ref", "Itm Ref."));

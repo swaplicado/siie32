@@ -37,7 +37,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 public class SViewFilter extends JPanel implements SGridFilter {
     
     public static final int FILTER_STP_CUR_USER = 1; // para filtros de usuario, mostrar sólo el usuario actual
-    public static final int FILTER_STP_INIT_USER = 2; // para filtros de usuario, mostrar sólo los que han creado iniciativas
+    public static final int FILTER_STP_INIT_USER = 2; // para filtros de usuario, mostrar sólo los que han creado propuestas
     public static final int FILTER_STP_ALL_USER = 3; // para filtros de usuario, todos los usuarios
 
     protected SGuiClient miClient;

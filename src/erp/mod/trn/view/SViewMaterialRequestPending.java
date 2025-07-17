@@ -114,7 +114,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         mjbToPur = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_right.gif")), "Enviar a compra", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar", this);
         //mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la requisición", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
         mjbToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")), "Regresar al solicitante", this);
@@ -194,7 +194,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         
         moDialogSupply = new SDialogMaterialRequestSupply(miClient, "Surtidos de la requisición");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
-        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la RM");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la requisición");
         moDialogAuthCardex = new SDialogAuthorizationCardex(miClient, "Cardex de autorizaciones");
         moDialogSegregations = new SDialogMaterialRequestSegregation(miClient, "Apartados de la requisición");
         //moDialogEstimationKardex = new SDialogMaterialRequestEstimationCardex(miClient, "Solicitudes de cotización");
@@ -373,7 +373,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                     boolean est = SMaterialRequestUtils.hasMatReqEstimation(miClient.getSession(), key);
                     String message = SMaterialRequestUtils.getReturnMessage(miClient.getSession(), key);
                     if (miClient.showMsgBoxConfirm("¿Esta seguro/a de regresar al solicitante?\n"
-                            + (est ? "Si se cambian ítems o eliminan partidas de la RM, se perderán la solicitudes de cotización existentes.\n" : "")
+                            + (est ? "Si se cambian ítems o eliminan partidas de la requisición, se perderán la solicitudes de cotización existentes.\n" : "")
                             + message) == JOptionPane.OK_OPTION) {
                         
                         message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);
@@ -591,7 +591,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
+                moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición");
                 int[] key = (int[]) gridRow.getRowPrimaryKey();
                 moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, key);
                 moDialogEstimate.setVisible(true);
@@ -833,7 +833,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 having += "HAVING (org_qty - sumi_qty) > COALESCE(SUM(req_pur.pur_qty), 0) ";
             }
             else if (mnGridType == SModConsts.TRNX_MAT_REQ_CLO_PUR) {
-                // Se comenta el filtro del estatus ya que actualmente no se actualiza por sí solo cuando una RM está completamente "comprada"
+                // Se comenta el filtro del estatus ya que actualmente no se actualiza por sí solo cuando una requisición está completamente "comprada"
 //                where += "AND (v.fk_st_mat_pur = " + SModSysConsts.TRNS_ST_MAT_PUR_DONE + ") ";
                 filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
                 if (filter != null) {

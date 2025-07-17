@@ -292,7 +292,7 @@ public class SAuthorizationsAPI {
                 + "END AS doc_authorn_status, "
                 + "v.id_authorn_step AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "  IF((cta.name IS NULL), 'REQUISICIÓN DE MATERIALES', cta.name) AS authorn_type,"
+                + "  IF((cta.name IS NULL), 'REQUISICIÓN', cta.name) AS authorn_type,"
                 + "v.*, "
                 + "IF(v.b_authorn, " + SGridConsts.ICON_THUMBS_UP + ", IF(v.b_reject, " + SGridConsts.ICON_THUMBS_DOWN + ", " + SGridConsts.ICON_NULL + ")) AS f_ico_auth_st, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "

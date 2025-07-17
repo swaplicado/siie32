@@ -86,7 +86,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         mjbToSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a suministro", this);
         mjbToEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_out.gif")), "Cotizar requisición", this);
         mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados de la requisición", this);
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Bitácora de cambios", this);
@@ -127,7 +127,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
-        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la RM");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la requisición");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
         
         msSeekQueryText = "";
@@ -303,7 +303,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                         miClient.showMsgBoxWarning("La requisición no puede cotizarse porque no está en estatus 'EN COMPRAS'");
                         return;
                     }
-                    moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición de materiales");
+                    moDialogEstimate = new SDialogMaterialRequestEstimation(miClient, "Cotizar requisición");
                     moDialogEstimate.setValue(SModConsts.TRN_MAT_REQ, new int[] { key[0] });
                     moDialogEstimate.setVisible(true);
                 }
@@ -370,7 +370,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                     boolean est = SMaterialRequestUtils.hasMatReqEstimation(miClient.getSession(), key);
                     String message = SMaterialRequestUtils.getReturnMessage(miClient.getSession(), key);
                     if (miClient.showMsgBoxConfirm("¿Esta seguro/a de regresar al solicitante?\n"
-                            + (est ? "Si se cambian ítems o eliminan partidas de la RM, se perderán la solicitudes de cotización existentes.\n" : "")
+                            + (est ? "Si se cambian ítems o eliminan partidas de la requisición, se perderán la solicitudes de cotización existentes.\n" : "")
                             + message) == JOptionPane.OK_OPTION) {
                         
                         message = SMaterialRequestUtils.updateStatusOfMaterialRequest(miClient.getSession(), key, SModSysConsts.TRNS_ST_MAT_REQ_NEW);

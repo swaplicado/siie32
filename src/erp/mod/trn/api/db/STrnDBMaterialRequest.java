@@ -16,7 +16,6 @@ import erp.mod.trn.api.data.SWebMatReqEtyNote;
 import erp.mod.trn.api.data.SWebMatReqNote;
 import erp.mod.trn.api.data.SWebMaterialRequest;
 import erp.mod.trn.api.data.SWebMaterialRequestEty;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -211,7 +210,7 @@ public class STrnDBMaterialRequest {
     }
 
     /**
-     * Obtiene la requisición de materiales asociada a una entrada específica de un documento.
+     * Obtiene la requisición asociada a una entrada específica de un documento.
      *
      * @param idYear Año del documento.
      * @param idDoc ID del documento.
@@ -227,7 +226,7 @@ public class STrnDBMaterialRequest {
                 return null;
             }
 
-            // Consulta para obtener la requisición de materiales.
+            // Consulta para obtener la requisición.
             String query = "SELECT " +
                     "    dpsmr.fid_mat_req " +
                     "FROM " +
@@ -247,7 +246,7 @@ public class STrnDBMaterialRequest {
             SWebMaterialRequest oMatReq = new SWebMaterialRequest();
 
             if (res.next()) {
-                // Asignar valores a la requisición de materiales.
+                // Asignar valores a la requisición.
                 oMatReq.setIdMaterialRequest(res.getInt("dpsmr.fid_mat_req"));
                 if (containsMatReqWithId(lMaterialRequests, oMatReq.getIdMaterialRequest())) {
                     SWebMaterialRequest oMatReqExist = getMatReqById(lMaterialRequests, oMatReq.getIdMaterialRequest());
@@ -259,7 +258,7 @@ public class STrnDBMaterialRequest {
                 oMatReq = this.getMatReqById(res.getInt("dpsmr.fid_mat_req"));
 
                 try {
-                    String fileName = this.msMainDatabase + "-" + "RM" + "-" + oMatReq.getIdMaterialRequest() + ".pdf";
+                    String fileName = this.msMainDatabase + "-" + "REQ" + "-" + oMatReq.getIdMaterialRequest() + ".pdf";
                     if (CloudStorageManager.storagedFileExists(fileName)) {
                         oMatReq.setMrStorageCloudUrl(CloudStorageManager.generatePresignedUrl(fileName));
                         System.out.println(fileName);
@@ -362,14 +361,14 @@ public class STrnDBMaterialRequest {
                 SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' AND steps1.res_pk_n1_n = mr.id_mat_req) ";
 
         switch (statusFilter) {
-            case -2: // TODAS MIS RM
+            case -2: // TODAS MIS requisiciones
                 if (whereUsers.isEmpty()) {
                     query.append("AND mr.fk_usr_req = ").append(idUser).append(" AND ").append(dateFilter);
                 } else {
                     query.append("AND ((").append(whereUsers).append(") OR (mr.fk_usr_req = ").append(idUser).append(")) AND ").append(dateFilter);
                 }
                 break;
-            case -1: // RM PENDIENTES
+            case -1: // requisiciones PENDIENTES
                 query.append("AND cfg_get_st_authorn(")
                      .append(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST).append(", '")
                      .append(SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ)).append("', mr.id_mat_req, NULL, NULL, NULL, NULL) IN (")
@@ -401,7 +400,7 @@ public class STrnDBMaterialRequest {
     }
 
     /**
-     * Obtiene la requisición de materiales por ID.
+     * Obtiene la requisición por ID.
      * 
      * @param idMaterialRequest
      * @return 
@@ -472,9 +471,9 @@ public class STrnDBMaterialRequest {
     }
 
     /**
-     * Carga las entradas de requisición de materiales asociadas a una requisición específica.
+     * Carga las entradas de requisición asociadas a una requisición específica.
      *
-     * @param materialRequestId ID de la requisición de materiales.
+     * @param materialRequestId ID de la requisición.
      * @return Una lista de objetos SWebMaterialRequestEty que representan las entradas de la requisición.
      */
     public ArrayList<SWebMaterialRequestEty> loadMaterialRequestEtys(final int materialRequestId) {
@@ -517,9 +516,9 @@ public class STrnDBMaterialRequest {
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON mre.fk_unit = u.id_unit  " +
                             "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON mre.fk_item_ref_n = iref.id_item  " +
                             "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
-                            // Agregar la tabla de notas de partidas de requisición de materiales
+                            // Agregar la tabla de notas de partidas de requisición
                             // INNER JOIN erp.trn_mat_req_ety_nts AS mre_nts ON mre.id_mat_req = mre_nts.fid_mat_req AND mre.id_ety = mre_nts.fid_mat_req_ety  "
-                            // Agregar la tabla de notas de requisición de materiales
+                            // Agregar la tabla de notas de requisición
                             // INNER JOIN erp.trn_mat_req_nts AS mr_nts ON mr_nts.fid_mat_req = mre.id_mat_req  "
         "WHERE " + 
                             "    NOT mre.b_del AND mre.id_mat_req = " + materialRequestId;
@@ -570,9 +569,9 @@ public class STrnDBMaterialRequest {
     }
 
     /**
-     * Obtiene los centros de costo asociados a una requisición de materiales.
+     * Obtiene los centros de costo asociados a una requisición.
      *
-     * @param materialRequestId ID de la requisición de materiales.
+     * @param materialRequestId ID de la requisición.
      * @return Una lista de objetos SWebCostCenter que representan los centros de costo asociados.
      */
     private ArrayList<SWebCostCenter> getCostCenters(final int materialRequestId) {

@@ -92,7 +92,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlFkBizPartnerId = new javax.swing.JLabel();
-        jcbFkBizPartnerId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkBizPartnerId = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jbFkBizPartnerId = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
@@ -114,7 +114,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Requisición de materiales");
+        setTitle("Requisición");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -225,8 +225,8 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-538)/2, (screenSize.height-466)/2, 538, 466);
+        setSize(new java.awt.Dimension(538, 466));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -440,7 +440,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
 
                 moRequisitionEntry = mvRequisitionEntries.get(i);
                 if (moRequisitionEntry == null) {
-                    miClient.showMsgBoxWarning("No se pudo leer la entrada de la requisición de materiales.");
+                    miClient.showMsgBoxWarning("No se pudo leer la entrada de la requisición.");
                     b = false;
                     break;
                 }
@@ -936,7 +936,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
 
         // Validate that the requisition of materials has not purchase orders:
 
-        if (!validation.getIsError() && moFieldIsDeleted.getBoolean() && !validateRequisitionMaterials("No se puede eliminar la requisición de materiales, porque tiene órdenes de compra generadas.")) {
+        if (!validation.getIsError() && moFieldIsDeleted.getBoolean() && !validateRequisitionMaterials("No se puede eliminar la requisición, porque tiene órdenes de compra generadas.")) {
             validation.setIsError(true);
         }
 

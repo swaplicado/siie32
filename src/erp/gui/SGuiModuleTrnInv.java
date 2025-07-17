@@ -667,44 +667,44 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         
         jmMenuReq = new JMenu("Requisiciones");
         
-        jmiReqPetNew = new JMenuItem("Mis RM nuevas");
-        jmiReqPetTbAuth = new JMenuItem("Mis RM en autorización");
-        jmiReqPetTbProccProv = new JMenuItem("Mis RM en suministro");
-        jmiReqPetTbProccPur = new JMenuItem("Mis RM en compras");
+        jmiReqPetNew = new JMenuItem("Mis requisiciones nuevas");
+        jmiReqPetTbAuth = new JMenuItem("Mis requisiciones en autorización");
+        jmiReqPetTbProccProv = new JMenuItem("Mis requisiciones en suministro");
+        jmiReqPetTbProccPur = new JMenuItem("Mis requisiciones en compras");
         
-        jmMenuReqPetAll = new JMenu("Todas mis RM");
-        jmiReqPetAll = new JMenuItem("Todas mis RM");
-        jmiReqAllConsEnt = new JMenuItem("RM de mis centros de consumo");
-        jmiReqAllSupEnt = new JMenuItem("RM de mis centros de suministro");
+        jmMenuReqPetAll = new JMenu("Todas mis requisiciones");
+        jmiReqPetAll = new JMenuItem("Todas mis requisiciones");
+        jmiReqAllConsEnt = new JMenuItem("Requisiciones de mis centros de consumo");
+        jmiReqAllSupEnt = new JMenuItem("Requisiciones de mis centros de suministro");
         
-        jmiReqAdmAuth = new JMenuItem("Todas las RM por autorizar (administrador)");
-        jmiReqRevTbAuth = new JMenuItem("RM por autorizar");
-        jmiReqRevAuth = new JMenuItem("RM autorizadas");
-        jmiReqRevNoAuth = new JMenuItem("RM rechazadas");
+        jmiReqAdmAuth = new JMenuItem("Todas las requisiciones por autorizar (administrador)");
+        jmiReqRevTbAuth = new JMenuItem("Requisiciones por autorizar");
+        jmiReqRevAuth = new JMenuItem("Requisiciones autorizadas");
+        jmiReqRevNoAuth = new JMenuItem("Requisiciones rechazadas");
         
-        jmiReqConsSupPend = new JMenuItem("RM de consumo por suministrar");
-        jmiReqConsSupPendDet = new JMenuItem("RM de consumo por suministrar a detalle");
-        jmiReqConsSup = new JMenuItem("RM de consumo suministradas");
-        jmiReqConsSupDet = new JMenuItem("RM de consumo suministradas a detalle");
+        jmiReqConsSupPend = new JMenuItem("Requisiciones de consumo por suministrar");
+        jmiReqConsSupPendDet = new JMenuItem("Requisiciones de consumo por suministrar a detalle");
+        jmiReqConsSup = new JMenuItem("Requisiciones de consumo suministradas");
+        jmiReqConsSupDet = new JMenuItem("Requisiciones de consumo suministradas a detalle");
         
-        jmiReqStockSupPend = new JMenuItem("RM de resurtido por suministrar");
-        jmiReqStockSupPendDet = new JMenuItem("RM de resurtido por suministrar a detalle");
-        jmiReqStockSup = new JMenuItem("RM de resurtido suministradas");
-        jmiReqStockSupDet = new JMenuItem("RM de resurtido suministradas a detalle");
+        jmiReqStockSupPend = new JMenuItem("Requisiciones de resurtido por suministrar");
+        jmiReqStockSupPendDet = new JMenuItem("Requisiciones de resurtido por suministrar a detalle");
+        jmiReqStockSup = new JMenuItem("Requisiciones de resurtido suministradas");
+        jmiReqStockSupDet = new JMenuItem("Requisiciones de resurtido suministradas a detalle");
         
-        jmiReqPurPend = new JMenuItem("RM por pedir");
-        jmiReqPurPendDet = new JMenuItem("RM por pedir a detalle");
-        jmiReqPurClosed = new JMenuItem("RM pedidas");
-        jmiReqPurClosedDet = new JMenuItem("RM pedidas a detalle");
-        jmiReqPendEstDet = new JMenuItem("RM por solicitar para cotización");
-        jmiReqEstDet = new JMenuItem("RM solicitadas para cotización");
+        jmiReqPurPend = new JMenuItem("Requisiciones por pedir");
+        jmiReqPurPendDet = new JMenuItem("Requisiciones por pedir a detalle");
+        jmiReqPurClosed = new JMenuItem("Requisiciones pedidas");
+        jmiReqPurClosedDet = new JMenuItem("Requisiciones pedidas a detalle");
+        jmiReqPendEstDet = new JMenuItem("Requisiciones por solicitar para cotización");
+        jmiReqEstDet = new JMenuItem("Requisiciones solicitadas para cotización");
         
-        jmiReqFollowingPurOpen = new JMenuItem("Seguimiento de compras de RM abiertas a detalle");
-        jmiReqFollowingPurClosed = new JMenuItem("Seguimiento de compras de RM cerradas a detalle");
+        jmiReqFollowingPurOpen = new JMenuItem("Seguimiento de compras de requisiciones abiertas a detalle");
+        jmiReqFollowingPurClosed = new JMenuItem("Seguimiento de compras de requisiciones cerradas a detalle");
         
-        jmMenuReqAll = new JMenu("Todas las RM");
-        jmiReqAll = new JMenuItem("Todas las RM");
-        jmiReqAllAcc = new JMenuItem("Todas las RM (reclasificación contable)");
+        jmMenuReqAll = new JMenu("Todas las requisiciones");
+        jmiReqAll = new JMenuItem("Todas las requisiciones");
+        jmiReqAllAcc = new JMenuItem("Todas las requisiciones (reclasificación contable)");
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
         
         jmMenuReq.add(jmiReqPetNew);

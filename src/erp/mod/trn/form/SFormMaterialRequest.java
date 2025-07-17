@@ -1160,9 +1160,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
 
         moFields.setFormButton(jbOnlySave);
         
-        moFormMatReqCC = new SFormMaterialRequestCostCenter(miClient, getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP ? SModConsts.TRNX_MAT_REQ_STK_SUP : SLibConsts.UNDEFINED, "Requisición de materiales y centros de costo");
+        moFormMatReqCC = new SFormMaterialRequestCostCenter(miClient, getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP ? SModConsts.TRNX_MAT_REQ_STK_SUP : SLibConsts.UNDEFINED, "Requisición y centros de costo");
         
-        moGridMatReqCC = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_CC, SLibConsts.UNDEFINED, "Requisición de materiales y centros de costo")  {
+        moGridMatReqCC = new SGridPaneForm(miClient, SModConsts.TRN_MAT_REQ_CC, SLibConsts.UNDEFINED, "Requisición y centros de costo")  {
             
             @Override
             public void initGrid() {
@@ -1270,10 +1270,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyWhs.setKeySettings(miClient, SGuiUtils.getLabelName("Almacén"), false);
         moFields.addField(moKeyWhs);
         
-        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la partida de RM", this);
+        jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver documentos relacionados de la partida de requisición", this);
         moGridMatReqList.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         
-        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la partida de la RM");
+        moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la partida de la requisición");
     
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -1311,7 +1311,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             if (moGridMatReqCC.getTable().getRowCount() > 1) {
                 moGridMatReqCC.removeGridRow(1);
                 moGridMatReqCC.renderGridRows();
-                miClient.showMsgBoxInformation("Sólo puede haber un solo centro de consumo en RM de resurtido.");
+                miClient.showMsgBoxInformation("Sólo puede haber un solo centro de consumo en requisiciones de resurtido.");
             }      
         }
         else {
@@ -2307,7 +2307,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
             if (isRegistryEditable) {
-                if (miClient.showMsgBoxConfirm("¿Esta seguro(a) que desea cerrar la captura sin guardar la requisición de materiales?") == JOptionPane.OK_OPTION)
+                if (miClient.showMsgBoxConfirm("¿Esta seguro(a) que desea cerrar la captura sin guardar la requisición?") == JOptionPane.OK_OPTION)
                     super.actionCancel();
             }
             else {

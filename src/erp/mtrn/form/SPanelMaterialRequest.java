@@ -279,7 +279,7 @@ public class SPanelMaterialRequest extends javax.swing.JPanel {
     }
 
     private void renderMaterialRequest() {
-        jtfDocumentType.setText("REQUISICIÓN DE MATERIALES");
+        jtfDocumentType.setText("REQUISICIÓN");
         jtfDocumentType.setToolTipText(jtfDocumentType.getText());
         jtfDocumentType.setCaretPosition(0);
         

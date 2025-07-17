@@ -156,7 +156,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Suministro de requisición de materiales");
+        setTitle("Suministro de requisición");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -167,7 +167,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
 
         jpBenefit.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición de materiales:"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Requisición:"));
         jPanel4.setPreferredSize(new java.awt.Dimension(400, 102));
         jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
@@ -184,7 +184,6 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
         jlMovDate.setText("Fecha:");
         jlMovDate.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jlMovDate);
-        jlMovDate.getAccessibleContext().setAccessibleName("Fecha:");
 
         jftMovDate.setEditable(false);
         jftMovDate.setPreferredSize(new java.awt.Dimension(165, 23));

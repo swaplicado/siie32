@@ -304,7 +304,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImportMatRequest = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_MAT_REQ));
         jbImportMatRequest.setPreferredSize(new Dimension(23, 23));
         jbImportMatRequest.addActionListener(this);
-        jbImportMatRequest.setToolTipText("Importar requisición de materiales");
+        jbImportMatRequest.setToolTipText("Importar requisición");
         
         jbChangeDpsEntryItem = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
         jbChangeDpsEntryItem.setPreferredSize(new Dimension(23, 23));

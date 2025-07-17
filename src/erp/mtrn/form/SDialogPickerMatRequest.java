@@ -81,7 +81,7 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Selección de requisición de materiales");
+        setTitle("Selección de requisición");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -295,8 +295,8 @@ public class SDialogPickerMatRequest extends javax.swing.JDialog implements erp.
         msRfcRec = "";
         moFilterKey = null;
 
-        jtfDpsClass.setText("REQUISICIÓN DE MATERIALES");
-        jtfDpsClass.setToolTipText("REQUISICIÓN DE MATERIALES");
+        jtfDpsClass.setText("REQUISICIÓN");
+        jtfDpsClass.setToolTipText("REQUISICIÓN");
 
         moPaneOptions.setTableRowSelection(0);
     }

@@ -146,7 +146,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlKeyType.setText("Tipo iniciativa:*");
+        jlKeyType.setText("Tipo propuesta:*");
         jlKeyType.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRow3.add(jlKeyType);
 
@@ -213,7 +213,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jlBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlBudgetHint.setToolTipText("Presupuesto que requerirá la iniciativa");
+        jlBudgetHint.setToolTipText("Presupuesto que requerirá la propuesta");
         jlBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpRow8.add(jlBudgetHint);
 
@@ -230,7 +230,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jlComBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlComBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlComBudgetHint.setToolTipText("Suma del total de pedidos de la iniciativa");
+        jlComBudgetHint.setToolTipText("Suma del total de pedidos de la propuesta");
         jlComBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpRow9.add(jlComBudgetHint);
 
@@ -247,7 +247,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint.setToolTipText("Suma del total de facturas de la iniciativa");
+        jlSpentBudgetHint.setToolTipText("Suma del total de facturas de la propuesta");
         jlSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpRow10.add(jlSpentBudgetHint);
 
@@ -263,13 +263,13 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpPurRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPurpose.setText("Proposito de la iniciativa:");
+        jlPurpose.setText("Proposito de la propuesta:");
         jlPurpose.setPreferredSize(new java.awt.Dimension(175, 23));
         jpPurRow1.add(jlPurpose);
 
         jlPurposeHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPurposeHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlPurposeHint.setToolTipText("Especifica la razón de ser o por qué es importante la iniciativa.");
+        jlPurposeHint.setToolTipText("Especifica la razón de ser o por qué es importante la propuesta.");
         jlPurposeHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpPurRow1.add(jlPurposeHint);
 
@@ -295,13 +295,13 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpPurRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDescription.setText("Descripción de la iniciativa:");
+        jlDescription.setText("Descripción de la propuesta:");
         jlDescription.setPreferredSize(new java.awt.Dimension(175, 23));
         jpPurRow3.add(jlDescription);
 
         jlDescriptionHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlDescriptionHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlDescriptionHint.setToolTipText("Especifica a detalle en qué consiste la iniciativa.");
+        jlDescriptionHint.setToolTipText("Especifica a detalle en qué consiste la propuesta.");
         jlDescriptionHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpPurRow3.add(jlDescriptionHint);
 
@@ -325,13 +325,13 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpPurRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlGoals.setText("Objetivos de la iniciativa:");
+        jlGoals.setText("Objetivos de la propuesta:");
         jlGoals.setPreferredSize(new java.awt.Dimension(175, 23));
         jpPurRow5.add(jlGoals);
 
         jlGoalsHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlGoalsHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlGoalsHint.setToolTipText("Especifica cuáles son los resultados especificos a lograr con la iniciativa.");
+        jlGoalsHint.setToolTipText("Especifica cuáles son los resultados especificos a lograr con la propuesta.");
         jlGoalsHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jpPurRow5.add(jlGoalsHint);
 

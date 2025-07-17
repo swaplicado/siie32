@@ -57,7 +57,7 @@ public class SDialogMaterialRequestDocsCardex extends SBeanFormDialog implements
         jpAuthorizationRoute = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Documentos relacionados con la RM");
+        setTitle("Documentos relacionados con la requisición");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -99,7 +99,7 @@ public class SDialogMaterialRequestDocsCardex extends SBeanFormDialog implements
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
 
-        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_DOCS_KAR, SLibConsts.UNDEFINED, "Vínculos de la RM") {
+        moGridLogs = new SGridPaneForm(miClient, SModConsts.TRNX_MAT_REQ_DOCS_KAR, SLibConsts.UNDEFINED, "Vínculos de la requisición") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);

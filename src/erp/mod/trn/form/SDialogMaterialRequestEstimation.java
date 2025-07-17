@@ -110,7 +110,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
         jPanel10 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlProviderName = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         jlProviderName1 = new javax.swing.JLabel();
@@ -196,7 +196,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
 
         jpMaterialRequest.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        jTPGeneralPanel.addTab("Requisición de materiales", jpMaterialRequest);
+        jTPGeneralPanel.addTab("Requisición", jpMaterialRequest);
 
         jpDelivery.setLayout(new java.awt.BorderLayout());
 

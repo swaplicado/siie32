@@ -161,8 +161,8 @@ public class SViewWarehouseConsumptionDetail extends SGridPaneView  {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_iog", "Tipo movimiento"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "supr_mant", "Supervisor mantto."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "usr_mant", "Usr. mantto."));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "fecha_req", "Fecha RM"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req", "Folio RM"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "fecha_req", "Fecha requisición"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req", "Folio requisición"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "concepto_gasto", "Concepto/gasto"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "consumo", "Centro consumo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "subconsumo", "Subcentro consumo"));

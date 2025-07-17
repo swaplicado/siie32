@@ -903,7 +903,7 @@ public class SStockValuationUtils {
     
     /**
      * Determina si la valuación con el ID recibido es válida.
-     * Consulta si hay una Requisición de Materiales actualizada después del timestamp de la última actualización de la valuación.
+     * Consulta si hay una requisición actualizada después del timestamp de la última actualización de la valuación.
      * Si hay requisiciones que cumplen el criterio, las devuelve en la lista; si la lista está vacía, la valuación es válida.
      * 
      * @param session Sesión de usuario.

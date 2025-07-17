@@ -9,10 +9,8 @@ import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.qlt.db.SDbCoAResult;
 import erp.mod.qlt.db.SDbDatasheetTemplate;
 import erp.mod.qlt.db.SMongoDbCoA;
-
 import java.io.File;
 import java.util.Map;
-
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -39,7 +37,7 @@ public abstract class SCoAUtils {
 //            return true;
         }
         else {
-            SGuiReport report = new SGuiReport("reps/qlt_coa.jasper", "Requisición de materiales");
+            SGuiReport report = new SGuiReport("reps/qlt_coa.jasper", "Requisición");
             File reportFile = new File(report.getFileName());
             JasperReport jasperReport = (JasperReport) JRLoader.loadObject(reportFile);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, mParameters, oClient.getSession().getStatement().getConnection());
