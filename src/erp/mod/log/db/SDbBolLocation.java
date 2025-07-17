@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Serializable {
 
@@ -459,12 +459,12 @@ public class SDbBolLocation extends SDbRegistryUser implements SGridRow, Seriali
         if (mnFkOriginBizPartnerAddress_n != 0 && mnFkOriginAddressAddress_n != 0 && mnFkOriginNeighborhoodZipCode_n != 0) {
             moCompBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkOriginBizPartnerAddress_n);
             moCompBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkOriginAddressAddress_n);
-            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkOriginNeighborhoodZipCode_n);
+            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCodeId(mnFkOriginNeighborhoodZipCode_n);
         }
         else if (mnFkDestinationBizPartnerAddress_n != 0 && mnFkDestinationAddressAddress_n != 0 && mnFkDestinationNeighborhoodZipCode_n != 0) {
             moCompBizPartnerBranchNeighborhood.setPkBizPartnerBranchAddressId(mnFkDestinationBizPartnerAddress_n);
             moCompBizPartnerBranchNeighborhood.setPkAddressAddressId(mnFkDestinationAddressAddress_n);
-            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCode(mnFkDestinationNeighborhoodZipCode_n);
+            moCompBizPartnerBranchNeighborhood.setFkNeighborhoodZipCodeId(mnFkDestinationNeighborhoodZipCode_n);
         }
         
         moCompBizPartnerBranchNeighborhood.save(session);
