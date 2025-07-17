@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.utils.SAuthJSONUtils;
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -59,6 +61,9 @@ public class SExportUtils {
     public static final int ROL_BUYER = 1;
     /** Rol proveedor. */
     public static final int ROL_SUPPLIER = 4;
+    
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
+            DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 
     private static final String BASE_PROVIDER_QUERY = "SELECT "
             + "    bp.*, "
@@ -67,17 +72,17 @@ public class SExportUtils {
             + "    addr.fid_cty_n, "
             + "    ct.tax_regime "
             + "FROM "
-            + "    erp.bpsu_bp AS bp "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp "
             + "    LEFT JOIN "
-            + "    erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS ct ON bp.id_bp = ct.id_bp "
             + "    LEFT JOIN "
-            + "    erp.bpsu_bpb AS bpb ON bp.id_bp = bpb.fid_bp "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bp.id_bp = bpb.fid_bp "
             + "    LEFT JOIN "
-            + "    erp.bpsu_bp_addee AS addr ON bp.id_bp = addr.fid_bp "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_ADDEE) + " AS addr ON bp.id_bp = addr.fid_bp "
             + "    LEFT JOIN "
-            + "    erp.locu_cty AS country ON addr.fid_cty_n = country.id_cty "
+            + "    " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS country ON addr.fid_cty_n = country.id_cty "
             + "    LEFT JOIN "
-            + "    erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb ";
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb ";
 
     /**
      * Ejecuta una consulta para obtener usuarios o proveedores y genera un JSON.
@@ -100,7 +105,7 @@ public class SExportUtils {
             );
 
             // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
-            List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, null);
+            List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, lastSyncDate);
 
             // Lee parámetros de configuración para la exportación
             String syncUrl = SAuthJSONUtils.getValueOfElement(config, "", "user_sync_url");
@@ -239,15 +244,24 @@ public class SExportUtils {
      * @throws SQLException Si ocurre un error al guardar el log.
      */
     private static void logSync(SGuiSession session, String syncType, String requestBody, String responseCode, String responseBody, List<SDbSyncLogEntry> logEntries) throws SQLException, Exception {
+        String sTimeStamp = TIMESTAMP_FORMATTER.format(
+                java.time.LocalDateTime.now().atZone(java.time.ZoneId.of("America/Mexico_City"))
+        );
         SDbSyncLog log = new SDbSyncLog();
+        
+        String logSufix = syncType + "_" + log.getThePk(session) + "_" + sTimeStamp;
+        
         log.setSyncType(syncType);
-        log.setRequestBody(sanitizeJsonString(requestBody));
+        log.setRequestBody(logSufix + "_request_body");
         log.setRequestTimestamp(new Date());
         log.setResponseCode(responseCode);
-        log.setResponseBody(sanitizeJsonString(responseBody));
+        log.setResponseBody(logSufix + "_response_body");
         log.setResponseTimestamp(new Date());
         log.getSyncLogEntries().addAll(logEntries);
         log.save(session);
+        
+        SExportLogUtils.safeWriteToLogFile(logSufix + "_request_body", requestBody);
+        SExportLogUtils.safeWriteToLogFile(logSufix + "_response_body", responseBody);
     }
 
     /**
@@ -259,10 +273,10 @@ public class SExportUtils {
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static Date getLastSyncDateTime(Statement statement, final String sSyncType) throws SQLException {
-        String query = "SELECT * FROM cfgu_sync_log WHERE response_code = '200' AND sync_type = '" + sSyncType + "';";
+        String query = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " WHERE response_code = '200' AND sync_type = '" + sSyncType + "';";
         try (ResultSet res = statement.executeQuery(query)) {
             if (res.next()) {
-                return res.getTimestamp("ts_usr_ins");
+                return res.getTimestamp("request_timestamp");
             }
         }
         return null;
@@ -288,23 +302,23 @@ public class SExportUtils {
                 "    bp.firstname, " +
                 "    u.ts_new, " +
                 "    u.ts_edit, " +
-                "    sloge.ts_usr_ins " +
+                "    sloge.ts_sync " +
                 "FROM " +
-                "    erp.usru_usr AS u " +
+                "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u " +
                 "        LEFT JOIN " +
-                "    erp.bpsu_bp AS bp ON u.fid_bp_n = bp.id_bp " +
+                "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON u.fid_bp_n = bp.id_bp " +
                 "        LEFT JOIN " +
-                "    cfgu_sync_log_ety AS sloge ON sloge.reference_id = u.id_usr " +
+                "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = u.id_usr " +
                 "        AND (sloge.response_code = '200' " +
                 "        OR sloge.response_code = '201') " +
                 "        LEFT JOIN " +
-                "    cfgu_sync_log AS slog ON sloge.id_sync_log = slog.id_sync_log " +
+                "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log " +
                 "         AND slog.sync_type = '" + EXPORT_SYNC_USERS + "' " +
                 "WHERE " +
-                "    (sloge.ts_usr_ins IS NULL ";
+                "    (sloge.ts_sync IS NULL ";
         
         if (oLastSyncDateTime != null) {
-            sql += "OR (sloge.ts_usr_ins >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "')";
+            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "')";
         }
         sql += ") ";
         if (oLastSyncDateTime == null) {
@@ -378,17 +392,17 @@ public class SExportUtils {
             throws SQLException {
         String sql = BASE_PROVIDER_QUERY
                 + "LEFT JOIN "
-                + "    cfgu_sync_log_ety AS sloge ON sloge.reference_id = bp.id_bp "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
                 + "        AND (sloge.response_code = '200' "
                 + "        OR sloge.response_code = '201') "
                 + "        LEFT JOIN "
-                + "    cfgu_sync_log AS slog ON sloge.id_sync_log = slog.id_sync_log "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
                 + "         AND slog.sync_type = '" + EXPORT_SYNC_SUPPLIERS + "' "
                 + "WHERE bp.b_sup "
-                + "AND    (sloge.ts_usr_ins IS NULL ";
+                + "AND    (sloge.ts_sync IS NULL ";
 
         if (oLastSyncDateTime != null) {
-            sql += "OR (sloge.ts_usr_ins >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "') ";
+            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "') ";
         }
         sql += ") ";
         if (oLastSyncDateTime == null) {

@@ -30,13 +30,13 @@ public class SDbSyncLog extends SDbRegistryUser {
     protected String msResponseCode;
     protected String msResponseBody;
     protected Date msResponseTimestamp;
-    protected int mnFkUserInsertId;
-    protected Date mtTsUserInsert;
+    protected int mnFkUserId;
+    protected Date mtTsUser;
     
     protected List<SDbSyncLogEntry> mlSyncLogEntries;
     
     public SDbSyncLog() {
-        super(SModConsts.CFGU_SYNC_LOG);
+        super(SModConsts.CFG_SYNC_LOG);
     }
 
     public void setIdSyncLog(int n) { this.mnPkSyncLogId = n; }
@@ -78,8 +78,8 @@ public class SDbSyncLog extends SDbRegistryUser {
         msResponseCode = "";
         msResponseBody = "";
         msResponseTimestamp = null;
-        mnFkUserInsertId = 0;
-        mtTsUserInsert = null;
+        mnFkUserId = 0;
+        mtTsUser = null;
 
         mlSyncLogEntries = new ArrayList<>();
     }
@@ -111,6 +111,20 @@ public class SDbSyncLog extends SDbRegistryUser {
             mnPkSyncLogId = resultSet.getInt(1);
         }
     }
+    
+    public int getThePk(SGuiSession session) throws SQLException, Exception {
+        ResultSet resultSet = null;
+
+        mnPkSyncLogId = 0;
+
+        msSql = "SELECT COALESCE(MAX(id_sync_log), 0) + 1 FROM " + getSqlTable() + " ";
+        resultSet = session.getStatement().executeQuery(msSql);
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        
+        return 0;
+    }
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
@@ -131,14 +145,14 @@ public class SDbSyncLog extends SDbRegistryUser {
             msResponseCode = resultSet.getString("response_code");
             msResponseBody = resultSet.getString("response_body");
             msResponseTimestamp = resultSet.getTimestamp("response_timestamp");
-            mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mnFkUserId = resultSet.getInt("fk_usr");
+            mtTsUser = resultSet.getTimestamp("ts_usr");
 
             mbRegistryNew = false;
 
             // Read sync log entries:
             mlSyncLogEntries.clear();
-            msSql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_SYNC_LOG_ENTRY) + " " +
+            msSql = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " " +
                     "WHERE id_sync_log = " + mnPkSyncLogId + " ORDER BY id_sync_log_entry ";
             ResultSet resultSetEntries = session.getStatement().executeQuery(msSql);
             while (resultSetEntries.next()) {
@@ -166,7 +180,7 @@ public class SDbSyncLog extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
-            mnFkUserInsertId = session.getUser().getPkUserId();
+            mnFkUserId = session.getUser().getPkUserId();
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkSyncLogId + ", " +
@@ -176,7 +190,7 @@ public class SDbSyncLog extends SDbRegistryUser {
                     "'" + msResponseCode + "', " +
                     "'" + msResponseBody + "', " +
                     "'" + SLibUtils.DbmsDateFormatDatetime.format(msResponseTimestamp) + "', " +
-                    mnFkUserInsertId + ", " +
+                    mnFkUserId + ", " +
                     "NOW()" + ")";
         }
         else {

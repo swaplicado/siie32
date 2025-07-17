@@ -89,6 +89,8 @@ public abstract class SModConsts {
     public static final int CFGU_LAN = 1012004;
     public static final int CFGU_SCA = 1012091;
     public static final int CFG_PARAM_ERP = 1012005;
+    public static final int CFG_SYNC_LOG = 1012051;
+    public static final int CFG_SYNC_LOG_ETY = 1012052;
     
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
@@ -98,8 +100,6 @@ public abstract class SModConsts {
     public static final int CFGU_AUTHORN_NODE_POS = 1013035;
     public static final int CFGU_AUTHORN_PATH = 1013031;
     public static final int CFGU_AUTHORN_STEP = 1013032;
-    public static final int CFGU_SYNC_LOG = 1013040;
-    public static final int CFGU_SYNC_LOG_ENTRY = 1013041;
     public static final int CFGU_DOC = 1013500;
 
     public static final int CFG_MMS = 1013501;
@@ -1000,6 +1000,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
         TablesMap.put(CFGU_SCA, "erp.cfgu_sca");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
+        TablesMap.put(CFG_SYNC_LOG, "erp.cfg_sync_log");
+        TablesMap.put(CFG_SYNC_LOG_ETY, "erp.cfg_sync_log_ety");
         
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");
@@ -1009,8 +1011,6 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_AUTHORN_NODE_POS, "cfgu_authorn_node_pos");
         TablesMap.put(CFGU_AUTHORN_PATH, "cfgu_authorn_path");
         TablesMap.put(CFGU_AUTHORN_STEP, "cfgu_authorn_step");
-        TablesMap.put(CFGU_SYNC_LOG, "cfgu_sync_log");
-        TablesMap.put(CFGU_SYNC_LOG_ENTRY, "cfgu_sync_log_ety");
         TablesMap.put(CFGU_DOC, "cfgu_doc");
 
         TablesMap.put(CFG_MMS, "cfg_mms");

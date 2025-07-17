@@ -25,9 +25,10 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     protected String msResponseCode;
     protected String msResponseBody;
     protected String msReferenceId;
+    protected Date mtTsSynchronization;
     
     public SDbSyncLogEntry() {
-        super(SModConsts.CFGU_SYNC_LOG_ENTRY);
+        super(SModConsts.CFG_SYNC_LOG_ETY);
     }
 
     public void setIdSyncLog(int n) { this.mnPkSyncLogId = n; }
@@ -35,12 +36,14 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     public void setResponseCode(String s) { this.msResponseCode = s; }
     public void setResponseBody(String s) { this.msResponseBody = s; }
     public void setReferenceId(String s) { this.msReferenceId = s; }
+    public void setTsSynchronization(Date t) { this.mtTsSynchronization = t; }
 
     public int getIdSyncLog() { return this.mnPkSyncLogId; }
     public int getIdSyncLogEntry() { return this.mnPkSyncLogEntryId; }
     public String getResponseCode() { return this.msResponseCode; }
     public String getResponseBody() { return this.msResponseBody; }
     public String getReferenceId() { return this.msReferenceId; }
+    public Date getTsSynchronization() { return this.mtTsSynchronization; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -61,7 +64,7 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         msResponseCode = "";
         msResponseBody = "";
         msReferenceId = "";
-        mtTsUserInsert = null;
+        mtTsSynchronization = null;
     }
 
     @Override
@@ -111,7 +114,7 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
             msResponseCode = resultSet.getString("response_code");
             msResponseBody = resultSet.getString("response_body");
             msReferenceId = resultSet.getString("reference_id");
-            mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mtTsSynchronization = resultSet.getTimestamp("ts_sync");
 
             mbRegistryNew = false;
         }
