@@ -461,7 +461,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 }
                 lConsumptions.addAll(0, lMvtAdjs);
                 System.out.println("Ajustando inventario...");
-                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateStart, lMvtAdjs);
+                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateEnd, lMvtAdjs);
                 SDbStockValuationDiogAdjust oValDiogAdj;
                 for (SDataDiog oDiog : lDiogs) {
                     oValDiogAdj = new SDbStockValuationDiogAdjust(mnPkStockValuationId, oDiog.getPkYearId(), oDiog.getPkDocId());

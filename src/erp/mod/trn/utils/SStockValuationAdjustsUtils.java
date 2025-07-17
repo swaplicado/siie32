@@ -15,6 +15,7 @@ import erp.mtrn.data.STrnStockMove;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -163,16 +164,22 @@ public abstract class SStockValuationAdjustsUtils {
      * Método para crear e insertar ajustes al inventario con cantidad 0 y el valor del ajuste.
      * 
      * @param session
-     * @param dateStart
+     * @param oValEndDate
      * @param lMvtAdjusts
      * @return 
      * 
      * @throws java.sql.SQLException
      */
-    public static List<SDataDiog> createDiogAdjusts(SGuiSession session, Date dateStart, List<SDbStockValuationMvt> lMvtAdjusts) throws SQLException {
+    public static List<SDataDiog> createDiogAdjusts(SGuiSession session, Date oValEndDate, List<SDbStockValuationMvt> lMvtAdjusts) throws SQLException {
         HashMap<String, SDataDiog> mDiogs = new HashMap<>();
+        // Sumar un día a fecha recibida:
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(oValEndDate);
+        calendar.add(Calendar.DATE, 1);
+        Date oDiogDate = calendar.getTime();
+        
         // Obtener el entero año a partir de la fecha de inicio con Calendar:
-        int pkYear = SLibTimeUtils.digestYear(dateStart)[0];
+        int pkYear = SLibTimeUtils.digestYear(oDiogDate)[0];
         String warehouseKey = null;
         for (SDbStockValuationMvt oSupply : lMvtAdjusts) {
             SDataDiog oDiog = null;
@@ -182,7 +189,7 @@ public abstract class SStockValuationAdjustsUtils {
                 
                 oDiog.setPkYearId(pkYear);
                 oDiog.setPkDocId(0);
-                oDiog.setDate(dateStart);
+                oDiog.setDate(oDiogDate);
                 oDiog.setNumberSeries("");
                 oDiog.setNumber("");
                 oDiog.setReference("");
