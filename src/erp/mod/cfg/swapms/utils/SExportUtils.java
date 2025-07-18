@@ -59,6 +59,10 @@ public class SExportUtils {
 
     /** Rol comprador. */
     public static final int ROL_BUYER = 1;
+    /** Rol contador. */
+    public static final int ROL_ACCOUNTANT = 2;
+    /** Rol pagador. */
+    public static final int ROL_PAYER = 3;
     /** Rol proveedor. */
     public static final int ROL_SUPPLIER = 4;
     
@@ -105,7 +109,7 @@ public class SExportUtils {
             );
 
             // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
-            List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, lastSyncDate);
+            List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, lastSyncDate, session.getConfigCompany().getCompanyId());
 
             // Lee parámetros de configuración para la exportación
             String syncUrl = SAuthJSONUtils.getValueOfElement(config, "", "user_sync_url");
@@ -159,10 +163,10 @@ public class SExportUtils {
      * @return Lista de usuarios/proveedores a exportar.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getDataToExport(Statement stmt, String syncType, Date lastSyncDate) throws SQLException {
+    private static List<SUserExport> getDataToExport(Statement stmt, String syncType, Date lastSyncDate, final int companyId) throws SQLException {
         switch (syncType) {
             case EXPORT_SYNC_USERS:
-                return getListOfUsersToExport(stmt, lastSyncDate);
+                return getListOfUsersToExport(stmt, lastSyncDate, companyId);
             case EXPORT_SYNC_SUPPLIERS:
                 return getListSuppliersToExport(stmt, lastSyncDate);
             default:
@@ -290,7 +294,7 @@ public class SExportUtils {
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getListOfUsersToExport(Statement statement, Date oLastSyncDateTime)
+    private static List<SUserExport> getListOfUsersToExport(Statement statement, Date oLastSyncDateTime, final int companyId)
             throws SQLException {
         String sql = "SELECT  " +
                 "    u.id_usr, " +
@@ -330,7 +334,7 @@ public class SExportUtils {
         }
 
         List<SUserExport> users = new ArrayList<>();
-        try (ResultSet res = statement.executeQuery(sql)) {
+        try (ResultSet res = statement.getConnection().createStatement().executeQuery(sql)) {
             String firstName = "";
             String lastName = "";
             while (res.next()) {
@@ -370,8 +374,9 @@ public class SExportUtils {
                 attr.user_type = USER_TYPE_INTERNAL;
                 attr.external_id = res.getInt("id_usr");
                 user.attributes = attr;
-
-                user.groups = new int[] { ROL_BUYER };
+                
+                List<Integer> lRoles = SUserRolesUtils.getRolesOfUser(statement, attr.external_id, companyId);
+                user.groups = lRoles.stream().mapToInt(Integer::intValue).toArray();
 
                 users.add(user);
             }
