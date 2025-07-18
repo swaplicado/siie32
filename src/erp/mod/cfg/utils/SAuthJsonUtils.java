@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author Edwin Carmona
  */
-public class SAuthJSONUtils {
+public class SAuthJsonUtils {
 
     /**
      * Verifica si un arreglo dentro de un objeto JSON contiene un valor específico.
@@ -79,5 +79,32 @@ public class SAuthJSONUtils {
             }
         }
         return sb.toString();
+    }
+    
+    /**
+     * Obtiene el valor de un elemento específico dentro de un nodo JSON.
+     *
+     * @param root Nodo raíz del JSON.
+     * @param parentKey Clave del nodo padre donde se encuentra el elemento.
+     * @param elementKey Clave del elemento cuyo valor se desea obtener.
+     * @return Valor del elemento como cadena de texto; si no es textual, retorna una cadena vacía.
+     */
+    public static String getValueOfElement(JsonNode root, String parentKey, String elementKey) {
+        JsonNode parentNode = parentKey.isEmpty() ? root : root.path(parentKey);
+        JsonNode elementNode = parentNode.path(elementKey);
+        return elementNode.isTextual() ? elementNode.asText() : "";
+    }
+
+    /**
+     * Verifica si un nodo JSON contiene un elemento específico.
+     *
+     * @param root Nodo raíz del JSON.
+     * @param parentKey Clave del nodo padre donde se encuentra el elemento.
+     * @param elementKey Clave del elemento a verificar.
+     * @return true si el elemento existe; false en caso contrario.
+     */
+    public static boolean containsElement(JsonNode root, String parentKey, String elementKey) {
+        JsonNode parentNode = parentKey.isEmpty() ? root : root.path(parentKey);
+        return parentNode.has(elementKey);
     }
 }

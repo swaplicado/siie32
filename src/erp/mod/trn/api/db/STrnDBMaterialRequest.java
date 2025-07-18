@@ -7,7 +7,7 @@ import com.swaplicado.data.StorageManagerException;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.mod.cfg.utils.SAuthJSONUtils;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
@@ -339,7 +339,7 @@ public class STrnDBMaterialRequest {
             if (!sCfg.isEmpty()) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = mapper.readTree(sCfg);
-                List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaRM", idSessionUser);
+                List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaRM", idSessionUser);
                 if (!toUsers.isEmpty()) {
                     return "1 = 1 ";
                 }

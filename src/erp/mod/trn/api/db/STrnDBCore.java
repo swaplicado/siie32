@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.mod.cfg.utils.SAuthJSONUtils;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
@@ -292,13 +292,13 @@ public class STrnDBCore {
             if (! sCfg.isEmpty()) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = mapper.readTree(sCfg);
-                List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosCompras", "vistaOC", idSessionUser);
+                List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosCompras", "vistaOC", idSessionUser);
                 // String userGroup = "usuariosCompras";
                 if (toUsers.isEmpty()) {
-                    toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosProyectos", "vistaOC", idSessionUser);
+                    toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosProyectos", "vistaOC", idSessionUser);
                     // userGroup = "usuariosProyectos";
                     if (toUsers.isEmpty()) {
-                        toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaOC", idSessionUser);
+                        toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosSuper", "vistaOC", idSessionUser);
                         // userGroup = "usuariosSuper";
                         if (! toUsers.isEmpty()) {
                             whereUsers = "1 = 1 ";
@@ -307,7 +307,7 @@ public class STrnDBCore {
                 }
 
                 if (! toUsers.isEmpty() && whereUsers.isEmpty()) {
-                    whereUsers = "tda.fid_usr_new IN (" + SAuthJSONUtils.getListAsString(toUsers) + ") ";
+                    whereUsers = "tda.fid_usr_new IN (" + SAuthJsonUtils.getListAsString(toUsers) + ") ";
                 }
             }
 

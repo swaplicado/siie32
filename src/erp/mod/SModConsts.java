@@ -89,6 +89,8 @@ public abstract class SModConsts {
     public static final int CFGU_LAN = 1012004;
     public static final int CFGU_SCA = 1012091;
     public static final int CFG_PARAM_ERP = 1012005;
+    public static final int CFG_SYNC_LOG = 1012051;
+    public static final int CFG_SYNC_LOG_ETY = 1012052;
     
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
@@ -998,6 +1000,8 @@ public abstract class SModConsts {
         TablesMap.put(CFGU_LAN, "erp.cfgu_lan");
         TablesMap.put(CFGU_SCA, "erp.cfgu_sca");
         TablesMap.put(CFG_PARAM_ERP, "erp.cfg_param_erp");
+        TablesMap.put(CFG_SYNC_LOG, "erp.cfg_sync_log");
+        TablesMap.put(CFG_SYNC_LOG_ETY, "erp.cfg_sync_log_ety");
         
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");

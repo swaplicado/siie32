@@ -1884,10 +1884,10 @@ public abstract class SAuthorizationUtils {
                         return;
                     }
 
-                    List<Integer> toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", lastUser);
+                    List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", lastUser);
                     String userGroup = "usuariosCompras";
                     if (toUsers.isEmpty()) {
-                        toUsers = SAuthJSONUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", lastUser);
+                        toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", lastUser);
                         userGroup = "usuariosProyectos";
                         if (toUsers.isEmpty()) {
                             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.WARNING,
@@ -1898,11 +1898,11 @@ public abstract class SAuthorizationUtils {
                     }
 
                     toRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(toUsers)).values());
-                    List<Integer> ccUsers = SAuthJSONUtils.getArrayIfContains(rootNode, userGroup, "cc", lastUser);
+                    List<Integer> ccUsers = SAuthJsonUtils.getArrayIfContains(rootNode, userGroup, "cc", lastUser);
                     if (!ccUsers.isEmpty()) {
                         ccRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(ccUsers)).values());
                     }
-                    List<Integer> bccUsers = SAuthJSONUtils.getArrayIfContains(rootNode, userGroup, "bcc", lastUser);
+                    List<Integer> bccUsers = SAuthJsonUtils.getArrayIfContains(rootNode, userGroup, "bcc", lastUser);
                     if (!bccUsers.isEmpty()) {
                         bccRecipients.addAll(SAuthorizationUtils.getMailsOfUsers(session.getStatement().getConnection().createStatement(), new ArrayList<>(bccUsers)).values());
                     }

@@ -29,7 +29,7 @@ public class SUserUtils {
                     + "WHERE u.id_usr = " + userId + ";";
         
         try {
-            statement.executeUpdate(sql);
+            statement.getConnection().createStatement().executeUpdate(sql);
         }
         catch (Exception e) {
             Logger.getLogger(SUserUtils.class.getName()).log(Level.SEVERE, null, e);
@@ -46,7 +46,7 @@ public class SUserUtils {
         ArrayList<Integer> userGroups = new ArrayList<>();
         try {
             String sql = "SELECT id_usr_grp FROM erp.usru_usr_grp_usr WHERE id_usr = " + userId + " ORDER BY id_usr_grp";
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql);
             while (resultSet.next()) {
                 userGroups.add(resultSet.getInt(1));
             }
