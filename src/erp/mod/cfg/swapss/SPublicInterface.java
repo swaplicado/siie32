@@ -30,9 +30,11 @@ public class SPublicInterface {
         try {
             this.oDbObj = new SMySqlClass();
             this.msMainDatabase = this.oDbObj.getMainDatabaseName();
-        } catch (SConfigException ex) {
+        }
+        catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

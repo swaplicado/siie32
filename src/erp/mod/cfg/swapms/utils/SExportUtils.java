@@ -62,8 +62,15 @@ public class SExportUtils {
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     
     private static final ZoneId MEXICO = java.time.ZoneId.of("America/Mexico_City");
-    private static final String HTTP_CODE_OK = "200";
-    private static final String HTTP_CODE_CREATED = "201";
+    private static final int HTTP_CODE_OK = 200;
+    private static final int HTTP_CODE_CREATED = 201;
+    private static final int HTTP_CODE_PENDING = 202;
+    private static final int HTTP_CODE_NO_CONTENT = 204;
+    private static final int HTTP_CODE_INVALID_REQUEST = 400;
+    private static final String PARTNER_ENTITY_TYPE_ORG = "ORG";
+    private static final String PARTNER_ENTITY_TYPE_PER = "PERSON";
+    
+    private static final String LOCAL_COUNTRY_MEX = "MEX";
 
     private static final int TIME_60_SECONDS = 60 * 1000; // 60 segundos en milisegundos
 
@@ -231,9 +238,9 @@ public class SExportUtils {
      */
     private static String getResponseCode(final boolean updateLastSync, final List<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
         if (logEntries.isEmpty() && SAuthJsonUtils.containsElement(responseJson, "", "results")) {
-            return "204"; // No content
+            return HTTP_CODE_NO_CONTENT + ""; // No content
         }
-        return updateLastSync ? HTTP_CODE_OK : "202";
+        return updateLastSync ? HTTP_CODE_OK + "" : HTTP_CODE_PENDING + "";
     }
 
     /**
@@ -460,8 +467,8 @@ public class SExportUtils {
                 SUserExport.Partner partner = new SUserExport.Partner();
                 partner.fiscal_id = fiscalId;
                 partner.full_name = sanitizeJsonString(res.getString("bp"));
-                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? "ORG" : "PER";
-                partner.country = countryCode == null || countryCode.isEmpty() ? "MEX" : countryCode;
+                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
+                partner.country = countryCode == null || countryCode.isEmpty() ? LOCAL_COUNTRY_MEX : countryCode;
                 partner.external_id = res.getInt("bp.id_bp");
                 partner.bp_comm = sanitizeJsonString(res.getString("bp.bp_comm"));
                 partner.tax_regime = sanitizeJsonString(res.getString("ct.tax_regime"));
@@ -509,8 +516,8 @@ public class SExportUtils {
                 SUserExport.Partner partner = new SUserExport.Partner();
                 partner.fiscal_id = res.getString("bp.fiscal_id");
                 partner.full_name = res.getString("bp.bp");
-                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? "ORG" : "PER";
-                partner.country = res.getString("country.cty_code") == null ? "MEX" : res.getString("country.cty_code");
+                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
+                partner.country = res.getString("country.cty_code") == null ? LOCAL_COUNTRY_MEX : res.getString("country.cty_code");
                 partner.external_id = res.getInt("bp.id_bp");
                 partner.bp_comm = res.getString("bp.bp_comm");
                 partner.tax_regime = res.getString("ct.tax_regime");
@@ -593,7 +600,7 @@ public class SExportUtils {
             }
 
             int status = connection.getResponseCode();
-            InputStream responseStream = (status >= 200 && status < 400) ? connection.getInputStream() : connection.getErrorStream();
+            InputStream responseStream = (status >= HTTP_CODE_OK && status < HTTP_CODE_INVALID_REQUEST) ? connection.getInputStream() : connection.getErrorStream();
 
             try (Scanner scanner = new Scanner(responseStream, charset)) {
                 responseBody = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
