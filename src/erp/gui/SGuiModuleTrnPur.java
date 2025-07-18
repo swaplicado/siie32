@@ -910,8 +910,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmiCatFunctionalAreaBudgets.setEnabled(hasRightCreditConfig && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
-        jmiCatBizPartherUpdate.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
-        jmiCatBizPartherUpdateLog.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
+        jmiCatBizPartherUpdate.setEnabled(hasRightDocTransaction);
+        jmiCatBizPartherUpdateLog.setEnabled(hasRightDocTransaction);
         jmiCatInitiatives.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
         jmEst.setEnabled(hasRightDocEstimate);
 

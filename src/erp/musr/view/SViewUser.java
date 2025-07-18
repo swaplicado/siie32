@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SViewUser extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -80,7 +80,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         //jbDelete.setEnabled(false);
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[18];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[20];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -99,6 +99,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_can_del", "Eliminable", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_act", "Cuenta activa", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "sync_status", "Exportado a portal)",  STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "sync_timestamp", "Fecha de exportación", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ue.usr", "Usr. modificación", STableConstants.WIDTH_USER);
@@ -208,7 +210,10 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
 
         msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
-                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, bbc.email_02, e.b_act "
+                + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, bbc.email_02, e.b_act, "
+                + "syl.ts_usr_ins AS sync_timestamp, "
+                + "CASE WHEN syl.reference_id IS NOT NULL THEN 1 " 
+                + "ELSE 0 END AS sync_status "
                 + "FROM erp.usru_usr AS u "
                 + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
                 + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "
@@ -218,6 +223,11 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp "
                 + "LEFT OUTER JOIN erp.bpsu_bpb_con AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = 1 "
                 + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp "
+                + "LEFT JOIN (SELECT syl.reference_id, syl.ts_usr_ins "
+                + "FROM cfgu_sync_log_ety AS syl "
+                + "INNER JOIN cfgu_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log "
+                + "WHERE syl.response_code IN ('200', '201') AND sy.id_sync_log = 1 "
+                + ") AS syl ON syl.reference_id = u.id_usr "
                 + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere)
                 + "ORDER BY u.usr, u.id_usr ";
     }

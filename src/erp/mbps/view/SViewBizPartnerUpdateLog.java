@@ -19,7 +19,7 @@ import javax.swing.JButton;
 public class SViewBizPartnerUpdateLog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     public SViewBizPartnerUpdateLog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.BPSU_BP_ADDEE, auxType01);
+        super(client, tabTitle, SDataConstants.BPSU_BP_DT_RE, auxType01);
         initComponents();
     }
 
