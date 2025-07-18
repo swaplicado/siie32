@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
-import erp.mod.cfg.swapms.SPublicInterface;
+import erp.mod.cfg.swapss.SPublicInterface;
 import erp.mod.cfg.swapms.utils.SUserExport;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;

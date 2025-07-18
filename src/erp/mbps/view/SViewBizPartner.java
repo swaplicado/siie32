@@ -71,7 +71,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JComboBox jcbFilterPaymentType;
     private javax.swing.JButton jbClearFilterDepartament;
     private javax.swing.JButton jbClearFilterPaymentType;
-    private javax.swing.JButton jbExportSuppliers;
+    private javax.swing.JButton jbExportDataToSwapServices;
     
     private int mnBizPartnerCategory;
     private java.lang.String msOrderKey;
@@ -275,12 +275,12 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
 
                 try {
-                    String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
+                    String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
                     if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                        jbExportSuppliers = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
+                        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
 
                         addTaskBarUpperSeparator();
-                        addTaskBarUpperComponent(jbExportSuppliers);
+                        addTaskBarUpperComponent(jbExportDataToSwapServices);
                     }
                 }
                 catch (Exception e) {
@@ -636,12 +636,12 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
 
     private void actionExportData() {
-        if (jbExportSuppliers != null && jbExportSuppliers.isEnabled()) {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             boolean bSyncAll = false;
             try {
                 String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SDbSyncLog.EXPORT_SYNC_SUPPLIERS, bSyncAll);
                 if (sResponse != null && sResponse.isEmpty()) {
-                    miClient.showMsgBoxInformation("Datos exportados correctamente");
+                    miClient.showMsgBoxInformation("Datos exportados correctamente.");
                 }
                 else {
                     miClient.showMsgBoxInformation("No se han encontrado datos para exportar." + sResponse);
@@ -990,7 +990,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             else if (button == jbClearFilterDepartament) {
                 actionClearFilterDepartament();
             }
-            else if (button == jbExportSuppliers) {
+            else if (button == jbExportDataToSwapServices) {
                 actionExportData();
             }
         }

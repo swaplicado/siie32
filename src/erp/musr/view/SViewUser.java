@@ -38,7 +38,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbSiieAppExport;
     private javax.swing.JButton jbSiieAppSync;
-    private javax.swing.JButton jbExportUsers;
+    private javax.swing.JButton jbExportDataToSwapServices;
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private String msSiieAppUrls;
@@ -85,11 +85,11 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         }
 
         try {
-            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
+            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
             if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                jbExportUsers = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
+                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
 
-                addTaskBarUpperComponent(jbExportUsers);
+                addTaskBarUpperComponent(jbExportDataToSwapServices);
             }
         }
         catch (Exception e) {
@@ -217,7 +217,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     }
 
     private void actionExportData() {
-        if (jbExportUsers != null && jbExportUsers.isEnabled()) {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             boolean bSyncAll = false;
             try {
                 String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SDbSyncLog.EXPORT_SYNC_USERS, bSyncAll);
@@ -277,7 +277,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             else if (button == jbSiieAppSync) {
                 actionSiieAppSync();
             }
-            else if (button == jbExportUsers) {
+            else if (button == jbExportDataToSwapServices) {
                 actionExportData();
             }
         }

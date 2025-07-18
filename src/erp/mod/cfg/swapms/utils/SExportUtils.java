@@ -103,7 +103,7 @@ public class SExportUtils {
             // Obtiene la configuración del servicio de sincronización
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(
-                SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG)
+                SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
             );
 
             // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
