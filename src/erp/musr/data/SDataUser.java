@@ -1104,6 +1104,43 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
     }
 
+    /**
+     * Check if user has the given role.
+     * @param role
+     * @return 
+     */
+    public boolean hasRole(final int role) {
+        return hasRole(new int[] { role });
+    }
+
+    /**
+     * Check if user has any of the given roles.
+     * @param roles
+     * @return 
+     */
+    public boolean hasRole(final int[] roles) {
+        boolean has = false;
+
+        ROLES:
+        for (int role : roles) {
+            for (SDataUserRoleUser roleUser : mvDbmsUserRolesUser) {
+                if (roleUser.getPkRoleId() == role) {
+                    has = true;
+                    break ROLES;
+                }
+            }
+
+            for (SDataUserRoleCompany roleCompany : mvDbmsUserRolesCompany) {
+                if (roleCompany.getPkRoleId() == role) {
+                    has = true;
+                    break ROLES;
+                }
+            }
+        }
+    
+        return has;
+    }
+
     /*
      * sa.lib.gui.SGuiUser overriden methods
      */

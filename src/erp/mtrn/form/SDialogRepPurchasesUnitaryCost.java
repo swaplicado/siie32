@@ -86,9 +86,6 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     private void initComponents() {
 
         gbtSelect = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -108,12 +105,16 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         jPanel12 = new javax.swing.JPanel();
         jrbAllAccounts = new javax.swing.JRadioButton();
         jrbSelectAccounts = new javax.swing.JRadioButton();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
         jpAccounts = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jbSelectAll = new javax.swing.JButton();
         jbDeselectAll = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jckShowRecordAdjAuditReadOnly = new javax.swing.JCheckBox();
+        jckShowRecordAdjYearEndReadOnly = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Reporte de costos unitarios de compras");
@@ -123,21 +124,6 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
                 formWindowActivated(evt);
             }
         });
-
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
-
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -221,13 +207,8 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
 
         jPanel9.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jPanel10.setLayout(new java.awt.BorderLayout());
-
-        jPanel11.setLayout(new java.awt.BorderLayout());
-        jPanel10.add(jPanel11, java.awt.BorderLayout.NORTH);
-
         jpAccounts.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuentas contables de compras:"));
-        jpAccounts.setLayout(new java.awt.BorderLayout());
+        jpAccounts.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -239,15 +220,44 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
 
         jpAccounts.add(jPanel13, java.awt.BorderLayout.NORTH);
 
-        jPanel10.add(jpAccounts, java.awt.BorderLayout.CENTER);
-
-        jPanel9.add(jPanel10, java.awt.BorderLayout.CENTER);
+        jPanel9.add(jpAccounts, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
 
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jckShowRecordAdjAuditReadOnly.setSelected(true);
+        jckShowRecordAdjAuditReadOnly.setText("Incluir ajustes de auditoría");
+        jckShowRecordAdjAuditReadOnly.setEnabled(false);
+        jckShowRecordAdjAuditReadOnly.setOpaque(false);
+        jckShowRecordAdjAuditReadOnly.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel14.add(jckShowRecordAdjAuditReadOnly);
+
+        jckShowRecordAdjYearEndReadOnly.setText("Incluir ajustes de cierre");
+        jckShowRecordAdjYearEndReadOnly.setEnabled(false);
+        jckShowRecordAdjYearEndReadOnly.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel14.add(jckShowRecordAdjYearEndReadOnly);
+
+        jPanel2.add(jPanel14, java.awt.BorderLayout.PAGE_END);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(576, 389));
+        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPrint);
+
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbExit);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -270,9 +280,9 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
         jpAccounts.add(moPaneAccounts, BorderLayout.CENTER);
         i = 0;
         columns = new STableColumnForm[3];
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", 75);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", 150);
-        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionada", STableConstants.WIDTH_BOOLEAN);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", 100);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", 250);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionada", STableConstants.WIDTH_BOOLEAN_2X);
         columns[i++].setEditable(true);
 
         for (i = 0; i < columns.length; i++) {
@@ -477,10 +487,9 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup gbtSelect;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -496,6 +505,8 @@ public class SDialogRepPurchasesUnitaryCost extends javax.swing.JDialog implemen
     private javax.swing.JButton jbPrint;
     private javax.swing.JButton jbSelectAll;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
+    private javax.swing.JCheckBox jckShowRecordAdjAuditReadOnly;
+    private javax.swing.JCheckBox jckShowRecordAdjYearEndReadOnly;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlCompanyBranch;

@@ -16,13 +16,13 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser implements Serializable {
 
     protected int mnPkBizPartnerBranchAddressId;
     protected int mnPkAddressAddressId;
-    protected int mnFkNeighborhoodZipCode;
+    protected int mnFkNeighborhoodZipCodeId;
     
     protected SDataBolNeighborhood moDbmsBolNeighborhood;
     
@@ -32,11 +32,11 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
     
     public void setPkBizPartnerBranchAddressId(int n) { mnPkBizPartnerBranchAddressId = n; }
     public void setPkAddressAddressId(int n) { mnPkAddressAddressId = n; }
-    public void setFkNeighborhoodZipCode(int n) { mnFkNeighborhoodZipCode = n; }
+    public void setFkNeighborhoodZipCodeId(int n) { mnFkNeighborhoodZipCodeId = n; }
 
     public int getPkBizPartnerBranchAddressId() { return mnPkBizPartnerBranchAddressId; }
     public int getPkAddressAddressId() { return mnPkAddressAddressId; }
-    public int getFkNeighborhoodZipCode() { return mnFkNeighborhoodZipCode; }
+    public int getFkNeighborhoodZipCodeId() { return mnFkNeighborhoodZipCodeId; }
 
     public void setDbmsBolNeighborhood(SDataBolNeighborhood o) { moDbmsBolNeighborhood = o; }
     
@@ -59,7 +59,7 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         
         mnPkBizPartnerBranchAddressId = 0;
         mnPkAddressAddressId = 0;
-        mnFkNeighborhoodZipCode = 0;
+        mnFkNeighborhoodZipCodeId = 0;
         
         moDbmsBolNeighborhood = null;
     }
@@ -100,16 +100,16 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         else {
             mnPkBizPartnerBranchAddressId = resultSet.getInt("id_bpb_add");
             mnPkAddressAddressId = resultSet.getInt("id_add_add");
-            mnFkNeighborhoodZipCode = resultSet.getInt("fk_nei_zip_code");
+            mnFkNeighborhoodZipCodeId = resultSet.getInt("fk_nei_zip_code");
 
             mbRegistryNew = false;
         }
         
         // Read Neighborhood
         
-        if (mnFkNeighborhoodZipCode != 0) {
+        if (mnFkNeighborhoodZipCodeId != 0) {
             moDbmsBolNeighborhood = new SDataBolNeighborhood();
-            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
+            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCodeId } , session.getStatement());
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -131,20 +131,20 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                 mnPkBizPartnerBranchAddressId + ", " + 
                 mnPkAddressAddressId + ", " + 
-                mnFkNeighborhoodZipCode + " " + 
+                mnFkNeighborhoodZipCodeId + " " + 
                 ")";
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
-//                "id_bpb_add = " + mnPkBizPartnerBranchAddressId + ", " +
-//                "id_add_add = " + mnPkAddressAddressId + ", " +
-                "fk_nei_zip_code = " + mnFkNeighborhoodZipCode + " " +
+                //"id_bpb_add = " + mnPkBizPartnerBranchAddressId + ", " +
+                //"id_add_add = " + mnPkAddressAddressId + ", " +
+                "fk_nei_zip_code = " + mnFkNeighborhoodZipCodeId + " " +
                 getSqlWhere();
         }
         
-        if (mnFkNeighborhoodZipCode != 0) {
+        if (mnFkNeighborhoodZipCodeId != 0) {
             moDbmsBolNeighborhood = new SDataBolNeighborhood();
-            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCode } , session.getStatement());
+            moDbmsBolNeighborhood.read(new int[] { mnFkNeighborhoodZipCodeId } , session.getStatement());
         }
         
         session.getStatement().execute(msSql);
@@ -158,7 +158,7 @@ public class SDbBizPartnerBranchAddressNeighborhood extends SDbRegistryUser impl
         
         registry.setPkBizPartnerBranchAddressId(this.getPkBizPartnerBranchAddressId());
         registry.setPkAddressAddressId(this.getPkAddressAddressId());
-        registry.setFkNeighborhoodZipCode(this.getFkNeighborhoodZipCode());
+        registry.setFkNeighborhoodZipCodeId(this.getFkNeighborhoodZipCodeId());
         
         registry.setDbmsBolNeighborhood(this.getDbmsBolNeighborhood()); // el clon comparte este registro que es de sólo lectura
         
