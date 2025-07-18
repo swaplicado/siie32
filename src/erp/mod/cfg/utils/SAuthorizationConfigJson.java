@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author Edwin Carmona
  */
-public class SAuthorizationConfigJSON {
+public class SAuthorizationConfigJson {
 
     private ArrayList<SCondition> conditions = new ArrayList<>();
 

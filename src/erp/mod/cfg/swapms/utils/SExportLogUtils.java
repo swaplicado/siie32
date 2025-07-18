@@ -15,7 +15,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Logger;
 
 /**
- *
+ * Clase para utilidades de exportación de logs.
+ * Esta clase proporciona métodos para escribir mensajes de log en archivos,
+ * asociados a un ID específico. Los mensajes se formatean con un timestamp
+ * y se guardan en un directorio específico.
  * @author Edwin Carmona
  */
 public class SExportLogUtils {

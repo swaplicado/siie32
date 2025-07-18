@@ -16,7 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Interfaz pública para la clase de sincronización de datos.
+ * Esta clase proporciona métodos para interactuar con la base de datos y
+ * realizar operaciones de sincronización de datos.
  * @author Edwin Carmona
  */
 public class SPublicInterface {
@@ -43,15 +45,23 @@ public class SPublicInterface {
     private Connection getConnection() {
         try {
             return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;
     }
     
+    /**
+     * Obtiene un proveedor por su ID fiscal.
+     *
+     * @param fiscalId ID fiscal del proveedor.
+     * @return Objeto {@code SUserExport} que representa al proveedor, o {@code null} si no se encuentra.
+     */
     public SUserExport getSupplierByFiscalId(final String fiscalId) {
         try {
             Connection conn = this.getConnection();
@@ -61,7 +71,8 @@ public class SPublicInterface {
             }
 
             return SExportUtils.getSupplierByFiscalId(conn.createStatement(), fiscalId);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
 

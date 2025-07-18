@@ -7,7 +7,7 @@ package erp.mod.cfg.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
-import erp.mod.cfg.utils.SAuthorizationConfigJSON;
+import erp.mod.cfg.utils.SAuthorizationConfigJson;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -50,7 +50,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 //    protected Date mtTsUserInsert;
 //    protected Date mtTsUserUpdate;
     
-    protected SAuthorizationConfigJSON moAuthConfigJson;
+    protected SAuthorizationConfigJson moAuthConfigJson;
 
     public SDbAuthorizationPath() {
         super(SModConsts.CFGU_AUTHORN_PATH);
@@ -104,7 +104,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
 //    public Date getTsUserInsert() { return mtTsUserInsert; }
 //    public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public SAuthorizationConfigJSON getAuthorizationConfigObject() { return moAuthConfigJson; }
+    public SAuthorizationConfigJson getAuthorizationConfigObject() { return moAuthConfigJson; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -213,7 +213,7 @@ public class SDbAuthorizationPath extends SDbRegistryUser {
             
             if (msConfigurationJson != null && msConfigurationJson.length() > 0) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                moAuthConfigJson = objectMapper.readValue(msConfigurationJson, SAuthorizationConfigJSON.class);
+                moAuthConfigJson = objectMapper.readValue(msConfigurationJson, SAuthorizationConfigJson.class);
             }
             
             mbRegistryNew = false;

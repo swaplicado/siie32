@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author Edwin Carmona
  */
-public class SAuthJSONUtils {
+public class SAuthJsonUtils {
 
     /**
      * Verifica si un arreglo dentro de un objeto JSON contiene un valor específico.

@@ -14,24 +14,22 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.db.SDbSyncLogEntry;
-import erp.mod.cfg.utils.SAuthJSONUtils;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -46,12 +44,6 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona
  */
 public class SExportUtils {
-
-    /** Constante para identificar la exportación de usuarios. */
-    public static final String EXPORT_SYNC_USERS = "USUARIO";
-    /** Constante para identificar la exportación de proveedores. */
-    public static final String EXPORT_SYNC_SUPPLIERS = "PROVEEDOR";
-
     /** Tipo de usuario interno. */
     public static final int USER_TYPE_INTERNAL = 1;
     /** Tipo de usuario proveedor. */
@@ -68,6 +60,12 @@ public class SExportUtils {
     
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    
+    private static final ZoneId MEXICO = java.time.ZoneId.of("America/Mexico_City");
+    private static final String HTTP_CODE_OK = "200";
+    private static final String HTTP_CODE_CREATED = "201";
+
+    private static final int TIME_60_SECONDS = 60 * 1000; // 60 segundos en milisegundos
 
     private static final String BASE_PROVIDER_QUERY = "SELECT "
             + "    bp.*, "
@@ -97,7 +95,7 @@ public class SExportUtils {
      * @return String con el JSON generado o mensaje de error.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static String exportJsonData(SGuiSession session, final String sSyncType, final boolean bSyncAll) throws SQLException {
+    public static String exportJsonData(final SGuiSession session, final String sSyncType, final boolean bSyncAll) throws SQLException {
         try {
             // Determina la fecha de la última sincronización exitosa si no es sincronización total
             Date lastSyncDate = bSyncAll ? null : getLastSyncDateTime(session.getStatement(), sSyncType);
@@ -112,9 +110,9 @@ public class SExportUtils {
             List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, lastSyncDate, session.getConfigCompany().getCompanyId());
 
             // Lee parámetros de configuración para la exportación
-            String syncUrl = SAuthJSONUtils.getValueOfElement(config, "", "user_sync_url");
-            int syncLimit = Integer.parseInt(SAuthJSONUtils.getValueOfElement(config, "", "user_sync_limit"));
-            String syncToken = SAuthJSONUtils.getValueOfElement(config, "", "user_sync_token");
+            String syncUrl = SAuthJsonUtils.getValueOfElement(config, "", "user_sync_url");
+            int syncLimit = Integer.parseInt(SAuthJsonUtils.getValueOfElement(config, "", "user_sync_limit"));
+            String syncToken = SAuthJsonUtils.getValueOfElement(config, "", "user_sync_token");
 
             // Si no hay datos para exportar, registra el intento y retorna vacío
             if (dataToExport == null || dataToExport.isEmpty()) {
@@ -145,10 +143,12 @@ public class SExportUtils {
             logSync(session, sSyncType, compactJson(requestBody), responseCode, compactJson(response), logEntries);
 
             return "";
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
             return "{\"error\": \"Error procesando JSON: " + ex.getMessage() + "\"}";
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
             return "{\"error\": \"Error en la exportación: " + ex.getMessage() + "\"}";
         }
@@ -163,11 +163,11 @@ public class SExportUtils {
      * @return Lista de usuarios/proveedores a exportar.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getDataToExport(Statement stmt, String syncType, Date lastSyncDate, final int companyId) throws SQLException {
+    private static List<SUserExport> getDataToExport(final Statement stmt, final String syncType, final Date lastSyncDate, final int companyId) throws SQLException {
         switch (syncType) {
-            case EXPORT_SYNC_USERS:
+            case SDbSyncLog.EXPORT_SYNC_USERS:
                 return getListOfUsersToExport(stmt, lastSyncDate, companyId);
-            case EXPORT_SYNC_SUPPLIERS:
+            case SDbSyncLog.EXPORT_SYNC_SUPPLIERS:
                 return getListSuppliersToExport(stmt, lastSyncDate);
             default:
                 throw new IllegalArgumentException("Tipo de sincronización no soportado: " + syncType);
@@ -180,10 +180,10 @@ public class SExportUtils {
      * @param responseJson Respuesta JSON del servicio.
      * @return Lista de entradas de log para la sincronización.
      */
-    private static List<SDbSyncLogEntry> parseSyncLogEntries(JsonNode responseJson) {
+    private static List<SDbSyncLogEntry> parseSyncLogEntries(final JsonNode responseJson) {
         List<SDbSyncLogEntry> entries = new ArrayList<>();
-        if (SAuthJSONUtils.containsElement(responseJson, "", "resultados")) {
-            JsonNode results = responseJson.path("resultados");
+        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
+            JsonNode results = responseJson.path("results");
             if (results.isArray()) {
                 for (JsonNode result : results) {
                     JsonNode externalIdNode = getExternalIdNode(result);
@@ -206,7 +206,7 @@ public class SExportUtils {
      * @param result Nodo JSON de resultado.
      * @return Nodo JSON con el external_id o null si no existe.
      */
-    private static JsonNode getExternalIdNode(JsonNode result) {
+    private static JsonNode getExternalIdNode(final JsonNode result) {
         JsonNode attributes = result.path("attributes");
         if (attributes.isObject() && attributes.has("external_id")) {
             return attributes.path("external_id");
@@ -229,11 +229,11 @@ public class SExportUtils {
      * @param responseJson   Respuesta JSON del servicio.
      * @return Código de respuesta como String.
      */
-    private static String getResponseCode(boolean updateLastSync, List<SDbSyncLogEntry> logEntries, JsonNode responseJson) {
-        if (logEntries.isEmpty() && SAuthJSONUtils.containsElement(responseJson, "", "resultados")) {
+    private static String getResponseCode(final boolean updateLastSync, final List<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
+        if (logEntries.isEmpty() && SAuthJsonUtils.containsElement(responseJson, "", "results")) {
             return "204"; // No content
         }
-        return updateLastSync ? "200" : "202";
+        return updateLastSync ? HTTP_CODE_OK : "202";
     }
 
     /**
@@ -247,13 +247,13 @@ public class SExportUtils {
      * @param logEntries   Lista de entradas de log generadas.
      * @throws SQLException Si ocurre un error al guardar el log.
      */
-    private static void logSync(SGuiSession session, String syncType, String requestBody, String responseCode, String responseBody, List<SDbSyncLogEntry> logEntries) throws SQLException, Exception {
+    private static void logSync(final SGuiSession session, final String syncType, final String requestBody, final String responseCode, final String responseBody, final List<SDbSyncLogEntry> logEntries) throws SQLException, Exception {
         String sTimeStamp = TIMESTAMP_FORMATTER.format(
-                java.time.LocalDateTime.now().atZone(java.time.ZoneId.of("America/Mexico_City"))
+                java.time.LocalDateTime.now().atZone(MEXICO)
         );
         SDbSyncLog log = new SDbSyncLog();
         
-        String logSufix = syncType + "_" + log.getThePk(session) + "_" + sTimeStamp;
+        String logSufix = syncType + "_" + log.getPk(session) + "_" + sTimeStamp;
         
         log.setSyncType(syncType);
         log.setRequestBody(logSufix + "_request_body");
@@ -276,7 +276,7 @@ public class SExportUtils {
      * @return Fecha de la última sincronización exitosa, o null si no existe.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static Date getLastSyncDateTime(Statement statement, final String sSyncType) throws SQLException {
+    private static Date getLastSyncDateTime(final Statement statement, final String sSyncType) throws SQLException {
         String query = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " WHERE response_code = '200' AND sync_type = '" + sSyncType + "';";
         try (ResultSet res = statement.executeQuery(query)) {
             if (res.next()) {
@@ -294,7 +294,7 @@ public class SExportUtils {
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getListOfUsersToExport(Statement statement, Date oLastSyncDateTime, final int companyId)
+    private static List<SUserExport> getListOfUsersToExport(final Statement statement, final Date oLastSyncDateTime, final int companyId)
             throws SQLException {
         String sql = "SELECT  " +
                 "    u.id_usr, " +
@@ -313,11 +313,11 @@ public class SExportUtils {
                 "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON u.fid_bp_n = bp.id_bp " +
                 "        LEFT JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = u.id_usr " +
-                "        AND (sloge.response_code = '200' " +
-                "        OR sloge.response_code = '201') " +
+                "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' " +
+                "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') " +
                 "        LEFT JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log " +
-                "         AND slog.sync_type = '" + EXPORT_SYNC_USERS + "' " +
+                "         AND slog.sync_type = '" + SDbSyncLog.EXPORT_SYNC_USERS + "' " +
                 "WHERE " +
                 "    (sloge.ts_sync IS NULL ";
         
@@ -364,7 +364,7 @@ public class SExportUtils {
                 SUserExport user = new SUserExport();
                 user.username = res.getString("usr");
                 user.email = res.getString("email");
-                user.password = res.getString("usr");
+                user.password = generateSecurePassword();
                 user.is_active = 1;
                 user.first_name = firstName;
                 user.last_name = lastName;
@@ -393,16 +393,16 @@ public class SExportUtils {
      * @return Lista de proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getListSuppliersToExport(Statement statement, Date oLastSyncDateTime)
+    private static List<SUserExport> getListSuppliersToExport(final Statement statement, final Date oLastSyncDateTime)
             throws SQLException {
         String sql = BASE_PROVIDER_QUERY
                 + "LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
-                + "        AND (sloge.response_code = '200' "
-                + "        OR sloge.response_code = '201') "
+                + "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' "
+                + "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
-                + "         AND slog.sync_type = '" + EXPORT_SYNC_SUPPLIERS + "' "
+                + "         AND slog.sync_type = '" + SDbSyncLog.EXPORT_SYNC_SUPPLIERS + "' "
                 + "WHERE bp.b_sup "
                 + "AND    (sloge.ts_sync IS NULL ";
 
@@ -440,13 +440,12 @@ public class SExportUtils {
                 String fiscalId = sanitizeJsonString(res.getString("bp.fiscal_id"));
                 if (res.getInt("addr.fid_cty_n") <= 1) {
                     user.username = fiscalId;
-                    user.password = fiscalId;
                 }
                 else {
                     user.username = countryCode + "." + fiscalId;
-                    user.password = countryCode + "." + fiscalId;
                 }
 
+                user.password = generateSecurePassword();
                 user.email = sanitizeJsonString(res.getString("email_01"));
                 user.is_active = 1;
                 user.first_name = firstName;
@@ -486,7 +485,7 @@ public class SExportUtils {
      * @param fiscalId ID fiscal del proveedor a buscar.
      * @return Un objeto SUserExport con los datos del proveedor, o null si no se encuentra.
      */
-    public static SUserExport getSupplierByFiscalId(Statement statement, String fiscalId) {
+    public static SUserExport getSupplierByFiscalId(final Statement statement, final String fiscalId) {
         String sql = BASE_PROVIDER_QUERY + " WHERE bp.fiscal_id = '" + fiscalId + "' "
                 + "AND NOT bp.b_del AND (bp.b_del IS NULL OR NOT bp.b_del) "
                 + "GROUP BY bp.id_bp "
@@ -540,7 +539,7 @@ public class SExportUtils {
      * @return Respuesta del servicio en formato JSON.
      * @throws Exception Si ocurre un error durante la solicitud.
      */
-    private static String requestSwapService(String sQuery, String sURL, String sMethod, String sBody, String sToken) throws Exception {
+    private static String requestSwapService(final String sQuery, final String sURL, final String sMethod, final String sBody, final String sToken) throws Exception {
         String charset = java.nio.charset.StandardCharsets.UTF_8.name();
         HttpURLConnection connection = null;
         String responseBody = "";
@@ -554,8 +553,8 @@ public class SExportUtils {
             }
 
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(60000); // 30 segundos para conectar
-            connection.setReadTimeout(60000);    // 30 segundos para leer respuesta
+            connection.setConnectTimeout(TIME_60_SECONDS); // 30 segundos para conectar
+            connection.setReadTimeout(TIME_60_SECONDS);    // 30 segundos para leer respuesta
             connection.setRequestMethod(sMethod.toUpperCase());
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");
@@ -615,7 +614,7 @@ public class SExportUtils {
     /**
      * Limpia una cadena para evitar caracteres problemáticos en JSON.
      */
-    private static String sanitizeJsonString(String input) {
+    private static String sanitizeJsonString(final String input) {
         if (input == null) {
             return "";
         }
@@ -629,31 +628,30 @@ public class SExportUtils {
     }
 
     /**
-     * Comprime una cadena de texto usando GZIP y la codifica en Base64.
-     */
-    public static String compressString(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             GZIPOutputStream gzip = new GZIPOutputStream(baos)) {
-            gzip.write(str.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            gzip.close();
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (Exception e) {
-            throw new RuntimeException("Error al comprimir la cadena", e);
-        }
-    }
-
-    /**
      * Compactar cadena de texto json quitando espacios y saltos de línea.
      * @param json
      * @return 
      */
-    public static String compactJson(String json) {
+    public static String compactJson(final String json) {
         if (json == null || json.isEmpty()) {
             return json;
         }
         return json.replaceAll("\\s+", "");
+    }
+
+    /**
+     * Genera una contraseña segura de 10 caracteres aleatorios.
+     * Incluye letras mayúsculas, minúsculas, números y caracteres especiales.
+     * @return Contraseña generada.
+     */
+    public static String generateSecurePassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+        StringBuilder password = new StringBuilder();
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(chars.length());
+            password.append(chars.charAt(index));
+        }
+        return password.toString();
     }
 }

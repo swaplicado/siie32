@@ -1,14 +1,14 @@
 ================================================================================
+SIIE 3.2 282.0/ 2025-07-18
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportación de usuarios y proveedores a servicio externo considerando renglones de Logs
+
+================================================================================
 SIIE 3.2 280.4/ 2025-07-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 -Validación de fecha de facturas asociadas a ordenes de compra relacionadas con los movimientos de almacén.
-
-================================================================================
-SIIE 3.2 280.3/ 2025-07-17
-Edwin Omar CARMONA FIGUEROA
---------------------------------------------------------------------------------
-- Exportación de usuarios y proveedores con log por renglón
 
 ================================================================================
 SIIE 3.2 280.3/ 2025-07-16
@@ -21,7 +21,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 280.2/ 2025-07-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-- Corrección de llave foránea nula en usuario de mantenimiento en diogs de ajuste de valuación.
+1) Corrección de llave foránea nula en usuario de mantenimiento en diogs de ajuste de valuación.
 
 ================================================================================
 SIIE 3.2 280.1/ 2025-07-15

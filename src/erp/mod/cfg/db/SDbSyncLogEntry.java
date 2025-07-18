@@ -15,6 +15,11 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
+ * Clase para sincronización de datos con servicios externos. * Esta clase
+ * representa una entrada de registro de sincronización, que almacena
+ * información sobre cada sincronización realizada, incluyendo el tipo de
+ * sincronización, cuerpo de la solicitud, código de respuesta, cuerpo de la
+ * respuesta, y marcas de tiempo.
  *
  * @author Edwin Carmona
  */
@@ -31,15 +36,15 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         super(SModConsts.CFG_SYNC_LOG_ETY);
     }
 
-    public void setIdSyncLog(int n) { this.mnPkSyncLogId = n; }
-    public void setIdSyncLogEntry(int n) { this.mnPkSyncLogEntryId = n; }
+    public void setPkSyncLogId(int n) { this.mnPkSyncLogId = n; }
+    public void setPkSyncLogEntryId(int n) { this.mnPkSyncLogEntryId = n; }
     public void setResponseCode(String s) { this.msResponseCode = s; }
     public void setResponseBody(String s) { this.msResponseBody = s; }
     public void setReferenceId(String s) { this.msReferenceId = s; }
     public void setTsSynchronization(Date t) { this.mtTsSynchronization = t; }
 
-    public int getIdSyncLog() { return this.mnPkSyncLogId; }
-    public int getIdSyncLogEntry() { return this.mnPkSyncLogEntryId; }
+    public int getPkSyncLogId() { return this.mnPkSyncLogId; }
+    public int getPkSyncLogEntryId() { return this.mnPkSyncLogEntryId; }
     public String getResponseCode() { return this.msResponseCode; }
     public String getResponseBody() { return this.msResponseBody; }
     public String getReferenceId() { return this.msReferenceId; }
@@ -103,7 +108,9 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
+        
         msSql = "SELECT * FROM " + getSqlTable() + " " + getSqlWhere(pk);
+        
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -133,7 +140,6 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
-            mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
@@ -146,6 +152,8 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         }
         else {
             msSql = "UPDATE " + getSqlTable() + " SET " +
+                    // "id_sync_log = " + mnPkSyncLogId + ", " +
+                    // "id_ety = " + mnPkSyncLogEntryId + ", " +
                     "response_code = '" + msResponseCode + "', " +
                     "response_body = '" + msResponseBody + "', " +
                     "reference_id = '" + msReferenceId + "' " +
@@ -161,6 +169,14 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
 
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SDbSyncLogEntry registry = new SDbSyncLogEntry();
+        registry.setPkSyncLogId(mnPkSyncLogId);
+        registry.setPkSyncLogEntryId(mnPkSyncLogEntryId);
+        registry.setResponseCode(msResponseCode);
+        registry.setResponseBody(msResponseBody);
+        registry.setReferenceId(msReferenceId);
+        registry.setTsSynchronization(mtTsSynchronization);
+
+        return registry;
     }
 }
