@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -3554,6 +3555,89 @@ public abstract class STrnUtilities {
             + "</tr>";
 
         return mail;
+    }
+    
+    public static String generateMailFooterWithChanges(boolean isEdited, List<SDataDpsEntryQuantityChange> qtyChanges, SDataDps dps) {
+         StringBuilder footer = new StringBuilder();
+         boolean hasChanges = false;
+         boolean isQtyEdited = false;
+         boolean isUnitEdited = false;
+
+         if (!qtyChanges.isEmpty()) {
+             SDataDpsEntryQuantityChange change = qtyChanges.get(qtyChanges.size() - 1);
+             isQtyEdited = (change.getQuantityNew() != change.getOriginalQuantityOld());
+             Integer auxFkUnitOld = change.getFkUnitOldId();
+             int fkUnitNewId = change.getFkUnitNewId();
+             isUnitEdited = (auxFkUnitOld != null && !auxFkUnitOld.equals(Integer.valueOf(fkUnitNewId)));
+         }
+
+         footer.append("</table>");
+         footer.append("<br>");
+         footer.append("<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">");
+         footer.append("<tr><th>Campo</th><th>Valor Anterior</th><th>Valor Nuevo</th></tr>");
+
+         Integer auxFkItemOld = dps.getDbmsDpsEntries().get(0).getAuxFkItemOld();
+         int fkItemId = dps.getDbmsDpsEntries().get(0).getFkItemId();
+         if (isEdited && auxFkItemOld != null && auxFkItemOld != fkItemId) {
+             hasChanges = true;
+             footer.append("<tr>")
+                   .append("<td>Artículo</td>")
+                   .append("<td>").append(auxFkItemOld).append("</td>")
+                   .append("<td><span style=\"color: red;\">").append(fkItemId).append("</span></td>")
+                   .append("</tr>");
+         }
+
+         if (isEdited && isQtyEdited) {
+             hasChanges = true;
+             Double quantityOld = !qtyChanges.isEmpty() ? qtyChanges.get(qtyChanges.size() - 1).getOriginalQuantityOld() : null;
+             double quantityNew = dps.getDbmsDpsEntries().get(0).getQuantity(); // Valor actualizado
+             footer.append("<tr>")
+                   .append("<td>Cantidad</td>")
+                   .append("<td>").append(quantityOld != null ? quantityOld : "N/A").append("</td>")
+                   .append("<td><span style=\"color: red;\">").append(quantityNew).append("</span></td>")
+                   .append("</tr>");
+         }
+
+         if (isEdited && isUnitEdited) {
+             hasChanges = true;
+             Integer unitOld = !qtyChanges.isEmpty() ? qtyChanges.get(qtyChanges.size() - 1).getFkUnitOldId() : null;
+             Integer unitNew = dps.getDbmsDpsEntries().get(0).getAuxFkUnitOld();
+             footer.append("<tr>")
+                   .append("<td>Unidad</td>")
+                   .append("<td>").append(unitOld != null ? unitOld : "N/A").append("</td>")
+                   .append("<td><span style=\"color: red;\">").append(unitNew != null ? unitNew : "N/A").append("</span></td>")
+                   .append("</tr>");
+         }
+
+         double originalPrice = dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getOriginalPriceUnitaryCy();
+         double newPrice = dps.getDbmsDpsEntries().get(0).getPriceUnitary();
+         if (isEdited && originalPrice != newPrice) {
+             hasChanges = true;
+             footer.append("<tr>")
+                   .append("<td>Precio Unitario</td>")
+                   .append("<td>").append(originalPrice).append("</td>")
+                   .append("<td><span style=\"color: red;\">").append(newPrice).append("</span></td>")
+                   .append("</tr>");
+         }
+
+         Integer auxFkUnitOld = dps.getDbmsDpsEntries().get(0).getAuxFkUnitOld();
+         Integer auxFkOriginalUnitOld = dps.getDbmsDpsEntries().get(0).getAuxFkOriginalUnitOld();
+         if (isEdited && auxFkUnitOld != null && auxFkOriginalUnitOld != null && !auxFkUnitOld.equals(auxFkOriginalUnitOld)) {
+             hasChanges = true;
+             footer.append("<tr>")
+                   .append("<td>Unidad Original</td>")
+                   .append("<td>").append(auxFkUnitOld).append("</td>")
+                   .append("<td><span style=\"color: red;\">").append(auxFkOriginalUnitOld).append("</span></td>")
+                   .append("</tr>");
+         }
+
+         if (hasChanges) {
+             footer.append("</table>");
+         } else {
+             footer.append("<p>No se detectaron cambios de item, cantidad, unidad, precio o moneda.</p>");
+         }
+
+         return footer.toString();
     }
     
     public static String computeMailFooterEndTable() {

@@ -12,6 +12,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.swapms.utils.SExportUtils;
 import erp.musr.view.SViewUser;
 import java.sql.SQLException;
@@ -29,7 +30,7 @@ import sa.lib.grid.SGridUtils;
 public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     private int supplierMatrix = 1;
     private int supplierType = 2;
-    private javax.swing.JButton jbExportData;
+    private javax.swing.JButton jbExportDataToSwapServices;
     
     public SViewBizPartnerUpdate(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.BPSU_BP_DT, auxType01);
@@ -54,12 +55,12 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         jbDelete.setEnabled(false);
         
         try {
-            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICE_CONFIG);
+            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
             if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                jbExportData = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
+                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
 
                 addTaskBarUpperSeparator();
-                addTaskBarUpperComponent(jbExportData);
+                addTaskBarUpperComponent(jbExportDataToSwapServices);
             }
         }
         catch (Exception e) {
@@ -165,24 +166,25 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         super.actionPerformed(e);
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
-            if (button == jbExportData) {
+            if (button == jbExportDataToSwapServices) {
                 actionExportData();
             }
         }
     }
     
     private void actionExportData() {
-        if (jbExportData != null && jbExportData.isEnabled()) {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             boolean bSyncAll = false;
             try {
-                String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SExportUtils.EXPORT_SYNC_SUPPLIERS, bSyncAll);
+                String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SDbSyncLog.EXPORT_SYNC_SUPPLIERS, bSyncAll);
                 if (sResponse != null && sResponse.isEmpty()) {
-                    miClient.showMsgBoxInformation("Datos exportados correctamente");
+                    miClient.showMsgBoxInformation("Datos exportados correctamente.");
                 }
                 else {
                     miClient.showMsgBoxInformation("No se han encontrado datos para exportar." + sResponse);
                 }
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 e.printStackTrace();
             }
         }

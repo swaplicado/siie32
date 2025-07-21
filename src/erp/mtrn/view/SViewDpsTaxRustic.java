@@ -74,16 +74,17 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
         int i;
 
         moTablePane.reset();
-        maoTableColumns = new STableColumn[18];
+        maoTableColumns = new STableColumn[19];
         
         i = 0;
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "FECHA", "Fecha doc.", STableConstants.WIDTH_DATE);
         maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rnum", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
         maoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "NUM", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "BP", "RFC", 200);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "BP.fiscal_id", "RFC", 200);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "BP", "Proveedor", 200);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "locality", "Municipio", 100);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "AD.zip_code", "Código postal", 50);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "CONCEPT", "Producto(Ítem)", 300);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "MASS", "Volumen", STableConstants.WIDTH_QUANTITY);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "PRICE_U", "P.U.", STableConstants.WIDTH_QUANTITY);
@@ -121,7 +122,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
         try {
             msSql = "SELECT D.DT AS FECHA, " +
                     "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) as f_rnum, " +
-                    "D.NUM, BP.BP, AD.locality, E.CONCEPT, E.MASS, E.PRICE_U, E.STOT_CUR_R, " +
+                    "D.NUM, BP.BP, BP.fiscal_id, AD.zip_code, AD.locality, E.CONCEPT, E.MASS, E.PRICE_U, E.STOT_CUR_R, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_pred[0] + "  AND TAX.ID_TAX = " + tax_rus_pred[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS IMPUESTOPREDIAL, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_prod_dep[0] + " AND TAX.ID_TAX = " + tax_rus_prod_dep[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS PRODEPORTE, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_pia[0] + " AND TAX.ID_TAX = " + tax_rus_pia[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS PIAFES, " +

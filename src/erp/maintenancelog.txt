@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 282.2/ 2025-07-21
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Correeción colunma RFC en el impuesto predial rustico.
+2) Adicicón de CP en el impuesto predial rustico.
+3) Correción de varibales en la exportación de bizParther en la vista de actulización de datos
+4) Funcionalidad de modifcación de contratos, solo se envie correo se se modifica precio, moneda, unidad, cantidad o ítem
+
+================================================================================
 SIIE 3.2 282.1/ 2025-07-18
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
