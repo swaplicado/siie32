@@ -12,12 +12,18 @@ import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.musr.data.SDataUserGroup;
+import erp.musr.data.SDataUserGroupUser;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -37,6 +43,9 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
     private erp.musr.data.SDataUserGroup moUserGroup;
     private erp.lib.form.SFormField moFieldUserGroup;
     private erp.lib.form.SFormField moFieldIsDeleted;
+    
+    private ArrayList<SDataUserGroupUser> maAvailableUsers;
+    private ArrayList<SDataUserGroupUser> maSelectedUsers;
     
     /**
      * Creates new form SFormUserGroup
@@ -60,12 +69,31 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jpRegistry = new javax.swing.JPanel();
+        jpGroupUser = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlUserGroup = new javax.swing.JLabel();
         jtfUserGroup = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jpUsers = new javax.swing.JPanel();
+        jpAvailableUsers = new javax.swing.JPanel();
+        jpAvailableUsersList = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jListAvailableUsers = new javax.swing.JList<>();
+        jpAvailableUsersCenter = new javax.swing.JPanel();
+        jpAvailableUsersControls = new javax.swing.JPanel();
+        jpAddUser = new javax.swing.JPanel();
+        jbAddUser = new javax.swing.JButton();
+        jpAddAllUser = new javax.swing.JPanel();
+        jbAddAllUser = new javax.swing.JButton();
+        jpRemoveUser = new javax.swing.JPanel();
+        jbRemoveUser = new javax.swing.JButton();
+        jpRemoveAllUser = new javax.swing.JPanel();
+        jbRemoveAllUser = new javax.swing.JButton();
+        jpSelectedUsers = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListSelectedUsers = new javax.swing.JList<>();
         jpControls = new javax.swing.JPanel();
         jpControls1 = new javax.swing.JPanel();
         jtfPkUserGroupId_Ro = new javax.swing.JTextField();
@@ -83,11 +111,10 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registo:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registo:"));
+        jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jpGroupUser.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -98,14 +125,90 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         jtfUserGroup.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel3.add(jtfUserGroup);
 
+        jpGroupUser.add(jPanel3);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jckIsDeleted.setForeground(java.awt.Color.red);
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel3.add(jckIsDeleted);
+        jPanel4.add(jckIsDeleted);
 
-        jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpGroupUser.add(jPanel4);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jpRegistry.add(jpGroupUser, java.awt.BorderLayout.NORTH);
+
+        jpUsers.setLayout(new java.awt.BorderLayout());
+
+        jpAvailableUsers.setLayout(new java.awt.BorderLayout());
+
+        jpAvailableUsersList.setBorder(javax.swing.BorderFactory.createTitledBorder("Usuarios disponibles:"));
+        jpAvailableUsersList.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(265, 147));
+
+        jListAvailableUsers.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(jListAvailableUsers);
+
+        jpAvailableUsersList.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jpAvailableUsers.add(jpAvailableUsersList, java.awt.BorderLayout.CENTER);
+
+        jpAvailableUsersCenter.setLayout(new java.awt.BorderLayout());
+
+        jpAvailableUsersControls.setLayout(new java.awt.GridLayout(4, 0));
+
+        jbAddUser.setText(">");
+        jbAddUser.setToolTipText("Agregar usuario");
+        jbAddUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpAddUser.add(jbAddUser);
+
+        jpAvailableUsersControls.add(jpAddUser);
+
+        jbAddAllUser.setText(">>");
+        jbAddAllUser.setToolTipText("Agregar todos los usuarios");
+        jbAddAllUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpAddAllUser.add(jbAddAllUser);
+
+        jpAvailableUsersControls.add(jpAddAllUser);
+
+        jbRemoveUser.setText("<");
+        jbRemoveUser.setToolTipText("Quitar usuario");
+        jbRemoveUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpRemoveUser.add(jbRemoveUser);
+
+        jpAvailableUsersControls.add(jpRemoveUser);
+
+        jbRemoveAllUser.setText("<<");
+        jbRemoveAllUser.setToolTipText("Quitar todos los usuarios");
+        jbRemoveAllUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpRemoveAllUser.add(jbRemoveAllUser);
+
+        jpAvailableUsersControls.add(jpRemoveAllUser);
+
+        jpAvailableUsersCenter.add(jpAvailableUsersControls, java.awt.BorderLayout.NORTH);
+
+        jpAvailableUsers.add(jpAvailableUsersCenter, java.awt.BorderLayout.EAST);
+
+        jpUsers.add(jpAvailableUsers, java.awt.BorderLayout.WEST);
+
+        jpSelectedUsers.setBorder(javax.swing.BorderFactory.createTitledBorder("Usuarios seleccionados:"));
+        jpSelectedUsers.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(275, 147));
+
+        jListSelectedUsers.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane2.setViewportView(jListSelectedUsers);
+
+        jpSelectedUsers.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jpUsers.add(jpSelectedUsers, java.awt.BorderLayout.CENTER);
+
+        jpRegistry.add(jpUsers, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
         jpControls.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -135,7 +238,7 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(416, 289));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -145,7 +248,7 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
 
     private void initComponentsExtra() {
         moFieldUserGroup = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfUserGroup, jlUserGroup);
-        moFieldUserGroup.setLengthMin(5);
+        moFieldUserGroup.setLengthMin(1);
         moFieldUserGroup.setLengthMax(50);
         moFieldIsDeleted = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
         
@@ -153,6 +256,10 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         mvFields.add(moFieldUserGroup);
         mvFields.add(moFieldIsDeleted);
         
+        jbAddUser.addActionListener(this);
+        jbAddAllUser.addActionListener(this);
+        jbRemoveUser.addActionListener(this);
+        jbRemoveAllUser.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         
@@ -178,6 +285,101 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         }
     }
     
+    private void readAvailableUsers() {
+        try {
+            maAvailableUsers.clear();
+            String selectedIds = "";
+            for (SDataUserGroupUser ugu : maSelectedUsers) {
+                selectedIds += (selectedIds.isEmpty() ? "" : ", ") + ugu.getPkUserId();
+            }
+            String sql = "SELECT id_usr, usr FROM erp.usru_usr "
+                    + "WHERE NOT b_del "
+                    + "AND id_usr NOT IN(" + (selectedIds.isEmpty() ? SLibConsts.UNDEFINED : selectedIds) + ") "
+                    + "AND usr <> '' "
+                    + "ORDER BY usr";
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                SDataUserGroupUser ugu = new SDataUserGroupUser();
+                ugu.setPkUserId(resultSet.getInt(1));
+                ugu.setUserName(resultSet.getString(2));
+                maAvailableUsers.add(ugu);
+            }
+            
+            populateAvailableUsers();
+        }
+        catch (SQLException e) {}
+    }
+    
+    private void populateAvailableUsers() {
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        maAvailableUsers.forEach((ugu) -> {
+            listModel.addElement(ugu.getUserName());
+        });
+        jListAvailableUsers.setModel(listModel);
+    }
+    
+    private void populateSelectedUsers() {
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        maSelectedUsers.forEach((ugu) -> {
+            listModel.addElement(ugu.getUserName());
+        });
+        jListSelectedUsers.setModel(listModel);
+    }
+    
+    private void actionAddUser() {
+        int selectedIndex = jListAvailableUsers.getSelectedIndex();
+        for (SDataUserGroupUser ugu : maAvailableUsers) {
+            if (ugu.getUserName().equals(jListAvailableUsers.getSelectedValue())){
+                maSelectedUsers.add(ugu);
+                maAvailableUsers.remove(ugu);
+                break;
+            }
+        }
+        populateAvailableUsers();
+        populateSelectedUsers();
+        jListAvailableUsers.setSelectedIndex(jListAvailableUsers.getModel().getSize() == selectedIndex ? selectedIndex -1 : selectedIndex);
+        jListSelectedUsers.setSelectedIndex(jListSelectedUsers.getModel().getSize() - 1);
+    }
+
+    private void actionAddAllUser() {
+        maAvailableUsers.forEach((ugu) -> {
+            maSelectedUsers.add(ugu);
+        });
+        maAvailableUsers.clear();
+        populateAvailableUsers();
+        populateSelectedUsers();
+        jListSelectedUsers.setSelectedIndex(jListSelectedUsers.getModel().getSize() - 1);
+    }
+
+    private void actionRemoveUser() {
+        int selectedIndex = jListSelectedUsers.getSelectedIndex();
+        for (SDataUserGroupUser ugu : maSelectedUsers) {
+            if (ugu.getUserName().equals(jListSelectedUsers.getSelectedValue())){
+                if (!ugu.getIsUserDeleted()) {
+                    maAvailableUsers.add(ugu);
+                }
+                maSelectedUsers.remove(ugu);
+                break;
+            }
+        }
+        populateAvailableUsers();
+        populateSelectedUsers();
+        jListSelectedUsers.setSelectedIndex(jListSelectedUsers.getModel().getSize() == selectedIndex ? selectedIndex -1 : selectedIndex);
+        jListAvailableUsers.setSelectedIndex(jListAvailableUsers.getModel().getSize() - 1);
+    }
+
+    private void actionRemoveAllUser() {
+        maSelectedUsers.forEach((ugu) -> {
+            if (!ugu.getIsUserDeleted()) {
+                maAvailableUsers.add(ugu);
+            }
+        });
+        maSelectedUsers.clear();
+        populateAvailableUsers();
+        populateSelectedUsers();
+        jListAvailableUsers.setSelectedIndex(jListAvailableUsers.getModel().getSize() - 1);
+    }
+    
     private void actionOk() {
         erp.lib.form.SFormValidation validation = formValidate();
 
@@ -200,18 +402,36 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         setVisible(false);
     }
     
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JList<String> jListAvailableUsers;
+    private javax.swing.JList<String> jListSelectedUsers;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton jbAddAllUser;
+    private javax.swing.JButton jbAddUser;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbRemoveAllUser;
+    private javax.swing.JButton jbRemoveUser;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlUserGroup;
+    private javax.swing.JPanel jpAddAllUser;
+    private javax.swing.JPanel jpAddUser;
+    private javax.swing.JPanel jpAvailableUsers;
+    private javax.swing.JPanel jpAvailableUsersCenter;
+    private javax.swing.JPanel jpAvailableUsersControls;
+    private javax.swing.JPanel jpAvailableUsersList;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpControls1;
     private javax.swing.JPanel jpControls2;
+    private javax.swing.JPanel jpGroupUser;
+    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JPanel jpRemoveAllUser;
+    private javax.swing.JPanel jpRemoveUser;
+    private javax.swing.JPanel jpSelectedUsers;
+    private javax.swing.JPanel jpUsers;
     private javax.swing.JTextField jtfPkUserGroupId_Ro;
     private javax.swing.JTextField jtfUserGroup;
     // End of variables declaration//GEN-END:variables
@@ -235,7 +455,16 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+        
+        maAvailableUsers = new ArrayList<>();
+        maSelectedUsers = new ArrayList<>();
 
+        readAvailableUsers();
+        populateSelectedUsers();
+        jListAvailableUsers.ensureIndexIsVisible(0);
+        
+        jckIsDeleted.setEnabled(false);
+        
         mbResetingForm = false;
     }
 
@@ -254,6 +483,24 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
                 break;
             }
         }
+        
+        if (!validation.getIsError()) {
+            if (maSelectedUsers.isEmpty()) {
+                validation.setMessage("No se puede guardar debido que no hay usuarios seleccionados.");
+                validation.setComponent(jbAddUser);
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            for (SDataUserGroupUser ugu : maSelectedUsers) {
+                if (ugu.getIsUserDeleted()) {
+                    validation.setMessage("No se puede guardar debido que hay usuarios seleccionados que están eliminados.");
+                    validation.setComponent(jbRemoveUser);
+                    break;
+                }
+            }
+        }
+        
         return validation;
     }
 
@@ -285,6 +532,14 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         moFieldIsDeleted.setFieldValue(moUserGroup.getIsDeleted());
         jtfPkUserGroupId_Ro.setText("" + moUserGroup.getPkUserGroupId());
         
+        maSelectedUsers.clear();
+        moUserGroup.getDbmsUserGroupUsers().forEach((ugu) -> {
+            maSelectedUsers.add(ugu);
+        });
+        readAvailableUsers();
+        populateSelectedUsers();
+        jListAvailableUsers.ensureIndexIsVisible(0);
+        
         jckIsDeleted.setEnabled(moUserGroup.getIsCanDelete());
     }
 
@@ -302,6 +557,11 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         
         moUserGroup.setUserGroup(moFieldUserGroup.getString());
         moUserGroup.setIsDeleted(moFieldIsDeleted.getBoolean());
+        
+        moUserGroup.getDbmsUserGroupUsers().clear();
+        maSelectedUsers.forEach((ugu) -> {
+            moUserGroup.getDbmsUserGroupUsers().add(ugu);
+        });
         
         return moUserGroup;
     }
@@ -326,7 +586,19 @@ public class SFormUserGroup extends javax.swing.JDialog implements erp.lib.form.
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbOk) {
+            if (button == jbAddUser) {
+                actionAddUser();
+            }
+            else if (button == jbAddAllUser) {
+                actionAddAllUser();
+            }
+            else if (button == jbRemoveUser) {
+                actionRemoveUser();
+            }
+            else if (button == jbRemoveAllUser) {
+                actionRemoveAllUser();
+            }
+            else if (button == jbOk) {
                 actionOk();
             }
             else if (button == jbCancel) {

@@ -10555,8 +10555,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (!mbFisDataCfdiUsageUserChange) {
                     moFieldFisDataCfdiUsage.setFieldValue(usage);
                 }
-                else if (!moFieldFisDataCfdiUsage.getFieldValue().toString().equals(usage) && miClient.showMsgBoxConfirm("La naturaleza doc. seleccionada tiene configurado el Uso de CFDI '" + usage + "'.\n"
-                        + "¿Desea asignar este valor al campo '" + jlFisDataCfdiUsage.getText() + "'?") == JOptionPane.OK_OPTION) {
+                else if (!moFieldFisDataCfdiUsage.getFieldValue().toString().equals(usage) && miClient.showMsgBoxConfirm("El valor del campo '" + jlFkDpsNatureId.getText() + "' tiene configurado el Uso del CFDI '" + usage + "',\n"
+                        + "pero el valor del campo '" + jlFisDataCfdiUsage.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', es '" + moFieldFisDataCfdiUsage.getFieldValue().toString() + "'.\n"
+                        + "¿Desea asignar el valor '" + usage + "' al campo '" + jlFisDataCfdiUsage.getText() + "'?") == JOptionPane.OK_OPTION) {
                         moFieldFisDataCfdiUsage.setFieldValue(usage);
                         msCfdiUsageSelected = usage;
                 } 
@@ -12541,9 +12542,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         
                         if (isApplingFiscalData()) {
                             if (moBizPartnerCategory.getTaxRegime().isEmpty() && jcbFisDataTaxRegimeIssuing.getSelectedIndex() > 0) {
-                                if(miClient.showMsgBoxConfirm("El campo '" + jlFisDataTaxRegimeIssuing.getText() + "' que corresponde a los datos fiscales, tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString()
-                                            + "'.\nEl proveedor en el catálogo no tiene un regimén fiscal asignado, por lo que hay que asegurarse de que este valor sea correcto.\n"
-                                            + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
+                                if(miClient.showMsgBoxConfirm("El campo '" + jlFisDataTaxRegimeIssuing.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString() + "',\n"
+                                        + "pero el proveedor en el catálogo no tiene asignado un regimén fiscal, por lo que hay que asegurarse de que este valor es correcto.\n"
+                                        + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
                                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
                                     validation.setComponent(jcbFisDataTaxRegimeIssuing);
                                     validation.setTabbedPaneIndex(TAB_FIS_DATA);
@@ -12553,9 +12554,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             if (!validation.getIsError()) {
                                 if (moConfPurposeDpsNature.getfixAsset().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0]) &&
                                         !moConfPurposeCfdUse.getfixAsset().contains(moFieldFisDataCfdiUsage.getFieldValue().toString())) {
-                                    if (miClient.showMsgBoxConfirm("El campo '" + jlFisDataCfdiUsage.getText() + "' que corresponde a los datos fiscales, no coincide con el propósito de '" + jlFkDpsNatureId.getText() + "' seleccionada.\n"
+                                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFisDataCfdiUsage.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) +"', '" + moFieldFisDataCfdiUsage.getFieldValue().toString() + "',\n"
+                                            + "no concuerda con el valor del campo '" + jlFkDpsNatureId.getText() + "', '" + jcbFkDpsNatureId.getSelectedItem().toString() + "'.\n"
                                             + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataCfdiUsage.getText());
+                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFisDataCfdiUsage.getText() + "'");
                                         validation.setComponent(jcbFisDataCfdiUsage);
                                         validation.setTabbedPaneIndex(TAB_FIS_DATA);
                                     }

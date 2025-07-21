@@ -13,6 +13,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -32,9 +33,14 @@ public class SDataUserGroup extends SDataRegistry {
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
+    
+    protected ArrayList<SDataUserGroupUser> maDbmsUserGroupUsers;
 
     public SDataUserGroup() {
         super(SDataConstants.USRU_USR_GRP);
+        
+        maDbmsUserGroupUsers = new ArrayList<>();
+        
         reset();
     }
 
@@ -62,6 +68,8 @@ public class SDataUserGroup extends SDataRegistry {
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
     
+    public ArrayList<SDataUserGroupUser> getDbmsUserGroupUsers() { return maDbmsUserGroupUsers; }
+    
     @Override
     public void setPrimaryKey(Object pk) {
         mnPkUserGroupId = ((int[]) pk)[0];
@@ -87,6 +95,8 @@ public class SDataUserGroup extends SDataRegistry {
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
+        
+        maDbmsUserGroupUsers.clear();
     }
 
     @Override
@@ -94,6 +104,7 @@ public class SDataUserGroup extends SDataRegistry {
         int[] key = (int[]) pk;
         String sql;
         ResultSet resultSet;
+        Statement statementAux;
        
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -117,6 +128,22 @@ public class SDataUserGroup extends SDataRegistry {
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
                 
+                statementAux = statement.getConnection().createStatement();
+                
+                // Leer usuarios pertenecientes al grupo de usuarios
+                
+                sql = "SELECT ugu.id_usr FROM erp.usru_usr_grp_usr AS ugu "
+                        + "INNER JOIN erp.usru_usr AS u ON ugu.id_usr = u.id_usr "
+                        + "WHERE ugu.id_usr_grp = " + mnPkUserGroupId + " "
+                        + "ORDER BY u.usr";
+                resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    SDataUserGroupUser ugu = new SDataUserGroupUser();
+                    if (ugu.read(new int[] { mnPkUserGroupId, resultSet.getInt(1) }, statementAux) == SLibConstants.DB_ACTION_READ_OK) {
+                        maDbmsUserGroupUsers.add(ugu);
+                    }
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -137,6 +164,7 @@ public class SDataUserGroup extends SDataRegistry {
     public int save(Connection connection) {
         int nParam = 1;
         CallableStatement callableStatement;
+        Statement statement;
         
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
@@ -167,6 +195,16 @@ public class SDataUserGroup extends SDataRegistry {
                 throw new Exception(msDbmsError);
             }
             else {
+                statement = connection.createStatement();
+                String sql = "DELETE FROM erp.usru_usr_grp_usr WHERE id_usr_grp = " + mnPkUserGroupId + ";";
+                statement.execute(sql);
+                
+                for (SDataUserGroupUser ugu : maDbmsUserGroupUsers) {
+                    ugu.setPkUserGroupId(mnPkUserGroupId);
+                    ugu.setIsRegistryNew(true);
+                    ugu.save(connection);
+                }
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
