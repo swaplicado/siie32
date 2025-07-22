@@ -250,7 +250,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
         msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
                 + "u.ts_new, u.ts_edit, u.ts_del, u.ts_last_sync_n, un.usr, ue.usr, ud.usr, uls.usr, b.bp, bbc.email_02, e.b_act, "
-                + "syl.ts_usr_ins AS sync_timestamp, "
+                + "syl.ts_sync AS sync_timestamp, "
                 + "CASE WHEN syl.reference_id IS NOT NULL THEN 1 " 
                 + "ELSE 0 END AS sync_status "
                 + "FROM erp.usru_usr AS u "
@@ -262,9 +262,9 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp "
                 + "LEFT OUTER JOIN erp.bpsu_bpb_con AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = 1 "
                 + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp "
-                + "LEFT JOIN (SELECT syl.reference_id, syl.ts_usr_ins "
-                + "FROM cfgu_sync_log_ety AS syl "
-                + "INNER JOIN cfgu_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log "
+                + "LEFT JOIN (SELECT syl.reference_id, syl.ts_sync "
+                + "FROM erp.cfg_sync_log_ety AS syl "
+                + "INNER JOIN erp.cfg_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log "
                 + "WHERE syl.response_code IN ('200', '201') AND sy.id_sync_log = 1 "
                 + ") AS syl ON syl.reference_id = u.id_usr "
                 + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere)
