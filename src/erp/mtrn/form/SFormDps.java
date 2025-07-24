@@ -4674,7 +4674,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //jcbCfdCceMoveReason.setEnabled(enableFields); // field stays disabled, required only for CFDI "T", but not supported yet!
         jcbCfdCceOperationType.setEnabled(enableFields);
         jcbCfdCceRequestKey.setEnabled(enableFields);
-        jcbExportation.setEnabled((enableFields && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice));
+        jcbExportation.setEnabled((enableFields && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsInvoice) || (enableFields && !(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && mbIsDpsAdjustment ));
         if (!jcbExportation.isEnabled()) {
             moFieldCfdCceExportation.setFieldValue(DCfdi40Catalogs.ClaveExportacionNoAplica);
         }
@@ -10690,7 +10690,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void itemStateChangeTypeExportation() {
+    private void itemStateChangeTypeExportation() { // xxx123
         if (jckCfdCceApplies.isSelected() && isCfdIntCommerceRequired()) {
             jlExportation.setEnabled(true);
             jcbExportation.setEnabled(true);

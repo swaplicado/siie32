@@ -28,6 +28,7 @@ import sa.lib.grid.SGridUtils;
  * @author Claudio Peña
  */
 public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+    private int formCancel = 0;
     private int supplierMatrix = 1;
     private int supplierType = 2;
     private javax.swing.JButton jbExportDataToSwapServices;
@@ -106,7 +107,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     public void createSqlQuery() {
         msSql = "SELECT bct.id_ct_bp, b.id_bp, b.bp, b.fiscal_id, b.bp_comm, " +
                 "con.email_01, bct.tax_regime, bct.lead_time, u.usr, lg.ts_usr_upd, " +
-                "syl.ts_usr_ins AS sync_timestamp, " +
+                "syl.ts_sync AS sync_timestamp, " +
                 "CASE WHEN syl.reference_id IS NOT NULL THEN 1 " +
                 "ELSE 0 END AS sync_status " +
                 "FROM erp.bpsu_bp AS b " +
@@ -118,9 +119,9 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                 "FROM erp.bpsu_bp_upd_log GROUP BY id_bp ) l2 ON l1.id_bp = l2.id_bp AND l1.ts_usr_upd = l2.ts_usr_upd " +
                 ") AS lg ON lg.id_bp = b.id_bp " +
                 "LEFT OUTER JOIN erp.usru_usr AS u ON u.id_usr = lg.fk_usr_upd " +
-                "LEFT JOIN (SELECT syl.reference_id, syl.ts_usr_ins " +
-                "FROM cfgu_sync_log_ety AS syl " +
-                "INNER JOIN cfgu_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log " +
+                "LEFT JOIN (SELECT syl.reference_id, syl.ts_sync " +
+                "FROM erp.cfg_sync_log_ety AS syl " +
+                "INNER JOIN erp.cfg_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log " +
                 "WHERE syl.response_code IN ('200', '201') AND sy.id_sync_log = " + supplierType + " " + 
                 ") AS syl ON syl.reference_id = b.id_bp " +
                 "WHERE NOT b.b_del " +
@@ -147,7 +148,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                     new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] }
                 );
                 
-                if (result == 0) { //0 es si el form es igual a cancel
+                if (result == formCancel) {
                     miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabType);
                     populateTable();
                 }
