@@ -87,7 +87,7 @@ public class SExportUtils {
             + "    LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bp.id_bp = bpb.fid_bp "
             + "    LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_ADDEE) + " AS addr ON bp.id_bp = addr.fid_bp "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS addr ON bpb.id_bpb = addr.id_bpb "
             + "    LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS country ON addr.fid_cty_n = country.id_cty "
             + "    LEFT JOIN "
@@ -410,7 +410,7 @@ public class SExportUtils {
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
                 + "         AND slog.sync_type = '" + SDbSyncLog.EXPORT_SYNC_SUPPLIERS + "' "
-                + "WHERE bp.b_sup "
+                + "WHERE bp.b_sup AND length(bp.fiscal_id) > 0 "
                 + "AND    (sloge.ts_sync IS NULL ";
 
         if (oLastSyncDateTime != null) {
@@ -445,15 +445,33 @@ public class SExportUtils {
                 SUserExport user = new SUserExport();
 
                 String fiscalId = sanitizeJsonString(res.getString("bp.fiscal_id"));
+                String foreignFiscalId = sanitizeJsonString(res.getString("bp.fiscal_frg_id"));
                 if (res.getInt("addr.fid_cty_n") <= 1) {
                     user.username = fiscalId;
                 }
                 else {
-                    user.username = countryCode + "." + fiscalId;
+                    if (foreignFiscalId == null || foreignFiscalId.isEmpty()) {
+                        continue;
+                    }
+                    user.username = countryCode + "." + foreignFiscalId;
                 }
 
                 user.password = generateSecurePassword();
-                user.email = sanitizeJsonString(res.getString("email_01"));
+                // Los mails pueden ser varios y separados por punto y coma (;), se toma el primero
+                // y los demás se asignan a otra variable para asignarse después
+                String[] emails = res.getString("email_01").split(";");
+                String otherEmails = "";
+                if (emails.length > 0) {
+                    user.email = sanitizeJsonString(emails[0]);
+                    for (int i = 1; i < emails.length; i++) {
+                        otherEmails += sanitizeJsonString(emails[i]) + ";";
+                        if (i == emails.length - 1) {
+                            otherEmails = otherEmails.substring(0, otherEmails.length() - 1);
+                        }
+                    }
+                } else {
+                    user.email = "";
+                }
                 user.is_active = 1;
                 user.first_name = firstName;
                 user.last_name = lastName;
@@ -462,10 +480,14 @@ public class SExportUtils {
                 attr.full_name = fullName;
                 attr.user_type = USER_TYPE_SUPPLIER;
                 attr.external_id = res.getInt("bp.id_bp");
+                if (otherEmails != null && !otherEmails.isEmpty()) {
+                    attr.other_emails = otherEmails;
+                }
                 user.attributes = attr;
 
                 SUserExport.Partner partner = new SUserExport.Partner();
                 partner.fiscal_id = fiscalId;
+                partner.foreign_fiscal_id = foreignFiscalId;
                 partner.full_name = sanitizeJsonString(res.getString("bp"));
                 partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
                 partner.country = countryCode == null || countryCode.isEmpty() ? LOCAL_COUNTRY_MEX : countryCode;
@@ -473,7 +495,7 @@ public class SExportUtils {
                 partner.bp_comm = sanitizeJsonString(res.getString("bp.bp_comm"));
                 partner.tax_regime = sanitizeJsonString(res.getString("ct.tax_regime"));
                 partner.b_sup = res.getInt("bp.b_sup");
-                partner.partner_mail = sanitizeJsonString(res.getString("email_01"));
+                partner.partner_mail = user.email;
                 user.partner = partner;
 
                 user.groups = new int[] { ROL_SUPPLIER };
