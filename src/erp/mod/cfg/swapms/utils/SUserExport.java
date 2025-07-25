@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Clase que representa la estructura de datos para exportar información de usuario
- * en formato JSON. Utilizada para el intercambio de datos con sistemas externos.
+ * Clase que representa la estructura de datos para exportar información de usuario en formato JSON.
+ * Utilizada para el intercambio de datos con sistemas externos.
  * 
  * Contiene los campos principales de un usuario, sus atributos adicionales,
  * información de socio/compañero (partner) y grupos a los que pertenece.

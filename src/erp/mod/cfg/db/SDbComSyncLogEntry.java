@@ -22,9 +22,9 @@ import sa.lib.gui.SGuiSession;
  * sincronización, cuerpo de la solicitud, código de respuesta, cuerpo de la
  * respuesta, y marcas de tiempo.
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Sergio Flores
  */
-public class SDbSyncLogEntry extends SDbRegistryUser {
+public class SDbComSyncLogEntry extends SDbRegistryUser {
 
     protected int mnPkSyncLogId;
     protected int mnPkEntryId;
@@ -33,8 +33,8 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     protected String msReferenceId;
     protected Date mtTsSynchronization;
     
-    public SDbSyncLogEntry() {
-        super(SModConsts.CFG_SYNC_LOG_ETY);
+    public SDbComSyncLogEntry() {
+        super(SModConsts.CFG_COM_SYNC_LOG_ETY);
     }
 
     public void setPkSyncLogId(int n) { this.mnPkSyncLogId = n; }
@@ -170,7 +170,7 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
 
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
-        SDbSyncLogEntry registry = new SDbSyncLogEntry();
+        SDbComSyncLogEntry registry = new SDbComSyncLogEntry();
         registry.setPkSyncLogId(mnPkSyncLogId);
         registry.setPkEntryId(mnPkEntryId);
         registry.setResponseCode(msResponseCode);

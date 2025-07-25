@@ -104,7 +104,11 @@ public abstract class SModConsts {
 
     public static final int CFG_MMS = 1013501;
     public static final int CFG_PARAM_CO = 1013502;
+    public static final int CFG_PARAM = 1013521;
+    public static final int CFG_CFD = 1013511;
     public static final int CFG_CUSTOM_REP = 1013531;
+    public static final int CFG_COM_SYNC_LOG = 1013551;
+    public static final int CFG_COM_SYNC_LOG_ETY = 1013552;
     
     public static final int CFGX_AUTHORN_COMMENTS = 1014001;
     
@@ -1015,7 +1019,11 @@ public abstract class SModConsts {
 
         TablesMap.put(CFG_MMS, "cfg_mms");
         TablesMap.put(CFG_PARAM_CO, "cfg_param_co");
+        TablesMap.put(CFG_PARAM, "cfg_param");
+        TablesMap.put(CFG_CFD, "cfg_cfd");
         TablesMap.put(CFG_CUSTOM_REP, "cfg_custom_rep");
+        TablesMap.put(CFG_COM_SYNC_LOG, "cfg_com_sync_log");
+        TablesMap.put(CFG_COM_SYNC_LOG_ETY, "cfg_com_sync_log_ety");
 
         TablesMap.put(USRS_TP_USR, "erp.usrs_tp_usr");
         TablesMap.put(USRS_TP_LEV, "erp.usrs_tp_lev");

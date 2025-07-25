@@ -9,18 +9,18 @@ package erp.mod.cfg.swapms.utils;
  * Clase contenedora para exportar datos masivos en formato JSON.
  * Utilizada como estructura principal para enviar múltiples usuarios junto con información de instancias de trabajo.
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Sergio Flores
  */
-public class SBodyExport {
+public class SReferenceBody {
     /**
      * Arreglo de identificadores de instancias de trabajo.
-     * Cada elemento representa una instancia de trabajo relacionada con los usuarios incluidos en el export.
+     * Cada elemento representa una instancia de trabajo relacionada con las referencias incluidas en el export.
      */
     public String[] work_instance;
     
     /**
-     * Arreglo de usuarios a exportar.
-     * Contiene objetos de tipo SUserExport con la información completa de cada usuario.
+     * Arreglo de referencias a exportar.
+     * Contiene objetos de tipo SReference con la información completa de cada referencia.
      */
     public SUserExport[] users;
 }

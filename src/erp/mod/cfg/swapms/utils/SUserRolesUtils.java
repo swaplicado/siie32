@@ -5,7 +5,6 @@ package erp.mod.cfg.swapms.utils;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import java.util.List;
 import erp.musr.data.SDataUser;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
  * Clase de utilidades para obtener los roles asignados a un usuario
  * según su configuración y permisos en la empresa.
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SUserRolesUtils {
     
@@ -26,11 +25,11 @@ public class SUserRolesUtils {
      * @param companyId ID de la empresa.
      * @return Lista de IDs de roles asignados al usuario.
      */
-    public static List<Integer> getRolesOfUser(Statement statement, int userId, final int companyId) {
+    public static ArrayList<Integer> getRolesOfUser(Statement statement, int userId, final int companyId) {
         SDataUser user = new SDataUser();
         user.read(new int[] { userId }, statement); // Carga los datos del usuario desde la base de datos
         
-        List<Integer> lRoles = new ArrayList<>();
+        ArrayList<Integer> lRoles = new ArrayList<>();
         
         // Si el usuario es universal, se le asignan todos los roles relevantes
         if (user.getIsUniversal()) {

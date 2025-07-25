@@ -47,9 +47,8 @@ public class SUserExportUtils {
            
         try {
             ResultSet resultSet = statement.executeQuery(sql);
-            
-            
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SUserExportUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -60,6 +59,7 @@ public class SUserExportUtils {
         String urls = "";
         String url = "";
         String value = "";
+        
         try {
             urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS);
             String arrayUrls[] = urls.split(";");
@@ -87,7 +87,7 @@ public class SUserExportUtils {
         SConectionUtils oCon = new SConectionUtils(miClient);
         oCon.conectWithSiieApp(url, "POST", data, null);
         
-        if( oCon.responseCode != 200){
+        if (oCon.responseCode != 200){
             miClient.showMsgBoxError("No fue posible conectarse con SIIE App.");
             return null;
         }
@@ -116,7 +116,7 @@ public class SUserExportUtils {
             SConectionUtils oCon = new SConectionUtils(miClient);
             oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
 
-            if( oCon.responseCode != 200){
+            if (oCon.responseCode != 200){
                 miClient.showMsgBoxError("No fue posible obtener el acceso a SIIE App.");
                 return null;
             }
@@ -137,7 +137,8 @@ public class SUserExportUtils {
                 apps.add(appRow);
             }
             
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         
@@ -145,14 +146,14 @@ public class SUserExportUtils {
     }
     
     public boolean exportUser(SDataUser user, SDataBizPartner moBizPartner, ArrayList<Vector> lApps) throws SQLException, ParseException{
-        if(user.getEmail().isEmpty()){
+        if (user.getEmail().isEmpty()){
             miClient.showMsgBoxWarning("Debe introducir una direccion de email");
             return false;
         }
         
         String token = this.loginSiieApp();
         
-        if(token.isEmpty()){
+        if (token.isEmpty()){
             return false;
         }
         
@@ -177,7 +178,7 @@ public class SUserExportUtils {
                         + "\"assigned\": \"" + app.get(2) + "\""
                         + "}";
                 
-                if(size > 0){
+                if (size > 0){
                     sJson = sJson + ",";
                 }
             }
@@ -201,12 +202,13 @@ public class SUserExportUtils {
             SConectionUtils oCon = new SConectionUtils(miClient);
             oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
 
-            if( oCon.responseCode != 200 ){
-                miClient.showMsgBoxError("No fue posible exportar el usuario");
+            if (oCon.responseCode != 200){
+                miClient.showMsgBoxError("No fue posible exportar el usuario.");
                 return false;
             }
             
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logger.getLogger(erp.siieapp.SUserExportUtils.class.getName()).log(Level.SEVERE, null, e);
         }
         
@@ -220,7 +222,7 @@ public class SUserExportUtils {
     public boolean unactiveUser(int userId, boolean isActive, boolean isDeleted) throws SQLException, ParseException{
         String token = this.loginSiieApp();
         
-        if(token.isEmpty()){
+        if (token.isEmpty()){
             return false;
         }
                 
@@ -238,12 +240,13 @@ public class SUserExportUtils {
             SConectionUtils oCon = new SConectionUtils(miClient);
             oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
 
-            if( oCon.responseCode != 200 && oCon.responseCode != 404 ){
+            if (oCon.responseCode != 200 && oCon.responseCode != 404 ){
                 miClient.showMsgBoxError("No fue posible actualizar el usuario en SIIE App.");
                 return false;
             }
             
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logger.getLogger(erp.siieapp.SUserExportUtils.class.getName()).log(Level.SEVERE, null, e);
         }
         
@@ -256,7 +259,7 @@ public class SUserExportUtils {
                 
             String token = this.loginSiieApp();
         
-            if(token.isEmpty()){
+            if (token.isEmpty()){
                 return false;
             }
             
@@ -276,7 +279,7 @@ public class SUserExportUtils {
                             + "\"isDeleted\": \"" + resultSet.getString("b_del") + "\""
                             + "}";
                     
-                    if(!resultSet.isLast()){
+                    if (!resultSet.isLast()){
                         sJson = sJson + ",";
                     }
                 }
@@ -295,10 +298,12 @@ public class SUserExportUtils {
             SConectionUtils oCon = new SConectionUtils(miClient);
             oCon.conectWithSiieApp(urlExportUser, "POST", data, "Bearer " + token);
             
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logger.getLogger(erp.siieapp.SUserExportUtils.class.getName()).log(Level.SEVERE, null, e);
             miClient.showMsgBoxError(e.getMessage());
-        } finally {
+        }
+        finally {
                 SGuiUtils.setCursorDefault(miClient);
                 miClient.showMsgBoxInformation("Usuarios sincronizados con SIIE App.");
         }

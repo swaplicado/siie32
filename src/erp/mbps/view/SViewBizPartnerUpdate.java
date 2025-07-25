@@ -12,10 +12,10 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
-import erp.mod.cfg.db.SDbSyncLog;
+import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swapms.utils.SExportUtils;
+import erp.mod.cfg.swapms.utils.SSwapConsts;
 import erp.musr.view.SViewUser;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -56,9 +56,10 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         jbDelete.setEnabled(false);
         
         try {
-            String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
-            if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
+            String paramValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
+            
+            if (!paramValue.isEmpty()) {
+                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -101,6 +102,26 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         mvSuscriptors.add(SDataConstants.BPSX_BP_CUS);
 
         populateTable();
+    }
+    
+    private void actionExportDataToSwapServices() {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
+            boolean syncAll = false;
+            
+            try {
+                String response = SExportUtils.exportJsonData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, syncAll);
+                
+                if (response.isEmpty()) {
+                    miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
+                }
+                else {
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -168,25 +189,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
             if (button == jbExportDataToSwapServices) {
-                actionExportData();
-            }
-        }
-    }
-    
-    private void actionExportData() {
-        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            boolean bSyncAll = false;
-            try {
-                String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SDbSyncLog.EXPORT_SYNC_SUPPLIERS, bSyncAll);
-                if (sResponse != null && sResponse.isEmpty()) {
-                    miClient.showMsgBoxInformation("Datos exportados correctamente.");
-                }
-                else {
-                    miClient.showMsgBoxInformation("No se han encontrado datos para exportar." + sResponse);
-                }
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
+                actionExportDataToSwapServices();
             }
         }
     }

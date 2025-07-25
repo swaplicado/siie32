@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona, Sergio Flores
  */
-public class SDbSyncLog extends SDbRegistryUser {
+public class SDbComSyncLog extends SDbRegistryUser {
     
     protected int mnPkSyncLogId;
     protected String msSyncType;
@@ -34,10 +34,10 @@ public class SDbSyncLog extends SDbRegistryUser {
     protected int mnFkUserId;
     protected Date mtTsUser;
     
-    protected ArrayList<SDbSyncLogEntry> moEntries;
+    protected ArrayList<SDbComSyncLogEntry> moEntries;
     
-    public SDbSyncLog() {
-        super(SModConsts.CFG_SYNC_LOG);
+    public SDbComSyncLog() {
+        super(SModConsts.CFG_COM_SYNC_LOG);
     }
 
     public void setPkSyncLogId(int n) { this.mnPkSyncLogId = n; }
@@ -60,7 +60,7 @@ public class SDbSyncLog extends SDbRegistryUser {
     public int getFkUserId() { return this.mnFkUserId; }
     public Date getTsUser() { return this.mtTsUser; }
 
-    public ArrayList<SDbSyncLogEntry> getEntries() { return moEntries; }
+    public ArrayList<SDbComSyncLogEntry> getEntries() { return moEntries; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -161,9 +161,9 @@ public class SDbSyncLog extends SDbRegistryUser {
             
             try (ResultSet resultSetEntries = session.getStatement().executeQuery(msSql)) {
                 while (resultSetEntries.next()) {
-                    SDbSyncLogEntry oSyncLogEntry = new SDbSyncLogEntry();
-                    oSyncLogEntry.read(session, new int[] { resultSetEntries.getInt("id_sync_log_entry") });
-                    moEntries.add(oSyncLogEntry);
+                    SDbComSyncLogEntry entry = new SDbComSyncLogEntry();
+                    entry.read(session, new int[] { resultSetEntries.getInt("id_sync_log_entry") });
+                    moEntries.add(entry);
                 }
             }
 
@@ -217,7 +217,7 @@ public class SDbSyncLog extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
 
-        for (SDbSyncLogEntry entry : moEntries) {
+        for (SDbComSyncLogEntry entry : moEntries) {
             entry.setPkSyncLogId(mnPkSyncLogId);
             entry.save(session);
         }
@@ -228,7 +228,7 @@ public class SDbSyncLog extends SDbRegistryUser {
 
     @Override
     public SDbRegistry clone() throws CloneNotSupportedException {
-        SDbSyncLog registry = new SDbSyncLog();
+        SDbComSyncLog registry = new SDbComSyncLog();
         registry.setPkSyncLogId(this.getPkSyncLogId());
         registry.setSyncType(this.getSyncType());
         registry.setRequestBody(this.getRequestBody());
@@ -239,8 +239,8 @@ public class SDbSyncLog extends SDbRegistryUser {
         registry.setFkUserId(this.mnFkUserId);
         registry.setTsUser(this.mtTsUser);
         
-        for (SDbSyncLogEntry entry : this.moEntries) {
-            registry.getEntries().add((SDbSyncLogEntry) entry.clone());
+        for (SDbComSyncLogEntry entry : this.moEntries) {
+            registry.getEntries().add((SDbComSyncLogEntry) entry.clone());
         }
         
         return registry;

@@ -18,8 +18,9 @@ import erp.lib.table.STableSetting;
 import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.mod.cfg.db.SDbSyncLog;
+import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swapms.utils.SExportUtils;
+import erp.mod.cfg.swapms.utils.SSwapConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsConsts;
@@ -30,7 +31,6 @@ import erp.musr.view.SViewUser;
 import erp.table.SFilterConstants;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
@@ -274,9 +274,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
 
                 try {
-                    String sServiceConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
-                    if (sServiceConfig != null && !sServiceConfig.isEmpty()) {
-                        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar datos a servicio externo", this);
+                    String paramValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
+                    
+                    if (!paramValue.isEmpty()) {
+                        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
                         addTaskBarUpperSeparator();
                         addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -634,19 +635,21 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
     }
 
-    private void actionExportData() {
+    private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            boolean bSyncAll = false;
+            boolean syncAll = false;
+            
             try {
-                String sResponse = SExportUtils.exportJsonData(miClient.getSession(), SDbSyncLog.EXPORT_SYNC_SUPPLIERS, bSyncAll);
-                if (sResponse != null && sResponse.isEmpty()) {
-                    miClient.showMsgBoxInformation("Datos exportados correctamente.");
+                String response = SExportUtils.exportJsonData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, syncAll);
+                
+                if (response.isEmpty()) {
+                    miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
                 }
                 else {
-                    miClient.showMsgBoxInformation("No se han encontrado datos para exportar." + sResponse);
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
                 }
             }
-            catch (SQLException e) {
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -990,7 +993,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 actionClearFilterDepartament();
             }
             else if (button == jbExportDataToSwapServices) {
-                actionExportData();
+                actionExportDataToSwapServices();
             }
         }
     }

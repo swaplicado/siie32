@@ -8,14 +8,13 @@ package erp.mod.cfg.swapms.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.db.SDbSyncLogEntry;
+import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.utils.SAuthJsonUtils;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -26,7 +25,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,9 +39,10 @@ import sa.lib.gui.SGuiSession;
  * JSON usando Jackson, facilitando la integración y sincronización de información
  * con otros sistemas.
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SExportUtils {
+    
     /** Tipo de usuario interno. */
     public static final int USER_TYPE_INTERNAL = 1;
     /** Tipo de usuario proveedor. */
@@ -57,6 +56,9 @@ public class SExportUtils {
     public static final int ROL_PAYER = 3;
     /** Rol proveedor. */
     public static final int ROL_SUPPLIER = 4;
+    
+    /** Tamaño máximo a preservar de las respuestas de los servicios. */
+    public static final int SIZE_64_KB = 2 ^ 16; // 65536
     
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
@@ -73,6 +75,8 @@ public class SExportUtils {
     private static final String LOCAL_COUNTRY_MEX = "MEX";
 
     private static final int TIME_60_SECONDS = 60 * 1000; // 60 segundos en milisegundos
+    
+    private static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
 
     private static final String BASE_PROVIDER_QUERY = "SELECT "
             + "    bp.*, "
@@ -92,217 +96,53 @@ public class SExportUtils {
             + "    " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS country ON addr.fid_cty_n = country.id_cty "
             + "    LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb ";
-
+    
     /**
-     * Ejecuta una consulta para obtener usuarios o proveedores y genera un JSON.
-     *
-     * @param session   Sesión de usuario para acceder a la base de datos.
-     * @param sSyncType Tipo de sincronización (USUARIO o PROVEEDOR).
-     * @param bSyncAll  Si es true, sincroniza todos los registros; si es false, solo los nuevos/cambiados.
-     * @return String con el JSON generado o mensaje de error.
-     * @throws SQLException Si ocurre un error en la consulta.
-     */
-    public static String exportJsonData(final SGuiSession session, final String sSyncType, final boolean bSyncAll) throws SQLException {
-        try {
-            // Determina la fecha de la última sincronización exitosa si no es sincronización total
-            Date lastSyncDate = bSyncAll ? null : getLastSyncDateTime(session.getStatement(), sSyncType);
-
-            // Obtiene la configuración del servicio de sincronización
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode config = mapper.readTree(
-                SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
-            );
-
-            // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
-            List<SUserExport> dataToExport = getDataToExport(session.getStatement(), sSyncType, lastSyncDate, session.getConfigCompany().getCompanyId());
-
-            // Lee parámetros de configuración para la exportación
-            String syncUrl = SAuthJsonUtils.getValueOfElement(config, "", "user_sync_url");
-            int syncLimit = Integer.parseInt(SAuthJsonUtils.getValueOfElement(config, "", "user_sync_limit"));
-            String syncToken = SAuthJsonUtils.getValueOfElement(config, "", "user_sync_token");
-
-            // Si no hay datos para exportar, registra el intento y retorna vacío
-            if (dataToExport == null || dataToExport.isEmpty()) {
-                logSync(session, sSyncType, "", "204", "No hay datos para exportar.", new ArrayList<>());
-                return "";
-            }
-
-            // Determina si se debe actualizar la fecha de última sincronización
-            boolean updateLastSync = dataToExport.size() <= syncLimit;
-            // Limita la cantidad de datos a exportar según el límite configurado
-            List<SUserExport> limitedData = dataToExport.size() > syncLimit ? dataToExport.subList(0, syncLimit) : dataToExport;
-
-            // Prepara el cuerpo de la petición en formato JSON
-            SBodyExport body = new SBodyExport();
-            body.work_instance = new String[] { "1" };
-            body.users = limitedData.toArray(new SUserExport[0]);
-            String requestBody = mapper.writeValueAsString(body);
-
-            // Realiza la petición HTTP al servicio de sincronización
-            String response = requestSwapService("", syncUrl, "POST", requestBody, syncToken);
-            JsonNode responseJson = mapper.readTree(response);
-
-            // Procesa la respuesta y genera los registros de log correspondientes
-            List<SDbSyncLogEntry> logEntries = parseSyncLogEntries(responseJson);
-            String responseCode = getResponseCode(updateLastSync, logEntries, responseJson);
-
-            // Registra la operación de sincronización en la base de datos
-            logSync(session, sSyncType, compactJson(requestBody), responseCode, compactJson(response), logEntries);
-
-            return "";
-        }
-        catch (JsonProcessingException ex) {
-            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return "{\"error\": \"Error procesando JSON: " + ex.getMessage() + "\"}";
-        }
-        catch (Exception ex) {
-            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
-            return "{\"error\": \"Error en la exportación: " + ex.getMessage() + "\"}";
-        }
-    }
-
-    /**
-     * Obtiene la lista de usuarios o proveedores a exportar según el tipo de sincronización.
-     *
-     * @param stmt         Statement para ejecutar la consulta.
-     * @param syncType     Tipo de sincronización (USUARIO o PROVEEDOR).
-     * @param lastSyncDate Fecha de última sincronización exitosa (puede ser null).
-     * @return Lista de usuarios/proveedores a exportar.
-     * @throws SQLException Si ocurre un error en la consulta.
-     */
-    private static List<SUserExport> getDataToExport(final Statement stmt, final String syncType, final Date lastSyncDate, final int companyId) throws SQLException {
-        switch (syncType) {
-            case SDbSyncLog.EXPORT_SYNC_USERS:
-                return getListOfUsersToExport(stmt, lastSyncDate, companyId);
-            case SDbSyncLog.EXPORT_SYNC_SUPPLIERS:
-                return getListSuppliersToExport(stmt, lastSyncDate);
-            default:
-                throw new IllegalArgumentException("Tipo de sincronización no soportado: " + syncType);
-        }
-    }
-
-    /**
-     * Parsea la respuesta JSON del servicio de sincronización y genera los registros de log.
-     *
-     * @param responseJson Respuesta JSON del servicio.
-     * @return Lista de entradas de log para la sincronización.
-     */
-    private static List<SDbSyncLogEntry> parseSyncLogEntries(final JsonNode responseJson) {
-        List<SDbSyncLogEntry> entries = new ArrayList<>();
-        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
-            JsonNode results = responseJson.path("results");
-            if (results.isArray()) {
-                for (JsonNode result : results) {
-                    JsonNode externalIdNode = getExternalIdNode(result);
-                    if (externalIdNode != null && externalIdNode.isInt()) {
-                        SDbSyncLogEntry entry = new SDbSyncLogEntry();
-                        entry.setResponseCode(result.path("status_code").asText());
-                        entry.setReferenceId(String.valueOf(externalIdNode.asInt()));
-                        entry.setResponseBody(sanitizeJsonString(result.path("message").asText()));
-                        entries.add(entry);
-                    }
-                }
-            }
-        }
-        return entries;
-    }
-
-    /**
-     * Obtiene el nodo 'external_id' de un resultado JSON, buscando en diferentes niveles.
-     *
-     * @param result Nodo JSON de resultado.
-     * @return Nodo JSON con el external_id o null si no existe.
-     */
-    private static JsonNode getExternalIdNode(final JsonNode result) {
-        JsonNode attributes = result.path("attributes");
-        if (attributes.isObject() && attributes.has("external_id")) {
-            return attributes.path("external_id");
-        }
-        JsonNode input = result.path("input");
-        if (input.isObject()) {
-            JsonNode attrInput = input.path("attributes");
-            if (attrInput.isObject() && attrInput.has("external_id")) {
-                return attrInput.path("external_id");
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Determina el código de respuesta a registrar según el resultado de la sincronización.
-     *
-     * @param updateLastSync Indica si se debe actualizar la última sincronización.
-     * @param logEntries     Lista de entradas de log generadas.
-     * @param responseJson   Respuesta JSON del servicio.
-     * @return Código de respuesta como String.
-     */
-    private static String getResponseCode(final boolean updateLastSync, final List<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
-        if (logEntries.isEmpty() && SAuthJsonUtils.containsElement(responseJson, "", "results")) {
-            return HTTP_CODE_NO_CONTENT + ""; // No content
-        }
-        return updateLastSync ? HTTP_CODE_OK + "" : HTTP_CODE_PENDING + "";
-    }
-
-    /**
-     * Registra en la base de datos el log de la operación de sincronización.
-     *
-     * @param session      Sesión de usuario.
-     * @param syncType     Tipo de sincronización.
-     * @param requestBody  Cuerpo de la petición (compactado).
-     * @param responseCode Código de respuesta.
-     * @param responseBody Cuerpo de la respuesta (compactado).
-     * @param logEntries   Lista de entradas de log generadas.
-     * @throws SQLException Si ocurre un error al guardar el log.
-     */
-    private static void logSync(final SGuiSession session, final String syncType, final String requestBody, final String responseCode, final String responseBody, final List<SDbSyncLogEntry> logEntries) throws SQLException, Exception {
-        String sTimeStamp = TIMESTAMP_FORMATTER.format(
-                java.time.LocalDateTime.now().atZone(MEXICO)
-        );
-        SDbSyncLog log = new SDbSyncLog();
-        
-        String logSufix = syncType + "_" + log.getPk(session) + "_" + sTimeStamp;
-        
-        log.setSyncType(syncType);
-        log.setRequestBody(logSufix + "_request_body");
-        log.setRequestTimestamp(new Date());
-        log.setResponseCode(responseCode);
-        log.setResponseBody(logSufix + "_response_body");
-        log.setResponseTimestamp(new Date());
-        log.getSyncLogEntries().addAll(logEntries);
-        log.save(session);
-        
-        SExportLogUtils.safeWriteToLogFile(logSufix + "_request_body", requestBody);
-        SExportLogUtils.safeWriteToLogFile(logSufix + "_response_body", responseBody);
-    }
-
-    /**
-     * Obtiene la fecha de la última sincronización exitosa para el tipo de dato indicado.
+     * Obtiene la fecha de la última sincronización exitosa para el tipo de sincronización indicado.
      * 
-     * @param statement Objeto Statement para ejecutar la consulta.
-     * @param sSyncType Tipo de sincronización.
+     * @param statement Statement para ejecutar la consulta.
+     * @param syncType Tipo de sincronización.
      * @return Fecha de la última sincronización exitosa, o null si no existe.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static Date getLastSyncDateTime(final Statement statement, final String sSyncType) throws SQLException {
-        String query = "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " WHERE response_code = '200' AND sync_type = '" + sSyncType + "';";
+    private static Date getLastSyncDateTime(final Statement statement, final SSyncType syncType) throws SQLException, Exception {
+        int table = 0;
+        
+        switch (syncType) {
+            case USER:
+            case PARTNER_SUPPLIER:
+                table = SModConsts.CFG_SYNC_LOG;
+                break;
+            case PURCHASE_ORDER:
+                table = SModConsts.CFG_COM_SYNC_LOG;
+                break;
+            default:
+                throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+        }
+        
+        String query = "SELECT request_timestamp "
+                + "FROM " + SModConsts.TablesMap.get(table) + " "
+                + "WHERE response_code = '" + HTTP_CODE_OK + "' "
+                + "AND sync_type = '" + syncType + "';";
+        
         try (ResultSet res = statement.executeQuery(query)) {
             if (res.next()) {
                 return res.getTimestamp("request_timestamp");
             }
         }
+        
         return null;
     }
 
     /**
      * Consulta los usuarios internos y los prepara para exportación en JSON.
      * 
-     * @param statement Objeto Statement para ejecutar la consulta.
-     * @param oLastSyncDateTime Fecha de última sincronización (puede ser null).
+     * @param statement Statement para ejecutar la consulta.
+     * @param lastSyncDatetime Fecha-hora de última sincronización (puede ser <code>null</code>).
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getListOfUsersToExport(final Statement statement, final Date oLastSyncDateTime, final int companyId)
-            throws SQLException {
+    private static ArrayList<SUserExport> getListOfUsersToExport(final Statement statement, final Date lastSyncDatetime, final int companyId) throws SQLException {
         String sql = "SELECT  " +
                 "    u.id_usr, " +
                 "    u.usr, " +
@@ -324,23 +164,25 @@ public class SExportUtils {
                 "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') " +
                 "        LEFT JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log " +
-                "         AND slog.sync_type = '" + SDbSyncLog.EXPORT_SYNC_USERS + "' " +
+                "         AND slog.sync_type = '" + SSyncType.USER + "' " +
                 "WHERE " +
                 "    (sloge.ts_sync IS NULL ";
         
-        if (oLastSyncDateTime != null) {
-            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "')";
+        if (lastSyncDatetime != null) {
+            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')";
         }
+        
         sql += ") ";
-        if (oLastSyncDateTime == null) {
+        
+        if (lastSyncDatetime == null) {
             sql += "AND NOT u.b_del " +
                 "AND (bp.b_del IS NULL OR NOT bp.b_del) ";
         }
         else {
-            sql += "AND u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "' ";
+            sql += "AND u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
         }
 
-        List<SUserExport> users = new ArrayList<>();
+        ArrayList<SUserExport> users = new ArrayList<>();
         try (ResultSet res = statement.getConnection().createStatement().executeQuery(sql)) {
             String firstName = "";
             String lastName = "";
@@ -350,18 +192,21 @@ public class SExportUtils {
                     res.getString("email") == null || !res.getString("email").contains("@")) {
                     continue; // Saltar usuarios inválidos
                 }
+                
                 if (res.getString("firstname") == null) {
                     firstName = "";
                 }
                 else {
                     firstName = res.getString("firstname");
                 }
+                
                 if (res.getString("lastname") == null) {
                     lastName = "";
                 }
                 else {
                     lastName = res.getString("lastname");
                 }
+                
                 // Validar que el usuario tenga un nombre y apellido
                 if (firstName.isEmpty() && lastName.isEmpty()) {
                     continue; // Saltar usuarios sin nombre y apellido
@@ -382,7 +227,7 @@ public class SExportUtils {
                 attr.external_id = res.getInt("id_usr");
                 user.attributes = attr;
                 
-                List<Integer> lRoles = SUserRolesUtils.getRolesOfUser(statement, attr.external_id, companyId);
+                ArrayList<Integer> lRoles = SUserRolesUtils.getRolesOfUser(statement, attr.external_id, companyId);
                 user.groups = lRoles.stream().mapToInt(Integer::intValue).toArray();
 
                 users.add(user);
@@ -395,13 +240,12 @@ public class SExportUtils {
     /**
      * Consulta los proveedores y los prepara para exportación en JSON.
      * 
-     * @param statement Objeto Statement para ejecutar la consulta.
-     * @param oLastSyncDateTime Fecha de última sincronización (puede ser null).
+     * @param statement Statement para ejecutar la consulta.
+     * @param lastSyncDatetime Fecha-hora de última sincronización (puede ser <code>null</code>).
      * @return Lista de proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static List<SUserExport> getListSuppliersToExport(final Statement statement, final Date oLastSyncDateTime)
-            throws SQLException {
+    private static ArrayList<SUserExport> getListOfPartnerSuppliersToExport(final Statement statement, final Date lastSyncDatetime) throws SQLException {
         String sql = BASE_PROVIDER_QUERY
                 + "LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
@@ -409,24 +253,28 @@ public class SExportUtils {
                 + "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
-                + "         AND slog.sync_type = '" + SDbSyncLog.EXPORT_SYNC_SUPPLIERS + "' "
+                + "         AND slog.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' "
                 + "WHERE bp.b_sup "
                 + "AND    (sloge.ts_sync IS NULL ";
 
-        if (oLastSyncDateTime != null) {
-            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "') ";
+        if (lastSyncDatetime != null) {
+            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "') ";
         }
+        
         sql += ") ";
-        if (oLastSyncDateTime == null) {
+        
+        if (lastSyncDatetime == null) {
             sql += "AND NOT bp.b_del ";
-        } else {
-            sql += "AND bp.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(oLastSyncDateTime) + "' ";
+        }
+        else {
+            sql += "AND bp.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
         }
 
         sql += "GROUP BY bp.id_bp "
                 + "ORDER BY bpb.ts_edit DESC;";
 
-        List<SUserExport> users = new ArrayList<>();
+        ArrayList<SUserExport> users = new ArrayList<>();
+        
         try (ResultSet res = statement.executeQuery(sql)) {
             String countryCode = "";
             String firstName = "";
@@ -483,6 +331,309 @@ public class SExportUtils {
         }
 
         return users;
+    }
+
+    /**
+     * Consulta las órdenes de compras y las prepara para exportación en JSON.
+     * 
+     * @param statement Statement para ejecutar la consulta.
+     * @param lastSyncDatetime Fecha-hora de última sincronización (puede ser <code>null</code>).
+     * @return Lista de órdenes de compras exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SUserExport> getListOfPurchaseOrdersToExport(final Statement statement, final Date lastSyncDatetime) throws SQLException {
+        String sql = BASE_PROVIDER_QUERY
+                + "LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
+                + "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' "
+                + "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
+                + "         AND slog.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' "
+                + "WHERE bp.b_sup "
+                + "AND    (sloge.ts_sync IS NULL ";
+
+        if (lastSyncDatetime != null) {
+            sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "') ";
+        }
+        
+        sql += ") ";
+        
+        if (lastSyncDatetime == null) {
+            sql += "AND NOT bp.b_del ";
+        }
+        else {
+            sql += "AND bp.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
+        }
+
+        sql += "GROUP BY bp.id_bp "
+                + "ORDER BY bpb.ts_edit DESC;";
+
+        ArrayList<SUserExport> users = new ArrayList<>();
+        
+        try (ResultSet res = statement.executeQuery(sql)) {
+            String countryCode = "";
+            String firstName = "";
+            String lastName = "";
+            String fullName = "";
+            while (res.next()) {
+                countryCode = sanitizeJsonString(res.getString("country.cty_code"));
+                firstName = sanitizeJsonString(res.getString("bp.firstname"));
+                lastName = sanitizeJsonString(res.getString("bp.lastname"));
+                if (firstName.isEmpty() && lastName.isEmpty()) {
+                    fullName = sanitizeJsonString(res.getString("bp.bp"));
+                } else {
+                    fullName = firstName + " " + lastName;
+                }
+
+                SUserExport user = new SUserExport();
+
+                String fiscalId = sanitizeJsonString(res.getString("bp.fiscal_id"));
+                if (res.getInt("addr.fid_cty_n") <= 1) {
+                    user.username = fiscalId;
+                }
+                else {
+                    user.username = countryCode + "." + fiscalId;
+                }
+
+                user.password = generateSecurePassword();
+                user.email = sanitizeJsonString(res.getString("email_01"));
+                user.is_active = 1;
+                user.first_name = firstName;
+                user.last_name = lastName;
+
+                SUserExport.Attributes attr = new SUserExport.Attributes();
+                attr.full_name = fullName;
+                attr.user_type = USER_TYPE_SUPPLIER;
+                attr.external_id = res.getInt("bp.id_bp");
+                user.attributes = attr;
+
+                SUserExport.Partner partner = new SUserExport.Partner();
+                partner.fiscal_id = fiscalId;
+                partner.full_name = sanitizeJsonString(res.getString("bp"));
+                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
+                partner.country = countryCode == null || countryCode.isEmpty() ? LOCAL_COUNTRY_MEX : countryCode;
+                partner.external_id = res.getInt("bp.id_bp");
+                partner.bp_comm = sanitizeJsonString(res.getString("bp.bp_comm"));
+                partner.tax_regime = sanitizeJsonString(res.getString("ct.tax_regime"));
+                partner.b_sup = res.getInt("bp.b_sup");
+                partner.partner_mail = sanitizeJsonString(res.getString("email_01"));
+                user.partner = partner;
+
+                user.groups = new int[] { ROL_SUPPLIER };
+
+                users.add(user);
+            }
+        }
+
+        return users;
+    }
+
+    /**
+     * Obtiene la lista de usuarios o proveedores a exportar según el tipo de sincronización.
+     *
+     * @param statement Statement para ejecutar la consulta.
+     * @param syncType Tipo de sincronización.
+     * @param lastSyncDate Fecha de última sincronización exitosa (puede ser <code>null</code>).
+     * @return Lista de datos a exportar.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SUserExport> getDataToExport(final Statement statement, final SSyncType syncType, final Date lastSyncDate, final int companyId) throws SQLException {
+        switch (syncType) {
+            case USER:
+                return getListOfUsersToExport(statement, lastSyncDate, companyId);
+                
+            case PARTNER_SUPPLIER:
+                return getListOfPartnerSuppliersToExport(statement, lastSyncDate);
+                
+            case PURCHASE_ORDER:
+                // return getListSuppliersToExport(stmt, lastSyncDate);
+                
+            default:
+                throw new IllegalArgumentException("Tipo de sincronización no soportado: '" + syncType + "'.");
+        }
+    }
+
+    /**
+     * Ejecuta una consulta para obtener usuarios o proveedores y genera un JSON.
+     *
+     * @param session Sesión de usuario para acceder a la base de datos.
+     * @param syncType Tipo de sincronización.
+     * @param syncAll Si es <code>true</code>, sincroniza todos los registros; si es <code>false</code>, solo los nuevos o modificados.
+     * @return <code>String</code> con el JSON generado o mensaje de error.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static String exportJsonData(final SGuiSession session, final SSyncType syncType, final boolean syncAll) throws SQLException, Exception {
+        try {
+            // Determina la fecha de la última sincronización exitosa si no es sincronización total
+            Date lastSyncDate = syncAll ? null : getLastSyncDateTime(session.getStatement(), syncType);
+
+            // Obtiene la configuración del servicio de sincronización
+            ObjectMapper mapper = new ObjectMapper();
+            
+            JsonNode config = mapper.readTree(
+                SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
+            );
+
+            // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
+            ArrayList<SUserExport> dataToExport = getDataToExport(session.getStatement(), syncType, lastSyncDate, session.getConfigCompany().getCompanyId());
+
+            // Si no hay datos para exportar, registra el intento y retorna vacío
+            if (dataToExport == null || dataToExport.isEmpty()) {
+                logSync(session, syncType, "", "" + HTTP_CODE_NO_CONTENT, "No hay nada para exportar.", new ArrayList<>());
+                return "";
+            }
+
+            // Lee parámetros de configuración para la sincronización:
+            
+            String parentKey = "";
+            
+            switch (syncType) {
+                case USER:
+                case PARTNER_SUPPLIER:
+                    parentKey = SSwapConsts.CFG_USER_SYNC;
+                    break;
+                case PURCHASE_ORDER:
+                    parentKey = SSwapConsts.CFG_PUR_ORD_SYNC;
+                    break;
+                default:
+                    throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+            }
+            
+            String instance = SAuthJsonUtils.getValueOfElement(config, "", SSwapConsts.CFG_INSTANCE);
+            String syncUrl = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_URL);
+            String syncToken = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_TOKEN);
+            String syncApiKey = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_API_KEY);
+            int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_LIMIT));
+
+            // Determina si se debe actualizar la fecha de última sincronización
+            boolean updateLastSync = dataToExport.size() <= syncLimit;
+            
+            // Limita la cantidad de datos a exportar según el límite configurado
+            ArrayList<SUserExport> limitedData = dataToExport.size() > syncLimit ? (ArrayList) dataToExport.subList(0, syncLimit) : dataToExport;
+
+            // Prepara el cuerpo de la petición en formato JSON
+            SBodyExport body = new SBodyExport();
+            body.work_instance = new String[] { instance };
+            body.users = limitedData.toArray(new SUserExport[0]);
+            String requestBody = mapper.writeValueAsString(body);
+
+            // Realiza la petición HTTP al servicio de sincronización
+            String response = requestSwapService("", syncUrl, "POST", requestBody, syncToken);
+            JsonNode responseJson = mapper.readTree(response);
+
+            // Procesa la respuesta y genera los registros de log correspondientes
+            ArrayList<SDbSyncLogEntry> logEntries = parseSyncLogEntries(responseJson);
+            String responseCode = getResponseCode(updateLastSync, logEntries, responseJson);
+
+            // Registra la operación de sincronización en la base de datos
+            logSync(session, syncType, compactJson(requestBody), responseCode, compactJson(response), logEntries);
+
+            return "";
+        }
+        catch (JsonProcessingException ex) {
+            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "{\"error\": \"Error procesando JSON: " + ex.getMessage() + "\"}";
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return "{\"error\": \"Error en la exportación: " + ex.getMessage() + "\"}";
+        }
+    }
+
+    /**
+     * Parsea la respuesta JSON del servicio de sincronización y genera los registros de log.
+     *
+     * @param responseJson Respuesta JSON del servicio.
+     * @return Lista de entradas de log para la sincronización.
+     */
+    private static ArrayList<SDbSyncLogEntry> parseSyncLogEntries(final JsonNode responseJson) {
+        ArrayList<SDbSyncLogEntry> entries = new ArrayList<>();
+        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
+            JsonNode results = responseJson.path("results");
+            if (results.isArray()) {
+                for (JsonNode result : results) {
+                    JsonNode externalIdNode = getExternalIdNode(result);
+                    if (externalIdNode != null && externalIdNode.isInt()) {
+                        SDbSyncLogEntry entry = new SDbSyncLogEntry();
+                        entry.setResponseCode(result.path("status_code").asText());
+                        entry.setReferenceId(String.valueOf(externalIdNode.asInt()));
+                        entry.setResponseBody(sanitizeJsonString(result.path("message").asText()));
+                        entries.add(entry);
+                    }
+                }
+            }
+        }
+        return entries;
+    }
+
+    /**
+     * Obtiene el nodo 'external_id' de un resultado JSON, buscando en diferentes niveles.
+     *
+     * @param result Nodo JSON de resultado.
+     * @return Nodo JSON con el external_id o null si no existe.
+     */
+    private static JsonNode getExternalIdNode(final JsonNode result) {
+        JsonNode attributes = result.path("attributes");
+        if (attributes.isObject() && attributes.has("external_id")) {
+            return attributes.path("external_id");
+        }
+        JsonNode input = result.path("input");
+        if (input.isObject()) {
+            JsonNode attrInput = input.path("attributes");
+            if (attrInput.isObject() && attrInput.has("external_id")) {
+                return attrInput.path("external_id");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determina el código de respuesta a registrar según el resultado de la sincronización.
+     *
+     * @param updateLastSync Indica si se debe actualizar la última sincronización.
+     * @param logEntries     Lista de entradas de log generadas.
+     * @param responseJson   Respuesta JSON del servicio.
+     * @return Código de respuesta como String.
+     */
+    private static String getResponseCode(final boolean updateLastSync, final ArrayList<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
+        if (logEntries.isEmpty() && SAuthJsonUtils.containsElement(responseJson, "", "results")) {
+            return HTTP_CODE_NO_CONTENT + ""; // No content
+        }
+        return updateLastSync ? HTTP_CODE_OK + "" : HTTP_CODE_PENDING + "";
+    }
+
+    /**
+     * Registra en la base de datos el log de la operación de sincronización.
+     *
+     * @param session Sesión de usuario.
+     * @param syncType Tipo de sincronización.
+     * @param requestBody Cuerpo de la petición (compactado).
+     * @param responseCode Código de respuesta.
+     * @param responseBody Cuerpo de la respuesta (compactado).
+     * @param logEntries Lista de entradas de log generadas.
+     * @throws SQLException Si ocurre un error al guardar el log.
+     */
+    private static void logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final String responseCode, final String responseBody, final ArrayList<SDbSyncLogEntry> logEntries) throws SQLException, Exception {
+        String sTimeStamp = TIMESTAMP_FORMATTER.format(
+                java.time.LocalDateTime.now().atZone(MEXICO)
+        );
+        
+        SDbSyncLog log = new SDbSyncLog();
+        
+        String logSufix = syncType + "_" + log.getPk(session) + "_" + sTimeStamp;
+        
+        log.setSyncType("" + syncType);
+        log.setRequestBody(logSufix + "_request_body");
+        log.setRequestTimestamp(new Date());
+        log.setResponseCode(responseCode);
+        log.setResponseBody(logSufix + "_response_body");
+        log.setResponseTimestamp(new Date());
+        log.getEntries().addAll(logEntries);
+        log.save(session);
+        
+        SExportLogUtils.safeWriteToLogFile(logSufix + "_request_body", requestBody);
+        SExportLogUtils.safeWriteToLogFile(logSufix + "_response_body", responseBody);
     }
 
     /**
