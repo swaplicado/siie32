@@ -1,9 +1,15 @@
 ================================================================================
+SIIE 3.2 282.4/ 2025-07-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección de la contabilización de ajustes de consumos en valuación.
+
+================================================================================
 SIIE 3.2 282.3/ 2025-07-25
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Cambio en la tabla de obtención del país del proveedor al exportarse
-2) Email del proveedor "se parte" y solo se toma el primero para su contacto
+1) Cambio en la tabla de obtención del país del proveedor al exportarse.
+2) Email del proveedor "se parte" y solo se toma el primero para su contacto.
 
 ================================================================================
 SIIE 3.2 282.2/ 2025-07-21
@@ -11,9 +17,9 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Corrección columna RFC en el impuesto predial rustico.
 2) Adición de CP en el impuesto predial rustico.
-3) Corrección de variables en la exportación y renombramiento en la consultas de bizParther en la vista de actualización de datos
-4) Funcionalidad de modificación de contratos, solo se envié correo se se modifica precio, moneda, unidad, cantidad o ítem
-5) Correción de Uso de CFDI para notas de crédito
+3) Corrección de variables en la exportación y renombramiento en la consultas de bizParther en la vista de actualización de datos.
+4) Funcionalidad de modificación de contratos, solo se envié correo se se modifica precio, moneda, unidad, cantidad o ítem.
+5) Correción de Uso de CFDI para notas de crédito.
 
 ================================================================================
 SIIE 3.2 282.1/ 2025-07-18

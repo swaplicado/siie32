@@ -530,7 +530,7 @@ public class SExportUtils {
             boolean isSyncWithinBounds = dataToExport.size() <= syncLimit;
             
             // Limita la cantidad de datos a exportar según el límite configurado
-            ArrayList<SExportData> dataToExportBounded = isSyncWithinBounds ? dataToExport : (ArrayList) dataToExport.subList(0, syncLimit);
+            ArrayList<SExportData> dataToExportBounded = isSyncWithinBounds ? dataToExport : (ArrayList<SExportData>) dataToExport.subList(0, syncLimit);
 
             // Prepara el cuerpo de la petición en formato JSON
             

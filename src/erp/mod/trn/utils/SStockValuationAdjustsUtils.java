@@ -121,6 +121,8 @@ public abstract class SStockValuationAdjustsUtils {
                     oMvtAdjust.setFkLotId(resultSet.getInt("fk_lot"));
                     oMvtAdjust.setFkCompanyBranchId(resultSet.getInt("fk_cob"));
                     oMvtAdjust.setFkWarehouseId(resultSet.getInt("fk_wh"));
+                    
+                    oMvtAdjust.setAuxIsAdjust(true);
 
                     oMvtAdjust.save(session);
 
