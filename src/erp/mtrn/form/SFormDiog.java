@@ -2550,6 +2550,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         int nYear = 0;
         java.util.Date tDate = null;
         SDataItem item = null;
+        SDataUnit unit = null;
         SDataDiogEntry iogEntry = null;
         Vector<STrnStockMove> stockMoves = null;
 
@@ -2561,6 +2562,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             
             for (STrnStockMove stockMove : stockMoves) {
                 item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { stockMove.getPkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
 
                 iogEntry = new SDataDiogEntry();
                 iogEntry.setPkYearId(SLibConstants.UNDEFINED);
@@ -2575,8 +2577,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogEntry.setIsInventoriable(true);
                 iogEntry.setIsDeleted(false);
                 iogEntry.setFkItemId(item.getPkItemId());
-                iogEntry.setFkUnitId(item.getFkUnitId());
-                iogEntry.setFkOriginalUnitId(item.getFkUnitId()); 
+                iogEntry.setFkUnitId(unit.getPkUnitId());
+                iogEntry.setFkOriginalUnitId(unit.getPkUnitId()); 
 
                 iogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
                 iogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
@@ -2597,10 +2599,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 iogEntry.setDbmsItem(item.getItem());
                 iogEntry.setDbmsItemKey(item.getKey());
-                iogEntry.setDbmsUnit(item.getDbmsDataUnit().getUnit());
-                iogEntry.setDbmsUnitSymbol(item.getDbmsDataUnit().getSymbol());
-                iogEntry.setDbmsOriginalUnit(item.getDbmsDataUnit().getUnit());
-                iogEntry.setDbmsOriginalUnitSymbol(item.getDbmsDataUnit().getSymbol());
+                iogEntry.setDbmsUnit(unit.getUnit());
+                iogEntry.setDbmsUnitSymbol(unit.getSymbol());
+                iogEntry.setDbmsOriginalUnit(unit.getUnit());
+                iogEntry.setDbmsOriginalUnitSymbol(unit.getSymbol());
 
                 iogEntry.getAuxStockMoves().add(stockMove);
 

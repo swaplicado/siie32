@@ -263,7 +263,7 @@ public class SDialogTicketsPicker extends javax.swing.JDialog implements SFormOp
         
         try {
             String sql = "SELECT st.id_sca_tic, st.num, st.fk_item, st.fk_bp, IF(td.id_sca_tic IS NULL, '', 'DOC') link, " +
-                    "bp.bp, i.name " +
+                    "bp.bp, i.item " +
                     "FROM erp.trnu_sca_tic AS st " +
                     "INNER JOIN erp.bpsu_bp AS bp ON st.fk_bp = bp.id_bp " +
                     "INNER JOIN erp.itmu_item AS i ON st.fk_item = i.id_item " +

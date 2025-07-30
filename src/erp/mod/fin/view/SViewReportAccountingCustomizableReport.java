@@ -141,7 +141,7 @@ public class SViewReportAccountingCustomizableReport extends SGridPaneView imple
                 + "re.concept, " 
                 + "debit, credit, " 
                 + "fid_item_n, " 
-                + "i.name, " 
+                + "i.item, " 
                 + "i.item_key "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
@@ -171,7 +171,7 @@ public class SViewReportAccountingCustomizableReport extends SGridPaneView imple
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ACC, "fid_cc_n", "No. centro costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "cc", "Centro costo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "item_key", "Clave ítem/Gasto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.name", "Ítem/Gasto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.item", "Ítem/Gasto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "re.concept", "Concepto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "re.debit", "Debe $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "re.credit", "Haber $"));

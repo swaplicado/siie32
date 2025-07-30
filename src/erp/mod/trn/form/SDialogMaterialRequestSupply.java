@@ -27,8 +27,7 @@ import erp.mtrn.data.STrnMaintUtilities;
 import erp.mtrn.data.STrnStock;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockSegregationUtils;
-import static erp.mtrn.form.SFormMaintDiog.COLOR_NONSIGNED;
-import static erp.mtrn.form.SFormMaintDiog.COLOR_SIGNED;
+import erp.mtrn.form.SFormMaintDiog;
 import erp.musr.data.SDataUser;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -85,6 +84,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     
     protected ArrayList<SMaterialRequestSupplyRow> mlDbMaterialRequestSupplies;
     protected ArrayList<SMaterialRequestSupplyRow> mlMemoryMaterialRequestSupplies;
+    
+    protected String msConfReqSign;
 
     /**
      * Creates new form SDialogMaterialRequestSegregation
@@ -508,8 +509,10 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             removeAllListeners();
             reloadCatalogues();
             addAllListeners();
+            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN);
+            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED));
         }
-        catch (NullPointerException ex) {
+        catch (Exception ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -519,6 +522,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             moKeyMaintUser.setSelectedIndex(0);
             moKeyWarehouseCompanyBranch.setSelectedIndex(0);
             mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+            moMaintDiogSignature = null;
+            showSignatureStatus();
         }
         catch (NullPointerException ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
@@ -819,22 +824,41 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     }
     
     private void actionOk() {
-        if (! isDiogSigned()) {
-            try {
-                if (getSignatoryFingerprint() == null) {
-                    if (miClient.showMsgBoxConfirm("El firmante carece de huella digital.\n¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
-                        return;
+        switch (msConfReqSign) {
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_REQUIRED:
+                if (!isDiogSigned()) {
+                    miClient.showMsgBoxInformation("No se puede guardar el movimiento sin firmar.");
+                    return;
+                }
+                break;
+                
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL_CONFIRM:
+                if (!isDiogSigned()) {
+                    try {
+                        if (getSignatoryFingerprint() == null) {
+                            if (miClient.showMsgBoxConfirm("El firmante carece de huella digital.\n¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
+                                return;
+                            }
+                        }
+                        else {
+                            if (miClient.showMsgBoxConfirm("¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
+                                return;
+                            }
+                        }
+                    }
+                    catch (SQLException ex) {
+                        Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                else {
-                    if (miClient.showMsgBoxConfirm("¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
-                        return;
-                    }
-                }
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                break;
+                
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL:
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED:
+                break;
+                
+            default:
+                miClient.showMsgBoxError("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN + " desconocida.\nContactar a soporte.");
+                return;
         }
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
@@ -850,7 +874,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                                                                 mlMemoryMaterialRequestSupplies,
                                                                 mnSegregationId,
                                                                 user,
-                                                                userSup
+                                                                userSup,
+                                                                moMaintDiogSignature != null
                                                             );
 
            HashMap<String, SDataDiog> mDbDiogs = new HashMap<>();
@@ -1018,11 +1043,11 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     private void showSignatureStatus() {
         if (isDiogSigned()) {
             jtfSignatureStatus.setText(STrnMaintConstants.SIGNED);
-            jtfSignatureStatus.setBackground(COLOR_SIGNED);
+            jtfSignatureStatus.setBackground(SFormMaintDiog.COLOR_SIGNED);
         }
         else {
             jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
-            jtfSignatureStatus.setBackground(COLOR_NONSIGNED);
+            jtfSignatureStatus.setBackground(SFormMaintDiog.COLOR_NONSIGNED);
         }
         jtfSignatureStatus.setCaretPosition(0);
     }

@@ -1035,6 +1035,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                         case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
                         case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
                         case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
                             user = mnFkMaintUserId_n;
                             userSupv = mnFkMaintUserSupervisorId;
                             break;
