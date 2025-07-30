@@ -131,6 +131,11 @@ public class SUserExport implements SExportData {
         public String foreign_fiscal_id;
         
         /**
+         * ID fiscal del partner en el extranjero (RFC, NIT, etc.)
+         */
+        public String foreign_fiscal_id;
+        
+        /**
          * Nombre completo del socio
          */
         public String full_name;
