@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * 
  * @author Edwin Carmona
  */
-public class SUserExport {
+public class SUserExport implements SExportData {
     /**
      * Nombre de usuario del sistema
      */
@@ -103,6 +103,12 @@ public class SUserExport {
          * ID externo del usuario (para integración con otros sistemas)
          */
         public int external_id;
+
+        /**
+         * Campo para almacenar otros emails del usuario
+         */
+        public String other_emails;
+        
     }
 
     /**
@@ -118,6 +124,11 @@ public class SUserExport {
          * ID fiscal (RFC, NIT, etc.)
          */
         public String fiscal_id;
+        
+        /**
+         * ID fiscal del partner en el extranjero (RFC, NIT, etc.)
+         */
+        public String foreign_fiscal_id;
         
         /**
          * Nombre completo del socio

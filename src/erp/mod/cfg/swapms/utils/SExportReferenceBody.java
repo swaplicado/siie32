@@ -11,7 +11,7 @@ package erp.mod.cfg.swapms.utils;
  *
  * @author Sergio Flores
  */
-public class SReferenceBody {
+public class SExportReferenceBody {
     /**
      * Arreglo de identificadores de instancias de trabajo.
      * Cada elemento representa una instancia de trabajo relacionada con las referencias incluidas en el export.

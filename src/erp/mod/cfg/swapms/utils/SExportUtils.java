@@ -74,7 +74,7 @@ public class SExportUtils {
     
     private static final String LOCAL_COUNTRY_MEX = "MEX";
 
-    private static final int TIME_60_SECONDS = 60 * 1000; // 60 segundos en milisegundos
+    private static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
     
     private static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
 
@@ -86,15 +86,15 @@ public class SExportUtils {
             + "    ct.tax_regime "
             + "FROM "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp "
-            + "    LEFT JOIN "
+            + "    LEFT OUTER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS ct ON bp.id_bp = ct.id_bp "
-            + "    LEFT JOIN "
+            + "    LEFT OUTER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bpb ON bp.id_bp = bpb.fid_bp "
-            + "    LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_ADDEE) + " AS addr ON bp.id_bp = addr.fid_bp "
-            + "    LEFT JOIN "
+            + "    LEFT OUTER JOIN "
+            + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS addr ON bpb.id_bpb = addr.id_bpb "
+            + "    LEFT OUTER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS country ON addr.fid_cty_n = country.id_cty "
-            + "    LEFT JOIN "
+            + "    LEFT OUTER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb ";
     
     /**
@@ -142,7 +142,7 @@ public class SExportUtils {
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SUserExport> getListOfUsersToExport(final Statement statement, final Date lastSyncDatetime, final int companyId) throws SQLException {
+    private static ArrayList<SExportData> getListOfUsersToExport(final Statement statement, final Date lastSyncDatetime, final int companyId) throws SQLException {
         String sql = "SELECT  " +
                 "    u.id_usr, " +
                 "    u.usr, " +
@@ -156,13 +156,13 @@ public class SExportUtils {
                 "    sloge.ts_sync " +
                 "FROM " +
                 "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u " +
-                "        LEFT JOIN " +
+                "        LEFT OUTER JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON u.fid_bp_n = bp.id_bp " +
-                "        LEFT JOIN " +
+                "        LEFT OUTER JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = u.id_usr " +
                 "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' " +
                 "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') " +
-                "        LEFT JOIN " +
+                "        LEFT OUTER JOIN " +
                 "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log " +
                 "         AND slog.sync_type = '" + SSyncType.USER + "' " +
                 "WHERE " +
@@ -182,7 +182,7 @@ public class SExportUtils {
             sql += "AND u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
         }
 
-        ArrayList<SUserExport> users = new ArrayList<>();
+        ArrayList<SExportData> users = new ArrayList<>();
         try (ResultSet res = statement.getConnection().createStatement().executeQuery(sql)) {
             String firstName = "";
             String lastName = "";
@@ -245,16 +245,16 @@ public class SExportUtils {
      * @return Lista de proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SUserExport> getListOfPartnerSuppliersToExport(final Statement statement, final Date lastSyncDatetime) throws SQLException {
+    private static ArrayList<SExportData> getListOfPartnerSuppliersToExport(final Statement statement, final Date lastSyncDatetime) throws SQLException {
         String sql = BASE_PROVIDER_QUERY
-                + "LEFT JOIN "
+                + "LEFT OUTER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
                 + "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' "
                 + "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') "
-                + "        LEFT JOIN "
+                + "        LEFT OUTER JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
                 + "         AND slog.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' "
-                + "WHERE bp.b_sup "
+                + "WHERE bp.b_sup AND bp.fiscal_id <> '' "
                 + "AND    (sloge.ts_sync IS NULL ";
 
         if (lastSyncDatetime != null) {
@@ -273,7 +273,7 @@ public class SExportUtils {
         sql += "GROUP BY bp.id_bp "
                 + "ORDER BY bpb.ts_edit DESC;";
 
-        ArrayList<SUserExport> users = new ArrayList<>();
+        ArrayList<SExportData> users = new ArrayList<>();
         
         try (ResultSet res = statement.executeQuery(sql)) {
             String countryCode = "";
@@ -286,22 +286,42 @@ public class SExportUtils {
                 lastName = sanitizeJsonString(res.getString("bp.lastname"));
                 if (firstName.isEmpty() && lastName.isEmpty()) {
                     fullName = sanitizeJsonString(res.getString("bp.bp"));
-                } else {
+                }
+                else {
                     fullName = firstName + " " + lastName;
                 }
 
                 SUserExport user = new SUserExport();
 
                 String fiscalId = sanitizeJsonString(res.getString("bp.fiscal_id"));
+                String foreignFiscalId = sanitizeJsonString(res.getString("bp.fiscal_frg_id"));
                 if (res.getInt("addr.fid_cty_n") <= 1) {
                     user.username = fiscalId;
                 }
                 else {
-                    user.username = countryCode + "." + fiscalId;
+                    if (foreignFiscalId == null || foreignFiscalId.isEmpty()) {
+                        continue;
+                    }
+                    user.username = countryCode + "." + foreignFiscalId;
                 }
 
                 user.password = generateSecurePassword();
-                user.email = sanitizeJsonString(res.getString("email_01"));
+                // Los mails pueden ser varios y separados por punto y coma (;), se toma el primero
+                // y los demás se asignan a otra variable para asignarse después
+                String[] emails = res.getString("email_01").split(";");
+                String otherEmails = "";
+                if (emails.length > 0) {
+                    user.email = sanitizeJsonString(emails[0]);
+                    for (int i = 1; i < emails.length; i++) {
+                        otherEmails += sanitizeJsonString(emails[i]) + ";";
+                        if (i == emails.length - 1) {
+                            otherEmails = otherEmails.substring(0, otherEmails.length() - 1);
+                        }
+                    }
+                }
+                else {
+                    user.email = "";
+                }
                 user.is_active = 1;
                 user.first_name = firstName;
                 user.last_name = lastName;
@@ -310,10 +330,14 @@ public class SExportUtils {
                 attr.full_name = fullName;
                 attr.user_type = USER_TYPE_SUPPLIER;
                 attr.external_id = res.getInt("bp.id_bp");
+                if (otherEmails != null && !otherEmails.isEmpty()) {
+                    attr.other_emails = otherEmails;
+                }
                 user.attributes = attr;
 
                 SUserExport.Partner partner = new SUserExport.Partner();
                 partner.fiscal_id = fiscalId;
+                partner.foreign_fiscal_id = foreignFiscalId;
                 partner.full_name = sanitizeJsonString(res.getString("bp"));
                 partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
                 partner.country = countryCode == null || countryCode.isEmpty() ? LOCAL_COUNTRY_MEX : countryCode;
@@ -321,7 +345,7 @@ public class SExportUtils {
                 partner.bp_comm = sanitizeJsonString(res.getString("bp.bp_comm"));
                 partner.tax_regime = sanitizeJsonString(res.getString("ct.tax_regime"));
                 partner.b_sup = res.getInt("bp.b_sup");
-                partner.partner_mail = sanitizeJsonString(res.getString("email_01"));
+                partner.partner_mail = user.email;
                 user.partner = partner;
 
                 user.groups = new int[] { ROL_SUPPLIER };
@@ -338,20 +362,28 @@ public class SExportUtils {
      * 
      * @param statement Statement para ejecutar la consulta.
      * @param lastSyncDatetime Fecha-hora de última sincronización (puede ser <code>null</code>).
+     * @param period Periodo de la sincronización (fechas inicial y final.)
      * @return Lista de órdenes de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SUserExport> getListOfPurchaseOrdersToExport(final Statement statement, final Date lastSyncDatetime) throws SQLException {
-        String sql = BASE_PROVIDER_QUERY
-                + "LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = bp.id_bp "
+    private static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final Statement statement, final Date lastSyncDatetime, final int companyId, final Date[] period) throws SQLException {
+        String sql = "SELECT id_year, id_doc, "
+                + "IF(num_ser = '', num, CONCAT(num_ser, '-', num)) AS ref, dt, fid_cur, tot_cur_r, fid_bp_r, "
+                + SSwapConsts.TXN_CAT_PURCHASE + " AS txn_category, " + SSwapConsts.TXN_TYPE_ORDER + " AS ref_type "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
+                + "LEFT OUTER JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS sloge ON sloge.reference_id = CONCAT(id_year, '-', id_doc) "
                 + "        AND (sloge.response_code = '" + HTTP_CODE_OK + "' "
                 + "        OR sloge.response_code = '" + HTTP_CODE_CREATED + "') "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
-                + "         AND slog.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' "
-                + "WHERE bp.b_sup "
-                + "AND    (sloge.ts_sync IS NULL ";
+                + "        LEFT OUTER JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS slog ON sloge.id_sync_log = slog.id_sync_log "
+                + "         AND slog.sync_type = '" + SSyncType.PURCHASE_ORDER + "' "
+                + "WHERE fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                + "AND dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(period[0]) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(period[1]) + "' "
+                + "AND (sloge.ts_sync IS NULL ";
 
         if (lastSyncDatetime != null) {
             sql += "OR (sloge.ts_sync >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "') ";
@@ -360,73 +392,35 @@ public class SExportUtils {
         sql += ") ";
         
         if (lastSyncDatetime == null) {
-            sql += "AND NOT bp.b_del ";
+            sql += "AND NOT b_del ";
         }
         else {
-            sql += "AND bp.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
+            sql += "AND ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' ";
         }
 
-        sql += "GROUP BY bp.id_bp "
-                + "ORDER BY bpb.ts_edit DESC;";
+        sql += "/*GROUP BY id_year, id_doc*/ "
+                + "ORDER BY ts_edit DESC;";
 
-        ArrayList<SUserExport> users = new ArrayList<>();
+        ArrayList<SExportData> references = new ArrayList<>();
         
         try (ResultSet res = statement.executeQuery(sql)) {
-            String countryCode = "";
-            String firstName = "";
-            String lastName = "";
-            String fullName = "";
             while (res.next()) {
-                countryCode = sanitizeJsonString(res.getString("country.cty_code"));
-                firstName = sanitizeJsonString(res.getString("bp.firstname"));
-                lastName = sanitizeJsonString(res.getString("bp.lastname"));
-                if (firstName.isEmpty() && lastName.isEmpty()) {
-                    fullName = sanitizeJsonString(res.getString("bp.bp"));
-                } else {
-                    fullName = firstName + " " + lastName;
-                }
+                SExportReference reference = new SExportReference();
 
-                SUserExport user = new SUserExport();
+                reference.company = companyId;
+                reference.transaction_class = res.getInt("txn_category");
+                reference.document_ref_type = res.getInt("ref_type");
+                reference.partner = res.getInt("fid_bp_r");
+                reference.reference = res.getString("ref");
+                reference.date = SLibUtils.DbmsDateFormatDate.format(res.getDate("dt"));
+                reference.currency = res.getInt("fid_cur");
+                reference.amount = res.getDouble("tot_cur_r");
 
-                String fiscalId = sanitizeJsonString(res.getString("bp.fiscal_id"));
-                if (res.getInt("addr.fid_cty_n") <= 1) {
-                    user.username = fiscalId;
-                }
-                else {
-                    user.username = countryCode + "." + fiscalId;
-                }
-
-                user.password = generateSecurePassword();
-                user.email = sanitizeJsonString(res.getString("email_01"));
-                user.is_active = 1;
-                user.first_name = firstName;
-                user.last_name = lastName;
-
-                SUserExport.Attributes attr = new SUserExport.Attributes();
-                attr.full_name = fullName;
-                attr.user_type = USER_TYPE_SUPPLIER;
-                attr.external_id = res.getInt("bp.id_bp");
-                user.attributes = attr;
-
-                SUserExport.Partner partner = new SUserExport.Partner();
-                partner.fiscal_id = fiscalId;
-                partner.full_name = sanitizeJsonString(res.getString("bp"));
-                partner.entity_type = res.getInt("bp.fid_tp_bp_idy") == 2 ? PARTNER_ENTITY_TYPE_ORG : PARTNER_ENTITY_TYPE_PER;
-                partner.country = countryCode == null || countryCode.isEmpty() ? LOCAL_COUNTRY_MEX : countryCode;
-                partner.external_id = res.getInt("bp.id_bp");
-                partner.bp_comm = sanitizeJsonString(res.getString("bp.bp_comm"));
-                partner.tax_regime = sanitizeJsonString(res.getString("ct.tax_regime"));
-                partner.b_sup = res.getInt("bp.b_sup");
-                partner.partner_mail = sanitizeJsonString(res.getString("email_01"));
-                user.partner = partner;
-
-                user.groups = new int[] { ROL_SUPPLIER };
-
-                users.add(user);
+                references.add(reference);
             }
         }
 
-        return users;
+        return references;
     }
 
     /**
@@ -435,10 +429,12 @@ public class SExportUtils {
      * @param statement Statement para ejecutar la consulta.
      * @param syncType Tipo de sincronización.
      * @param lastSyncDate Fecha de última sincronización exitosa (puede ser <code>null</code>).
+     * @param period Periodo de la sincronización (fechas inicial y final.)
+     * @param companyId ID de la empresa de la sesión de usuario.
      * @return Lista de datos a exportar.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SUserExport> getDataToExport(final Statement statement, final SSyncType syncType, final Date lastSyncDate, final int companyId) throws SQLException {
+    private static ArrayList<SExportData> getDataToExport(final Statement statement, final SSyncType syncType, final Date lastSyncDate, final int companyId, final Date[] period) throws SQLException {
         switch (syncType) {
             case USER:
                 return getListOfUsersToExport(statement, lastSyncDate, companyId);
@@ -447,7 +443,7 @@ public class SExportUtils {
                 return getListOfPartnerSuppliersToExport(statement, lastSyncDate);
                 
             case PURCHASE_ORDER:
-                // return getListSuppliersToExport(stmt, lastSyncDate);
+                return getListOfPurchaseOrdersToExport(statement, lastSyncDate, companyId, period);
                 
             default:
                 throw new IllegalArgumentException("Tipo de sincronización no soportado: '" + syncType + "'.");
@@ -455,7 +451,7 @@ public class SExportUtils {
     }
 
     /**
-     * Ejecuta una consulta para obtener usuarios o proveedores y genera un JSON.
+     * Ejecuta una consulta para obtener datos y generar un JSON.
      *
      * @param session Sesión de usuario para acceder a la base de datos.
      * @param syncType Tipo de sincronización.
@@ -464,19 +460,43 @@ public class SExportUtils {
      * @throws SQLException Si ocurre un error en la consulta.
      */
     public static String exportJsonData(final SGuiSession session, final SSyncType syncType, final boolean syncAll) throws SQLException, Exception {
+        return exportJsonData(session, syncType, null, syncAll);
+    }
+
+    /**
+     * Ejecuta una consulta para obtener datos y generar un JSON.
+     *
+     * @param session Sesión de usuario para acceder a la base de datos.
+     * @param syncType Tipo de sincronización.
+     * @param period Periodo de la sincronización (fechas inicial y final.)
+     * @param syncAll Si es <code>true</code>, sincroniza todos los registros; si es <code>false</code>, solo los nuevos o modificados.
+     * @return <code>String</code> con el JSON generado o mensaje de error.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static String exportJsonData(final SGuiSession session, final SSyncType syncType, final Date[] period, final boolean syncAll) throws SQLException, Exception {
         try {
+            // Valida tipo de sincronización
+            switch (syncType) {
+                case USER:
+                case PARTNER_SUPPLIER:
+                case PURCHASE_ORDER:
+                    break;
+                default:
+                    throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+            }
+            
+            ObjectMapper mapper = new ObjectMapper();
+            
             // Determina la fecha de la última sincronización exitosa si no es sincronización total
             Date lastSyncDate = syncAll ? null : getLastSyncDateTime(session.getStatement(), syncType);
 
             // Obtiene la configuración del servicio de sincronización
-            ObjectMapper mapper = new ObjectMapper();
-            
             JsonNode config = mapper.readTree(
                 SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
             );
 
             // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
-            ArrayList<SUserExport> dataToExport = getDataToExport(session.getStatement(), syncType, lastSyncDate, session.getConfigCompany().getCompanyId());
+            ArrayList<SExportData> dataToExport = getDataToExport(session.getStatement(), syncType, lastSyncDate, session.getConfigCompany().getCompanyId(), period);
 
             // Si no hay datos para exportar, registra el intento y retorna vacío
             if (dataToExport == null || dataToExport.isEmpty()) {
@@ -491,32 +511,48 @@ public class SExportUtils {
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
-                    parentKey = SSwapConsts.CFG_USER_SYNC;
+                    parentKey = SSwapConsts.CFG_OBJ_USER_SYNC;
                     break;
                 case PURCHASE_ORDER:
-                    parentKey = SSwapConsts.CFG_PUR_ORD_SYNC;
+                    parentKey = SSwapConsts.CFG_OBJ_PUR_ORD_SYNC;
                     break;
                 default:
-                    throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                    // nada
             }
             
-            String instance = SAuthJsonUtils.getValueOfElement(config, "", SSwapConsts.CFG_INSTANCE);
-            String syncUrl = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_URL);
-            String syncToken = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_TOKEN);
-            String syncApiKey = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_API_KEY);
-            int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.ATT_LIMIT));
+            String instance = SAuthJsonUtils.getValueOfElement(config, "", SSwapConsts.CFG_OBJ_INSTANCE);
+            String syncUrl = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_URL);
+            String syncToken = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_TOKEN);
+            String syncApiKey = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_API_KEY);
+            int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_LIMIT));
 
             // Determina si se debe actualizar la fecha de última sincronización
-            boolean updateLastSync = dataToExport.size() <= syncLimit;
+            boolean isSyncWithinBounds = dataToExport.size() <= syncLimit;
             
             // Limita la cantidad de datos a exportar según el límite configurado
-            ArrayList<SUserExport> limitedData = dataToExport.size() > syncLimit ? (ArrayList) dataToExport.subList(0, syncLimit) : dataToExport;
+            ArrayList<SExportData> dataToExportBounded = isSyncWithinBounds ? dataToExport : (ArrayList) dataToExport.subList(0, syncLimit);
 
             // Prepara el cuerpo de la petición en formato JSON
-            SBodyExport body = new SBodyExport();
-            body.work_instance = new String[] { instance };
-            body.users = limitedData.toArray(new SUserExport[0]);
-            String requestBody = mapper.writeValueAsString(body);
+            
+            String requestBody = ""; // XXX
+            
+            switch (syncType) {
+                case USER:
+                case PARTNER_SUPPLIER:
+                    SBodyExport body = new SBodyExport();
+                    body.work_instance = new String[] { instance };
+                    body.users = dataToExportBounded.toArray(new SUserExport[0]);
+                    requestBody = mapper.writeValueAsString(body);
+                    break;
+                    
+                case PURCHASE_ORDER:
+                    
+                    requestBody = "";
+                    break;
+                default:
+                    // nada
+            }
+            
 
             // Realiza la petición HTTP al servicio de sincronización
             String response = requestSwapService("", syncUrl, "POST", requestBody, syncToken);
@@ -524,7 +560,7 @@ public class SExportUtils {
 
             // Procesa la respuesta y genera los registros de log correspondientes
             ArrayList<SDbSyncLogEntry> logEntries = parseSyncLogEntries(responseJson);
-            String responseCode = getResponseCode(updateLastSync, logEntries, responseJson);
+            String responseCode = getResponseCode(isSyncWithinBounds, logEntries, responseJson);
 
             // Registra la operación de sincronización en la base de datos
             logSync(session, syncType, compactJson(requestBody), responseCode, compactJson(response), logEntries);
@@ -589,18 +625,18 @@ public class SExportUtils {
     }
 
     /**
-     * Determina el código de respuesta a registrar según el resultado de la sincronización.
+     * Determina el código de respuesta a registrar según el resultado de la updateDateOfLastSync.
      *
      * @param updateLastSync Indica si se debe actualizar la última sincronización.
      * @param logEntries     Lista de entradas de log generadas.
      * @param responseJson   Respuesta JSON del servicio.
      * @return Código de respuesta como String.
      */
-    private static String getResponseCode(final boolean updateLastSync, final ArrayList<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
+    private static String getResponseCode(final boolean updateDateOfLastSync, final ArrayList<SDbSyncLogEntry> logEntries, final JsonNode responseJson) {
         if (logEntries.isEmpty() && SAuthJsonUtils.containsElement(responseJson, "", "results")) {
             return HTTP_CODE_NO_CONTENT + ""; // No content
         }
-        return updateLastSync ? HTTP_CODE_OK + "" : HTTP_CODE_PENDING + "";
+        return updateDateOfLastSync ? HTTP_CODE_OK + "" : HTTP_CODE_PENDING + "";
     }
 
     /**
@@ -644,7 +680,8 @@ public class SExportUtils {
      * @return Un objeto SUserExport con los datos del proveedor, o null si no se encuentra.
      */
     public static SUserExport getSupplierByFiscalId(final Statement statement, final String fiscalId) {
-        String sql = BASE_PROVIDER_QUERY + " WHERE bp.fiscal_id = '" + fiscalId + "' "
+        String sql = BASE_PROVIDER_QUERY
+                + "WHERE bp.fiscal_id = '" + fiscalId + "' "
                 + "AND NOT bp.b_del AND (bp.b_del IS NULL OR NOT bp.b_del) "
                 + "GROUP BY bp.id_bp "
                 + "ORDER BY bpb.ts_edit DESC;";
@@ -711,8 +748,8 @@ public class SExportUtils {
             }
 
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(TIME_60_SECONDS); // 30 segundos para conectar
-            connection.setReadTimeout(TIME_60_SECONDS);    // 30 segundos para leer respuesta
+            connection.setConnectTimeout(TIME_60_SEC); // 30 segundos para conectar
+            connection.setReadTimeout(TIME_60_SEC);    // 30 segundos para leer respuesta
             connection.setRequestMethod(sMethod.toUpperCase());
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");

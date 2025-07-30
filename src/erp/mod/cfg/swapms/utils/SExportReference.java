@@ -16,12 +16,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  *
  * @author Sergio Flores
  */
-public class SReference {
+public class SExportReference implements SExportData {
 
     /**
      * ID de la empresa
      */
-    public String company;
+    public int company;
 
     /**
      * ID de la categoría de la transacción

@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.db;
+package erp.mod.cfg.swapms.utils;
 
 /**
  *
  * @author Sergio Flores
  */
-public enum SSyncType {
-    USER,
-    PARTNER_SUPPLIER,
-    PURCHASE_ORDER,
-    SCALE_TICKET
+public interface SExportData {
+    
 }
