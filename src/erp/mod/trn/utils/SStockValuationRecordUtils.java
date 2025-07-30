@@ -294,7 +294,8 @@ public class SStockValuationRecordUtils {
                             null,
                             oConsumption.getFkStockValuationId(),
                             oConsumption.getPkStockValuationMvtId(),
-                            bookkeepingNumber);
+                            bookkeepingNumber,
+                            oConsumption.isAuxAdjust());
                     lRecordEntries.add(oDataRecordEntry);
                 }
             }
@@ -395,7 +396,8 @@ public class SStockValuationRecordUtils {
                             oConsumption.getAuxWarehousePk(),
                             oConsumption.getFkStockValuationId(),
                             oConsumption.getPkStockValuationMvtId(),
-                            bookkeepingNumber
+                            bookkeepingNumber,
+                            oConsumption.isAuxAdjust()
                     );
                     lRecordEntries.add(oDataRecordEntryWhs);
                 }
@@ -420,7 +422,7 @@ public class SStockValuationRecordUtils {
      * @param dQuantity Cantidad del movimiento.
      * @param dPercent Porcentaje de prorrateo.
      * @param dQuantityPercent Cantidad prorrateada.
-     * @param dCost Costo del movimiento.
+     * @param dValue Costo del movimiento.
      * @param oUnit Unidad del ítem.
      * @param sConfigConceptText Texto de configuración para el concepto.
      * @param oAccount Cuenta contable.
@@ -445,10 +447,10 @@ public class SStockValuationRecordUtils {
      */
     private static SDataRecordEntry createRecordEntry(SGuiSession session, 
             final int movType, final Object[] recordPk, final SDataItem oItem, final double dQuantity, final double dPercent, 
-            final double dQuantityPercent, final double dCost, final SDataUnit oUnit, final String sConfigConceptText, final SDataAccount oAccount, 
+            final double dQuantityPercent, final double dValue, final SDataUnit oUnit, final String sConfigConceptText, final SDataAccount oAccount, 
             final int nIdCc, final String sIdCc, final int sortPosition, final int[] pkDiog, final int nItemRef, 
             final int[] fkSystemMove, final int[] fkSystemAccount, final int[] fkSystemMoveType, final int[] pkWhs, final int stkValuationId, 
-            final int stkValuationMvtId, final SDataBookkeepingNumber bookkeepingNumber) throws Exception {
+            final int stkValuationMvtId, final SDataBookkeepingNumber bookkeepingNumber, final boolean bAdjust) throws Exception {
         SDataRecordEntry oRecordEntry = new SDataRecordEntry();
 
         oRecordEntry.setPkYearId((int) recordPk[0]);
@@ -459,18 +461,55 @@ public class SStockValuationRecordUtils {
         oRecordEntry.setConcept(SStockValuationRecordUtils.getConcept(oItem.getName(), dQuantity, dPercent, oUnit.getSymbol(), sConfigConceptText));
         oRecordEntry.setReference("");
         oRecordEntry.setIsReferenceTax(false);
-        if (movType == TYPE_INV) {
-            oRecordEntry.setDebit(0d);
-            oRecordEntry.setCredit(dCost);
-            oRecordEntry.setDebitCy(0d);
-            oRecordEntry.setCreditCy(dCost);
+
+        if (!bAdjust) {
+            // Se trata de un consumo y el valor siempre es positivo
+            if (movType == TYPE_INV) {
+                oRecordEntry.setDebit(0d);
+                oRecordEntry.setCredit(dValue);
+                oRecordEntry.setDebitCy(0d);
+                oRecordEntry.setCreditCy(dValue);
+            }
+            else {
+                oRecordEntry.setDebit(dValue);
+                oRecordEntry.setCredit(0d);
+                oRecordEntry.setDebitCy(dValue);
+                oRecordEntry.setCreditCy(0d);
+            }
         }
         else {
-            oRecordEntry.setDebit(dCost);
-            oRecordEntry.setCredit(0d);
-            oRecordEntry.setDebitCy(dCost);
-            oRecordEntry.setCreditCy(0d);
+            // Se trata de un ajuste y el valor puede ser negativo
+            // (Es negativo cuando la factura tiene un costo menor que la OC)
+            if (dValue >= 0d) {
+                if (movType == TYPE_INV) {
+                    oRecordEntry.setDebit(dValue);
+                    oRecordEntry.setCredit(0d);
+                    oRecordEntry.setDebitCy(dValue);
+                    oRecordEntry.setCreditCy(0d);
+                }
+                else {
+                    oRecordEntry.setDebit(0d);
+                    oRecordEntry.setCredit(dValue);
+                    oRecordEntry.setDebitCy(0d);
+                    oRecordEntry.setCreditCy(dValue);
+                }
+            }
+            else {
+                if (movType == TYPE_INV) {
+                    oRecordEntry.setDebit(0d);
+                    oRecordEntry.setCredit(-dValue);
+                    oRecordEntry.setDebitCy(0d);
+                    oRecordEntry.setCreditCy(-dValue);
+                }
+                else {
+                    oRecordEntry.setDebit(-dValue);
+                    oRecordEntry.setCredit(0d);
+                    oRecordEntry.setDebitCy(-dValue);
+                    oRecordEntry.setCreditCy(0d);
+                }
+            }
         }
+
         oRecordEntry.setExchangeRate(1d);
         oRecordEntry.setExchangeRateSystem(1d);
         oRecordEntry.setUnits(dQuantityPercent);

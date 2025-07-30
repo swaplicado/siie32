@@ -72,6 +72,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected String sLogMessage;
     protected int[] maAuxTypeDpsIn;
     protected int[] maAuxTypeDpsOut;
+    protected boolean mbAuxIsAdjust;
 
     public SDbStockValuationMvt() {
         super(SModConsts.TRN_STK_VAL_MVT);
@@ -123,6 +124,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public void setLogMessage(String s) { sLogMessage = s; }
     public void setAuxTypeDpsIn(int[] typeDpsIn) { maAuxTypeDpsIn = typeDpsIn; }
     public void setAuxTypeDpsOut(int[] typeDpsOut) { maAuxTypeDpsOut = typeDpsOut; }
+    public void setAuxIsAdjust(boolean b) { mbAuxIsAdjust = b; }
     
     public int getPkStockValuationMvtId() { return mnPkStockValuationMvtId; }
     public Date getDateMove() { return mtDate; }
@@ -170,6 +172,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public String getLogMessage() { return sLogMessage; }
     public int[] getAuxTypeDpsIn() { return maAuxTypeDpsIn; }
     public int[] getAuxTypeDpsOut() { return maAuxTypeDpsOut; }
+    public boolean isAuxAdjust() { return mbAuxIsAdjust; }
 
     public int[] getAuxWarehousePk() {
         if (mnFkWarehouseId > 0) {
@@ -246,6 +249,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         msAuxMaterialRequestData = "";
         maAuxTypeDpsIn = new int[] { 0, 0, 0 };
         maAuxTypeDpsOut = new int[] { 0, 0, 0 };
+        mbAuxIsAdjust = false;
     }
 
     @Override
@@ -473,6 +477,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         registry.setLogMessage(this.getLogMessage());
         registry.setAuxTypeDpsIn(this.getAuxTypeDpsIn());
         registry.setAuxTypeDpsOut(this.getAuxTypeDpsOut());
+        registry.setAuxIsAdjust(this.isAuxAdjust());
         
         registry.setRegistryNew(this.isRegistryNew());
         
