@@ -4,6 +4,7 @@
  */
 package erp.musr.view;
 
+import erp.SClient;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -49,23 +50,27 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     }
 
     private void initComponents() {
-        int i;
-        int levelRightEdit = SDataConstantsSys.UNDEFINED;
-        msSiieAppUrls = "";
-
-        moTabFilterDeleted = new STabFilterDeleted(this);
-
+        // Initialize commands:
+        
         jbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
         jbCopy.setPreferredSize(new Dimension(23, 23));
         jbCopy.addActionListener(this);
         jbCopy.setToolTipText("Copiar usuario");
 
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbCopy);
 
+        moTabFilterDeleted = new STabFilterDeleted(this);
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterDeleted);
+        
         try {
            msSiieAppUrls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_APP_URLS);
            
-            if (! msSiieAppUrls.isEmpty()) {
+            if (!msSiieAppUrls.isEmpty()) {
+                addTaskBarUpperSeparator();
+        
                 jbSiieAppExport = new JButton(miClient.getImageIcon(SLibConstants.ICON_ARROW_UP));
                 jbSiieAppExport.setPreferredSize(new Dimension(23, 23));
                 jbSiieAppExport.addActionListener(this);
@@ -85,28 +90,20 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
         }
 
-        try {
-            String paramValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
-            
-            if (!paramValue.isEmpty()) {
-                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar usuarios a " + SSwapConsts.SWAP_SERVICES, this);
-                
-                addTaskBarUpperSeparator();
-                addTaskBarUpperComponent(jbExportDataToSwapServices);
-            }
-        }
-        catch (Exception e) {
-            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
+        // Command button for SWAP Services:
+        if ((boolean) ((SClient) miClient).getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP)) {
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar usuarios a " + SSwapConsts.SWAP_SERVICES, this);
+
+            addTaskBarUpperSeparator();
+            addTaskBarUpperComponent(jbExportDataToSwapServices);
         }
 
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterDeleted);
+        // Initialize table:
 
-        //jbDelete.setEnabled(false);
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
         erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[20];
 
-        i = 0;
+        int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
@@ -137,10 +134,11 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
 
-        levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_USR).Level;
+        int levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_USR).Level;
 
         jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
         jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        //jbDelete.setEnabled(false);
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.USRX_RIGHT);

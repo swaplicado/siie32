@@ -5,6 +5,7 @@
 
 package erp.mbps.view;
 
+import erp.SClient;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelEmployee;
@@ -27,12 +28,9 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.mod.hrs.form.SDialogEmployerSubstitution;
-import erp.musr.view.SViewUser;
 import erp.table.SFilterConstants;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -91,7 +89,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
 
     private void initComponents() {
-        int i;
         int rightLevelBp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
         int rightLevelBpCatCreate = 0;
         int rightLevelBpCatEdit = 0;
@@ -107,6 +104,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbBizPartnerExport);
         
         if (mbIsViewEmployees) {
@@ -188,8 +186,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             addTaskBarLowerComponent(jbClearFilterPaymentType);
         }
 
-        STableColumn[] aoTableColumns = null;
+        // Initialize table:
+
         STableField[] aoKeyFields = new STableField[1];
+        STableColumn[] aoTableColumns = null;
 
         switch(mnTabTypeAux01) {
             case SDataConstants.BPSX_BP_CO:
@@ -230,8 +230,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             default:
                 // nothing
         }
-
-        i = 0;
+        
+        int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bp.id_bp");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
@@ -273,18 +273,12 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
                 rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
 
-                try {
-                    String paramValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
-                    
-                    if (!paramValue.isEmpty()) {
-                        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+                // Command button for SWAP Services:
+                if ((boolean) ((SClient) miClient).getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP)) {
+                    jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
-                        addTaskBarUpperSeparator();
-                        addTaskBarUpperComponent(jbExportDataToSwapServices);
-                    }
-                }
-                catch (Exception e) {
-                    Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
+                    addTaskBarUpperSeparator();
+                    addTaskBarUpperComponent(jbExportDataToSwapServices);
                 }
                 break;
 

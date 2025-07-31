@@ -14,19 +14,32 @@ public abstract class SSwapConsts {
     public static final String SWAP_SERVICES = "SWAP Services";
 
     /**
-     * JSON configuration object for instance.
+     * JSON name/value pair for link-up status (enabled/disabled) of SWAP Services in current company.
+     * ("NVP" = name/value pair.)
      */
-    public static final String CFG_OBJ_INSTANCE = "instance";
+    public static final String CFG_NVP_LINK_UP = "link-up";
 
     /**
-     * JSON configuration object for users "synchronization" (exportation actually!)
+     * JSON name/value pair for list of ID's of ERP companies integrated into SWAP Services.
+     * ("NVP" = name/value pair.)
      */
-    public static final String CFG_OBJ_USER_SYNC = "user-sync";
+    public static final String CFG_NVP_COMPANIES = "companies";
 
     /**
-     * JSON configuration object for purchase orders "synchronization" (exportation actually!)
+     * JSON name/value pair for ID of SWAP-Services instance.
+     * ("NVP" = name/value pair.)
      */
-    public static final String CFG_OBJ_PUR_ORD_SYNC = "pur-ord-sync";
+    public static final String CFG_NVP_INSTANCE = "instance";
+
+    /**
+     * JSON object for request attributes of users service.
+     */
+    public static final String CFG_OBJ_USER_SRV = "user-srv";
+
+    /**
+     * JSON object for request attributes of purchase-orders service.
+     */
+    public static final String CFG_OBJ_PUR_ORD_SRV = "pur-ord-srv";
 
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";

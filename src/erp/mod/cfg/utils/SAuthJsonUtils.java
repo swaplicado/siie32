@@ -83,16 +83,29 @@ public class SAuthJsonUtils {
     
     /**
      * Obtiene el valor de un elemento específico dentro de un nodo JSON.
+     * Puede recuperar como <code>String</code>: textos, enteros y arreglos de enteros.
      *
      * @param root Nodo raíz del JSON.
      * @param parentKey Clave del nodo padre donde se encuentra el elemento.
      * @param elementKey Clave del elemento cuyo valor se desea obtener.
-     * @return Valor del elemento como cadena de texto; si no es textual, retorna una cadena vacía.
+     * @return Valor del elemento como cadena de texto; si no es texto, entero o arreglo de enteros, devuelve una cadena vacía.
      */
-    public static String getValueOfElement(JsonNode root, String parentKey, String elementKey) {
+    public static String getValueOfElementAsText(JsonNode root, String parentKey, String elementKey) {
         JsonNode parentNode = parentKey.isEmpty() ? root : root.path(parentKey);
         JsonNode elementNode = parentNode.path(elementKey);
-        return elementNode.isTextual() ? elementNode.asText() : "";
+        String value = "";
+        
+        if (elementNode.isTextual()) {
+            value = elementNode.asText();
+        }
+        else if (elementNode.isInt()) {
+            value = "" + elementNode.asInt();
+        }
+        else if (elementNode.isArray()) {
+            value = elementNode.toString().replaceAll("[\\[\\]]", "");
+        }
+        
+        return value;
     }
 
     /**

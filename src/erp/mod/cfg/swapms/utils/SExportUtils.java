@@ -8,6 +8,7 @@ package erp.mod.cfg.swapms.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SClient;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
@@ -475,7 +476,7 @@ public class SExportUtils {
      */
     public static String exportJsonData(final SGuiSession session, final SSyncType syncType, final Date[] period, final boolean syncAll) throws SQLException, Exception {
         try {
-            // Valida tipo de sincronización
+            // Validar tipo de sincronización:
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
@@ -485,20 +486,13 @@ public class SExportUtils {
                     throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
             }
             
-            ObjectMapper mapper = new ObjectMapper();
-            
-            // Determina la fecha de la última sincronización exitosa si no es sincronización total
+            // Determinar la fecha de la última sincronización exitosa si no es sincronización total:
             Date lastSyncDate = syncAll ? null : getLastSyncDateTime(session.getStatement(), syncType);
 
-            // Obtiene la configuración del servicio de sincronización
-            JsonNode config = mapper.readTree(
-                SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
-            );
-
-            // Obtiene los datos a exportar según el tipo de sincronización y la fecha de última sincronización
+            // Obtener los datos a exportar según el tipo de sincronización y la fecha de la última sincronización:
             ArrayList<SExportData> dataToExport = getDataToExport(session.getStatement(), syncType, lastSyncDate, session.getConfigCompany().getCompanyId(), period);
 
-            // Si no hay datos para exportar, registra el intento y retorna vacío
+            // Si no hay datos para exportar, registra el intento y retorna vacío:
             if (dataToExport == null || dataToExport.isEmpty()) {
                 logSync(session, syncType, "", "" + HTTP_CODE_NO_CONTENT, "No hay nada para exportar.", new ArrayList<>());
                 return "";
@@ -511,37 +505,44 @@ public class SExportUtils {
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
-                    parentKey = SSwapConsts.CFG_OBJ_USER_SYNC;
+                    parentKey = SSwapConsts.CFG_OBJ_USER_SRV;
                     break;
                 case PURCHASE_ORDER:
-                    parentKey = SSwapConsts.CFG_OBJ_PUR_ORD_SYNC;
+                    parentKey = SSwapConsts.CFG_OBJ_PUR_ORD_SRV;
                     break;
                 default:
                     // nada
             }
             
-            String instance = SAuthJsonUtils.getValueOfElement(config, "", SSwapConsts.CFG_OBJ_INSTANCE);
-            String syncUrl = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_URL);
-            String syncToken = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_TOKEN);
-            String syncApiKey = SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_API_KEY);
-            int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElement(config, parentKey, SSwapConsts.CFG_ATT_LIMIT));
+            // Instanciar mapeador de objetos multipropósito:
+            ObjectMapper mapper = new ObjectMapper();
+            
+            // Obtener la configuración del servicio de sincronización
+            JsonNode config = mapper.readTree(
+                    SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
+            );
+            
+            String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_URL);
+            String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_TOKEN);
+            String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_API_KEY);
+            int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_LIMIT));
 
-            // Determina si se debe actualizar la fecha de última sincronización
+            // Determinar si se debe actualizar la fecha de la última sincronización:
             boolean isSyncWithinBounds = dataToExport.size() <= syncLimit;
             
-            // Limita la cantidad de datos a exportar según el límite configurado
+            // Acotar la cantidad de datos a exportar según el límite configurado:
             ArrayList<SExportData> dataToExportBounded = isSyncWithinBounds ? dataToExport : (ArrayList<SExportData>) dataToExport.subList(0, syncLimit);
 
-            // Prepara el cuerpo de la petición en formato JSON
+            // Preparar el cuerpo de la petición en formato JSON:
             
-            String requestBody = ""; // XXX
+            String requestBody = "";
             
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
                     SBodyExport body = new SBodyExport();
-                    body.work_instance = new String[] { instance };
-                    body.users = dataToExportBounded.toArray(new SUserExport[0]);
+                    body.work_instance = new String[] { "" + ((SClient) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_INSTANCE) };
+                    body.users = (SUserExport[]) dataToExportBounded.toArray(new SUserExport[0]);
                     requestBody = mapper.writeValueAsString(body);
                     break;
                     
@@ -552,17 +553,16 @@ public class SExportUtils {
                 default:
                     // nada
             }
-            
 
-            // Realiza la petición HTTP al servicio de sincronización
+            // Realizar la petición HTTP a SWAP Services:
             String response = requestSwapService("", syncUrl, "POST", requestBody, syncToken);
             JsonNode responseJson = mapper.readTree(response);
 
-            // Procesa la respuesta y genera los registros de log correspondientes
+            // Procesar la respuesta y generar las entradas de bitácora correspondientes:
             ArrayList<SDbSyncLogEntry> logEntries = parseSyncLogEntries(responseJson);
             String responseCode = getResponseCode(isSyncWithinBounds, logEntries, responseJson);
 
-            // Registra la operación de sincronización en la base de datos
+            // Registrar la operación de exportación en la base de datos:
             logSync(session, syncType, compactJson(requestBody), responseCode, compactJson(response), logEntries);
 
             return "";

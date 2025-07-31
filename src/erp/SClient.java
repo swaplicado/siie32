@@ -8,6 +8,8 @@ package erp;
 
 import cfd.DCfdConsts;
 import cfd.DCfdSignature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -38,6 +40,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.gui.SGuiDatePicker;
 import erp.lib.gui.SGuiDateRangePicker;
 import erp.lib.gui.SGuiModule;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCertificate;
 import erp.mfin.data.SDataExchangeRate;
 import erp.mfin.data.SDataRecord;
@@ -53,6 +56,8 @@ import erp.mod.SModuleMkt;
 import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
+import erp.mod.cfg.swapms.utils.SSwapConsts;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.usr.db.SDbUserGui;
 import erp.mtrn.data.SCfdUtils;
 import erp.redis.SLockManager;
@@ -79,6 +84,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -245,6 +252,11 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     
     private Jedis moJedis;
     private SLockManager moSLockManager;
+    
+    // SWAP-Services Settings:
+    private boolean mbSwapServicesLinkUp;
+    private int[] manSwapServicesCompanies;
+    private int mnSwapServicesInstance;
     
     public static boolean IsDevMode;
     private static long DevStartControlPoint;
@@ -1365,6 +1377,8 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
             moModuleHrs = null;
             moModuleQlt = null;
             
+            resetSwapServicesSettings();
+            
             prepareGui();
         }
         catch (Exception e) {
@@ -1442,6 +1456,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             
                             prepareGui();
                             createSession();
+                            retrieveSwapServicesSettings();
                             SCfdUtils.resetDataSetForPayroll();
 
                             boolean actionOk = actionFileSession(true);
@@ -1455,6 +1470,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             }
                             
                             break;
+                            
                         default:
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_UNKNOWN);
                             break;
@@ -1820,6 +1836,61 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     
     public SParamsApp getParamsApp() {
         return moParamsApp;
+    }
+    
+    private void resetSwapServicesSettings() {
+        mbSwapServicesLinkUp = false;
+        manSwapServicesCompanies = new int[] {};
+        mnSwapServicesInstance = 0;
+    }
+    
+    private void retrieveSwapServicesSettings() {
+        resetSwapServicesSettings();
+        
+        try {
+            JsonNode config = new ObjectMapper().readTree(
+                    SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
+            );
+
+            mbSwapServicesLinkUp = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_LINK_UP)) == 1;
+
+            if (mbSwapServicesLinkUp) {
+                String companies = SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_COMPANIES);
+                manSwapServicesCompanies = SLibUtils.textExplodeAsIntArray(companies, ",");
+                mnSwapServicesInstance = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_INSTANCE));
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+        }
+    }
+    
+    /**
+     * Get required SWAP-Services Setting.
+     * 
+     * @param setting Required SWAP-Services Setting.
+     * Supported options defined in <code>SSwapConsts</code>: CFG_NVP_LINK_UP, CFG_NVP_COMPANIES or CFG_NVP_INSTANCE.
+     * @return Value of required SWAP-Services Setting:
+     * CFG_NVP_LINK_UP as <code>boolean</code>, CFG_NVP_COMPANIES as <code>int[]</code>, CFG_NVP_INSTANCE as <code>int</code>.
+     */
+    public Object getSwapServicesSetting(final String setting) {
+        Object value = null;
+        
+        switch (setting) {
+            case SSwapConsts.CFG_NVP_LINK_UP:
+                value = mbSwapServicesLinkUp;
+                break;
+            case SSwapConsts.CFG_NVP_COMPANIES:
+                value = manSwapServicesCompanies;
+                break;
+            case SSwapConsts.CFG_NVP_INSTANCE:
+                value = mnSwapServicesInstance;
+                break;
+            default:
+                // nothing
+        }
+        
+        return value;
     }
     
     @Override
