@@ -518,9 +518,7 @@ public class SExportUtils {
             ObjectMapper mapper = new ObjectMapper();
             
             // Obtener la configuración del servicio de sincronización
-            JsonNode config = mapper.readTree(
-                    SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
-            );
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
             
             String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_URL);
             String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, parentKey, SSwapConsts.CFG_ATT_TOKEN);

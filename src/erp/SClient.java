@@ -1848,9 +1848,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         resetSwapServicesSettings();
         
         try {
-            JsonNode config = new ObjectMapper().readTree(
-                    SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG)
-            );
+            JsonNode config = new ObjectMapper().readTree(SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
 
             mbSwapServicesLinkUp = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_LINK_UP)) == 1;
 
