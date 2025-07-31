@@ -3,8 +3,7 @@ SIIE 3.2 282.5/ 2025-07-30
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Implementación de la configuración del grado de obligatoriedad de firma con huella digital al recoger materiales de almacén.
-2) Corrección en el guardado de precios comerciales, para guardar con la Unidad (simple) de las partidas de una factura
-    y en caso de que se requiera, también el precio comercial de la Unidad Original.
+2) Corrección en el guardado de precios comerciales, para guardar con la Unidad (simple) de las partidas de una factura y en caso de que se requiera, también el precio comercial de la unidad original.
 
 ================================================================================
 SIIE 3.2 282.4/ 2025-07-30

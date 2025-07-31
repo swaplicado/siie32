@@ -97,7 +97,6 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
             }
 
             if (mbIsRegistryNew) {
-                
                 sql = "INSERT INTO usr_usr_func VALUES (" +
                         mnPkUserId + ", " +
                         mnPkFunctionalAreaId + " " +
