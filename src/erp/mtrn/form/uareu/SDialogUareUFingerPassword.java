@@ -37,9 +37,12 @@ public class SDialogUareUFingerPassword extends JDialog implements erp.lib.form.
     private int mnFormResult;
     private boolean mbFirstTime;
     private int mnMode;
+    private String msUserPassword;
 
     /**
      * Creates new form SLogin
+     * @param client
+     * @param mode
      */
     public SDialogUareUFingerPassword(SClientInterface client, int mode) {
         super(client.getFrame(), true);
@@ -301,7 +304,10 @@ public class SDialogUareUFingerPassword extends JDialog implements erp.lib.form.
                                     validation.setMessage("La longitud de la contraseña no puede ser mayor a 4.");
                                 }
                                 else if (!password.matches("[0-9]*")) {
-                                      validation.setMessage("La contraseña debe ser númerica");
+                                    validation.setMessage("La contraseña debe ser númerica.");
+                                }
+                                else if (!password.equals(msUserPassword)) {
+                                    validation.setMessage("La contraseña no es correcta.");
                                 }
 
                                 if (validation.getIsError()) {
@@ -347,7 +353,7 @@ public class SDialogUareUFingerPassword extends JDialog implements erp.lib.form.
     public void setValue(int type, Object value) {
         switch (type) {
             case VALUE_FINGERPASSWORD:
-                jpfUserPasswordConfirm.getPassword();
+                msUserPassword = ((int) value) + "";
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

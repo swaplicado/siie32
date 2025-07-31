@@ -78,8 +78,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     public static final String SERIES_ADJ_OUT = "MAS";
     public static final String SERIES_TRA_IN = "MTE";
     public static final String SERIES_TRA_OUT = "MTS";
-    public static final Color COLOR_SIGNED = new Color(255, 255, 102);
-    public static final Color COLOR_NONSIGNED = new Color(102, 255, 102);
+    public static final Color COLOR_SIGNED = new Color(102, 255, 102);
+    public static final Color COLOR_NONSIGNED = new Color(255, 255, 102);
     
     private int mnFormType;
     

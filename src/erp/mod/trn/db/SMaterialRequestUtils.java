@@ -200,7 +200,8 @@ public abstract class SMaterialRequestUtils {
         return qtySupplied;
     }
     
-    public static ArrayList<SDataDiog> makeDiogs(SGuiClient client, final int pkYear, final Date date, final int fkUser, ArrayList<SMaterialRequestSupplyRow> lSupplies, final int idStkseg, final int user, final int userSup) {
+    public static ArrayList<SDataDiog> makeDiogs(SGuiClient client, final int pkYear, final Date date, final int fkUser, 
+            ArrayList<SMaterialRequestSupplyRow> lSupplies, final int idStkseg, final int user, final int userSup, final boolean sign) {
         HashMap<String, SDataDiog> mDiogs = new HashMap<>();
         String warehouseKey = null;
         for (SMaterialRequestSupplyRow oSupply : lSupplies) {
@@ -252,6 +253,7 @@ public abstract class SMaterialRequestUtils {
                 oDiog.setFkUserDeleteId(1);
                 
                 oDiog.setAuxSegregationStockId(idStkseg);
+                oDiog.setAuxSignDiog(sign);
                         
                 mDiogs.put(warehouseKey, oDiog);
             }

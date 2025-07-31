@@ -36,7 +36,6 @@ import erp.cfd.SCfdDataImpuesto;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.gui.SGuiUtilities;
 import erp.gui.session.SSessionCustom;
@@ -3138,7 +3137,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                         
                         if (dpsEntry.getXtaIsPurInvoiceInventoriable()) {
-                            dpsEntry.setXtaPriceCommUnitary(dpsEntry.getPriceUnitary() + (dAdminPriceAvg / dpsEntry.getQuantity()));
+                            dpsEntry.setXtaPriceCommUnitary(SLibUtils.round((dpsEntry.getPriceUnitary() - dpsEntry.getDiscountUnitary()) + 
+                                    (dpsEntry.getQuantity() == 0 ? 0 : (dAdminPriceAvg / dpsEntry.getQuantity())), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits()));
+                            
+                            if (dpsEntry.getFkUnitId() != dpsEntry.getFkOriginalUnitId()) {
+                                dpsEntry.setXtaOriginalPriceCommUnitary(SLibUtils.round((dpsEntry.getOriginalPriceUnitaryCy() - dpsEntry.getOriginalDiscountUnitaryCy()) * mdExchangeRate + 
+                                        (dpsEntry.getOriginalQuantity() == 0 ? 0 : (dAdminPriceAvg / dpsEntry.getOriginalQuantity())), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits()));
+                            }
                         }
 
                         if (dpsEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {

@@ -145,7 +145,7 @@ public class SDbBolMerchandiseQuantity extends SDbRegistryUser implements SGridR
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
         
-        msSql = "SELECT mq.*, i.name AS item, u.unit FROM " + getSqlTable() + " AS mq " +
+        msSql = "SELECT mq.*, i.item AS item, u.unit FROM " + getSqlTable() + " AS mq " +
                 "INNER JOIN log_bol_merch AS m ON mq.id_bol = m.id_bol AND mq.id_merch = m.id_merch " +
                 "INNER JOIN erp.itmu_item AS i ON m.fk_item = i.id_item " + 
                 "INNER JOIN erp.itmu_unit AS u ON m.fk_unit = u.id_unit " + 

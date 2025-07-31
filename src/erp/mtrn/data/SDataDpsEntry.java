@@ -206,6 +206,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     
     protected boolean mbXtaIsPurInvoiceInventoriable; 
     protected double mnXtaPriceCommUnitary;
+    protected double mnXtaOriginalPriceCommUnitary;
     
     protected int mnAuxFkItemOld;
     protected double mdAuxQuantityOld;
@@ -564,9 +565,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     
     public void setXtaIsPurInvoiceInventoriable(boolean b) { mbXtaIsPurInvoiceInventoriable = b; }
     public void setXtaPriceCommUnitary(double n) { mnXtaPriceCommUnitary = n; }
+    public void setXtaOriginalPriceCommUnitary(double n) { mnXtaOriginalPriceCommUnitary = n; }
     
     public boolean getXtaIsPurInvoiceInventoriable() { return mbXtaIsPurInvoiceInventoriable; }
     public double getXtaPriceCommUnitary() { return mnXtaPriceCommUnitary; }
+    public double getXtaOriginalPriceCommUnitary() { return mnXtaOriginalPriceCommUnitary; }
     
     public void setAuxFkItemOld(int i) { mnAuxFkItemOld = i; }
     public void setAuxQuantityOld(double n) { mdAuxQuantityOld = n; }
@@ -767,6 +770,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         
         mbXtaIsPurInvoiceInventoriable = false;
         mnXtaPriceCommUnitary = 0;
+        mnXtaOriginalPriceCommUnitary = 0;
         
         mnAuxFkItemOld = 0;
         mdAuxQuantityOld = 0;
@@ -1675,13 +1679,25 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     if (mbXtaIsPurInvoiceInventoriable) {
                         SDbPriceCommercialLog log = new SDbPriceCommercialLog();
                         log.setPkItemId(mnFkItemId);
-                        log.setPkUnitId(mnFkOriginalUnitId);
+                        log.setPkUnitId(mnFkUnitId);
                         log.setPrice(mnXtaPriceCommUnitary);
                         log.setFkDpsYear_n(mnPkYearId);
                         log.setFkDpsDoc_n(mnPkDocId);
                         log.setFkDpsEntry_n(mnPkEntryId);
                         log.setSystem(true);
                         log.saveFromDps(connection);
+                        
+                        if (mnXtaOriginalPriceCommUnitary != 0) {
+                            SDbPriceCommercialLog origLog = new SDbPriceCommercialLog();
+                            origLog.setPkItemId(mnFkItemId);
+                            origLog.setPkUnitId(mnFkOriginalUnitId);
+                            origLog.setPrice(mnXtaOriginalPriceCommUnitary);
+                            origLog.setFkDpsYear_n(mnPkYearId);
+                            origLog.setFkDpsDoc_n(mnPkDocId);
+                            origLog.setFkDpsEntry_n(mnPkEntryId);
+                            origLog.setSystem(true);
+                            origLog.saveFromDps(connection);
+                        }
                     }
                 }
 
@@ -2166,6 +2182,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         clone.setXtaIsPurInvoiceInventoriable(mbXtaIsPurInvoiceInventoriable);
         clone.setXtaPriceCommUnitary(mnXtaPriceCommUnitary);
+        clone.setXtaPriceCommUnitary(mnXtaOriginalPriceCommUnitary);
         
         clone.setAuxFkItemOld(mnAuxFkItemOld);
         clone.setAuxQuantityOld(mdAuxQuantityOld);

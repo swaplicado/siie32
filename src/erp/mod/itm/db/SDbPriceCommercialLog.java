@@ -78,21 +78,6 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
         return samePrice;
     }
     
-//    private void sameItem(Connection connection) throws SQLException, Exception { 
-//        boolean sameItem = false;
-//        
-//        msSql = "SELECT id_log FROM " + getSqlTable() + " WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId + " AND NOT b_del";
-//        try (ResultSet resultSet = connection.createStatement().executeQuery(msSql)) {
-//            if (resultSet.next()) {
-//                sameItem = true;
-//            }
-//        }
-//        if (sameItem) {
-//            msSql = "UPDATE " + getSqlTable() + " SET b_del = 1 WHERE id_item = " + mnPkItemId + " AND id_unit = " + mnPkUnitId;
-//            connection.createStatement().execute(msSql);
-//        }
-//    }
-    
     public void setPkItemId(int n) { mnPkItemId = n; }
     public void setPkUnitId(int n) { mnPkUnitId = n; }
     public void setPkLogId(int n) { mnPkLogId = n; }
@@ -140,7 +125,6 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
         ResultSet resultSet;
         if (isItemInv(connection)) {
             if (!isSamePrice(connection)) {
-                //sameItem(connection);
                 mnPkLogId = 0;
         
                 msSql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM " + getSqlTable() + " " +
