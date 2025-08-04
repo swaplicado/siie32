@@ -56,7 +56,7 @@ import erp.mod.SModuleMkt;
 import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
-import erp.mod.cfg.swapms.utils.SSwapConsts;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.usr.db.SDbUserGui;
 import erp.mtrn.data.SCfdUtils;
@@ -2175,7 +2175,17 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     @Override
     public JFileChooser getFileChooser() {
         if (moFileChooser == null) {
-            moFileChooser = new JFileChooser();
+            showMsgBoxInformation("Se creará el diálogo Abrir, espere un momento de favor...");
+            try {
+                getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                moFileChooser = new JFileChooser();
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            finally {
+                getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         }
         
         return moFileChooser;

@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swapss;
+package erp.mod.cfg.swap;
 
-import erp.mod.cfg.swapms.utils.SExportUtils;
-import erp.mod.cfg.swapms.utils.SUserExport;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SExportDataUser;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.db.STrnDBCore;
@@ -64,7 +64,7 @@ public class SPublicInterface {
      * @param fiscalId ID fiscal del proveedor.
      * @return Objeto {@code SUserExport} que representa al proveedor, o {@code null} si no se encuentra.
      */
-    public SUserExport getSupplierByFiscalId(final String fiscalId) {
+    public SExportDataUser getSupplierByFiscalId(final String fiscalId) {
         try {
             Connection conn = this.getConnection();
 

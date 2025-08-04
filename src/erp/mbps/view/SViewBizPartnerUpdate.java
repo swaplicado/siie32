@@ -8,13 +8,14 @@ package erp.mbps.view;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SSyncType;
-import erp.mod.cfg.swapms.utils.SExportUtils;
-import erp.mod.cfg.swapms.utils.SSwapConsts;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.musr.view.SViewUser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -106,20 +107,18 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            boolean syncAll = false;
-            
             try {
-                String response = SExportUtils.exportJsonData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, syncAll);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, false);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
                 }
                 else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
                 }
             }
             catch (Exception e) {
-                e.printStackTrace();
+                SLibUtilities.printOutException(this, e);
             }
         }
     }

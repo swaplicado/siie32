@@ -74,6 +74,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgCfdiStampClosing;
     private javax.swing.JMenuItem jmiCfgDpsNature;
     private javax.swing.JMenuItem jmiCfgFunctionalAreas;
+    private javax.swing.JMenuItem jmiCfgFunctionalSubAreas;
     private javax.swing.JMenuItem jmiCfgAuthSteps;
     private javax.swing.JMenuItem jmiCfgSystemNotes;
     private javax.swing.JMenuItem jmiCfgMmsItem;
@@ -146,6 +147,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCfdiStampClosing = new JMenuItem("Generación de inventario inicial de timbres...");
         jmiCfgDpsNature = new JMenuItem("Naturaleza de docs. de C/V");
         jmiCfgFunctionalAreas = new JMenuItem("Áreas funcionales");
+        jmiCfgFunctionalSubAreas = new JMenuItem("Subáreas funcionales");
         jmiCfgAuthSteps = new JMenuItem("Autorizaciones");
         jmiCfgSystemNotes = new JMenuItem("Notas predefinidas de docs. de C/V");
         jmiCfgMmsItem = new JMenuItem("Configuración de ítems para envío por correo-e");
@@ -174,6 +176,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgDpsNature);
         jmCfg.add(jmiCfgFunctionalAreas);
+        jmCfg.add(jmiCfgFunctionalSubAreas);
         jmCfg.add(jmiCfgAuthSteps);
         jmCfg.add(jmiCfgSystemNotes);
         jmCfg.addSeparator();
@@ -216,6 +219,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgCfdiStampClosing.addActionListener(this);
         jmiCfgDpsNature.addActionListener(this);
         jmiCfgFunctionalAreas.addActionListener(this);
+        jmiCfgFunctionalSubAreas.addActionListener(this);
         jmiCfgAuthSteps.addActionListener(this);
         jmiCfgSystemNotes.addActionListener(this);
         jmiCfgMmsItem.addActionListener(this);
@@ -262,6 +266,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDncDiogCompanyBranchEntity.setEnabled(hasRightDiogDnc);
         jmiCfgDpsNature.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgFunctionalAreas.setEnabled((hasRightParamsCompany || hasRightParamsErp) && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
+        jmiCfgFunctionalSubAreas.setEnabled((hasRightParamsCompany || hasRightParamsErp) && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         jmiCfgAuthSteps.setEnabled((hasRightParamsCompany || hasRightParamsErp) && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         jmiCfgSystemNotes.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgMmsItem.setEnabled(hasRightParamsCompany || hasRightParamsErp);
@@ -739,6 +744,9 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgFunctionalAreas) {
                  miClient.getSession().showView(SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCfgFunctionalSubAreas) {
+                 miClient.getSession().showView(SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCfgAuthSteps) {
                  miClient.getSession().showView(SModConsts.CFGU_AUTHORN_STEP, SLibConsts.UNDEFINED, null);

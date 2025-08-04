@@ -805,7 +805,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         }
                         
                         if (restore) {
-                            boolean needUpdate = SCfdUtils.restoreCfdCancelAck((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), 0, true);
+                            boolean needUpdate = SCfdUtils.restoreCfdCancelAckPdf((SClientInterface) miClient, (receiptIssue == null ? cfd : receiptIssue.getDbmsDataCfd()), 0, true);
 
                             if (needUpdate) {
                                 miClient.getSession().notifySuscriptors(mnGridType);

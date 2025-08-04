@@ -1086,8 +1086,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionImportCfdi(boolean withPurchaseOrder) {
-        if (withPurchaseOrder ? jbImportCfdiWithPurchaseOrder.isEnabled() :
-                jbImportCfdiWithOutPurchaseOrder.isEnabled()) {
+        if (withPurchaseOrder ? jbImportCfdiWithPurchaseOrder.isEnabled() : jbImportCfdiWithOutPurchaseOrder.isEnabled()) {
             SDataDps purchaseOrderDps = null; 
             FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
             miClient.getFileChooser().repaint();
@@ -1105,8 +1104,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             try {
-                if (!withPurchaseOrder  || (withPurchaseOrder && purchaseOrderDps != null)) {
-                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                if (!withPurchaseOrder || (withPurchaseOrder && purchaseOrderDps != null)) {
+                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                         if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                             SCfdRenderer renderer = new SCfdRenderer(miClient);
                             SDataDps dpsRendered = renderer.renderCfdi(miClient.getFileChooser().getSelectedFile(), purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
@@ -1123,6 +1122,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             miClient.showMsgBoxInformation("El archivo solo puede ser XML.");
                         }
                     }
+                    
                     miClient.getFileChooser().resetChoosableFileFilters();
                 }
             }
@@ -3065,7 +3065,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, dps.getDbmsDataCfd(), 0, true);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAckPdf(miClient, dps.getDbmsDataCfd(), 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

@@ -10,11 +10,14 @@ import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
 import erp.mod.cfg.db.SDbDocument;
 import erp.mod.cfg.db.SDbFunctionalArea;
+import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
 import erp.mod.cfg.form.SFormFunctionalArea;
+import erp.mod.cfg.form.SFormFunctionalSubArea;
 import erp.mod.cfg.view.SViewAuthorizations;
 import erp.mod.cfg.view.SViewFunctionalArea;
+import erp.mod.cfg.view.SViewFunctionalSubArea;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -34,7 +37,8 @@ import sa.lib.gui.SGuiReport;
  */
 public class SModuleCfg extends SGuiModule {
 
-    private SFormFunctionalArea moFunctionalsAreas;
+    private SFormFunctionalArea moFunctionalArea;
+    private SFormFunctionalSubArea moFunctionalSubArea;
     
     public SModuleCfg(SGuiClient client) {
         super(client, SModConsts.MOD_CFG_N, SLibConsts.UNDEFINED);
@@ -62,6 +66,9 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_FUNC:
                 registry = new SDbFunctionalArea();
+                break;
+            case SModConsts.CFGU_FUNC_SUB:
+                registry = new SDbFunctionalSubArea();
                 break;
             case SModConsts.CFGU_SHIFT:
                 registry = new SDbShift();
@@ -153,29 +160,41 @@ public class SModuleCfg extends SGuiModule {
                 }
                 break;
             case SModConsts.CFGU_CUR:
-                settings = new SGuiCatalogueSettings("Moneda", 1, 1, SLibConsts.DATA_TYPE_TEXT);
-                sql = "SELECT id_cur AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, cur AS " + SDbConsts.FIELD_ITEM + ", cur_key AS " + SDbConsts.FIELD_COMP + " " +
+                settings = new SGuiCatalogueSettings("Moneda", 1, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT id_cur AS " + SDbConsts.FIELD_ID + "1, cur AS " + SDbConsts.FIELD_ITEM + ", cur_key AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM erp.cfgu_cur " +
                         "WHERE NOT b_del " +
                         "ORDER BY cur, id_cur ";
                 break;
             case SModConsts.CFGS_TP_MMS:
-                settings = new SGuiCatalogueSettings("Configuración", 1, 1, SLibConsts.DATA_TYPE_TEXT);
-                sql = "SELECT id_tp_mms AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
+                settings = new SGuiCatalogueSettings("Configuración", 1, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT id_tp_mms AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM erp.cfgs_tp_mms " +
                         "WHERE NOT b_del " +
                         "ORDER BY name, id_tp_mms ";
                 break;
             case SModConsts.CFGU_FUNC:
-                settings = new SGuiCatalogueSettings("Área funcional", 1, 1, SLibConsts.DATA_TYPE_TEXT);
-                sql = "SELECT fa.id_func AS " + SDbConsts.FIELD_ID + "1, 1 AS " + SDbConsts.FIELD_FK + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_COMP + " " +
-                        "FROM " + SModConsts.TablesMap.get(type) + " AS fa ";
+                settings = new SGuiCatalogueSettings("Área funcional", 1, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT f.id_func AS " + SDbConsts.FIELD_ID + "1, f.name AS " + SDbConsts.FIELD_ITEM + ", f.code AS " + SDbConsts.FIELD_COMP + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " AS f ";
                 if (subtype != 0) {
-                    sql += "INNER JOIN usr_usr_func AS fau ON " +
-                            "fau.id_func = fa.id_func AND fau.id_usr = " + subtype + " ";
+                    sql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC) + " AS uf ON " +
+                            "uf.id_func = f.id_func AND uf.id_usr = " + subtype + " ";
                 }
-                sql += "WHERE NOT b_del " +
-                        "ORDER BY name, fa.id_func ";
+                sql += "WHERE NOT f.b_del " +
+                        "ORDER BY f.name, f.code, f.id_func ";
+                break;
+            case SModConsts.CFGU_FUNC_SUB:
+                settings = new SGuiCatalogueSettings("Subárea funcional", 1, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT fs.id_func_sub AS " + SDbConsts.FIELD_ID + "1, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS " + SDbConsts.FIELD_ITEM + ", fs.code AS " + SDbConsts.FIELD_COMP + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " AS fs " +
+                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func ";
+                if (subtype != 0) {
+                    sql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON " +
+                            "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + subtype + " ";
+                }
+                sql += "WHERE NOT fs.b_del AND NOT f.b_del " +
+                        "ORDER BY f.code, fs.name, fs.code, fs.id_func_sub ";
                 break;
             case SModConsts.CFGU_SCA:
                 settings = new SGuiCatalogueSettings("Báscula", 1);
@@ -208,6 +227,9 @@ public class SModuleCfg extends SGuiModule {
             case SModConsts.CFGU_FUNC:
                 view = new SViewFunctionalArea(miClient, "Áreas funcionales");
                 break;
+            case SModConsts.CFGU_FUNC_SUB:
+                view = new SViewFunctionalSubArea(miClient, "Subáreas funcionales");
+                break;
             case SModConsts.CFGU_AUTHORN_STEP:
                 view = new SViewAuthorizations(miClient, "Autorizaciones");
                 break;
@@ -229,8 +251,12 @@ public class SModuleCfg extends SGuiModule {
         
         switch (type) {
             case SModConsts.CFGU_FUNC:
-                if (moFunctionalsAreas == null) moFunctionalsAreas = new SFormFunctionalArea(miClient, "Área funcional");
-                form = moFunctionalsAreas;
+                if (moFunctionalArea == null) moFunctionalArea = new SFormFunctionalArea(miClient, "Área funcional");
+                form = moFunctionalArea;
+                break;
+            case SModConsts.CFGU_FUNC_SUB:
+                if (moFunctionalSubArea == null) moFunctionalSubArea = new SFormFunctionalSubArea(miClient, "Subárea funcional");
+                form = moFunctionalSubArea;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

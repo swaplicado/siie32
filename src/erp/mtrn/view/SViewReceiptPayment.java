@@ -599,7 +599,7 @@ public class SViewReceiptPayment extends erp.lib.table.STableTab implements java
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, cfd, 0, true);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAckPdf(miClient, cfd, 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);

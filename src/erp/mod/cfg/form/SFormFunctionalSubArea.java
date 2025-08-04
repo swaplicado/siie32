@@ -5,7 +5,7 @@
 package erp.mod.cfg.form;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.db.SDbFunctionalArea;
+import erp.mod.cfg.db.SDbFunctionalSubArea;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -17,19 +17,19 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SFormFunctionalArea extends SBeanForm {
+public class SFormFunctionalSubArea extends SBeanForm {
 
-    private SDbFunctionalArea moRegistry;
+    private SDbFunctionalSubArea moRegistry;
 
     /**
      * Creates new form SFormFunctionalArea
      * @param client
      * @param title
      */
-    public SFormFunctionalArea(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, title);
+    public SFormFunctionalSubArea(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -46,21 +46,31 @@ public class SFormFunctionalArea extends SBeanForm {
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jPanel28 = new javax.swing.JPanel();
+        jlFunctionalArea = new javax.swing.JLabel();
+        moKeyFunctionalArea = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jlCode = new javax.swing.JLabel();
         moTextCode = new sa.lib.gui.bean.SBeanFieldText();
         jPanel5 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel28 = new javax.swing.JPanel();
-        jlExpensesMonthly = new javax.swing.JLabel();
-        moDecExpensesMonthly = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jLabel1 = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFunctionalArea.setText("Área funcional:");
+        jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel28.add(jlFunctionalArea);
+
+        moKeyFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel28.add(moKeyFunctionalArea);
+
+        jPanel2.add(jPanel28);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -82,26 +92,11 @@ public class SFormFunctionalArea extends SBeanForm {
 
         jPanel2.add(jPanel5);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlExpensesMonthly.setText("Límite mensual:");
-        jlExpensesMonthly.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jlExpensesMonthly);
-        jPanel28.add(moDecExpensesMonthly);
-
-        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel1.setText("(límite mensual 0.00 = sin límite mensual)");
-        jLabel1.setPreferredSize(new java.awt.Dimension(205, 23));
-        jPanel28.add(jLabel1);
-
-        jPanel2.add(jPanel28);
-
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel28;
@@ -109,9 +104,9 @@ public class SFormFunctionalArea extends SBeanForm {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JLabel jlCode;
-    private javax.swing.JLabel jlExpensesMonthly;
+    private javax.swing.JLabel jlFunctionalArea;
     private javax.swing.JLabel jlName;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecExpensesMonthly;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyFunctionalArea;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
@@ -119,14 +114,13 @@ public class SFormFunctionalArea extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
+        moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moDecExpensesMonthly.setCompoundFieldSettings(miClient);
-        moDecExpensesMonthly.getField().setDecimalSettings(SGuiUtils.getLabelName(jlExpensesMonthly), SGuiConsts.GUI_TYPE_DEC_AMT, false);
 
+        moFields.addField(moKeyFunctionalArea);
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
-        moFields.addField(moDecExpensesMonthly.getField());
 
         moFields.setFormButton(jbSave);
     }
@@ -148,7 +142,7 @@ public class SFormFunctionalArea extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbFunctionalArea) registry;
+        moRegistry = (SDbFunctionalSubArea) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -165,9 +159,9 @@ public class SFormFunctionalArea extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
+        moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId() });
         moTextName.setValue(moRegistry.getName());
         moTextCode.setValue(moRegistry.getCode());
-        moDecExpensesMonthly.getField().setValue(moRegistry.getExpensesMonthly());
 
         setFormEditable(true);
 
@@ -176,13 +170,13 @@ public class SFormFunctionalArea extends SBeanForm {
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbFunctionalArea registry = moRegistry.clone();
+        SDbFunctionalSubArea registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) { }
 
         registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
-        registry.setExpensesMonthly(moDecExpensesMonthly.getField().getValue());
+        registry.setFkFunctionalAreaId(moKeyFunctionalArea.getValue()[0]);
 
         return registry;
     }

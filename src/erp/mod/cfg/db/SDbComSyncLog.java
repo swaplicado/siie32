@@ -6,7 +6,8 @@
 package erp.mod.cfg.db;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.swapms.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -179,11 +180,11 @@ public class SDbComSyncLog extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         // limitar msRequestBody y msResponseBody a 64 KB, para evitar problemas de tamaño en la base de datos:
-        if (msRequestBody != null && msRequestBody.length() > SExportUtils.SIZE_64_KB) {
-            msRequestBody = msRequestBody.substring(0, SExportUtils.SIZE_64_KB);
+        if (msRequestBody != null && msRequestBody.length() > SSwapConsts.SIZE_64_KB) {
+            msRequestBody = msRequestBody.substring(0, SSwapConsts.SIZE_64_KB);
         }
-        if (msResponseBody != null && msResponseBody.length() > SExportUtils.SIZE_64_KB) {
-            msResponseBody = msResponseBody.substring(0, SExportUtils.SIZE_64_KB);
+        if (msResponseBody != null && msResponseBody.length() > SSwapConsts.SIZE_64_KB) {
+            msResponseBody = msResponseBody.substring(0, SSwapConsts.SIZE_64_KB);
         }
 
         if (mbRegistryNew) {

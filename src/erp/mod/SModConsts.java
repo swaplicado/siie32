@@ -94,6 +94,7 @@ public abstract class SModConsts {
     
     public static final int CFGU_CERT = 1013001;
     public static final int CFGU_FUNC = 1013011;
+    public static final int CFGU_FUNC_SUB = 1013012;
     public static final int CFGU_SHIFT = 1013021;
     public static final int CFGU_AUTHORN_NODE = 1013033;
     public static final int CFGU_AUTHORN_NODE_USR = 1013034;
@@ -139,6 +140,7 @@ public abstract class SModConsts {
 
     public static final int USR_USR_GUI = 1023001;
     public static final int USR_USR_FUNC = 1023011;
+    public static final int USR_USR_FUNC_SUB = 1023012;
 
     /*
      * Localities
@@ -1009,6 +1011,7 @@ public abstract class SModConsts {
         
         TablesMap.put(CFGU_CERT, "cfgu_cert");
         TablesMap.put(CFGU_FUNC, "cfgu_func");
+        TablesMap.put(CFGU_FUNC_SUB, "cfgu_func_sub");
         TablesMap.put(CFGU_SHIFT, "cfgu_shift");
         TablesMap.put(CFGU_AUTHORN_NODE, "cfgu_authorn_node");
         TablesMap.put(CFGU_AUTHORN_NODE_USR, "cfgu_authorn_node_usr");
@@ -1048,6 +1051,7 @@ public abstract class SModConsts {
 
         TablesMap.put(USR_USR_GUI, "usr_usr_gui");
         TablesMap.put(USR_USR_FUNC, "usr_usr_func");
+        TablesMap.put(USR_USR_FUNC_SUB, "usr_usr_func_sub");
 
         TablesMap.put(LOCU_CTY, "erp.locu_cty");
         TablesMap.put(LOCU_STA, "erp.locu_sta");

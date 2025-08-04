@@ -9,14 +9,15 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SSyncType;
-import erp.mod.cfg.swapms.utils.SExportUtils;
-import erp.mod.cfg.swapms.utils.SSwapConsts;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.musr.form.SFormExportUser;
 import erp.siieapp.SUserExportUtils;
 import java.awt.Dimension;
@@ -221,10 +222,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
 
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            boolean syncAll = false;
-            
             try {
-                String response = SExportUtils.exportJsonData(miClient.getSession(), SSyncType.USER, syncAll);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, false);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Los usuarios fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
@@ -234,7 +233,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 }
             }
             catch (Exception e) {
-                e.printStackTrace();
+                SLibUtilities.printOutException(this, e);
             }
         }
     }
