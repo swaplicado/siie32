@@ -1248,6 +1248,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             switch (formType) {
                 case SDataConstants.TRN_DPS:
                     miForm.setValue(SDataConstants.USRS_TP_LEV, mnCurrentUserPrivilegeLevel);
+                    miForm.setValue(SLibConstants.VALUE_IS_COPY, isCopy);
 
                     if (moFormComplement != null) {
                         if (moFormComplement instanceof int[]) {

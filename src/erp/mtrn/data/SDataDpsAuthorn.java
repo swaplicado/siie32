@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -173,7 +174,7 @@ public class SDataDpsAuthorn extends SDataRegistry {
                         mnPkDocId + ", " +
                         mnPkAuthornId + ", " +
                         "'" + msNotes + "', " +
-                        "'" + msException + "', " +
+                        "'" + SLibUtils.textToSql(msException) + "', " +
                         mbDeleted + ", " +
                         mnFkAuthorizationStatusId + ", " +
                         mnFkUserNewId + ", " +
@@ -190,7 +191,7 @@ public class SDataDpsAuthorn extends SDataRegistry {
                         //"id_doc = " + mnPkDocId + ", " +
                         //"id_authorn = " + mnPkAuthornId + ", " +
                         //"nts = '" + msNotes + ", " +
-                        "exc='" + msException + "', " +
+                        "exc = '" + SLibUtils.textToSql(msException) + "', " +
                         //"b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "fid_st_authorn = " + mnFkAuthorizationStatusId + ", " +
                         //"fid_usr_new = " + mnFkUserNewId + ", " +

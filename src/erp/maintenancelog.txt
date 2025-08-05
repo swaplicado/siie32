@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 282.7/ 2025-08-05
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Ajuste en el copiado de documentos de DPS.
+2) Eliminación del ítem de referencia cuando el ítem no lo requiere en la forma de importación de documentos desde XML.
+3) Se agrega la opción de anular el proceso de autorización web a documentos con estado de autorización N/A, siempre y cuando haya algo que borrar.
+4) Corrección al guardar en la bitácora de estados de autorización cuando el mensaje de Cloud Storage viene con comillas simples.
+
+================================================================================
 SIIE 3.2 282.6/ 2025-08-01
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
