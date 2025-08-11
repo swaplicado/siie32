@@ -3204,26 +3204,33 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
                     fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA
+                            && fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING
                             && fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
                         miClient.showMsgBoxInformation("No se puede anular la autorización porque el estatus de autorización de la orden seleccionada es '" + fileProcess.getDpsStatus() + "'.");
                     }
                     else {
-                        if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
-                            // Eliminar archivos de la nube:
-                            SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
-                            
-                            // Eliminar pasos de autorización:
-                            SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
-                            
-                            // Actualizar estatus de autorización:
-                            String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
-                            miClient.getSession().getStatement().execute(sql);
-                            
-                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
-                            
-                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
-                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                        if (SAuthorizationUtils.hasAuthornStatus(miClient.getSession(), fileProcess.getPrimaryKey())
+                                || SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey())) {
+                            if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
+                                // Eliminar archivos de la nube:
+                                SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
+
+                                // Eliminar pasos de autorización:
+                                SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+
+                                // Actualizar estatus de autorización:
+                                String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
+                                miClient.getSession().getStatement().execute(sql);
+
+                                fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("El documento no tiene un proceso de autorización para anular.");
                         }
                     }
                 }
@@ -3316,7 +3323,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " +
-                "ELSE sah.name END, '') AS stat_auth, " : "");
+                "ELSE sah.name END, sah.name) AS stat_auth, " : "");
         if (mbIsAuthWebAvailable) {
             msSql += "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
                     + "    COALESCE((SELECT GROUP_CONCAT(usr SEPARATOR ',') "

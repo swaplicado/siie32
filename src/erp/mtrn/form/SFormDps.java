@@ -185,6 +185,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbUpdatingForm;
     private boolean mbDocBeingImported;
     private boolean mbMatRequestImport;
+    private boolean mbIsCopy;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     
@@ -4229,6 +4230,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moParamDpsSource = null;
         mbIsLocalCurrency = false;
         mbIsImported = false;
+        mbIsCopy = false;
         mnDeliveryType = SLibConsts.UNDEFINED;
         mnCfdXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
 
@@ -5562,55 +5564,57 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             moDps.setFkSalesSupervisorBizPartnerId_n(mnSalesSupervisorBizPartnerId_n);
 
-            renderSalesAgentOfBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
-            renderSalesAgentOfDocument(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
-            renderSalesSupervisorOfBizPartner(moDps.getFkSalesSupervisorBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorBizPartnerId_n() });
-            renderSalesSupervisorOfDocument(moDps.getFkSalesSupervisorId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorId_n() });
+            if (!mbIsCopy) {
+                renderSalesAgentOfBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
+                renderSalesAgentOfDocument(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
+                renderSalesSupervisorOfBizPartner(moDps.getFkSalesSupervisorBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorBizPartnerId_n() });
+                renderSalesSupervisorOfDocument(moDps.getFkSalesSupervisorId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorId_n() });
 
-            // set document's payment type:
-            if (moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED) {
-                if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
-                    moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
-                }
-                else {
-                    moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CREDIT });
-                }
-            }
-
-            // set document's CFDI values:
-            updateDpsCfdiSettings();
-
-            // set document's language:
-            if (moDps.getFkLanguajeId() == SLibConsts.UNDEFINED) {
-                moFieldFkLanguajeId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkLanguageId_n() : miClient.getSessionXXX().getParamsErp().getFkLanguageId() });
-            }
-
-            // set document's currency:
-            if (moDps.getFkCurrencyId() == SLibConsts.UNDEFINED) {
-                double exr = 0;
-
-                moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkCurrencyId_n() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
-
-                if (isLocalCurrency()) {
-                    exr = 1;
-                }
-                else {
-                    try {
-                        exr = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moDps.getDate());
+                // set document's payment type:
+                if (moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED) {
+                    if (moBizPartnerCategory.getEffectiveCreditTypeId() == SDataConstantsSys.BPSS_TP_CRED_CRED_NO) {
+                        moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
                     }
-                    catch (Exception e) {
-                        SLibUtilities.renderException(this, e);
+                    else {
+                        moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CREDIT });
                     }
                 }
 
-                moFieldExchangeRateSystem.setFieldValue(exr);
-                moFieldExchangeRate.setFieldValue(exr);
-            }
+                // set document's CFDI values:
+                updateDpsCfdiSettings();
 
-            // emulate item state changed events:
-            
-            itemStateChangedFkPaymentTypeId(moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED || mbIsDpsAdjustment);   // reset days of credit if needed
-            itemStateChangedFkCurrencyId(false); // do not calculate document's total
+                // set document's language:
+                if (moDps.getFkLanguajeId() == SLibConsts.UNDEFINED) {
+                    moFieldFkLanguajeId.setFieldValue(new int[] { moBizPartnerCategory.getFkLanguageId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkLanguageId_n() : miClient.getSessionXXX().getParamsErp().getFkLanguageId() });
+                }
+
+                // set document's currency:
+                if (moDps.getFkCurrencyId() == SLibConsts.UNDEFINED) {
+                    double exr = 0;
+
+                    moFieldFkCurrencyId.setFieldValue(new int[] { moBizPartnerCategory.getFkCurrencyId_n() != SLibConsts.UNDEFINED ? moBizPartnerCategory.getFkCurrencyId_n() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
+
+                    if (isLocalCurrency()) {
+                        exr = 1;
+                    }
+                    else {
+                        try {
+                            exr = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moDps.getDate());
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.renderException(this, e);
+                        }
+                    }
+
+                    moFieldExchangeRateSystem.setFieldValue(exr);
+                    moFieldExchangeRate.setFieldValue(exr);
+                }
+
+                // emulate item state changed events:
+
+                itemStateChangedFkPaymentTypeId(moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED || mbIsDpsAdjustment);   // reset days of credit if needed
+                itemStateChangedFkCurrencyId(false); // do not calculate document's total
+            }
         }
     }
 
@@ -10396,7 +10400,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             // Document in foreign currency:
 
-            if (moDps != null && moDps.getIsRegistryNew() && !moDps.getAuxKeepExchangeRate() && !mbDocBeingImported) {
+            if (moDps != null && moDps.getIsRegistryNew() && !(moDps.getAuxKeepExchangeRate() || mbIsCopy) && !mbDocBeingImported) {
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRate);
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRateSystem);
             }
@@ -11745,12 +11749,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int[] keyBp = new int[] { moDps.getFkBizPartnerId_r() };
         int[] keyBpb = new int[] { moDps.getFkBizPartnerBranchId() };
         int[] keyBpbAdd = new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() };
+        int[] keyIncoterm = new int[] { moDps.getFkIncotermId() };
+        int[] keySpotSrc = new int[] { moDps.getFkSpotSourceId_n() };
+        int[] keySpotDes = new int[] { moDps.getFkSpotDestinyId_n() };
         
         if (!moDps.getAuxKeepDpsData()) {
             moDps = createNewDps(null);
             setBizPartner(keyBp, keyBpb, keyBpbAdd);
             renderRecordAutomatic();
             renderPk();
+            
+            if (mbIsCopy) {
+                moFieldFkIncotermId.setFieldValue(keyIncoterm);
+                moFieldFkSpotSrcId_n.setFieldValue(keySpotSrc);
+                moFieldFkSpotDesId_n.setFieldValue(keySpotDes);
+            }
 
             for (STableRow row : moPaneGridEntries.getGridRows()) {
                 SDataDpsEntry entry = (SDataDpsEntry) row.getData();
@@ -13013,7 +13026,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
         moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
-        moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId()});
+        moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
         
         // set business partner, set aswell business partner default preferences when document is new:
 
@@ -13782,6 +13795,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 break;
             case SLibConstants.VALUE_IS_MAT_REQ:
                 mbMatRequestImport = (Boolean) value;
+                break;
+            case SLibConstants.VALUE_IS_COPY:
+                mbIsCopy = (Boolean) value;
                 break;
             default:
         }

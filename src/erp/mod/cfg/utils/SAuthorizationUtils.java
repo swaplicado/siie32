@@ -1612,7 +1612,7 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    private static boolean hasStepsOfAuthorization(SGuiSession session, final int authorizationType, final Object pk) {
+    public static boolean hasStepsOfAuthorization(SGuiSession session, final int authorizationType, final Object pk) {
          String condPk = "";
         switch(authorizationType) {
             case AUTH_TYPE_MAT_REQUEST:
@@ -2014,6 +2014,20 @@ public abstract class SAuthorizationUtils {
         catch (Exception ex) {
             Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static boolean hasAuthornStatus(final SGuiSession session, int[] pkDps) {
+        try {
+            String sql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + pkDps[0] + " AND id_doc = " + pkDps[1] + " AND NOT b_del;";
+            ResultSet resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+        catch(SQLException e) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return false;
     }
     
     private static boolean isValidEmailAddress(String email) {

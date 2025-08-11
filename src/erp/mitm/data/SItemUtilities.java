@@ -94,6 +94,7 @@ public abstract class SItemUtilities {
                     + "WHERE cpt_key = '" + conceptKey + "' "
                     + "AND cpt_prod_serv = '" + conceptProdServ + "' "
                     + "AND fid_bp = " + bizPartnerId + " "
+                    + "AND NOT b_del "
                     + (itemId != 0 ? "AND fid_item = " + itemId + " " : "");
             try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
                 if (resultSet.next()){

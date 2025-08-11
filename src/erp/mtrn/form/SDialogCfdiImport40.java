@@ -1365,6 +1365,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                                     SDataConstants.ITMU_ITEM, new int[] { rowCfdiImport.getItem().getDbmsFkDefaultItemRefId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                 rowCfdiImport.setReferenceItem(refItem);
                             }
+                            else {
+                                rowCfdiImport.setReferenceItem(null);
+                            }
                             
                             // Se asigna la unidad del ítem principal.
                             rowCfdiImport.setUnit(item.getDbmsDataUnit());
