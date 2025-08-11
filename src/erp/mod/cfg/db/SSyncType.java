@@ -10,8 +10,9 @@ package erp.mod.cfg.db;
  * @author Sergio Flores
  */
 public enum SSyncType {
+    FUNCTIONAL_AREA,
     USER,
     PARTNER_SUPPLIER,
-    PURCHASE_ORDER,
-    SCALE_TICKET
+    PURCHASE_ORDER_REF,
+    SCALE_TICKET_REF
 }

@@ -348,7 +348,7 @@ public class SViewBillOfLading extends SGridPaneView implements ActionListener {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     SDataCfd cfd = SCfdUtils.getCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_BOL, gridRow.getRowPrimaryKey()); 
-                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck((SClientInterface)miClient, cfd, 0, true);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAckPdf((SClientInterface)miClient, cfd, 0, true);
 
                     if (needUpdate) {
                         miClient.getSession().notifySuscriptors(mnGridType);

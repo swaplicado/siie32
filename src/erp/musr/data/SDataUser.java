@@ -414,6 +414,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                             mbExtraIsSpecialRoleAdmor = true;
                             break;
                         default:
+                            // nothing
                     }
                 }
 
@@ -1152,7 +1153,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public boolean isAdministrator() {
-        return isSupervisor() || mnFkUserTypeId == SModSysConsts.USRS_TP_USR_ADM || mbExtraIsSpecialRoleAdmor;
+        return isSupervisor() || isConfigurator() || mnFkUserTypeId == SModSysConsts.USRS_TP_USR_ADM || mbExtraIsSpecialRoleAdmor;
     }
 
     public boolean isConfigurator() {
@@ -1161,7 +1162,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public boolean isSupervisor() {
-        return mnFkUserTypeId == SModSysConsts.USRS_TP_USR_SUP || mnPkUserId == SDataConstantsSys.USRX_USER_SUPER || mbExtraIsSpecialRoleSuper;
+        return mnPkUserId == SDataConstantsSys.USRX_USER_SUPER || mnFkUserTypeId == SModSysConsts.USRS_TP_USR_SUP || mbExtraIsSpecialRoleSuper;
     }
 
     @Override

@@ -8,16 +8,13 @@ package erp.mbps.view;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SSyncType;
-import erp.mod.cfg.swapms.utils.SExportUtils;
-import erp.mod.cfg.swapms.utils.SSwapConsts;
-import erp.musr.view.SViewUser;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
@@ -25,132 +22,158 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
-    private int formCancel = 0;
-    private int supplierMatrix = 1;
-    private int supplierType = 2;
+    
     private javax.swing.JButton jbExportDataToSwapServices;
     
+    private int mnBizPartnerCategory;
+    private java.lang.String msOrderKey;
+    
+    private boolean mbSwapServicesLinkUp;
+    
     public SViewBizPartnerUpdate(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.BPSU_BP_DT, auxType01);
+        super(client, tabTitle, SDataConstants.BPSX_BP_UPD, auxType01);
         initComponents();
     }
 
     private void initComponents() {
         boolean canEditSupplier = false;
-        int levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
         int levelRightEditCategory = 0;
 
         switch (mnTabTypeAux01) {
             case SDataConstantsSys.BPSS_CT_BP_SUP:
+                mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_SUP;
                 canEditSupplier = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).HasRight;
                 levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
                 break;
             default:
+                // nothing
         }
                 
         jbNew.setEnabled(false);
-        jbEdit.setEnabled(canEditSupplier && (levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP);
+        jbEdit.setEnabled(canEditSupplier && levelRightEditCategory >= SUtilConsts.LEV_AUTHOR);
         jbDelete.setEnabled(false);
         
-        try {
-            String paramValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG);
-            
-            if (!paramValue.isEmpty()) {
-                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+        // Enable SWAP Services:
+        mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+        if (mbSwapServicesLinkUp) {
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_mag.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
-                addTaskBarUpperSeparator();
-                addTaskBarUpperComponent(jbExportDataToSwapServices);
-            }
-        }
-        catch (Exception e) {
-            Logger.getLogger(SViewUser.class.getName()).log(Level.SEVERE, null, e);
+            addTaskBarUpperSeparator();
+            addTaskBarUpperComponent(jbExportDataToSwapServices);
         }
              
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[11];
+        STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 13 : 11];
 
         int i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "b.id_bp");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bct.id_ct_bp");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bp.id_bp");
+        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bp_ct.id_ct_bp");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Asociado negocios", 300);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.id_bp", "Clave", 75);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.fiscal_id", "RFC", 150);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp_comm", "Nombre comercial", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.email_01", "Cuentas(s) correo-e", 300);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bct.tax_regime", "Régimen fiscal", 75);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bct.lead_time", "Plazo entrega (Días)", 75);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "sync_status", "Exportado a portal)",  STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "sync_timestamp", "Fecha de exportación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usr. actualización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "lg.ts_usr_upd", "Actualización", STableConstants.WIDTH_DATE_TIME);
+        
+        if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.bp_key", "Clave", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp_comm", "Nombre comercial", 200);
+            msOrderKey = "bp_ct.bp_key, bp.bp_comm, bp.bp, bp.id_bp ";
+        }
+        else if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_NAME_KEY) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.bp_key", "Clave", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp_comm", "Nombre comercial", 200);
+            msOrderKey = "bp.bp, bp_ct.bp_key, bp.bp_comm, bp.id_bp ";
+        }
+        else {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp_comm", "Nombre comercial", 200);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.bp_key", "Clave", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 250);
+            msOrderKey = "bp.bp_comm, bp_ct.bp_key, bp.bp, bp.id_bp ";
+        }
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.co_key", "Clave empresa", 100);
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_frg_id", "ID fiscal", 100);
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpbc.email_01", "Cuentas(s) correo-e", 300);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.lead_time", "Plazo entrega (días)", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.tax_regime", "Régimen fiscal CFDI", 50);
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ulog.usr", "Usr. actualización", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tlog.ts_usr_upd", "Actualización", STableConstants.WIDTH_DATE_TIME);
+        
+        if (mbSwapServicesLinkUp) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_swap_srv_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_swap_srv_ts_last_exp", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
+        }
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
 
+        mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
-        mvSuscriptors.add(SDataConstants.BPSX_BP_SUP);
-        mvSuscriptors.add(SDataConstants.BPSX_BP_CUS);
+        if (mnBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP) {
+            mvSuscriptors.add(SDataConstants.BPSX_BP_SUP);
+        }
 
         populateTable();
     }
     
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            boolean syncAll = false;
-            
             try {
-                String response = SExportUtils.exportJsonData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, syncAll);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, false);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
                 }
                 else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
                 }
             }
             catch (Exception e) {
-                e.printStackTrace();
+                SLibUtilities.printOutException(this, e);
             }
         }
     }
 
     @Override
     public void createSqlQuery() {
-        msSql = "SELECT bct.id_ct_bp, b.id_bp, b.bp, b.fiscal_id, b.bp_comm, " +
-                "con.email_01, bct.tax_regime, bct.lead_time, u.usr, lg.ts_usr_upd, " +
-                "syl.ts_sync AS sync_timestamp, " +
-                "CASE WHEN syl.reference_id IS NOT NULL THEN 1 " +
-                "ELSE 0 END AS sync_status " +
-                "FROM erp.bpsu_bp AS b " +
-                "INNER JOIN erp.bpsu_bpb AS bp ON bp.fid_bp = b.id_bp " +
-                "INNER JOIN erp.BPSU_BPB_CON AS con ON con.id_bpb = bp.id_bpb " +
-                "INNER JOIN erp.BPSU_BP_CT AS bct ON bct.id_bp = b.id_bp " +
-                "LEFT JOIN ( SELECT l1.* FROM erp.bpsu_bp_upd_log l1 " +
-                "INNER JOIN (SELECT id_bp, MAX(ts_usr_upd) AS ts_usr_upd " +
-                "FROM erp.bpsu_bp_upd_log GROUP BY id_bp ) l2 ON l1.id_bp = l2.id_bp AND l1.ts_usr_upd = l2.ts_usr_upd " +
-                ") AS lg ON lg.id_bp = b.id_bp " +
-                "LEFT OUTER JOIN erp.usru_usr AS u ON u.id_usr = lg.fk_usr_upd " +
-                "LEFT JOIN (SELECT syl.reference_id, syl.ts_sync " +
-                "FROM erp.cfg_sync_log_ety AS syl " +
-                "INNER JOIN erp.cfg_sync_log AS sy ON sy.id_sync_log = syl.id_sync_log " +
-                "WHERE syl.response_code IN ('200', '201') AND sy.id_sync_log = " + supplierType + " " + 
-                ") AS syl ON syl.reference_id = b.id_bp " +
-                "WHERE NOT b.b_del " +
-                "AND bp.fid_tp_bpb = " + supplierMatrix + " " +
-                "AND con.id_con = " + supplierMatrix + " "+
-                "AND bct.id_ct_bp = " + supplierType + " "+ 
-                "GROUP BY b.id_bp " +
-                "ORDER BY b.id_bp ";
+        msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, " +
+                "bp_ct.id_ct_bp, bp_ct.bp_key, bp_ct.co_key, bp_ct.lead_time, bp_ct.tax_regime, bpbc.email_01, " +
+                "ulog.usr, tlog.ts_usr_upd" +
+                (mbSwapServicesLinkUp ? ", sle.reference_id IS NOT NULL AS _swap_srv_is_exp, sle.ts_sync AS _swap_srv_ts_last_exp" : "") + " " +
+                "FROM erp.bpsu_bp AS bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp_ct.id_bp = bp.id_bp " +
+                "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
+                "INNER JOIN erp.bpsu_bpb_con AS bpbc ON bpbc.id_bpb = bpb.id_bpb AND bpbc.id_con = " + SUtilConsts.BRA_CON_ID + " " +
+                "/* Business Partner Update Log: */ " +
+                "LEFT OUTER JOIN (" +
+                    "SELECT bul.id_bp, bul.fk_usr_upd, bul.ts_usr_upd " +
+                    "FROM erp.bpsu_bp_upd_log AS bul " +
+                    "INNER JOIN (" +
+                        "SELECT id_bp, MAX(id_log) AS id_log " +
+                        "FROM erp.bpsu_bp_upd_log " +
+                        "GROUP BY id_bp ORDER BY id_bp" +
+                    ") AS tlogx ON tlogx.id_bp = bul.id_bp AND tlogx.id_log = bul.id_log " +
+                ") AS tlog ON tlog.id_bp = bp.id_bp " +
+                "LEFT OUTER JOIN erp.usru_usr AS ulog ON ulog.id_usr = tlog.fk_usr_upd " +
+                (mbSwapServicesLinkUp ? "/* SWAP Services Sync Log: */ " +
+                "LEFT OUTER JOIN erp.cfg_sync_log_ety AS sle ON sle.reference_id = CONVERT(bp.id_bp, CHAR) " +
+                "AND (sle.response_code = '" + SExportUtils.HTTP_CODE_OK + "' OR sle.response_code = '" + SExportUtils.HTTP_CODE_CREATED + "') " +
+                "LEFT OUTER JOIN erp.cfg_sync_log AS sl ON sl.id_sync_log = sle.id_sync_log " +
+                "AND sl.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' " : "") +
+                "WHERE NOT bp.b_del AND NOT bp_ct.b_del " +
+                "AND bp_ct.id_ct_bp = " + mnBizPartnerCategory + " "+ 
+                "ORDER BY " + msOrderKey;
     }
 
     @Override
@@ -164,14 +187,8 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     public void actionEdit() {
         if (jbEdit.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                int result = miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showForm(
-                    mnTabTypeAux01 == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstants.BPSX_BP_CUS_SUP : SDataConstants.BPSX_BP_CUS_SUP,
-                    new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] }
-                );
-                
-                if (result == formCancel) {
+                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showForm(mnTabType, mnTabTypeAux01, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabType);
-                    populateTable();
                 }
             }
         }
@@ -180,6 +197,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     @Override
     public void actionDelete() {
         if (jbDelete.isEnabled()) {
+            
         }
     }
 

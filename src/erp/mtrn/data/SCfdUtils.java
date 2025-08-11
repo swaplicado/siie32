@@ -2722,25 +2722,109 @@ public abstract class SCfdUtils implements Serializable {
 
     /**
      * Validate that CFDI's XML corresponds to CFD registry.
+     * @param client GUI client.
      * @param xml CFDI's XML.
      * @param cfd CFD registry.
      * @return true if is correct.
      */
     @SuppressWarnings("deprecation")
-    private static boolean doesXmlBelongsToCfd(final String xml, final SDataCfd cfd) throws Exception {
-        cfd.ver32.DElementComprobante comprobanteXml = null;
-        cfd.ver32.DElementComprobante comprobanteCfd = null;
+    private static boolean doesXmlBelongsToCfd(final SClientInterface client, final String xml, final SDataCfd cfd) throws Exception {
+        String message;
         boolean valid = false;
+        
+        switch (cfd.getFkXmlTypeId()) {
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                cfd.ver32.DElementComprobante comprobante32Xml = null;
+                cfd.ver32.DElementComprobante comprobante32Cfd = null;
 
-        comprobanteXml = DCfdUtils.getCfdi32(xml);
-        comprobanteCfd = DCfdUtils.getCfdi32(cfd.getDocXml());
+                comprobante32Xml = DCfdUtils.getCfdi32(xml);
+                comprobante32Cfd = DCfdUtils.getCfdi32(cfd.getDocXml());
 
-        valid = comprobanteCfd.getEltEmisor().getAttRfc().getString().compareTo(comprobanteXml.getEltEmisor().getAttRfc().getString()) == 0 &&
-                comprobanteCfd.getEltReceptor().getAttRfc().getString().compareTo(comprobanteXml.getEltReceptor().getAttRfc().getString()) == 0 &&
-                comprobanteCfd.getAttSerie().getString().compareTo(comprobanteXml.getAttSerie().getString()) == 0 &&
-                comprobanteCfd.getAttFolio().getString().compareTo(comprobanteXml.getAttFolio().getString()) == 0 &&
-                comprobanteCfd.getAttFecha().getDatetime().compareTo(comprobanteXml.getAttFecha().getDatetime()) == 0 && //xxx123 fecha
-                comprobanteCfd.getAttTotal().getDouble() == comprobanteXml.getAttTotal().getDouble();
+                valid = comprobante32Cfd.getAttVersion().equals(comprobante32Xml.getAttVersion()) &&
+                        comprobante32Cfd.getAttTipoDeComprobante().getOption().equals(comprobante32Xml.getAttTipoDeComprobante().getOption()) &&
+                        comprobante32Cfd.getEltEmisor().getAttRfc().getString().equals(comprobante32Xml.getEltEmisor().getAttRfc().getString()) &&
+                        comprobante32Cfd.getEltReceptor().getAttRfc().getString().equals(comprobante32Xml.getEltReceptor().getAttRfc().getString()) &&
+                        comprobante32Cfd.getAttSerie().getString().equals(comprobante32Xml.getAttSerie().getString()) &&
+                        comprobante32Cfd.getAttFolio().getString().equals(comprobante32Xml.getAttFolio().getString()) &&
+                        SLibTimeUtils.isSameDate(comprobante32Cfd.getAttFecha().getDatetime(), comprobante32Xml.getAttFecha().getDatetime()) &&
+                        SLibUtils.compareAmount(comprobante32Cfd.getAttTotal().getDouble(), comprobante32Xml.getAttTotal().getDouble()) &&
+                        comprobante32Cfd.getAttMoneda().getString().equals(comprobante32Xml.getAttMoneda().getString());
+                break;
+                
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                cfd.ver33.DElementComprobante comprobante33Xml = null;
+                cfd.ver33.DElementComprobante comprobante33Cfd = null;
+
+                comprobante33Xml = DCfdUtils.getCfdi33(xml);
+                comprobante33Cfd = DCfdUtils.getCfdi33(cfd.getDocXml());
+
+                valid = comprobante33Cfd.getVersion() == comprobante33Xml.getVersion() &&
+                        comprobante33Cfd.getAttTipoDeComprobante().getString().equals(comprobante33Xml.getAttTipoDeComprobante().getString()) &&
+                        comprobante33Cfd.getEltEmisor().getAttRfc().getString().equals(comprobante33Xml.getEltEmisor().getAttRfc().getString()) &&
+                        comprobante33Cfd.getEltReceptor().getAttRfc().getString().equals(comprobante33Xml.getEltReceptor().getAttRfc().getString()) &&
+                        comprobante33Cfd.getAttSerie().getString().equals(comprobante33Xml.getAttSerie().getString()) &&
+                        comprobante33Cfd.getAttFolio().getString().equals(comprobante33Xml.getAttFolio().getString()) &&
+                        SLibTimeUtils.isSameDate(comprobante33Cfd.getAttFecha().getDatetime(), comprobante33Xml.getAttFecha().getDatetime()) &&
+                        SLibUtils.compareAmount(comprobante33Cfd.getAttTotal().getDouble(), comprobante33Xml.getAttTotal().getDouble()) &&
+                        comprobante33Cfd.getAttMoneda().getString().equals(comprobante33Xml.getAttMoneda().getString());
+                break;
+                
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_40:
+                cfd.ver40.DElementComprobante comprobante40Xml = null;
+                cfd.ver40.DElementComprobante comprobante40Cfd = null;
+
+                comprobante40Xml = DCfdUtils.getCfdi40(xml);
+                comprobante40Cfd = DCfdUtils.getCfdi40(cfd.getDocXml());
+
+                if (comprobante40Cfd.getVersion() != comprobante40Xml.getVersion()) {
+                    throw new Exception("El valor de 'Versión' del registro del CFDI, \"" + comprobante40Cfd.getVersion() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getVersion() + "\".");
+                }
+                if (!comprobante40Cfd.getAttTipoDeComprobante().getString().equals(comprobante40Xml.getAttTipoDeComprobante().getString())) {
+                    throw new Exception("El valor de 'TipoDeComprobante' del registro del CFDI, \"" + comprobante40Cfd.getAttTipoDeComprobante().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getAttTipoDeComprobante().getString() + "\".");
+                }
+                if (!comprobante40Cfd.getEltEmisor().getAttRfc().getString().equals(comprobante40Xml.getEltEmisor().getAttRfc().getString())) {
+                    throw new Exception("El valor de 'Emisor.Rfc' del registro del CFDI, \"" + comprobante40Cfd.getEltEmisor().getAttRfc().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getEltEmisor().getAttRfc().getString() + "\".");
+                }
+                if (!comprobante40Cfd.getEltReceptor().getAttRfc().getString().equals(comprobante40Xml.getEltReceptor().getAttRfc().getString())) {
+                    throw new Exception("El valor de 'Receptor.Rfc' del registro del CFDI, \"" + comprobante40Cfd.getEltReceptor().getAttRfc().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getEltReceptor().getAttRfc().getString() + "\".");
+                }
+                if (!comprobante40Cfd.getAttSerie().getString().equals(comprobante40Xml.getAttSerie().getString())) {
+                    message = "El valor de 'Serie' del registro del CFDI, \"" + comprobante40Cfd.getAttSerie().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getAttSerie().getString() + "\".";
+                    if (client.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        throw new Exception("Corregir el valor 'Serie' en un nuevo archivo XML:\n" + message);
+                    }
+                }
+                if (!comprobante40Cfd.getAttFolio().getString().equals(comprobante40Xml.getAttFolio().getString())) {
+                    message = "El valor de 'Folio' del registro del CFDI, \"" + comprobante40Cfd.getAttFolio().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getAttFolio().getString() + "\".";
+                    if (client.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        throw new Exception("Corregir el valor 'Folio' en un nuevo archivo XML:\n" + message);
+                    }
+                }
+                if (!SLibTimeUtils.isSameDate(comprobante40Cfd.getAttFecha().getDatetime(), comprobante40Xml.getAttFecha().getDatetime())) {
+                    throw new Exception("El valor de 'Fecha' del registro del CFDI, \"" + SLibUtils.DbmsDateFormatDate.format(comprobante40Cfd.getAttFecha().getDatetime()) + "\", "
+                            + "es distinto al del archivo XML, \"" + SLibUtils.DbmsDateFormatDate.format(comprobante40Xml.getAttFecha().getDatetime()) + "\".");
+                }
+                if (!SLibUtils.compareAmount(comprobante40Cfd.getAttTotal().getDouble(), comprobante40Xml.getAttTotal().getDouble())) {
+                    throw new Exception("El valor de 'Total' del registro del CFDI, \"" + SLibUtils.getDecimalFormatAmount().format(comprobante40Cfd.getAttTotal().getDouble()) + "\", "
+                            + "es distinto al del archivo XML, \"" + SLibUtils.getDecimalFormatAmount().format(comprobante40Xml.getAttTotal().getDouble()) + "\".");
+                }
+                if (!comprobante40Cfd.getAttMoneda().getString().equals(comprobante40Xml.getAttMoneda().getString())) {
+                    throw new Exception("El valor de 'Moneda' del registro del CFDI, \"" + comprobante40Cfd.getAttTipoDeComprobante().getString() + "\", "
+                            + "es distinto al del archivo XML, \"" + comprobante40Xml.getAttTipoDeComprobante().getString() + "\".");
+                }
+                
+                valid = true;
+                break;
+                
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de CFD: [" + cfd.getFkXmlTypeId() + "].");
+        }
 
         return valid;
     }
@@ -2877,7 +2961,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void resetCfdiDeactivateFlags(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             boolean deactivate = true;
@@ -3178,7 +3262,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void printCfd(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies, boolean isCfdStorageInProcess) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (canPrintCfd(cfd, isCfdStorageInProcess)) {
@@ -3199,7 +3283,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void printCfdEnglish(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode, int numberCopies, boolean isCfdStorageInProcess) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (canPrintCfd(cfd, isCfdStorageInProcess)) {
@@ -3268,7 +3352,7 @@ public abstract class SCfdUtils implements Serializable {
      */
     public static void printCfdCancelAck(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, int printMode) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (canObtainCfdCancelAck(client, cfd)) {
@@ -3888,7 +3972,7 @@ public abstract class SCfdUtils implements Serializable {
                         else {
                             // Save file PDF and set flag PDF as correct:
 
-                            valid = restoreCfdCancelAck(client, cfd, payrollCfdVersion, false);
+                            valid = restoreCfdCancelAckPdf(client, cfd, payrollCfdVersion, false);
                         }
                     }
                     else {
@@ -3925,8 +4009,8 @@ public abstract class SCfdUtils implements Serializable {
     
     /**
      * Restore CFD stamped.
-     * @param client
-     * @param cfd
+     * @param client GUI client.
+     * @param cfd CFD registry.
      * @param payrollCfdVersion Supported constants: SCfdConsts.CFDI_PAYROLL_VER_OLD, SCfdConsts.CFDI_PAYROLL_VER_CUR or 0 when does not apply.
      * @param isRequestByUser
      * @return
@@ -3939,13 +4023,13 @@ public abstract class SCfdUtils implements Serializable {
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante solicitado no es un CFDI.");
+            throw new Exception("El registro del CFDI del comprobante no es un CFDI.");
         }
         else if (cfd.isStamped()) {
-            throw new Exception("No es necesario restaurar el CFDI.");
+            throw new Exception("No es necesario restaurar el XML timbrado del CFDI porque el comprobante ya está timbrado.");
         }
 
         pac = getPacForValidation(client, cfd);
@@ -3963,7 +4047,7 @@ public abstract class SCfdUtils implements Serializable {
                 createSignCancelLogEntry(client, "", !cfd.isStamped() ? SCfdConsts.ACTION_CODE_VAL_SIGN : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_NA, cfd.getPkCfdId(), pac == null ? 0 : pac.getPkPacId());
             }
 
-            if (!doesXmlBelongsToCfd(fileXml, cfd)) {
+            if (!doesXmlBelongsToCfd(client, fileXml, cfd)) {
                 createSignCancelLogEntry(client, "El archivo XML proporcionado no pertenece al CFDI seleccionado.", !cfd.isStamped() ? SCfdConsts.ACTION_CODE_VAL_SIGN : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_NA, cfd.getPkCfdId(), pac == null ? 0 : pac.getPkPacId());
 
                 throw new Exception("El archivo XML proporcionado no pertenece al CFDI seleccionado.");
@@ -3978,7 +4062,7 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     /**
-     * Restore CFD cancel acknowledgement.
+     * Restore CFD cancel acknowledgement in PDF.
      * @param client
      * @param cfd
      * @param isRequestByUser
@@ -3986,26 +4070,31 @@ public abstract class SCfdUtils implements Serializable {
      * @return
      * @throws Exception 
      */
-    public static boolean restoreCfdCancelAck(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final boolean isRequestByUser) throws Exception {
+    public static boolean restoreCfdCancelAckPdf(final SClientInterface client, final SDataCfd cfd, final int payrollCfdVersion, final boolean isRequestByUser) throws Exception {
         SDialogRestoreCfdi restoreCfdi = null;
         SDataPac pac = null;
         boolean isRestore = false;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else if (!cfd.isCfdi()) {
-            throw new Exception("El comprobante solicitado no es un CFDI.");
+            throw new Exception("El registro del CFDI del comprobante no es un CFDI.");
+        }
+        else if (!cfd.isStamped()) {
+            throw new Exception("No es necesario restaurar PDF del acuse de cancelación del CFDI porque el comprobante no está timbrado.");
         }
         else {
             if (isRequestByUser) {
                 if (!cfd.getIsProcessingWebService()) {
                     if (!cfd.isStamped() || cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        throw new Exception("No es necesario restaurar el acuse de cancelación.");
+                        throw new Exception("No es necesario restaurar el PDF del acuse de cancelación del CFDI:\n"
+                                + "el comprobante no está timbrado o el CFDI no está cancelado.");
                     }
                 }
                 else if (!(cfd.isStamped() && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED)) {
-                    throw new Exception("No es necesario restaurar el acuse de cancelación.");
+                    throw new Exception("No es necesario restaurar el PDF del acuse de cancelación del CFDI:\n"
+                            + "el comprobante no está timbrado y el CFDI ya está cancelado.");
                 }
             }
         }
@@ -5472,7 +5561,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (areCfdInconsistent(cfdsValidate)) {
@@ -5664,7 +5753,7 @@ public abstract class SCfdUtils implements Serializable {
     
     public static void downloadXmlCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (canObtainCfdXml(cfd)) {
@@ -5727,7 +5816,7 @@ public abstract class SCfdUtils implements Serializable {
 
     public static void getAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");
         }
         else {
             if (canObtainCfdCancelAck(client, cfd)) {

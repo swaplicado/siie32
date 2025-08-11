@@ -101,13 +101,16 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         mnBizCategory = category;
         mbShowValidateButton = true;
         mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
+        
         if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
             createParamsMap40();
         }
         else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
             createParamsMap33();
         }
+        
         showCfdi();
+        
         return moDpsRendered;
     }
       

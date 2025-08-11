@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormBrandType extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -128,7 +128,7 @@ public class SFormBrandType extends javax.swing.JDialog implements erp.lib.form.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldBrandType = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfBrandType, jlBrandType);
         moFieldBrandType.setLengthMax(50);

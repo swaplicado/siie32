@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SClientApi implements SClientInterface {
     
@@ -163,6 +163,11 @@ public class SClientApi implements SClientInterface {
 
     @Override
     public DCfdSignature getCfdSignature(float cfdVersion) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object getSwapServicesSetting(String setting) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

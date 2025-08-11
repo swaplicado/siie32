@@ -20,8 +20,6 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
-import erp.mbps.data.SDataBizPartner;
-import erp.mbps.form.SFormBizPartnerUpdate;
 import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataCostCenterItem;
 import erp.mfin.form.SDialogRepBizPartnerAccountingMoves;
@@ -76,7 +74,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -258,7 +256,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepDpsBizPartner moDialogRepDpsBizPartner;
     private erp.mtrn.form.SDialogRepDpsWithBalance moDialogRepDpsWithBalance;
     private erp.mtrn.form.SDialogRepSalesPurchases moDialogRepSalesPurchases;
-    private erp.mbps.form.SFormBizPartnerUpdate moFormBizPartnerSupplierData;
     private erp.mtrn.form.SDialogRepSalesPurchasesByConcept moDialogRepSalesPurchasesByConcept;
     private erp.mtrn.form.SDialogRepSalesPurchasesByLocality moDialogRepSalesPurchasesByLocality;
     private erp.mtrn.form.SDialogRepSalesPurchasesComparative moDialogRepSalesPurchasesComparative;
@@ -1186,20 +1183,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm.setValue(1, SDataConstantsSys.BPSS_CT_BP_SUP);
                     break;
-                case SDataConstants.BPSX_BP_CUS_SUP:
-                    if (moFormBizPartnerSupplierData == null) {
-                        moFormBizPartnerSupplierData = new SFormBizPartnerUpdate(miClient);
-                    }
-                    if (pk != null) {
-                        moRegistry = new SDataBizPartner();
-                        moFormBizPartnerSupplierData.setRegistry(moRegistry);
-                    }
-                    miForm = moFormBizPartnerSupplierData;
-                    miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
-                    miForm.setFormVisible(true);
-                    int formResult = miForm.getFormResult();
-                    result = (formResult == SLibConstants.FORM_RESULT_OK) ? SLibConstants.DB_ACTION_SAVE_OK : SLibConstants.DB_ACTION_ANNUL_OK;
-                    break;
                 case SDataConstants.TRN_DPS:
                     if (moFormDps == null) {
                         moFormDps = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
@@ -1209,7 +1192,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDps();
                     }
                     break;
-                    
                 case SDataConstants.TRNX_DPS_RO:
                     if (moFormDpsRo == null) {
                         moFormDpsRo = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
@@ -1248,7 +1230,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             switch (formType) {
                 case SDataConstants.TRN_DPS:
                     miForm.setValue(SDataConstants.USRS_TP_LEV, mnCurrentUserPrivilegeLevel);
-                    miForm.setValue(SLibConstants.VALUE_IS_COPY, isCopy);
 
                     if (moFormComplement != null) {
                         if (moFormComplement instanceof int[]) {
@@ -1363,16 +1344,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "Bloqueo proveedores";
                     break;
                     
-                case SDataConstants.BPSU_BP_DT:
-                    oViewClass = erp.mbps.view.SViewBizPartnerUpdate.class;
-                    sViewTitle = "Datos de proveedores";
-                    break;
-                    
-                case SDataConstants.BPSU_BP_DT_RE:
-                    oViewClass = erp.mbps.view.SViewBizPartnerUpdateLog.class;
-                    sViewTitle = "Actualizaciones datos proveedores";
-                    break;
-
                 case SDataConstants.FIN_CC_ITEM:
                     oViewClass = erp.mfin.view.SViewCostCenterItem.class;
                     sViewTitle = "Config. centros costo ítems";
@@ -1757,10 +1728,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiCatBizPartherUpdate) {         
-               showView(SDataConstants.BPSU_BP_DT, SDataConstantsSys.BPSS_CT_BP_SUP);
+               miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_UPD, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiCatBizPartherUpdateLog) {      
-               showView(SDataConstants.BPSU_BP_DT_RE, SDataConstantsSys.BPSS_CT_BP_SUP);
+               miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSU_BP_UPD_LOG, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiCatInitiatives) {
                 miClient.getSession().showView(SModConsts.TRN_INIT, SLibConstants.UNDEFINED, null);

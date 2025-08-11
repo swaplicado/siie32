@@ -26,11 +26,11 @@ import erp.mbps.form.SFormBizPartnerBranchContact;
 import erp.mbps.form.SFormBizPartnerEmployee;
 import erp.mbps.form.SFormBizPartnerSimple;
 import erp.mbps.form.SFormBizPartnerType;
+import erp.mbps.form.SFormBizPartnerUpdate;
 import erp.mbps.form.SFormScaleBizPartner;
 import erp.mcfg.data.SDataScale;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import erp.mbps.form.SFormBizPartnerUpdate;
 
 /**
  *
@@ -81,8 +81,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiBizPartnerBizArea;
 
     private erp.mbps.form.SFormBizPartner moFormBizPartner;
-    private erp.mbps.form.SFormBizPartnerUpdate moFormBizPartnerSupplierData;
     private erp.mbps.form.SFormBizPartnerSimple moFormBizPartnerSimple;
+    private erp.mbps.form.SFormBizPartnerUpdate moFormBizPartnerUpdate;
     private erp.mbps.form.SFormBizPartnerAttribute moFormBizPartnerAttribute;
     private erp.mbps.form.SFormBizPartnerEmployee moFormBizPartnerEmployee;
     private erp.mbps.form.SFormBizPartnerBranchContact moFormBizPartnerBranchContact;
@@ -399,16 +399,6 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     miForm = moFormBizPartner;
                     miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
                     break;
-                case SDataConstants.BPSX_BP_CUS_SUP:
-                    if (moFormBizPartnerSupplierData == null) {
-                        moFormBizPartnerSupplierData = new SFormBizPartnerUpdate(miClient);
-                    }
-                    if (pk != null) {
-                        moRegistry = new SDataBizPartner();
-                    }
-                    miForm = moFormBizPartnerSupplierData;
-                    miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
-                    break;
                 case SDataConstants.BPSX_BP_CDR:
                 case SDataConstants.BPSX_BP_DBR:
                     if (moFormBizPartnerSimple == null) {
@@ -419,6 +409,16 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormBizPartnerSimple;
                     miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
+                    break;
+                case SDataConstants.BPSX_BP_UPD:
+                    if (moFormBizPartnerUpdate == null) {
+                        moFormBizPartnerUpdate = new SFormBizPartnerUpdate(miClient);
+                    }
+                    if (pk != null) {
+                        moRegistry = new SDataBizPartner();
+                    }
+                    miForm = moFormBizPartnerUpdate;
+                    miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_CATEGORY, auxType);
                     break;
                 case SDataConstants.BPSX_BP_ATT_BANK:
                 case SDataConstants.BPSX_BP_ATT_CARR:
@@ -608,6 +608,16 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     auxType01 = viewType;
                     break;
                     
+                case SDataConstants.BPSX_BP_UPD:
+                    oViewClass = erp.mbps.view.SViewBizPartnerUpdate.class;
+                    sViewTitle = "Datos proveedores";
+                    break;
+                    
+                case SDataConstants.BPSU_BP_UPD_LOG:
+                    oViewClass = erp.mbps.view.SViewBizPartnerUpdateLog.class;
+                    sViewTitle = "Actualizaciones datos proveedores";
+                    break;
+
                 case SDataConstants.BPSX_BP_EMP_REL:
                     oViewClass = erp.mbps.view.SViewBizPartnerEmployeeRelatives.class;
                     sViewTitle = "Datos personales empleados";

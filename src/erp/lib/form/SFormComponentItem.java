@@ -9,7 +9,7 @@ package erp.lib.form;
  *
  * @author Sergio Flores
  */
-public class SFormComponentItem implements java.io.Serializable {
+public class SFormComponentItem implements java.io.Serializable, java.lang.Comparable<SFormComponentItem> {
     
     private java.lang.Object moPrimaryKey;
     private java.lang.String msItem;
@@ -41,5 +41,10 @@ public class SFormComponentItem implements java.io.Serializable {
     @Override
     public java.lang.String toString() {
         return getItem();
+    }
+
+    @Override
+    public int compareTo(SFormComponentItem o) {
+        return this.toString().compareTo(o.toString());
     }
 }

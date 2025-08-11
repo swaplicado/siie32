@@ -15,7 +15,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbFunctionalArea extends SDbRegistryUser {
 
@@ -75,6 +75,7 @@ public class SDbFunctionalArea extends SDbRegistryUser {
         mnPkFunctionalAreaId = 0;
         msCode = "";
         msName = "";
+        mdExpensesMonthly = 0;
         mbDeleted = false;
         mbSystem = false;
         mnFkUserInsertId = 0;

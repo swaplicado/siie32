@@ -35,6 +35,9 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -90,6 +93,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
@@ -140,6 +144,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbValidateCfdi;
     private javax.swing.JButton jbGetCfdiStatus;
     private javax.swing.JButton jbSendByEmail;
+    private javax.swing.JButton jbExportDataToSwapServices;
     private javax.swing.JButton jbResetPacFlags;
     private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
     private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
@@ -186,6 +191,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightAnnul;
     private boolean mbHasRightLogistics;
     private boolean mbIsAuthWebAvailable; // auth web must be enabled in configuration and this view must be for purchases orders!
+    private boolean mbSwapServicesLinkUp;
+    
     private int mnModule;
     private int idBpGOM = 1995; //id bp GOM <<<<< XXX ESTO ES INACEPTABLE! XXX <<<<<
     
@@ -466,6 +473,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbResetPacFlags.addActionListener(this);
         jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
         
+        // Enable SWAP Services:
+        if (mbIsCategoryPur && mbIsOrd) { // purchase orders only!
+            mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+            if (mbSwapServicesLinkUp) {
+                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_mag.gif")), "Exportar referencias pedidos a " + SSwapConsts.SWAP_SERVICES, this);
+
+                addTaskBarUpperSeparator();
+                addTaskBarUpperComponent(jbExportDataToSwapServices);
+            }
+        }
+
         if (mbIsAuthWebAvailable) {
             jbAuthWebLoadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
             jbAuthWebLoadSupportFiles.setPreferredSize(new Dimension(23, 23));
@@ -599,6 +617,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetCfdiStatus);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(jbSendByEmail);
+        if (mbSwapServicesLinkUp) {
+            addTaskBarLowerComponent(jbExportDataToSwapServices);
+        }
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
@@ -1086,8 +1107,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionImportCfdi(boolean withPurchaseOrder) {
-        if (withPurchaseOrder ? jbImportCfdiWithPurchaseOrder.isEnabled() :
-                jbImportCfdiWithOutPurchaseOrder.isEnabled()) {
+        if (withPurchaseOrder ? jbImportCfdiWithPurchaseOrder.isEnabled() : jbImportCfdiWithOutPurchaseOrder.isEnabled()) {
             SDataDps purchaseOrderDps = null; 
             FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
             miClient.getFileChooser().repaint();
@@ -1105,8 +1125,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             try {
-                if (!withPurchaseOrder  || (withPurchaseOrder && purchaseOrderDps != null)) {
-                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                if (!withPurchaseOrder || (withPurchaseOrder && purchaseOrderDps != null)) {
+                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                         if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                             SCfdRenderer renderer = new SCfdRenderer(miClient);
                             SDataDps dpsRendered = renderer.renderCfdi(miClient.getFileChooser().getSelectedFile(), purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
@@ -1123,6 +1143,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             miClient.showMsgBoxInformation("El archivo solo puede ser XML.");
                         }
                     }
+                    
                     miClient.getFileChooser().resetChoosableFileFilters();
                 }
             }
@@ -3037,6 +3058,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
+    private void actionExportDataToSwapServices() {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
+            try {
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PURCHASE_ORDER_REF, false);
+                
+                if (response.isEmpty()) {
+                    miClient.showMsgBoxInformation("Las referencias de pedidos fueron exportadas correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
+                }
+                else {
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar las referencias de pedidos a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(this, e);
+            }
+        }
+    }
+
     private void actionRestoreCfdStamped() throws Exception {
         if (jbRestoreCfdStamped.isEnabled()) {
             if (isRowSelected()) {
@@ -3065,7 +3104,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, dps.getDbmsDataCfd(), 0, true);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAckPdf(miClient, dps.getDbmsDataCfd(), 0, true);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -3627,6 +3666,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbSendByEmail) {
                     actionSendByEmail();
+                }
+                else if (button == jbExportDataToSwapServices) {
+                    actionExportDataToSwapServices();
                 }
                 else if (button == jbRestoreCfdStamped) {
                     actionRestoreCfdStamped();

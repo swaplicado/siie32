@@ -9,10 +9,11 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
+import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -82,20 +83,10 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
     @Override
     public int save(java.sql.Connection connection) {
         String sql = "";
-        ResultSet resultSet = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            if (mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) FROM usr_usr_func WHERE id_usr = " + mnPkUserId + " AND id_func = " + mnPkFunctionalAreaId + " ";
-                resultSet = connection.createStatement().executeQuery(sql);
-
-                if (resultSet.next()) {
-                    mbIsRegistryNew = resultSet.getInt(1) == 0;
-                }
-            }
-
             if (mbIsRegistryNew) {
                 sql = "INSERT INTO usr_usr_func VALUES (" +
                         mnPkUserId + ", " +
@@ -103,12 +94,9 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
                         ")";
             }
             else {
-                /*
-                sql = "UPDATE usr_usr_func SET " +
-                        //"id_usr = " + mnPkUserId + ", " +
-                        //"id_func = " + mnPkFunctionalAreaId + " ";
-                */
+                throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
             }
+            
             connection.createStatement().execute(sql);
 
             mbIsRegistryNew = false;
@@ -118,6 +106,7 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
+        
         return mnLastDbActionResult;
     }
 

@@ -77,7 +77,7 @@ public class SFormFunctionalArea extends SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);
@@ -90,7 +90,7 @@ public class SFormFunctionalArea extends SBeanForm {
         jPanel28.add(moDecExpensesMonthly);
 
         jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel1.setText("(límite mensual 0.00 = sin límite mensual)");
+        jLabel1.setText("(Límite mensual 0.00 = sin límite)");
         jLabel1.setPreferredSize(new java.awt.Dimension(205, 23));
         jPanel28.add(jLabel1);
 
@@ -119,10 +119,10 @@ public class SFormFunctionalArea extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moDecExpensesMonthly.setCompoundFieldSettings(miClient);
-        moDecExpensesMonthly.getField().setDecimalSettings(SGuiUtils.getLabelName(jlExpensesMonthly.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecExpensesMonthly.getField().setDecimalSettings(SGuiUtils.getLabelName(jlExpensesMonthly), SGuiConsts.GUI_TYPE_DEC_AMT, false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);

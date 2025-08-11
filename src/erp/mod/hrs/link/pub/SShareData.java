@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
-import erp.mod.cfg.swapss.SPublicInterface;
-import erp.mod.cfg.swapms.utils.SUserExport;
+import erp.mod.cfg.swap.SPublicInterface;
+import erp.mod.cfg.swap.utils.SExportDataUser;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
@@ -368,7 +368,7 @@ public class SShareData {
         return oMatReq;
     }
     
-    public SUserExport getSupplierByFiscalId(String fiscalId) {
+    public SExportDataUser getSupplierByFiscalId(String fiscalId) {
         SPublicInterface oInterface = new SPublicInterface();
         
         return oInterface.getSupplierByFiscalId(fiscalId);

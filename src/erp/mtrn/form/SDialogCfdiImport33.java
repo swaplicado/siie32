@@ -2028,6 +2028,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         moDpsNew.setAuxFileXmlName(moCfdiFile.getName());
         
         moDpsNew.getDbmsDpsEntries().clear();
+        
         for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
             SRowCfdiImport33 row = (SRowCfdiImport33) moConceptTablePane.getTableRow(i);
             moDpsNew.getDbmsDpsEntries().add(row.getDpsEntry());
@@ -2047,6 +2048,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     private void saveItemMatchBizPartner(SRowCfdiImport33 rowCfdiImport) {
         try {
             SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
+            
             int key = SItemUtilities.getMatchItemBizPartnerId(miClient, 
                 rowCfdiImport.getConcepto().getAttNoIdentificacion().getString(), 
                 rowCfdiImport.getConcepto().getAttClaveProdServ().getString(),
@@ -2080,6 +2082,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 match.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
                 match.setFkCostCenterId_n(rowCfdiImport.getCostCenter() == null ? "" : rowCfdiImport.getCostCenter().getPkCostCenterIdXXX());
             }
+            
             match.save(miClient.getSession().getStatement().getConnection());
         }
         catch (Exception e){

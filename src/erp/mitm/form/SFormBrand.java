@@ -158,7 +158,7 @@ public class SFormBrand extends javax.swing.JDialog implements erp.lib.form.SFor
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkBrandTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBrandTypeId, jlFkBrandTypeId);
         moFieldFkBrandTypeId.setPickerButton(jbFkBrandTypeId);

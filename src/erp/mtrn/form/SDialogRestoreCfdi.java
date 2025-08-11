@@ -58,9 +58,7 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
 
         bgCurrency = new javax.swing.ButtonGroup();
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jpData = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jpCfdi = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlFile = new javax.swing.JLabel();
         jtfFile = new javax.swing.JTextField();
@@ -70,7 +68,6 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Fecha anulación"); // NOI18N
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -79,23 +76,19 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
             }
         });
 
-        jpData.setLayout(new java.awt.BorderLayout());
+        jpCfdi.setBorder(javax.swing.BorderFactory.createTitledBorder("Inserción de archivo del comprobante:"));
+        jpCfdi.setLayout(new java.awt.BorderLayout());
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
-
-        jPanel1.setLayout(new java.awt.GridLayout(2, 1));
-
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 0, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFile.setText("Archivo:*");
-        jlFile.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlFile.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlFile);
 
         jtfFile.setEditable(false);
         jtfFile.setText("FILE");
         jtfFile.setOpaque(false);
-        jtfFile.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfFile.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel4.add(jtfFile);
 
         jbFile.setText("...");
@@ -103,15 +96,11 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         jbFile.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel4.add(jbFile);
 
-        jPanel1.add(jPanel4);
+        jpCfdi.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jPanel8.add(jPanel1);
+        getContentPane().add(jpCfdi, java.awt.BorderLayout.CENTER);
 
-        jpData.add(jPanel8, java.awt.BorderLayout.CENTER);
-
-        getContentPane().add(jpData, java.awt.BorderLayout.CENTER);
-
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -125,8 +114,8 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-336)/2, (screenSize.height-238)/2, 336, 238);
+        setSize(new java.awt.Dimension(496, 289));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -145,10 +134,10 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         jbFile.addActionListener(this);
         
         if (mnFormType == SCfdConsts.ACTION_CODE_PRC_SIGN) {
-            setTitle("Recuperar CFDI timbrado");
+            setTitle("Insertar XML timbrado del CFDI");
         }
         else {
-            setTitle("Recuperar acuse de cancelación");
+            setTitle("Insertar PDF del acuse de cancelación del CFDI");
         }
         
         if (mnFormSubtype == SCfdConsts.CFDI_FILE_XML) {
@@ -232,15 +221,13 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCurrency;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbFile;
     private javax.swing.JButton jbOk;
     private javax.swing.JLabel jlFile;
-    private javax.swing.JPanel jpData;
+    private javax.swing.JPanel jpCfdi;
     private javax.swing.JTextField jtfFile;
     // End of variables declaration//GEN-END:variables
 

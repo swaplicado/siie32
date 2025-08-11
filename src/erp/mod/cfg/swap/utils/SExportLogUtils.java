@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swapms.utils;
+package erp.mod.cfg.swap.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -69,7 +69,8 @@ public class SExportLogUtils {
     public static String safeWriteToLogFile(String sufixFileName, String message) {
         try {
             return writeToLogFile(sufixFileName, message);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.err.println("Error al escribir en el archivo de log: " + e.getMessage());
             return null;
         }
