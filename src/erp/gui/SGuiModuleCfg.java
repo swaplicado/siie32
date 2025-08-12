@@ -103,6 +103,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.form.SFormOptionPicker moPickerCompany;
     private erp.form.SFormOptionPicker moPickerCompanyBranchEntity;
     private erp.form.SFormOptionPicker moPickerFunctionalArea;
+    private erp.form.SFormOptionPicker moPickerFunctionalSubArea;
     
     public SGuiModuleCfg(erp.client.SClientInterface client) {
         super(client, SDataConstants.MOD_CFG);
@@ -599,6 +600,9 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SModConsts.CFGU_FUNC:
                     picker = moPickerFunctionalArea = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerFunctionalArea);
+                    break;
+                case SModConsts.CFGU_FUNC_SUB:
+                    picker = moPickerFunctionalSubArea = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerFunctionalSubArea);
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM_PICK);

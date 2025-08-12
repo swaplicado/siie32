@@ -398,14 +398,10 @@ public abstract class SFormUtilities {
     public static boolean isComboBoxItemContained(javax.swing.JComboBox comboBox, java.lang.Object key) {
         boolean contained = false;
 
-        if (comboBox.getItemCount() > 0) {
-            for (int i = 0; i < comboBox.getItemCount(); i++) {
-                SFormComponentItem item = (SFormComponentItem) comboBox.getItemAt(i);
-
-                if (SLibUtilities.compareKeys(key, item.getPrimaryKey())) {
-                    contained = true;
-                    break;
-                }
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            if (SLibUtilities.compareKeys(key, ((SFormComponentItem) comboBox.getItemAt(i)).getPrimaryKey())) {
+                contained = true;
+                break;
             }
         }
         

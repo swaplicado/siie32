@@ -206,11 +206,11 @@ public class SModuleCfg extends SGuiModule {
                         "FROM " + SModConsts.TablesMap.get(type) + " AS fs " +
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func ";
                 if (subtype != 0) {
-                    sql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON " +
+                    sql += "INNER JOIN " + SModConsts.TablesMap.get(type) + " AS ufs ON " +
                             "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + subtype + " ";
                 }
                 sql += "WHERE NOT fs.b_del AND NOT f.b_del " +
-                        "ORDER BY f.code, fs.name, fs.code, fs.id_func_sub ";
+                        "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub ";
                 break;
             case SModConsts.CFGU_SCA:
                 settings = new SGuiCatalogueSettings("Báscula", 1);

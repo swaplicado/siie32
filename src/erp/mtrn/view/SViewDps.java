@@ -684,18 +684,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[50]; // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[51]; // extra columns for accounting record and CFD info
         }
         else if (mbIsOrd) {
             if (mbIsAuthWebAvailable) {
-                aoTableColumns = new STableColumn[47];
+                aoTableColumns = new STableColumn[48];
             }
             else {
-                aoTableColumns = new STableColumn[43];
+                aoTableColumns = new STableColumn[44];
             }
         }
         else {
-            aoTableColumns = new STableColumn[42];
+            aoTableColumns = new STableColumn[43];
         }
 
         i = 0;
@@ -814,7 +814,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.comms_ref", "Ref comercial", STableConstants.WIDTH_DOC_NUM_REF);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza documento", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fa_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_sub_code", "Subárea funcional", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_concept", "Concepto documento", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_mfg_ord", "Orden producción", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_copy", "Copia", STableConstants.WIDTH_BOOLEAN);
@@ -3405,7 +3406,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         
         msSql += "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
+                "(SELECT f.code FROM cfgu_func AS f WHERE d.fid_func = f.id_func) AS f_func_code, " +
+                "(SELECT fs.code FROM cfgu_func_sub AS fs WHERE d.fid_func_sub = fs.id_func_sub) AS f_func_sub_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
                 "(SELECT CONCAT(dps_src.num_ser, IF(length(dps_src.num_ser) = 0, '', '-'), dps_src.num) " +
                 "FROM trn_dps AS dps_src INNER JOIN trn_dps_dps_supply AS spl ON dps_src.id_doc = spl.id_src_doc AND dps_src.id_year = spl.id_src_year " +

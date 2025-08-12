@@ -298,6 +298,9 @@ public abstract class SDataReadDescriptions {
             case SModConsts.CFGU_FUNC:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "name") + " AS descrip FROM cfgu_func WHERE id_func = " + ((int[]) pk)[0] + " ";
                 break;
+            case SModConsts.CFGU_FUNC_SUB:
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "name") + " AS descrip FROM cfgu_func_sub WHERE id_func_sub = " + ((int[]) pk)[0] + " ";
+                break;
             case SModConsts.LOGS_TP_MOT:
                 sql = "SELECT name AS descrip FROM " + SModConsts.TablesMap.get(catalogue) + " WHERE id_tp_mot = " + ((int[]) pk)[0] + " ";
                 break;

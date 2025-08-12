@@ -190,9 +190,18 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 
             case SModConsts.CFGU_FUNC:
                 aoTableColumns = new STableColumnForm[2];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre", 300);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código", 100);
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área", 300);
                 setTitle("Seleccionar área funcional");
+                break;
+                
+            case SModConsts.CFGU_FUNC_SUB:
+                aoTableColumns = new STableColumnForm[4];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código área funcional", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre área funcional", 300);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre subárea funcional", 300);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código subárea funcional", 100);
+                setTitle("Seleccionar subárea funcional");
                 break;
                 
             case SDataConstants.USRU_USR:
