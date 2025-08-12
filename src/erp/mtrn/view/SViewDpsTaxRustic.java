@@ -122,7 +122,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
         try {
             msSql = "SELECT D.DT AS FECHA, " +
                     "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, 6)) as f_rnum, " +
-                    "D.NUM, BP.BP, BP.fiscal_id, AD.zip_code, AD.locality, E.CONCEPT, E.MASS, E.PRICE_U, E.STOT_CUR_R, " +
+                    "D.NUM, BP.BP, BP.fiscal_id, AD.zip_code, AD.county, E.CONCEPT, E.MASS, E.PRICE_U, E.STOT_CUR_R, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_pred[0] + "  AND TAX.ID_TAX = " + tax_rus_pred[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS IMPUESTOPREDIAL, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_prod_dep[0] + " AND TAX.ID_TAX = " + tax_rus_prod_dep[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS PRODEPORTE, " +
                     "(SELECT TAX FROM TRN_DPS_ETY_TAX AS TAX WHERE TAX.ID_TAX_BAS = " + tax_rus_pia[0] + " AND TAX.ID_TAX = " + tax_rus_pia[1] + " AND TAX.ID_YEAR = D.ID_YEAR AND TAX.ID_DOC = D.ID_DOC) AS PIAFES, " +
@@ -132,7 +132,7 @@ public class SViewDpsTaxRustic extends erp.lib.table.STableTab implements java.a
                     "INNER JOIN TRN_DPS_ETY AS E ON E.ID_YEAR = D.ID_YEAR and E.ID_DOC = D.ID_DOC " +
                     "INNER JOIN TRN_DPS_ETY_TAX AS DET ON DET.ID_YEAR = D.ID_YEAR and DET.ID_DOC = D.ID_DOC " +
                     "INNER JOIN ERP.BPSU_BP AS BP ON BP.ID_BP = D.fid_bp_r " +
-                    "INNER JOIN ERP.BPSU_BPB AS BPB ON BP.ID_BP = BPB.ID_BPB " +
+                    "INNER JOIN ERP.BPSU_BPB AS BPB ON BP.ID_BP = BPB.fid_bp " +
                     "INNER JOIN ERP.BPSU_BPB_ADD AS AD ON BPB.ID_BPB = AD.ID_BPB " +
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                     "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
