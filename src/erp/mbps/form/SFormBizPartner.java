@@ -3745,7 +3745,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner.setBizPartnerCommercial(moFieldBizPartnerCommercial.getString().isEmpty() ? moBizPartner.getBizPartner() : moFieldBizPartnerCommercial.getString());
 
         moBizPartner.setFiscalId(moFieldFiscalId.getString().toUpperCase());
-        moBizPartner.setFiscalFrgId(moFieldFiscalFrgId.getString().toUpperCase());
+        moBizPartner.setFiscalFrgId(moFieldFiscalFrgId.getString());
         //moBizPartner.setCodeBankSantander();
         //moBizPartner.setCodeBankBanBajio();
         moBizPartner.setWeb(moFieldWeb.getString());

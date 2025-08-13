@@ -69,7 +69,8 @@ public class SExportLogUtils {
     public static String safeWriteToLogFile(String sufixFileName, String message) {
         try {
             return writeToLogFile(sufixFileName, message);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.err.println("Error al escribir en el archivo de log: " + e.getMessage());
             return null;
         }

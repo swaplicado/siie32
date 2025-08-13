@@ -3238,7 +3238,7 @@ public abstract class SDataUtilities {
      */
     public static boolean isCatalogueCfg(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_CFG && catalogue < SDataConstants.GLOBAL_CAT_USR ||
-                catalogue >= SModConsts.CFGS_CT_ENT && catalogue <= SModConsts.CFG_PARAM_CO;
+                catalogue >= SModConsts.CFGS_CT_ENT && catalogue < SModConsts.USRS_TP_USR;
     }
 
     /**
@@ -3322,7 +3322,7 @@ public abstract class SDataUtilities {
     public static boolean isCatalogueLog(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_LOG && catalogue < SDataConstants.GLOBAL_CAT_MFG ||
                 catalogue >= SDataConstants.MOD_LOG && catalogue < SDataConstants.MOD_MFG ||
-                catalogue >= SModConsts.LOGS_TP_SHIP && catalogue <= SModConsts.LOG_BOL_MERCH_QTY;
+                catalogue >= SModConsts.LOGS_TP_SHIP && catalogue < SModConsts.MFGS_ST_ORD;
     }
 
     /**
@@ -3339,7 +3339,7 @@ public abstract class SDataUtilities {
     public static boolean isCatalogueHrs(int catalogue) {
         return catalogue >= SDataConstants.GLOBAL_CAT_HRS && catalogue < SDataConstants.GLOBAL_CAT_QLT ||
                 catalogue >= SDataConstants.MOD_HRS && catalogue < SDataConstants.MOD_QLT ||
-                catalogue >= SModConsts.HRSS_CL_HRS_CAT && catalogue <= SModConsts.HRSX_AUT_DED;
+                catalogue >= SModConsts.HRSS_CL_HRS_CAT && catalogue < SModConsts.QLT_LOT_APR;
     }
     
     /**

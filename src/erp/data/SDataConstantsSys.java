@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -1728,6 +1728,7 @@ public abstract class SDataConstantsSys {
     public static final int MFGX_ORD_CST_DONE_YES = 2;
 
     public static final int VALUE_BIZ_PARTNER_TYPE = 1;
+    public static final int VALUE_BIZ_PARTNER_CATEGORY = 2;
     public static final int VALUE_COMPANY_BRANCH = 1;
     public static final int VALUE_ACCOUNT_CASH = 2;
     public static final int VALUE_TYPE_DOC = 3;

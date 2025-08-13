@@ -10,6 +10,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.musr.data.SDataUserFunctionalArea;
+import erp.musr.data.SDataUserFunctionalSubArea;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Alfonso Flores, Isabel Servín, Adrián Avilés
+ * @author Alfonso Flores, Isabel Servín, Adrián Avilés, Sergio Flores
  */
 public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -49,8 +50,10 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
     protected java.util.Date mtUserDeleteTs;
 
     protected java.lang.String msDbmsUser;
+    protected java.lang.String msDbmsBizPartner;
     
-    private ArrayList<SDataUserFunctionalArea> maUserFunctionalArea;
+    private ArrayList<SDataUserFunctionalArea> maUserFunctionalAreas;
+    private ArrayList<SDataUserFunctionalSubArea> maUserFunctionalSubAreas;
     private ArrayList<SDataUserDnsDps> maUserDnsDps;
 
     public SDataUserConfigurationTransaction() {
@@ -100,10 +103,12 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
     
-    public ArrayList<SDataUserFunctionalArea> getUserFunctionalArea() { return maUserFunctionalArea; }
+    public ArrayList<SDataUserFunctionalArea> getUserFunctionalAreas() { return maUserFunctionalAreas; }
+    public ArrayList<SDataUserFunctionalSubArea> getUserFunctionalSubAreas() { return maUserFunctionalSubAreas; }
     public ArrayList<SDataUserDnsDps> getUserDnsDps() { return maUserDnsDps; }
 
     public String getDbmsUser() { return msDbmsUser; }
+    public String getDbmsBizPartner() { return msDbmsBizPartner; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -140,7 +145,11 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
         mtUserEditTs = null;
         mtUserDeleteTs = null;
         
-        maUserFunctionalArea = new ArrayList<>();
+        msDbmsUser = "";
+        msDbmsBizPartner = "";
+        
+        maUserFunctionalAreas = new ArrayList<>();
+        maUserFunctionalSubAreas = new ArrayList<>();
         maUserDnsDps = new ArrayList<>();
     }
 
@@ -155,8 +164,11 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
         reset();
 
         try {
-            sql = "SELECT t.*, u.usr FROM trn_usr_cfg AS t INNER JOIN erp.usru_usr AS u ON t.id_usr = u.id_usr " +
-                    "WHERE t.id_usr = " + key[0] + " ";
+            sql = "SELECT t.*, u.usr, COALESCE(b.bp, '') AS _bp "
+                    + "FROM trn_usr_cfg AS t "
+                    + "INNER JOIN erp.usru_usr AS u ON t.id_usr = u.id_usr "
+                    + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = u.fid_bp_n "
+                    + "WHERE t.id_usr = " + key[0] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -214,6 +226,7 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                 mtUserDeleteTs = resultSet.getTimestamp("t.ts_del");
 
                 msDbmsUser = resultSet.getString("u.usr");
+                msDbmsBizPartner = resultSet.getString("_bp");
 
                 oStatementAux = statement.getConnection().createStatement();
                 
@@ -231,7 +244,25 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        maUserFunctionalArea.add(userFunctionalArea);
+                        maUserFunctionalAreas.add(userFunctionalArea);
+                    }
+                }
+                
+                // Read aswell user functional sub-areas:
+
+                sql = "SELECT id_func_sub " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " " +
+                        "WHERE id_usr = " + mnPkUserId + " " +
+                        "ORDER BY id_func_sub ";
+                
+                resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    SDataUserFunctionalSubArea userFunctionalSubArea = new SDataUserFunctionalSubArea();
+                    if (userFunctionalSubArea.read(new int[] { mnPkUserId, resultSet.getInt("id_func_sub") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                    else {
+                        maUserFunctionalSubAreas.add(userFunctionalSubArea);
                     }
                 }
                 
@@ -302,22 +333,39 @@ public class SDataUserConfigurationTransaction extends erp.lib.data.SDataRegistr
 
             mnDbmsErrorId = callableStatement.getInt(nParam - 2);
             msDbmsError = callableStatement.getString(nParam - 1);
+            
+            // Save dependent registries:
 
-            // 3. Delete aswell user functional areas:
-            Statement statement = null;
-
-            statement = connection.createStatement();
+            Statement statement = connection.createStatement();
+            
+            // Delete aswell user functional areas:
             
             sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC) + " WHERE id_usr = " + mnPkUserId + " ";
             statement.executeUpdate(sql);
             
-            // 3. Save aswell user functional areas:
+            // Save aswell user functional areas:
 
-            for (SDataUserFunctionalArea userFunctionalArea : maUserFunctionalArea) {
+            for (SDataUserFunctionalArea userFunctionalArea : maUserFunctionalAreas) {
                 userFunctionalArea.setPkUserId(mnPkUserId);
                 userFunctionalArea.setIsRegistryNew(true);
 
                 if (userFunctionalArea.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                }
+            }
+            
+            // Delete aswell user functional areas:
+            
+            sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " WHERE id_usr = " + mnPkUserId + " ";
+            statement.executeUpdate(sql);
+            
+            // Save aswell user functional areas:
+
+            for (SDataUserFunctionalSubArea userFunctionalSubArea : maUserFunctionalSubAreas) {
+                userFunctionalSubArea.setPkUserId(mnPkUserId);
+                userFunctionalSubArea.setIsRegistryNew(true);
+
+                if (userFunctionalSubArea.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                 }
             }

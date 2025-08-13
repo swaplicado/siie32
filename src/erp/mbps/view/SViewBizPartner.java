@@ -5,7 +5,6 @@
 
 package erp.mbps.view;
 
-import erp.SClient;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelEmployee;
@@ -20,8 +19,8 @@ import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsConsts;
@@ -51,7 +50,7 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores
  */
 public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -77,6 +76,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private boolean mbIsViewEmployees;
     private boolean mbIsViewBizPartnersSimple;
     private boolean mbHasRightEmpWage;
+    private boolean mbSwapServicesLinkUp;
     
     private int mnFilterPaymentTypeId;
     private int mnFilterDepartamentId;
@@ -273,9 +273,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
                 rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
 
-                // Command button for SWAP Services:
-                if ((boolean) ((SClient) miClient).getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP)) {
-                    jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+                // Enable SWAP Services:
+                mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+                if (mbSwapServicesLinkUp) {
+                    jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
                     addTaskBarUpperSeparator();
                     addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -583,6 +584,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         mvSuscriptors.add(SDataConstants.BPSX_BP_SUP);
         mvSuscriptors.add(SDataConstants.BPSX_BP_DBR);
         mvSuscriptors.add(SDataConstants.BPSX_BP_CDR);
+        mvSuscriptors.add(SDataConstants.BPSX_BP_UPD);
         mvSuscriptors.add(SDataConstants.BPSX_BP_ATT_BANK);
         mvSuscriptors.add(SDataConstants.BPSX_BP_ATT_CARR);
         mvSuscriptors.add(SDataConstants.BPSX_BP_ATT_SAL_AGT);
@@ -632,7 +634,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, false);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");

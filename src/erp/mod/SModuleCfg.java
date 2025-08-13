@@ -5,6 +5,8 @@
 
 package erp.mod;
 
+import erp.mod.cfg.db.SDbComSyncLog;
+import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbCompanyBranchEntity;
 import erp.mod.cfg.db.SDbCountry;
 import erp.mod.cfg.db.SDbCurrency;
@@ -13,6 +15,8 @@ import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
+import erp.mod.cfg.db.SDbSyncLog;
+import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.form.SFormFunctionalArea;
 import erp.mod.cfg.form.SFormFunctionalSubArea;
 import erp.mod.cfg.view.SViewAuthorizations;
@@ -64,6 +68,12 @@ public class SModuleCfg extends SGuiModule {
             case SModConsts.CFGU_COB_ENT:
                 registry = new SDbCompanyBranchEntity();
                 break;
+            case SModConsts.CFG_SYNC_LOG:
+                registry = new SDbSyncLog();
+                break;
+            case SModConsts.CFG_SYNC_LOG_ETY:
+                registry = new SDbSyncLogEntry();
+                break;
             case SModConsts.CFGU_FUNC:
                 registry = new SDbFunctionalArea();
                 break;
@@ -75,6 +85,12 @@ public class SModuleCfg extends SGuiModule {
                 break;
             case SModConsts.CFGU_DOC:
                 registry = new SDbDocument();
+                break;
+            case SModConsts.CFG_COM_SYNC_LOG:
+                registry = new SDbComSyncLog();
+                break;
+            case SModConsts.CFG_COM_SYNC_LOG_ETY:
+                registry = new SDbComSyncLogEntry();
                 break;
             case SModConsts.LOCU_CTY:
                 registry = new SDbCountry();
@@ -190,11 +206,11 @@ public class SModuleCfg extends SGuiModule {
                         "FROM " + SModConsts.TablesMap.get(type) + " AS fs " +
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func ";
                 if (subtype != 0) {
-                    sql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON " +
+                    sql += "INNER JOIN " + SModConsts.TablesMap.get(type) + " AS ufs ON " +
                             "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + subtype + " ";
                 }
                 sql += "WHERE NOT fs.b_del AND NOT f.b_del " +
-                        "ORDER BY f.code, fs.name, fs.code, fs.id_func_sub ";
+                        "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub ";
                 break;
             case SModConsts.CFGU_SCA:
                 settings = new SGuiCatalogueSettings("Báscula", 1);

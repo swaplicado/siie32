@@ -19,7 +19,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewBizPartnerBranch extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -151,6 +151,7 @@ public class SViewBizPartnerBranch extends erp.lib.table.STableTab implements ja
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
+        mvSuscriptors.add(SDataConstants.BPSX_BP_UPD);
         mvSuscriptors.add(SDataConstants.FINU_TAX_REG);
         mvSuscriptors.add(SDataConstants.USRU_USR);
 

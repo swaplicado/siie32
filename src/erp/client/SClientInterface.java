@@ -42,7 +42,7 @@ public interface SClientInterface {
     public erp.lib.gui.SGuiDateRangePicker getGuiDateRangePickerXXX();
     public erp.lib.form.SFormOptionPickerInterface getOptionPicker(int optionType);
     public cfd.DCfdSignature getCfdSignature(float cfdVersion);
-//    public cfd.DCfdSignature getCfdSignature(java.util.Date cfdDate);
+    public java.lang.Object getSwapServicesSetting(final String setting);
     public javax.swing.JFileChooser getFileChooser();
     public int pickOption(int optionType, erp.lib.form.SFormFieldInterface field, java.lang.Object filterKey);
     public int pickOption(int optionType, erp.form.SFormFieldAccount field, java.lang.Object filterKey);

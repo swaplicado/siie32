@@ -56,7 +56,7 @@ import erp.mod.SModuleMkt;
 import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
-import erp.mod.cfg.swap.utils.SSwapConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.usr.db.SDbUserGui;
 import erp.mtrn.data.SCfdUtils;
@@ -120,7 +120,7 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Edwin Carmona, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
@@ -1863,34 +1863,6 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         }
     }
     
-    /**
-     * Get required SWAP-Services Setting.
-     * 
-     * @param setting Required SWAP-Services Setting.
-     * Supported options defined in <code>SSwapConsts</code>: CFG_NVP_LINK_UP, CFG_NVP_COMPANIES or CFG_NVP_INSTANCE.
-     * @return Value of required SWAP-Services Setting:
-     * CFG_NVP_LINK_UP as <code>boolean</code>, CFG_NVP_COMPANIES as <code>int[]</code>, CFG_NVP_INSTANCE as <code>int</code>.
-     */
-    public Object getSwapServicesSetting(final String setting) {
-        Object value = null;
-        
-        switch (setting) {
-            case SSwapConsts.CFG_NVP_LINK_UP:
-                value = mbSwapServicesLinkUp;
-                break;
-            case SSwapConsts.CFG_NVP_COMPANIES:
-                value = manSwapServicesCompanies;
-                break;
-            case SSwapConsts.CFG_NVP_INSTANCE:
-                value = mnSwapServicesInstance;
-                break;
-            default:
-                // nothing
-        }
-        
-        return value;
-    }
-    
     @Override
     public SSessionXXX getSessionXXX() {
         return moSessionXXX;
@@ -2030,6 +2002,35 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     @Override
     public cfd.DCfdSignature getCfdSignature(float cfdVersion) {
         return mhmCfdSignatures.get(cfdVersion);
+    }
+    
+    /**
+     * Get required SWAP-Services Setting.
+     * 
+     * @param setting Required SWAP-Services Setting.
+     * Supported options defined in <code>SSwapConsts</code>: CFG_NVP_LINK_UP, CFG_NVP_COMPANIES or CFG_NVP_INSTANCE.
+     * @return Value of required SWAP-Services Setting:
+     * CFG_NVP_LINK_UP as <code>boolean</code>, CFG_NVP_COMPANIES as <code>int[]</code>, CFG_NVP_INSTANCE as <code>int</code>.
+     */
+    @Override
+    public Object getSwapServicesSetting(final String setting) {
+        Object value = null;
+        
+        switch (setting) {
+            case SSwapConsts.CFG_NVP_LINK_UP:
+                value = mbSwapServicesLinkUp;
+                break;
+            case SSwapConsts.CFG_NVP_COMPANIES:
+                value = manSwapServicesCompanies;
+                break;
+            case SSwapConsts.CFG_NVP_INSTANCE:
+                value = mnSwapServicesInstance;
+                break;
+            default:
+                // nothing
+        }
+        
+        return value;
     }
 
     @Override

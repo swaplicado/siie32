@@ -61,6 +61,7 @@ import erp.mfin.data.SFinMovementType;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
@@ -110,7 +111,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_CLO_COMMS_USR = 5;
     public static final int FIELD_USR = 6;
     public static final int LEN_SERIES = 25; // maximum length of number series
-    public static final int LEN_NUMBER = 32; // maximum length of number
+    public static final int LEN_NUMBER = SSwapConsts.LEN_UUID; // maximum length of number
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
@@ -208,6 +209,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkDpsNatureId;
     protected int mnFkCompanyBranchId;
     protected int mnFkFunctionalAreaId;
+    protected int mnFkFunctionalSubAreaId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
     protected int mnFkBizPartnerBranchAddressId;
@@ -1913,6 +1915,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkFunctionalAreaId(int n) { mnFkFunctionalAreaId = n; }
+    public void setFkFunctionalSubAreaId(int n) { mnFkFunctionalSubAreaId = n; }
     public void setFkBizPartnerId_r(int n) { mnFkBizPartnerId_r = n; }
     public void setFkBizPartnerBranchId(int n) { mnFkBizPartnerBranchId = n; }
     public void setFkBizPartnerBranchAddressId(int n) { mnFkBizPartnerBranchAddressId = n; }
@@ -2038,6 +2041,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkFunctionalAreaId() { return mnFkFunctionalAreaId; }
+    public int getFkFunctionalSubAreaId() { return mnFkFunctionalSubAreaId; }
     public int getFkBizPartnerId_r() { return mnFkBizPartnerId_r; }
     public int getFkBizPartnerBranchId() { return mnFkBizPartnerBranchId; }
     public int getFkBizPartnerBranchAddressId() { return mnFkBizPartnerBranchAddressId; }
@@ -2356,6 +2360,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkDpsNatureId = 0;
         mnFkCompanyBranchId = 0;
         mnFkFunctionalAreaId = 0;
+        mnFkFunctionalSubAreaId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
         mnFkBizPartnerBranchAddressId = 0;
@@ -2559,6 +2564,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkDpsNatureId = oResultSet.getInt("d.fid_dps_nat");
                 mnFkCompanyBranchId = oResultSet.getInt("d.fid_cob");
                 mnFkFunctionalAreaId = oResultSet.getInt("d.fid_func");
+                mnFkFunctionalSubAreaId = oResultSet.getInt("fid_func_sub");
                 mnFkBizPartnerId_r = oResultSet.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = oResultSet.getInt("d.fid_bpb");
                 mnFkBizPartnerBranchAddressId = oResultSet.getInt("d.fid_add");
@@ -2934,7 +2940,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -3006,6 +3012,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkDpsNatureId);
             oCallableStatement.setInt(nParam++, mnFkCompanyBranchId);
             oCallableStatement.setInt(nParam++, mnFkFunctionalAreaId);
+            oCallableStatement.setInt(nParam++, mnFkFunctionalSubAreaId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerId_r);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAddressId);

@@ -3,7 +3,8 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import erp.SClient;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
@@ -47,7 +48,7 @@ public abstract class SUserUtils {
         }
         else {
             // iterar sobre todas las empresas configuradas para SWAP Services:
-            for (int companyId : (int[]) ((SClient) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES)) {
+            for (int companyId : (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES)) {
                 if (user.hasAccessToModule(SDataConstants.MOD_PUR, companyId)) {
                     // si el usuario tiene acceso al módulo de compras, es Comprador:
                     roles.add(SSwapConsts.ROL_BUYER);
@@ -85,7 +86,7 @@ public abstract class SUserUtils {
         
         // revisar si el usuario es administrador o si tiene acceso universal:
         if (user.isAdministrator() || user.getIsUniversal()) {
-            int[] companies = (int[]) ((SClient) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES);
+            int[] companies = (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES);
             accesibleCompanies.addAll(Arrays.stream(companies).boxed().collect(Collectors.toList()));
         }
         else {
@@ -113,9 +114,6 @@ public abstract class SUserUtils {
      * @throws java.sql.SQLException
      */
     public static ArrayList<int[]> getUserAsignedFunctionalSubAreas(final SGuiSession session, int userId) throws SQLException {
-        SDataUser user = new SDataUser();
-        user.read(new int[] { userId }, session.getStatement()); // Carga los datos del usuario desde la base de datos
-        
         ArrayList<int[]> asignedFunctionalSubAreas = new ArrayList<>();
         
         HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
@@ -126,7 +124,7 @@ public abstract class SUserUtils {
             String sql = "SELECT ufs.id_func_sub "
                     + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs "
                     + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = ufs.id_func_sub "
-                    + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = ufs.fid_func "
+                    + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                     + "WHERE ufs.id_usr = " + userId + " AND NOT fs.b_del AND NOT f.b_del "
                     + "ORDER BY ufs.id_func_sub;";
 

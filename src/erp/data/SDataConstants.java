@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public abstract class SDataConstants {
 
@@ -141,6 +141,7 @@ public abstract class SDataConstants {
     public static final int USRX_QRY_FIN_REC = 202511;
     public static final int USRX_QRY_SAL_AGT = 202512;
     public static final int USRX_USR_FUNC = 202521;
+    public static final int USRX_USR_FUNC_SUB = 202522;
 
     public static final int LOCU_CTY = 203001;
     public static final int LOCU_STA = 203002;
@@ -166,19 +167,18 @@ public abstract class SDataConstants {
     public static final int BPSU_BP_ATT = 204014;
     public static final int BPSU_BP_BA = 204015;
     public static final int BPSU_BP_NTS = 204016;
+    public static final int BPSU_BP_UPD_LOG = 204081;
     public static final int BPSU_BPB = 204017;
     public static final int BPSU_BPB_NTS = 204018;
     public static final int BPSU_BPB_ADD = 204019;
     public static final int BPSU_BPB_ADD_NTS = 204020;
     public static final int BPSU_BPB_CON = 204021;
     public static final int BPSU_BANK_ACC = 204022;
+    public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_BANK_ACC_CARD = 204023;
     public static final int BPSU_BANK_ACC_NTS = 204024;
-    public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
-    public static final int BPSU_BP_DT = 204028;
-    public static final int BPSU_BP_DT_RE = 204029;
     public static final int BPSU_BP_ADDEE = 204031;
     public static final int BPSU_SCA_BP = 204091;
     public static final int BPSU_SCA_BP_MAP = 204092;    
@@ -202,7 +202,6 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_EMP_REL = 204571; // employee relatives
     public static final int BPSX_BP_INT_SUP = 204608; //international suppliers
     public static final int BPSX_BP_INT_CUS = 204609; //international customers
-    public static final int BPSX_BP_CUS_SUP = 204610;
 
     public static final int BPSX_BP_X_SUP_CUS = 204514;
     public static final int BPSX_BP_X_CDR_DBR = 204515;
@@ -243,6 +242,8 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_ATT_EMP = 204553;
     public static final int BPSX_BP_ATT_EMP_MFG = 204554;
     public static final int BPSX_BP_ATT_SAL_AGT = 204555;
+    
+    public static final int BPSX_BP_UPD = 204581;
     
     public static final int BPSX_SCA_BP_DET = 204701;
 

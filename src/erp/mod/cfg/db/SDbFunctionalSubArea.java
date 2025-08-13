@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbFunctionalSubArea extends SDbRegistryUser {
     
-    public static final String SEPARATOR = "/ ";
+    public static final String SEPARATOR = "/ "; // blank included!
 
     protected int mnPkFunctionalSubAreaId;
     protected String msCode;
@@ -185,7 +185,7 @@ public class SDbFunctionalSubArea extends SDbRegistryUser {
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
 

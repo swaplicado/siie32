@@ -12,6 +12,7 @@
 package erp.mtrn.form;
 
 import erp.data.SDataConstants;
+import erp.data.SDataReadComponentItems;
 import erp.lib.SLibConstants;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
@@ -20,15 +21,19 @@ import erp.lib.form.SFormValidation;
 import erp.mod.SModConsts;
 import erp.mtrn.data.SDataUserConfigurationTransaction;
 import erp.musr.data.SDataUserFunctionalArea;
+import erp.musr.data.SDataUserFunctionalSubArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Adrián Avilés
+ * @author Alfonso Flores, Adrián Avilés, Sergio Flores
  */
 public class SFormUserConfigurationTransaction extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -53,9 +58,9 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     private erp.lib.form.SFormField moFieldSalesDocLimit_n;
     private erp.lib.form.SFormField moFieldCapacityVolumeMinPercentage;
     private erp.lib.form.SFormField moFieldCapacityMassMinPercentage;
-    private java.util.Vector<erp.lib.form.SFormComponentItem> mvFunctionalsAreas;
-    private java.util.Vector<erp.lib.form.SFormComponentItem> mvUserFunctionalsAreas;
-    private java.util.Vector<erp.lib.form.SFormComponentItem> mvEmptyListItems;
+    
+    private java.util.Vector<erp.lib.form.SFormComponentItem> mvFuncAreaItems;
+    private java.util.HashMap<Integer, java.util.Vector<erp.lib.form.SFormComponentItem>> moFuncSubAreaItemsMap; // key = functional area ID; value = item array of its functional-subareas
 
     /** Creates new form SFormUserConfigurationTransaction */
     public SFormUserConfigurationTransaction(erp.client.SClientInterface client) {
@@ -76,11 +81,14 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jpUser = new javax.swing.JPanel();
         jlUser = new javax.swing.JLabel();
         jtfUser = new javax.swing.JTextField();
+        jlBizPartner = new javax.swing.JLabel();
+        jtfBizPartner = new javax.swing.JTextField();
+        jTabbedPane = new javax.swing.JTabbedPane();
+        jpSettingsTab = new javax.swing.JPanel();
+        jpSettings = new javax.swing.JPanel();
         jckIsPurchasesItemAllApplying = new javax.swing.JCheckBox();
         Dummy01 = new javax.swing.JLabel();
         jlPurchasesConLimit_n = new javax.swing.JLabel();
@@ -127,31 +135,40 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jPanel9 = new javax.swing.JPanel();
         jtfCapacityMassMinPer = new javax.swing.JTextField();
         jlDummy1 = new javax.swing.JLabel();
-        jPanel14 = new javax.swing.JPanel();
-        jPanel70 = new javax.swing.JPanel();
-        jPanel84 = new javax.swing.JPanel();
-        jPanel85 = new javax.swing.JPanel();
-        jlFunctionalAreasSystem = new javax.swing.JLabel();
-        jspFunctionalAreasSystem = new javax.swing.JScrollPane();
-        jltFunctionalAreasSystem = new javax.swing.JList<SFormComponentItem>();
-        jpUserFunctionalsAreas = new javax.swing.JPanel();
-        jlFunctionalAreasUser = new javax.swing.JLabel();
-        jspFunctionalAreasUser = new javax.swing.JScrollPane();
-        jltFunctionalAreasUser = new javax.swing.JList<SFormComponentItem>();
-        jPanel86 = new javax.swing.JPanel();
-        jPanel87 = new javax.swing.JPanel();
-        jPanel88 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jPanel91 = new javax.swing.JPanel();
-        jPanel89 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel90 = new javax.swing.JPanel();
-        jbTransferFunctionalArea = new javax.swing.JButton();
-        jbTransferAllFunctionalAreas = new javax.swing.JButton();
-        jbReturnFunctionalAreas = new javax.swing.JButton();
-        jbReturnAllFunctionalAreas = new javax.swing.JButton();
-        jPanel92 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jpFuncAreasTab = new javax.swing.JPanel();
+        jpFuncAreas = new javax.swing.JPanel();
+        jpFuncAreasAvailable = new javax.swing.JPanel();
+        jlFuncAreasAvailable = new javax.swing.JLabel();
+        jspFuncAreasAvailable = new javax.swing.JScrollPane();
+        jltFuncAreasAvailable = new javax.swing.JList<SFormComponentItem>();
+        jpFuncAreasSelected = new javax.swing.JPanel();
+        jlFuncAreasSelected = new javax.swing.JLabel();
+        jspFuncAreasSelected = new javax.swing.JScrollPane();
+        jltFuncAreasSelected = new javax.swing.JList<SFormComponentItem>();
+        jpFuncAreasCommands = new javax.swing.JPanel();
+        jpFunctionalsAreasCommandsN = new javax.swing.JPanel();
+        jlFunctionalAreaCommandDummy = new javax.swing.JLabel();
+        jbFunctionalAreaAdd = new javax.swing.JButton();
+        jbFunctionalAreaAddAll = new javax.swing.JButton();
+        jbFunctionalAreaRemove = new javax.swing.JButton();
+        jbFunctionalAreaRemoveAll = new javax.swing.JButton();
+        jpFuncSubAreas = new javax.swing.JPanel();
+        jpFuncSubAreasAvailable = new javax.swing.JPanel();
+        jlFuncSubAreasAvailable = new javax.swing.JLabel();
+        jspFuncSubAreasAvailable = new javax.swing.JScrollPane();
+        jltFuncSubAreasAvailable = new javax.swing.JList<SFormComponentItem>();
+        jpFuncSubAreasSelected = new javax.swing.JPanel();
+        jlFuncSubAreasSelected = new javax.swing.JLabel();
+        jspFuncSubAreasSelected = new javax.swing.JScrollPane();
+        jltFuncSubAreasSelected = new javax.swing.JList<SFormComponentItem>();
+        jpFuncSubAreasCommands = new javax.swing.JPanel();
+        jpFunctionalSubAreasCommandsN = new javax.swing.JPanel();
+        jlFunctionalSubAreaCommandDummy = new javax.swing.JLabel();
+        jbFunctionalSubAreaAdd = new javax.swing.JButton();
+        jbFunctionalSubAreaAddAll = new javax.swing.JButton();
+        jbFunctionalSubAreaRemove = new javax.swing.JButton();
+        jbFunctionalSubAreaRemoveAll = new javax.swing.JButton();
+        jpCommands = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -164,29 +181,46 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jpUser.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jPanel3.setLayout(new java.awt.GridLayout(14, 2, 0, 1));
-
-        jlUser.setText("Nombre del usuario:");
-        jPanel3.add(jlUser);
+        jlUser.setText("Usuario:");
+        jlUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpUser.add(jlUser);
 
         jtfUser.setEditable(false);
-        jtfUser.setText("USER");
+        jtfUser.setText("TEXT");
         jtfUser.setFocusable(false);
-        jPanel3.add(jtfUser);
+        jtfUser.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpUser.add(jtfUser);
+
+        jlBizPartner.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlBizPartner.setText("Empleado:");
+        jlBizPartner.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpUser.add(jlBizPartner);
+
+        jtfBizPartner.setEditable(false);
+        jtfBizPartner.setText("TEXT");
+        jtfBizPartner.setFocusable(false);
+        jtfBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpUser.add(jtfBizPartner);
+
+        getContentPane().add(jpUser, java.awt.BorderLayout.PAGE_START);
+
+        jpSettingsTab.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del usuario:"));
+        jpSettingsTab.setLayout(new java.awt.BorderLayout());
+
+        jpSettings.setLayout(new java.awt.GridLayout(14, 2, 0, 2));
 
         jckIsPurchasesItemAllApplying.setText("Puede comprar todos los ítem");
-        jPanel3.add(jckIsPurchasesItemAllApplying);
+        jpSettings.add(jckIsPurchasesItemAllApplying);
 
         Dummy01.setForeground(java.awt.SystemColor.textInactiveText);
         Dummy01.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        Dummy01.setText("(límite 0.00 = sin límite)");
-        jPanel3.add(Dummy01);
+        Dummy01.setText("(Límite 0.00 = sin límite)");
+        jpSettings.add(Dummy01);
 
         jlPurchasesConLimit_n.setText("Límite máx. autorizado contratos compras:");
-        jPanel3.add(jlPurchasesConLimit_n);
+        jpSettings.add(jlPurchasesConLimit_n);
 
         jPanel15.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -200,10 +234,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeyPurchasesCon.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel15.add(jtfCurrencyKeyPurchasesCon, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel15);
+        jpSettings.add(jPanel15);
 
         jlPurchasesOrderLimit_n.setText("Límite máx. autorizado pedidos compras:");
-        jPanel3.add(jlPurchasesOrderLimit_n);
+        jpSettings.add(jlPurchasesOrderLimit_n);
 
         jPanel4.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -217,10 +251,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeyPurchasesOrder.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel4.add(jtfCurrencyKeyPurchasesOrder, java.awt.BorderLayout.EAST);
 
-        jPanel3.add(jPanel4);
+        jpSettings.add(jPanel4);
 
         jlPurchasesOrderLimitMonthly_n.setText("Límite máx. mes autorizado pedidos compras:");
-        jPanel3.add(jlPurchasesOrderLimitMonthly_n);
+        jpSettings.add(jlPurchasesOrderLimitMonthly_n);
 
         jPanel12.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -234,10 +268,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeyPurchasesOrderLimitMonthly_n.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel12.add(jtfCurrencyKeyPurchasesOrderLimitMonthly_n, java.awt.BorderLayout.EAST);
 
-        jPanel3.add(jPanel12);
+        jpSettings.add(jPanel12);
 
         jlPurchasesDocLimit_n.setText("Límite máx. autorizado facturas compras:");
-        jPanel3.add(jlPurchasesDocLimit_n);
+        jpSettings.add(jlPurchasesDocLimit_n);
 
         jPanel5.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -251,18 +285,18 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeyPurchasesDoc.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel5.add(jtfCurrencyKeyPurchasesDoc, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel5);
+        jpSettings.add(jPanel5);
 
         jckIsSalesItemAllApplying.setText("Puede vender todos los ítem");
-        jPanel3.add(jckIsSalesItemAllApplying);
+        jpSettings.add(jckIsSalesItemAllApplying);
 
         Dummy02.setForeground(java.awt.SystemColor.textInactiveText);
         Dummy02.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        Dummy02.setText("(límite 0.00 = sin límite)");
-        jPanel3.add(Dummy02);
+        Dummy02.setText("(Límite 0.00 = sin límite)");
+        jpSettings.add(Dummy02);
 
         jlSalesConLimit_n.setText("Límite máx. autorizado contratos ventas:");
-        jPanel3.add(jlSalesConLimit_n);
+        jpSettings.add(jlSalesConLimit_n);
 
         jPanel16.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -276,10 +310,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeySalesCon.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel16.add(jtfCurrencyKeySalesCon, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel16);
+        jpSettings.add(jPanel16);
 
         jlSalesOrderLimit_n.setText("Límite máx. autorizado pedidos ventas:");
-        jPanel3.add(jlSalesOrderLimit_n);
+        jpSettings.add(jlSalesOrderLimit_n);
 
         jPanel6.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -293,10 +327,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeySalesOrder.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel6.add(jtfCurrencyKeySalesOrder, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel6);
+        jpSettings.add(jPanel6);
 
         jlSalesOrderLimitMonthly_n.setText("Límite máx. mensual autorizado pedidos ventas:");
-        jPanel3.add(jlSalesOrderLimitMonthly_n);
+        jpSettings.add(jlSalesOrderLimitMonthly_n);
 
         jPanel13.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -310,10 +344,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeySalesOrderLimitMonthly_n.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel13.add(jtfCurrencyKeySalesOrderLimitMonthly_n, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel13);
+        jpSettings.add(jPanel13);
 
         jlSalesDocLimit_n.setText("Límite máx. autorizado facturas ventas:");
-        jPanel3.add(jlSalesDocLimit_n);
+        jpSettings.add(jlSalesDocLimit_n);
 
         jPanel7.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -327,13 +361,13 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeySalesDoc.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel7.add(jtfCurrencyKeySalesDoc, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel7);
-        jPanel3.add(jPanel10);
-        jPanel3.add(jPanel11);
+        jpSettings.add(jPanel7);
+        jpSettings.add(jPanel10);
+        jpSettings.add(jPanel11);
 
         jlCapacityVolumeMinPer.setText("Capacidad mín. autorizada volumen embarques:");
         jlCapacityVolumeMinPer.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel3.add(jlCapacityVolumeMinPer);
+        jpSettings.add(jlCapacityVolumeMinPer);
 
         jPanel8.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -344,10 +378,10 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlDummy.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel8.add(jlDummy, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel8);
+        jpSettings.add(jPanel8);
 
         jlCapacityMassMinPer.setText("Capacidad mín. autorizada masa embarques:");
-        jPanel3.add(jlCapacityMassMinPer);
+        jpSettings.add(jlCapacityMassMinPer);
 
         jPanel9.setLayout(new java.awt.BorderLayout(2, 0));
 
@@ -358,124 +392,166 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlDummy1.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jlDummy1, java.awt.BorderLayout.LINE_END);
 
-        jPanel3.add(jPanel9);
+        jpSettings.add(jPanel9);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpSettingsTab.add(jpSettings, java.awt.BorderLayout.NORTH);
 
-        jTabbedPane.addTab("Límites de transacciones", jPanel2);
+        jTabbedPane.addTab("Límites de transacciones", jpSettingsTab);
 
-        jPanel14.setLayout(new java.awt.BorderLayout());
+        jpFuncAreasTab.setBorder(javax.swing.BorderFactory.createTitledBorder("Áreas funcionales del usuario:"));
+        jpFuncAreasTab.setLayout(new java.awt.BorderLayout());
 
-        jPanel70.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de acceso:"));
-        jPanel70.setLayout(new java.awt.BorderLayout());
+        jpFuncAreas.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jPanel84.setLayout(new java.awt.BorderLayout(5, 0));
+        jpFuncAreasAvailable.setPreferredSize(new java.awt.Dimension(325, 160));
+        jpFuncAreasAvailable.setLayout(new java.awt.BorderLayout());
 
-        jPanel85.setPreferredSize(new java.awt.Dimension(230, 200));
-        jPanel85.setLayout(new java.awt.BorderLayout());
+        jlFuncAreasAvailable.setText("Áreas funcionales disponibles:");
+        jlFuncAreasAvailable.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpFuncAreasAvailable.add(jlFuncAreasAvailable, java.awt.BorderLayout.PAGE_START);
 
-        jlFunctionalAreasSystem.setText("Áreas funcionales disponibles:");
-        jlFunctionalAreasSystem.setPreferredSize(new java.awt.Dimension(115, 23));
-        jPanel85.add(jlFunctionalAreasSystem, java.awt.BorderLayout.PAGE_START);
-
-        jltFunctionalAreasSystem.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltFuncAreasAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltFunctionalAreasSystemMouseClicked(evt);
+                jltFuncAreasAvailableMouseClicked(evt);
             }
         });
-        jspFunctionalAreasSystem.setViewportView(jltFunctionalAreasSystem);
+        jspFuncAreasAvailable.setViewportView(jltFuncAreasAvailable);
 
-        jPanel85.add(jspFunctionalAreasSystem, java.awt.BorderLayout.CENTER);
+        jpFuncAreasAvailable.add(jspFuncAreasAvailable, java.awt.BorderLayout.CENTER);
 
-        jPanel84.add(jPanel85, java.awt.BorderLayout.WEST);
+        jpFuncAreas.add(jpFuncAreasAvailable, java.awt.BorderLayout.WEST);
 
-        jpUserFunctionalsAreas.setPreferredSize(new java.awt.Dimension(280, 200));
-        jpUserFunctionalsAreas.setLayout(new java.awt.BorderLayout());
+        jpFuncAreasSelected.setPreferredSize(new java.awt.Dimension(325, 160));
+        jpFuncAreasSelected.setLayout(new java.awt.BorderLayout());
 
-        jlFunctionalAreasUser.setText("Áreas funcionales del usuario:");
-        jlFunctionalAreasUser.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpUserFunctionalsAreas.add(jlFunctionalAreasUser, java.awt.BorderLayout.PAGE_START);
+        jlFuncAreasSelected.setText("Áreas funcionales asignadas:");
+        jlFuncAreasSelected.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpFuncAreasSelected.add(jlFuncAreasSelected, java.awt.BorderLayout.PAGE_START);
 
-        jltFunctionalAreasUser.addMouseListener(new java.awt.event.MouseAdapter() {
+        jltFuncAreasSelected.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jltFunctionalAreasUserMouseClicked(evt);
+                jltFuncAreasSelectedMouseClicked(evt);
             }
         });
-        jspFunctionalAreasUser.setViewportView(jltFunctionalAreasUser);
+        jspFuncAreasSelected.setViewportView(jltFuncAreasSelected);
 
-        jpUserFunctionalsAreas.add(jspFunctionalAreasUser, java.awt.BorderLayout.CENTER);
+        jpFuncAreasSelected.add(jspFuncAreasSelected, java.awt.BorderLayout.CENTER);
 
-        jPanel84.add(jpUserFunctionalsAreas, java.awt.BorderLayout.EAST);
+        jpFuncAreas.add(jpFuncAreasSelected, java.awt.BorderLayout.EAST);
 
-        jPanel86.setPreferredSize(new java.awt.Dimension(200, 100));
-        jPanel86.setLayout(new java.awt.BorderLayout());
+        jpFuncAreasCommands.setPreferredSize(new java.awt.Dimension(200, 100));
+        jpFuncAreasCommands.setLayout(new java.awt.BorderLayout());
 
-        jPanel87.setPreferredSize(new java.awt.Dimension(100, 130));
-        jPanel87.setLayout(new java.awt.BorderLayout());
+        jpFunctionalsAreasCommandsN.setPreferredSize(new java.awt.Dimension(100, 130));
+        jpFunctionalsAreasCommandsN.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jpFunctionalsAreasCommandsN.add(jlFunctionalAreaCommandDummy);
 
-        jPanel88.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel88.add(jLabel5);
+        jbFunctionalAreaAdd.setText(">");
+        jbFunctionalAreaAdd.setToolTipText("Agregar");
+        jpFunctionalsAreasCommandsN.add(jbFunctionalAreaAdd);
 
-        jPanel87.add(jPanel88, java.awt.BorderLayout.NORTH);
+        jbFunctionalAreaAddAll.setText(">>");
+        jbFunctionalAreaAddAll.setToolTipText("Agregar todo");
+        jpFunctionalsAreasCommandsN.add(jbFunctionalAreaAddAll);
 
-        jPanel91.setLayout(new java.awt.BorderLayout());
+        jbFunctionalAreaRemove.setText("<");
+        jbFunctionalAreaRemove.setToolTipText("Quitar");
+        jpFunctionalsAreasCommandsN.add(jbFunctionalAreaRemove);
 
-        jPanel89.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel89.add(jLabel6);
+        jbFunctionalAreaRemoveAll.setText("<<");
+        jbFunctionalAreaRemoveAll.setToolTipText("Quitar todo");
+        jpFunctionalsAreasCommandsN.add(jbFunctionalAreaRemoveAll);
 
-        jPanel91.add(jPanel89, java.awt.BorderLayout.NORTH);
+        jpFuncAreasCommands.add(jpFunctionalsAreasCommandsN, java.awt.BorderLayout.NORTH);
 
-        jPanel90.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel90.setLayout(new java.awt.GridLayout(4, 1));
+        jpFuncAreas.add(jpFuncAreasCommands, java.awt.BorderLayout.CENTER);
 
-        jbTransferFunctionalArea.setText(">");
-        jbTransferFunctionalArea.setToolTipText("Agregar");
-        jPanel90.add(jbTransferFunctionalArea);
+        jpFuncAreasTab.add(jpFuncAreas, java.awt.BorderLayout.NORTH);
 
-        jbTransferAllFunctionalAreas.setText(">>");
-        jbTransferAllFunctionalAreas.setToolTipText("Agregar todos");
-        jPanel90.add(jbTransferAllFunctionalAreas);
+        jpFuncSubAreas.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jbReturnFunctionalAreas.setText("<");
-        jbReturnFunctionalAreas.setToolTipText("Remover");
-        jPanel90.add(jbReturnFunctionalAreas);
+        jpFuncSubAreasAvailable.setPreferredSize(new java.awt.Dimension(325, 160));
+        jpFuncSubAreasAvailable.setLayout(new java.awt.BorderLayout());
 
-        jbReturnAllFunctionalAreas.setText("<<");
-        jbReturnAllFunctionalAreas.setToolTipText("Remover todos");
-        jPanel90.add(jbReturnAllFunctionalAreas);
+        jlFuncSubAreasAvailable.setText("Subáreas funcionales disponibles:");
+        jlFuncSubAreasAvailable.setPreferredSize(new java.awt.Dimension(115, 23));
+        jpFuncSubAreasAvailable.add(jlFuncSubAreasAvailable, java.awt.BorderLayout.PAGE_START);
 
-        jPanel91.add(jPanel90, java.awt.BorderLayout.CENTER);
+        jltFuncSubAreasAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltFuncSubAreasAvailableMouseClicked(evt);
+            }
+        });
+        jspFuncSubAreasAvailable.setViewportView(jltFuncSubAreasAvailable);
 
-        jPanel87.add(jPanel91, java.awt.BorderLayout.CENTER);
+        jpFuncSubAreasAvailable.add(jspFuncSubAreasAvailable, java.awt.BorderLayout.CENTER);
 
-        jPanel86.add(jPanel87, java.awt.BorderLayout.NORTH);
+        jpFuncSubAreas.add(jpFuncSubAreasAvailable, java.awt.BorderLayout.WEST);
 
-        jPanel84.add(jPanel86, java.awt.BorderLayout.CENTER);
+        jpFuncSubAreasSelected.setPreferredSize(new java.awt.Dimension(325, 160));
+        jpFuncSubAreasSelected.setLayout(new java.awt.BorderLayout());
 
-        jPanel70.add(jPanel84, java.awt.BorderLayout.NORTH);
+        jlFuncSubAreasSelected.setText("Subáreas funcionales asignadas:");
+        jlFuncSubAreasSelected.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpFuncSubAreasSelected.add(jlFuncSubAreasSelected, java.awt.BorderLayout.PAGE_START);
 
-        jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jPanel70.add(jPanel92, java.awt.BorderLayout.CENTER);
+        jltFuncSubAreasSelected.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jltFuncSubAreasSelectedMouseClicked(evt);
+            }
+        });
+        jspFuncSubAreasSelected.setViewportView(jltFuncSubAreasSelected);
 
-        jPanel14.add(jPanel70, java.awt.BorderLayout.CENTER);
+        jpFuncSubAreasSelected.add(jspFuncSubAreasSelected, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane.addTab("Áreas funcionales", jPanel14);
+        jpFuncSubAreas.add(jpFuncSubAreasSelected, java.awt.BorderLayout.EAST);
+
+        jpFuncSubAreasCommands.setPreferredSize(new java.awt.Dimension(200, 100));
+        jpFuncSubAreasCommands.setLayout(new java.awt.BorderLayout());
+
+        jpFunctionalSubAreasCommandsN.setPreferredSize(new java.awt.Dimension(100, 130));
+        jpFunctionalSubAreasCommandsN.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jpFunctionalSubAreasCommandsN.add(jlFunctionalSubAreaCommandDummy);
+
+        jbFunctionalSubAreaAdd.setText(">");
+        jbFunctionalSubAreaAdd.setToolTipText("Agregar");
+        jpFunctionalSubAreasCommandsN.add(jbFunctionalSubAreaAdd);
+
+        jbFunctionalSubAreaAddAll.setText(">>");
+        jbFunctionalSubAreaAddAll.setToolTipText("Agregar todo");
+        jpFunctionalSubAreasCommandsN.add(jbFunctionalSubAreaAddAll);
+
+        jbFunctionalSubAreaRemove.setText("<");
+        jbFunctionalSubAreaRemove.setToolTipText("Quitar");
+        jpFunctionalSubAreasCommandsN.add(jbFunctionalSubAreaRemove);
+
+        jbFunctionalSubAreaRemoveAll.setText("<<");
+        jbFunctionalSubAreaRemoveAll.setToolTipText("Quitar todo");
+        jpFunctionalSubAreasCommandsN.add(jbFunctionalSubAreaRemoveAll);
+
+        jpFuncSubAreasCommands.add(jpFunctionalSubAreasCommandsN, java.awt.BorderLayout.NORTH);
+
+        jpFuncSubAreas.add(jpFuncSubAreasCommands, java.awt.BorderLayout.CENTER);
+
+        jpFuncAreasTab.add(jpFuncSubAreas, java.awt.BorderLayout.SOUTH);
+
+        jTabbedPane.addTab("Áreas funcionales", jpFuncAreasTab);
 
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpCommands.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpCommands.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jpCommands.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
+        jpCommands.add(jbCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(jpCommands, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(800, 500));
         setLocationRelativeTo(null);
@@ -485,20 +561,32 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jltFunctionalAreasSystemMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFunctionalAreasSystemMouseClicked
+    private void jltFuncAreasAvailableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFuncAreasAvailableMouseClicked
         if (evt.getClickCount() == 2) {
-            mouseClickedFunctionalsAreas();
+            mouseClickedFuncAreasAvailable();
         }
-    }//GEN-LAST:event_jltFunctionalAreasSystemMouseClicked
+    }//GEN-LAST:event_jltFuncAreasAvailableMouseClicked
 
-    private void jltFunctionalAreasUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFunctionalAreasUserMouseClicked
+    private void jltFuncAreasSelectedMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFuncAreasSelectedMouseClicked
         if (evt.getClickCount() == 2) {
-            mouseClickedUserFunctionalsAreas();
+            mouseClickedFuncAreasSelected();
         }
-    }//GEN-LAST:event_jltFunctionalAreasUserMouseClicked
+    }//GEN-LAST:event_jltFuncAreasSelectedMouseClicked
+
+    private void jltFuncSubAreasAvailableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFuncSubAreasAvailableMouseClicked
+        if (evt.getClickCount() == 2) {
+            mouseClickedFuncSubAreasAvailable();
+        }
+    }//GEN-LAST:event_jltFuncSubAreasAvailableMouseClicked
+
+    private void jltFuncSubAreasSelectedMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jltFuncSubAreasSelectedMouseClicked
+        if (evt.getClickCount() == 2) {
+            mouseClickedFuncSubAreasSelected();
+        }
+    }//GEN-LAST:event_jltFuncSubAreasSelectedMouseClicked
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldIsPurchasesItemAllApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsPurchasesItemAllApplying);
         moFieldPurchasesConLimit_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPurchasesConLimit_n, jlPurchasesConLimit_n);
@@ -538,14 +626,17 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         mvFields.add(moFieldCapacityVolumeMinPercentage);
         mvFields.add(moFieldCapacityMassMinPercentage);
 
-        jbTransferFunctionalArea.addActionListener(this);
-        jbTransferAllFunctionalAreas.addActionListener(this);
-        jbReturnFunctionalAreas.addActionListener(this);
-        jbReturnAllFunctionalAreas.addActionListener(this);
+        jbFunctionalAreaAdd.addActionListener(this);
+        jbFunctionalAreaAddAll.addActionListener(this);
+        jbFunctionalAreaRemove.addActionListener(this);
+        jbFunctionalAreaRemoveAll.addActionListener(this);
+        jbFunctionalSubAreaAdd.addActionListener(this);
+        jbFunctionalSubAreaAddAll.addActionListener(this);
+        jbFunctionalSubAreaRemove.addActionListener(this);
+        jbFunctionalSubAreaRemoveAll.addActionListener(this);
         
-        mvEmptyListItems = new Vector<SFormComponentItem>();
-        mvFunctionalsAreas = new Vector<SFormComponentItem>();
-        mvUserFunctionalsAreas = new Vector<SFormComponentItem>();
+        mvFuncAreaItems = null;
+        moFuncSubAreaItemsMap = null;
         
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -572,107 +663,152 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         }
     }
     
-    private void readerFunctionalAreasDataBase() {
-        mvFunctionalsAreas.clear();
-
-        SFormUtilities.populateList(miClient, jltFunctionalAreasSystem, SModConsts.CFGU_FUNC);
-
-        for (int j = 0; j < jltFunctionalAreasSystem.getModel().getSize(); j++) {
-            
-            mvFunctionalsAreas.add((SFormComponentItem) jltFunctionalAreasSystem.getModel().getElementAt(j));
-        }
-    }
-    
-    private void loadFunctionalAreasUserDataBase() {
-        SFormComponentItem item = null;
-        boolean isLast = false;
-        boolean found = false;
-        int indexFunctionalArea = 0;
+    /**
+     * Update given list by adding items whose primary key matches the given functional area ID.
+     */
+    private void addFuncSubAreasToList(final javax.swing.JList<SFormComponentItem> list, final int funcAreaId) {
+        Vector<SFormComponentItem> items = moFuncSubAreaItemsMap.get(funcAreaId);
         
-        for (SDataUserFunctionalArea functionalArea : moUserConfigurationTransaction.getUserFunctionalArea()) {
-            indexFunctionalArea = 0;
-            isLast = false;
-            
-            while (!isLast) {
-                jltFunctionalAreasSystem.setSelectedIndex(indexFunctionalArea);
-            
-                if (jltFunctionalAreasSystem.getSelectedIndex() != -1) {
-                    item = (SFormComponentItem) jltFunctionalAreasSystem.getModel().getElementAt(indexFunctionalArea);
-                }
-                else {
-                    isLast = true;
-                }
-                
-                found = false;
-                if (item != null) {
-                    if (SLibUtils.compareKeys((int[]) item.getPrimaryKey(), new int[] { functionalArea.getPkFunctionalAreaId() })) {
-                        SFormUtilities.addListItem(jltFunctionalAreasUser, item);
-                        SFormUtilities.removeListSelectedItem(jltFunctionalAreasSystem);
-                        found = true;
-                    }
-                }
-                indexFunctionalArea++;
-                
-                if (found || indexFunctionalArea == jltFunctionalAreasSystem.getModel().getSize()) {
-                    isLast = true;
-                }
+        if (items != null && !items.isEmpty()) {
+            int index = list.getSelectedIndex(); // attent to preserve current selection
+            SFormUtilities.addListItems(list, items);
+
+            int size = list.getModel().getSize();
+            if (size > 0) {
+                list.setSelectedIndex(index != -1 ? index : size - 1);
             }
         }
     }
     
-    private void populateListFunctionalAreas() {
-        readerFunctionalAreasDataBase();
+    /**
+     * Update given list by removing items whose foreign key matches the given functional area ID.
+     */
+    private void removeFuncSubAreasFromList(final javax.swing.JList<SFormComponentItem> list, final int funcAreaId) {
+        Vector<SFormComponentItem> currentItems = SFormUtilities.getListItems(list);
+        Vector<SFormComponentItem> elegibleItems = new Vector<>();
         
-        jltFunctionalAreasSystem.setListData(mvEmptyListItems);
+        for (SFormComponentItem item : currentItems) {
+            if (((int[]) item.getForeignKey())[0] == funcAreaId) {
+                elegibleItems.add(item);
+            }
+        }
         
-        SFormUtilities.populateList(miClient, jltFunctionalAreasSystem, SModConsts.CFGU_FUNC);
+        if (!elegibleItems.isEmpty()) {
+            for (SFormComponentItem item : elegibleItems) {
+                currentItems.remove(item);
+            }
+            
+            list.setListData(currentItems);
+            list.setSelectedIndex(0);
+        }
     }
-
-    private void actionTransferFunctionalAreas() {
-         SFormComponentItem item = null;
-
-         if (jltFunctionalAreasSystem.getSelectedIndex() != -1) {
-             item = SFormUtilities.removeListSelectedItem(jltFunctionalAreasSystem);
-             
-             SFormUtilities.addListItem(jltFunctionalAreasUser, item);
-             
-             if (jltFunctionalAreasSystem.getModel().getSize() >= 0) {
-                 jltFunctionalAreasSystem.setSelectedIndex(0);
-             }
-         }
-    }
-
-    private void actionTransferAllFunctionalAreas() {
-        int from = 0;
-        int rows = jltFunctionalAreasSystem.getModel().getSize();
-
-        for (int row = 0; row < rows; row++) {
-            jltFunctionalAreasSystem.setSelectedIndex(from);
-            actionTransferFunctionalAreas();
+    
+    private void actionFuncAreaAdd() {
+        int index;
+        if ((index = jltFuncAreasAvailable.getSelectedIndex()) != -1) {
+            // move current available item to list of selected items:
+            SFormComponentItem item = SFormUtilities.removeListSelectedItem(jltFuncAreasAvailable);
+            SFormUtilities.addListItem(jltFuncAreasSelected, item);
+            
+            // select proper items on both lists:
+            int size;
+            if ((size = jltFuncAreasAvailable.getModel().getSize()) > 0) {
+                jltFuncAreasAvailable.setSelectedIndex(index < size ? index : size - 1);
+            }
+            jltFuncAreasSelected.setSelectedIndex(jltFuncAreasSelected.getModel().getSize() - 1);
+            
+            // add related functional sub-areas as well:
+            int funcAreaId = ((int[]) item.getPrimaryKey())[0];
+            addFuncSubAreasToList(jltFuncSubAreasAvailable, funcAreaId);
         }
     }
 
-    private void actionReturnFunctionalAreas() {
-         SFormComponentItem item = null;
-         
-        if (jltFunctionalAreasUser.getSelectedIndex() != -1) {
-            item = SFormUtilities.removeListSelectedItem(jltFunctionalAreasUser);
-             
-             SFormUtilities.addListItem(jltFunctionalAreasSystem, item);
-             
-             if (jltFunctionalAreasUser.getModel().getSize() >= 0) {
-                 jltFunctionalAreasUser.setSelectedIndex(0);
-             }
+    private void actionFuncAreaAddAll() {
+        int items = jltFuncAreasAvailable.getModel().getSize();
+        
+        for (int i = 0; i < items; i++) {
+            jltFuncAreasAvailable.setSelectedIndex(0);
+            actionFuncAreaAdd(); // add all items, one at a time
         }
     }
 
-    private void actionReturnAllFunctionalAreas() {
-        int from = 0;
-        int rows = jltFunctionalAreasUser.getModel().getSize();
+    private void actionFuncAreaRemove() {
+        int index;
+        if ((index = jltFuncAreasSelected.getSelectedIndex()) != -1) {
+            // move current selected item to list of available items:
+            SFormComponentItem item = SFormUtilities.removeListSelectedItem(jltFuncAreasSelected);
+            SFormUtilities.addListItem(jltFuncAreasAvailable, item);
+            
+            // select proper items on both lists:
+            int size;
+            if ((size = jltFuncAreasSelected.getModel().getSize()) > 0) {
+                jltFuncAreasSelected.setSelectedIndex(index < size ? index : size - 1);
+            }
+            jltFuncAreasAvailable.setSelectedIndex(jltFuncAreasAvailable.getModel().getSize() - 1);
+            
+            // remove related functional sub-areas as well:
+            int funcAreaId = ((int[]) item.getPrimaryKey())[0];
+            removeFuncSubAreasFromList(jltFuncSubAreasAvailable, funcAreaId);
+            removeFuncSubAreasFromList(jltFuncSubAreasSelected, funcAreaId);
+        }
+    }
 
-        for (int row = 0; row < rows; row++) {
-            jltFunctionalAreasUser.setSelectedIndex(from);
-            actionReturnFunctionalAreas();
+    private void actionFuncAreaRemoveAll() {
+        int items = jltFuncAreasSelected.getModel().getSize();
+        
+        for (int i = 0; i < items; i++) {
+            jltFuncAreasSelected.setSelectedIndex(0);
+            actionFuncAreaRemove(); // remove all items, one at a time
+        }
+    }
+
+    private void actionFuncSubAreaAdd() {
+        int index;
+        if ((index = jltFuncSubAreasAvailable.getSelectedIndex()) != -1) {
+            // move current available item to list of selected items:
+            SFormComponentItem item = SFormUtilities.removeListSelectedItem(jltFuncSubAreasAvailable);
+            SFormUtilities.addListItem(jltFuncSubAreasSelected, item);
+            
+            // select proper items on both lists:
+            int size;
+            if ((size = jltFuncSubAreasAvailable.getModel().getSize()) > 0) {
+                jltFuncSubAreasAvailable.setSelectedIndex(index < size ? index : size - 1);
+            }
+            jltFuncSubAreasSelected.setSelectedIndex(jltFuncSubAreasSelected.getModel().getSize() - 1);
+        }
+    }
+
+    private void actionFuncSubAreaAddAll() {
+        int items = jltFuncSubAreasAvailable.getModel().getSize();
+        
+        for (int i = 0; i < items; i++) {
+            jltFuncSubAreasAvailable.setSelectedIndex(0);
+            actionFuncSubAreaAdd(); // add all items, one at a time
+        }
+    }
+
+    private void actionFuncSubAreaRemove() {
+        int index;
+        if ((index = jltFuncSubAreasSelected.getSelectedIndex()) != -1) {
+            // move current selected item to list of available items:
+            SFormComponentItem item = SFormUtilities.removeListSelectedItem(jltFuncSubAreasSelected);
+            SFormUtilities.addListItem(jltFuncSubAreasAvailable, item);
+            
+            // select proper items on both lists:
+            int size;
+            if ((size = jltFuncSubAreasSelected.getModel().getSize()) > 0) {
+                jltFuncSubAreasSelected.setSelectedIndex(index < size ? index : size - 1);
+            }
+            jltFuncSubAreasAvailable.setSelectedIndex(jltFuncSubAreasAvailable.getModel().getSize() - 1);
+        }
+    }
+
+    private void actionFuncSubAreaRemoveAll() {
+        int items = jltFuncSubAreasSelected.getModel().getSize();
+        
+        for (int i = 0; i < items; i++) {
+            jltFuncSubAreasSelected.setSelectedIndex(0);
+            actionFuncSubAreaRemove(); // remove all items, one at a time
         }
     }
 
@@ -698,60 +834,61 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         setVisible(false);
     }
 
-    private void mouseClickedFunctionalsAreas() {
-        actionTransferFunctionalAreas();
+    private void mouseClickedFuncAreasAvailable() {
+        actionFuncAreaAdd();
     }
 
-    private void mouseClickedUserFunctionalsAreas() {
-        actionReturnFunctionalAreas();
+    private void mouseClickedFuncAreasSelected() {
+        actionFuncAreaRemove();
+    }
+
+    private void mouseClickedFuncSubAreasAvailable() {
+        actionFuncSubAreaAdd();
+    }
+
+    private void mouseClickedFuncSubAreasSelected() {
+        actionFuncSubAreaRemove();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Dummy01;
     private javax.swing.JLabel Dummy02;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel70;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel84;
-    private javax.swing.JPanel jPanel85;
-    private javax.swing.JPanel jPanel86;
-    private javax.swing.JPanel jPanel87;
-    private javax.swing.JPanel jPanel88;
-    private javax.swing.JPanel jPanel89;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JPanel jPanel90;
-    private javax.swing.JPanel jPanel91;
-    private javax.swing.JPanel jPanel92;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbFunctionalAreaAdd;
+    private javax.swing.JButton jbFunctionalAreaAddAll;
+    private javax.swing.JButton jbFunctionalAreaRemove;
+    private javax.swing.JButton jbFunctionalAreaRemoveAll;
+    private javax.swing.JButton jbFunctionalSubAreaAdd;
+    private javax.swing.JButton jbFunctionalSubAreaAddAll;
+    private javax.swing.JButton jbFunctionalSubAreaRemove;
+    private javax.swing.JButton jbFunctionalSubAreaRemoveAll;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbReturnAllFunctionalAreas;
-    private javax.swing.JButton jbReturnFunctionalAreas;
-    private javax.swing.JButton jbTransferAllFunctionalAreas;
-    private javax.swing.JButton jbTransferFunctionalArea;
     private javax.swing.JCheckBox jckIsPurchasesItemAllApplying;
     private javax.swing.JCheckBox jckIsSalesItemAllApplying;
+    private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlCapacityMassMinPer;
     private javax.swing.JLabel jlCapacityVolumeMinPer;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlDummy1;
-    private javax.swing.JLabel jlFunctionalAreasSystem;
-    private javax.swing.JLabel jlFunctionalAreasUser;
+    private javax.swing.JLabel jlFuncAreasAvailable;
+    private javax.swing.JLabel jlFuncAreasSelected;
+    private javax.swing.JLabel jlFuncSubAreasAvailable;
+    private javax.swing.JLabel jlFuncSubAreasSelected;
+    private javax.swing.JLabel jlFunctionalAreaCommandDummy;
+    private javax.swing.JLabel jlFunctionalSubAreaCommandDummy;
     private javax.swing.JLabel jlPurchasesConLimit_n;
     private javax.swing.JLabel jlPurchasesDocLimit_n;
     private javax.swing.JLabel jlPurchasesOrderLimitMonthly_n;
@@ -761,11 +898,30 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
     private javax.swing.JLabel jlSalesOrderLimitMonthly_n;
     private javax.swing.JLabel jlSalesOrderLimit_n;
     private javax.swing.JLabel jlUser;
-    private javax.swing.JList<SFormComponentItem> jltFunctionalAreasSystem;
-    private javax.swing.JList<SFormComponentItem> jltFunctionalAreasUser;
-    private javax.swing.JPanel jpUserFunctionalsAreas;
-    private javax.swing.JScrollPane jspFunctionalAreasSystem;
-    private javax.swing.JScrollPane jspFunctionalAreasUser;
+    private javax.swing.JList<SFormComponentItem> jltFuncAreasAvailable;
+    private javax.swing.JList<SFormComponentItem> jltFuncAreasSelected;
+    private javax.swing.JList<SFormComponentItem> jltFuncSubAreasAvailable;
+    private javax.swing.JList<SFormComponentItem> jltFuncSubAreasSelected;
+    private javax.swing.JPanel jpCommands;
+    private javax.swing.JPanel jpFuncAreas;
+    private javax.swing.JPanel jpFuncAreasAvailable;
+    private javax.swing.JPanel jpFuncAreasCommands;
+    private javax.swing.JPanel jpFuncAreasSelected;
+    private javax.swing.JPanel jpFuncAreasTab;
+    private javax.swing.JPanel jpFuncSubAreas;
+    private javax.swing.JPanel jpFuncSubAreasAvailable;
+    private javax.swing.JPanel jpFuncSubAreasCommands;
+    private javax.swing.JPanel jpFuncSubAreasSelected;
+    private javax.swing.JPanel jpFunctionalSubAreasCommandsN;
+    private javax.swing.JPanel jpFunctionalsAreasCommandsN;
+    private javax.swing.JPanel jpSettings;
+    private javax.swing.JPanel jpSettingsTab;
+    private javax.swing.JPanel jpUser;
+    private javax.swing.JScrollPane jspFuncAreasAvailable;
+    private javax.swing.JScrollPane jspFuncAreasSelected;
+    private javax.swing.JScrollPane jspFuncSubAreasAvailable;
+    private javax.swing.JScrollPane jspFuncSubAreasSelected;
+    private javax.swing.JTextField jtfBizPartner;
     private javax.swing.JTextField jtfCapacityMassMinPer;
     private javax.swing.JTextField jtfCapacityVolumeMinPer;
     private javax.swing.JTextField jtfCurrencyKeyPurchasesCon;
@@ -805,6 +961,9 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+        
+        jtfUser.setText("");
+        jtfBizPartner.setText("");
 
         jtfCurrencyKeyPurchasesCon.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeyPurchasesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
@@ -814,12 +973,38 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jtfCurrencyKeySalesOrder.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesOrderLimitMonthly_n.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
         jtfCurrencyKeySalesDoc.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-        jltFunctionalAreasUser.setListData(mvEmptyListItems);
+        
+        jltFuncAreasAvailable.setListData(new SFormComponentItem[] {});
+        jltFuncAreasSelected.setListData(new SFormComponentItem[] {});
+        jltFuncSubAreasAvailable.setListData(new SFormComponentItem[] {});
+        jltFuncSubAreasSelected.setListData(new SFormComponentItem[] {});
     }
 
     @Override
     public void formRefreshCatalogues() {
-        populateListFunctionalAreas();
+        // populate available functional areas:
+        
+        mvFuncAreaItems = SDataReadComponentItems.getComponentItemsForList(SModConsts.CFGU_FUNC, miClient.getSession().getStatement(), null, null);
+        
+        jltFuncAreasAvailable.setListData(mvFuncAreaItems);
+        
+        // prepare map of functional sub-areas:
+        
+        moFuncSubAreaItemsMap = new HashMap<>();
+        Vector<erp.lib.form.SFormComponentItem> funcSubAreaItems = SDataReadComponentItems.getComponentItemsForList(SModConsts.CFGU_FUNC_SUB, miClient.getSession().getStatement(), null, null);
+        
+        for (SFormComponentItem funcAreaItem : mvFuncAreaItems) {
+            int funcAreaId = ((int[]) funcAreaItem.getPrimaryKey())[0];
+            Vector<SFormComponentItem> items = new Vector<>();
+            
+            for (SFormComponentItem funcSubAreaItem : funcSubAreaItems) {
+                if (((int[]) funcSubAreaItem.getForeignKey())[0] == funcAreaId) {
+                    items.add(funcSubAreaItem);
+                }
+            }
+            
+            moFuncSubAreaItemsMap.put(funcAreaId, items);
+        }
     }
 
     @Override
@@ -836,17 +1021,36 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         
         if (!validation.getIsError()) {
             if (moFieldPurchasesOrderLimitMonthly_n.getDouble() > 0 && moFieldPurchasesOrderLimitMonthly_n.getDouble() < moFieldPurchasesOrderLimit_n.getDouble()) {
-                validation.setIsError(true);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPurchasesOrderLimitMonthly_n.getText() + "'.");
                 validation.setComponent(jtfPurchasesOrderLimitMonthly_n);
                 jTabbedPane.setSelectedIndex(0);
             }
-            
-            if (!validation.getIsError() && moFieldSalesOrderLimitMonthly_n.getDouble() > 0 && moFieldSalesOrderLimitMonthly_n.getDouble() < moFieldSalesOrderLimit_n.getDouble()) {
-                validation.setIsError(true);
+            else if (!validation.getIsError() && moFieldSalesOrderLimitMonthly_n.getDouble() > 0 && moFieldSalesOrderLimitMonthly_n.getDouble() < moFieldSalesOrderLimit_n.getDouble()) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlSalesOrderLimitMonthly_n.getText() + "'.");
                 validation.setComponent(jtfSalesOrderLimitMonthly_n);
                 jTabbedPane.setSelectedIndex(0);
+            }
+            else {
+                for (int i = 0; i < jltFuncAreasSelected.getModel().getSize(); i++) {
+                    boolean found = false;
+                    SFormComponentItem funcAreaItem = (SFormComponentItem) jltFuncAreasSelected.getModel().getElementAt(i);
+                    int funcAreaId = ((int[]) funcAreaItem.getPrimaryKey())[0];
+                    
+                    for (int j = 0; j < jltFuncSubAreasSelected.getModel().getSize(); j++) {
+                        SFormComponentItem funcSubAreaItem = (SFormComponentItem) jltFuncSubAreasSelected.getModel().getElementAt(j);
+                        if (((int[]) funcSubAreaItem.getForeignKey())[0] == funcAreaId) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        validation.setMessage("No se han asignado subáreas funcionales del área funcional '" + funcAreaItem.getItem() + "'.");
+                        validation.setComponent(jltFuncSubAreasAvailable);
+                        jTabbedPane.setSelectedIndex(1);
+                        break;
+                    }
+                }
             }
         }
 
@@ -878,6 +1082,11 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         moUserConfigurationTransaction = (SDataUserConfigurationTransaction) registry;
 
         jtfUser.setText(moUserConfigurationTransaction.getDbmsUser());
+        jtfUser.setCaretPosition(0);
+        
+        jtfBizPartner.setText(moUserConfigurationTransaction.getDbmsBizPartner());
+        jtfBizPartner.setCaretPosition(0);
+        
         moFieldIsPurchasesItemAllApplying.setFieldValue(moUserConfigurationTransaction.getIsPurchasesItemAllApplying());
         moFieldPurchasesConLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesContractLimit_n());
         moFieldPurchasesOrderLimit_n.setFieldValue(moUserConfigurationTransaction.getPurchasesOrderLimit_n());
@@ -891,13 +1100,78 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         moFieldCapacityVolumeMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityVolumeMinPercentage());
         moFieldCapacityMassMinPercentage.setFieldValue(moUserConfigurationTransaction.getCapacityMassMinPercentage());
         
-        loadFunctionalAreasUserDataBase();
+        // process assigned functional areas:
+        
+        HashMap<Integer, SFormComponentItem> funcAreaAvailableItemsMap = new HashMap<>(); // key = functional area ID; value = corresponding item
+        Vector<SFormComponentItem> funcAreaSelectedItems = new Vector<>();
+        
+        for (SFormComponentItem item : mvFuncAreaItems) {
+            funcAreaAvailableItemsMap.put(((int[]) item.getPrimaryKey())[0], item);
+        }
+        
+        for (SDataUserFunctionalArea funcArea : moUserConfigurationTransaction.getUserFunctionalAreas()) {
+            SFormComponentItem item = funcAreaAvailableItemsMap.remove(funcArea.getPkFunctionalAreaId());
+            if (item != null) {
+                funcAreaSelectedItems.add(item);
+            }
+        }
+        
+        List<SFormComponentItem> funcAreaAvailableItemsList = new ArrayList<>(funcAreaAvailableItemsMap.values());
+        Collections.sort(funcAreaAvailableItemsList);
+        
+        jltFuncAreasAvailable.setListData(new Vector<>(funcAreaAvailableItemsList));
+        if (jltFuncAreasAvailable.getModel().getSize() > 0) {
+            jltFuncAreasAvailable.setSelectedIndex(0);
+        }
+        
+        List<SFormComponentItem> funcAreaSelectedItemsList = new ArrayList<>(funcAreaSelectedItems);
+        Collections.sort(funcAreaSelectedItemsList);
+        
+        jltFuncAreasSelected.setListData(new Vector<>(funcAreaSelectedItemsList));
+        if (jltFuncAreasSelected.getModel().getSize() > 0) {
+            jltFuncAreasSelected.setSelectedIndex(0);
+        }
+        
+        // process assigned functional subareas:
+        
+        HashMap<Integer, SFormComponentItem> funcSubAreaAvailableItemsMap = new HashMap<>(); // key = functional sub-area ID; value = corresponding item
+        Vector<SFormComponentItem> funcSubAreaSelectedItems = new Vector<>();
+        
+        for (SDataUserFunctionalArea funcSubArea : moUserConfigurationTransaction.getUserFunctionalAreas()) {
+            Vector<SFormComponentItem> items = moFuncSubAreaItemsMap.get(funcSubArea.getPkFunctionalAreaId());
+            if (items != null) {
+                for (SFormComponentItem item : items) {
+                    funcSubAreaAvailableItemsMap.put(((int[]) item.getPrimaryKey())[0], item);
+                }
+            }
+        }
+        
+        for (SDataUserFunctionalSubArea funcSubArea : moUserConfigurationTransaction.getUserFunctionalSubAreas()) {
+            SFormComponentItem item = funcSubAreaAvailableItemsMap.remove(funcSubArea.getPkFunctionalSubAreaId());
+            if (item != null) {
+                funcSubAreaSelectedItems.add(item);
+            }
+        }
+
+        List<SFormComponentItem> funcSubAreaAvailableItemsList = new ArrayList<>(funcSubAreaAvailableItemsMap.values());
+        Collections.sort(funcSubAreaAvailableItemsList);
+        
+        jltFuncSubAreasAvailable.setListData(new Vector<>(funcSubAreaAvailableItemsList));
+        if (jltFuncSubAreasAvailable.getModel().getSize() > 0) {
+            jltFuncSubAreasAvailable.setSelectedIndex(0);
+        }
+        
+        List<SFormComponentItem> funcSubSelectedItemsList = new ArrayList<>(funcSubAreaSelectedItems);
+        Collections.sort(funcSubSelectedItemsList);
+        
+        jltFuncSubAreasSelected.setListData(new Vector<>(funcSubSelectedItemsList));
+        if (jltFuncSubAreasSelected.getModel().getSize() > 0) {
+            jltFuncSubAreasSelected.setSelectedIndex(0);
+        }
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataUserFunctionalArea functionalArea = null;
-        
         if (moUserConfigurationTransaction == null) {
             moUserConfigurationTransaction = new SDataUserConfigurationTransaction();
             moUserConfigurationTransaction.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -919,14 +1193,22 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         moUserConfigurationTransaction.setCapacityVolumeMinPercentage(moFieldCapacityVolumeMinPercentage.getDouble());
         moUserConfigurationTransaction.setCapacityMassMinPercentage(moFieldCapacityMassMinPercentage.getDouble());
         
-        // Save functional areas:
+        // get functional areas:
         
-        moUserConfigurationTransaction.getUserFunctionalArea().clear();
-        for (int j = 0; j < jltFunctionalAreasUser.getModel().getSize(); j++) {
-            functionalArea = new SDataUserFunctionalArea();
-            
-            functionalArea.setPkFunctionalAreaId(((int[]) ((SFormComponentItem) jltFunctionalAreasUser.getModel().getElementAt(j)).getPrimaryKey())[0]);
-            moUserConfigurationTransaction.getUserFunctionalArea().add(functionalArea);
+        moUserConfigurationTransaction.getUserFunctionalAreas().clear();
+        for (int i = 0; i < jltFuncAreasSelected.getModel().getSize(); i++) {
+            SDataUserFunctionalArea funcArea = new SDataUserFunctionalArea();
+            funcArea.setPkFunctionalAreaId(((int[]) ((SFormComponentItem) jltFuncAreasSelected.getModel().getElementAt(i)).getPrimaryKey())[0]);
+            moUserConfigurationTransaction.getUserFunctionalAreas().add(funcArea);
+        }
+
+        // get functional sub-areas:
+        
+        moUserConfigurationTransaction.getUserFunctionalSubAreas().clear();
+        for (int i = 0; i < jltFuncSubAreasSelected.getModel().getSize(); i++) {
+            SDataUserFunctionalSubArea funcSubArea = new SDataUserFunctionalSubArea();
+            funcSubArea.setPkFunctionalSubAreaId(((int[]) ((SFormComponentItem) jltFuncSubAreasSelected.getModel().getElementAt(i)).getPrimaryKey())[0]);
+            moUserConfigurationTransaction.getUserFunctionalSubAreas().add(funcSubArea);
         }
 
         return moUserConfigurationTransaction;
@@ -958,17 +1240,29 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbTransferFunctionalArea) {
-                actionTransferFunctionalAreas();
+            else if (button == jbFunctionalAreaAdd) {
+                actionFuncAreaAdd();
             }
-            else if (button == jbTransferAllFunctionalAreas) {
-                actionTransferAllFunctionalAreas();
+            else if (button == jbFunctionalAreaAddAll) {
+                actionFuncAreaAddAll();
             }
-            else if (button == jbReturnFunctionalAreas) {
-                actionReturnFunctionalAreas();
+            else if (button == jbFunctionalAreaRemove) {
+                actionFuncAreaRemove();
             }
-            else if (button == jbReturnAllFunctionalAreas) {
-                actionReturnAllFunctionalAreas();
+            else if (button == jbFunctionalAreaRemoveAll) {
+                actionFuncAreaRemoveAll();
+            }
+            else if (button == jbFunctionalSubAreaAdd) {
+                actionFuncSubAreaAdd();
+            }
+            else if (button == jbFunctionalSubAreaAddAll) {
+                actionFuncSubAreaAddAll();
+            }
+            else if (button == jbFunctionalSubAreaRemove) {
+                actionFuncSubAreaRemove();
+            }
+            else if (button == jbFunctionalSubAreaRemoveAll) {
+                actionFuncSubAreaRemoveAll();
             }
         }
     }

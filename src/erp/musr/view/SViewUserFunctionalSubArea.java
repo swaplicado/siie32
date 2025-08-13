@@ -18,12 +18,12 @@ import sa.gui.util.SUtilConsts;
  *
  * @author Sergio Flores
  */
-public class SViewUserFunctionalArea extends erp.lib.table.STableTab {
+public class SViewUserFunctionalSubArea extends erp.lib.table.STableTab {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
 
-    public SViewUserFunctionalArea(erp.client.SClientInterface client, java.lang.String tabTitle) {
-        super(client, tabTitle, SDataConstants.USRX_USR_FUNC);
+    public SViewUserFunctionalSubArea(erp.client.SClientInterface client, java.lang.String tabTitle) {
+        super(client, tabTitle, SDataConstants.USRX_USR_FUNC_SUB);
         initComponents();
     }
 
@@ -39,7 +39,7 @@ public class SViewUserFunctionalArea extends erp.lib.table.STableTab {
         //jbDelete.setEnabled(false);
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[6];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[9];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -51,9 +51,12 @@ public class SViewUserFunctionalArea extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.usr", "Usuario", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_act", "Cuenta activa", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "u.b_del", "Usuario eliminado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f.name", "Nombre área funcional", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f.code", "Código área funcional", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f.name", "Nombre área funcional", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "f.b_del", "Área funcional eliminada", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fs.name", "Nombre subárea funcional", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fs.code", "Código subárea funcional", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "fs.b_del", "Subárea funcional eliminada", STableConstants.WIDTH_BOOLEAN);
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -106,15 +109,17 @@ public class SViewUserFunctionalArea extends erp.lib.table.STableTab {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT u.b_del ";
             }
         }
-        
+
         sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "u.id_usr > " + SUtilConsts.USR_NA_ID + " ";
 
         msSql = "SELECT u.id_usr, u.usr, u.b_act, u.b_del, " +
-                "f.id_func, f.name, f.code, f.b_del " +
+                "f.id_func, f.name, f.code, f.b_del, " +
+                "fs.id_func_sub, fs.name, fs.code, fs.b_del " +
                 "FROM erp.usru_usr AS u " +
-                "LEFT OUTER JOIN usr_usr_func AS uf ON uf.id_usr = u.id_usr " +
-                "LEFT OUTER JOIN cfgu_func AS f ON f.id_func = uf.id_func " +
+                "LEFT OUTER JOIN usr_usr_func_sub AS ufs ON ufs.id_usr = u.id_usr " +
+                "LEFT OUTER JOIN cfgu_func_sub AS fs ON fs.id_func_sub = ufs.id_func_sub " +
+                "LEFT OUTER JOIN cfgu_func AS f ON f.id_func = fs.fk_func " +
                 (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY u.usr, u.id_usr, f.name, f.code, f.id_func ";
+                "ORDER BY u.usr, u.id_usr, f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub ";
     }
 }

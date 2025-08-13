@@ -8,7 +8,6 @@ package erp.musr.form;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadRegistries;
-import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormComponentItem;
@@ -36,7 +35,6 @@ import erp.server.SServerRequest;
 import erp.siieapp.SUserExportUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
@@ -45,8 +43,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
 import org.json.simple.parser.ParseException;
 import sa.lib.SLibMethod;
 import sa.lib.gui.SGuiClient;
@@ -394,7 +390,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel81.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartner.setText("Empleado usuario:");
+        jlBizPartner.setText("Empleado:");
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel81.add(jlBizPartner);
 
@@ -403,7 +399,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel81.add(jcbFkBizPartnerId);
 
         jbFkBizPartnerId.setText("jButton1");
-        jbFkBizPartnerId.setToolTipText("Seleccionar asociado de negocios");
+        jbFkBizPartnerId.setToolTipText("Seleccionar empleado...");
         jbFkBizPartnerId.setFocusable(false);
         jbFkBizPartnerId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel81.add(jbFkBizPartnerId);

@@ -6,21 +6,21 @@
 package erp.mod.cfg.swap.utils;
 
 /**
- * Clase contenedora para exportar datos masivos en formato JSON.
- * Utilizada como estructura principal para enviar múltiples usuarios junto con información de instancias de trabajo.
+ * Clase contenedora para exportar datos masivos de referencias de transacciones en formato JSON.
+ * Utilizada como estructura principal para enviar múltiples referencias de transacciones y las instancias de SWAP Services.
  *
  * @author Sergio Flores
  */
 public class SRequestReferencesBody {
     /**
-     * Arreglo de identificadores de instancias de trabajo.
-     * Cada elemento representa una instancia de trabajo relacionada con las referencias incluidas en el export.
+     * Arreglo de identificadores de instancias.
+     * Cada elemento representa una instancia relacionada con los datos de la exportación.
      */
     public String[] work_instance;
     
     /**
-     * Arreglo de referencias a exportar.
-     * Contiene objetos de tipo SReference con la información completa de cada referencia.
+     * Arreglo de referencias de transacciones a exportar.
+     * Arreglo de objetos con la información completa de cada referencia de transacciones.
      */
-    public SExportDataUser[] users;
+    public SExportDataReference[] references;
 }

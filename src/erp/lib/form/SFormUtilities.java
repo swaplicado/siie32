@@ -314,13 +314,13 @@ public abstract class SFormUtilities {
 
         if (comboBox.getItemCount() > 0) {
             if (complement instanceof Integer) {
-                int value = ((Integer) complement).intValue();
+                int value = (Integer) complement;
 
                 for (int i = 0; i < comboBox.getItemCount(); i++) {
                     SFormComponentItem item = (SFormComponentItem) comboBox.getItemAt(i);
 
                     if (item.getComplement() != null && item.getComplement() instanceof Integer) {
-                        if (value == ((Integer) item.getComplement()).intValue()) {
+                        if (value == (Integer) item.getComplement()) {
                             comboBox.setSelectedIndex(i);
                             located = true;
                             break;
@@ -329,13 +329,13 @@ public abstract class SFormUtilities {
                 }
             }
             else if (complement instanceof Double) {
-                double value = ((Double) complement).doubleValue();
+                double value = (Double) complement;
 
                 for (int i = 0; i < comboBox.getItemCount(); i++) {
                     SFormComponentItem item = (SFormComponentItem) comboBox.getItemAt(i);
 
                     if (item.getComplement() != null && item.getComplement() instanceof Double) {
-                        if (value == ((Double) item.getComplement()).doubleValue()) {
+                        if (value == (Double) item.getComplement()) {
                             comboBox.setSelectedIndex(i);
                             located = true;
                             break;
@@ -398,14 +398,10 @@ public abstract class SFormUtilities {
     public static boolean isComboBoxItemContained(javax.swing.JComboBox comboBox, java.lang.Object key) {
         boolean contained = false;
 
-        if (comboBox.getItemCount() > 0) {
-            for (int i = 0; i < comboBox.getItemCount(); i++) {
-                SFormComponentItem item = (SFormComponentItem) comboBox.getItemAt(i);
-
-                if (SLibUtilities.compareKeys(key, item.getPrimaryKey())) {
-                    contained = true;
-                    break;
-                }
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            if (SLibUtilities.compareKeys(key, ((SFormComponentItem) comboBox.getItemAt(i)).getPrimaryKey())) {
+                contained = true;
+                break;
             }
         }
         
@@ -526,16 +522,25 @@ public abstract class SFormUtilities {
         }
     }
 
-    public static java.util.Vector<erp.lib.form.SFormComponentItem> removeListItems(javax.swing.JList<SFormComponentItem> list, int indexBegin, int indexEnd) {
-        int i = 0;
-        Vector<SFormComponentItem> vRemovedItems = new Vector<SFormComponentItem>();
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+    public static java.util.Vector<erp.lib.form.SFormComponentItem> getListItems(javax.swing.JList<SFormComponentItem> list) {
+        Vector<SFormComponentItem> vListItems = new Vector<>();
 
-        for (i = 0; i < list.getModel().getSize(); i++) {
+        for (int i = 0; i < list.getModel().getSize(); i++) {
             vListItems.add((SFormComponentItem) list.getModel().getElementAt(i));
         }
 
-        for (i = indexBegin; i <= indexEnd; i++) {
+        return vListItems;
+    }
+
+    public static java.util.Vector<erp.lib.form.SFormComponentItem> removeListItems(javax.swing.JList<SFormComponentItem> list, int indexBegin, int indexEnd) {
+        Vector<SFormComponentItem> vRemovedItems = new Vector<>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
+
+        for (int i = 0; i < list.getModel().getSize(); i++) {
+            vListItems.add((SFormComponentItem) list.getModel().getElementAt(i));
+        }
+
+        for (int i = indexBegin; i <= indexEnd; i++) {
             vRemovedItems.add(vListItems.remove(indexBegin));
         }
 
@@ -572,7 +577,7 @@ public abstract class SFormUtilities {
     }
 
     public static void addListItems(javax.swing.JList<SFormComponentItem> list, java.util.Vector<erp.lib.form.SFormComponentItem> listData) {
-        Vector<SFormComponentItem> listItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> listItems = new Vector<>();
 
         for (int i = 0; i < list.getModel().getSize(); i++) {
             listItems.add((SFormComponentItem) list.getModel().getElementAt(i));

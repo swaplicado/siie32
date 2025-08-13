@@ -7,21 +7,20 @@ package erp.mod.cfg.swap.utils;
 
 /**
  * Clase contenedora para exportar datos masivos de áreas funcionales en formato JSON.
- * Utilizada como estructura principal para enviar múltiples áreas funcionales y la información de instancias.
+ * Utilizada como estructura principal para enviar múltiples áreas funcionales y las instancias de SWAP Services.
  *
  * @author Sergio Flores
  */
 public class SRequestFunctionalAreasBody {
-    
     /**
      * Arreglo de identificadores de instancias.
-     * Cada elemento representa una instancia relacionada con las áreas funcionales incluidas en la exportación.
+     * Cada elemento representa una instancia relacionada con los datos de la exportación.
      */
     public String[] work_instance;
     
     /**
      * Arreglo de áreas funcionales a exportar.
-     * Arreglo de objetos SExportDataFunctionalArea con la información completa de cada área funcional.
+     * Arreglo de objetos con la información completa de cada área funcional.
      */
     public SExportDataFunctionalArea[] functional_areas;
 }

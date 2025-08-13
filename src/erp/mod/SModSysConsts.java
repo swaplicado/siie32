@@ -70,6 +70,10 @@ public abstract class SModSysConsts {
 
     public static final int CFGU_FUNC_NA = 1;
     
+    public static final int CFGU_FUNC_SUB_NA = 1;
+    
+    public static final int CFGU_SHIFT_NA = 1;
+    
     public static final int CFGX_IVM_FIFO = 1;
     public static final int CFGX_IVM_LIFO = 2;
     public static final int CFGX_IVM_AVG = 3;

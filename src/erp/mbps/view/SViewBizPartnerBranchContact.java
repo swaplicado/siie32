@@ -21,7 +21,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewBizPartnerBranchContact extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -171,6 +171,7 @@ public class SViewBizPartnerBranchContact extends erp.lib.table.STableTab implem
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
+        mvSuscriptors.add(SDataConstants.BPSX_BP_UPD);
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();

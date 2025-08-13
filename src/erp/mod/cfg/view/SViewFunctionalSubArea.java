@@ -62,7 +62,7 @@ public class SViewFunctionalSubArea extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY f.code, f.name, v.name, v.code, v.id_func ";
+                + "ORDER BY f.code, f.name, f.id_func, v.name, v.code, v.id_func_sub ";
     }
 
     @Override

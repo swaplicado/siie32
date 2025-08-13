@@ -68,14 +68,14 @@ public class SExportDataUser implements SExportData {
     public int[] groups;
     
     /**
-     * Arreglo de ID de empresas a las que tiene acceso el usuario.
+     * Arreglo de ID de empresas a las que tiene acceso el usuario interno.
      * Se incluye en el JSON solo si no es nulo.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public int[] companies;
     
     /**
-     * Arreglo de áreas funcionales que tiene asignadas el usuario.
+     * Arreglo de áreas funcionales que tiene asignadas el usuario interno.
      * Se incluye en el JSON solo si no es nulo.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -100,7 +100,7 @@ public class SExportDataUser implements SExportData {
          * Se incluye en el JSON solo si no es nulo.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        public String other_emails;
+        public String other_emails; // separados entre sí por punto y coma ';'
         
         /**
          * Indicador de si el usuario está borrado.

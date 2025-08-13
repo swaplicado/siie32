@@ -119,7 +119,7 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="(l&#xed;mite mensual 0.00 = sin l&#xed;mite mensual)"/>
+                    <Property name="text" type="java.lang.String" value="(L&#xed;mite mensual 0.00 = sin l&#xed;mite)"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[205, 23]"/>
                     </Property>

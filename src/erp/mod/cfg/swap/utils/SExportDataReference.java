@@ -21,6 +21,11 @@ public class SExportDataReference implements SExportData {
     public int external_company_id;
 
     /**
+     * ID del área funcional de la referencia en el sistema externo.
+     */
+    public int external_functional_area_id;
+
+    /**
      * ID de la categoría de la transacción de la referencia (1 = Compras; 2 = Ventas).
      */
     public int transaction_class_id;
@@ -48,7 +53,7 @@ public class SExportDataReference implements SExportData {
     /**
      * Código de moneda (ISO 4217) del monto de la referencia.
      */
-    public int currency_code;
+    public String currency_code;
 
     /**
      * Monto de la referencia.

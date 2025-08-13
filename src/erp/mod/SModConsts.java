@@ -112,6 +112,7 @@ public abstract class SModConsts {
     public static final int CFG_COM_SYNC_LOG_ETY = 1013552;
     
     public static final int CFGX_AUTHORN_COMMENTS = 1014001;
+    public static final int CFGX_FUNC_SUB = 1014012;
     
     /*
      * Users

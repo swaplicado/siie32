@@ -1977,6 +1977,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         moDpsNew.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
         moDpsNew.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+        moDpsNew.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
         moDpsNew.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
         moDpsNew.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
         moDpsNew.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());

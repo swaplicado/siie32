@@ -286,6 +286,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
+        jlEmail.setForeground(new java.awt.Color(0, 102, 102));
         jlEmail.setText("Cuenta(s) correo-e:");
         jlEmail.setPreferredSize(new java.awt.Dimension(110, 23));
         jlEmail.setRequestFocusEnabled(false);

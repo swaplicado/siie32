@@ -6,6 +6,9 @@ package erp.mod.cfg.form;
 
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -19,7 +22,7 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormFunctionalSubArea extends SBeanForm {
+public class SFormFunctionalSubArea extends SBeanForm implements ActionListener {
 
     private SDbFunctionalSubArea moRegistry;
 
@@ -49,6 +52,7 @@ public class SFormFunctionalSubArea extends SBeanForm {
         jPanel28 = new javax.swing.JPanel();
         jlFunctionalArea = new javax.swing.JLabel();
         moKeyFunctionalArea = new sa.lib.gui.bean.SBeanFieldKey();
+        jbModifyFunctionalArea = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jlCode = new javax.swing.JLabel();
         moTextCode = new sa.lib.gui.bean.SBeanFieldText();
@@ -63,12 +67,17 @@ public class SFormFunctionalSubArea extends SBeanForm {
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFunctionalArea.setText("Área funcional:");
+        jlFunctionalArea.setText("Área funcional:*");
         jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlFunctionalArea);
 
         moKeyFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel28.add(moKeyFunctionalArea);
+
+        jbModifyFunctionalArea.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbModifyFunctionalArea.setToolTipText("Modificar");
+        jbModifyFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel28.add(jbModifyFunctionalArea);
 
         jPanel2.add(jPanel28);
 
@@ -103,6 +112,7 @@ public class SFormFunctionalSubArea extends SBeanForm {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JButton jbModifyFunctionalArea;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlFunctionalArea;
     private javax.swing.JLabel jlName;
@@ -124,20 +134,26 @@ public class SFormFunctionalSubArea extends SBeanForm {
 
         moFields.setFormButton(jbSave);
     }
+    
+    private void actionPerformedModifyFunctionalArea() {
+        moKeyFunctionalArea.setEditable(true);
+        moKeyFunctionalArea.requestFocusInWindow();
+        jbModifyFunctionalArea.setEnabled(false);
+    }
 
     @Override
     public void addAllListeners() {
-
+        jbModifyFunctionalArea.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-
+        jbModifyFunctionalArea.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-
+        miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC, 0, null);
     }
 
     @Override
@@ -160,10 +176,18 @@ public class SFormFunctionalSubArea extends SBeanForm {
         }
 
         moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId() });
-        moTextName.setValue(moRegistry.getName());
         moTextCode.setValue(moRegistry.getCode());
+        moTextName.setValue(moRegistry.getName());
 
         setFormEditable(true);
+        
+        if (moRegistry.isRegistryNew()) {
+            jbModifyFunctionalArea.setEnabled(false);
+        }
+        else {
+            moKeyFunctionalArea.setEditable(false);
+            jbModifyFunctionalArea.setEnabled(true);
+        }
 
         addAllListeners();
     }
@@ -174,8 +198,8 @@ public class SFormFunctionalSubArea extends SBeanForm {
 
         if (registry.isRegistryNew()) { }
 
-        registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
+        registry.setName(moTextName.getValue());
         registry.setFkFunctionalAreaId(moKeyFunctionalArea.getValue()[0]);
 
         return registry;
@@ -186,5 +210,16 @@ public class SFormFunctionalSubArea extends SBeanForm {
         SGuiValidation validation = moFields.validateFields();
 
         return validation;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbModifyFunctionalArea) {
+                actionPerformedModifyFunctionalArea();
+            }
+        }
     }
 }

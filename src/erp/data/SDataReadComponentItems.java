@@ -10,6 +10,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbFunctionalSubArea;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -207,20 +208,36 @@ public abstract class SDataReadComponentItems {
                  * pk[0] = Filter: Array integer; user ID. It's optional, if is null inner join statement is unnecesary.
                  */
                 lenPk = 1;
-                sql = "SELECT fa.id_func AS f_id_1, name AS f_item "
-                        + "FROM cfgu_func AS fa ";
+                sql = "SELECT f.id_func AS f_id_1, CONCAT(f.name, ' - ', f.code) AS f_item "
+                        + "FROM cfgu_func AS f ";
                 if (pk != null) {
-                    sql += "INNER JOIN usr_usr_func AS fau ON "
-                            + "fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) pk)[0] + " ";
+                    sql += "INNER JOIN usr_usr_func AS uf ON "
+                            + "uf.id_func = f.id_func AND uf.id_usr = " + ((int[]) pk)[0] + " ";
                 }
-                sql += "WHERE NOT b_del ";
+                sql += "WHERE NOT f.b_del ";
                 sql += "ORDER BY f_item, f_id_1 ";
                 
                 text = "área funcional";
                 break;
-
-            default:
+            case SModConsts.CFGU_FUNC_SUB:
+                /* Use of Object pk:
+                 * pk[0] = Filter: Array integer; user ID. It's optional, if is null inner join statement is unnecesary.
+                 */
+                lenPk = 1;
+                lenFk = 1;
+                sql = "SELECT fs.id_func_sub AS f_id_1, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS f_item, fk_func AS f_fid_1 "
+                        + "FROM cfgu_func_sub AS fs "
+                        + "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func ";
+                if (pk != null) {
+                    sql += "INNER JOIN usr_usr_func_sub AS ufs ON "
+                            + "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + ((int[]) pk)[0] + " ";
+                }
+                sql += "WHERE NOT fs.b_del AND NOT f.b_del ";
+                sql += "ORDER BY f_item, f_id_1 ";
+                
+                text = "subárea funcional";
                 break;
+            default:
         }
 
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
@@ -284,7 +301,6 @@ public abstract class SDataReadComponentItems {
                 text = "usuario";
                 break;
             default:
-                break;
         }
 
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
@@ -1636,7 +1652,6 @@ public abstract class SDataReadComponentItems {
                             break;
                         default:
                             text = "serie folios de compras-ventas";
-                            break;
                     }
                 }
 
@@ -1943,7 +1958,6 @@ public abstract class SDataReadComponentItems {
                 text = "línea";
                 break;
             default:
-                break;
         }
 
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
@@ -1966,6 +1980,7 @@ public abstract class SDataReadComponentItems {
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.QLT_TP_ANALYSIS) + " WHERE b_del = 0 ORDER BY name ";
                 text = "tipo de análisis de laboratorio";
                 break;
+                
             case SModConsts.QLT_ANALYSIS:
             case SDataConstants.QLT_ANALYSIS:
                 lenPk = 1;
@@ -1982,7 +1997,6 @@ public abstract class SDataReadComponentItems {
                 break;
 
             default:
-                break;
         }
 
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
@@ -2108,7 +2122,6 @@ public abstract class SDataReadComponentItems {
                         + "ORDER BY name, id_sht ";
                 text = "turno";
                 break;
-
             case SModConsts.HRS_BEN:
                 lenPk = 1;
                 sql = "SELECT id_ben AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
@@ -2118,9 +2131,7 @@ public abstract class SDataReadComponentItems {
                         + "ORDER BY name, id_ben ";
                 text = "tabla prestaciones";
                 break;
-
             default:
-                break;
         }
 
         return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
@@ -2145,7 +2156,7 @@ public abstract class SDataReadComponentItems {
         ResultSet oResultSet = null;
         Object[] aoSettings = null;
         SFormComponentItem oComponentItem = null;
-        Vector<SFormComponentItem> vVector = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vVector = new Vector<>();
 
         if (SDataUtilities.isCatalogueCfg(pnCatalogue)) {
             aoSettings = getSettingsCatCfg(pnCatalogue, poParamsErp, poPk);

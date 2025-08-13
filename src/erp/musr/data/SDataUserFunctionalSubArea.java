@@ -13,32 +13,32 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public class SDataUserFunctionalSubArea extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkUserId;
-    protected int mnPkFunctionalAreaId;
+    protected int mnPkFunctionalSubAreaId;
     
-    public SDataUserFunctionalArea() {
+    public SDataUserFunctionalSubArea() {
         super(SModConsts.USR_USR_FUNC);
     }
 
     public void setPkUserId(int n) { mnPkUserId = n; }
-    public void setPkFunctionalAreaId(int n) { mnPkFunctionalAreaId = n; }
+    public void setPkFunctionalSubAreaId(int n) { mnPkFunctionalSubAreaId = n; }
 
     public int getPkUserId() { return mnPkUserId; }
-    public int getPkFunctionalAreaId() { return mnPkFunctionalAreaId; }
+    public int getPkFunctionalSubAreaId() { return mnPkFunctionalSubAreaId; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkUserId = ((int[]) pk)[0];
-        mnPkFunctionalAreaId = ((int[]) pk)[1];
+        mnPkFunctionalSubAreaId = ((int[]) pk)[1];
     }
 
     @Override
     public java.lang.Object getPrimaryKey() {
-        return new int[] { mnPkUserId, mnPkFunctionalAreaId };
+        return new int[] { mnPkUserId, mnPkFunctionalSubAreaId };
     }
 
     @Override
@@ -46,7 +46,7 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
         super.resetRegistry();
 
         mnPkUserId = 0;
-        mnPkFunctionalAreaId = 0;
+        mnPkFunctionalSubAreaId = 0;
     }
 
     @Override
@@ -59,14 +59,14 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
         reset();
 
         try {
-            sql = "SELECT * FROM usr_usr_func where id_usr = " + key[0] + " AND id_func = " + key[1] + " ";
+            sql = "SELECT * FROM usr_usr_func_sub where id_usr = " + key[0] + " AND id_func_sub = " + key[1] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
                 mnPkUserId = resultSet.getInt("id_usr");
-                mnPkFunctionalAreaId = resultSet.getInt("id_func");
+                mnPkFunctionalSubAreaId = resultSet.getInt("id_func_sub");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -88,9 +88,9 @@ public class SDataUserFunctionalArea extends erp.lib.data.SDataRegistry implemen
 
         try {
             if (mbIsRegistryNew) {
-                sql = "INSERT INTO usr_usr_func VALUES (" +
+                sql = "INSERT INTO usr_usr_func_sub VALUES (" +
                         mnPkUserId + ", " +
-                        mnPkFunctionalAreaId + " " +
+                        mnPkFunctionalSubAreaId + " " +
                         ")";
             }
             else {

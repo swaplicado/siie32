@@ -6,19 +6,22 @@
 package erp.mod.cfg.db;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SSwapConsts;
+import erp.mod.cfg.swap.SSwapConsts;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
- * Clase para sincronización de datos con servicios externos. * Esta clase
- * representa una entrada de registro de sincronización, que almacena
+ * Clase para registrar el detalle de la sincronización de datos con servicios externos.
+ * 
+ * Esta clase representa una entrada de registro de sincronización, que almacena
  * información sobre cada sincronización realizada, incluyendo el tipo de
  * sincronización, cuerpo de la solicitud, código de respuesta, cuerpo de la
  * respuesta, y marcas de tiempo.
@@ -32,26 +35,36 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     protected String msResponseCode;
     protected String msResponseBody;
     protected String msReferenceId;
-    protected Date mtTsSynchronization;
+    protected Date mtTsSync;
+    
+    protected String msAuxDatabase;
+    
+    protected Class moClass;
     
     public SDbSyncLogEntry() {
         super(SModConsts.CFG_SYNC_LOG_ETY);
+    
+        moClass = getClass();
     }
 
-    public void setPkSyncLogId(int n) { this.mnPkSyncLogId = n; }
-    public void setPkEntryId(int n) { this.mnPkEntryId = n; }
-    public void setResponseCode(String s) { this.msResponseCode = s; }
-    public void setResponseBody(String s) { this.msResponseBody = s; }
-    public void setReferenceId(String s) { this.msReferenceId = s; }
-    public void setTsSynchronization(Date t) { this.mtTsSynchronization = t; }
+    public void setPkSyncLogId(int n) { mnPkSyncLogId = n; }
+    public void setPkEntryId(int n) { mnPkEntryId = n; }
+    public void setResponseCode(String s) { msResponseCode = s; }
+    public void setResponseBody(String s) { msResponseBody = s; }
+    public void setReferenceId(String s) { msReferenceId = s; }
+    public void setTsSync(Date t) { mtTsSync = t; }
 
-    public int getPkSyncLogId() { return this.mnPkSyncLogId; }
-    public int getPkEntryId() { return this.mnPkEntryId; }
-    public String getResponseCode() { return this.msResponseCode; }
-    public String getResponseBody() { return this.msResponseBody; }
-    public String getReferenceId() { return this.msReferenceId; }
-    public Date getTsSynchronization() { return this.mtTsSynchronization; }
+    public int getPkSyncLogId() { return mnPkSyncLogId; }
+    public int getPkEntryId() { return mnPkEntryId; }
+    public String getResponseCode() { return msResponseCode; }
+    public String getResponseBody() { return msResponseBody; }
+    public String getReferenceId() { return msReferenceId; }
+    public Date getTsSync() { return mtTsSync; }
 
+    public void setAuxDatabase(String s) { msAuxDatabase = s; }
+    
+    public String getAuxDatabase() { return msAuxDatabase; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkSyncLogId = pk[0];
@@ -71,23 +84,26 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         msResponseCode = "";
         msResponseBody = "";
         msReferenceId = "";
-        mtTsSynchronization = null;
+        mtTsSync = null;
+            
+        msAuxDatabase = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_sync_log = " + mnPkSyncLogId + " AND id_ety = " + mnPkEntryId + " ";
+        return "WHERE id_sync_log = " + mnPkSyncLogId + " "
+                + "AND id_ety = " + mnPkEntryId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_sync_log = " + pk[0] + " " +
-               "AND id_ety = " + (pk.length > 1 ? pk[1] : 0) + " ";
+        return "WHERE id_sync_log = " + pk[0] + " "
+                + "AND id_ety = " + pk[1] + " ";
     }
 
     @Override
@@ -96,8 +112,9 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
 
         mnPkEntryId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_ety), 0) + 1 FROM " + getSqlTable() + "  " +
-                "WHERE id_sync_log = " + mnPkSyncLogId + " ";
+        msSql = "SELECT COALESCE(MAX(id_ety), 0) + 1 "
+                + "FROM " + getSqlTable() + " "
+                + "WHERE id_sync_log = " + mnPkSyncLogId + ";";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkEntryId = resultSet.getInt(1);
@@ -111,7 +128,8 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
         
-        msSql = "SELECT * FROM " + getSqlTable() + " " + getSqlWhere(pk);
+        msSql = "SELECT * "
+                + "FROM " + getSqlTable() + " " + getSqlWhere(pk);
         
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
@@ -123,7 +141,7 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
             msResponseCode = resultSet.getString("response_code");
             msResponseBody = resultSet.getString("response_body");
             msReferenceId = resultSet.getString("reference_id");
-            mtTsSynchronization = resultSet.getTimestamp("ts_sync");
+            mtTsSync = resultSet.getTimestamp("ts_sync");
 
             mbRegistryNew = false;
         }
@@ -136,7 +154,7 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         // limitar msRequestBody y msResponseBody a 64 KB, para evitar problemas de tamaño en la base de datos:
-        if (msResponseBody != null && msResponseBody.length() > SSwapConsts.SIZE_64_KB) {
+        if (msResponseBody.length() > SSwapConsts.SIZE_64_KB) {
             msResponseBody = msResponseBody.substring(0, SSwapConsts.SIZE_64_KB);
         }
 
@@ -145,23 +163,15 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
             mnFkUserInsertId = session.getUser().getPkUserId();
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkSyncLogId + ", " +
-                    mnPkEntryId + ", " +
-                    "'" + msResponseCode + "', " +
-                    "'" + msResponseBody + "', " +
-                    "'" + msReferenceId + "', " +
-                    "NOW()" + ")";
+                    mnPkSyncLogId + ", " + 
+                    mnPkEntryId + ", " + 
+                    "'" + msResponseCode + "', " + 
+                    "'" + msResponseBody + "', " + 
+                    "'" + msReferenceId + "', " + 
+                    (mtTsSync == null ? "NOW()" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtTsSync) + "'") + ");";
         }
         else {
-            msSql = "UPDATE " + getSqlTable() + " SET " +
-                    // "id_sync_log = " + mnPkSyncLogId + ", " +
-                    // "id_ety = " + mnPkEntryId + ", " +
-                    "response_code = '" + msResponseCode + "', " +
-                    "response_body = '" + msResponseBody + "', " +
-                    "reference_id = '" + msReferenceId + "' " +
-                    // ts_usr_ins is not updated, as it is the timestamp of the first insert
-                    // ts_usr_upd is not updated, as it is the timestamp of the last update
-                    getSqlWhere();
+            throw new Exception(SDbConsts.ERR_MSG_REG_NON_UPDATABLE);
         }
 
         session.getStatement().execute(msSql);
@@ -170,14 +180,29 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public SDbRegistry clone() throws CloneNotSupportedException {
-        SDbSyncLogEntry registry = new SDbSyncLogEntry();
-        registry.setPkSyncLogId(mnPkSyncLogId);
-        registry.setPkEntryId(mnPkEntryId);
-        registry.setResponseCode(msResponseCode);
-        registry.setResponseBody(msResponseBody);
-        registry.setReferenceId(msReferenceId);
-        registry.setTsSynchronization(mtTsSynchronization);
+        SDbSyncLogEntry registry = null;
+        
+        try {
+            Constructor<?> constructor = moClass.getConstructor();
+            
+            registry = (SDbSyncLogEntry) constructor.newInstance(new Object[] {});
+            
+            registry.setPkSyncLogId(this.getPkSyncLogId());
+            registry.setPkEntryId(this.getPkEntryId());
+            registry.setResponseCode(this.getResponseCode());
+            registry.setResponseBody(this.getResponseBody());
+            registry.setReferenceId(this.getReferenceId());
+            registry.setTsSync(this.getTsSync());
+            
+            registry.setAuxDatabase(this.getAuxDatabase());
+            
+            registry.moClass = this.moClass;
+        }
+        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            SLibUtils.printException(this, e);
+        }
 
         return registry;
     }

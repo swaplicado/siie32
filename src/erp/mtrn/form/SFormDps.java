@@ -223,7 +223,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldFkPaymentTypeId;
     private erp.lib.form.SFormField moFieldFkLanguajeId;
     private erp.lib.form.SFormField moFieldFkDpsNatureId;
-    private erp.lib.form.SFormField moFieldFkFunctionalAreaId;
+    private erp.lib.form.SFormField moFieldFkFunctionalSubAreaId;
     private erp.lib.form.SFormField moFieldFkCurrencyId;
     private erp.lib.form.SFormField moFieldIsDiscountDocApplying;
     private erp.lib.form.SFormField moFieldIsDiscountDocPercentage;
@@ -359,7 +359,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnCfdXmlType; // current XML type for CFD type invoice
     private double mdPrepayments;
     private double mdPrepaymentsCy;
-    private int mnOldFunctionalAreaId;
+    private int mnOldFunctionalSubAreaId;
     private double mdOldExchangeRate;
     private double mdOldDiscountDocPercentage;
     private boolean mbOldIsDiscountDocApplying;
@@ -474,7 +474,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckIsRebill = new javax.swing.JCheckBox();
         jPanel16 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
-        jcbNumberSeries = new javax.swing.JComboBox<>();
+        jcbNumberSeries = new javax.swing.JComboBox<SFormComponentItem>();
         jtfNumber = new javax.swing.JTextField();
         jtfNumberReference = new javax.swing.JTextField();
         jPanel18 = new javax.swing.JPanel();
@@ -506,13 +506,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel5 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlFkPaymentTypeId = new javax.swing.JLabel();
-        jcbFkPaymentTypeId = new javax.swing.JComboBox<>();
+        jcbFkPaymentTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel35 = new javax.swing.JPanel();
         jlCfdiPaymentWay = new javax.swing.JLabel();
-        jcbCfdiPaymentWay = new javax.swing.JComboBox<>();
+        jcbCfdiPaymentWay = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel32 = new javax.swing.JPanel();
         jlCfdiPaymentMethod = new javax.swing.JLabel();
-        jcbCfdiPaymentMethod = new javax.swing.JComboBox<>();
+        jcbCfdiPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel25 = new javax.swing.JPanel();
         jlConditionsPayment = new javax.swing.JLabel();
         jtfConditionsPayment = new javax.swing.JTextField();
@@ -527,16 +527,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFkDpsStatusAuthorizationRo = new javax.swing.JTextField();
         jPanel26 = new javax.swing.JPanel();
         jlFkLanguageId = new javax.swing.JLabel();
-        jcbFkLanguageId = new javax.swing.JComboBox<>();
+        jcbFkLanguageId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel33 = new javax.swing.JPanel();
         jlFkDpsNatureId = new javax.swing.JLabel();
-        jcbFkDpsNatureId = new javax.swing.JComboBox<>();
+        jcbFkDpsNatureId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel92 = new javax.swing.JPanel();
-        jlFkFunctionalAreaId = new javax.swing.JLabel();
-        jcbFkFunctionalAreaId = new javax.swing.JComboBox<>();
+        jlFkFunctionalSubAreaId = new javax.swing.JLabel();
+        jcbFkFunctionalSubAreaId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel31 = new javax.swing.JPanel();
         jlAccTag = new javax.swing.JLabel();
-        jcbAccTag = new javax.swing.JComboBox<>();
+        jcbAccTag = new javax.swing.JComboBox<String>();
         jPanel30 = new javax.swing.JPanel();
         jckIsAudited = new javax.swing.JCheckBox();
         jckIsAuthorized = new javax.swing.JCheckBox();
@@ -554,7 +554,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpCurrency = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
-        jcbFkCurrencyId = new javax.swing.JComboBox<>();
+        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCurrencyId = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
         jlExchangeRateSystem = new javax.swing.JLabel();
@@ -624,9 +624,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbExportCsv = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
-        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<>();
+        jcbAdjustmentSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jlTaxRegionId = new javax.swing.JLabel();
-        jcbTaxRegionId = new javax.swing.JComboBox<>();
+        jcbTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbTaxRegionId = new javax.swing.JButton();
         jbEditTaxRegion = new javax.swing.JButton();
         jpMarketing = new javax.swing.JPanel();
@@ -648,7 +648,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel38 = new javax.swing.JPanel();
         jlFkProductionOrderId_n = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
-        jcbFkProductionOrderId_n = new javax.swing.JComboBox<>();
+        jcbFkProductionOrderId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkProductionOrderId_n = new javax.swing.JButton();
         jpOtherMarketing = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
@@ -673,36 +673,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel64 = new javax.swing.JPanel();
         jlFkContactId_n = new javax.swing.JLabel();
         jPanel80 = new javax.swing.JPanel();
-        jcbFkContactId_n = new javax.swing.JComboBox<>();
+        jcbFkContactId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jpOtherLogistics = new javax.swing.JPanel();
         jPanel49 = new javax.swing.JPanel();
         jPanel50 = new javax.swing.JPanel();
         jlFkIncotermId = new javax.swing.JLabel();
-        jcbFkIncotermId = new javax.swing.JComboBox<>();
+        jcbFkIncotermId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkIncotermId = new javax.swing.JButton();
         jPanel84 = new javax.swing.JPanel();
         jlFkSpotSrcId_n = new javax.swing.JLabel();
-        jcbFkSpotSrcId_n = new javax.swing.JComboBox<>();
+        jcbFkSpotSrcId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel85 = new javax.swing.JPanel();
         jlFkSpotDesId_n = new javax.swing.JLabel();
-        jcbFkSpotDesId_n = new javax.swing.JComboBox<>();
+        jcbFkSpotDesId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel51 = new javax.swing.JPanel();
         jlFkModeOfTransportationTypeId = new javax.swing.JLabel();
-        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<>();
+        jcbFkModeOfTransportationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkModeOfTransportationTypeId = new javax.swing.JButton();
         jPanel52 = new javax.swing.JPanel();
         jlFkCarrierTypeId = new javax.swing.JLabel();
-        jcbFkCarrierTypeId = new javax.swing.JComboBox<>();
+        jcbFkCarrierTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel53 = new javax.swing.JPanel();
         jlFkCarrierId_n = new javax.swing.JLabel();
-        jcbFkCarrierId_n = new javax.swing.JComboBox<>();
+        jcbFkCarrierId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkCarrierId_n = new javax.swing.JButton();
         jPanel86 = new javax.swing.JPanel();
         jlFkVehicleTypeId_n = new javax.swing.JLabel();
-        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleTypeId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel54 = new javax.swing.JPanel();
         jlFkVehicleId_n = new javax.swing.JLabel();
-        jcbFkVehicleId_n = new javax.swing.JComboBox<>();
+        jcbFkVehicleId_n = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkVehicleId_n = new javax.swing.JButton();
         jPanel55 = new javax.swing.JPanel();
         jlDriver = new javax.swing.JLabel();
@@ -730,13 +730,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jckCfdCceApplies = new javax.swing.JCheckBox();
         jPanel98 = new javax.swing.JPanel();
         jlCfdCceMoveReason = new javax.swing.JLabel();
-        jcbCfdCceMoveReason = new javax.swing.JComboBox<>();
+        jcbCfdCceMoveReason = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel99 = new javax.swing.JPanel();
         jlCfdCceOperationType = new javax.swing.JLabel();
-        jcbCfdCceOperationType = new javax.swing.JComboBox<>();
+        jcbCfdCceOperationType = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel100 = new javax.swing.JPanel();
         jlCfdCceRequestKey = new javax.swing.JLabel();
-        jcbCfdCceRequestKey = new javax.swing.JComboBox<>();
+        jcbCfdCceRequestKey = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel101 = new javax.swing.JPanel();
         jlCfdCceCertificateOrigin = new javax.swing.JLabel();
         jtfCfdCceCertificateOrigin = new javax.swing.JTextField();
@@ -780,7 +780,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfAddCfdAddendaType = new javax.swing.JTextField();
         jPanel41 = new javax.swing.JPanel();
         jlAddCfdAddendaSubtype = new javax.swing.JLabel();
-        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<>();
+        jcbAddCfdAddendaSubtype = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel69 = new javax.swing.JPanel();
         jlAddLorealFolioNotaRecepción = new javax.swing.JLabel();
         jtfAddLorealFolioNotaRecepción = new javax.swing.JTextField();
@@ -828,7 +828,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel76 = new javax.swing.JPanel();
         jPanel123 = new javax.swing.JPanel();
         jlAddAmc71SupplierGln = new javax.swing.JLabel();
-        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71SupplierGln = new javax.swing.JComboBox<String>();
         jlAddAmc71SupplierGlnHint = new javax.swing.JLabel();
         jPanel124 = new javax.swing.JPanel();
         jlAddAmc71SupplierNumber = new javax.swing.JLabel();
@@ -836,7 +836,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71SupplierNumberHint = new javax.swing.JLabel();
         jPanel125 = new javax.swing.JPanel();
         jlAddAmc71CompanyGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71CompanyGln = new javax.swing.JComboBox<String>();
         jlAddAmc71CompanyGlnHint = new javax.swing.JLabel();
         jPanel131 = new javax.swing.JPanel();
         jlAddAmc71CompanyContact = new javax.swing.JLabel();
@@ -844,7 +844,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlAddAmc71CompanyContactHint = new javax.swing.JLabel();
         jPanel126 = new javax.swing.JPanel();
         jlAddAmc71CompanyBranchGln = new javax.swing.JLabel();
-        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<>();
+        jcbAddAmc71CompanyBranchGln = new javax.swing.JComboBox<String>();
         jlAddAmc71CompanyBranchGlnHint = new javax.swing.JLabel();
         jPanel130 = new javax.swing.JPanel();
         jlAddAmc71ShipToName = new javax.swing.JLabel();
@@ -880,21 +880,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDeleteBillOfLading = new javax.swing.JButton();
         jPanel95 = new javax.swing.JPanel();
         jlCfdiTaxRegimeIssuing = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<>();
+        jcbCfdiTaxRegimeIssuing = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel1 = new javax.swing.JLabel();
         jlGlobalInf = new javax.swing.JLabel();
         jPanel93 = new javax.swing.JPanel();
         jlCfdiTaxRegimeReceptor = new javax.swing.JLabel();
-        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<>();
+        jcbCfdiTaxRegimeReceptor = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel2 = new javax.swing.JLabel();
         jlGblPeriodicity = new javax.swing.JLabel();
-        jcbGblPeriodicity = new javax.swing.JComboBox<>();
+        jcbGblPeriodicity = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel94 = new javax.swing.JPanel();
         jlCfdiCfdiUsage = new javax.swing.JLabel();
-        jcbCfdiCfdiUsage = new javax.swing.JComboBox<>();
+        jcbCfdiCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
         jLabel3 = new javax.swing.JLabel();
         jlGblMonth = new javax.swing.JLabel();
-        jcbGblMonth = new javax.swing.JComboBox<>();
+        jcbGblMonth = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel114 = new javax.swing.JPanel();
         jlCfdiConfirmation = new javax.swing.JLabel();
         jtfCfdiConfirmation = new javax.swing.JTextField();
@@ -904,7 +904,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfGblYear = new javax.swing.JTextField();
         jPanel132 = new javax.swing.JPanel();
         jlExportation = new javax.swing.JLabel();
-        jcbExportation = new javax.swing.JComboBox<>();
+        jcbExportation = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel115 = new javax.swing.JPanel();
         jbCfdiRelatedDocs = new javax.swing.JButton();
         jtfCfdiFirstRelatedDps = new javax.swing.JTextField();
@@ -961,23 +961,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel134 = new javax.swing.JPanel();
         jPanel145 = new javax.swing.JPanel();
         jlFisDataPaymentMethod = new javax.swing.JLabel();
-        jcbFisDataPaymentMethod = new javax.swing.JComboBox<>();
+        jcbFisDataPaymentMethod = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel137 = new javax.swing.JPanel();
         jlFisDataTaxRegimeIssuing = new javax.swing.JLabel();
-        jcbFisDataTaxRegimeIssuing = new javax.swing.JComboBox<>();
+        jcbFisDataTaxRegimeIssuing = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel138 = new javax.swing.JPanel();
         jlFisDataTaxRegimeReceptor = new javax.swing.JLabel();
-        jcbFisDataTaxRegimeReceptor = new javax.swing.JComboBox<>();
+        jcbFisDataTaxRegimeReceptor = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel140 = new javax.swing.JPanel();
         jlFisDataCfdiUsage = new javax.swing.JLabel();
-        jcbFisDataCfdiUsage = new javax.swing.JComboBox<>();
+        jcbFisDataCfdiUsage = new javax.swing.JComboBox<SFormComponentItem>();
         jpInitiatives = new javax.swing.JPanel();
         jPanel135 = new javax.swing.JPanel();
         jPanel152 = new javax.swing.JPanel();
         jPanel153 = new javax.swing.JPanel();
         jPanel146 = new javax.swing.JPanel();
         jlInitInitiative = new javax.swing.JLabel();
-        jcbInitInitiative = new javax.swing.JComboBox<>();
+        jcbInitInitiative = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel141 = new javax.swing.JPanel();
         jlInitType = new javax.swing.JLabel();
         jtfInitType = new javax.swing.JTextField();
@@ -1461,12 +1461,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel92.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkFunctionalAreaId.setText("Área funcional: *");
-        jlFkFunctionalAreaId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel92.add(jlFkFunctionalAreaId);
+        jlFkFunctionalSubAreaId.setText("Área funcional: *");
+        jlFkFunctionalSubAreaId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel92.add(jlFkFunctionalSubAreaId);
 
-        jcbFkFunctionalAreaId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel92.add(jcbFkFunctionalAreaId);
+        jcbFkFunctionalSubAreaId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel92.add(jcbFkFunctionalSubAreaId);
 
         jPanel5.add(jPanel92);
 
@@ -3740,7 +3740,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldConditionsPayment.setLengthMax(50);
         moFieldFkLanguajeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkLanguageId, jlFkLanguageId);
         moFieldFkDpsNatureId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsNatureId, jlFkDpsNatureId);
-        moFieldFkFunctionalAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalAreaId, jlFkFunctionalAreaId);
+        moFieldFkFunctionalSubAreaId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkFunctionalSubAreaId, jlFkFunctionalSubAreaId);
         moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldFkCurrencyId.setPickerButton(jbFkCurrencyId);
         moFieldIsDiscountDocApplying = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountDocApplying);
@@ -3995,7 +3995,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldConditionsPayment);
         mvFields.add(moFieldFkLanguajeId);
         mvFields.add(moFieldFkDpsNatureId);
-        mvFields.add(moFieldFkFunctionalAreaId);
+        mvFields.add(moFieldFkFunctionalSubAreaId);
         mvFields.add(moFieldIsAudited);
         mvFields.add(moFieldIsAuthorized);
         mvFields.add(moFieldIsSystem);
@@ -6442,7 +6442,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfConditionsPayment.setFocusable(false);
             //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
-            jcbFkFunctionalAreaId.setEnabled(false);
+            jcbFkFunctionalSubAreaId.setEnabled(false);
             
             jcbAccTag.setEnabled(false);
 
@@ -6564,7 +6564,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jtfConditionsPayment.setFocusable(true);
             //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(jcbFkDpsNatureId.getItemCount() > 2);
-            jcbFkFunctionalAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalAreaId.getItemCount() - 1) != 1); // enable when functional areas applying and only one asignated to current user
+            jcbFkFunctionalSubAreaId.setEnabled(isApplingFunctionalAreas() && (jcbFkFunctionalSubAreaId.getItemCount() - 1) > 1); // enable when functional areas applying and more than one is asignated to current user
             
             try {
                 jcbAccTag.setEnabled(!SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty());
@@ -11410,7 +11410,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsNatureId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkFunctionalAreaId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkFunctionalSubAreaId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkIncotermId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkLanguageId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkModeOfTransportationTypeId;
@@ -11551,7 +11551,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlFkDpsStatus;
     private javax.swing.JLabel jlFkDpsStatusAuthorization;
     private javax.swing.JLabel jlFkDpsStatusValidity;
-    private javax.swing.JLabel jlFkFunctionalAreaId;
+    private javax.swing.JLabel jlFkFunctionalSubAreaId;
     private javax.swing.JLabel jlFkIncotermId;
     private javax.swing.JLabel jlFkLanguageId;
     private javax.swing.JLabel jlFkModeOfTransportationTypeId;
@@ -11906,10 +11906,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNS_TP_PAY_CASH });
         moFieldFkDpsNatureId.setFieldValue(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
         if (!isApplingFunctionalAreas()) {
-            moFieldFkFunctionalAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_NA });
+            moFieldFkFunctionalSubAreaId.setFieldValue(new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
         }
-        else if ((jcbFkFunctionalAreaId.getItemCount() - 1) == 1) {
-            jcbFkFunctionalAreaId.setSelectedIndex(1);
+        else if ((jcbFkFunctionalSubAreaId.getItemCount() - 1) == 1) {
+            jcbFkFunctionalSubAreaId.setSelectedIndex(1); // preselect the only one selectable option
         }
         moFieldFkIncotermId.setFieldValue(new int[] { SModSysConsts.LOGS_INC_NA });
         moFieldFkModeOfTransportationTypeId.setFieldValue(new int[] { SModSysConsts.LOGS_TP_MOT_NA });
@@ -11957,7 +11957,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditHelp.setEnabled(false);
         jbOk.setEnabled(true);
 
-        mnOldFunctionalAreaId = 0;
+        mnOldFunctionalSubAreaId = 0;
         mdOldExchangeRate = 0;
         mdOldDiscountDocPercentage = 0;
         mbOldIsDiscountDocApplying = false;
@@ -11999,10 +11999,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SFormUtilities.populateComboBox(miClient, jcbFkDpsNatureId, SDataConstants.TRNU_DPS_NAT);
         
         if (!isApplingFunctionalAreas()) {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC); // load all functional areas, "non-applying" inclusive
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalSubAreaId, SModConsts.CFGU_FUNC_SUB); // load all functional sub-areas, "non-applying" inclusive
         }
         else {
-            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalAreaId, SModConsts.CFGU_FUNC, new int[] { miClient.getSessionXXX().getUser().getPkUserId() }); // load only user-asigned functional areas, "non-applying" may not be included
+            SFormUtilities.populateComboBox(miClient, jcbFkFunctionalSubAreaId, SModConsts.CFGU_FUNC_SUB, new int[] { miClient.getSessionXXX().getUser().getPkUserId() }); // load only user-asigned functional sub-areas, "non-applying" may not be included
         }
         
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
@@ -12247,14 +12247,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 // validate other all purpose fields:
 
                 if (!validation.getIsError()) {
-                    if (jcbFkFunctionalAreaId.getSelectedIndex() <= 0) {
+                    if (jcbFkFunctionalSubAreaId.getSelectedIndex() <= 0) {
                         String message = "";
-                        if (mnOldFunctionalAreaId != 0 && SFormUtilities.isComboBoxItemContained(jcbFkFunctionalAreaId, new int[] { mnOldFunctionalAreaId })) {
-                            message = "La opción original del campo '" + jlFkFunctionalAreaId.getText() + "', '" + (String) miClient.getSession().readField(SModConsts.CFGU_FUNC, new int[] { mnOldFunctionalAreaId }, SDbRegistry.FIELD_NAME) + "', "
+                        if (mnOldFunctionalSubAreaId != 0 && !SFormUtilities.isComboBoxItemContained(jcbFkFunctionalSubAreaId, new int[] { mnOldFunctionalSubAreaId })) {
+                            message = "La opción original del campo '" + jlFkFunctionalSubAreaId.getText() + "', '" + (String) miClient.getSession().readField(SModConsts.CFGU_FUNC_SUB, new int[] { mnOldFunctionalSubAreaId }, SDbRegistry.FIELD_NAME) + "', "
                                     + "no está asignada al usuario '" + miClient.getSession().getUser().getName() + "'.";
                         }
-                        validation.setMessage((!message.isEmpty() ? message + "\n" : "") + SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkFunctionalAreaId.getText() + "'.");
-                        validation.setComponent(jcbFkFunctionalAreaId);
+                        validation.setMessage((!message.isEmpty() ? message + "\n" : "") + SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkFunctionalSubAreaId.getText() + "'.");
+                        validation.setComponent(jcbFkFunctionalSubAreaId);
                     }
                     else if (jckRecordUser.isSelected() && moRecordUserKey == null) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckRecordUser.getText() + "'.");
@@ -13025,7 +13025,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkPaymentTypeId.setFieldValue(new int[] { moDps.getFkPaymentTypeId() });
         moFieldFkLanguajeId.setFieldValue(new int[] { moDps.getFkLanguajeId() });
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
-        moFieldFkFunctionalAreaId.setFieldValue(new int[] { moDps.getFkFunctionalAreaId() });
+        moFieldFkFunctionalSubAreaId.setFieldValue(new int[] { moDps.getFkFunctionalSubAreaId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
         
         // set business partner, set aswell business partner default preferences when document is new:
@@ -13328,7 +13328,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditLogistics.setEnabled(enableMinor);
         jbEditNotes.setEnabled(enableMinor);
 
-        mnOldFunctionalAreaId = moDps.getFkFunctionalAreaId();
+        mnOldFunctionalSubAreaId = moDps.getFkFunctionalSubAreaId();
         mdOldExchangeRate = moFieldExchangeRate.getDouble();
         mdOldDiscountDocPercentage = moFieldDiscountDocPercentage.getDouble();
         mbOldIsDiscountDocApplying = moFieldIsDiscountDocApplying.getBoolean();
@@ -13452,7 +13452,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //moDps.setFkSalesAgentBizPartnerId_n(...
 
             moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
-            moDps.setFkFunctionalAreaId(jcbFkFunctionalAreaId.getSelectedIndex() > 0 ? moFieldFkFunctionalAreaId.getKeyAsIntArray()[0] : SModSysConsts.CFGU_FUNC_NA);
+            if (!isApplingFunctionalAreas() || jcbFkFunctionalSubAreaId.getSelectedIndex() <= 0) {
+                moDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                moDps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+            }
+            else {
+                SFormComponentItem item = (SFormComponentItem) jcbFkFunctionalSubAreaId.getSelectedItem();
+                moDps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
+                moDps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
+            }
             moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
             moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
             moDps.setFkSalesAgentId_n(mnSalesAgentId_n);

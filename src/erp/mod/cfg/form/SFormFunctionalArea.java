@@ -90,7 +90,7 @@ public class SFormFunctionalArea extends SBeanForm {
         jPanel28.add(moDecExpensesMonthly);
 
         jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel1.setText("(límite mensual 0.00 = sin límite mensual)");
+        jLabel1.setText("(Límite mensual 0.00 = sin límite)");
         jLabel1.setPreferredSize(new java.awt.Dimension(205, 23));
         jPanel28.add(jLabel1);
 
