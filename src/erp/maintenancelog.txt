@@ -1,4 +1,34 @@
 ================================================================================
+SIIE 3.2 284.0/ 2025-08-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de gestión del catálogo de subáreas funcionales.
+2) Implementación de asignación de subáreas funcionales a usuarios en la configuración de usuarios para transacciones.
+3) Implementación de obtención directa de valores de parámetros de configuración de SWAP Services en SIIE Client.
+4) Refactorizacón de funcionalidades y componentes de la gestión de datos de proveedores por usuarios compradores: vistas, formas, registros de datos y módulos SIIE.
+5) Implementación de exportación de usuarios, proveedores, subáreas funcionales y referencias de pedidos de compras a SWAP Services.
+6) Incorporación de captura de subárea funcional en documentos, subordinada a la captura original de áreas funcionales, y muestra de su código en la vista correspondiente de documentos.
+7) Ampliación del largo de folios de documentos a 36 posiciones, para permitir UUID completos.
+
+================================================================================
+SIIE 3.2 282.10/ 2025-08-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la inserción de XML timbrado de CFDI en cuanto a la validación de correspondendencia. La validación de datos se hizo para el CFDI 3.2, pero no se actualizó al 3.3 ni 4.0.
+
+================================================================================
+SIIE 3.2 282.9/ 2025-08-13
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) implementación del nivel de obligatoriedad del firmado en los prestamos de herramientas.
+
+================================================================================
+SIIE 3.2 282.8/ 2025-08-12
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección del campo localidad en el predial rustico, campos en SIIE diferentes (locality = localidad , county = municipo)
+
+================================================================================
 SIIE 3.2 282.7/ 2025-08-05
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

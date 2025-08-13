@@ -25,6 +25,7 @@ import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.lib.table.STableRow;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
@@ -86,7 +87,6 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
-    protected int mnTabTypeAux01;
     private boolean mbResetingForm;
     
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -119,6 +119,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private boolean mbMaintAreaNeeded;
     private boolean mbWarehouseDestinyNeeded;
     private String msSeriesIogCounterpart;
+    private String msConfReqSign;
 
     private erp.mcfg.data.SDataCompanyBranchEntity moWarehouseSource;
     private erp.mcfg.data.SDataCompanyBranchEntity moWarehouseDestiny;
@@ -718,6 +719,11 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         SFormUtilities.createActionMap(rootPane, this, "actionRowAdd", "rowAdd", KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionRowClear", "rowClear", KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
+    
+        try {
+            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN);
+        }
+        catch (Exception e) { }
     }
 
     private void windowActivated() {
@@ -894,7 +900,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jbEntryClear.setEnabled(true);
             jbEntryDelete.setEnabled(true);
             
-            jbSign.setEnabled(true);
+            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED));
         }
     }
 
@@ -1867,18 +1873,36 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     if (!validationMsg.isEmpty()) {
                         throw new Exception(validationMsg);
                     }
-            
-                    if (!isDiogSigned()) {
-                        if (getSignatoryFingerprint() == null) {
-                            miClient.showMsgBoxInformation("El firmante carece de huella digital.\nEl movimiento deberá ser firmado posteriormente.");
-                        }
-                        else {
-                            if (miClient.showMsgBoxConfirm("¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
+                    
+                    switch (msConfReqSign) {
+                        case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_REQUIRED:
+                            if (!isDiogSigned()) {
                                 validation.setMessage("Se debe firmar el movimiento.");
                                 validation.setComponent(jbSign);
                             }
-                        }
-                    }                
+                            break;
+                            
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL_CONFIRM:
+                                if (!isDiogSigned()) {
+                                    if (getSignatoryFingerprint() == null) {
+                                        miClient.showMsgBoxInformation("El firmante carece de huella digital.\nEl movimiento deberá ser firmado posteriormente.");
+                                    }
+                                    else {
+                                        if (miClient.showMsgBoxConfirm("¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
+                                            validation.setMessage("Se debe firmar el movimiento.");
+                                            validation.setComponent(jbSign);
+                                        }
+                                    }
+                                }
+                                break;
+                                
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL:
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED:
+                                break;
+
+                            default:
+                                miClient.showMsgBoxWarning("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN + " desconocida.\nContactar a soporte.");
+                    }             
                 }
                 catch (Exception e) {
                     validation.setMessage(e.toString());
