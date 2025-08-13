@@ -80,7 +80,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     protected int mnItemDefaultId;
     protected boolean mbAreSigned;
     
-    private SGuiFieldKeyGroup moFieldKeyEntityGroup;
+    protected SGuiFieldKeyGroup moFieldKeyEntityGroup;
     
     protected ArrayList<SMaterialRequestSupplyRow> mlDbMaterialRequestSupplies;
     protected ArrayList<SMaterialRequestSupplyRow> mlMemoryMaterialRequestSupplies;
