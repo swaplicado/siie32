@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 282.9/ 2025-08-13
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) implementación del nivel de obligatoriedad del firmado en los prestamos de herramientas.
+
+================================================================================
+SIIE 3.2 282.8/ 2025-08-12
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección del campo localidad en el predial rustico, campos en SIIE diferentes (locality = localidad , county = municipo)
+
+================================================================================
 SIIE 3.2 282.7/ 2025-08-05
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
