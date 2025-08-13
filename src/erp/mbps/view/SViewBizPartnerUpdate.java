@@ -13,8 +13,9 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SHttpConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SSwapConsts;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
@@ -59,14 +60,14 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         // Enable SWAP Services:
         mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
         if (mbSwapServicesLinkUp) {
-            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_mag.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
 
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbExportDataToSwapServices);
         }
              
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 13 : 11];
+        STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 14 : 11];
 
         int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bp.id_bp");
@@ -109,8 +110,9 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tlog.ts_usr_upd", "Actualización", STableConstants.WIDTH_DATE_TIME);
         
         if (mbSwapServicesLinkUp) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_swap_srv_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_swap_srv_ts_last_exp", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_ss_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss._ss_usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss._ss_resp_ts", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
         }
 
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -130,10 +132,11 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, false);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabType);
                 }
                 else {
                     miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
@@ -150,7 +153,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, " +
                 "bp_ct.id_ct_bp, bp_ct.bp_key, bp_ct.co_key, bp_ct.lead_time, bp_ct.tax_regime, bpbc.email_01, " +
                 "ulog.usr, tlog.ts_usr_upd" +
-                (mbSwapServicesLinkUp ? ", sle.reference_id IS NOT NULL AS _swap_srv_is_exp, sle.ts_sync AS _swap_srv_ts_last_exp" : "") + " " +
+                (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss._ss_usr, tss._ss_resp_ts") + " " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp_ct.id_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
@@ -166,11 +169,15 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                     ") AS tlogx ON tlogx.id_bp = bul.id_bp AND tlogx.id_log = bul.id_log " +
                 ") AS tlog ON tlog.id_bp = bp.id_bp " +
                 "LEFT OUTER JOIN erp.usru_usr AS ulog ON ulog.id_usr = tlog.fk_usr_upd " +
-                (mbSwapServicesLinkUp ? "/* SWAP Services Sync Log: */ " +
-                "LEFT OUTER JOIN erp.cfg_sync_log_ety AS sle ON sle.reference_id = CONVERT(bp.id_bp, CHAR) " +
-                "AND (sle.response_code = '" + SExportUtils.HTTP_CODE_OK + "' OR sle.response_code = '" + SExportUtils.HTTP_CODE_CREATED + "') " +
-                "LEFT OUTER JOIN erp.cfg_sync_log AS sl ON sl.id_sync_log = sle.id_sync_log " +
-                "AND sl.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' " : "") +
+                (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ " +
+                "LEFT OUTER JOIN (SELECT sle.reference_id, u.usr AS _ss_usr, MAX(sl.response_timestamp) AS _ss_resp_ts " +
+                "FROM erp.cfg_sync_log AS sl " +
+                "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log " +
+                "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr " +
+                "WHERE sl.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' " +
+                "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') " +
+                "GROUP BY sle.reference_id, u.usr " +
+                "ORDER BY CONVERT(sle.reference_id, UNSIGNED)) AS tss ON tss.reference_id = CONVERT(bp.id_bp, CHAR) ") +
                 "WHERE NOT bp.b_del AND NOT bp_ct.b_del " +
                 "AND bp_ct.id_ct_bp = " + mnBizPartnerCategory + " "+ 
                 "ORDER BY " + msOrderKey;

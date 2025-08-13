@@ -6,7 +6,7 @@
 package erp.mod.cfg.db;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.swap.utils.SSwapConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
@@ -37,11 +37,13 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     protected String msReferenceId;
     protected Date mtTsSync;
     
+    protected String msAuxDatabase;
+    
     protected Class moClass;
     
     public SDbSyncLogEntry() {
         super(SModConsts.CFG_SYNC_LOG_ETY);
-        
+    
         moClass = getClass();
     }
 
@@ -59,6 +61,10 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
     public String getReferenceId() { return msReferenceId; }
     public Date getTsSync() { return mtTsSync; }
 
+    public void setAuxDatabase(String s) { msAuxDatabase = s; }
+    
+    public String getAuxDatabase() { return msAuxDatabase; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkSyncLogId = pk[0];
@@ -79,11 +85,13 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         msResponseBody = "";
         msReferenceId = "";
         mtTsSync = null;
+            
+        msAuxDatabase = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
@@ -187,6 +195,10 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
             registry.setResponseBody(this.getResponseBody());
             registry.setReferenceId(this.getReferenceId());
             registry.setTsSync(this.getTsSync());
+            
+            registry.setAuxDatabase(this.getAuxDatabase());
+            
+            registry.moClass = this.moClass;
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             SLibUtils.printException(this, e);

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.utils;
+package erp.mod.cfg.swap;
 
 /**
  *
@@ -32,14 +32,14 @@ public abstract class SSwapConsts {
     public static final String CFG_NVP_INSTANCE = "instance";
 
     /**
-     * JSON object for request attributes of functional-areas service.
-     */
-    public static final String CFG_OBJ_AREAS_SRV = "areas-srv";
-
-    /**
      * JSON object for request attributes of users service.
      */
     public static final String CFG_OBJ_USERS_SRV = "users-srv";
+
+    /**
+     * JSON object for request attributes of functional-areas service.
+     */
+    public static final String CFG_OBJ_AREAS_SRV = "areas-srv";
 
     /**
      * JSON object for request attributes of transaction-references service

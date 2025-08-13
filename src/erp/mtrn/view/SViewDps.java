@@ -36,8 +36,8 @@ import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -477,7 +477,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsCategoryPur && mbIsOrd) { // purchase orders only!
             mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
             if (mbSwapServicesLinkUp) {
-                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_mag.gif")), "Exportar referencias pedidos a " + SSwapConsts.SWAP_SERVICES, this);
+                jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar referencias pedidos a " + SSwapConsts.SWAP_SERVICES, this);
 
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -3062,7 +3062,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PURCHASE_ORDER_REF, false);
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PURCHASE_ORDER_REF);
                 
                 if (response.isEmpty()) {
                     miClient.showMsgBoxInformation("Las referencias de pedidos fueron exportadas correctamente a " + SSwapConsts.SWAP_SERVICES + ".");

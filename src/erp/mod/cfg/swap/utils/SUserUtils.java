@@ -3,6 +3,7 @@
  */
 package erp.mod.cfg.swap.utils;
 
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;

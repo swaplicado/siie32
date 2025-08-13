@@ -14,6 +14,7 @@ public abstract class SJsonUtils {
 
     /**
      * Sanitiza una cadena JSON para evitar caracteres problemáticos.
+     * 
      * @param json Cadena JSON.
      * @return Cadena JSON sanitizada.
      */
@@ -26,11 +27,12 @@ public abstract class SJsonUtils {
     }
 
     /**
-     * Compacta una cadena JSON quitando espacios y saltos de línea.
+     * Remueve todos los espacios en blanco (espacios, tabuladores, saltos de línea, etc.) de la cadena JSON.
+     * 
      * @param json Cadena JSON.
      * @return Cadena JSON compactada.
      */
-    public static String compactJson(final String json) {
+    public static String removeWhiteSpaces(final String json) {
         if (json == null || json.isEmpty()) {
             return json;
         }

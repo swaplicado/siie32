@@ -61,7 +61,7 @@ import erp.mfin.data.SFinMovementType;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.utils.SSwapConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;

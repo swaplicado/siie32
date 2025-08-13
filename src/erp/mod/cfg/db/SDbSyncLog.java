@@ -41,6 +41,8 @@ public class SDbSyncLog extends SDbRegistryUser {
     
     protected ArrayList<SDbSyncLogEntry> moEntries;
     
+    protected String msAuxDatabase;
+    
     protected Class moClass;
     protected Class moChildClass;
     protected int mnChildType;
@@ -75,6 +77,10 @@ public class SDbSyncLog extends SDbRegistryUser {
 
     public ArrayList<SDbSyncLogEntry> getEntries() { return moEntries; }
 
+    public void setAuxDatabase(String s) { msAuxDatabase = s; }
+    
+    public String getAuxDatabase() { return msAuxDatabase; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkSyncLogId = pk[0];
@@ -100,11 +106,13 @@ public class SDbSyncLog extends SDbRegistryUser {
         mtTsUser = null;
 
         moEntries = new ArrayList<>();
+        
+        msAuxDatabase = "";
     }
 
     @Override
     public String getSqlTable() {
-        return SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
@@ -169,6 +177,7 @@ public class SDbSyncLog extends SDbRegistryUser {
                 
                 while (resultSetEntries.next()) {
                     SDbSyncLogEntry entry = (SDbSyncLogEntry) constructor.newInstance(new Object[] {});
+                    entry.setAuxDatabase(msAuxDatabase);
                     entry.read(session, new int[] { mnPkSyncLogId, resultSetEntries.getInt("id_ety") });
                     moEntries.add(entry);
                 }
@@ -239,6 +248,7 @@ public class SDbSyncLog extends SDbRegistryUser {
         for (SDbSyncLogEntry entry : moEntries) {
             entry.setPkSyncLogId(mnPkSyncLogId);
             entry.setTsSync(mtTsUser); // sync as well the sync entry!
+            entry.setAuxDatabase(msAuxDatabase);
             entry.save(session);
         }
 
@@ -269,6 +279,12 @@ public class SDbSyncLog extends SDbRegistryUser {
             for (SDbSyncLogEntry entry : this.moEntries) {
                 registry.getEntries().add((SDbSyncLogEntry) entry.clone());
             }
+            
+            registry.setAuxDatabase(this.getAuxDatabase());
+            
+            registry.moClass = this.moClass;
+            registry.moChildClass = this.moChildClass;
+            registry.mnChildType = this.mnChildType;
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             SLibUtils.printException(this, e);

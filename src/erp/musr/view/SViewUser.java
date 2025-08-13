@@ -15,8 +15,9 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SHttpConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SSwapConsts;
 import erp.musr.form.SFormExportUser;
 import erp.siieapp.SUserExportUtils;
 import java.awt.Dimension;
@@ -24,11 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
-import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -94,7 +93,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         // Enable SWAP Services:
         mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
         if (mbSwapServicesLinkUp) {
-            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_mag.gif")), "Exportar usuarios a " + SSwapConsts.SWAP_SERVICES, this);
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar usuarios a " + SSwapConsts.SWAP_SERVICES, this);
 
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -103,7 +102,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         // Initialize table:
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 20 : 18];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 21 : 18];
 
         int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -128,11 +127,13 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "u.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_siie_app_usr_last_sync", "SIIE App usr. últ. sinccronización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_siie_app_ts_last_sync", "SIIE App últ. sinccronización", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_siie_app_usr_last_sync", "SIIE App usr. últ. sincronización", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_siie_app_ts_last_sync", "SIIE App últ. sincronización", STableConstants.WIDTH_DATE_TIME);
+        
         if (mbSwapServicesLinkUp) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_swap_srv_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_swap_srv_ts_last_exp", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_ss_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss._ss_usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss._ss_resp_ts", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
         }
         
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -146,9 +147,107 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         //jbDelete.setEnabled(false);
 
         mvSuscriptors.add(mnTabType);
+        mvSuscriptors.add(SDataConstants.TRN_USR_CFG);
         mvSuscriptors.add(SDataConstants.USRX_RIGHT);
 
         populateTable();
+    }
+
+    private void actionCopy() {
+        if (jbCopy.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+
+    private void actionSiieAppExport() {
+        if (jbSiieAppExport != null && jbSiieAppExport.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int[] pkUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                SFormExportUser moSFormExportUser = new SFormExportUser((SClientInterface) miClient);
+                moSFormExportUser.setValue(pkUser[0], null);
+                moSFormExportUser.setVisible(true);
+                if (moSFormExportUser.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+
+    private void actionSiieAppSync() {
+        if (jbSiieAppSync != null && jbSiieAppSync.isEnabled()) {
+            SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
+            oExport.SynchronizeExternal();
+            miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+        }
+    }
+
+    private void actionExportDataToSwapServices() {
+        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
+            try {
+                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.USER);
+                
+                if (response.isEmpty()) {
+                    miClient.showMsgBoxInformation("Los usuarios fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
+                }
+                else {
+                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los usuarios a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(this, e);
+            }
+        }
+    }
+
+    @Override
+    public void createSqlQuery() {
+        java.lang.String sqlWhere = "";
+        erp.lib.table.STableSetting setting = null;
+
+        for (int i = 0; i < mvTableSettings.size(); i++) {
+            setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
+            if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT u.b_del ";
+            }
+        }
+
+        msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
+                + "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, "
+                + "b.bp, bbc.email_02, e.b_act, "
+                + "uls.usr AS _siie_app_usr_last_sync, u.ts_last_sync_n AS _siie_app_ts_last_sync"
+                + (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss._ss_usr, tss._ss_resp_ts") + " "
+                + "FROM erp.usru_usr AS u "
+                + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
+                + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "
+                + "INNER JOIN erp.usru_usr AS ud ON u.fid_usr_del =  ud.id_usr "
+                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = u.fid_bp_n AND b.b_att_emp "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
+                + "LEFT OUTER JOIN erp.bpsu_bpb_con AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = " + SUtilConsts.BRA_CON_ID + " "
+                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp "
+                + "/* SIIE App Sync Log: */ "
+                + "LEFT OUTER JOIN erp.usru_usr AS uls ON uls.id_usr = u.fid_usr_last_sync_n "
+                + (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ "
+                + "LEFT OUTER JOIN (SELECT sle.reference_id, u.usr AS _ss_usr, MAX(sl.response_timestamp) AS _ss_resp_ts "
+                + "FROM erp.cfg_sync_log AS sl "
+                + "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log "
+                + "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr "
+                + "WHERE sl.sync_type = '" + SSyncType.USER + "' "
+                + "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') "
+                + "GROUP BY sle.reference_id, u.usr "
+                + "ORDER BY CONVERT(sle.reference_id, UNSIGNED)) AS tss ON tss.reference_id = CONVERT(u.id_usr, CHAR) ")
+                + (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere)
+                + "ORDER BY u.usr, u.id_usr ";
     }
 
     @Override
@@ -181,101 +280,6 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         if (jbDelete.isEnabled()) {
 
         }
-    }
-
-    private void actionCopy() {
-        if (jbCopy.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else {
-                if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
-                }
-            }
-        }
-    }
-
-    public int showMsgBoxConfirm(String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, SGuiConsts.MSG_BOX_CONFIRM, JOptionPane.YES_NO_OPTION);
-    }
-
-    private void actionSiieAppExport() {
-        if (jbSiieAppExport != null && jbSiieAppExport.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else {
-                int[] pkUser = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
-                SFormExportUser moSFormExportUser = new SFormExportUser((SClientInterface) miClient);
-                moSFormExportUser.setValue(pkUser[0], null);
-                moSFormExportUser.setVisible(true);
-                if (moSFormExportUser.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
-                }
-            }
-        }
-    }
-
-    private void actionSiieAppSync() {
-        if (jbSiieAppSync != null && jbSiieAppSync.isEnabled()) {
-            SUserExportUtils oExport = new SUserExportUtils((SGuiClient) miClient);
-            oExport.SynchronizeExternal();
-        }
-    }
-
-    private void actionExportDataToSwapServices() {
-        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, false);
-                
-                if (response.isEmpty()) {
-                    miClient.showMsgBoxInformation("Los usuarios fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
-                }
-                else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los usuarios a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
-            }
-        }
-    }
-
-    @Override
-    public void createSqlQuery() {
-        java.lang.String sqlWhere = "";
-        erp.lib.table.STableSetting setting = null;
-
-        for (int i = 0; i < mvTableSettings.size(); i++) {
-            setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
-            if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT u.b_del ";
-            }
-        }
-
-        msSql = "SELECT u.id_usr, u.email, u.usr, u.b_univ, u.b_can_edit, u.b_can_del, u.b_act, u.b_del, u.b_can_edit AS " + STableConstants.FIELD_IS_EDITABLE + ", "
-                + "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, "
-                + "b.bp, bbc.email_02, e.b_act, "
-                + "uls.usr AS _siie_app_usr_last_sync, u.ts_last_sync_n AS _siie_app_ts_last_sync"
-                + (mbSwapServicesLinkUp ? ", sle.reference_id IS NOT NULL AS _swap_srv_is_exp, sle.ts_sync AS _swap_srv_ts_last_exp" : "") + " "
-                + "FROM erp.usru_usr AS u "
-                + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
-                + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "
-                + "INNER JOIN erp.usru_usr AS ud ON u.fid_usr_del =  ud.id_usr "
-                + "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = u.fid_bp_n AND b.b_att_emp "
-                + "LEFT OUTER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
-                + "LEFT OUTER JOIN erp.bpsu_bpb_con AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = " + SUtilConsts.BRA_CON_ID + " "
-                + "LEFT OUTER JOIN erp.hrsu_emp AS e ON e.id_emp = b.id_bp "
-                + "/* SIIE App Sync Log: */ "
-                + "LEFT OUTER JOIN erp.usru_usr AS uls ON uls.id_usr = u.fid_usr_last_sync_n "
-                + (mbSwapServicesLinkUp ? "/* SWAP Services Sync Log: */ "
-                + "LEFT OUTER JOIN erp.cfg_sync_log_ety AS sle ON sle.reference_id = CONVERT(u.id_usr, CHAR) "
-                + "AND (sle.response_code = '" + SExportUtils.HTTP_CODE_OK + "' OR sle.response_code = '" + SExportUtils.HTTP_CODE_CREATED + "') "
-                + "LEFT OUTER JOIN erp.cfg_sync_log AS sl ON sl.id_sync_log = sle.id_sync_log "
-                + "AND sl.sync_type = '" + SSyncType.USER + "' " : "")
-                + (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere)
-                + "ORDER BY u.usr, u.id_usr ";
     }
 
     @Override

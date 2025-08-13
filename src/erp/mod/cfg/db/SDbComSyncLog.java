@@ -21,7 +21,7 @@ public class SDbComSyncLog extends SDbSyncLog {
         mnRegistryType = SModConsts.CFG_COM_SYNC_LOG;
         
         moClass = getClass();
-        moChildClass = SDbSyncLogEntry.class;
-        mnChildType = SModConsts.CFG_SYNC_LOG_ETY;
+        moChildClass = SDbComSyncLogEntry.class;
+        mnChildType = SModConsts.CFG_COM_SYNC_LOG_ETY;
     }
 }
