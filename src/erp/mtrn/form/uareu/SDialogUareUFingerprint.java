@@ -31,6 +31,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormUtilities;
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import javax.swing.SwingUtilities;
 import sa.lib.SLibConsts;
 
@@ -41,14 +42,17 @@ import sa.lib.SLibConsts;
 public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
     
     public static final int VALUE_FINGERPRINT = 1;
+    public static final int VALUE_FINGERPRINT_USR = 2;
     public static final int MODE_ENROLLMENT = 1;
     public static final int MODE_VERIFICATION = 2;
+    public static final int MODE_GET_FINGERPRINT_USR = 3;
     public static final String TEMPLATE_PROPERTY = "template";
 
+    private final erp.client.SClientInterface miClient;
+    private final int mnMode;
     private int mnFormResult;
     private boolean mbFirstTime;
-    private int mnMode;
-    private erp.client.SClientInterface miClient;
+    private int mnMaintUserId;
 
     private DPFPTemplate moFpTemplate;          // to handle fingerprints
     private DPFPCapture moFpCapture;            // to handle DigitalPersona device
@@ -248,6 +252,33 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
         return featureSet;
     }
     
+    private boolean verifyAgainstDatabase(DPFPFeatureSet featureSet) throws Exception {
+        boolean matchFound = false;
+        moFPVerification = DPFPGlobal.getVerificationFactory().createVerification();
+        // Consulta a la base de datos para obtener todas las plantillas
+        String sql = "SELECT id_maint_user, fingerprint_n FROM trn_maint_user WHERE NOT b_del AND fingerprint_n IS NOT NULL";
+        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                byte[] storedTemplateData = resultSet.getBytes("fingerprint_n");
+                if (storedTemplateData != null) {
+                    DPFPTemplate storedTemplate = DPFPGlobal.getTemplateFactory().createTemplate(storedTemplateData);
+                    DPFPVerificationResult result = moFPVerification.verify(featureSet, storedTemplate);
+                    if (result.isVerified()) {
+                        appendMessage("Coincidencia encontrada con una huella registrada.");
+                        mnMaintUserId = resultSet.getInt("id_maint_user");
+                        matchFound = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!matchFound) {
+            appendMessage("No se encontró coincidencia con ninguna huella registrada.");
+        }
+        
+        return matchFound;
+    }
+    
     public void processCapture(final DPFPSample sample) {
         switch (mnMode) {
             case MODE_ENROLLMENT:
@@ -313,6 +344,27 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
                     SLibUtilities.renderException(this, e);
                 }
                 break;
+                
+            case MODE_GET_FINGERPRINT_USR:
+                try {
+                    DPFPFeatureSet featureSet = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+                    
+                    if (featureSet == null) {
+                        throw new Exception("No fue posible obtener los atributos de la muestra de huella digital.");
+                    }
+                    
+                    // Comparar con todas las huellas en la base de datos
+                    boolean matchFound = verifyAgainstDatabase(featureSet);
+                    if (matchFound) {
+                        actionOk();
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No se encontró coincidencia con ninguna huella registrada.\nIntenta de nuevo.");
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
                 
             default:
         }
@@ -420,6 +472,11 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
             case VALUE_FINGERPRINT:
                 value = moFpTemplate.serialize();
                 break;
+                
+            case VALUE_FINGERPRINT_USR:
+                value = mnMaintUserId;
+                break;
+                
             default:
                 miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

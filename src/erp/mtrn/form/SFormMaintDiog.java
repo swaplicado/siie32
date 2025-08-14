@@ -10,6 +10,7 @@
  */
 
 package erp.mtrn.form;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -1438,27 +1439,72 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     }
 
     private void actionSign() {
-        try {                  
-            byte[] fingerprint = getSignatoryFingerprint();
-            int fingerPassword = getSignatoryFingerPassword();
-            
-            if (fingerprint == null && fingerPassword == 0) {
-                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
+        try {  
+            boolean userSelected = false;
+            boolean movIn = false;
+            switch (mnParamMaintMovementType) {
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_MAT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
+                    if (jcbMaintReturnUserSupervisor.getSelectedIndex() > 0 || jcbMaintReturnUser.getSelectedIndex() > 0) {
+                        userSelected = true;
+                        movIn = true;
+                    }
+                    break;
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_MAT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
+                case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                    if (jcbMaintUserSupervisor.getSelectedIndex() > 0 || jcbMaintUser.getSelectedIndex() > 0) {
+                        userSelected = true;
+                        movIn = false;
+                    }
+                    break;
+                default:
             }
-            if (fingerprint != null) {
-                if (STrnMaintUtilities.verifyFingerprint(miClient, fingerprint)) {
-                    moMaintDiogSignature = new SDbMaintDiogSignature();
-                    showSignatureStatus();
+            if (userSelected) {
+                byte[] fingerprint = getSignatoryFingerprint();
+                int fingerPassword = getSignatoryFingerPassword();
+
+                if (fingerprint == null && fingerPassword == 0) {
+                    throw new Exception("El firmante carece de huella digital y contraseña.");
                 }
-            }            
-            else if (fingerPassword != 0) {
-                if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
-                    moMaintDiogSignature = new SDbMaintDiogSignature();
-                    showSignatureStatus();                
-                }
-            } 
+                if (fingerprint != null) {
+                    if (STrnMaintUtilities.verifyFingerprint(miClient, fingerprint)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();
+                    }
+                }            
+                else if (fingerPassword != 0) {
+                    if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();                
+                    }
+                } 
+            }
             else {
-                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
+                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient);
+                if (pk != 0) {
+                    if (movIn) {
+                        SGuiUtils.locateItem(jcbMaintReturnUser, new int[] { pk });
+                        if (jcbMaintReturnUser.getSelectedIndex() > 0) {
+                            moMaintDiogSignature = new SDbMaintDiogSignature();
+                            showSignatureStatus();
+                        }
+                    }
+                    else {
+                        SGuiUtils.locateItem(jcbMaintUser, new int[] { pk });
+                        if (jcbMaintUser.getSelectedIndex() > 0) {
+                            moMaintDiogSignature = new SDbMaintDiogSignature();
+                            showSignatureStatus();
+                        }
+                    }
+                }
             }
         }
         catch (Exception e) {

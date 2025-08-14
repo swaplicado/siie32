@@ -1054,26 +1054,35 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     
     private void actionSign() {
         try {
-            byte[] fingerprint = getSignatoryFingerprint();
-            int fingerPassword = getSignatoryFingerPassword();
-            
-            if (fingerprint == null && fingerPassword == 0) {
-                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
+            if (moKeyMaintUserSupervisor.getSelectedIndex() > 0 || moKeyMaintUser.getSelectedIndex() > 0) {
+                byte[] fingerprint = getSignatoryFingerprint();
+                int fingerPassword = getSignatoryFingerPassword();
+
+                if (fingerprint == null && fingerPassword == 0) {
+                    throw new Exception("El firmante carece de huella digital y contraseña.");
+                }
+                if (fingerprint != null) {
+                    if (STrnMaintUtilities.verifyFingerprint((SClientInterface) miClient, fingerprint)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();
+                    }
+                }            
+                else if (fingerPassword != 0) {
+                    if (STrnMaintUtilities.verifyFingerPassword((SClientInterface) miClient, fingerPassword)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();                
+                    }
+                } 
             }
-            if (fingerprint != null) {
-                if (STrnMaintUtilities.verifyFingerprint((SClientInterface) miClient, fingerprint)) {
-                    moMaintDiogSignature = new SDbMaintDiogSignature();
-                    showSignatureStatus();
-                }
-            }            
-            else if (fingerPassword != 0) {
-                if (STrnMaintUtilities.verifyFingerPassword((SClientInterface) miClient, fingerPassword)) {
-                    moMaintDiogSignature = new SDbMaintDiogSignature();
-                    showSignatureStatus();                
-                }
-            } 
             else {
-                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
+                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient);
+                if (pk != 0) {
+                    moKeyMaintUser.setValue(new int[] { pk });
+                    if (moKeyMaintUser.getSelectedIndex() > 0) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();
+                    }
+                }
             }
         }
         catch (Exception ex) {
