@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 284.3/ 2025-08-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Ajustes y correcciones de valuaciones de consumos de inventario en base a observaciones de diferencia de precios en facturas y OC
+
+================================================================================
 SIIE 3.2 284.2/ 2025-08-15
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------

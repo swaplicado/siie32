@@ -482,30 +482,30 @@ public class SStockValuationRecordUtils {
             // (Es negativo cuando la factura tiene un costo menor que la OC)
             if (dValue >= 0d) {
                 if (movType == TYPE_INV) {
-                    oRecordEntry.setDebit(dValue);
-                    oRecordEntry.setCredit(0d);
-                    oRecordEntry.setDebitCy(dValue);
-                    oRecordEntry.setCreditCy(0d);
-                }
-                else {
                     oRecordEntry.setDebit(0d);
                     oRecordEntry.setCredit(dValue);
                     oRecordEntry.setDebitCy(0d);
                     oRecordEntry.setCreditCy(dValue);
                 }
+                else {
+                    oRecordEntry.setDebit(dValue);
+                    oRecordEntry.setCredit(0d);
+                    oRecordEntry.setDebitCy(dValue);
+                    oRecordEntry.setCreditCy(0d);
+                }
             }
             else {
                 if (movType == TYPE_INV) {
-                    oRecordEntry.setDebit(0d);
-                    oRecordEntry.setCredit(-dValue);
-                    oRecordEntry.setDebitCy(0d);
-                    oRecordEntry.setCreditCy(-dValue);
-                }
-                else {
                     oRecordEntry.setDebit(-dValue);
                     oRecordEntry.setCredit(0d);
                     oRecordEntry.setDebitCy(-dValue);
                     oRecordEntry.setCreditCy(0d);
+                }
+                else {
+                    oRecordEntry.setDebit(0d);
+                    oRecordEntry.setCredit(-dValue);
+                    oRecordEntry.setDebitCy(0d);
+                    oRecordEntry.setCreditCy(-dValue);
                 }
             }
         }
