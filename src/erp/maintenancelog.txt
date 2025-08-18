@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 284.4/ 2025-08-18
+Sergio Abraham FLORES GUTIÉRREZ/ Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la validación de captura de nuevas partidas de contabilización personalizada por cuestión de redondeo.
+2) Preparación del releas 3.2 284.
+
+================================================================================
 SIIE 3.2 284.3/ 2025-08-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
