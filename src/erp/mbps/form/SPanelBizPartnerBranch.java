@@ -35,13 +35,12 @@ import erp.mod.SModSysConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.mail.SMailUtils;
 
 /**
  *
@@ -998,7 +997,6 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         int count = 0;
-        ArrayList<String> email = new ArrayList<>();
         SFormValidation validation = new SFormValidation();
         SDataBizPartnerBranchAddress address = null;
 
@@ -1084,13 +1082,16 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             }
         }
 
-        email.addAll(Arrays.asList(SLibUtils.textExplode(moFieldEmail.getString(), ";")));
-        for(String field:email) {
-            if (!validation.getIsError() && field.length() > 0) {
-                field = SLibUtilities.validateEmail(field);
-                if (field.length() > 0) {
+        if (!validation.getIsError() && !moFieldEmail.getString().isEmpty()) {
+            moFieldEmail.setString(SMailUtils.sanitizeEmails(moFieldEmail.getString()));
+            
+            String[] emails = SLibUtils.textExplode(moFieldEmail.getString(), ";");
+            for (String email : emails) {
+                String result = SLibUtilities.validateEmail(email);
+                if (!result.isEmpty()) {
+                    validation.setMessage(result);
                     validation.setComponent(jtfEmail);
-                    validation.setMessage(field);
+                    break;
                 }
             }
         }

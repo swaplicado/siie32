@@ -510,12 +510,13 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmail.setText("Cuenta correo-e");
+        jlEmail.setForeground(new java.awt.Color(0, 102, 102));
+        jlEmail.setText("Cuenta correo-e:");
         jlEmail.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel24.add(jlEmail);
 
         jtfEmail.setText("CUENTA CORREO-E");
-        jtfEmail.setPreferredSize(new java.awt.Dimension(240, 23));
+        jtfEmail.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel24.add(jtfEmail);
 
         jPanel16.add(jPanel24);

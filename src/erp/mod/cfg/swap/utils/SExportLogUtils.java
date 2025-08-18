@@ -19,12 +19,12 @@ import java.util.logging.Logger;
  * Esta clase proporciona métodos para escribir mensajes de log en archivos,
  * asociados a un ID específico. Los mensajes se formatean con un timestamp
  * y se guardan en un directorio específico.
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SExportLogUtils {
+    
     private static final String LOG_DIRECTORY = "logs/export"; // Directorio donde se guardarán los logs
-    private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     /**
      * Escribe un mensaje en un archivo de log asociado a un ID específico.
@@ -35,7 +35,7 @@ public class SExportLogUtils {
      * @return 
      * @throws IOException Si ocurre un error de E/S al escribir el archivo
      */
-    public static String writeToLogFile(String sufixFileName, String message) throws IOException {
+    public static String writeToLogFile(final String sufixFileName, final String message) throws IOException {
         // Crear el directorio de logs si no existe
         Path logDirectory = Paths.get(LOG_DIRECTORY);
         if (!Files.exists(logDirectory)) {
@@ -66,7 +66,7 @@ public class SExportLogUtils {
      * @param message Mensaje a escribir en el log
      * @return string si la operación fue exitosa, null si hubo error
      */
-    public static String safeWriteToLogFile(String sufixFileName, String message) {
+    public static String safeWriteToLogFile(final String sufixFileName, final String message) {
         try {
             return writeToLogFile(sufixFileName, message);
         }

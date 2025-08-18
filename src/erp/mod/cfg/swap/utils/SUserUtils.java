@@ -3,12 +3,11 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import erp.mod.cfg.swap.SSwapConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
-import static erp.mod.cfg.swap.utils.SExportUtils.getSwapCompaniesForSqlQuery;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.musr.data.SDataUser;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -92,7 +91,7 @@ public abstract class SUserUtils {
         else {
             String sql = "SELECT id_co "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.USRU_ACCESS_CO) + " "
-                    + "WHERE id_usr = " + userId + " AND id_co IN (" + getSwapCompaniesForSqlQuery(session) + ") "
+                    + "WHERE id_usr = " + userId + " AND id_co IN (" + SExportUtils.getSwapCompaniesForSqlQuery(session) + ") "
                     + "ORDER BY id_co;";
             
             try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {

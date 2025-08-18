@@ -5,6 +5,7 @@
 
 package erp.mbps.view;
 
+import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -15,10 +16,14 @@ import erp.lib.table.STableField;
 import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SResponses;
+import java.awt.Cursor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.grid.SGridUtils;
 
 /**
@@ -60,14 +65,15 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         // Enable SWAP Services:
         mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
         if (mbSwapServicesLinkUp) {
-            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
+                    "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PARTNER_SUPPLIER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbExportDataToSwapServices);
         }
              
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 14 : 11];
+        STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 15 : 12];
 
         int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bp.id_bp");
@@ -101,6 +107,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_frg_id", "ID fiscal", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_country_code", "País origen", 50);
         
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpbc.email_01", "Cuentas(s) correo-e", 300);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.lead_time", "Plazo entrega (días)", 50);
@@ -132,18 +139,15 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
-                
-                if (response.isEmpty()) {
-                    miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
-                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabType);
-                }
-                else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
-                }
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
+                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }
@@ -152,12 +156,15 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
     public void createSqlQuery() {
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, " +
                 "bp_ct.id_ct_bp, bp_ct.bp_key, bp_ct.co_key, bp_ct.lead_time, bp_ct.tax_regime, bpbc.email_01, " +
+                "COALESCE(cty.cty_code, '" + DCfdi40Catalogs.ClavePaísMex + "') AS _country_code, " +
                 "ulog.usr, tlog.ts_usr_upd" +
                 (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss._ss_usr, tss._ss_resp_ts") + " " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp_ct.id_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
                 "INNER JOIN erp.bpsu_bpb_con AS bpbc ON bpbc.id_bpb = bpb.id_bpb AND bpbc.id_con = " + SUtilConsts.BRA_CON_ID + " " +
+                "INNER JOIN erp.bpsu_bpb_add AS bpba ON bpba.id_bpb = bpb.id_bpb AND bpba.id_add = " + SUtilConsts.BRA_ADD_ID + " " +
+                "LEFT OUTER JOIN erp.locu_cty AS cty ON cty.id_cty = bpba.fid_cty_n " +
                 "/* Business Partner Update Log: */ " +
                 "LEFT OUTER JOIN (" +
                     "SELECT bul.id_bp, bul.fk_usr_upd, bul.ts_usr_upd " +

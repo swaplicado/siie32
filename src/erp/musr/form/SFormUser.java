@@ -46,6 +46,7 @@ import javax.swing.JOptionPane;
 import org.json.simple.parser.ParseException;
 import sa.lib.SLibMethod;
 import sa.lib.gui.SGuiClient;
+import sa.lib.mail.SMailUtils;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -378,6 +379,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlEmail.setForeground(new java.awt.Color(0, 102, 102));
         jlEmail.setText("Correo-e usuario:");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel1.add(jlEmail);
@@ -3764,6 +3766,13 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             jpfUserPasswordConfirm.setText("");
                             validation.setComponent(jpfUserPassword);
                         }
+                    }
+                }
+                
+                if (!validation.getIsError() && !moFieldEmail.getString().isEmpty()) {
+                    if (!SMailUtils.isValidEmail(moFieldEmail.getString())) {
+                        validation.setMessage("El valor del campo '" + jlEmail.getText() + "' es inválido.");
+                        validation.setComponent(jtfEmail);
                     }
                 }
             }

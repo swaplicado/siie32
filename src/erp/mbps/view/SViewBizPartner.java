@@ -20,7 +20,9 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsConsts;
@@ -28,6 +30,7 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.mod.hrs.form.SDialogEmployerSubstitution;
 import erp.table.SFilterConstants;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import javax.swing.ButtonGroup;
@@ -276,7 +279,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 // Enable SWAP Services:
                 mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
                 if (mbSwapServicesLinkUp) {
-                    jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar proveedores a " + SSwapConsts.SWAP_SERVICES, this);
+                    jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
+                    "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PARTNER_SUPPLIER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
                     addTaskBarUpperSeparator();
                     addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -634,17 +638,15 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
-                
-                if (response.isEmpty()) {
-                    miClient.showMsgBoxInformation("Los proveedores fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
-                }
-                else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los provedores a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
-                }
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
+                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }

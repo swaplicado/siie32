@@ -17,15 +17,19 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SResponses;
 import erp.musr.form.SFormExportUser;
 import erp.siieapp.SUserExportUtils;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 
@@ -93,7 +97,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         // Enable SWAP Services:
         mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
         if (mbSwapServicesLinkUp) {
-            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")), "Exportar usuarios a " + SSwapConsts.SWAP_SERVICES, this);
+            jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
+                    "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.USER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -194,18 +199,15 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
-                String response = SExportUtils.exportData(miClient.getSession(), SSyncType.USER);
-                
-                if (response.isEmpty()) {
-                    miClient.showMsgBoxInformation("Los usuarios fueron exportados correctamente a " + SSwapConsts.SWAP_SERVICES + ".");
-                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_USR).refreshCatalogues(mnTabType);
-                }
-                else {
-                    miClient.showMsgBoxInformation("Ocurrió un problema al exportar los usuarios a " + SSwapConsts.SWAP_SERVICES + ":\n" + response);
-                }
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER);
+                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_USR, mnTabType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }

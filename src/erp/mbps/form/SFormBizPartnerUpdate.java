@@ -9,18 +9,23 @@ import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerUpdateLogEntry;
+import erp.mloc.data.SDataCountry;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
+import sa.lib.mail.SMailUtils;
 
 /**
  *
@@ -74,6 +79,10 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
         jPanel35 = new javax.swing.JPanel();
         jlFiscalFrgId = new javax.swing.JLabel();
         jtfFiscalFrgId = new javax.swing.JTextField();
+        jPanel36 = new javax.swing.JPanel();
+        jlCountry = new javax.swing.JLabel();
+        jtfCountryCode = new javax.swing.JTextField();
+        jtfCountryName = new javax.swing.JTextField();
         jPanel34 = new javax.swing.JPanel();
         jlBizPartnerCommercial = new javax.swing.JLabel();
         jtfBizPartnerCommercial = new javax.swing.JTextField();
@@ -125,7 +134,7 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
         jpBizPartner.setLayout(new java.awt.BorderLayout());
 
         jpBizPartner11.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del asociado de negocios:"));
-        jpBizPartner11.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jpBizPartner11.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -168,6 +177,26 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
         jPanel35.add(jtfFiscalFrgId);
 
         jpBizPartner11.add(jPanel35);
+
+        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCountry.setText("País de origen:");
+        jlCountry.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel36.add(jlCountry);
+
+        jtfCountryCode.setEditable(false);
+        jtfCountryCode.setText("TEXT");
+        jtfCountryCode.setFocusable(false);
+        jtfCountryCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel36.add(jtfCountryCode);
+
+        jtfCountryName.setEditable(false);
+        jtfCountryName.setText("TEXT");
+        jtfCountryName.setFocusable(false);
+        jtfCountryName.setPreferredSize(new java.awt.Dimension(345, 23));
+        jPanel36.add(jtfCountryName);
+
+        jpBizPartner11.add(jPanel36);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -431,6 +460,7 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
@@ -438,6 +468,7 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
     private javax.swing.JLabel jlAddingMultipleMailHelp;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartnerCommercial;
+    private javax.swing.JLabel jlCountry;
     private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlFiscalFrgId;
     private javax.swing.JLabel jlFiscalId;
@@ -457,6 +488,8 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
     private javax.swing.JPanel jpCommands2;
     private javax.swing.JTextField jtfBizPartner;
     private javax.swing.JTextField jtfBizPartnerCommercial;
+    private javax.swing.JTextField jtfCountryCode;
+    private javax.swing.JTextField jtfCountryName;
     private javax.swing.JTextField jtfEmail;
     private javax.swing.JTextField jtfFiscalFrgId;
     private javax.swing.JTextField jtfFiscalId;
@@ -488,6 +521,8 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
         jtfBizPartner.setText("");
         jtfFiscalId.setText("");
         jtfFiscalFrgId.setText("");
+        jtfCountryCode.setText("");
+        jtfCountryName.setText("");
         jtfPkBizPartnerId_Ro.setText("");
 
         msOldBizPartnerCommercial = "";
@@ -513,6 +548,27 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
                 break;
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            moFieldEmail.setString(SMailUtils.sanitizeEmails(moFieldEmail.getString()));
+            
+            if (moFieldEmail.getString().isEmpty() && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlEmail.getText() + "'?") != JOptionPane.YES_OPTION) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEmail.getText() + "'.");
+                validation.setComponent(jtfEmail);
+            }
+            
+            if (!validation.getIsError() && !moFieldEmail.getString().isEmpty()) {
+                String[] emails = SLibUtils.textExplode(moFieldEmail.getString(), ";");
+                for (String email : emails) {
+                    String result = SLibUtilities.validateEmail(email);
+                    if (!result.isEmpty()) {
+                        validation.setMessage(result);
+                        validation.setComponent(jtfEmail);
+                        break;
+                    }
+                }
             }
         }
         
@@ -555,11 +611,16 @@ public class SFormBizPartnerUpdate extends javax.swing.JDialog implements erp.li
         jtfFiscalId.setText(moBizPartner.getFiscalId());
         jtfFiscalFrgId.setText(moBizPartner.getFiscalFrgId());
         jtfPkBizPartnerId_Ro.setText("" + moBizPartner.getPkBizPartnerId());
+        SDataCountry country = moBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry();
+        jtfCountryCode.setText(country.getCountryCode());
+        jtfCountryName.setText(country.getCountry());
         
         jtfBizPartner.setCaretPosition(0);
         jtfFiscalId.setCaretPosition(0);
         jtfFiscalFrgId.setCaretPosition(0);
         jtfPkBizPartnerId_Ro.setCaretPosition(0);
+        jtfCountryCode.setCaretPosition(0);
+        jtfCountryName.setCaretPosition(0);
         
         // preseve old values:
         

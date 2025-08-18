@@ -20,6 +20,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.mail.SMailUtils;
 
 /**
  *
@@ -124,6 +125,7 @@ public class SDialogCfdSending extends SBeanFormDialog implements ActionListener
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlEmail.setForeground(new java.awt.Color(0, 102, 102));
         jlEmail.setText("Cuentas correo-e:*");
         jlEmail.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlEmail);
@@ -141,7 +143,7 @@ public class SDialogCfdSending extends SBeanFormDialog implements ActionListener
         jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlAddingMultipleMailHelp.setToolTipText("Para varias cuentas de correo-e, separarlas con \";\", sin espacios, p. ej., \"ejemplo1@mail.com;ejemplo2@mail.com\"");
+        jlAddingMultipleMailHelp.setToolTipText("Separar varias cuentas con \";\", sin espacios, p. ej., \"cuenta1@mail.com;cuenta2@mail.com\"");
         jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jlAddingMultipleMailHelp);
 
@@ -264,14 +266,14 @@ public class SDialogCfdSending extends SBeanFormDialog implements ActionListener
 
     @Override
     public SGuiValidation validateForm() {
-        String[] emails;
-        String result = "";
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            emails = SLibUtils.textExplode(moTextEmail.getValue(), ";");
+            moTextEmail.setValue(SMailUtils.sanitizeEmails(moTextEmail.getValue()));
+            
+            String[] emails = SLibUtils.textExplode(moTextEmail.getValue(), ";");
             for (String email: emails) {
-                result = SLibUtilities.validateEmail(email);    // XXX implement this funtion into new framework!
+                String result = SLibUtilities.validateEmail(email);
                 if (!result.isEmpty()) {
                     validation.setMessage(result);
                     validation.setComponent(moTextEmail);
