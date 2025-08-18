@@ -76,13 +76,18 @@ public abstract class SStockValuationAdjustsUtils {
                 + "	" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS fac_e ON fac_e.id_year = supp.id_des_year "
                 + "        AND fac_e.id_doc = supp.id_des_doc "
                 + "        AND fac_e.id_ety = supp.id_des_ety "
+                + "	" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS fac ON fac_e.id_year = fac.id_year "
+                + "        AND fac_e.id_doc = fac.id_doc "
                 + "WHERE "
                 + "    NOT mvt.b_del AND mvt.b_temp_price "
                 + "        AND NOT mvt.b_rev "
                 + "        AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + " "
                 + "        AND oc.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
                 + "        AND oc.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
-                + "        AND oc.fid_tp_dps =  " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ";";
+                + "        AND oc.fid_tp_dps =  " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "        AND fac.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' "
+                + "        AND fac.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
+                + "        AND NOT fac.b_del ";
         
         try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
              ResultSet resultSet = st.executeQuery(sql)) {

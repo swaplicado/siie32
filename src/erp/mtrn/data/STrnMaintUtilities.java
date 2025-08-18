@@ -86,4 +86,17 @@ public abstract class STrnMaintUtilities {
         
         return verified;
     }
+    
+    public static int getFingerprintUserPk(final SClientInterface client) {
+        int pk = 0;
+        SDialogUareUFingerprint dialog = new SDialogUareUFingerprint(client, SDialogUareUFingerprint.MODE_GET_FINGERPRINT_USR);
+        
+        dialog.formReset();
+        dialog.setVisible(true);
+        if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            pk = (int) dialog.getValue(SDialogUareUFingerprint.VALUE_FINGERPRINT_USR);
+        }
+        
+        return pk;
+    }
 }

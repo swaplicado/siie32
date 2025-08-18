@@ -103,7 +103,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -197,7 +197,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbSwapServicesLinkUp;
     
     private int mnModule;
-    private int idBpGOM = 1995; //id bp GOM <<<<< XXX ESTO ES INACEPTABLE! XXX <<<<<
     
     /**
      * View to audit documents.
@@ -1931,7 +1930,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             if (SLibUtilities.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT)) == 1) {
                                 map.put("sAcro", acro);
                                 if (agt != null) {
-                                    if (agt.getPkBizPartnerId() == idBpGOM ) {
+                                    if (agt.getPkBizPartnerId() == SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT_ACRO))) {
                                         map.put("printAcro", false);
                                     } else {
                                         map.put("printAcro", true);
@@ -2479,7 +2478,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sAgt", agt == null ? null : SLibUtils.textToAscii(agt.getFirstname() + " " + agt.getLastname()));
                             map.put("lan", SLibConstants.LAN_ENGLISH);
                             map.put("sAcro", acro);
-                            if (agt.getPkBizPartnerId() == idBpGOM ) {
+                            if (agt.getPkBizPartnerId() == SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT_ACRO))) {
                                 map.put("printAcro", false);
                             } else {
                                 map.put("printAcro", true);
