@@ -509,8 +509,8 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             removeAllListeners();
             reloadCatalogues();
             addAllListeners();
-            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN);
-            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED));
+            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE);
+            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_NOT_REQUIRED));
         }
         catch (Exception ex) {
             Logger.getLogger(SDialogMaterialRequestSupply.class.getName()).log(Level.SEVERE, null, ex);
@@ -825,14 +825,14 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
     
     private void actionOk() {
         switch (msConfReqSign) {
-            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_REQUIRED:
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE_REQUIRED:
                 if (!isDiogSigned()) {
                     miClient.showMsgBoxInformation("No se puede guardar el movimiento sin firmar.");
                     return;
                 }
                 break;
                 
-            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL_CONFIRM:
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL_CONFIRM:
                 if (!isDiogSigned()) {
                     try {
                         if (getSignatoryFingerprint() == null) {
@@ -852,12 +852,12 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 }
                 break;
                 
-            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL:
-            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED:
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL:
+            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_NOT_REQUIRED:
                 break;
                 
             default:
-                miClient.showMsgBoxError("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN + " desconocida.\nContactar a soporte.");
+                miClient.showMsgBoxError("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE + " desconocida.\nContactar a soporte.");
                 return;
         }
         

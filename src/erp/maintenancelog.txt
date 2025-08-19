@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 284.5/ 2025-08-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio en nombres de las constantes relacionadas al firmado de suministros de almacén y al préstamo de herramientas.
+
+================================================================================
 SIIE 3.2 284.4/ 2025-08-18
 Sergio Abraham FLORES GUTIÉRREZ/ Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------

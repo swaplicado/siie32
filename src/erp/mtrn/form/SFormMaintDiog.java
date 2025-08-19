@@ -722,7 +722,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
     
         try {
-            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN);
+            msConfReqSign = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE);
         }
         catch (Exception e) { }
     }
@@ -901,7 +901,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             jbEntryClear.setEnabled(true);
             jbEntryDelete.setEnabled(true);
             
-            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED));
+            jbSign.setEnabled(!msConfReqSign.equals(SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_NOT_REQUIRED));
         }
     }
 
@@ -1921,14 +1921,14 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     }
                     
                     switch (msConfReqSign) {
-                        case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_REQUIRED:
+                        case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE_REQUIRED:
                             if (!isDiogSigned()) {
                                 validation.setMessage("Se debe firmar el movimiento.");
                                 validation.setComponent(jbSign);
                             }
                             break;
                             
-                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL_CONFIRM:
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL_CONFIRM:
                                 if (!isDiogSigned()) {
                                     if (getSignatoryFingerprint() == null) {
                                         miClient.showMsgBoxInformation("El firmante carece de huella digital.\nEl movimiento deberá ser firmado posteriormente.");
@@ -1942,12 +1942,12 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                                 }
                                 break;
                                 
-                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL:
-                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED:
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL:
+                            case SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_NOT_REQUIRED:
                                 break;
 
                             default:
-                                miClient.showMsgBoxWarning("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN + " desconocida.\nContactar a soporte.");
+                                miClient.showMsgBoxWarning("Configuración " + SDataConstantsSys.CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE + " desconocida.\nContactar a soporte.");
                     }             
                 }
                 catch (Exception e) {

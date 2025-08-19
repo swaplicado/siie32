@@ -127,7 +127,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_DPS_AUTH_WEB = "TRN_DPS_AUTH_WEB";
     public static final String CFG_PARAM_TRN_DPS_AUTH_USR_GRP = "TRN_DPS_AUTH_USR_GRP";
     public static final String CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND = "TRN_DPS_AUTH_MAIL_SEND";
-    public static final String CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN = "TRN_DIOG_OUT_REQ_SIGN";
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE = "TRN_DIOG_OUT_SIGNING_RULE";
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNATORY_RULE = "TRN_DIOG_OUT_SIGNATORY_RULE";
     public static final String CFG_PARAM_TRN_ITEM_TANK_CAR = "TRN_ITEM_TANK_CAR";
     public static final String CFG_PARAM_TRN_ITEM_ACIDITY = "TRN_ITEM_ACIDITY";
     public static final String CFG_PARAM_TRN_ITEM_MAT_REQ_PUR = "TRN_ITEM_MAT_REQ_PUR";
@@ -172,10 +173,10 @@ public abstract class SDataConstantsSys {
     public static final int CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_INACT = 0;
     public static final int CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT = 1;
     
-    public static final String CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_REQUIRED = "R"; // El firmado es requerido
-    public static final String CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL_CONFIRM = "OC"; // El firmado es opcional pero con confirmación al guardar
-    public static final String CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_OPTIONAL = "O"; // El firmado es opconal sin confirmación al guardar
-    public static final String CFG_PARAM_TRN_DIOG_OUT_REQ_SIGN_NOT_REQUIRED = "NR"; // El firmado no es requerido
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNING_RULE_REQUIRED = "R"; // El firmado es requerido
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL_CONFIRM = "OC"; // El firmado es opcional pero con confirmación al guardar
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNING_OPTIONAL = "O"; // El firmado es opconal sin confirmación al guardar
+    public static final String CFG_PARAM_TRN_DIOG_OUT_SIGNING_NOT_REQUIRED = "NR"; // El firmado no es requerido
     
     /* XXX 2019-08-16 Sergio Flores: Not used yet.
     public static final int USRS_TP_LEV_NO_PERMISSION = 0;
