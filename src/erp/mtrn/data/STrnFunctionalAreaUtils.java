@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -21,128 +22,181 @@ import java.util.logging.Logger;
  */
 public class STrnFunctionalAreaUtils {
     
-    public static final int FUNC_AREA_ID = 1;
-    public static final int FUNC_AREA_CODE = 2;
-    public static final int FUNC_AREA_NAME = 3;
+    public static final int FIELD_ID = 1;
+    public static final int FIELD_CODE = 2;
     
     /**
-     * Obtener valores del campo solicitado de las áreas funcionales del usuario.
+     * Obtener los ID de las áreas y subáreas funcionales del usuario.
+     * 
      * @param client GUI client.
-     * @param userId User ID.
+     * @return <code>ArrayList<int[]></code> en el que cada elemento es un arreglo de enteros de dos posiciones:
+     * index 0: ID del área funcional;
+     * index 1: ID del subárea funcional.
+     */
+    public static ArrayList<int[]> getUserFunctionalSubAreaIds(final SClientInterface client) {
+        int userId = client.getSessionXXX().getUser().getPkUserId();
+        
+        String sql = "SELECT f.id_func, fs.id_func_sub "
+                + "FROM cfgu_func AS f "
+                + "INNER JOIN cfgu_func_sub AS fs ON fs.fk_func = f.id_func "
+                + "INNER JOIN usr_usr_func_sub AS ufs ON ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + userId + " "
+                + "WHERE NOT f.b_del AND NOT fs.b_del "
+                + "ORDER BY f.id_func, fs.id_func_sub;";
+
+        ArrayList<int[]> ids = new ArrayList<>();
+        
+        try {
+            try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+                while (resulSet.next()) {
+                    ids.add(new int[] { resulSet.getInt(1), resulSet.getInt(2) });
+                }
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnFunctionalAreaUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return ids;
+    }
+
+    
+    /**
+     * Obtener los valores del campo solicitado de las áreas funcionales del usuario.
+     * 
+     * @param client GUI client.
      * @param fieldType Field type.
      * @return 
      */
-    public static ArrayList<String> getFunctionalAreasOfUser(final SClientInterface client, final int userId, final int fieldType) {
-        String query = "SELECT ";
+    private static ArrayList<Object> getUserFunctionalAreaData(final SClientInterface client, final int fieldType) {
         String field = "";
+        int userId = client.getSessionXXX().getUser().getPkUserId();
         
         switch (fieldType) {
-            case FUNC_AREA_ID:
-                field = "fa.id_func";
+            case FIELD_CODE:
+                field = "f.code";
                 break;
-                
-            case FUNC_AREA_CODE:
-                field = "fa.code";
-                break;
-                
-            case FUNC_AREA_NAME:
-                field = "fa.name";
-                break;
-                
             default:
-                field = "fa.id_func";
+                field = "f.id_func";
         }
         
-        query += field + " FROM cfgu_func AS fa ";
-        query += "INNER JOIN usr_usr_func AS fau ON "
-                + "fau.id_func = fa.id_func AND fau.id_usr = " + userId + " ";
-        query += "WHERE NOT fa.b_del ";
+        String sql = "SELECT " + field + " "
+                + "FROM cfgu_func AS f "
+                + "INNER JOIN usr_usr_func AS uf ON uf.id_func = f.id_func AND uf.id_usr = " + userId + " "
+                + "WHERE NOT f.b_del "
+                + "ORDER BY f.id_func;";
 
-        ArrayList<String> areas = new ArrayList<>();
+        ArrayList<Object> data = new ArrayList<>();
         
         try {
-            ResultSet resulSet = client.getSession().getStatement().executeQuery(query);
-            
-            while (resulSet.next()) {
-                areas.add(resulSet.getString(field));
+            try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+                while (resulSet.next()) {
+                    switch (fieldType) {
+                        case FIELD_CODE:
+                            data.add(resulSet.getString(1));
+                            break;
+                        default:
+                            data.add(resulSet.getInt(1));
+                    }
+                }
             }
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnFunctionalAreaUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return areas;
+        return data;
     }
-    
-    private static int getNumberOfFuncionalAreas(final SClientInterface client) {
-        String query = "SELECT COUNT(*) AS n_areas FROM cfgu_func WHERE NOT b_del;";
+
+    /**
+     * Obtener los ID de las áreas funcionales del usuario.
+     * @param client GUI client.
+     * @return 
+     */
+    private static ArrayList<Integer> getUserFunctionalAreaIds(final SClientInterface client) {
+        ArrayList<Object> data = getUserFunctionalAreaData(client, FIELD_ID);
+        return new ArrayList<>(data.stream()
+                .map(o -> (Integer) o) // safe cast since all are Integers
+                .collect(Collectors.toCollection(ArrayList::new)));
+    }
+
+    /**
+     * Obtener los códigos de las áreas funcionales del usuario.
+     * @param client GUI client.
+     * @return 
+     */
+    private static ArrayList<String> getUserFunctionalAreaCodes(final SClientInterface client) {
+        ArrayList<Object> data = getUserFunctionalAreaData(client, FIELD_CODE);
+        return new ArrayList<>(data.stream()
+                .map(o -> (String) o) // safe cast since all are Strings
+                .collect(Collectors.toCollection(ArrayList::new)));
+    }
+
+    private static int getCountOfFuncionalAreas(final SClientInterface client) {
+        int count = 0;
+        
         try {
-            ResultSet resulSet = client.getSession().getStatement().executeQuery(query);
-            
-            if (resulSet.next()) {
-                return resulSet.getInt("n_areas");
+            String sql = "SELECT COUNT(*) "
+                    + "FROM cfgu_func "
+                    + "WHERE NOT b_del;";
+            try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+                if (resulSet.next()) {
+                    count = resulSet.getInt(1);
+                }
             }
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnFunctionalAreaUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return 0;
+        return count;
     }
     
     /**
-     * Determina las áreas asignadas de un usuario y devuelve los ids separados por coma [0],
-     * y los códigos correspondientes[1], en caso de que el usuario tenga todas las áreas asignadas devuelve la
-     * cadena "(TODAS)" [1]
+     * Determina las áreas funcionales asignadas de un usuario y devuelve:
+     * - index 0: los ID separados por coma;
+     * - index 1: los códigos correspondientes, o, si el usuario tiene asignadas todas las áreas, el texto "(TODAS)".
      * @param client
-     * @param functionalAreaId ID del área funcional activa.
-     * @return 
+     * @param currentFunctionalAreaId ID del área funcional activa.
+     * @return Arreglo <code>String[]</code> con lista de ID y códigos de las áreas funcionales asignadas al usuario actual.
      */
-    public static String[] getTextFilterOfFunctionalAreas(final SClientInterface client, int functionalAreaId) {
-        String text = "";
+    public static String[] getTextFilterOfFunctionalAreas(final SClientInterface client, int currentFunctionalAreaId) {
+        String ids = "";
         String codes = "";
-        String functionalAreaIds = "";
-        ArrayList<String> functionalAreaIdsList = null;
-        ArrayList<String> functionalAreaCodesList = null;
         
-        if (! client.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            return new String[] { "", "(ND)" };
+        if (!client.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) { // functional areas not supported!
+            ids = "" + currentFunctionalAreaId;
+            codes = "(ND)";
         }
-        
-        if (functionalAreaId == SLibConstants.UNDEFINED) {
-            functionalAreaIdsList = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(client, client.getSessionXXX().getUser().getPkUserId(), STrnFunctionalAreaUtils.FUNC_AREA_ID);
+        else if (currentFunctionalAreaId != 0) { // current functional area
+            ids = "" + currentFunctionalAreaId;
+            codes = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC, new int[] { currentFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE);
+        }
+        else { // all functional areas of session user
+            ArrayList<Integer> userFunctionalAreaIds = STrnFunctionalAreaUtils.getUserFunctionalAreaIds(client);
             
-            if (functionalAreaIdsList.isEmpty()) {
-                functionalAreaIds = "0";
-                text = "(NINGUNA)";
+            if (userFunctionalAreaIds.isEmpty()) {
+                ids = "0";
+                codes = "(NINGUNA)";
             }
             else {
-                for (String id : functionalAreaIdsList) {
-                    functionalAreaIds += id + ", ";
+                for (Integer id : userFunctionalAreaIds) {
+                    ids += (ids.isEmpty() ? "" : ", ") + id;
                 }
 
-                functionalAreaIds = functionalAreaIds.substring(0, functionalAreaIds.length() - 2);
-                
-                if (functionalAreaIdsList.size() == STrnFunctionalAreaUtils.getNumberOfFuncionalAreas(client)) {
-                    text = "(TODAS)";
+                if (userFunctionalAreaIds.size() == STrnFunctionalAreaUtils.getCountOfFuncionalAreas(client)) {
+                    codes = "(TODAS)";
                 }
                 else {
-                    functionalAreaCodesList = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(client, client.getSessionXXX().getUser().getPkUserId(), STrnFunctionalAreaUtils.FUNC_AREA_CODE);
-                    for (String code : functionalAreaCodesList) {
+                    ArrayList<String> userFunctionalAreaCodes = STrnFunctionalAreaUtils.getUserFunctionalAreaCodes(client);
+                    for (String code : userFunctionalAreaCodes) {
                         if (!code.isEmpty()) {
-                            codes += code + ", ";
+                            codes += (codes.isEmpty() ? "" : ", ") + code;
                         }
                     }
-
-                    text = codes.substring(0, codes.length() - 2);
                 }
             }
         }
-        else {
-            text = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC, new int[] { functionalAreaId }, SLibConstants.DESCRIPTION_CODE);
-            functionalAreaIds = "" + functionalAreaId;
-        }
         
-        return new String[] { functionalAreaIds, text };
+        return new String[] { ids, codes };
     }
 }

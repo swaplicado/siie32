@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 284.6/ 2025-08-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la incorporación de los ID de áreas y subáreas funcionales del usuario en el procesamiento de requisiciones en pedidos.
+2) Refactorización general a las utilerías de obtención de áreas funcionales del usuario actual.
+3) Refactorización para postergar la instanciación, hasta ser necesaria, de diálogos de reportes en los módulos de compras y en el de ventas.
+
+================================================================================
 SIIE 3.2 284.5/ 2025-08-19
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

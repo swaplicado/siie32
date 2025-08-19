@@ -40,6 +40,7 @@ import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
 import erp.mod.trn.form.SDialogSendMailContract;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPayment;
@@ -48,7 +49,6 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataSign;
-import erp.mtrn.data.SConfigurationItemDps;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepAdv;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
@@ -94,7 +94,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -271,8 +271,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnComparative;
     private javax.swing.JMenuItem jmiRepTrnDpsDetailBizPartner;
     private javax.swing.JMenuItem jmiRepTrnNetTotal;
-    private javax.swing.JMenuItem jmiRepTrnCommTotal;
     private javax.swing.JMenuItem jmiRepTrnNetAnalytic;
+    private javax.swing.JMenuItem jmiRepTrnCommTotal;
     private javax.swing.JMenuItem jmiRepTrnFileCsv;
     private javax.swing.JMenuItem jmiRepTrnJournal;
     private javax.swing.JMenuItem jmiRepTrnItemUnitaryPrice;
@@ -679,13 +679,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnComparative = new JMenuItem("Reporte comparativo de ventas netas...");
         jmiRepTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de ventas por cliente...");
         jmiRepTrnNetTotal = new JMenuItem("Relación de ventas netas por periodo...");
-        jmiRepTrnCommTotal = new JMenuItem("Relación comercial de ventas por periodo...");
         jmiRepTrnNetAnalytic = new JMenuItem("Relación de ventas, devoluciones y descuentos por periodo...");
+        jmiRepTrnCommTotal = new JMenuItem("Relación comercial de ventas por periodo...");
         jmiRepTrnFileCsv = new JMenuItem("Archivo CSV de ventas netas por periodo...");
         jmiRepTrnJournal = new JMenuItem("Reporte de diario de ventas...");
         jmiRepTrnItemUnitaryPrice = new JMenuItem("Reporte de precios unitarios de ventas...");
         jsRepTrn = new JPopupMenu.Separator();
-        jmiRepTrnContractStatus = new JMenuItem("Reporte de estatus de contratos de ventas...");
+        jmiRepTrnContractStatus = new JMenuItem("Consulta de estatus de contratos de ventas");
         jmiRepTrnContractBackorderStock = new JMenuItem("Reporte de backorder contratos de ventas vs. existencias...");
         jsRepContract = new JPopupMenu.Separator();
         jmiRepTrnShipmentItem = new JMenuItem("Reporte de embarque y surtido de ítems...");
@@ -765,8 +765,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnDpsDetailBizPartner);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnNetTotal);
-        jmRep.add(jmiRepTrnCommTotal);
         jmRep.add(jmiRepTrnNetAnalytic);
+        jmRep.add(jmiRepTrnCommTotal);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnFileCsv);
         jmRep.addSeparator();
@@ -779,24 +779,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnShipmentItem);
         jmRep.add(jsRepTrnShipment); // separator
         jmRep.add(jmiRepMoneyIn);
-
-        moDialogRepDpsList = new SDialogRepDpsList(miClient);
-        moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
-        moDialogRepDpsWithBalance = new SDialogRepDpsWithBalance(miClient);
-        moDialogRepSalesPurchases = new SDialogRepSalesPurchases(miClient);
-        moDialogRepSalesPurchasesByConcept = new SDialogRepSalesPurchasesByConcept(miClient);
-        moDialogRepSalesPurchasesByLocality = new SDialogRepSalesPurchasesByLocality(miClient);
-        moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
-        moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
-        moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
-        moDialogRepCommercialSalesPurchases = new SDialogRepCommercialSalesPurchases(miClient);
-        moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
-        moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
-        moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
-        moDialogRepContractStock = new SDialogRepContractStock(miClient);
-        moDialogRepDpsShipmentItem = new SDialogRepDpsShipmentItem(miClient);
-        moDialogRepDpsMoves = new SDialogRepDpsMoves(miClient);
-        moDialogRepAccTag = new SDialogRepAccountTag(miClient);
 
         jmiCatDpsDncDocumentNumberSeries.addActionListener(this);
         jmiCatDiogDncDocumentNumberSeries.addActionListener(this);
@@ -950,8 +932,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnComparative.addActionListener(this);
         jmiRepTrnDpsDetailBizPartner.addActionListener(this);
         jmiRepTrnNetTotal.addActionListener(this);
-        jmiRepTrnCommTotal.addActionListener(this);
         jmiRepTrnNetAnalytic.addActionListener(this);
+        jmiRepTrnCommTotal.addActionListener(this);
         jmiRepTrnFileCsv.addActionListener(this);
         jmiRepTrnJournal.addActionListener(this);
         jmiRepTrnItemUnitaryPrice.addActionListener(this);
@@ -2427,83 +2409,125 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_CUS).setVisible(true);
             }
             else if (item == jmiRepDpsList) {
+                if (moDialogRepDpsList == null) {
+                    moDialogRepDpsList = new SDialogRepDpsList(miClient);
+                }
                 moDialogRepDpsList.setParamIsSupplier(false);
                 moDialogRepDpsList.formRefreshCatalogues();
                 moDialogRepDpsList.formReset();
                 moDialogRepDpsList.setFormVisible(true);
             }
             else if (item == jmiRepDpsBizPartner) {
+                if (moDialogRepDpsBizPartner == null) {
+                    moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
+                }
                 moDialogRepDpsBizPartner.setParamIsSupplier(false);
                 moDialogRepDpsBizPartner.formRefreshCatalogues();
                 moDialogRepDpsBizPartner.formReset();
                 moDialogRepDpsBizPartner.setFormVisible(true);
             }
             else if (item == jmiRepDpsWithBalance) {
+                if (moDialogRepDpsWithBalance == null) {
+                    moDialogRepDpsWithBalance = new SDialogRepDpsWithBalance(miClient);
+                }
                 moDialogRepDpsWithBalance.setParamIsSupplier(false);
                 moDialogRepDpsWithBalance.formRefreshCatalogues();
                 moDialogRepDpsWithBalance.formReset();
                 moDialogRepDpsWithBalance.setFormVisible(true);
             }
             else if (item == jmiRepTrn) {
+                if (moDialogRepSalesPurchases == null) {
+                    moDialogRepSalesPurchases = new SDialogRepSalesPurchases(miClient);
+                }
                 moDialogRepSalesPurchases.setParamIsSupplier(false);
                 moDialogRepSalesPurchases.formRefreshCatalogues();
                 moDialogRepSalesPurchases.formReset();
                 moDialogRepSalesPurchases.setFormVisible(true);
             }
             else if (item == jmiRepTrnConcept) {
+                if (moDialogRepSalesPurchasesByConcept == null) {
+                    moDialogRepSalesPurchasesByConcept = new SDialogRepSalesPurchasesByConcept(miClient);
+                }
                 moDialogRepSalesPurchasesByConcept.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByConcept.formReset();
                 moDialogRepSalesPurchasesByConcept.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesByConcept.setFormVisible(true);
             }
             else if (item == jmiRepTrnLocality) {
+                if (moDialogRepSalesPurchasesByLocality == null) {
+                    moDialogRepSalesPurchasesByLocality = new SDialogRepSalesPurchasesByLocality(miClient);
+                }
                 moDialogRepSalesPurchasesByLocality.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByLocality.formReset();
                 moDialogRepSalesPurchasesByLocality.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesByLocality.setFormVisible(true);
             }
             else if (item == jmiRepTrnComparative) {
+                if (moDialogRepSalesPurchasesComparative == null) {
+                    moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
+                }
                 moDialogRepSalesPurchasesComparative.formReset();
                 moDialogRepSalesPurchasesComparative.setFormVisible(true);
             }
             else if (item == jmiRepTrnDpsDetailBizPartner) {
+                if (moDialogRepSalesPurchasesDetailByBizPartner == null) {
+                    moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
+                }
                 moDialogRepSalesPurchasesDetailByBizPartner.formRefreshCatalogues();
                 moDialogRepSalesPurchasesDetailByBizPartner.formReset();
                 moDialogRepSalesPurchasesDetailByBizPartner.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesDetailByBizPartner.setFormVisible(true);
             }
             else if (item == jmiRepTrnNetTotal) {
+                if (moDialogRepSalesPurchasesNet == null) {
+                    moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
+                }
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesNet.setParamIsNet(true);
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
-            else if (item == jmiRepTrnCommTotal) {
-                moDialogRepCommercialSalesPurchases.formRefreshCatalogues();
-                moDialogRepCommercialSalesPurchases.formReset();
-                moDialogRepCommercialSalesPurchases.setParamIsSupplier(false);
-                moDialogRepCommercialSalesPurchases.setParamIsNet(true);
-                moDialogRepCommercialSalesPurchases.setFormVisible(true);
-            }
             else if (item == jmiRepTrnNetAnalytic) {
+                if (moDialogRepSalesPurchasesNet == null) {
+                    moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
+                }
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesNet.setParamIsNet(false);
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
+            else if (item == jmiRepTrnCommTotal) {
+                if (moDialogRepCommercialSalesPurchases == null) {
+                    moDialogRepCommercialSalesPurchases = new SDialogRepCommercialSalesPurchases(miClient);
+                }
+                moDialogRepCommercialSalesPurchases.formRefreshCatalogues();
+                moDialogRepCommercialSalesPurchases.formReset();
+                moDialogRepCommercialSalesPurchases.setParamIsSupplier(false);
+                moDialogRepCommercialSalesPurchases.setParamIsNet(true);
+                moDialogRepCommercialSalesPurchases.setFormVisible(true);
+            }
             else if (item == jmiRepTrnFileCsv) {
+                if (moDialogRepSalesPurchasesFileCsv == null) {
+                    moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
+                }
                 moDialogRepSalesPurchasesFileCsv.formReset();
                 moDialogRepSalesPurchasesFileCsv.setFormVisible(true);
             }
             else if (item == jmiRepTrnJournal) {
+                if (moDialogRepSalesPurchasesJournal == null) {
+                    moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
+                }
                 moDialogRepSalesPurchasesJournal.formRefreshCatalogues();
                 moDialogRepSalesPurchasesJournal.formReset();
                 moDialogRepSalesPurchasesJournal.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesJournal.setFormVisible(true);
             }
             else if (item == jmiRepTrnItemUnitaryPrice) {
+                if (moDialogRepSalesPurchasesItemUnitaryPrice == null) {
+                    moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
+                }
                 moDialogRepSalesPurchasesItemUnitaryPrice.formRefreshCatalogues();
                 moDialogRepSalesPurchasesItemUnitaryPrice.formReset();
                 moDialogRepSalesPurchasesItemUnitaryPrice.setParamIsSupplier(false);
@@ -2513,23 +2537,35 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 new SDialogRepContractStatus(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_CUS, "Reporte de estatus de contratos").setVisible(true);
             }
             else if (item == jmiRepTrnContractBackorderStock) {
+                if (moDialogRepContractStock == null) {
+                    moDialogRepContractStock = new SDialogRepContractStock(miClient);
+                }
                 moDialogRepContractStock.formRefreshCatalogues();
                 moDialogRepContractStock.formReset();
                 moDialogRepContractStock.setParamIsSupplier(false);
                 moDialogRepContractStock.setFormVisible(true);
             }
             else if (item == jmiRepTrnShipmentItem) {
+                if (moDialogRepDpsShipmentItem == null) {
+                    moDialogRepDpsShipmentItem = new SDialogRepDpsShipmentItem(miClient);
+                }
                 moDialogRepDpsShipmentItem.formRefreshCatalogues();
                 moDialogRepDpsShipmentItem.formReset();
                 moDialogRepDpsShipmentItem.setFormVisible(true);
             }
             else if (item == jmiRepMoneyIn) {
+                if (moDialogRepDpsMoves == null) {
+                    moDialogRepDpsMoves = new SDialogRepDpsMoves(miClient);
+                }
                 moDialogRepDpsMoves.formRefreshCatalogues();
                 moDialogRepDpsMoves.formReset();
                 moDialogRepDpsMoves.setParamIsSupplier(false);
                 moDialogRepDpsMoves.setFormVisible(true);
             }
             else if (item == jmiRepAccTag) {
+                if (moDialogRepAccTag == null) {
+                    moDialogRepAccTag = new SDialogRepAccountTag(miClient);
+                }
                 moDialogRepAccTag.formRefreshCatalogues();
                 moDialogRepAccTag.formReset();
                 moDialogRepAccTag.setParamIsSupplier(false);

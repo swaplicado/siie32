@@ -36,7 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, java.awt.event.ItemListener {
 
@@ -150,7 +150,7 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlConsumeSubEntity.setText("Sucentro de consumo:");
+        jlConsumeSubEntity.setText("Subcentro de consumo:");
         jlConsumeSubEntity.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlConsumeSubEntity);
 
@@ -466,14 +466,17 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
             moDps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
             moDps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
             moDps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
-            ArrayList<String> areas = STrnFunctionalAreaUtils.getFunctionalAreasOfUser(miClient, 
-                                                                                miClient.getSession().getUser().getPkUserId(), 
-                                                                                STrnFunctionalAreaUtils.FUNC_AREA_ID);
-            if (areas.size() > 0) {
-                moDps.setFkFunctionalAreaId(Integer.parseInt(areas.get(0)));
+            
+            ArrayList<int[]> subareas = STrnFunctionalAreaUtils.getUserFunctionalSubAreaIds(miClient);
+            
+            if (subareas.isEmpty()) {
+                moDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                moDps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
             }
             else {
-                moDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                int[] key = subareas.get(0);
+                moDps.setFkFunctionalAreaId(key[0]);
+                moDps.setFkFunctionalSubAreaId(key[1]);
             }
             
             mlEtys = null;

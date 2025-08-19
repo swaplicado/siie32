@@ -600,14 +600,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnLocality = new JMenuItem("Reporte de compras netas por zona geográfica...");
         jmiRepTrnComparative = new JMenuItem("Reporte comparativo de compras netas...");
         jmiRepTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de compras por proveedor...");
-        jmiRepTaxRustic = new JMenuItem("Reporte predial rustico");
+        jmiRepTaxRustic = new JMenuItem("Consulta predial rustico");
         jmiRepTrnNetTotal = new JMenuItem("Relación de compras netas por período...");
         jmiRepTrnNetAnalytic = new JMenuItem("Relación de compras, devoluciones y descuentos por período...");
         jmiRepTrnFileCsv = new JMenuItem("Archivo CSV de compras netas por período...");
         jmiRepTrnJournal = new JMenuItem("Reporte de diario de compras...");
         jmiRepTrnItemUnitaryPrice = new JMenuItem("Reporte de precios unitarios de compras...");
         jsRepTrn = new JPopupMenu.Separator();
-        jmiRepTrnContractStatus = new JMenuItem("Reporte de estatus de contratos de compras...");
+        jmiRepTrnContractStatus = new JMenuItem("Consulta de estatus de contratos de compras");
         jmiRepTrnContractBackorderStock = new JMenuItem("Reporte de backorder contratos de compras vs. existencias...");
         jsRepContract = new JPopupMenu.Separator();
         jmiRepTrnUnitaryCosts = new JMenuItem("Reporte de costos unitarios de compras...");
@@ -690,22 +690,6 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnContractBackorderStock);
         jmRep.add(jsRepContract); // separator
         jmRep.add(jmiRepTrnUnitaryCosts);
-        
-        moDialogRepDpsList = new SDialogRepDpsList(miClient);
-        moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
-        moDialogRepDpsWithBalance = new SDialogRepDpsWithBalance(miClient);
-        moDialogRepSalesPurchases = new SDialogRepSalesPurchases(miClient);
-        moDialogRepSalesPurchasesByConcept = new SDialogRepSalesPurchasesByConcept(miClient);
-        moDialogRepSalesPurchasesByLocality = new SDialogRepSalesPurchasesByLocality(miClient);
-        moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
-        moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
-        moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
-        moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
-        moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
-        moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
-        moDialogRepContractStock = new SDialogRepContractStock(miClient);
-        moDialogRepPurchasesUnitaryCost = new SDialogRepPurchasesUnitaryCost(miClient);
-        moDialogRepAccTag = new SDialogRepAccountTag(miClient);
         
         jmiCatDpsDncDocumentNumberSeries.addActionListener(this);
         jmiCatDiogDncDocumentNumberSeries.addActionListener(this);
@@ -2076,46 +2060,70 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 new SDialogRepBizPartnerAccountingMoves(miClient, SDataConstantsSys.BPSS_CT_BP_SUP).setVisible(true);
             }
             else if (item == jmiRepDpsList) {
+                if (moDialogRepDpsList == null) {
+                    moDialogRepDpsList = new SDialogRepDpsList(miClient);
+                }
                 moDialogRepDpsList.setParamIsSupplier(true);
                 moDialogRepDpsList.formRefreshCatalogues();
                 moDialogRepDpsList.formReset();
                 moDialogRepDpsList.setFormVisible(true);
             }
             else if (item == jmiRepDpsBizPartner) {
+                if (moDialogRepDpsBizPartner == null) {
+                    moDialogRepDpsBizPartner = new SDialogRepDpsBizPartner(miClient);
+                }
                 moDialogRepDpsBizPartner.setParamIsSupplier(true);
                 moDialogRepDpsBizPartner.formRefreshCatalogues();
                 moDialogRepDpsBizPartner.formReset();
                 moDialogRepDpsBizPartner.setFormVisible(true);
             }
             else if (item == jmiRepDpsWithBalance) {
+                if (moDialogRepDpsWithBalance == null) {
+                    moDialogRepDpsWithBalance = new SDialogRepDpsWithBalance(miClient);
+                }
                 moDialogRepDpsWithBalance.setParamIsSupplier(true);
                 moDialogRepDpsWithBalance.formRefreshCatalogues();
                 moDialogRepDpsWithBalance.formReset();
                 moDialogRepDpsWithBalance.setFormVisible(true);
             }
             else if (item == jmiRepTrn) {
+                if (moDialogRepSalesPurchases == null) {
+                    moDialogRepSalesPurchases = new SDialogRepSalesPurchases(miClient);
+                }
                 moDialogRepSalesPurchases.setParamIsSupplier(true);
                 moDialogRepSalesPurchases.formRefreshCatalogues();
                 moDialogRepSalesPurchases.formReset();
                 moDialogRepSalesPurchases.setFormVisible(true);
             }
             else if (item == jmiRepTrnConcept) {
+                if (moDialogRepSalesPurchasesByConcept == null) {
+                    moDialogRepSalesPurchasesByConcept = new SDialogRepSalesPurchasesByConcept(miClient);
+                }
                 moDialogRepSalesPurchasesByConcept.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByConcept.formReset();
                 moDialogRepSalesPurchasesByConcept.setParamIsSupplier(true);
                 moDialogRepSalesPurchasesByConcept.setFormVisible(true);
             }
             else if (item == jmiRepTrnLocality) {
+                if (moDialogRepSalesPurchasesByLocality == null) {
+                    moDialogRepSalesPurchasesByLocality = new SDialogRepSalesPurchasesByLocality(miClient);
+                }
                 moDialogRepSalesPurchasesByLocality.formRefreshCatalogues();
                 moDialogRepSalesPurchasesByLocality.formReset();
                 moDialogRepSalesPurchasesByLocality.setParamIsSupplier(true);
                 moDialogRepSalesPurchasesByLocality.setFormVisible(true);
             }
             else if (item == jmiRepTrnComparative) {
+                if (moDialogRepSalesPurchasesComparative == null) {
+                    moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
+                }
                 moDialogRepSalesPurchasesComparative.formReset();
                 moDialogRepSalesPurchasesComparative.setFormVisible(true);
             }
             else if (item == jmiRepTrnDpsDetailBizPartner) {
+                if (moDialogRepSalesPurchasesDetailByBizPartner == null) {
+                    moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
+                }
                 moDialogRepSalesPurchasesDetailByBizPartner.formRefreshCatalogues();
                 moDialogRepSalesPurchasesDetailByBizPartner.formReset();
                 moDialogRepSalesPurchasesDetailByBizPartner.setParamIsSupplier(true);
@@ -2125,6 +2133,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstants.TRNX_DPS_TAX_RUS);
             }
             else if (item == jmiRepTrnNetTotal) {
+                if (moDialogRepSalesPurchasesNet == null) {
+                    moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
+                }
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(true);
@@ -2132,6 +2143,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
             else if (item == jmiRepTrnNetAnalytic) {
+                if (moDialogRepSalesPurchasesNet == null) {
+                    moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
+                }
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
                 moDialogRepSalesPurchasesNet.formReset();
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(true);
@@ -2139,16 +2153,25 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
             }
             else if (item == jmiRepTrnFileCsv) {
+                if (moDialogRepSalesPurchasesFileCsv == null) {
+                    moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
+                }
                 moDialogRepSalesPurchasesFileCsv.formReset();
                 moDialogRepSalesPurchasesFileCsv.setFormVisible(true);
             }
             else if (item == jmiRepTrnJournal) {
+                if (moDialogRepSalesPurchasesJournal == null) {
+                    moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
+                }
                 moDialogRepSalesPurchasesJournal.formRefreshCatalogues();
                 moDialogRepSalesPurchasesJournal.formReset();
                 moDialogRepSalesPurchasesJournal.setParamIsSupplier(true);
                 moDialogRepSalesPurchasesJournal.setFormVisible(true);
             }
             else if (item == jmiRepTrnItemUnitaryPrice) {
+                if (moDialogRepSalesPurchasesItemUnitaryPrice == null) {
+                    moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
+                }
                 moDialogRepSalesPurchasesItemUnitaryPrice.formRefreshCatalogues();
                 moDialogRepSalesPurchasesItemUnitaryPrice.formReset();
                 moDialogRepSalesPurchasesItemUnitaryPrice.setParamIsSupplier(true);
@@ -2158,17 +2181,26 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 new SDialogRepContractStatus(miClient.getSession().getClient(), SDataConstantsSys.BPSS_CT_BP_SUP, "Reporte de estatus de contratos").setVisible(true);
             }
             else if (item == jmiRepTrnContractBackorderStock) {
+                if (moDialogRepContractStock == null) {
+                    moDialogRepContractStock = new SDialogRepContractStock(miClient);
+                }
                 moDialogRepContractStock.formRefreshCatalogues();
                 moDialogRepContractStock.formReset();
                 moDialogRepContractStock.setParamIsSupplier(true);
                 moDialogRepContractStock.setFormVisible(true);
             }
             else if (item == jmiRepTrnUnitaryCosts) {
+                if (moDialogRepPurchasesUnitaryCost == null) {
+                    moDialogRepPurchasesUnitaryCost = new SDialogRepPurchasesUnitaryCost(miClient);
+                }
                 moDialogRepPurchasesUnitaryCost.formRefreshCatalogues();
                 moDialogRepPurchasesUnitaryCost.formReset();
                 moDialogRepPurchasesUnitaryCost.setFormVisible(true);
             }
             else if (item == jmiRepAccAccTag) {
+                if (moDialogRepAccTag == null) {
+                    moDialogRepAccTag = new SDialogRepAccountTag(miClient);
+                }
                 moDialogRepAccTag.formRefreshCatalogues();
                 moDialogRepAccTag.formReset();
                 moDialogRepAccTag.setParamIsSupplier(true);
