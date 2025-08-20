@@ -164,7 +164,7 @@ public class STrnFunctionalAreaUtils {
         String codes = "";
         
         if (!client.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) { // functional areas not supported!
-            ids = "" + currentFunctionalAreaId;
+            ids = "";
             codes = "(ND)";
         }
         else if (currentFunctionalAreaId != 0) { // current functional area
