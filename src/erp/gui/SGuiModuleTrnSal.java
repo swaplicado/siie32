@@ -265,6 +265,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepDpsList;
     private javax.swing.JMenuItem jmiRepDpsBizPartner;
     private javax.swing.JMenuItem jmiRepDpsWithBalance;
+    private javax.swing.JMenuItem jmiRepDpsEntryLocality;
     private javax.swing.JMenuItem jmiRepTrn;
     private javax.swing.JMenuItem jmiRepTrnConcept;
     private javax.swing.JMenuItem jmiRepTrnLocality;
@@ -673,6 +674,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepDpsList = new JMenuItem("Listado de facturas por periodo...");
         jmiRepDpsBizPartner = new JMenuItem("Reporte de facturas de clientes...");
         jmiRepDpsWithBalance = new JMenuItem("Reporte de facturas con saldo de clientes...");
+        jmiRepDpsEntryLocality = new JMenuItem("Reporte de ventas por facturas");
         jmiRepTrn = new JMenuItem("Reporte de ventas netas...");
         jmiRepTrnConcept = new JMenuItem("Reporte de ventas netas por concepto...");
         jmiRepTrnLocality = new JMenuItem("Reporte de ventas netas por zona geográfica...");
@@ -757,6 +759,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepDpsList);
         jmRep.add(jmiRepDpsBizPartner);
         jmRep.add(jmiRepDpsWithBalance);
+        jmRep.add(jmiRepDpsEntryLocality);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrn);
         jmRep.add(jmiRepTrnConcept);
@@ -926,6 +929,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepDpsList.addActionListener(this);
         jmiRepDpsBizPartner.addActionListener(this);
         jmiRepDpsWithBalance.addActionListener(this);
+        jmiRepDpsEntryLocality.addActionListener(this);
         jmiRepTrn.addActionListener(this);
         jmiRepTrnConcept.addActionListener(this);
         jmiRepTrnLocality.addActionListener(this);
@@ -1011,6 +1015,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsEntryAnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiRepDpsEntryLocality.setEnabled(hasRightDocTransaction);
         jmiDpsMailPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsMailSent.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmDpsWs.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -1740,6 +1745,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 sViewTitle += "Notas crédito (detalle)";
                             }
                             break;
+                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_SAL:
+                            oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartnerLocality.class;
+                            if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+                                sViewTitle += "Reporte ventas facturas";
+                            }
+                            break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
@@ -2434,6 +2445,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepDpsWithBalance.formRefreshCatalogues();
                 moDialogRepDpsWithBalance.formReset();
                 moDialogRepDpsWithBalance.setFormVisible(true);
+            }
+            else if (item == jmiRepDpsEntryLocality) {
+               showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_SAL, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
             else if (item == jmiRepTrn) {
                 if (moDialogRepSalesPurchases == null) {
