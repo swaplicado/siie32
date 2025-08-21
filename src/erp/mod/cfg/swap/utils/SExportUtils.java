@@ -442,6 +442,219 @@ public abstract class SExportUtils {
     }
 
     /**
+     * Consulta los socios de negocios proveedores de pedidos de compras del Portal de Proveedores de AETH, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de socios de negocios proveedores exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfPartnerSuppliersToExportAeth(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> users = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String database = "erp_aeth";
+            String referenceId = "CONVERT(b.id_bp, CHAR) ";
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PARTNER_SUPPLIER, "");
+            
+            String sql = getSqlQueryBasePartnerSuppliers()
+                    + "WHERE b.id_bp IN ("
+                    + "SELECT DISTINCT t.fid_bp_r "
+                    + "FROM "
+                    + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS t "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
+//                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
+                    + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS fs ON fs.id_func = t.fid_func "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
+                    + "WHERE ("
+                    + "(t.id_year = 2023 AND t.id_doc = 31) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 6928) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 11809) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12008) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12011) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12050) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12341) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12345) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12346) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12364) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12369) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12370) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12372) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12384) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12719) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 12738) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13457) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13458) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13459) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13501) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13518) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13643) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13791) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13967) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 13977) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 14113) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 14115) "
+                    + "OR (t.id_year = 2023 AND t.id_doc = 14397) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 4007) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 5341) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 5596) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 5926) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 6552) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 6649) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 6905) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 6910) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7027) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7033) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7291) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7367) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7423) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7426) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7624) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7625) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7626) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7627) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7661) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7764) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7785) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7806) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7818) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7911) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 7989) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8052) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8180) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8205) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8369) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8432) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8453) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8473) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8476) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8656) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8658) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8695) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8808) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8834) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8835) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8853) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 8941) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9050) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9126) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9128) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9346) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9351) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9354) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9357) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9358) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9378) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9382) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9383) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9388) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9403) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9404) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9409) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9420) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9442) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9443) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9446) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9447) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9449) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9527) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9557) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9560) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9565) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9578) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9579) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9580) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9759) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9760) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9761) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9762) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9880) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 9960) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10016) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10017) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10018) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10019) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10024) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10175) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10176) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10178) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10188) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10189) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10191) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10267) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10314) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10374) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10378) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10382) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10424) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10451) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10458) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10468) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10472) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10475) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10477) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10480) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10563) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10631) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10681) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10747) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10748) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10762) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10914) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10920) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10922) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10923) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10924) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10925) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10926) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10928) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10940) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10953) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10990) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10991) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 10993) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11082) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11167) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11183) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11454) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11455) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11481) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11497) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11566) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11600) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11718) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11764) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11765) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11766) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11767) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11772) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11776) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11778) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11779) "
+                    + "OR (t.id_year = 2025 AND t.id_doc = 11780) "
+                    + ") "
+                    + "ORDER BY "
+                    + "t.fid_bp_r "
+                    + ") "
+//                    + "AND b.b_sup AND b.fiscal_id <> '' AND b.fiscal_id <> '" + DCfdConsts.RFC_GEN_NAC + "' "
+                    + "ORDER BY "
+                    + "b.id_bp;";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                SExportDataUser user = createUserForPartnerSupplier(resultSet);
+                
+                if (user != null) {
+                    // el usuario del socio de negocios proveedor no fue omitido:
+                    users.add(user);
+                }
+            }
+        }
+
+        return users;
+    }
+
+    /**
      * Consulta las áreas funcionales de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
      * 
      * @param session Sesión de usuario.
@@ -532,7 +745,7 @@ public abstract class SExportUtils {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PURCHASE_ORDER_REF, database);
-/*
+
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, "
@@ -551,10 +764,10 @@ public abstract class SExportUtils {
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS xde ON xde.id_year = dds.id_des_year AND xde.id_doc = dds.id_des_doc AND xde.id_ety = dds.id_des_ety "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS xd ON xd.id_year = xde.id_year AND xd.id_doc = xde.id_doc "
                         + "WHERE "
-                        + "/*NOT d.b_del AND * /NOT de.b_del " // bloque comentado para incluir pedidos eliminados (para "eliminar" referencias en subsecuentes exportaciones)
-                        + "/*AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " * /" // bloque comentado para incluir pedidos "anulados" (para "eliminar" referencias en subsecuentes exportaciones)
+                        + "/*NOT d.b_del AND */NOT de.b_del " // bloque comentado para incluir pedidos eliminados (para "eliminar" referencias en subsecuentes exportaciones)
+                        + "/*AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " */" // bloque comentado para incluir pedidos "anulados" (para "eliminar" referencias en subsecuentes exportaciones)
                         + "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "/*AND NOT d.b_link * /" // bloque comentado para incluir pedidos enlazados forzadamente (para "eliminar" referencias en subsecuentes exportaciones)
+                        + "/*AND NOT d.b_link */" // bloque comentado para incluir pedidos enlazados forzadamente (para "eliminar" referencias en subsecuentes exportaciones)
                         + "GROUP BY "
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
@@ -566,7 +779,7 @@ public abstract class SExportUtils {
                         + ") AS t "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = t.fid_func "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND NOT t.b_link) "
@@ -579,220 +792,240 @@ public abstract class SExportUtils {
                         + "HAVING _entries_linked < _entries "
                         + "ORDER BY "
                         + "t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp "
-                        + "/*LIMIT " + (syncLimit + LIMIT_SURPLUS) + "* /;";"
-*/
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp;";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    String txnReference;
+                    
+                    txnReference = resultSet.getString("t.num_ser");
+                    txnReference += (txnReference.isEmpty() ? "" : "-") + resultSet.getString("t.num");
+                    txnReference = SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + SSwapConsts.SEPARATOR_DOC_REF + txnReference; // código de tipo de referencia + '/' + referencia
+                    
+                    SExportDataReference reference = new SExportDataReference();
+
+                    reference.external_company_id = companyId;
+                    reference.external_functional_area_id = resultSet.getInt("t.fid_func_sub");
+                    reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
+                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_REF_TYPE_ORDER;
+                    reference.external_partner_id = resultSet.getInt("t.fid_bp_r");
+                    reference.reference = txnReference;
+                    reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
+                    reference.currency_code = resultSet.getString("c.cur_key");
+                    reference.amount = resultSet.getDouble("t.tot_cur_r");
+                    reference.is_deleted = resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+
+                    references.add(reference);
+                }
+            }
+        }
+
+        return references;
+    }
+
+    /**
+     * Consulta las referencias de pedidos de compras del Portal de Proveedores de AETH, y las prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de órdenes de compras exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfPurchaseOrderRefsToExportAeth(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> references = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
+            
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            for (Integer companyId : databasesMap.keySet()) {
+                if (companyId != 2852) {
+                    continue;
+                }
+
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PURCHASE_ORDER_REF, database);
+                
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name, t.fid_bp_r, b.bp, "
-                        + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked "
-                        + "FROM ("
-                        + "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
-                        + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func, d.fid_bp_r, "
-                        + "de.id_ety, de.fid_item, de.fid_unit, de.qty, "
-                        + "COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _qty_linked, "
-                        + "de.qty <= COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _is_linked "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name, t.fid_bp_r, b.bp "
                         + "FROM "
-                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
-                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds ON dds.id_src_year = de.id_year AND dds.id_src_doc = de.id_doc AND dds.id_src_ety = de.id_ety "
-                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS xde ON xde.id_year = dds.id_des_year AND xde.id_doc = dds.id_des_doc AND xde.id_ety = dds.id_des_ety "
-                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS xd ON xd.id_year = xde.id_year AND xd.id_doc = xde.id_doc "
-                        + "WHERE "
-                        + "/*NOT d.b_del AND */NOT de.b_del " // bloque comentado para incluir pedidos eliminados (para "eliminar" referencias en subsecuentes exportaciones)
-                        + "/*AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " */" // bloque comentado para incluir pedidos "anulados" (para "eliminar" referencias en subsecuentes exportaciones)
-                        + "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "/*AND NOT d.b_link */" // bloque comentado para incluir pedidos enlazados forzadamente (para "eliminar" referencias en subsecuentes exportaciones)
-                        + "GROUP BY "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
-                        + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func, d.fid_bp_r, "
-                        + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
-                        + "ORDER BY "
-                        + "d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
-                        + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func, d.fid_bp_r, "
-                        + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
-                        + ") AS t "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS t "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
 //                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS fs ON fs.id_func = t.fid_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "WHERE ("
-                        + "("
-+ "(t.id_year = 2023 AND t.id_doc = 31) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 6928) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 11809) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12008) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12011) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12050) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12341) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12345) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12346) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12364) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12369) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12370) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12372) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12384) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12719) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 12738) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13457) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13458) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13459) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13501) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13518) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13643) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13791) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13967) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 13977) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 14113) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 14115) "
-+ "OR (t.id_year = 2023 AND t.id_doc = 14397) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 4007) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 5341) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 5596) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 5926) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 6552) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 6649) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 6905) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 6910) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7027) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7033) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7291) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7367) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7423) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7426) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7624) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7625) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7626) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7627) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7661) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7764) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7785) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7806) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7818) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7911) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 7989) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8052) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8180) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8205) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8369) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8432) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8453) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8473) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8476) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8656) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8658) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8695) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8808) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8834) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8835) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8853) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 8941) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9050) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9126) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9128) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9346) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9351) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9354) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9357) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9358) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9378) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9382) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9383) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9388) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9403) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9404) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9409) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9420) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9442) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9443) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9446) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9447) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9449) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9527) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9557) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9560) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9565) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9578) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9579) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9580) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9759) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9760) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9761) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9762) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9880) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 9960) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10016) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10017) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10018) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10019) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10024) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10175) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10176) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10178) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10188) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10189) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10191) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10267) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10314) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10374) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10378) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10382) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10424) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10451) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10458) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10468) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10472) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10475) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10477) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10480) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10563) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10631) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10681) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10747) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10748) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10762) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10914) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10920) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10922) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10923) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10924) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10925) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10926) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10928) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10940) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10953) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10990) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10991) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 10993) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11082) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11167) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11183) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11454) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11455) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11481) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11497) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11566) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11600) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11718) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11764) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11765) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11766) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11767) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11772) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11776) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11778) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11779) "
-+ "OR (t.id_year = 2025 AND t.id_doc = 11780) "
-                        + ") OR "
-                        + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND NOT t.b_link) "
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PURCHASE_ORDER_REF, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + "(t.id_year = 2023 AND t.id_doc = 31) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 6928) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 11809) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12008) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12011) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12050) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12341) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12345) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12346) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12364) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12369) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12370) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12372) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12384) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12719) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 12738) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13457) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13458) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13459) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13501) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13518) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13643) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13791) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13967) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 13977) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 14113) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 14115) "
+                        + "OR (t.id_year = 2023 AND t.id_doc = 14397) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 4007) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 5341) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 5596) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 5926) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 6552) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 6649) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 6905) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 6910) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7027) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7033) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7291) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7367) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7423) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7426) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7624) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7625) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7626) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7627) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7661) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7764) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7785) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7806) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7818) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7911) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 7989) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8052) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8180) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8205) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8369) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8432) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8453) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8473) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8476) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8656) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8658) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8695) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8808) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8834) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8835) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8853) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 8941) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9050) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9126) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9128) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9346) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9351) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9354) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9357) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9358) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9378) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9382) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9383) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9388) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9403) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9404) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9409) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9420) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9442) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9443) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9446) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9447) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9449) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9527) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9557) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9560) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9565) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9578) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9579) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9580) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9759) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9760) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9761) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9762) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9880) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 9960) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10016) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10017) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10018) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10019) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10024) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10175) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10176) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10178) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10188) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10189) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10191) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10267) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10314) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10374) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10378) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10382) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10424) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10451) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10458) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10468) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10472) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10475) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10477) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10480) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10563) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10631) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10681) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10747) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10748) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10762) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10914) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10920) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10922) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10923) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10924) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10925) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10926) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10928) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10940) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10953) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10990) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10991) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 10993) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11082) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11167) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11183) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11454) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11455) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11481) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11497) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11566) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11600) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11718) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11764) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11765) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11766) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11767) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11772) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11776) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11778) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11779) "
+                        + "OR (t.id_year = 2025 AND t.id_doc = 11780) "
                         + ") "
-                        + "GROUP BY "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name, t.fid_bp_r, b.bp "
-                        + "HAVING _entries_linked < _entries "
                         + "ORDER BY "
                         + "t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name, t.fid_bp_r, b.bp;";
@@ -817,7 +1050,7 @@ public abstract class SExportUtils {
                     reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
                     reference.currency_code = resultSet.getString("c.cur_key");
                     reference.amount = resultSet.getDouble("t.tot_cur_r");
-                    reference.is_deleted = resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
                     references.add(reference);
                 }
@@ -844,7 +1077,12 @@ public abstract class SExportUtils {
                 break;
                 
             case PARTNER_SUPPLIER:
-                data = getListOfPartnerSuppliersToExport(session);
+                if (((SClientInterface) session.getClient()).isDev()) {
+                    data = getListOfPartnerSuppliersToExportAeth(session);
+                }
+                else {
+                    data = getListOfPartnerSuppliersToExport(session);
+                }
                 break;
                 
             case FUNCTIONAL_AREA:
@@ -852,7 +1090,12 @@ public abstract class SExportUtils {
                 break;
                 
             case PURCHASE_ORDER_REF:
-                data = getListOfPurchaseOrderRefsToExport(session);
+                if (((SClientInterface) session.getClient()).isDev()) {
+                    data = getListOfPurchaseOrderRefsToExportAeth(session);
+                }
+                else {
+                    data = getListOfPurchaseOrderRefsToExport(session);
+                }
                 break;
                 
             default:
@@ -1448,7 +1691,7 @@ public abstract class SExportUtils {
         if (!responses.getInfos().isEmpty()) {
             if (responses.isResponsesOk()) {
                 String message = "Los registros '" + SSwapUtils.translateSyncType(responses.getSyncType(), SLibConsts.LAN_ISO639_ES) + "' fueron exportados correctamente "
-                        + "a " + SSwapConsts.SWAP_SERVICES + ":\n" + responses;
+                        + "a " + SSwapConsts.SWAP_SERVICES + ":\n\n" + responses;
                 
                 if (!((SClientInterface) session.getClient()).isGui()) {
                     System.out.println(message);

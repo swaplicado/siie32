@@ -97,6 +97,11 @@ public class SClientApi implements SClientInterface {
     }
 
     @Override
+    public boolean isDev() {
+        return false;
+    }
+
+    @Override
     public SGuiSession getSession() {
         return moSession;
     }

@@ -47,7 +47,7 @@ public class SResponses {
         String string = "";
         
         for (SResponseInfo info : maInfos) {
-            string += (string.isEmpty() ? "" : "\n") + info;
+            string += (string.isEmpty() ? "" : "\n\n") + info;
         }
         
         return string;
