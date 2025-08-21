@@ -318,7 +318,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbChangeDpsEntryItem = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
         jbChangeDpsEntryItem.setPreferredSize(new Dimension(23, 23));
         jbChangeDpsEntryItem.addActionListener(this);
-        jbChangeDpsEntryItem.setToolTipText("Cambiar ítems de documentos");
+        jbChangeDpsEntryItem.setToolTipText("Cambiar cantidad o ítem de referencia o CC de paridas del documento");
 
         jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));
@@ -639,7 +639,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImportCfdiWithOutPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportCfdiWithPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportMatRequest.setEnabled(mbIsCategoryPur);
-        jbChangeDpsEntryItem.setEnabled(true);
+        jbChangeDpsEntryItem.setEnabled(mbIsOrd);
         jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbChangeAgentSupervisor.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbSetDeliveryDate.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
@@ -1179,12 +1179,30 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionChangeDpsEntryItem() {
-        if (jbChangeDpsEntryItem.isEnabled()) {
-            if (isRowSelected()) {
-                if (miClient.getGuiModule(mnModule).showForm(SDataConstants.TRNX_DPS_EDIT, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+        try {
+            if (jbChangeDpsEntryItem.isEnabled()) {
+                if (isRowSelected()) {
+                    SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+                    fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING &&
+                            fileProcess.getDps().getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                        if (!fileProcess.getDpsHasLinkedDocs(miClient.getSession())) {
+                            if (miClient.getGuiModule(mnModule).showForm(SDataConstants.TRNX_DPS_EDIT, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                                miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pueden cambiar los datos de las partidas porque el pedido seleccionado tiene vínculos con facturas.");
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se pueden cambiar los datos de las partidas porque el estatus de autorización del pedido seleccionada es '" + fileProcess.getDpsStatus() + "'.");
+                    }
                 }
             }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
     

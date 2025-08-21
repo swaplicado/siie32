@@ -42,7 +42,7 @@ import javax.swing.event.ListSelectionEvent;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener {
 
@@ -817,7 +817,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         moFieldIncoterm = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfIncoterm, jlIncoterm);
         moFieldModeOfTransportationType = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfModeOfTransportationType, jlModeOfTransportationType);
 
-        aoTableColumns = new STableColumnForm[22];
+        aoTableColumns = new STableColumnForm[23];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha ped.", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo ped.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio ped.", STableConstants.WIDTH_DOC_NUM);
@@ -835,6 +835,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Partida fac.", STableConstants.WIDTH_NUM_TINYINT);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad fac.", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Remolque, tanq./cont.", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha NC", STableConstants.WIDTH_DATE);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo NC", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio NC", STableConstants.WIDTH_DOC_NUM);
@@ -1005,7 +1006,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
 
         try {
             sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS f_ped, " +
-                    "dep.sort_pos, cobp.code, dep.orig_qty, u.symbol, dp.tot_cur_r, COALESCE(SUM(re.debit_cur - re.credit_cur), 0) AS f_bal, dp.comms_ref " +
+                    "dep.sort_pos, cobp.code, dep.orig_qty, u.symbol, dp.tot_cur_r, COALESCE(SUM(re.debit_cur - re.credit_cur), 0) AS f_bal, dp.comms_ref, dep.cont_tank " +
                     "FROM trn_dps_dps_supply AS sp " +
                     "INNER JOIN trn_dps_ety AS dep ON dep.id_year = sp.id_des_year AND dep.id_doc = sp.id_des_doc AND " +
                     "dep.id_ety = sp.id_des_ety AND dep.b_del = 0 " +
@@ -1042,6 +1043,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
                 oRow.setQtyDoc(resulSet.getDouble(9));
                 oRow.setTotalDoc(resulSet.getDouble(11));
                 oRow.setBalance(resulSet.getDouble(12));
+                oRow.setContTank(resulSet.getString(14));
 
                 mdQtyDoc += (resulSet.getDouble(9));
                 msUnitDoc = (resulSet.getString(10));

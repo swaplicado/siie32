@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 284.10/ 2025-08-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Modificación a la forma erp.mtrn.form.SFormDpsEdit para permitir cambiar la cantidad de las partidas de OC,
+    además del centro de costo y el ítem de referencia, también se agregó la opción de eliminar el ítem de referencia.
+2) Adición de la matricula del tanque a la tabla de la vista de "Ver detalles de vínculos" para contratos.
+
+================================================================================
 SIIE 3.2 284.9/ 2025-08-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

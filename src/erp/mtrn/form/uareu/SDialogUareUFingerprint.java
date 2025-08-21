@@ -43,6 +43,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     
     public static final int VALUE_FINGERPRINT = 1;
     public static final int VALUE_FINGERPRINT_USR = 2;
+    public static final int VALUE_USER_SUPV = 2;
     public static final int MODE_ENROLLMENT = 1;
     public static final int MODE_VERIFICATION = 2;
     public static final int MODE_GET_FINGERPRINT_USR = 3;
@@ -52,6 +53,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     private final int mnMode;
     private int mnFormResult;
     private boolean mbFirstTime;
+    private boolean mbIsUsrSupv;
     private int mnMaintUserId;
 
     private DPFPTemplate moFpTemplate;          // to handle fingerprints
@@ -255,17 +257,23 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     private boolean verifyAgainstDatabase(DPFPFeatureSet featureSet) throws Exception {
         boolean matchFound = false;
         moFPVerification = DPFPGlobal.getVerificationFactory().createVerification();
+        String sql;
         // Consulta a la base de datos para obtener todas las plantillas
-        String sql = "SELECT id_maint_user, fingerprint_n FROM trn_maint_user WHERE NOT b_del AND fingerprint_n IS NOT NULL";
+        if (mbIsUsrSupv) {
+            sql = "SELECT id_maint_user_supv, fingerprint_n FROM trn_maint_user_supv WHERE NOT b_del AND fingerprint_n IS NOT NULL";
+        }
+        else {
+            sql = "SELECT id_maint_user, fingerprint_n FROM trn_maint_user WHERE NOT b_del AND fingerprint_n IS NOT NULL";
+        }
         try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
-                byte[] storedTemplateData = resultSet.getBytes("fingerprint_n");
+                byte[] storedTemplateData = resultSet.getBytes(2);
                 if (storedTemplateData != null) {
                     DPFPTemplate storedTemplate = DPFPGlobal.getTemplateFactory().createTemplate(storedTemplateData);
                     DPFPVerificationResult result = moFPVerification.verify(featureSet, storedTemplate);
                     if (result.isVerified()) {
                         appendMessage("Coincidencia encontrada con una huella registrada.");
-                        mnMaintUserId = resultSet.getInt("id_maint_user");
+                        mnMaintUserId = resultSet.getInt(1);
                         matchFound = true;
                         break;
                     }
@@ -411,6 +419,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
         moFpTemplate = null;
         moFpEnrollment = null;
         moFPVerification = null;
+        mbIsUsrSupv = false;
     }
 
     @Override
@@ -458,6 +467,9 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
         switch (type) {
             case VALUE_FINGERPRINT:
                 moFpTemplate = DPFPGlobal.getTemplateFactory().createTemplate((byte[]) value);
+                break;
+            case VALUE_USER_SUPV:
+                mbIsUsrSupv = (boolean) value;
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

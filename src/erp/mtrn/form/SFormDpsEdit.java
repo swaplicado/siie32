@@ -11,7 +11,6 @@
 
 package erp.mtrn.form;
 
-import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -25,9 +24,9 @@ import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
-import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataCostCenter;
 import erp.mitm.data.SDataItem;
+import erp.mod.fin.db.SFinUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryEdit;
@@ -40,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
@@ -48,7 +48,7 @@ import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
 
 /**
- * Modificar el ítem y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
+ * Modificar el ítem de referencia y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
  * @author Isabel Servín, Adrián Avilés
  */
 public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
@@ -56,19 +56,26 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private final erp.client.SClientInterface miClient;
     private int mnFormResult;
     private boolean mbFirstTime;
-    private boolean mbDocuentsLockedError;
+    private boolean mbDocumentsLockedError;
     private erp.lib.table.STablePane moDocEntriesTablePane; 
     
     private SDataDps moDps;
-    private SFormOptionPickerItems moPickerItems;
-    private SFormOptionPicker moPickerCostCenter;
     private SDataDpsEntryEdit moDpsEntryEdit;
+    
+    private SPanelDps moPanelDps;
+    private SFormDpsEditQty moFormDpsEditQty;
+    private SFormOptionPicker moPickerCostCenter;
+    private SFormOptionPickerItems moPickerItems;
     
     private int mnFormStatus;
     private final int mnFormType;
     
     private ArrayList<SDataDps> moDocuments;
     private ArrayList<int[]> moUpdateDocumentEntryKeys;
+    
+    private double mdTotalDpsOld;
+    
+    private DecimalFormat moAmountFormat;
 
     /** Creates new form SFormCfdiChangeItem
      * @param client
@@ -92,27 +99,27 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private void initComponents() {
 
         jpCfdiChangeItem = new javax.swing.JPanel();
-        jpCfdiData = new javax.swing.JPanel();
-        jpCfdiHeader = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jlNameEmisor = new javax.swing.JLabel();
-        jtfNameEmisor = new javax.swing.JTextField();
-        jlRfcEmisor = new javax.swing.JLabel();
-        jtfRfcEmisor = new javax.swing.JTextField();
-        jPanel12 = new javax.swing.JPanel();
-        jlInvoiceCfdi = new javax.swing.JLabel();
-        jtfInvoiceCfdi = new javax.swing.JTextField();
-        jtfPaymentType = new javax.swing.JTextField();
-        jlDateCfdi = new javax.swing.JLabel();
-        jtfDateCfdi = new javax.swing.JTextField();
-        jpCfdiConcepts = new javax.swing.JPanel();
-        jpCfdiConceptsGrid = new javax.swing.JPanel();
-        jpCfdiConceptsDataNorth = new javax.swing.JPanel();
-        jpCfdiConceptSetup = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
-        jbSelectItem = new javax.swing.JButton();
-        jbCostCenter = new javax.swing.JButton();
-        jPanel15 = new javax.swing.JPanel();
+        jpDpsData = new javax.swing.JPanel();
+        jpHeader = new javax.swing.JPanel();
+        jlPanelDps = new javax.swing.JLabel();
+        jpDpsConcepts = new javax.swing.JPanel();
+        jpConceptsGrid = new javax.swing.JPanel();
+        jpConceptsDataNorth = new javax.swing.JPanel();
+        jpConceptSetup = new javax.swing.JPanel();
+        jbEditQty = new javax.swing.JButton();
+        jbSelectCostCenter = new javax.swing.JButton();
+        jbSelectReferenceItem = new javax.swing.JButton();
+        jbDeleteReferenceItem = new javax.swing.JButton();
+        jpDpsTotal = new javax.swing.JPanel();
+        jlTotalDpsOld = new javax.swing.JLabel();
+        jtfTotalDpsOld = new javax.swing.JTextField();
+        jtfCurrencyDpsOld = new javax.swing.JTextField();
+        jlTotalDpsNew = new javax.swing.JLabel();
+        jtfTotalDpsNew = new javax.swing.JTextField();
+        jtfCurrencyDpsNew = new javax.swing.JTextField();
+        jlDiff = new javax.swing.JLabel();
+        jtfDiff = new javax.swing.JTextField();
+        jtfDiffCurrencyKey = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -129,95 +136,106 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jpCfdiChangeItem.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpCfdiChangeItem.setLayout(new java.awt.BorderLayout());
 
-        jpCfdiData.setLayout(new java.awt.BorderLayout());
+        jpDpsData.setLayout(new java.awt.BorderLayout());
 
-        jpCfdiHeader.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales del Documento:"));
-        jpCfdiHeader.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jpHeader.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlPanelDps.setText("[Panel de documento de compras-ventas]");
+        jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
+        jpHeader.add(jlPanelDps, java.awt.BorderLayout.CENTER);
 
-        jlNameEmisor.setText("Emisor:");
-        jlNameEmisor.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel6.add(jlNameEmisor);
+        jpDpsData.add(jpHeader, java.awt.BorderLayout.CENTER);
 
-        jtfNameEmisor.setEditable(false);
-        jtfNameEmisor.setFocusable(false);
-        jtfNameEmisor.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel6.add(jtfNameEmisor);
+        jpCfdiChangeItem.add(jpDpsData, java.awt.BorderLayout.NORTH);
 
-        jlRfcEmisor.setText("  RFC:");
-        jlRfcEmisor.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel6.add(jlRfcEmisor);
+        jpDpsConcepts.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas del documento:"));
+        jpDpsConcepts.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jtfRfcEmisor.setEditable(false);
-        jtfRfcEmisor.setFocusable(false);
-        jtfRfcEmisor.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel6.add(jtfRfcEmisor);
+        jpConceptsGrid.setName(""); // NOI18N
+        jpConceptsGrid.setLayout(new java.awt.BorderLayout());
+        jpDpsConcepts.add(jpConceptsGrid, java.awt.BorderLayout.CENTER);
 
-        jpCfdiHeader.add(jPanel6);
+        jpConceptsDataNorth.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpConceptSetup.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoiceCfdi.setText("Folio doc.:");
-        jlInvoiceCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlInvoiceCfdi);
+        jbEditQty.setText("Cambiar cantidad");
+        jbEditQty.setPreferredSize(new java.awt.Dimension(180, 23));
+        jpConceptSetup.add(jbEditQty);
 
-        jtfInvoiceCfdi.setEditable(false);
-        jtfInvoiceCfdi.setFocusable(false);
-        jtfInvoiceCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jtfInvoiceCfdi);
+        jbSelectCostCenter.setText("Cambiar centro costo");
+        jbSelectCostCenter.setPreferredSize(new java.awt.Dimension(180, 23));
+        jpConceptSetup.add(jbSelectCostCenter);
 
-        jtfPaymentType.setEditable(false);
-        jtfPaymentType.setFocusable(false);
-        jtfPaymentType.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel12.add(jtfPaymentType);
+        jbSelectReferenceItem.setText("Cambiar ítem referencia");
+        jbSelectReferenceItem.setPreferredSize(new java.awt.Dimension(180, 23));
+        jpConceptSetup.add(jbSelectReferenceItem);
 
-        jlDateCfdi.setText("  Fecha doc.:");
-        jlDateCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlDateCfdi);
+        jbDeleteReferenceItem.setText("Eliminar ítem referencia");
+        jbDeleteReferenceItem.setPreferredSize(new java.awt.Dimension(180, 23));
+        jpConceptSetup.add(jbDeleteReferenceItem);
 
-        jtfDateCfdi.setEditable(false);
-        jtfDateCfdi.setFocusable(false);
-        jtfDateCfdi.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel12.add(jtfDateCfdi);
+        jpConceptsDataNorth.add(jpConceptSetup, java.awt.BorderLayout.CENTER);
 
-        jpCfdiHeader.add(jPanel12);
+        jpDpsConcepts.add(jpConceptsDataNorth, java.awt.BorderLayout.NORTH);
 
-        jpCfdiData.add(jpCfdiHeader, java.awt.BorderLayout.CENTER);
+        jpCfdiChangeItem.add(jpDpsConcepts, java.awt.BorderLayout.CENTER);
 
-        jpCfdiChangeItem.add(jpCfdiData, java.awt.BorderLayout.NORTH);
+        jpDpsTotal.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales del documento:"));
+        jpDpsTotal.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jpCfdiConcepts.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas del documento:"));
-        jpCfdiConcepts.setLayout(new java.awt.BorderLayout(0, 5));
+        jlTotalDpsOld.setText("Total anterior:");
+        jlTotalDpsOld.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpDpsTotal.add(jlTotalDpsOld);
 
-        jpCfdiConceptsGrid.setName(""); // NOI18N
-        jpCfdiConceptsGrid.setLayout(new java.awt.BorderLayout());
-        jpCfdiConcepts.add(jpCfdiConceptsGrid, java.awt.BorderLayout.CENTER);
+        jtfTotalDpsOld.setEditable(false);
+        jtfTotalDpsOld.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfTotalDpsOld.setText("0,000,000.0000");
+        jtfTotalDpsOld.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpDpsTotal.add(jtfTotalDpsOld);
 
-        jpCfdiConceptsDataNorth.setLayout(new java.awt.BorderLayout());
+        jtfCurrencyDpsOld.setEditable(false);
+        jtfCurrencyDpsOld.setText("CUR");
+        jtfCurrencyDpsOld.setFocusable(false);
+        jtfCurrencyDpsOld.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDpsTotal.add(jtfCurrencyDpsOld);
 
-        jpCfdiConceptSetup.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
+        jlTotalDpsNew.setText("     Total nuevo:");
+        jlTotalDpsNew.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpDpsTotal.add(jlTotalDpsNew);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jtfTotalDpsNew.setEditable(false);
+        jtfTotalDpsNew.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jtfTotalDpsNew.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfTotalDpsNew.setText("0,000,000,000.00");
+        jtfTotalDpsNew.setFocusable(false);
+        jtfTotalDpsNew.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpDpsTotal.add(jtfTotalDpsNew);
 
-        jbSelectItem.setText("Cambiar ítem referencia");
-        jbSelectItem.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel11.add(jbSelectItem);
+        jtfCurrencyDpsNew.setEditable(false);
+        jtfCurrencyDpsNew.setText("CUR");
+        jtfCurrencyDpsNew.setFocusable(false);
+        jtfCurrencyDpsNew.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDpsTotal.add(jtfCurrencyDpsNew);
 
-        jbCostCenter.setText("Cambiar centro costo");
-        jbCostCenter.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel11.add(jbCostCenter);
+        jlDiff.setText("     Diferencia:");
+        jlDiff.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpDpsTotal.add(jlDiff);
 
-        jpCfdiConceptSetup.add(jPanel11);
+        jtfDiff.setEditable(false);
+        jtfDiff.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfDiff.setText("0,000,000.0000");
+        jtfDiff.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpDpsTotal.add(jtfDiff);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpCfdiConceptSetup.add(jPanel15);
+        jtfDiffCurrencyKey.setEditable(false);
+        jtfDiffCurrencyKey.setText("CUR");
+        jtfDiffCurrencyKey.setFocusable(false);
+        jtfDiffCurrencyKey.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpDpsTotal.add(jtfDiffCurrencyKey);
 
-        jpCfdiConceptsDataNorth.add(jpCfdiConceptSetup, java.awt.BorderLayout.CENTER);
-
-        jpCfdiConcepts.add(jpCfdiConceptsDataNorth, java.awt.BorderLayout.NORTH);
-
-        jpCfdiChangeItem.add(jpCfdiConcepts, java.awt.BorderLayout.CENTER);
+        jpCfdiChangeItem.add(jpDpsTotal, java.awt.BorderLayout.PAGE_END);
 
         getContentPane().add(jpCfdiChangeItem, java.awt.BorderLayout.CENTER);
 
@@ -231,6 +249,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
+        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
@@ -248,7 +267,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             mbFirstTime = false;
             moDocEntriesTablePane.getTable().requestFocus();
         }
-        if(mbDocuentsLockedError) {
+        
+        if (mbDocumentsLockedError) {
             /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
             releaseDpsUserLock();
             */
@@ -258,30 +278,45 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             releaseDpsUserSLock();
             setVisible(false);
         }
+        else if (! SDataUtilities.isPeriodOpen(miClient, moDps.getDateDoc())) {
+            miClient.showMsgBoxWarning("¡El periodo contable de la fecha del documento está cerrado!");
+            releaseDpsUserSLock();
+            setVisible(false);
+        }
     }
     
     private void initComponentsExtra() {
+        moAmountFormat = miClient.getSessionXXX().getFormatters().getDecimalsValueFormat();
+        
         // Tabla general (conceptos):
         int i = 0;
         STableColumnForm[] columns;
         
         moDocEntriesTablePane = new STablePane(miClient);
-        jpCfdiConceptsGrid.add(moDocEntriesTablePane, BorderLayout.CENTER);
+        jpConceptsGrid.add(moDocEntriesTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[11];
+        columns = new STableColumnForm[19];
       
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave concepto", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio u. $", STableConstants.WIDTH_VALUE_UNITARY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_UNIT_SYMBOL);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad anterior", STableConstants.WIDTH_QUANTITY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total partida anterior $", STableConstants.WIDTH_VALUE_2X);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cantidad nueva", STableConstants.WIDTH_QUANTITY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Total partida nuevo $", STableConstants.WIDTH_VALUE_2X);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo anterior", STableConstants.WIDTH_ACCOUNT_ID);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo anterior", STableConstants.WIDTH_ACCOUNT);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo nuevo", STableConstants.WIDTH_ACCOUNT_ID);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo nuevo", STableConstants.WIDTH_ACCOUNT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia anterior", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia anterior", 250);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave centro costo anterior", STableConstants.WIDTH_ITEM_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo anterior", STableConstants.WIDTH_ACCOUNT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia nuevo", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia nuevo", 250);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave centro costo nuevo", STableConstants.WIDTH_ITEM_KEY);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo nuevo", STableConstants.WIDTH_ACCOUNT);
-        
         
         for (i = 0; i < columns.length; i++) {
             moDocEntriesTablePane.addTableColumn(columns[i]);
@@ -291,8 +326,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbSelectItem.addActionListener(this);
-        jbCostCenter.addActionListener(this);
+        jbEditQty.addActionListener(this);
+        jbSelectCostCenter.addActionListener(this);
+        jbSelectReferenceItem.addActionListener(this);
+        jbDeleteReferenceItem.addActionListener(this);
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -310,8 +347,13 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         
         // Activar o desactivar componentes:
         
-        jbSelectItem.setEnabled(true);
-        jbCostCenter.setEnabled(true); 
+        jbSelectReferenceItem.setEnabled(true);
+        jbSelectCostCenter.setEnabled(true); 
+        jbDeleteReferenceItem.setEnabled(true); 
+        
+        moPanelDps = new SPanelDps(miClient);
+        jpHeader.remove(jlPanelDps); 
+        jpHeader.add(moPanelDps, BorderLayout.CENTER);
     }
     
     private void getAssociatedDocuments(SDataDps dps) {
@@ -540,7 +582,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         moDocEntriesTablePane.createTable();
         
         for (int i = 0; i < moDps.getDbmsDpsEntries().size(); i++) {
-            SRowDpsEdit row = new SRowDpsEdit(miClient, moDps.getDbmsDpsEntries().get(i));
+            SRowDpsEdit row = new SRowDpsEdit(miClient, moDps.getDbmsDpsEntries().get(i), moDps.getDbmsCurrencyKey());
             moDocEntriesTablePane.addTableRow(row);
         }
         
@@ -549,33 +591,40 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         moDocEntriesTablePane.getTable().getTableHeader().setReorderingAllowed(false);
     }
     
-    private void actionSelectItemReference() { 
-        if (jbSelectItem.isEnabled()) {
+    private void actionEditQty() {
+        if (jbEditQty.isEnabled()) {
             int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
-            
             if (selectedRow == -1) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
             }
             else {
                 SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
-
-                if (moPickerItems == null) {
-                    moPickerItems = SFormOptionPickerItems.createOptionPicker(miClient, SDataConstants.ITMX_ITEM_IOG, moPickerItems);
+                SDataDpsEntry dpsEty = moDps.getDbmsDpsEntry((int[]) rowDpsEdit.getDpsEntryPK());
+                if (moFormDpsEditQty == null) {        
+                    moFormDpsEditQty = new SFormDpsEditQty(miClient);
                 }
-                moPickerItems.formReset();
+                moFormDpsEditQty.formReset();
+                moFormDpsEditQty.setValue(SDataConstants.TRN_DPS, new Object[] { moDps, rowDpsEdit.getDpsEntryPK() });
+                moFormDpsEditQty.setFormVisible(true);
                 
-                moPickerItems.setFilterKey(SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
-                moPickerItems.formRefreshOptionPane();
-                moPickerItems.setSelectedPrimaryKey(rowDpsEdit.getItemRefNew() == null ? 
-                        (new int [] { rowDpsEdit.getItemRefOld() != null ? rowDpsEdit.getItemRefOld().getPkItemId() : 0 }) : new int [] { rowDpsEdit.getItemRefNew().getPkItemId() });
-                moPickerItems.setFormVisible(true); 
-
-                if (moPickerItems.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient,
-                        SDataConstants.ITMU_ITEM, (int[]) moPickerItems.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                    rowDpsEdit.setItemRefNew(item);
-                    
+                if (moFormDpsEditQty.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    double newQty = (double) moFormDpsEditQty.getValue(SFormDpsEditQty.TRN_DPS_QTY_VALUE);
+                    dpsEty.setOriginalQuantity(newQty);
+                    dpsEty.calculateTotal(
+                            miClient, moDps.getDate(), 
+                            moDps.getFkTaxIdentityEmisorTypeId(), moDps.getFkTaxIdentityReceptorTypeId(), 
+                            moDps.getIsDiscountDocPercentage(), moDps.getDiscountDocPercentage(), moDps.getExchangeRate());
+                    rowDpsEdit.setDpsEntry(dpsEty);
+                    try {
+                        moDps.calculateTotal(miClient);
+                        jtfTotalDpsNew.setText(moAmountFormat.format(moDps.getTotalCy_r()));
+                        jtfDiff.setText(moAmountFormat.format(mdTotalDpsOld - moDps.getTotalCy_r()));
+                        jtfDiffCurrencyKey.setText(moDps.getDbmsCurrencyKey());
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
+                    rowDpsEdit.setOriginalQuantityNew(newQty);
                     rowDpsEdit.prepareTableRow();
                     moDocEntriesTablePane.renderTableRows();
                     moDocEntriesTablePane.setTableRowSelection(selectedRow);
@@ -584,8 +633,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
     }
 
-    private void actionCostCenter() {
-        if (jbCostCenter.isEnabled()) {
+    private void actionSelectCostCenter() {
+        if (jbSelectCostCenter.isEnabled()) {
             int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
             if (selectedRow == -1) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
@@ -611,11 +660,70 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                     key = moPickerCostCenter.getSelectedPrimaryKey();
                     SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient,
                             SDataConstants.FIN_CC, key, SLibConstants.EXEC_MODE_SILENT);
-                    rowDpsEdit.setCostCenterNew(costCenter);
+                    if (costCenter != null && SFinUtils.isCostCenterMaxLevel(miClient.getSession(), costCenter.getPkCostCenterIdXXX())) {
+                        rowDpsEdit.setCostCenterNew(costCenter);
+                        rowDpsEdit.prepareTableRow();
+                        moDocEntriesTablePane.renderTableRows();
+                        moDocEntriesTablePane.setTableRowSelection(selectedRow);
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No se puede seleccionar el centro de costo elegido debido a que no tiene la profundidad necesaria.");
+                    }
+                }
+            }
+        }
+    }
+    
+    private void actionSelectItemReference() { 
+        if (jbSelectReferenceItem.isEnabled()) {
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
+
+                if (moPickerItems == null) {
+                    moPickerItems = SFormOptionPickerItems.createOptionPicker(miClient, SDataConstants.ITMX_ITEM_IOG, moPickerItems);
+                }
+                moPickerItems.formReset();
+                
+                moPickerItems.formRefreshOptionPane();
+                moPickerItems.setSelectedPrimaryKey(rowDpsEdit.getItemRefNew() == null ? 
+                        (new int [] { rowDpsEdit.getItemRefOld() != null ? rowDpsEdit.getItemRefOld().getPkItemId() : 0 }) : new int [] { rowDpsEdit.getItemRefNew().getPkItemId() });
+                moPickerItems.setFormVisible(true); 
+
+                if (moPickerItems.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient,
+                        SDataConstants.ITMU_ITEM, (int[]) moPickerItems.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                    rowDpsEdit.setItemRefNew(item);
+                    
                     rowDpsEdit.prepareTableRow();
                     moDocEntriesTablePane.renderTableRows();
                     moDocEntriesTablePane.setTableRowSelection(selectedRow);
                 }
+            }
+        }
+    }
+    
+    private void actionDeleteItemReference() {
+        if (jbDeleteReferenceItem.isEnabled()) {
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
+                SDataItem item = new SDataItem();
+                item.setItem("(REMOVIDO)");
+                rowDpsEdit.setItemRefNew(item);
+                
+                rowDpsEdit.prepareTableRow();
+                moDocEntriesTablePane.renderTableRows();
+                moDocEntriesTablePane.setTableRowSelection(selectedRow);
             }
         }
     }
@@ -628,6 +736,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             for (SDataDps document : moDocuments) {
                 SDataDpsEntry entry = document.getDbmsDpsEntry(updateDocumentEntryKey);
                 if (entry != null) {
+                    if (rowDpsEdit.getOriginalQuantityNew() != 0) {
+                        entry.setOriginalQuantity(rowDpsEdit.getOriginalQuantityNew());
+                        entry.setIsRegistryEdited(true);
+                    }
                     if (rowDpsEdit.getItemRefNew() != null) {
                         entry.setFkItemRefId_n(rowDpsEdit.getItemRefNew().getPkItemId());
                         entry.setIsRegistryEdited(true);
@@ -711,31 +823,31 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbCostCenter;
+    private javax.swing.JButton jbDeleteReferenceItem;
+    private javax.swing.JButton jbEditQty;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbSelectItem;
-    private javax.swing.JLabel jlDateCfdi;
-    private javax.swing.JLabel jlInvoiceCfdi;
-    private javax.swing.JLabel jlNameEmisor;
-    private javax.swing.JLabel jlRfcEmisor;
+    private javax.swing.JButton jbSelectCostCenter;
+    private javax.swing.JButton jbSelectReferenceItem;
+    private javax.swing.JLabel jlDiff;
+    private javax.swing.JLabel jlPanelDps;
+    private javax.swing.JLabel jlTotalDpsNew;
+    private javax.swing.JLabel jlTotalDpsOld;
     private javax.swing.JPanel jpCfdiChangeItem;
-    private javax.swing.JPanel jpCfdiConceptSetup;
-    private javax.swing.JPanel jpCfdiConcepts;
-    private javax.swing.JPanel jpCfdiConceptsDataNorth;
-    private javax.swing.JPanel jpCfdiConceptsGrid;
-    private javax.swing.JPanel jpCfdiData;
-    private javax.swing.JPanel jpCfdiHeader;
+    private javax.swing.JPanel jpConceptSetup;
+    private javax.swing.JPanel jpConceptsDataNorth;
+    private javax.swing.JPanel jpConceptsGrid;
     private javax.swing.JPanel jpControls;
-    private javax.swing.JTextField jtfDateCfdi;
-    private javax.swing.JTextField jtfInvoiceCfdi;
-    private javax.swing.JTextField jtfNameEmisor;
-    private javax.swing.JTextField jtfPaymentType;
-    private javax.swing.JTextField jtfRfcEmisor;
+    private javax.swing.JPanel jpDpsConcepts;
+    private javax.swing.JPanel jpDpsData;
+    private javax.swing.JPanel jpDpsTotal;
+    private javax.swing.JPanel jpHeader;
+    private javax.swing.JTextField jtfCurrencyDpsNew;
+    private javax.swing.JTextField jtfCurrencyDpsOld;
+    private javax.swing.JTextField jtfDiff;
+    private javax.swing.JTextField jtfDiffCurrencyKey;
+    private javax.swing.JTextField jtfTotalDpsNew;
+    private javax.swing.JTextField jtfTotalDpsOld;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -751,12 +863,12 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
             SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i); 
             
-            if (row.getItemRefNew() != null || row.getCostCenterNew() != null) {
+            if (row.getOriginalQuantityNew() != 0 || row.getItemRefNew() != null || row.getCostCenterNew() != null) {
                 isAnyEntryChanged = true;
             }
         }
         if (!isAnyEntryChanged) {
-            validation.setMessage("Ninguna entrada tiene un item o un centro de costo nuevo seleccionado.");
+            validation.setMessage("Ninguna entrada tiene una cantidad nueva o item de referencia o un centro de costo nuevo seleccionado.");
         }
         if (!validation.getIsError()) {
             SDataDps dps = comprobateRegistry();
@@ -778,6 +890,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
             SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
             SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) row.getDpsEntryPK());
+            if (row.getOriginalQuantityNew() != 0) {
+                entry.setOriginalQuantity(row.getOriginalQuantityNew());
+                entry.setIsRegistryEdited(true);
+            }
             if (row.getItemRefNew() != null) {
                 entry.setFkItemRefId_n(row.getItemRefNew().getPkItemId());
                 entry.setIsRegistryEdited(true);
@@ -802,12 +918,14 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         mnFormResult = SLibConstants.UNDEFINED;
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-        mbDocuentsLockedError = false;
+        mbDocumentsLockedError = false;
         
         moDps = null;
         moDocuments = null;
         moUpdateDocumentEntryKeys = null;
         moDocEntriesTablePane.clearTableRows();
+        
+        mdTotalDpsOld = 0;
     }
 
     @Override
@@ -833,30 +951,20 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     public void setRegistry(SDataRegistry registry) {
         moDps = (SDataDps) registry;
         
-        if (! SDataUtilities.isPeriodOpen(miClient, moDps.getDateDoc())) {
-            miClient.showMsgBoxWarning("El periodo contable está cerrado, no se puede realizar esta acción");
-        }
-        
         moDocuments = new ArrayList<>();
         getAssociatedDocuments(moDps);
         
-        mbDocuentsLockedError = lockDocuments();
+        mbDocumentsLockedError = lockDocuments();
         
-        SDataBizPartner bizPartnerEmisor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
-            SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
-
-        jtfRfcEmisor.setText(bizPartnerEmisor.getFiscalId());
-        jtfNameEmisor.setText(bizPartnerEmisor.getBizPartner());
-        jtfInvoiceCfdi.setText(moDps.getNumberSeries() + moDps.getNumber());
-        jtfPaymentType.setText(moDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CASH ? 
-                DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD);
-        jtfDateCfdi.setText(SLibUtils.DbmsDateFormatDatetime.format(moDps.getDateDoc()));
-
-        jtfRfcEmisor.setCaretPosition(0); 
-        jtfNameEmisor.setCaretPosition(0);
-        jtfInvoiceCfdi.setCaretPosition(0);
-        jtfPaymentType.setCaretPosition(0);
-        jtfDateCfdi.setCaretPosition(0);
+        moPanelDps.setDps(moDps, null);
+        
+        mdTotalDpsOld = moDps.getTotalCy_r();
+        jtfTotalDpsOld.setText(moAmountFormat.format(mdTotalDpsOld));
+        jtfCurrencyDpsOld.setText(moDps.getDbmsCurrencyKey());
+        jtfTotalDpsNew.setText(moAmountFormat.format(mdTotalDpsOld));
+        jtfCurrencyDpsNew.setText(moDps.getDbmsCurrencyKey());
+        jtfDiff.setText("");
+        jtfDiffCurrencyKey.setText("");
         
         populateTable();
     }
@@ -870,8 +978,13 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 updateAssocDocuments(entry.getPrimaryKey(), row);
             }
         }
-        moDpsEntryEdit = new SDataDpsEntryEdit(mnFormType);
-        moDpsEntryEdit.setDocuments(moDocuments);
+        moDpsEntryEdit = new SDataDpsEntryEdit();
+        
+        moDpsEntryEdit.getDocuments().clear();
+        moDocuments.forEach((document) -> {
+            moDpsEntryEdit.getDocuments().add(document);
+        });
+        moDpsEntryEdit.setUserEditId(miClient.getSession().getUser().getPkUserId());
         
         return moDpsEntryEdit;
     }
@@ -902,11 +1015,17 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbSelectItem) {
+            else if (button == jbEditQty) {
+                actionEditQty();
+            }
+            else if (button == jbSelectCostCenter) {
+                actionSelectCostCenter();
+            }
+            else if (button == jbSelectReferenceItem) {
                 actionSelectItemReference();
             }
-            else if (button == jbCostCenter) {
-                actionCostCenter();
+            else if (button == jbDeleteReferenceItem) {
+                actionDeleteItemReference();
             }
         }
     }

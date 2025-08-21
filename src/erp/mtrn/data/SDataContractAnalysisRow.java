@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
 
@@ -28,6 +28,7 @@ public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
     protected double mdQtyDoc;
     protected double mdTotalDoc;
     protected double mdBalance;
+    protected java.lang.String msContTank;
     protected java.util.Date mtDateAdj;
     protected java.lang.String msTypeAdj;
     protected java.lang.String msNumberAdj;
@@ -57,6 +58,7 @@ public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
         mdQtyDoc = 0;
         mdTotalDoc = 0;
         mdBalance = 0;
+        msContTank = "";
         mtDateAdj = null;
         msTypeAdj = "";
         msNumberAdj = "";
@@ -81,6 +83,7 @@ public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
     public void setQtyDoc(double d) { mdQtyDoc = d; }
     public void setTotalDoc(double d) { mdTotalDoc = d; }
     public void setBalance(double d) { mdBalance = d; }
+    public void setContTank(java.lang.String s) { msContTank = s; }
     public void setDateAdj(java.util.Date t) { mtDateAdj = t; }
     public void setTypeAdj(java.lang.String s) { msTypeAdj = s; }
     public void setNumberAdj(java.lang.String s) { msNumberAdj = s; }
@@ -104,6 +107,7 @@ public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
     public double getQtyODoc() { return mdQtyDoc; }
     public double getTotalDoc() { return mdTotalDoc; }
     public double getBalance() { return mdBalance; }
+    public java.lang.String getContTank() { return msContTank; }
     public java.util.Date getDateAdj() { return mtDateAdj; }
     public java.lang.String getTypeAdj() { return msTypeAdj; }
     public java.lang.String getNumberAdj() { return msNumberAdj; }
@@ -130,6 +134,7 @@ public class SDataContractAnalysisRow extends erp.lib.table.STableRow {
         mvValues.add(mdBalance);
         mvValues.add(mnEntryDocId);
         mvValues.add(mdQtyDoc);
+        mvValues.add(msContTank);
         mvValues.add(mtDateAdj);
         mvValues.add(msTypeAdj);
         mvValues.add(msNumberAdj);

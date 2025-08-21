@@ -88,6 +88,14 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         return entries;
     }
     
+    public boolean getDpsHasLinkedDocs(SGuiSession session) throws Exception {
+        Statement statement = session.getDatabase().getConnection().createStatement();
+        String sql = "SELECT id_des_year AS year, id_des_doc AS doc FROM trn_dps_dps_supply AS tdds "
+                + "WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId;
+        ResultSet resultSet = statement.executeQuery(sql);
+        return resultSet.next();
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkYearId = pk[0];

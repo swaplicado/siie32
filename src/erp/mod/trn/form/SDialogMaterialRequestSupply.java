@@ -1075,7 +1075,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
                 } 
             }
             else {
-                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient);
+                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient, false);
                 if (pk != 0) {
                     moKeyMaintUser.setValue(new int[] { pk });
                     if (moKeyMaintUser.getSelectedIndex() > 0) {

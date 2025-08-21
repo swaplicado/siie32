@@ -54,6 +54,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -1488,20 +1489,50 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 } 
             }
             else {
-                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient);
+                int pk = STrnMaintUtilities.getFingerprintUserPk((SClientInterface) miClient, mnParamMaintUserType == SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR);
                 if (pk != 0) {
                     if (movIn) {
-                        SGuiUtils.locateItem(jcbMaintReturnUser, new int[] { pk });
-                        if (jcbMaintReturnUser.getSelectedIndex() > 0) {
-                            moMaintDiogSignature = new SDbMaintDiogSignature();
-                            showSignatureStatus();
+                        if (mnParamMaintUserType == SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR) {
+                            String sql = "SELECT fk_maint_user_n FROM trn_maint_user_supv WHERE id_maint_user_supv = " + pk + " AND NOT b_del";
+                            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                            if (resultSet.next()) {
+                                SGuiUtils.locateItem(jcbMaintReturnUser, new int[] { resultSet.getInt(1) });
+                                stateChangedReturnMaintUser();
+                                SGuiUtils.locateItem(jcbMaintReturnUserSupervisor, new int[] { pk });
+                                if (jcbMaintReturnUserSupervisor.getSelectedIndex() > 0) {
+                                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                                    showSignatureStatus();
+                                }
+                            }
+                        }
+                        else {
+                            SGuiUtils.locateItem(jcbMaintReturnUser, new int[] { pk });
+                            if (jcbMaintReturnUser.getSelectedIndex() > 0) {
+                                moMaintDiogSignature = new SDbMaintDiogSignature();
+                                showSignatureStatus();
+                            }
                         }
                     }
                     else {
-                        SGuiUtils.locateItem(jcbMaintUser, new int[] { pk });
-                        if (jcbMaintUser.getSelectedIndex() > 0) {
-                            moMaintDiogSignature = new SDbMaintDiogSignature();
-                            showSignatureStatus();
+                        if (mnParamMaintUserType == SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR) {
+                            String sql = "SELECT fk_maint_user_n FROM trn_maint_user_supv WHERE id_maint_user_supv = " + pk + " AND NOT b_del";
+                            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                            if (resultSet.next()) {
+                                SGuiUtils.locateItem(jcbMaintUser, new int[] { resultSet.getInt(1) });
+                                stateChangedMaintUser();
+                                SGuiUtils.locateItem(jcbMaintUserSupervisor, new int[] { pk });
+                                if (jcbMaintUserSupervisor.getSelectedIndex() > 0) {
+                                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                                    showSignatureStatus();
+                                }
+                            }
+                        }
+                        else {
+                            SGuiUtils.locateItem(jcbMaintUser, new int[] { pk });
+                            if (jcbMaintUser.getSelectedIndex() > 0) {
+                                moMaintDiogSignature = new SDbMaintDiogSignature();
+                                showSignatureStatus();
+                            }
                         }
                     }
                 }
