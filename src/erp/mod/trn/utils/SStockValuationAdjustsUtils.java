@@ -76,6 +76,7 @@ public abstract class SStockValuationAdjustsUtils {
                 + "	" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS fac_e ON fac_e.id_year = supp.id_des_year "
                 + "        AND fac_e.id_doc = supp.id_des_doc "
                 + "        AND fac_e.id_ety = supp.id_des_ety "
+                + "        INNER JOIN "
                 + "	" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS fac ON fac_e.id_year = fac.id_year "
                 + "        AND fac_e.id_doc = fac.id_doc "
                 + "WHERE "
