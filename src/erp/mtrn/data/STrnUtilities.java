@@ -2066,17 +2066,27 @@ public abstract class STrnUtilities {
                 client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
             }
             else {
-                if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
-                    bizPartnerUserSend = new SDataBizPartner();
-                    bizPartnerUserSend.read(new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, client.getSession().getStatement());
-                    //Si es un pedido mandar el correo del institucional
-                    if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                //Si es un pedido 
+                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                    //Si viene de la interfaz, se valida si hay correo del usuario de la sesion
+                    if (client.isGui()) {
                         userMail = ((SDataUser) client.getSession().getUser()).getEmail();
-                        if (userMail.isEmpty()) {
-                            userMail = mms.getUser();
-                        }
                     }
-                    else {
+                    //Si no hay correo entonces se busca el del creador de la OC
+                    if (userMail.isEmpty()) {
+                        SDataUser user = new SDataUser();
+                        user.read(new int[] { oDps.getFkUserNewId() }, client.getSession().getStatement());
+                        userMail = user.getEmail();
+                    }
+                    //Si no hay correo se usa el institucional
+                    if (userMail.isEmpty()) {
+                        userMail = mms.getUser();
+                    }
+                }
+                else {
+                    if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
+                        bizPartnerUserSend = new SDataBizPartner();
+                        bizPartnerUserSend.read(new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, client.getSession().getStatement());
                         userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
                     }
                 }
