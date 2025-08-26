@@ -485,7 +485,7 @@ public class SViewMaterialRequesPendingSupply extends SGridPaneView implements A
             }
         }
         
-        where += (where.isEmpty() ? "" : "AND ") + "auth.auth_status IN (" + SAuthorizationUtils.AUTH_STATUS_NA + ", " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + ")";
+        where += (where.isEmpty() ? "" : "AND ") + "auth.auth_status IN (" + SAuthorizationUtils.AUTH_STATUS_NA + ", " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_STK_SUP) {
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {

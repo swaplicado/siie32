@@ -715,7 +715,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 AND ve.b_del = 0 ";
         }
 
-        where += (where.isEmpty() ? "" : "AND ") + "auth.auth_status IN (" + SAuthorizationUtils.AUTH_STATUS_NA + ", " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + ")";
+        where += (where.isEmpty() ? "" : "AND ") + "auth.auth_status IN (" + SAuthorizationUtils.AUTH_STATUS_NA + ", " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
