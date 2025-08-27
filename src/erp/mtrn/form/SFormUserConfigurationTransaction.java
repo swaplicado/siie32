@@ -410,6 +410,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlFuncAreasAvailable.setPreferredSize(new java.awt.Dimension(115, 23));
         jpFuncAreasAvailable.add(jlFuncAreasAvailable, java.awt.BorderLayout.PAGE_START);
 
+        jspFuncAreasAvailable.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         jltFuncAreasAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jltFuncAreasAvailableMouseClicked(evt);
@@ -427,6 +429,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlFuncAreasSelected.setText("Áreas funcionales asignadas:");
         jlFuncAreasSelected.setPreferredSize(new java.awt.Dimension(105, 23));
         jpFuncAreasSelected.add(jlFuncAreasSelected, java.awt.BorderLayout.PAGE_START);
+
+        jspFuncAreasSelected.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jltFuncAreasSelected.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -477,6 +481,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlFuncSubAreasAvailable.setPreferredSize(new java.awt.Dimension(115, 23));
         jpFuncSubAreasAvailable.add(jlFuncSubAreasAvailable, java.awt.BorderLayout.PAGE_START);
 
+        jspFuncSubAreasAvailable.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         jltFuncSubAreasAvailable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jltFuncSubAreasAvailableMouseClicked(evt);
@@ -494,6 +500,8 @@ public class SFormUserConfigurationTransaction extends javax.swing.JDialog imple
         jlFuncSubAreasSelected.setText("Subáreas funcionales asignadas:");
         jlFuncSubAreasSelected.setPreferredSize(new java.awt.Dimension(105, 23));
         jpFuncSubAreasSelected.add(jlFuncSubAreasSelected, java.awt.BorderLayout.PAGE_START);
+
+        jspFuncSubAreasSelected.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jltFuncSubAreasSelected.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

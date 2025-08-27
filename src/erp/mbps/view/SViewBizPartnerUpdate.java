@@ -118,8 +118,8 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         
         if (mbSwapServicesLinkUp) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_ss_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss._ss_usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss._ss_resp_ts", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss.usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss.ts_usr", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
         }
 
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -158,7 +158,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                 "bp_ct.id_ct_bp, bp_ct.bp_key, bp_ct.co_key, bp_ct.lead_time, bp_ct.tax_regime, bpbc.email_01, " +
                 "COALESCE(cty.cty_code, '" + DCfdi40Catalogs.ClavePaísMex + "') AS _country_code, " +
                 "ulog.usr, tlog.ts_usr_upd" +
-                (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss._ss_usr, tss._ss_resp_ts") + " " +
+                (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss.usr, tss.ts_usr") + " " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp_ct.id_bp = bp.id_bp " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
@@ -177,14 +177,21 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                 ") AS tlog ON tlog.id_bp = bp.id_bp " +
                 "LEFT OUTER JOIN erp.usru_usr AS ulog ON ulog.id_usr = tlog.fk_usr_upd " +
                 (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ " +
-                "LEFT OUTER JOIN (SELECT sle.reference_id, u.usr AS _ss_usr, MAX(sl.response_timestamp) AS _ss_resp_ts " +
-                "FROM erp.cfg_sync_log AS sl " +
-                "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log " +
-                "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr " +
-                "WHERE sl.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' " +
-                "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') " +
-                "GROUP BY sle.reference_id, u.usr " +
-                "ORDER BY CONVERT(sle.reference_id, UNSIGNED)) AS tss ON tss.reference_id = CONVERT(bp.id_bp, CHAR) ") +
+                "LEFT OUTER JOIN ( " +
+                    "SELECT t.reference_id, u.usr, sl.ts_usr " +
+                    "FROM erp.cfg_sync_log AS sl " +
+                    "INNER JOIN ( " +
+                        "SELECT sle.reference_id, MAX(sl.id_sync_log) AS id_sync_log " +
+                        "FROM erp.cfg_sync_log AS sl " +
+                        "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log " +
+                        "WHERE sl.sync_type = '" + SSyncType.PARTNER_SUPPLIER + "' " +
+                        "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') " +
+                        "GROUP BY sle.reference_id " +
+                        "ORDER BY CONVERT(sle.reference_id, UNSIGNED)" +
+                    ") AS t ON t.id_sync_log = sl.id_sync_log " +
+                    "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr " +
+                    "ORDER BY CONVERT(t.reference_id, UNSIGNED)" +
+                ") AS tss ON tss.reference_id = CONVERT(bp.id_bp, CHAR) ") +
                 "WHERE NOT bp.b_del AND NOT bp_ct.b_del " +
                 "AND bp_ct.id_ct_bp = " + mnBizPartnerCategory + " "+ 
                 "ORDER BY " + msOrderKey;

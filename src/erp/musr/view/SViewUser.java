@@ -137,8 +137,8 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         
         if (mbSwapServicesLinkUp) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_ss_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss._ss_usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss._ss_resp_ts", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss.usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss.ts_usr", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
         }
         
         for (i = 0; i < aoTableColumns.length; i++) {
@@ -228,7 +228,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, "
                 + "b.bp, bbc.email_02, e.b_act, "
                 + "uls.usr AS _siie_app_usr_last_sync, u.ts_last_sync_n AS _siie_app_ts_last_sync"
-                + (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss._ss_usr, tss._ss_resp_ts") + " "
+                + (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss.usr, tss.ts_usr") + " "
                 + "FROM erp.usru_usr AS u "
                 + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
                 + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "
@@ -240,14 +240,21 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "/* SIIE App Sync Log: */ "
                 + "LEFT OUTER JOIN erp.usru_usr AS uls ON uls.id_usr = u.fid_usr_last_sync_n "
                 + (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ "
-                + "LEFT OUTER JOIN (SELECT sle.reference_id, u.usr AS _ss_usr, MAX(sl.response_timestamp) AS _ss_resp_ts "
-                + "FROM erp.cfg_sync_log AS sl "
-                + "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log "
-                + "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr "
-                + "WHERE sl.sync_type = '" + SSyncType.USER + "' "
-                + "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') "
-                + "GROUP BY sle.reference_id, u.usr "
-                + "ORDER BY CONVERT(sle.reference_id, UNSIGNED)) AS tss ON tss.reference_id = CONVERT(u.id_usr, CHAR) ")
+                + "LEFT OUTER JOIN ( "
+                    + "SELECT t.reference_id, u.usr, sl.ts_usr "
+                    + "FROM erp.cfg_sync_log AS sl "
+                    + "INNER JOIN ( "
+                        + "SELECT sle.reference_id, MAX(sl.id_sync_log) AS id_sync_log "
+                        + "FROM erp.cfg_sync_log AS sl "
+                        + "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log "
+                        + "WHERE sl.sync_type = '" + SSyncType.USER + "' "
+                        + "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') "
+                        + "GROUP BY sle.reference_id "
+                        + "ORDER BY CONVERT(sle.reference_id, UNSIGNED)"
+                    + ") AS t ON t.id_sync_log = sl.id_sync_log "
+                    + "INNER JOIN erp.usru_usr AS u ON u.id_usr = sl.fk_usr "
+                    + "ORDER BY CONVERT(t.reference_id, UNSIGNED)"
+                + ") AS tss ON tss.reference_id = CONVERT(u.id_usr, CHAR) ")
                 + (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere)
                 + "ORDER BY u.usr, u.id_usr ";
     }

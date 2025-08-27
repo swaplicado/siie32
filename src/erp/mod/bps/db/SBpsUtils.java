@@ -69,7 +69,7 @@ public abstract class SBpsUtils {
                 name = number == SUtilConsts.NUM_SNG ? "Customer" : "Customers";
                 break;
             case SModSysConsts.BPSS_CT_BP_SUP:
-                name = number == SUtilConsts.NUM_SNG ? "Vendor" : "Vendors";
+                name = number == SUtilConsts.NUM_SNG ? "Supplier" : "Suppliers";
                 break;
             case SModSysConsts.BPSS_CT_BP_DBR:
                 name = number == SUtilConsts.NUM_SNG ? "Debtor" : "Debtors";

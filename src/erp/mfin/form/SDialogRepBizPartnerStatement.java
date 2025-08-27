@@ -530,7 +530,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             String title = ""; 
             switch (mnBizPartnerCategory) {
                 case SDataConstantsSys.BPSS_CT_BP_SUP:
-                    title = "VENDOR STATEMENT"; 
+                    title = "SUPPLIER STATEMENT"; 
                     break;
                 case SDataConstantsSys.BPSS_CT_BP_CUS:
                     title = "CUSTOMER STATEMENT";
