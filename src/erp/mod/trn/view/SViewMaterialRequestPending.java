@@ -698,7 +698,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
         String subWhere = "";
         String join = "";
         String groupOrderBy = "";
-        String subGroupOrderBy = "";
+        String subGroupOrderBy;
         String select = "";
         String having = "";
         Object filter;
@@ -715,13 +715,7 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
             where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 AND ve.b_del = 0 ";
         }
 
-        
-        where += (where.isEmpty() ? "" : "AND ") + "(cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
-                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
-                SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " " +
-                "OR cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + 
-                ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = " +
-                SAuthorizationUtils.AUTH_STATUS_NA + ") ";
+        where += (where.isEmpty() ? "" : "AND ") + "auth.auth_status IN (" + SAuthorizationUtils.AUTH_STATUS_NA + ", " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + ") ";
         
         if (mnGridType == SModConsts.TRNX_MAT_REQ_PEND_SUP) {
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL) {
@@ -944,21 +938,19 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
-                + "LEFT JOIN (SELECT de.fid_mat_req_n, de.fid_mat_req_ety_n, SUM(de.qty * IF(d.fid_ct_iog = 1, -1, 1)) AS sumi_qty "
+                + "LEFT JOIN ("
+                + "SELECT de.fid_mat_req_n, de.fid_mat_req_ety_n, SUM(de.qty * IF(d.fid_ct_iog = 1, -1, 1)) AS sumi_qty "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " AS d " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS v ON de.fid_mat_req_n = v.id_mat_req " 
                 + "WHERE de.fid_mat_req_n IS NOT NULL AND de.fid_mat_req_ety_n IS NOT NULL " 
                 + "AND NOT de.b_del AND NOT d.b_del " 
                 + subWhere
-                + "GROUP BY " + subGroupOrderBy + " " 
-                + "ORDER BY " + subGroupOrderBy + " ) AS de ON " 
+                + "GROUP BY " + subGroupOrderBy + ") AS de ON " 
                 + "ve.id_mat_req = de.fid_mat_req_n AND ve.id_ety = de.fid_mat_req_ety_n ";
         
-        msSql += "LEFT JOIN (SELECT "
-                + "ddmr.fid_mat_req, "
-                + "ddmr.fid_mat_req_ety, "
-                + "SUM(ddmr.qty) AS pur_qty "
+        msSql += "LEFT JOIN ("
+                + "SELECT ddmr.fid_mat_req, ddmr.fid_mat_req_ety, SUM(ddmr.qty) AS pur_qty "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS ddmr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dpsety ON "
                 + "ddmr.fid_dps_year = dpsety.id_year AND ddmr.fid_dps_doc = dpsety.id_doc AND ddmr.fid_dps_ety = dpsety.id_ety "
@@ -974,8 +966,15 @@ public class SViewMaterialRequestPending extends SGridPaneView implements Action
                 + "AND dps.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                 + "AND dps.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                 + "GROUP BY ddmr.fid_mat_req " + (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_DETAIL || mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PROVIDED_DETAIL ? ", ddmr.fid_mat_req_ety " : "")
-                + "ORDER BY ddmr.fid_mat_req) AS req_pur ON "
+                + ") AS req_pur ON "
                 + "ve.id_mat_req = req_pur.fid_mat_req AND ve.id_ety = req_pur.fid_mat_req_ety ";
+        
+        msSql += "LEFT JOIN ("
+                + "SELECT id_mat_req, cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", 'trn_mat_req', id_mat_req, NULL, NULL, NULL, NULL) AS auth_status "
+                + "FROM trn_mat_req "
+                + ") AS auth ON "
+                + "v.id_mat_req = auth.id_mat_req ";
+        
         msSql += join
                 + (where.isEmpty() ? "" : "WHERE " + where)
                 + "GROUP BY " + groupOrderBy + " " 

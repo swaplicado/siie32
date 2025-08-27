@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 284.11/ 2025-08-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Cambio en el remitente en el envío de OC al proveedor al momento de ser autorizadas, dependiendo si viene de la interfaz o de un sistema externo.
+2) Optimización de las consultas de Requisiciones en suministro para reducir el tiempo de respuesta del sistema.
+
+================================================================================
 SIIE 3.2 284.10/ 2025-08-21
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
