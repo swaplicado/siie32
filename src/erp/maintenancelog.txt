@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 284.12/ 2025-08-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la consulta de de las vistas de usuarios y configuración de usuarios para transacciones para evitar que se dupliquen los renglones por la inclusión del usuario en la subconsulta de control de exportaciones de datos a SWAP Services.
+2) Refactorización de las funcionalidades de exportación de datos a SWAP Services con vistas a incorporar los demás tipos de interacciones: órdenes de compras, solicitudes de pagos, pagos, etc.
+
+================================================================================
 SIIE 3.2 284.11/ 2025-08-26
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
