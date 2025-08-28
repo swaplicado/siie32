@@ -167,10 +167,10 @@ public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab i
                 "LEFT OUTER JOIN erp.usru_usr AS ue ON ue.id_usr = uc.fid_usr_edit " +
                 "LEFT OUTER JOIN erp.usru_usr AS ud ON ud.id_usr = uc.fid_usr_del " +
                 (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ " +
-                "LEFT OUTER JOIN ( " +
+                "LEFT OUTER JOIN (" +
                     "SELECT t.reference_id, u.usr, sl.ts_usr " +
                     "FROM erp.cfg_sync_log AS sl " +
-                    "INNER JOIN ( " +
+                    "INNER JOIN (" +
                         "SELECT sle.reference_id, MAX(sl.id_sync_log) AS id_sync_log " +
                         "FROM erp.cfg_sync_log AS sl " +
                         "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log " +

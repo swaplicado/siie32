@@ -307,7 +307,7 @@ public abstract class SExportUtils {
      * @param responseBody Cuerpo de la respuesta (compactado).
      * @param responseDatetime Fecha-hora de la respuesta en el dispositivo cliente.
      * @param syncLogEntries Lista de entradas de log generadas.
-     * @throws SQLException Si ocurre un error en la consulta.
+     * @throws SQLException Si ocurre un error en las actualizaciones.
      */
     private static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
         int entriesLogged = 0;
@@ -436,18 +436,48 @@ public abstract class SExportUtils {
     }
     
     /**
+     * Cerrar las bitácoras de sincronización completando los últimos detalles de las entradas:
+     * marcar la última entrada en bitácora de sincronización con estatus "CREADA" como "OK" para indicar la culminación del proceso de sincronización.
+     *
+     * @param session Sesión de usuario.
+     * @param statement Statement para ejecutar la consulta.
+     * @param syncType Tipo de sincronización.
+     * @param firstRequestDatetime Fecha-hora de la primer petición en el dispositivo cliente del conjunto actual de iteraciones de sincronización.
+     * @throws SQLException Si ocurre un error en las actualizaciones.
+     */
+    private static void closeLogSync(final SGuiSession session, final SSyncType syncType, final Date firstRequestDatetime) throws SQLException, Exception {
+        switch (syncType) {
+            case USER:
+            case PARTNER_SUPPLIER:
+                SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, "");
+                break;
+
+            case FUNCTIONAL_AREA:
+            case PURCHASE_ORDER_REF:
+                HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
+                for (Integer companyId : databasesMap.keySet()) {
+                    String database = databasesMap.get(companyId);
+                    SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, database);
+                }
+                break;
+
+            default:
+                throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+        }
+    }
+    
+    /**
      * Procesa la respuesta de SWAP Services y hace las entradas en las bitácoras de sincronización.
      * 
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
-     * @param isSyncWithinBounds La sincronización está dentro de los límites configurados.
      * @param requestBody Cuerpo de la petición (compactado).
      * @param requestDatetime Fecha-hora de la petición en el dispositivo cliente.
      * @param responseBody Respuesta de SWAP Services.
      * @param responseDatetime Fecha-hora de la respuesta en el dispositivo cliente.
      * @throws Exception
      */
-    private static int computeResponse(final SGuiSession session, final SSyncType syncType, final boolean isSyncWithinBounds, final String requestBody, final Date requestDatetime, final String responseBody, final Date responseDatetime) throws Exception {
+    private static int computeResponse(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final String responseBody, final Date responseDatetime) throws Exception {
         final JsonNode responseJson = new ObjectMapper().readTree(responseBody);
         
         // Procesar la respuesta y generar las entradas de bitácora correspondientes:
@@ -459,7 +489,7 @@ public abstract class SExportUtils {
             httpResponseStatusCode = SHttpConsts.RSC_SUCC_NO_CONTENT;
         }
         else {
-            httpResponseStatusCode = isSyncWithinBounds ? SHttpConsts.RSC_SUCC_OK : SHttpConsts.RSC_SUCC_ACCEPTED;
+            httpResponseStatusCode = SHttpConsts.RSC_SUCC_CREATED;
         }
         
         // Registrar la operación de exportación en las bitácoras de sincronización:
@@ -521,6 +551,7 @@ public abstract class SExportUtils {
 
         SResponseInfo info = new SResponseInfo(syncType);
         info.setRegistriesRetrieved(allExportDatas.size());
+        Date firstRequestDatetime = null;
         
         do {
             // Determinar si los datos a sincronizar están dentro del límite permitido:
@@ -566,17 +597,27 @@ public abstract class SExportUtils {
             }
 
             // Realizar la petición HTTP a SWAP Services:
+            
             Date requestDatetime = new Date();
             String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey);
             Date responseDatetime = new Date();
 
+            if (firstRequestDatetime == null) {
+                firstRequestDatetime = requestDatetime;
+            }
+            
             // Procesar la respuesta:
-            int registriesSynced = computeResponse(session, syncType, isSyncWithinBounds, requestBody, requestDatetime, responseBody, responseDatetime);
+            int registriesSynced = computeResponse(session, syncType, requestBody, requestDatetime, responseBody, responseDatetime);
             info.updateIteration(currentExportDatas.size(), registriesSynced);
             
             // Mostrar el progreso de la sincronización:
             System.out.println(info.getProgress());
         } while (!info.isProcessingComplete());
+        
+        // Cerrar las bitácoras de sincronización:
+        if (info.isProcessingComplete() && info.getRegistriesSynced() > 0) {
+            closeLogSync(session, syncType, firstRequestDatetime);
+        }
 
         return info;
     }
@@ -593,7 +634,7 @@ public abstract class SExportUtils {
     public static SResponses exportData(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
         SResponses responses = new SResponses(syncType);
         
-        if (!((SClientInterface) session.getClient()).isGui() || session.getClient().showMsgBoxConfirm("La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar varios segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+        if (!((SClientInterface) session.getClient()).isGui() || session.getClient().showMsgBoxConfirm("La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
             SSyncType syncTypeInProgress = null;
             SResponseInfo info = null;
 

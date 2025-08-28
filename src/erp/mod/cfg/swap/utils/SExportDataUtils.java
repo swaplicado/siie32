@@ -78,16 +78,27 @@ public abstract class SExportDataUtils {
      */
     private static String getSqlQueryBasePartnerSuppliers() {
         return "SELECT "
-            + "b.id_bp, b.bp, b.lastname, b.firstname, b.bp_comm, "
-            + "b.fiscal_id, b.fiscal_frg_id, b.fid_tp_bp_idy, b.b_del, "
-            + "bc.b_del, bc.tax_regime, bba.fid_cty_n, cty.cty_code, bbc.email_01 "
-            + "FROM "
-            + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = " + SUtilConsts.BRA_CON_ID + " "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SUtilConsts.BRA_ADD_ID + " "
-            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS cty ON cty.id_cty = bba.fid_cty_n ";
+                + "b.id_bp, b.bp, b.lastname, b.firstname, b.bp_comm, "
+                + "b.fiscal_id, b.fiscal_frg_id, b.fid_tp_bp_idy, b.b_del, "
+                + "bc.b_del, bc.tax_regime, bba.fid_cty_n, cty.cty_code, bbc.email_01 "
+                + "FROM "
+                + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = " + SUtilConsts.BRA_CON_ID + " "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SUtilConsts.BRA_ADD_ID + " "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS cty ON cty.id_cty = bba.fid_cty_n "
+                + "LEFT OUTER JOIN ("
+                    + "SELECT bul.id_bp, bul.ts_usr_upd "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bul "
+                    + "INNER JOIN ("
+                        + "SELECT bulx.id_bp, MAX(bulx.id_log) AS id_log "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bulx "
+                        + "GROUP BY bulx.id_bp "
+                        + "ORDER BY bulx.id_bp"
+                    + ") AS t ON t.id_bp = bul.id_bp AND t.id_log = bul.id_log "
+                    + "ORDER BY bul.id_bp"
+                + ") AS tbul ON tbul.id_bp = b.id_bp ";
     }
 
     /**
@@ -119,6 +130,7 @@ public abstract class SExportDataUtils {
      * 
      * @param statement Statement para ejecutar la consulta.
      * @param syncType Tipo de sincronización.
+     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
      * @return Fecha de la última sincronización exitosa, o null si no existe.
      * @throws SQLException Si ocurre un error en la consulta.
      */
@@ -140,6 +152,36 @@ public abstract class SExportDataUtils {
         }
         
         return datetime;
+    }
+
+    /**
+     * Marcar la última entrada en bitácora de sincronización con estatus "CREADA" como "OK" para indicar la culminación del proceso de sincronización.
+     * 
+     * @param statement Statement para ejecutar la consulta.
+     * @param syncType Tipo de sincronización.
+     * @param firstRequestDatetime Fecha-hora de la primer petición en el dispositivo cliente del conjunto actual de iteraciones de sincronización.
+     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static void markLastSyncCreatedAsOk(final Statement statement, final SSyncType syncType, final Date firstRequestDatetime, final String database) throws SQLException, Exception {
+        String table = getSqlTableSyncLog(syncType, database);
+        
+        String sql = "SELECT MAX(id_sync_log) " // timestamp of server device!
+                + "FROM " + table + " "
+                + "WHERE response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "' "
+                + "AND sync_type = '" + syncType + "' "
+                + "AND request_timestamp >= '" + SLibUtils.DbmsDateFormatDatetime.format(firstRequestDatetime) + "';";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                int syncLogId = resultSet.getInt(1);
+                if (syncLogId > 0) {
+                    sql = "UPDATE " + table + " SET response_code = '" + SHttpConsts.RSC_SUCC_OK + "' "
+                            + "WHERE id_sync_log = " + syncLogId + " ;";
+                    statement.execute(sql);
+                }
+            }
+        }
     }
 
     /**
@@ -193,13 +235,15 @@ public abstract class SExportDataUtils {
             
             while (resultSet.next()) {
                 int userId = resultSet.getInt("u.id_usr");
+                String username = resultSet.getString("u.usr");
+                String email = resultSet.getString("u.email");
                 
                 // validar que el usuario tenga nombre y correo:
                 
-                if (resultSet.getString("u.usr").isEmpty() || !SMailUtils.isValidEmail(resultSet.getString("u.email"))) {
+                if (username.isEmpty() || !SMailUtils.isValidEmail(email)) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                             "Usuario omitido (nombre de usuariio vacío o correo inválido): ID = {0}; username = {1}; email = {2}.",
-                            new Object[] { userId, resultSet.getString("u.usr"), resultSet.getString("u.email") });
+                            new Object[] { userId, username, email });
                     continue; // omitir usuario inválido
                 }
                 
@@ -217,8 +261,8 @@ public abstract class SExportDataUtils {
                 
                 if (firstName.isEmpty() || lastName.isEmpty()) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
-                            "Usuario omitido (nombre(s) o apellido(s) vacíos): ID = {0}; last_name = {1}; first_name = {2}.",
-                            new Object[] { userId, lastName, firstName });
+                            "Usuario omitido (nombre(s) o apellido(s) vacíos): ID = {0}; username = {1}; last_name = {2}; first_name = {3}.",
+                            new Object[] { userId, username, lastName, firstName });
                     continue; // omitir usuario inválido
                 }
 
@@ -226,8 +270,8 @@ public abstract class SExportDataUtils {
                 
                 SExportDataUser user = new SExportDataUser();
                 
-                user.username = resultSet.getString("u.usr");
-                user.email = resultSet.getString("u.email");
+                user.username = username;
+                user.email = email;
                 user.password = SExportUtils.generateSecurePassword();
                 user.is_active = resultSet.getBoolean("u.b_act");
                 user.first_name = firstName;
@@ -383,7 +427,7 @@ public abstract class SExportDataUtils {
         ArrayList<SExportData> users = new ArrayList<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
-            String referenceId = "CONVERT(b.id_bp, CHAR) ";
+            String referenceId = "CONVERT(b.id_bp, CHAR)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PARTNER_SUPPLIER, "");
             
             String sql = getSqlQueryBasePartnerSuppliers()
@@ -391,7 +435,8 @@ public abstract class SExportDataUtils {
                     + "((NOT b.b_del AND NOT bc.b_del) "
                     + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PARTNER_SUPPLIER, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
                     + "AND b.b_sup AND b.fiscal_id <> '' AND b.fiscal_id <> '" + DCfdConsts.RFC_GEN_NAC + "' "
                     + "ORDER BY "
@@ -419,6 +464,7 @@ public abstract class SExportDataUtils {
      * @return Lista de socios de negocios proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
+    @Deprecated
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
         
@@ -718,12 +764,12 @@ public abstract class SExportDataUtils {
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PURCHASE_ORDER_REF, database);
 
                 String sql = "SELECT "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
+                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked "
                         + "FROM ("
                         + "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty, "
                         + "COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _qty_linked, "
@@ -740,11 +786,11 @@ public abstract class SExportDataUtils {
                         + "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                         + "/*AND NOT d.b_link */" // bloque comentado para incluir pedidos enlazados forzadamente (para "eliminar" referencias en subsecuentes exportaciones)
                         + "GROUP BY "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
                         + "ORDER BY "
-                        + "d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, "
+                        + "d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
                         + ") AS t "
@@ -755,14 +801,14 @@ public abstract class SExportDataUtils {
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND NOT t.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PURCHASE_ORDER_REF, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
                         + "GROUP BY "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
+                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp "
                         + "HAVING _entries_linked < _entries "
                         + "ORDER BY "
-                        + "t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
+                        + "t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp;";
 
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -802,6 +848,7 @@ public abstract class SExportDataUtils {
      * @return Lista de órdenes de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
+    @Deprecated
     private static ArrayList<SExportData> getListOfPurchaseOrderRefsToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
         

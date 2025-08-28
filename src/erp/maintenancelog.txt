@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 284.13/ 2025-08-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Inclusión de proveedores con actualización de sus datos comerciales y pedidos de compras cerrados/abiertos manualmente en los datos a exportar a SWAP Services.
+2) Refactorización de las funcionalidades originales de control de datos exportados como completos o parciales, marcando únicamente como OK la entrada en bitácora de la última iteración, y solo si hubo exportaciones en todo el proceso.
+
+================================================================================
 SIIE 3.2 284.12/ 2025-08-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

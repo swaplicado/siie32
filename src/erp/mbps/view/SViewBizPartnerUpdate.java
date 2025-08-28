@@ -177,10 +177,10 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                 ") AS tlog ON tlog.id_bp = bp.id_bp " +
                 "LEFT OUTER JOIN erp.usru_usr AS ulog ON ulog.id_usr = tlog.fk_usr_upd " +
                 (!mbSwapServicesLinkUp ? "" : "/* SWAP Services Sync Log: */ " +
-                "LEFT OUTER JOIN ( " +
+                "LEFT OUTER JOIN (" +
                     "SELECT t.reference_id, u.usr, sl.ts_usr " +
                     "FROM erp.cfg_sync_log AS sl " +
-                    "INNER JOIN ( " +
+                    "INNER JOIN (" +
                         "SELECT sle.reference_id, MAX(sl.id_sync_log) AS id_sync_log " +
                         "FROM erp.cfg_sync_log AS sl " +
                         "INNER JOIN erp.cfg_sync_log_ety AS sle ON sle.id_sync_log = sl.id_sync_log " +
