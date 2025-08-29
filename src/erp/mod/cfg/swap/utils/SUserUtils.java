@@ -41,7 +41,7 @@ public abstract class SUserUtils {
         if (user.isAdministrator()) {
             // si el usuario es administrador, igualmente es Administrador (y también los demás roles):
             roles.add(SSwapConsts.ROL_ADMINISTRATOR);
-            roles.add(SSwapConsts.ROL_BUYER);
+            roles.add(SSwapConsts.ROL_PURCHASER);
             roles.add(SSwapConsts.ROL_ACCOUNTANT);
             roles.add(SSwapConsts.ROL_PAYER);
         }
@@ -50,7 +50,7 @@ public abstract class SUserUtils {
             for (int companyId : (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES)) {
                 if (user.hasAccessToModule(SDataConstants.MOD_PUR, companyId)) {
                     // si el usuario tiene acceso al módulo de compras, es Comprador:
-                    roles.add(SSwapConsts.ROL_BUYER);
+                    roles.add(SSwapConsts.ROL_PURCHASER);
                     break;
                 }
             }

@@ -5,8 +5,8 @@
  */
 package erp.mod.cfg.swap;
 
-import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SExportDataUser;
+import erp.mod.cfg.swap.utils.SExportDataUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.db.STrnDBCore;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * Interfaz pública para la clase de sincronización de datos.
  * Esta clase proporciona métodos para interactuar con la base de datos y
  * realizar operaciones de sincronización de datos.
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SPublicInterface {
     
@@ -72,7 +72,7 @@ public class SPublicInterface {
                 return null;
             }
 
-            return SExportUtils.getSupplierByFiscalId(conn.createStatement(), fiscalId);
+            return SExportDataUtils.getSupplierByFiscalId(conn.createStatement(), fiscalId);
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);

@@ -603,6 +603,9 @@
                       </Constraints>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jspFuncAreasAvailable">
+                      <Properties>
+                        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
+                      </Properties>
                       <AuxValues>
                         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                       </AuxValues>
@@ -654,6 +657,9 @@
                       </Constraints>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jspFuncAreasSelected">
+                      <Properties>
+                        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
+                      </Properties>
                       <AuxValues>
                         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                       </AuxValues>
@@ -780,6 +786,9 @@
                       </Constraints>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jspFuncSubAreasAvailable">
+                      <Properties>
+                        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
+                      </Properties>
                       <AuxValues>
                         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                       </AuxValues>
@@ -831,6 +840,9 @@
                       </Constraints>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jspFuncSubAreasSelected">
+                      <Properties>
+                        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
+                      </Properties>
                       <AuxValues>
                         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                       </AuxValues>

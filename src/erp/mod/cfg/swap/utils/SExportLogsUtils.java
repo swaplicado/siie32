@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * y se guardan en un directorio específico.
  * @author Edwin Carmona, Sergio Flores
  */
-public class SExportLogUtils {
+public class SExportLogsUtils {
     
     private static final String LOG_DIRECTORY = "logs/export"; // Directorio donde se guardarán los logs
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -50,7 +50,7 @@ public class SExportLogUtils {
         String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
         String formattedMessage = String.format("[%s] %s%n", timestamp, message);
 
-        Logger.getLogger(SExportLogUtils.class.getName()).info(formattedMessage);
+        Logger.getLogger(SExportLogsUtils.class.getName()).info(formattedMessage);
         
         // Escribir en el archivo (crear si no existe, añadir si existe)
         Files.write(logFile, formattedMessage.getBytes(), 

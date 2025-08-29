@@ -23,6 +23,7 @@ import java.util.ArrayList;
  * (C) BaseX Team 2005-18, BSD License
  */
 public final class SBaseXClient implements Closeable {
+    
     /** UTF-8 charset. */
     private static final Charset UTF8 = Charset.forName("UTF-8");
     /** Output stream. */

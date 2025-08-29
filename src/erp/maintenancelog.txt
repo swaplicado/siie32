@@ -1,8 +1,22 @@
 ================================================================================
-SIIE 3.2 284.12/ 2025-08-29
+SIIE 3.2 284.14/ 2025-08-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se permite enviar a autorización OC que cuyo estatus sea rechazado.
+
+================================================================================
+SIIE 3.2 284.13/ 2025-08-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Inclusión de proveedores con actualización de sus datos comerciales y pedidos de compras cerrados/abiertos manualmente en los datos a exportar a SWAP Services.
+2) Refactorización de las funcionalidades originales de control de datos exportados como completos o parciales, marcando únicamente como OK la entrada en bitácora de la última iteración, y solo si hubo exportaciones en todo el proceso.
+
+================================================================================
+SIIE 3.2 284.12/ 2025-08-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la consulta de de las vistas de usuarios y configuración de usuarios para transacciones para evitar que se dupliquen los renglones por la inclusión del usuario en la subconsulta de control de exportaciones de datos a SWAP Services.
+2) Refactorización de las funcionalidades de exportación de datos a SWAP Services con vistas a incorporar los demás tipos de interacciones: órdenes de compras, solicitudes de pagos, pagos, etc.
 
 ================================================================================
 SIIE 3.2 284.11/ 2025-08-26
@@ -35,7 +49,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 284.7/ 2025-08-20
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Adición de la vista reporte de ventas por facturas a detalle VENTAS
+1) Adición de la vista reporte de ventas por facturas a detalle VENTAS.
 
 ================================================================================
 SIIE 3.2 284.6/ 2025-08-19
@@ -62,13 +76,13 @@ Sergio Abraham FLORES GUTIÉRREZ/ Jhonatan Claudio PEÑA HERNÁNDEZ
 SIIE 3.2 284.3/ 2025-08-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Ajustes y correcciones de valuaciones de consumos de inventario en base a observaciones de diferencia de precios en facturas y OC
+1) Ajustes y correcciones de valuaciones de consumos de inventario en base a observaciones de diferencia de precios en facturas y OC.
 
 ================================================================================
 SIIE 3.2 284.2/ 2025-08-15
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección de configuración del acrónimo para contratos de ventas y compras
+1) Corrección de configuración del acrónimo para contratos de ventas y compras.
 
 ================================================================================
 SIIE 3.2 284.1/ 2025-08-14

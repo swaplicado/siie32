@@ -106,7 +106,7 @@ public abstract class SSwapConsts {
     /**
      * Rol Comprador.
      */
-    public static final int ROL_BUYER = 2;
+    public static final int ROL_PURCHASER = 2;
     
     /**
      * Rol Contador.
