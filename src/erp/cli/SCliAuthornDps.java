@@ -7,9 +7,9 @@ package erp.cli;
 
 import erp.SParamsApp;
 import erp.mod.cfg.utils.SAuthorizationUtils;
-import erp.musr.data.SDataUser;
 import erp.siieapp.SAppLinkResponse;
 import erp.siieapp.SAuthorizationsAPI;
+import erp.siieapp.SClientUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
@@ -47,15 +47,18 @@ public class SCliAuthornDps {
     }
 
     private static void run(SDbDatabase dbCompany) throws Exception {
-        SGuiSession session = new SGuiSession(null);
-        session.setDatabase(dbCompany);
+//        SGuiSession session = new SGuiSession(null);
+//        session.setDatabase(dbCompany);
         
-        SDataUser user = new SDataUser();
-        user.read(new int[] { 2 }, session.getStatement());
-        session.setUser(user);
+//        SDataUser user = new SDataUser();
+//        user.read(new int[] { 76 }, session.getStatement());
+//        session.setUser(user);
+
+        SClientUtils cl = new SClientUtils(76);
+        SGuiSession session = cl.setSession("{\"dbHost\":\"localhost\",\"dbName\":\"erp\",\"dbPort\":\"3306\",\"dbUser\":\"root\",\"dbPass\":\"msroot\",\"dbMainId\":\"2852\"}");
         
         SAuthorizationsAPI api = new SAuthorizationsAPI(session);
-        SAppLinkResponse resp = api.approbeResource(SAuthorizationUtils.AUTH_TYPE_DPS, new int[] { 2025, 6057 }, 2, "");
+        SAppLinkResponse resp = api.approbeResource(SAuthorizationUtils.AUTH_TYPE_DPS, new int[] { 2025, 6085 }, 76, "");
         //String resp = api.rejectResource(SAuthorizationUtils.AUTH_TYPE_DPS, new int[] { 2025, 6057 }, 2, "");
     
         System.out.println("proceso terminado!");

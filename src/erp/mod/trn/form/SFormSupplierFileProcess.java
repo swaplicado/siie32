@@ -1154,10 +1154,11 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
                 if (!mbIsEditingFile) {
                     if (!mbIsExistingFile) {
                         if (moKeySuppBp.getSelectedIndex() > 0) {
-                            String sql = "SELECT * FROM trn_sup_file WHERE num = '" + moTextSuppNum.getValue() + "' AND fid_bp_n = " + moKeySuppBp.getValue()[0];
+                            String sql = "SELECT * FROM trn_sup_file WHERE num = '" + moTextSuppNum.getValue() + "' AND fid_bp_n = " + moKeySuppBp.getValue()[0] + " AND NOT b_del";
                             try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
                                 if (resultSet.next()) {
-                                    validation.setMessage("Ya existe un registro para el folio del archivo de soporte del el asociado de negocios seleccionado.\nFavor de verificar.");
+                                    validation.setMessage("Ya existe un registro para el folio del archivo de soporte del el asociado de negocios seleccionado.\n"
+                                            + "Se puede seleccionar el folio ya existente en el botón '...' junto al campo 'Folio soporte'.");
                                     validation.setComponent(moTextSuppNum);
                                 }
                             }
@@ -1478,6 +1479,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         mbIsCapturingFile = false;
         if (mbIsEditingFile) {
             maSuppFiles.add(mnEditingSelectedIndex, moSuppFileDeleted);
+            maSuppFilesDeleted.remove(moSuppFileDeleted);
         }
         mbIsEditingFile = false;
         valueChanged(null);
@@ -1843,8 +1845,8 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         moDocCur = (SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, 
                 new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_VERBOSE);
         mnDpsStAuth = moRegistry.getDps().getFkDpsAuthorizationStatusId();
-        mbIsDocExtemp = mnDpsStAuth != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA;
-        mbCanEdit = mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
+        mbIsDocExtemp = mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN;
+        mbCanEdit = mnDpsStAuth != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
         
         moTextDocType.setValue(moDpsType.getDpsType());
         moTextCob.setValue(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }));
@@ -1900,7 +1902,7 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         jbEditRow.setEnabled(mbCanEdit);
         jbDeleteRow.setEnabled(mbCanEdit);
         jbSave.setEnabled(mbCanEdit);
-        jbSaveAndSend.setEnabled(mbCanEdit && mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        jbSaveAndSend.setEnabled(mbCanEdit && (mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || mnDpsStAuth == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT));
         
         mbSendAuth = false;
     }

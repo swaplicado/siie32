@@ -42,7 +42,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     private STabFilterDatePeriod moTabFilterDatePeriod;
     private JFileChooser moFileChooserDownload;
     
-    private JButton jbAnullAuth;
+    private JButton jbAuthWebAnullAuth;
     private JButton jbAddFileSupp;
     private JButton jbDownFileSupp;
     private JButton jbAll;
@@ -66,10 +66,10 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         moFileChooserDownload.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         moFileChooserDownload.setDialogTitle("Seleccionar directorio para descargar archivo...");
         
-        jbAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
-        jbAnullAuth.setPreferredSize(new Dimension(23, 23));
-        jbAnullAuth.addActionListener(this);
-        jbAnullAuth.setToolTipText("Anular autorización");
+        jbAuthWebAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
+        jbAuthWebAnullAuth.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebAnullAuth.addActionListener(this);
+        jbAuthWebAnullAuth.setToolTipText("Anular autorización");
         
         jbAddFileSupp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
         jbAddFileSupp.setPreferredSize(new Dimension(23, 23));
@@ -108,7 +108,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
-        addTaskBarUpperComponent(jbAnullAuth);
+        addTaskBarUpperComponent(jbAuthWebAnullAuth);
         if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_AUTH) {
             addTaskBarUpperComponent(jbAddFileSupp);
         }
@@ -292,9 +292,9 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         }
     }
     
-    private void actionRestartAuth() {
+    private void actionAuthWebAnullAuth() {
          try {
-            if (jbAnullAuth.isEnabled()) {
+            if (jbAuthWebAnullAuth.isEnabled()) {
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
                     fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
@@ -304,6 +304,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                     }
                     else {
                         if (miClient.showMsgBoxConfirm("El documento regresara a estatus de autorización \"N/A\".\n¿Desea continuar?") == JOptionPane.OK_OPTION) {
+                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+                            
                             // Eliminar archivos de la nube
                             SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
                             
@@ -313,8 +315,6 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
                             // Actualizar estatus de autorización
                             String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
                             miClient.getSession().getStatement().execute(sql);
-                            
-                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
                             
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
@@ -425,8 +425,8 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             if (button == jbAddFileSupp) {
                 actionAddFileSupp();
             }
-            if (button == jbAnullAuth) {
-                actionRestartAuth();
+            if (button == jbAuthWebAnullAuth) {
+                actionAuthWebAnullAuth();
             }
             else if (button == jbDownFileSupp) {
                 actionDownFileSupp();

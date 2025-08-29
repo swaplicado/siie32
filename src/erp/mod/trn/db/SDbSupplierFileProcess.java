@@ -62,7 +62,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         msSql = "UPDATE trn_dps SET fid_st_dps_authorn = " + stAuth + " WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
         session.getStatement().getConnection().createStatement().execute(msSql);
     }
-    
+        
     public void readMaterialRequests(SGuiSession session) throws Exception {
         maMaterialRequests = new ArrayList<>();
         Statement statement = session.getDatabase().getConnection().createStatement();
