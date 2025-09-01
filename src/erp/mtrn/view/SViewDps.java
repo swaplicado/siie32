@@ -480,7 +480,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
             if (mbSwapServicesLinkUp) {
                 jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
-                    "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_REF_ORDER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
+                    "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PURCHASE_ORDER_REF, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(jbExportDataToSwapServices);
@@ -3084,7 +3084,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_REF_ORDER);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PURCHASE_ORDER_REF);
                 SExportUtils.processResponses(miClient.getSession(), responses, mnModule, mnTabType);
             }
             catch (Exception e) {

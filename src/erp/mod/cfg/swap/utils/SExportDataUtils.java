@@ -59,7 +59,7 @@ public abstract class SExportDataUtils {
                 break;
                 
             case FUNCTIONAL_AREA:
-            case PUR_REF_ORDER:
+            case PURCHASE_ORDER_REF:
             case PUR_REF_SCALE_TICKET:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
@@ -761,7 +761,7 @@ public abstract class SExportDataUtils {
 
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PURCHASE_ORDER_REF, database);
 
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
@@ -800,7 +800,7 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND NOT t.b_link) "
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PURCHASE_ORDER_REF, database) + "))"
                         + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
                         + "GROUP BY "
@@ -866,7 +866,7 @@ public abstract class SExportDataUtils {
 
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PURCHASE_ORDER_REF, database);
                 
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
@@ -1107,7 +1107,7 @@ public abstract class SExportDataUtils {
                 data = getListOfFunctionalAreasToExport(session);
                 break;
                 
-            case PUR_REF_ORDER:
+            case PURCHASE_ORDER_REF:
                 if (((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfPurchaseOrderRefsToExportAeth(session);
                 }
