@@ -29,10 +29,10 @@ public abstract class SSwapUtils {
                     case FUNCTIONAL_AREA:
                         translation = "AREA_FUNCIONAL";
                         break;
-                    case PURCHASE_ORDER_REF:
+                    case PUR_REF_ORDER:
                         translation = "REF_PEDIDO_COMPRAS";
                         break;
-                    case SCALE_TICKET_REF:
+                    case PUR_REF_SCALE_TICKET:
                         translation = "REF_BOLETO_BÁSCULA";
                         break;
                     default:
