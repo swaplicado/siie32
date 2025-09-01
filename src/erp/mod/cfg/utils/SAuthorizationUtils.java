@@ -1685,7 +1685,8 @@ public abstract class SAuthorizationUtils {
     public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) throws Exception {
         SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
         fileProcess.read(client.getSession(), pk);
-        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA) {
+        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
+                fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
             if (canSendAuthornAppWeb(client, fileProcess)) {
                 SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
                 dialog.setVisible(true);

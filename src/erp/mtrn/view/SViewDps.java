@@ -3272,6 +3272,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         if (SAuthorizationUtils.hasAuthornStatus(miClient.getSession(), fileProcess.getPrimaryKey())
                                 || SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey())) {
                             if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
+                                fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+                                
                                 // Eliminar archivos de la nube:
                                 SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
 
@@ -3281,8 +3283,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 // Actualizar estatus de autorización:
                                 String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
                                 miClient.getSession().getStatement().execute(sql);
-
-                                fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
 
                                 miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                                 miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
