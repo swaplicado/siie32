@@ -36,6 +36,7 @@ import erp.mmfg.data.SDataProductionOrderChargeEntryLot;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
@@ -2016,12 +2017,14 @@ public abstract class STrnUtilities {
      * @throws java.lang.Exception
      */
     public static void sendDpsOrder(final SClientInterface client, final int[] dpsKey, boolean confirmSending) throws Exception {
+        SAuthorizationUtils.writeLog("sendDpsOrder");
         SDataDps dps = new SDataDps();
         dps.read(dpsKey, client.getSession().getStatement());
         
         if (dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN &&
                 dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
             client.showMsgBoxWarning("No se puede enviar el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
+            SAuthorizationUtils.writeLog("No se puede enviar el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
         }
         else {
             boolean send = true;
@@ -2030,6 +2033,7 @@ public abstract class STrnUtilities {
                 send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
             }
             if (send) {
+                SAuthorizationUtils.writeLog("Send = true");
                 sendMailOrder(client, dps);
             }
         }
@@ -2055,6 +2059,7 @@ public abstract class STrnUtilities {
         SDataBizPartner bizPartnerUserSend;
 
         try {
+            SAuthorizationUtils.writeLog("sendMailOrder");
             int dpsCategory = oDps.getFkDpsCategoryId();
             if (client.isGui()) {
                 client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -2062,6 +2067,7 @@ public abstract class STrnUtilities {
             mms = getMms(client, dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
             
             bizPartnerMail = getMailToSendForOrder(client, oDps);
+            SAuthorizationUtils.writeLog("bizPartnerMail: " + bizPartnerMail);
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
                 client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
             }
@@ -2090,6 +2096,8 @@ public abstract class STrnUtilities {
                         userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
                     }
                 }
+                
+                SAuthorizationUtils.writeLog("userMail: " + userMail);
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
                 sender.setMailReplyTo(mms.getXtaMailReplyTo());
@@ -2122,6 +2130,7 @@ public abstract class STrnUtilities {
                     }
 
                     if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, false)) {
+                        SAuthorizationUtils.writeLog("agregado al log\n\n");
                     }
 
                     pdf.delete();
@@ -2136,6 +2145,9 @@ public abstract class STrnUtilities {
         }
         catch (Exception e) {
             SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+            try {
+                SAuthorizationUtils.writeLog(e.getMessage());
+            }catch (Exception ex) {}
         }
         finally {
             if (client.isGui()) {
@@ -2787,6 +2799,7 @@ public abstract class STrnUtilities {
         SCfdXmlCatalogs xmlCatalogs;
         
         try {
+            SAuthorizationUtils.writeLog("createReportOrder ");
             if (client.isGui()) {
                 cursor = client.getFrame().getCursor();
                 client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
