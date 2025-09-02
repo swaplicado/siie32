@@ -10,6 +10,7 @@ package erp.mod.cfg.db;
  * @author Sergio Flores
  */
 public enum SSyncType {
+    // For ERP database:
     USER,
     PARTNER_SUPPLIER,
     PARTNER_CUSTOMER,
@@ -17,6 +18,7 @@ public enum SSyncType {
     AUTH_JOB_TITLE,
     AUTH_DEPARTMENT,
     AUTH_FUNCTIONAL_AREA,
+    // For company database:
     FUNCTIONAL_AREA,
     REQUISITION,
     REQUISITION_AUTH,
@@ -24,7 +26,6 @@ public enum SSyncType {
     PUR_QUOTE_REQ,
     PUR_ORDER,
     PUR_ORDER_AUTH,
-    PURCHASE_ORDER_REF,
     PUR_REF_ORDER,
     PUR_REF_SCALE_TICKET,
     PUR_INVOICE,

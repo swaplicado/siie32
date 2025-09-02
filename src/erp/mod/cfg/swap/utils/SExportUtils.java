@@ -235,7 +235,7 @@ public abstract class SExportUtils {
                         break;
 
                     case FUNCTIONAL_AREA:
-                    case PURCHASE_ORDER_REF:
+                    case PUR_REF_ORDER:
                         HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         for (JsonNode result : results) {
@@ -333,7 +333,7 @@ public abstract class SExportUtils {
                             break;
 
                         case FUNCTIONAL_AREA:
-                        case PURCHASE_ORDER_REF:
+                        case PUR_REF_ORDER:
                             log = new SDbComSyncLog();
                             break;
 
@@ -375,7 +375,7 @@ public abstract class SExportUtils {
                                 break;
 
                             case FUNCTIONAL_AREA:
-                            case PURCHASE_ORDER_REF:
+                            case PUR_REF_ORDER:
                                 log = new SDbComSyncLog();
                                 break;
 
@@ -453,7 +453,7 @@ public abstract class SExportUtils {
                 break;
 
             case FUNCTIONAL_AREA:
-            case PURCHASE_ORDER_REF:
+            case PUR_REF_ORDER:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -531,7 +531,7 @@ public abstract class SExportUtils {
                 jsonParentKey = SSwapConsts.CFG_OBJ_AREAS_SRV;
                 break;
                 
-            case PURCHASE_ORDER_REF:
+            case PUR_REF_ORDER:
                 jsonParentKey = SSwapConsts.CFG_OBJ_TXN_REFS_SRV;
                 break;
                 
@@ -585,7 +585,7 @@ public abstract class SExportUtils {
                     requestBody = mapper.writeValueAsString(functionalAreasBody);
                     break;
 
-                case PURCHASE_ORDER_REF:
+                case PUR_REF_ORDER:
                     SRequestReferencesBody referencesBody = new SRequestReferencesBody();
                     referencesBody.work_instance = instanceArray;
                     referencesBody.references = (SExportDataReference[]) currentExportDatas.toArray(new SExportDataReference[0]);
@@ -657,7 +657,7 @@ public abstract class SExportUtils {
                         }
                         break;
 
-                    case PURCHASE_ORDER_REF:
+                    case PUR_REF_ORDER:
                         // exportar antes áreas funcionales:
                         syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
                         info = computeRequest(session, syncTypeInProgress);
