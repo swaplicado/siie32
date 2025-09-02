@@ -12,15 +12,19 @@ import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.musr.data.SDataUser;
 import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewUserRight extends erp.lib.table.STableTab {
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
+
+    private boolean mbSwapServicesLinkUp;
 
     public SViewUserRight(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.USRX_RIGHT);
@@ -36,10 +40,12 @@ public class SViewUserRight extends erp.lib.table.STableTab {
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
+        mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+        
         //jbDelete.setEnabled(false);
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[5];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 6 : 5];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -53,6 +59,10 @@ public class SViewUserRight extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_prv_usr", "Privilegios usuario", STableConstants.WIDTH_BOOLEAN_3X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_rol_co", "Roles empresa", STableConstants.WIDTH_BOOLEAN_3X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_config_prv_co", "Privilegios empresa", STableConstants.WIDTH_BOOLEAN_3X);
+        
+        if (mbSwapServicesLinkUp) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_sync_roles", SSwapConsts.SWAP_SERVICES + " roles sincronización", STableConstants.WIDTH_BOOLEAN_3X);
+        }
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -109,7 +119,8 @@ public class SViewUserRight extends erp.lib.table.STableTab {
         msSql = "SELECT u.id_usr, u.usr, erp.usr_validate_config_rol_usr(u.id_usr) AS b_config_rol_usr, " +
                 "erp.usr_validate_config_prv_usr(u.id_usr) AS b_config_prv_usr, " +
                 "erp.usr_validate_config_rol_co(u.id_usr) AS b_config_rol_co, " +
-                "erp.usr_validate_config_prv_co(u.id_usr) AS b_config_prv_co " +
+                "erp.usr_validate_config_prv_co(u.id_usr) AS b_config_prv_co, " +
+                "(u.sync_settings <> '' AND u.sync_settings <> '" + SDataUser.SYNC_SETTINGS_DEF + "') AS b_sync_roles " +
                 "FROM erp.usru_usr AS u " +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY u.usr, u.id_usr ";

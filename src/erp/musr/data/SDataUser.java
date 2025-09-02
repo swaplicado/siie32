@@ -5,6 +5,9 @@
 
 package erp.musr.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -15,6 +18,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mtrn.data.SDataUserConfigurationTransaction;
 import erp.mtrn.data.STrnUtilities;
 import java.io.Serializable;
@@ -36,11 +40,15 @@ import sa.lib.gui.SGuiUser;
  * @author Sergio Flores, Alfonso Flores, Claudio Peña, Edwin Carmona
  */
 public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
+
+    public static final String SYNC_ATT_ROLES = "roles";
+    public static final java.lang.String SYNC_SETTINGS_DEF = "{\"roles\": []}";
     
     protected int mnPkUserId;
     protected java.lang.String msUser;
     protected java.lang.String msUserPassword;
     protected java.lang.String msEmail;
+    protected java.lang.String msSyncSettings;
     protected boolean mbIsUniversal;
     protected boolean mbIsCanEdit;
     protected boolean mbIsCanDelete;
@@ -114,6 +122,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setUser(java.lang.String s) { msUser = s; }
     public void setUserPassword(java.lang.String s) { msUserPassword = s; }
     public void setEmail(java.lang.String s) { msEmail = s; }
+    public void setSyncSettings(java.lang.String s) { msSyncSettings = s; }
     public void setIsUniversal(boolean b) { mbIsUniversal = b; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
@@ -134,6 +143,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public java.lang.String getUser() { return msUser; }
     public java.lang.String getUserPassword() { return msUserPassword; }
     public java.lang.String getEmail() { return msEmail; }
+    public java.lang.String getSyncSettings() { return msSyncSettings; }
     public boolean getIsUniversal() { return mbIsUniversal; }
     public boolean getIsCanEdit() { return mbIsCanEdit; }
     public boolean getIsCanDelete() { return mbIsCanDelete; }
@@ -190,6 +200,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         msUser = "";
         msUserPassword = "";
         msEmail = "";
+        msSyncSettings = "";
         mbIsUniversal = false;
         mbIsCanEdit = false;
         mbIsCanDelete = false;
@@ -254,6 +265,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                 msUser = resultSet.getString("usr");
                 msUserPassword = "";    // password is encrypted in DBMS, so is not usefull here
                 msEmail = resultSet.getString("email");
+                msSyncSettings = resultSet.getString("sync_settings");
                 mbIsUniversal = resultSet.getBoolean("b_univ");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
@@ -457,11 +469,12 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.usru_usr_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(param++, mnPkUserId);
             callableStatement.setString(param++, msUser);
             callableStatement.setString(param++, msUserPassword);
             callableStatement.setString(param++, msEmail);
+            callableStatement.setString(param++, msSyncSettings);
             callableStatement.setBoolean(param++, mbIsUniversal);
             callableStatement.setBoolean(param++, mbIsCanEdit);
             callableStatement.setBoolean(param++, mbIsCanDelete);
@@ -961,6 +974,10 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         return right;
     }
 
+    /**
+     * Read user privileges.
+     * @param session 
+     */
     public void readUserPrivileges(SGuiSession session) {
         String sql = "";
         ResultSet resultSet = null;
@@ -1140,6 +1157,41 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
     
         return has;
+    }
+    
+    /**
+     * Set roles in sync settings.
+     * @param roles List of roles.
+     */
+    public void setSyncSettingsRoles(ArrayList<String> roles) {
+        String jsonRoles = "";
+        
+        for (String role : roles) {
+            jsonRoles += (jsonRoles.isEmpty() ? "" : ", ") + "\"" + role + "\"";
+        }
+        
+        msSyncSettings = "{\"roles\": [" + jsonRoles + "]}";
+    }
+
+    /**
+     * Get roles in sync settings.
+     * @return
+     * @throws JsonProcessingException 
+     */
+    public ArrayList<String> getSyncSettingsRoles() throws JsonProcessingException {
+        return decodeSyncSettingsRoles(msSyncSettings);
+    }
+    
+    /**
+     * Decode roles in JSON String.
+     * @param jsonRoles JSON String with roles.
+     * @return
+     * @throws JsonProcessingException 
+     */
+    public static ArrayList<String> decodeSyncSettingsRoles(String jsonRoles) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(jsonRoles);
+        return SAuthJsonUtils.getValueOfElementAsTextArray(node, "", SYNC_ATT_ROLES);
     }
 
     /*

@@ -13,11 +13,12 @@ package erp.musr.form;
 
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
-import erp.lib.form.SFormField;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.musr.data.SDataUserPrivilegeCompany;
 import erp.musr.data.SDataUserPrivilegeCompanyRow;
 import erp.musr.data.SDataUserPrivilegeRow;
@@ -26,9 +27,11 @@ import erp.musr.data.SDataUserRoleCompany;
 import erp.musr.data.SDataUserRoleCompanyRow;
 import erp.musr.data.SDataUserRoleRow;
 import erp.musr.data.SDataUserRoleUser;
+import erp.musr.data.SSyncRoles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
@@ -37,6 +40,10 @@ import javax.swing.AbstractAction;
  * @author Alfonso Flores, Sergio Flores
  */
 public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+    
+    public static final int TAB_USER_RIGHTS = 0;
+    public static final int TAB_COMPANY_RIGHTS = 1;
+    public static final int TAB_SYNC_SETTINGS = 2;
 
     private int mnFormType;
     private int mnFormResult;
@@ -48,6 +55,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
     private erp.musr.data.SDataUser moUser;
     SFormUserRightEntry moFormUserRightEntry;
+    private boolean mbSwapServicesLinkUp;
 
     private erp.lib.table.STablePane moUserRolesPane;
     private erp.lib.table.STablePane moUserPrivilegesPane;
@@ -81,8 +89,8 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jlUser = new javax.swing.JLabel();
         jtfUser = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel7 = new javax.swing.JPanel();
+        jTabbedPane = new javax.swing.JTabbedPane();
+        jpUserRights = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jbAddUserRole = new javax.swing.JButton();
@@ -96,7 +104,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jbDeleteUserPrivilege = new javax.swing.JButton();
         jpPanel9 = new javax.swing.JPanel();
         jpUserPrivileges = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        jpCompanyRights = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jbAddCompanyRole = new javax.swing.JButton();
@@ -110,6 +118,13 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jbDeleteCompanyPrivilege = new javax.swing.JButton();
         jpCoPriv = new javax.swing.JPanel();
         jpCompanyPrivileges = new javax.swing.JPanel();
+        jpRoles = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jchkRoleComprador = new javax.swing.JCheckBox();
+        jchkRoleCompradorRevisor = new javax.swing.JCheckBox();
+        jchkRoleContador = new javax.swing.JCheckBox();
+        jchkRolePagador = new javax.swing.JCheckBox();
+        jchkRoleAdministrador = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Permisos de usuario");
@@ -154,7 +169,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.BorderLayout());
+        jpUserRights.setLayout(new java.awt.BorderLayout());
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Roles asignados:"));
         jPanel8.setPreferredSize(new java.awt.Dimension(771, 220));
@@ -183,7 +198,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jpUserRoles.setLayout(new java.awt.BorderLayout());
         jPanel8.add(jpUserRoles, java.awt.BorderLayout.CENTER);
 
-        jPanel7.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jpUserRights.add(jPanel8, java.awt.BorderLayout.NORTH);
 
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Privilegios asignados:"));
         jPanel9.setPreferredSize(new java.awt.Dimension(771, 215));
@@ -217,12 +232,12 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel9.add(jpPanel9, java.awt.BorderLayout.CENTER);
 
-        jPanel7.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jpUserRights.add(jPanel9, java.awt.BorderLayout.CENTER);
         jPanel9.getAccessibleContext().setAccessibleName("null");
 
-        jTabbedPane1.addTab("Permisos a nivel de usuario", jPanel7);
+        jTabbedPane.addTab("Permisos a nivel de usuario", jpUserRights);
 
-        jPanel6.setLayout(new java.awt.BorderLayout());
+        jpCompanyRights.setLayout(new java.awt.BorderLayout());
 
         jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Roles asignados:"));
         jPanel10.setPreferredSize(new java.awt.Dimension(771, 220));
@@ -251,7 +266,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jpCompanyRoles.setLayout(new java.awt.BorderLayout());
         jPanel10.add(jpCompanyRoles, java.awt.BorderLayout.CENTER);
 
-        jPanel6.add(jPanel10, java.awt.BorderLayout.NORTH);
+        jpCompanyRights.add(jPanel10, java.awt.BorderLayout.NORTH);
 
         jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Privilegios asignados:"));
         jPanel11.setLayout(new java.awt.BorderLayout(0, 5));
@@ -284,11 +299,35 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel11.add(jpCoPriv, java.awt.BorderLayout.CENTER);
 
-        jPanel6.add(jPanel11, java.awt.BorderLayout.CENTER);
+        jpCompanyRights.add(jPanel11, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Permisos a nivel de empresa", jPanel6);
+        jTabbedPane.addTab("Permisos a nivel de empresa", jpCompanyRights);
 
-        jPanel4.add(jTabbedPane1, java.awt.BorderLayout.PAGE_START);
+        jpRoles.setBorder(javax.swing.BorderFactory.createTitledBorder("Roles de sincronización:"));
+        jpRoles.setLayout(new java.awt.BorderLayout());
+
+        jPanel5.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+
+        jchkRoleComprador.setText("Es Comprador");
+        jPanel5.add(jchkRoleComprador);
+
+        jchkRoleCompradorRevisor.setText("Es Comprador-Revisor");
+        jPanel5.add(jchkRoleCompradorRevisor);
+
+        jchkRoleContador.setText("Es Contador");
+        jPanel5.add(jchkRoleContador);
+
+        jchkRolePagador.setText("Es Pagador");
+        jPanel5.add(jchkRolePagador);
+
+        jchkRoleAdministrador.setText("Es Administrador");
+        jPanel5.add(jchkRoleAdministrador);
+
+        jpRoles.add(jPanel5, java.awt.BorderLayout.NORTH);
+
+        jTabbedPane.addTab("Configuración de sincronización", jpRoles);
+
+        jPanel4.add(jTabbedPane, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -303,10 +342,12 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         int i;
 
         moFormUserRightEntry = new SFormUserRightEntry(miClient);
+        mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+        jTabbedPane.setEnabledAt(TAB_SYNC_SETTINGS, mbSwapServicesLinkUp);
 
         erp.lib.table.STableColumnForm tableColumnsUserRoles[];
         erp.lib.table.STableColumnForm tableColumnsUserPrivileges[];
@@ -409,7 +450,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jTabbedPane1.setSelectedIndex(0);
+            jTabbedPane.setSelectedIndex(0);
         }
     }
 
@@ -798,55 +839,55 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     }
 
     public void publicActionAddRole() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbAddUserRole.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbAddUserRole.isEnabled()) {
             actionAddUserRole();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbAddCompanyRole.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbAddCompanyRole.isEnabled()) {
             actionAddCompanyRole();
         }
     }
 
     public void publicActionModifyRole() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbModifyUserRole.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbModifyUserRole.isEnabled()) {
             actionModifyUserRole();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbModifyCompanyRole.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbModifyCompanyRole.isEnabled()) {
             actionModifyCompanyRole();
         }
     }
 
     public void publicActionDeleteRole() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbDeleteUserRole.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbDeleteUserRole.isEnabled()) {
             actionDeleteUserRole();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbDeleteCompanyRole.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbDeleteCompanyRole.isEnabled()) {
             actionDeleteCompanyRole();
         }
     }
 
     public void publicActionAddPrivilege() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbAddUserPrivilege.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbAddUserPrivilege.isEnabled()) {
             actionAddUserPrivilege();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbAddCompanyPrivilege.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbAddCompanyPrivilege.isEnabled()) {
             actionAddCompanyPrivilege();
         }
     }
 
     public void publicActionModifyPrivilege() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbModifyUserPrivilege.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbModifyUserPrivilege.isEnabled()) {
             actionModifyUserPrivilege();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbModifyCompanyPrivilege.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbModifyCompanyPrivilege.isEnabled()) {
             actionModifyCompanyPrivilege();
         }
     }
 
     public void publicActionDeletePrivilege() {
-        if (jTabbedPane1.getSelectedIndex() == 0 && jbDeleteUserPrivilege.isEnabled()) {
+        if (jTabbedPane.getSelectedIndex() == 0 && jbDeleteUserPrivilege.isEnabled()) {
             actionDeleteUserPrivilege();
         }
-        else if (jTabbedPane1.getSelectedIndex() == 1 && jbDeleteCompanyPrivilege.isEnabled()) {
+        else if (jTabbedPane.getSelectedIndex() == 1 && jbDeleteCompanyPrivilege.isEnabled()) {
             actionDeleteCompanyPrivilege();
         }
     }
@@ -862,11 +903,10 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbAddCompanyPrivilege;
     private javax.swing.JButton jbAddCompanyRole;
     private javax.swing.JButton jbAddUserPrivilege;
@@ -881,12 +921,20 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JButton jbModifyUserPrivilege;
     private javax.swing.JButton jbModifyUserRole;
     private javax.swing.JButton jbOk;
+    private javax.swing.JCheckBox jchkRoleAdministrador;
+    private javax.swing.JCheckBox jchkRoleComprador;
+    private javax.swing.JCheckBox jchkRoleCompradorRevisor;
+    private javax.swing.JCheckBox jchkRoleContador;
+    private javax.swing.JCheckBox jchkRolePagador;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpCoPriv;
     private javax.swing.JPanel jpCompanyPrivileges;
+    private javax.swing.JPanel jpCompanyRights;
     private javax.swing.JPanel jpCompanyRoles;
     private javax.swing.JPanel jpPanel9;
+    private javax.swing.JPanel jpRoles;
     private javax.swing.JPanel jpUserPrivileges;
+    private javax.swing.JPanel jpUserRights;
     private javax.swing.JPanel jpUserRoles;
     private javax.swing.JTextField jtfUser;
     // End of variables declaration//GEN-END:variables
@@ -916,7 +964,16 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         moUserPrivilegesPane.clearTableRows();
         moCompanyPrivilegesPane.createTable(null);
         moCompanyPrivilegesPane.clearTableRows();
-        jTabbedPane1.setSelectedIndex(0);
+        
+        if (mbSwapServicesLinkUp) {
+            jchkRoleComprador.setSelected(false);
+            jchkRoleCompradorRevisor.setSelected(false);
+            jchkRoleContador.setSelected(false);
+            jchkRolePagador.setSelected(false);
+            jchkRoleAdministrador.setSelected(false);
+        }
+        
+        jTabbedPane.setSelectedIndex(0);
     }
 
     @Override
@@ -1005,30 +1062,49 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         if (i >= 1) {
             moCompanyPrivilegesPane.setTableRowSelection(0);
         }
+        
+        if (mbSwapServicesLinkUp) {
+            try {
+                ArrayList<String> roles = moUser.getSyncSettingsRoles();
+                
+                for (String role : roles) {
+                    if (role.equals("" + SSyncRoles.COMPRADOR)) {
+                        jchkRoleComprador.setSelected(true);
+                    }
+                    else if (role.equals("" + SSyncRoles.COMPRADOR_REVISOR)) {
+                        jchkRoleCompradorRevisor.setSelected(true);
+                    }
+                    else if (role.equals("" + SSyncRoles.CONTADOR)) {
+                        jchkRoleContador.setSelected(true);
+                    }
+                    else if (role.equals("" + SSyncRoles.PAGADOR)) {
+                        jchkRolePagador.setSelected(true);
+                    }
+                    else if (role.equals("" + SSyncRoles.ADMINISTRADOR)) {
+                        jchkRoleAdministrador.setSelected(true);
+                    }
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
     }
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataUserRoleUser role = null;
-        SDataUserRoleCompany roleCompany = null;
-        SDataUserPrivilegeUser privilege = null;
-        SDataUserPrivilegeCompany privilegeCompany = null;
-        int i = 0;
-
         // Read the user roles:
 
         moUser.getDbmsUserRolesUser().clear();
-        for (i = 0; i < moUserRolesPane.getTableGuiRowCount(); i++) {
-            role = new SDataUserRoleUser();
-            role = (SDataUserRoleUser) moUserRolesPane.getTableRow(i).getData();
+        for (int i = 0; i < moUserRolesPane.getTableGuiRowCount(); i++) {
+            SDataUserRoleUser role = (SDataUserRoleUser) moUserRolesPane.getTableRow(i).getData();
             role.setPkUserId(moUser.getPkUserId());
             moUser.getDbmsUserRolesUser().add(role);
         }
 
         moUser.getDbmsUserRolesCompany().clear();
-        for (i = 0; i < moCompanyRolesPane.getTableGuiRowCount(); i++) {
-            roleCompany = new SDataUserRoleCompany();
-            roleCompany = (SDataUserRoleCompany) moCompanyRolesPane.getTableRow(i).getData();
+        for (int i = 0; i < moCompanyRolesPane.getTableGuiRowCount(); i++) {
+            SDataUserRoleCompany roleCompany = (SDataUserRoleCompany) moCompanyRolesPane.getTableRow(i).getData();
             roleCompany.setPkUserId(moUser.getPkUserId());
             moUser.getDbmsUserRolesCompany().add(roleCompany);
         }
@@ -1036,21 +1112,41 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         // Read the user privileges:
 
         moUser.getDbmsUserPrivilegesUser().clear();
-        for (i = 0; i < moUserPrivilegesPane.getTableGuiRowCount(); i++) {
-            privilege = new SDataUserPrivilegeUser();
-            privilege = (SDataUserPrivilegeUser) moUserPrivilegesPane.getTableRow(i).getData();
+        for (int i = 0; i < moUserPrivilegesPane.getTableGuiRowCount(); i++) {
+            SDataUserPrivilegeUser privilege = (SDataUserPrivilegeUser) moUserPrivilegesPane.getTableRow(i).getData();
             privilege.setPkUserId(moUser.getPkUserId());
             moUser.getDbmsUserPrivilegesUser().add(privilege);
         }
 
         moUser.getDbmsUserPrivilegesCompany().clear();
-        for (i = 0; i < moCompanyPrivilegesPane.getTableGuiRowCount(); i++) {
-            privilegeCompany = new SDataUserPrivilegeCompany();
-            privilegeCompany = (SDataUserPrivilegeCompany) moCompanyPrivilegesPane.getTableRow(i).getData();
+        for (int i = 0; i < moCompanyPrivilegesPane.getTableGuiRowCount(); i++) {
+            SDataUserPrivilegeCompany privilegeCompany = (SDataUserPrivilegeCompany) moCompanyPrivilegesPane.getTableRow(i).getData();
             privilegeCompany.setPkUserId(moUser.getPkUserId());
             moUser.getDbmsUserPrivilegesCompany().add(privilegeCompany);
         }
 
+        if (mbSwapServicesLinkUp) {
+            ArrayList<String> roles = new ArrayList<>();
+            
+            if (jchkRoleComprador.isSelected()) {
+                roles.add("" + SSyncRoles.COMPRADOR);
+            }
+            if (jchkRoleCompradorRevisor.isSelected()) {
+                roles.add("" + SSyncRoles.COMPRADOR_REVISOR);
+            }
+            if (jchkRoleContador.isSelected()) {
+                roles.add("" + SSyncRoles.CONTADOR);
+            }
+            if (jchkRolePagador.isSelected()) {
+                roles.add("" + SSyncRoles.PAGADOR);
+            }
+            if (jchkRoleAdministrador.isSelected()) {
+                roles.add("" + SSyncRoles.ADMINISTRADOR);
+            }
+            
+            moUser.setSyncSettingsRoles(roles);
+        }
+        
         return moUser;
     }
 

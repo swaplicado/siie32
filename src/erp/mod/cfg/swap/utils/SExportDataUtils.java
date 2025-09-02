@@ -277,18 +277,26 @@ public abstract class SExportDataUtils {
                 user.first_name = firstName;
                 user.last_name = lastName;
 
+                boolean purchaserAgent = false;
+                ArrayList<Integer> roles = SUserUtils.getUserRoles(session, userId);
+                ArrayList<Integer> companies = SUserUtils.getUserAccesibleCompanies(session, userId);
+                
+                if (roles.contains(SSwapConsts.ROL_PURCHASER_AGENT)) {
+                    purchaserAgent = true;
+                    roles.remove(SSwapConsts.ROL_PURCHASER_AGENT);
+                }
+                
                 SExportDataUser.Attributes attributes = new SExportDataUser.Attributes();
                 attributes.full_name = SJsonUtils.sanitizeJson(firstName + " " + lastName);
                 attributes.user_type = SSwapConsts.USER_TYPE_INTERNAL;
                 attributes.other_emails = null; // no soportado en usuarios
+                attributes.notification_settings = purchaserAgent ? SSwapConsts.PURCHASER_AGENT : "";
                 attributes.is_deleted = resultSet.getBoolean("u.b_del");
                 attributes.external_id = userId;
                 user.attributes = attributes;
                 
-                ArrayList<Integer> roles = SUserUtils.getUserRoles(session, userId);
                 user.groups = roles.stream().mapToInt(Integer::intValue).toArray();
 
-                ArrayList<Integer> companies = SUserUtils.getUserAccesibleCompanies(session, userId);
                 user.companies = companies.stream().mapToInt(Integer::intValue).toArray();
 
                 ArrayList<int[]> functionalSubAreas = SUserUtils.getUserAsignedFunctionalSubAreas(session, userId);

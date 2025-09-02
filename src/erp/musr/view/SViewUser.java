@@ -107,7 +107,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         // Initialize table:
 
         erp.lib.table.STableField[] aoKeyFields = new STableField[1];
-        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 21 : 18];
+        erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[mbSwapServicesLinkUp ? 22 : 18];
 
         int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "u.id_usr");
@@ -136,6 +136,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "_siie_app_ts_last_sync", "SIIE App últ. sincronización", STableConstants.WIDTH_DATE_TIME);
         
         if (mbSwapServicesLinkUp) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_sync_roles", SSwapConsts.SWAP_SERVICES + " roles sincronización", 150);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_ss_is_exp", SSwapConsts.SWAP_SERVICES + " exportado",  STableConstants.WIDTH_BOOLEAN_2X);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tss.usr", SSwapConsts.SWAP_SERVICES + " usr. últ. exportación", STableConstants.WIDTH_USER);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "tss.ts_usr", SSwapConsts.SWAP_SERVICES + " últ. exportación", STableConstants.WIDTH_DATE_TIME);
@@ -228,7 +229,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
                 + "u.ts_new, u.ts_edit, u.ts_del, un.usr, ue.usr, ud.usr, "
                 + "b.bp, bbc.email_02, e.b_act, "
                 + "uls.usr AS _siie_app_usr_last_sync, u.ts_last_sync_n AS _siie_app_ts_last_sync"
-                + (!mbSwapServicesLinkUp ? "" : ", tss.reference_id IS NOT NULL AS _ss_is_exp, tss.usr, tss.ts_usr") + " "
+                + (!mbSwapServicesLinkUp ? "" : ", IF(u.sync_settings = '', '', u.sync_settings) AS _sync_roles, tss.reference_id IS NOT NULL AS _ss_is_exp, tss.usr, tss.ts_usr") + " "
                 + "FROM erp.usru_usr AS u "
                 + "INNER JOIN erp.usru_usr AS un ON u.fid_usr_new = un.id_usr "
                 + "INNER JOIN erp.usru_usr AS ue ON u.fid_usr_edit = ue.id_usr "

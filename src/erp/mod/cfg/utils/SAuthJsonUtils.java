@@ -5,13 +5,14 @@ package erp.mod.cfg.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Clase de utilidades para procesar objetos JSON en el contexto de autenticación.
  * Utiliza la librería Jackson para trabajar con nodos JSON.
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SAuthJsonUtils {
 
@@ -91,9 +92,9 @@ public class SAuthJsonUtils {
      * @return Valor del elemento como cadena de texto; si no es texto, entero o arreglo de enteros, devuelve una cadena vacía.
      */
     public static String getValueOfElementAsText(JsonNode root, String parentKey, String elementKey) {
+        String value = "";
         JsonNode parentNode = parentKey.isEmpty() ? root : root.path(parentKey);
         JsonNode elementNode = parentNode.path(elementKey);
-        String value = "";
         
         if (elementNode.isTextual()) {
             value = elementNode.asText();
@@ -106,6 +107,38 @@ public class SAuthJsonUtils {
         }
         
         return value;
+    }
+
+    /**
+     * Obtiene el valor de un elemento específico dentro de un nodo JSON.
+     * Puede recuperar como <code>String</code>: textos, enteros y arreglos de enteros.
+     *
+     * @param root Nodo raíz del JSON.
+     * @param parentKey Clave del nodo padre donde se encuentra el elemento.
+     * @param elementKey Clave del elemento cuyo valor se desea obtener.
+     * @return Valor del elemento como cadena de texto; si no es texto, entero o arreglo de enteros, devuelve una cadena vacía.
+     */
+    public static ArrayList<String> getValueOfElementAsTextArray(JsonNode root, String parentKey, String elementKey) {
+        ArrayList<String> values = new ArrayList<>();
+        JsonNode parentNode = parentKey.isEmpty() ? root : root.path(parentKey);
+        JsonNode elementNode = parentNode.path(elementKey);
+        
+        if (elementNode.isTextual()) {
+            values.add(elementNode.asText());
+        }
+        else if (elementNode.isInt()) {
+            values.add("" + elementNode.asInt());
+        }
+        else if (elementNode.isArray()) {
+            Iterator<JsonNode> elements = elementNode.elements();
+            
+            while (elements.hasNext()) {
+                JsonNode node = elements.next();
+                values.add(node.asText());
+            }
+        }
+        
+        return values;
     }
 
     /**

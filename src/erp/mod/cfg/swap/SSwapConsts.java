@@ -122,4 +122,15 @@ public abstract class SSwapConsts {
      * Rol Proveedor.
      */
     public static final int ROL_SUPPLIER = 5;
+    
+    /**
+     * Rol Agente Comprador.
+     */
+    public static final int ROL_PURCHASER_AGENT = 12;
+    
+    /**
+     * Tipo de entidad organización (persona moral).
+     */
+    public static final String PURCHASER_AGENT = "PURCHASER_AGENT";
+    
 }

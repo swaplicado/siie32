@@ -103,6 +103,11 @@ public class SExportDataUser implements SExportData {
         public String other_emails; // separados entre sí por punto y coma ';'
         
         /**
+         * Configuración para notificaciones.
+         */
+        public String notification_settings;
+        
+        /**
          * Indicador de si el usuario está borrado.
          */
         public boolean is_deleted;

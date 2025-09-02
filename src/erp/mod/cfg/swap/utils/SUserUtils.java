@@ -9,6 +9,7 @@ import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.musr.data.SDataUser;
+import erp.musr.data.SSyncRoles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ public abstract class SUserUtils {
      * @param userId ID del usuario.
      * @return Lista de roles del usuario requerido. Valores: constantes SSwapConsts.ROL_...
      */
-    public static ArrayList<Integer> getUserRoles(final SGuiSession session, int userId) {
+    @Deprecated
+    public static ArrayList<Integer> getUserRolesFromPrivileges(final SGuiSession session, int userId) {
         SDataUser user = new SDataUser();
         user.read(new int[] { userId }, session.getStatement()); // Carga los datos del usuario desde la base de datos
         
@@ -67,6 +69,52 @@ public abstract class SUserUtils {
         }
         
         return roles;
+    }
+    
+    /**
+     * Obtiene los roles del usuario requerido.
+     * 
+     * @param session Sesión de usuario.
+     * @param userId ID del usuario.
+     * @return Lista de roles del usuario requerido. Valores: constantes SSwapConsts.ROL_...
+     */
+    public static ArrayList<Integer> getUserRoles(final SGuiSession session, int userId) {
+        SDataUser user = new SDataUser();
+        user.read(new int[] { userId }, session.getStatement()); // Carga los datos del usuario desde la base de datos
+        
+        ArrayList<String> roles = null;
+        
+        try {
+            roles = user.getSyncSettingsRoles();
+        }
+        catch (Exception e) {
+            
+        }
+        
+        ArrayList<Integer> userRoles = new ArrayList<>();
+        
+        if (roles != null) {
+            for (String role : roles) {
+                if (role.equals("" + SSyncRoles.COMPRADOR)) {
+                    userRoles.add(SSwapConsts.ROL_PURCHASER);
+                    userRoles.add(SSwapConsts.ROL_PURCHASER_AGENT);
+                }
+                else if (role.equals("" + SSyncRoles.COMPRADOR_REVISOR)) {
+                    userRoles.add(SSwapConsts.ROL_PURCHASER);
+                }
+                else if (role.equals("" + SSyncRoles.CONTADOR)) {
+                    userRoles.add(SSwapConsts.ROL_ACCOUNTANT);
+                }
+                else if (role.equals("" + SSyncRoles.PAGADOR)) {
+                    userRoles.add(SSwapConsts.ROL_PAYER);
+                }
+                else if (role.equals("" + SSyncRoles.ADMINISTRADOR)) {
+                    userRoles.add(SSwapConsts.ROL_ADMINISTRATOR);
+                }
+            }
+        }
+        
+        return userRoles;
     }
     
     /**
