@@ -28,6 +28,7 @@ import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdPaymentUtils;
@@ -1034,8 +1035,10 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      * Create images of user signatures into report parameters map of purchase orders.
      * Printable images are not serializable, so create them where needed.
      * @param map Report parameters map.
+     * @throws java.lang.Exception
      */
-    public static void createUserSignaturesIntoPurchaseOrderReportParams(final Map<String, Object> map) {
+    public static void createUserSignaturesIntoPurchaseOrderReportParams(final Map<String, Object> map) throws Exception {
+        SAuthorizationUtils.writeLog("createUserSignaturesIntoPurchaseOrderReportParams");
         String[] mapKeys = new String[] { "oUserBuyer", "oUserAuthorize" };
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         
@@ -1065,6 +1068,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      * @throws Exception 
      */
     public static JasperPrint createJasperPrint(final int reportType, final Map<String, Object> reportParams, final Connection connection) throws JRException, Exception {
+        SAuthorizationUtils.writeLog("createJasperprint");
         JasperPrint jasperPrint = null;
         String reportFileName = SDataUtilities.getReportFileName(reportType);
         

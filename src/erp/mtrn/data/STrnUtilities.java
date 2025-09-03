@@ -2909,6 +2909,7 @@ public abstract class STrnUtilities {
                 jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             }
             else {
+                SAuthorizationUtils.writeLog("llamada al bat ");
                 ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "\"batch/copy-reps.bat\"");
                 pb.redirectErrorStream(true); // redirige la salida del batch a la consola
                 Process process = pb.start();
@@ -2937,6 +2938,7 @@ public abstract class STrnUtilities {
                     outputStreamPdf = new FileOutputStream(file);
 
                     JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
+                    SAuthorizationUtils.writeLog("printmodepdffile");
 
                     outputStreamPdf.close();
                     break;
@@ -2946,6 +2948,9 @@ public abstract class STrnUtilities {
         }
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            try {
+                SAuthorizationUtils.writeLog(e.getMessage());
+            }catch(Exception ex){}
         }
         finally {
             if (client.isGui()) {
