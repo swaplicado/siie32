@@ -71,7 +71,9 @@ public class SCliSendAuthMails {
         
         ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
         while (resultSet.next()) {
-            SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+            try {
+                SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+            }catch (Exception e) {}
         }
     }
     
