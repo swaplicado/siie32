@@ -21,8 +21,6 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
 import erp.siieapp.SUserResource;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1985,7 +1983,6 @@ public abstract class SAuthorizationUtils {
      * @throws Exception 
      */
     public static void sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
-        SAuthorizationUtils.writeLog("sendAutomaticProviderAuthornMails " + SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND));
         if (SLibUtils.parseInt(SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT) {
             STrnUtilities.sendDpsOrder(client, pkDps, false);
         }
@@ -2043,19 +2040,6 @@ public abstract class SAuthorizationUtils {
             result = false;
         }
         return result;
-    }
-    
-    /**
-     * Guarda la entrada en el archivo de bitacora *.log dentro de la carpeta raiz de SIIE.
-     * @param entry Entrada a guardar en la bitacora.
-     * @throws Exception
-     */
-    public static void writeLog(String entry) throws Exception {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("SAuthorizations.log", true))) {
-            writer.append(System.getProperty("line.separator"));
-            writer.append(entry);
-            writer.close();
-        }
     }
     
     /**

@@ -86,16 +86,10 @@ public class SAuthorizationsAPI {
                                 updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
                                         userId);
-                                SAuthorizationUtils.writeLog("-----------------------------------------------------------------------");
-                                SAuthorizationUtils.writeLog("OC de compra autorizada: " + ((int[]) pk)[0] + " - " + ((int[]) pk)[1]);
                                 SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk), actionUserName, comments);
-                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
+                                //SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
                             }
                             catch (Exception ex) {
-                                try {
-                                    SAuthorizationUtils.writeLog(ex.getMessage());
-                                }
-                                catch (Exception exe) {}
                                 Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
@@ -188,7 +182,7 @@ public class SAuthorizationsAPI {
                             SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
                             
                             if (sendProvMail) {
-                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
+                                //SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
                             }
                         }
                         catch (Exception ex) {

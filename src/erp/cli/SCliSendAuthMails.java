@@ -1,0 +1,83 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.cli;
+
+import erp.SClientApi;
+import erp.SParamsApp;
+import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.musr.data.SDataUser;
+import java.sql.ResultSet;
+import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbDatabase;
+import sa.lib.gui.SGuiSession;
+
+/**
+ *
+ * @author Isabel Servín
+ */
+public class SCliSendAuthMails {
+   
+    public static void main(String[] args) {
+        SParamsApp paramsApp = new SParamsApp();
+        SDbDatabase dbCompany = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+        
+        try {
+            if (!paramsApp.read()) {
+                throw new Exception(erp.SClient.ERR_PARAMS_APP_READING);
+            }
+            
+            int result = dbCompany.connect(paramsApp.getDatabaseHostClt(), paramsApp.getDatabasePortClt(), 
+                    "erp_aeth", paramsApp.getDatabaseUser(), paramsApp.getDatabasePswd());
+            if (result != SDbConsts.CONNECTION_OK) {
+                throw new Exception(SDbConsts.ERR_MSG_DB_CONNECTION);
+            }
+            
+            run(dbCompany);
+            
+            dbCompany.disconnect();
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SCliSendAuthMails.class.getName(), e);
+            System.exit(-1);
+        }
+    }
+    
+    private static void run(SDbDatabase dbCompany) throws Exception {
+        SGuiSession session = new SGuiSession(null);
+        session.setDatabase(dbCompany);
+        
+        SDataUser user = new SDataUser();
+        user.read(new int[] { 1 }, session.getStatement());
+        session.setUser(user);
+        
+        SClientApi client = createClientApi(session , 1);
+        
+        String sql = "SELECT d.id_year, d.id_doc " +
+                "FROM trn_dps AS d " +
+                "LEFT JOIN trn_dps_snd_log AS l ON " +
+                "d.id_year = l.id_year AND d.id_doc = l.id_doc AND l.b_snd AND l.id_snd = " +
+                "  (SELECT MAX(aux.id_snd) FROM trn_dps_snd_log AS aux WHERE l.id_year = aux.id_year and l.id_doc = aux.id_doc) " +
+                "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
+                "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
+                "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " " +
+                "AND d.fid_st_dps_authorn IN (" + SModSysConsts.TRNS_ST_DPS_AUTHORN_REJECT + ", " + SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN + ") " +
+                "AND d.ts_authorn >= NOW() - INTERVAL 24 HOUR " +
+                "AND NOT d.b_del " +
+                "AND (d.ts_authorn > l.ts OR l.ts IS NULL);";
+        
+        ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+        }
+    }
+    
+    private static SClientApi createClientApi(SGuiSession session, int userId) {
+        SClientApi clientApi = new SClientApi(session, userId);
+        return clientApi;
+    }
+}
