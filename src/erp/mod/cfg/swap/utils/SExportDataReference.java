@@ -61,7 +61,7 @@ public class SExportDataReference implements SExportData {
     public double amount;
     
     /**
-     * Indicador de si la referencia está borrada.
+     * Indicador de borrada de la referencia.
      */
     public boolean is_deleted;
 }

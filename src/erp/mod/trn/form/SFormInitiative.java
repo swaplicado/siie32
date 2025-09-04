@@ -25,7 +25,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormInitiative extends SBeanForm implements ItemListener {
     
@@ -66,17 +66,16 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jpRow4 = new javax.swing.JPanel();
         jlKeyPeriod = new javax.swing.JLabel();
         moKeyPeriod = new sa.lib.gui.bean.SBeanFieldKey();
-        jpNorthCenter = new javax.swing.JPanel();
+        jpRow7 = new javax.swing.JPanel();
+        jlKeyFuncArea = new javax.swing.JLabel();
+        moKeyFuncArea = new sa.lib.gui.bean.SBeanFieldKey();
+        jpNorthEast = new javax.swing.JPanel();
         jpRow5 = new javax.swing.JPanel();
         jlDateDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
         jpRow6 = new javax.swing.JPanel();
         jlDateDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jpRow7 = new javax.swing.JPanel();
-        jlKeyFuncArea = new javax.swing.JLabel();
-        moKeyFuncArea = new sa.lib.gui.bean.SBeanFieldKey();
-        jpNorthEast = new javax.swing.JPanel();
         jpRow8 = new javax.swing.JPanel();
         jlCurBudget = new javax.swing.JLabel();
         moCurBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -120,7 +119,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpNorth.setLayout(new java.awt.BorderLayout());
 
-        jpNorthWest.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+        jpNorthWest.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
 
         jpRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -128,7 +127,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jlTextCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRow1.add(jlTextCode);
 
-        moTextCode.setEnabled(false);
+        moTextCode.setPreferredSize(new java.awt.Dimension(200, 23));
         jpRow1.add(moTextCode);
 
         jpNorthWest.add(jpRow1);
@@ -139,7 +138,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jlTextName.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRow2.add(jlTextName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(400, 23));
         jpRow2.add(moTextName);
 
         jpNorthWest.add(jpRow2);
@@ -166,48 +165,43 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpNorthWest.add(jpRow4);
 
-        jpNorth.add(jpNorthWest, java.awt.BorderLayout.WEST);
-
-        jpNorthCenter.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
-
-        jpRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateDateStart.setText("Fecha inicial:");
-        jlDateDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow5.add(jlDateDateStart);
-        jpRow5.add(moDateDateStart);
-
-        jpNorthCenter.add(jpRow5);
-
-        jpRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDateDateEnd.setText("Fecha final:");
-        jlDateDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow6.add(jlDateDateEnd);
-        jpRow6.add(moDateDateEnd);
-
-        jpNorthCenter.add(jpRow6);
-
         jpRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlKeyFuncArea.setText("Aréa funcional:*");
         jlKeyFuncArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRow7.add(jlKeyFuncArea);
 
-        moKeyFuncArea.setEnabled(false);
-        moKeyFuncArea.setPreferredSize(new java.awt.Dimension(150, 23));
+        moKeyFuncArea.setPreferredSize(new java.awt.Dimension(400, 23));
         jpRow7.add(moKeyFuncArea);
 
-        jpNorthCenter.add(jpRow7);
+        jpNorthWest.add(jpRow7);
 
-        jpNorth.add(jpNorthCenter, java.awt.BorderLayout.CENTER);
+        jpNorth.add(jpNorthWest, java.awt.BorderLayout.WEST);
 
-        jpNorthEast.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+        jpNorthEast.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
+
+        jpRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateDateStart.setText("Fecha inicial:");
+        jlDateDateStart.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpRow5.add(jlDateDateStart);
+        jpRow5.add(moDateDateStart);
+
+        jpNorthEast.add(jpRow5);
+
+        jpRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDateDateEnd.setText("Fecha final:");
+        jlDateDateEnd.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpRow6.add(jlDateDateEnd);
+        jpRow6.add(moDateDateEnd);
+
+        jpNorthEast.add(jpRow6);
 
         jpRow8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurBudget.setText("Presupuesto estimado:*");
-        jlCurBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlCurBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jpRow8.add(jlCurBudget);
         jpRow8.add(moCurBudget);
 
@@ -222,7 +216,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jpRow9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurComBudget.setText("Presupuesto comprometido:");
-        jlCurComBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlCurComBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jpRow9.add(jlCurComBudget);
 
         moCurComBudget.setEnabled(false);
@@ -239,7 +233,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jpRow10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurSpentBudget.setText("Presupuesto ejercido:");
-        jlCurSpentBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlCurSpentBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jpRow10.add(jlCurSpentBudget);
 
         moCurSpentBudget.setEnabled(false);
@@ -388,7 +382,6 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     private javax.swing.JPanel jpDescription;
     private javax.swing.JPanel jpGoals;
     private javax.swing.JPanel jpNorth;
-    private javax.swing.JPanel jpNorthCenter;
     private javax.swing.JPanel jpNorthEast;
     private javax.swing.JPanel jpNorthWest;
     private javax.swing.JPanel jpPurRow1;
@@ -427,13 +420,13 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlTextCode), 5);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlTextName), 50);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlTextCode), 25);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlTextName), 250);
         moKeyType.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyType), true);
         moKeyPeriod.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyPeriod), true);
+        moKeyFuncArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyFuncArea), true);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateStart), false);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateEnd), false);
-        moKeyFuncArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyFuncArea), true);
         moCurBudget.setCompoundFieldSettings(miClient);
         moCurBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurBudget), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moCurComBudget.setCompoundFieldSettings(miClient);
@@ -445,9 +438,9 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         moFields.addField(moTextName);
         moFields.addField(moKeyType);
         moFields.addField(moKeyPeriod);
+        moFields.addField(moKeyFuncArea);
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
-        moFields.addField(moKeyFuncArea);
         moFields.addField(moCurBudget.getField());
         moFields.addField(moCurComBudget.getField());
         moFields.addField(moCurSpentBudget.getField());

@@ -6,35 +6,35 @@
 package erp.mod.cfg.swap.utils;
 
 /**
- * Clase que representa la estructura de datos para exportar información de un área funcional en formato JSON.
+ * Clase que representa la estructura de datos para exportar información de un elemento organizacional en formato JSON.
  * Utilizada para el intercambio de datos con sistemas externos.
  * 
  * @author Sergio Flores
  */
-public class SExportDataFunctionalArea implements SExportData {
+public class SExportDataAuthOrgElement implements SExportData {
 
     /**
-     * Código del área funcional.
+     * Código del elemento organizacional.
      */
     public String code;
     
     /**
-     * Nombre del área funcional.
+     * Nombre del elemento organizacional.
      */
     public String name;
     
     /**
-     * Indicador de borrado del área funcional
+     * Tipo del elemento organizacional.
+     */
+    public int org_element_type;
+    
+    /**
+     * Indicador de borrado del elemento organizacional.
      */
     public boolean is_deleted;
     
     /**
-     * ID de la empresa del área funcional en el sistema externo.
-     */
-    public int external_company_id;
-    
-    /**
-     * ID del área funcional en el sistema externo.
+     * ID del elemento organizacional en el sistema externo.
      */
     public int external_id;
 }

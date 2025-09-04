@@ -5,7 +5,6 @@
  */
 package erp.mod.cfg.swap;
 
-import erp.mod.cfg.db.SSyncType;
 import sa.lib.SLibConsts;
 
 /**
@@ -25,6 +24,15 @@ public abstract class SSwapUtils {
                         break;
                     case PARTNER_SUPPLIER:
                         translation = "SOCIO_PROVEEDOR";
+                        break;
+                    case PARTNER_CUSTOMER:
+                        translation = "SOCIO_CLIENTE";
+                        break;
+                    case AUTH_ACTOR:
+                        translation = "AUTH_ACTOR";
+                        break;
+                    case AUTH_JOB_TITLE:
+                        translation = "AUTH_PUESTO_LABORAL";
                         break;
                     case FUNCTIONAL_AREA:
                         translation = "AREA_FUNCIONAL";

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Edwin Carmona, Sergio Flores
  */
 public class SExportDataUser implements SExportData {
+    
     /**
      * Nombre de usuario del sistema.
      */
@@ -36,7 +37,7 @@ public class SExportDataUser implements SExportData {
     public String password;
     
     /**
-     * Indicador de si el usuario está activo en el sistema.
+     * Indicador de estatus activo en el sistema del usuario.
      */
     public boolean is_active;
     
@@ -85,6 +86,7 @@ public class SExportDataUser implements SExportData {
      * Clase interna para los atributos adicionales del usuario.
      */
     public static class Attributes {
+        
         /**
          * Nombre completo del usuario.
          */
@@ -108,7 +110,7 @@ public class SExportDataUser implements SExportData {
         public String notification_settings;
         
         /**
-         * Indicador de si el usuario está borrado.
+         * Indicador de borrado del usuario.
          */
         public boolean is_deleted;
         
@@ -122,6 +124,7 @@ public class SExportDataUser implements SExportData {
      * Clase interna para la información del socio de negocios del usuario.
      */
     public static class Partner {
+        
         /**
          * Indicador de si el socio de negocios es Proveedor.
          */

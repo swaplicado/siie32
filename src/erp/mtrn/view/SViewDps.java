@@ -35,7 +35,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SExportUtils;

@@ -12,6 +12,12 @@ package erp.mod.cfg.swap;
 public abstract class SSwapConsts {
 
     public static final String SWAP_SERVICES = "SWAP Services";
+    
+    public static int SIIE = 1;
+    
+    /*
+     * SWAP Services.
+     */
 
     /**
      * JSON name/value pair for link-up status (enabled/disabled) of SWAP
@@ -46,7 +52,7 @@ public abstract class SSwapConsts {
      * (e.g., purchase-orders references).
      */
     public static final String CFG_OBJ_TXN_REFS_SRV = "txn-refs-srv";
-
+    
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";
@@ -58,6 +64,15 @@ public abstract class SSwapConsts {
     public static final int TXN_DOC_REF_TYPE_ORDER = 22;
     public static final String TXN_DOC_REF_TYPE_ORDER_CODE = "OC";
     
+    /*
+     * Sistema de Autorizaciones:
+     */
+    
+    public static final String CFG_OBJ_AUTH_SRV = "auth-srv";
+    public static final String CFG_OBJ_AUTH_ACTOR = "actor";
+    public static final String CFG_OBJ_AUTH_ORG_ELEMENT = "org-element";
+    public static final String CFG_OBJ_AUTH_START_AUTH = "start-auth";
+
     /**
      * Separator for foreign fiscal ID separator from country code.
      */

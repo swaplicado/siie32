@@ -120,11 +120,21 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jpCompanyPrivileges = new javax.swing.JPanel();
         jpRoles = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jchkRoleComprador = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
         jchkRoleCompradorRevisor = new javax.swing.JCheckBox();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel12 = new javax.swing.JPanel();
         jchkRoleContador = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel13 = new javax.swing.JPanel();
         jchkRolePagador = new javax.swing.JCheckBox();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
         jchkRoleAdministrador = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Permisos de usuario");
@@ -308,20 +318,68 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
 
         jPanel5.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jchkRoleComprador.setText("Es Comprador");
-        jPanel5.add(jchkRoleComprador);
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jchkRoleComprador.setText("Es Comprador-Agente");
+        jchkRoleComprador.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel6.add(jchkRoleComprador);
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("(Para interactuar con proveedores, principalmente.)");
+        jLabel1.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel6.add(jLabel1);
+
+        jPanel5.add(jPanel6);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jchkRoleCompradorRevisor.setText("Es Comprador-Revisor");
-        jPanel5.add(jchkRoleCompradorRevisor);
+        jchkRoleCompradorRevisor.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel7.add(jchkRoleCompradorRevisor);
+
+        jLabel2.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel2.setText("(Para autorizar compras y/o pagos, principalmente.)");
+        jLabel2.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel7.add(jLabel2);
+
+        jPanel5.add(jPanel7);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jchkRoleContador.setText("Es Contador");
-        jPanel5.add(jchkRoleContador);
+        jchkRoleContador.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel12.add(jchkRoleContador);
+
+        jLabel3.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel3.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel12.add(jLabel3);
+
+        jPanel5.add(jPanel12);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jchkRolePagador.setText("Es Pagador");
-        jPanel5.add(jchkRolePagador);
+        jchkRolePagador.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel13.add(jchkRolePagador);
+
+        jLabel4.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel4.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel13.add(jLabel4);
+
+        jPanel5.add(jPanel13);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jchkRoleAdministrador.setText("Es Administrador");
-        jPanel5.add(jchkRoleAdministrador);
+        jchkRoleAdministrador.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel16.add(jchkRoleAdministrador);
+
+        jLabel5.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel5.setText("(Para administrar y configurar los sistemas externos.)");
+        jLabel5.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel16.add(jLabel5);
+
+        jPanel5.add(jPanel16);
 
         jpRoles.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -893,17 +951,27 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JTabbedPane jTabbedPane;

@@ -12,6 +12,7 @@ package erp.mod.cfg.swap.utils;
  * @author Edwin Carmona, Sergio Flores
  */
 public class SRequestUsersBody {
+    
     /**
      * Arreglo de identificadores de instancias.
      * Cada elemento representa una instancia relacionada con los datos de la exportación.

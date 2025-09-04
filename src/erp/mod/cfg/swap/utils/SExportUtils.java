@@ -16,10 +16,10 @@ import erp.mod.cfg.db.SDbComSyncLog;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.db.SDbSyncLogEntry;
-import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -174,6 +174,25 @@ public abstract class SExportUtils {
         
         return responseBody;
     }
+    
+    /**
+     * Process Logger with result JSON node.
+     * @param result 
+     */
+    private static void processEntriesNotFound(final JsonNode result) {
+        String text = "";
+
+        if (result.has("message")) {
+            JsonNode message = result.path("message");
+            text = "message: " + message.toString();
+        }
+        else {
+            text = "<unknown>: " + result.toString();
+        }
+
+        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, null, new Exception(text));
+        System.err.println(text);
+    }
 
     /**
      * Analiza gramaticalmente la respuesta JSON del servicio de sincronización y genera los entradas de la bitácora de sincronización.
@@ -194,8 +213,9 @@ public abstract class SExportUtils {
                 switch (syncType) {
                     case USER:
                     case PARTNER_SUPPLIER:
+                    case PARTNER_CUSTOMER:
                         for (JsonNode result : results) {
-                            boolean found = false;
+                            boolean entriesFound = false;
                             
                             if (result.has("user")) {
                                 JsonNode user = result.path("user");
@@ -212,24 +232,80 @@ public abstract class SExportUtils {
                                         entry.setReferenceId("" + externalId.asInt());
                                         entries.add(entry);
                                         
-                                        found = true;
+                                        entriesFound = true;
                                     }
                                 }
                             }
                             
-                            if (!found){
-                                String text = "";
-                                
-                                if (result.has("message")) {
-                                    JsonNode message = result.path("message");
-                                    text = "message: " + message.toString();
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
+                            }
+                        }
+                        break;
+
+                    case AUTH_ACTOR:
+                        for (JsonNode result : results) {
+                            boolean entriesFound = false;
+                            
+                            if (result.has("data")) {
+                                JsonNode data = result.path("data");
+
+                                if (data.isObject()) {
+                                    JsonNode externalId = data.path("external_id");
+                                    int actorType = data.path("actor_type").asInt();
+                                    String prefix;
+                                    
+                                    switch (actorType) {
+                                        case SExportDataAuthActor.ACTOR_TYPE_USER:
+                                            prefix = SExportDataAuthActor.ACTOR_CODE_PREFIX_USER;
+                                            break;
+                                        case SExportDataAuthActor.ACTOR_TYPE_THIRD_PARTY:
+                                            prefix = SExportDataAuthActor.ACTOR_CODE_PREFIX_SUPPLIER;
+                                            break;
+                                        default:
+                                            prefix = "";
+                                    }
+
+                                    SDbSyncLogEntry entry = new SDbSyncLogEntry();
+                                    entry.setResponseCode(result.path("status_code").asText());
+                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
+                                    entry.setReferenceId((prefix.isEmpty() ? "" : prefix + "-") + externalId.asInt());
+                                    entries.add(entry);
+
+                                    entriesFound = true;
                                 }
-                                else {
-                                    text = "<unknown>: " + result.toString();
+                            }
+                            
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
+                            }
+                        }
+                        break;
+                        
+                    case AUTH_JOB_TITLE:
+                    case AUTH_DEPARTMENT:
+                    case AUTH_FUNCTIONAL_AREA:
+                        for (JsonNode result : results) {
+                            boolean entriesFound = false;
+                            
+                            if (result.has("data")) {
+                                JsonNode data = result.path("data");
+
+                                if (data.isObject()) {
+                                    JsonNode externalId = data.path("external_id");
+
+                                    SDbSyncLogEntry entry = new SDbSyncLogEntry();
+                                    entry.setResponseCode(result.path("status_code").asText());
+                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
+                                    entry.setReferenceId("" + externalId.asInt());
+                                    entries.add(entry);
+
+                                    entriesFound = true;
                                 }
-                                
-                                Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, null, new Exception(text));
-                                System.err.println(text);
+                            }
+                            
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
                             }
                         }
                         break;
@@ -239,7 +315,7 @@ public abstract class SExportUtils {
                         HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         for (JsonNode result : results) {
-                            boolean found = false;
+                            boolean entriesFound = false;
                             
                             if (result.has("data")) {
                                 JsonNode data = result.path("data");
@@ -254,23 +330,12 @@ public abstract class SExportUtils {
                                     entry.setAuxDatabase(databasesMap.get(data.path("company_id").asInt()));
                                     entries.add(entry);
                                     
-                                    found = true;
+                                    entriesFound = true;
                                 }
                             }
                             
-                            if (!found){
-                                String text = "";
-                                
-                                if (result.has("message")) {
-                                    JsonNode message = result.path("message");
-                                    text = "message: " + message.toString();
-                                }
-                                else {
-                                    text = "<unknown>: " + result.toString();
-                                }
-                                
-                                Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, null, new Exception(text));
-                                System.err.println(text);
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
                             }
                         }
                         break;
@@ -329,6 +394,11 @@ public abstract class SExportUtils {
                     switch (syncType) {
                         case USER:
                         case PARTNER_SUPPLIER:
+                        case PARTNER_CUSTOMER:
+                        case AUTH_ACTOR:
+                        case AUTH_JOB_TITLE:
+                        case AUTH_DEPARTMENT:
+                        case AUTH_FUNCTIONAL_AREA:
                             log = new SDbSyncLog();
                             break;
 
@@ -371,6 +441,11 @@ public abstract class SExportUtils {
                         switch (syncType) {
                             case USER:
                             case PARTNER_SUPPLIER:
+                            case PARTNER_CUSTOMER:
+                            case AUTH_ACTOR:
+                            case AUTH_JOB_TITLE:
+                            case AUTH_DEPARTMENT:
+                            case AUTH_FUNCTIONAL_AREA:
                                 log = new SDbSyncLog();
                                 break;
 
@@ -449,6 +524,11 @@ public abstract class SExportUtils {
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
+            case PARTNER_CUSTOMER:
+            case AUTH_ACTOR:
+            case AUTH_JOB_TITLE:
+            case AUTH_DEPARTMENT:
+            case AUTH_FUNCTIONAL_AREA:
                 SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, "");
                 break;
 
@@ -519,20 +599,59 @@ public abstract class SExportUtils {
 
         // Leer la configuración de la sincronización:
 
-        String jsonParentKey = "";
+        String cfgParamKey = "";
+        String jsonBaseKey = "";
+        String jsonConfigKey = "";
 
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
-                jsonParentKey = SSwapConsts.CFG_OBJ_USERS_SRV;
-                break;
-                
+            case PARTNER_CUSTOMER:
             case FUNCTIONAL_AREA:
-                jsonParentKey = SSwapConsts.CFG_OBJ_AREAS_SRV;
+            case PUR_REF_ORDER:
+                cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
+                
+                switch (syncType) {
+                    case USER:
+                    case PARTNER_SUPPLIER:
+                    case PARTNER_CUSTOMER:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_USERS_SRV;
+                        break;
+
+                    case FUNCTIONAL_AREA:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_AREAS_SRV;
+                        break;
+
+                    case PUR_REF_ORDER:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_REFS_SRV;
+                        break;
+
+                    default:
+                        // nothing
+                }
                 break;
                 
-            case PUR_REF_ORDER:
-                jsonParentKey = SSwapConsts.CFG_OBJ_TXN_REFS_SRV;
+            case AUTH_ACTOR:
+            case AUTH_JOB_TITLE:
+            case AUTH_DEPARTMENT:
+            case AUTH_FUNCTIONAL_AREA:
+                cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG;
+                jsonBaseKey = SSwapConsts.CFG_OBJ_AUTH_SRV;
+                
+                switch (syncType) {
+                    case AUTH_ACTOR:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_AUTH_ACTOR;
+                        break;
+
+                    case AUTH_JOB_TITLE:
+                    case AUTH_DEPARTMENT:
+                    case AUTH_FUNCTIONAL_AREA:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_AUTH_ORG_ELEMENT;
+                        break;
+
+                    default:
+                        // nothing
+                }
                 break;
                 
             default:
@@ -540,12 +659,34 @@ public abstract class SExportUtils {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
 
-        String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonParentKey, SSwapConsts.CFG_ATT_URL);
-        String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonParentKey, SSwapConsts.CFG_ATT_TOKEN);
-        String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonParentKey, SSwapConsts.CFG_ATT_API_KEY);
-        int syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, jsonParentKey, SSwapConsts.CFG_ATT_LIMIT));
+        String syncUrl = "";
+        String syncToken = "";
+        String syncApiKey = "";
+        int syncLimit = 0;
+        
+        // Recuperar la configuración base:
+        
+        if (!jsonBaseKey.isEmpty()) {
+            syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
+            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+        }
+        
+        // Recuperar la configuración del servicio:
+        
+        syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
+        
+        if (syncToken.isEmpty()) {
+            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico
+        }
+        
+        if (syncApiKey.isEmpty()) {
+            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_API_KEY); // recuperar API key específica
+        }
+        
+        syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_LIMIT));
         
         // Procesar la exportación de datos, iterando hasta completar la exportación de todos los registros recuperados:
 
@@ -572,12 +713,29 @@ public abstract class SExportUtils {
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
+                case PARTNER_CUSTOMER:
                     SRequestUsersBody usersBody = new SRequestUsersBody();
                     usersBody.work_instance = instanceArray;
                     usersBody.users = (SExportDataUser[]) currentExportDatas.toArray(new SExportDataUser[0]);
                     requestBody = mapper.writeValueAsString(usersBody);
                     break;
 
+                case AUTH_ACTOR:
+                    SRequestAuthActorsBody actorsBody = new SRequestAuthActorsBody();
+                    actorsBody.id_external_system = SSwapConsts.SIIE;
+                    actorsBody.actors = (SExportDataAuthActor[]) currentExportDatas.toArray(new SExportDataAuthActor[0]);
+                    requestBody = mapper.writeValueAsString(actorsBody);
+                    break;
+
+                case AUTH_JOB_TITLE:
+                case AUTH_DEPARTMENT:
+                case AUTH_FUNCTIONAL_AREA:
+                    SRequestAuthOrgElementsBody orgElementsBody = new SRequestAuthOrgElementsBody();
+                    orgElementsBody.id_external_system = SSwapConsts.SIIE;
+                    orgElementsBody.elements = (SExportDataAuthOrgElement[]) currentExportDatas.toArray(new SExportDataAuthOrgElement[0]);
+                    requestBody = mapper.writeValueAsString(orgElementsBody);
+                    break;
+                    
                 case FUNCTIONAL_AREA:
                     SRequestFunctionalAreasBody functionalAreasBody = new SRequestFunctionalAreasBody();
                     functionalAreasBody.work_instance = instanceArray;
@@ -642,9 +800,43 @@ public abstract class SExportUtils {
                 switch (syncType) {
                     case USER:
                     case PARTNER_SUPPLIER:
+                    case PARTNER_CUSTOMER:
                         if (syncType == SSyncType.USER) {
-                            // exportar antes áreas funcionales:
+                            // para sincronización de usuarios: exportar antes áreas funcionales:
                             syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                        }
+
+                        if (info == null || info.isResponseOk()) {
+                            // para todas las sincronizaciones: exportar antes puestos laborales:
+                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+
+                            if (info.isResponseOk()) {
+                                // para todas las sincronizaciones: exportar antes actores:
+                                syncTypeInProgress = SSyncType.AUTH_ACTOR;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                                
+                                if (info.isResponseOk()) {
+                                    // exportar usuarios o socios de negocio:
+                                    syncTypeInProgress = syncType;
+                                    info = computeRequest(session, syncTypeInProgress);
+                                    responses.getInfos().add(info);
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case AUTH_ACTOR:
+                    case AUTH_JOB_TITLE:
+                    case AUTH_DEPARTMENT:
+                    case AUTH_FUNCTIONAL_AREA:
+                        if (syncType == SSyncType.AUTH_ACTOR) {
+                            // exportar antes puestos laborales:
+                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }

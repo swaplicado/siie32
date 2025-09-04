@@ -13,7 +13,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;

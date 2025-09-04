@@ -5,7 +5,7 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapUtils;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;

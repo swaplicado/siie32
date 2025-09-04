@@ -11,16 +11,18 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
-import erp.mod.cfg.db.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
+import erp.musr.data.SSyncRoles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.gui.util.SUtilConsts;
@@ -55,6 +57,11 @@ public abstract class SExportDataUtils {
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
+            case PARTNER_CUSTOMER:
+            case AUTH_ACTOR:
+            case AUTH_JOB_TITLE:
+            case AUTH_DEPARTMENT:
+            case AUTH_FUNCTIONAL_AREA:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
                 
@@ -111,7 +118,14 @@ public abstract class SExportDataUtils {
      */
     private static String getSqlSubQuerySyncedRegistries(final SSyncType syncType, final String database) throws Exception {
         String table = getSqlTableSyncLog(syncType, database);
-        boolean sortAsUnsigned = syncType == SSyncType.USER || syncType == SSyncType.PARTNER_SUPPLIER || syncType == SSyncType.FUNCTIONAL_AREA;
+        boolean sortAsUnsigned = syncType == SSyncType.USER || 
+                syncType == SSyncType.PARTNER_SUPPLIER || 
+                syncType == SSyncType.PARTNER_CUSTOMER || 
+                syncType == SSyncType.AUTH_ACTOR || 
+                syncType == SSyncType.AUTH_JOB_TITLE || 
+                syncType == SSyncType.AUTH_DEPARTMENT || 
+                syncType == SSyncType.AUTH_FUNCTIONAL_AREA || 
+                syncType == SSyncType.FUNCTIONAL_AREA;
         
         return "SELECT "
                 + "DISTINCT sle.reference_id "
@@ -138,7 +152,7 @@ public abstract class SExportDataUtils {
         Date datetime = null;
         String table = getSqlTableSyncLog(syncType, database);
         
-        String sql = "SELECT id_sync_log, ts_usr " // timestamp of server device!
+        String sql = "SELECT id_sync_log, TIMESTAMPADD(HOUR, -1, ts_usr) AS _last_sync " // timestamp of server device! (minus one hour)
                 + "FROM " + table + " "
                 + "WHERE response_code = '" + SHttpConsts.RSC_SUCC_OK + "' "
                 + "AND sync_type = '" + syncType + "' "
@@ -147,7 +161,7 @@ public abstract class SExportDataUtils {
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
-                datetime = resultSet.getTimestamp("ts_usr");
+                datetime = resultSet.getTimestamp("_last_sync");
             }
         }
         
@@ -281,9 +295,16 @@ public abstract class SExportDataUtils {
                 ArrayList<Integer> roles = SUserUtils.getUserRoles(session, userId);
                 ArrayList<Integer> companies = SUserUtils.getUserAccesibleCompanies(session, userId);
                 
-                if (roles.contains(SSwapConsts.ROL_PURCHASER_AGENT)) {
-                    purchaserAgent = true;
-                    roles.remove(SSwapConsts.ROL_PURCHASER_AGENT);
+                HashSet<Integer> groups = new HashSet<>();
+                
+                for (Integer role : roles) {
+                    if (role == SSwapConsts.ROL_PURCHASER_AGENT) {
+                        purchaserAgent = true;
+                        groups.add(SSwapConsts.ROL_PURCHASER);
+                    }
+                    else {
+                        groups.add(role);
+                    }
                 }
                 
                 SExportDataUser.Attributes attributes = new SExportDataUser.Attributes();
@@ -295,7 +316,7 @@ public abstract class SExportDataUtils {
                 attributes.external_id = userId;
                 user.attributes = attributes;
                 
-                user.groups = roles.stream().mapToInt(Integer::intValue).toArray();
+                user.groups = groups.stream().mapToInt(Integer::intValue).toArray();
 
                 user.companies = companies.stream().mapToInt(Integer::intValue).toArray();
 
@@ -677,6 +698,180 @@ public abstract class SExportDataUtils {
         }
 
         return users;
+    }
+
+    /**
+     * Consulta los usuarios, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de usuarios exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfAuthActorsToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> actors = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String userReferenceId = "CONCAT('" + SExportDataAuthActor.ACTOR_CODE_PREFIX_USER + "-', u.id_usr)";
+            String supplierReferenceId = "CONCAT('" + SExportDataAuthActor.ACTOR_CODE_PREFIX_SUPPLIER + "-', b.id_bp)";
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AUTH_ACTOR, "");
+            
+            /*
+             * Explicación de la consulta unida para obtener los actores para el Sistema de Autorizaciones:
+             * 1. Obtener los usuarios con socio de negocios que tengan cualquiera de los roles afines a "Comprador".
+             * 2. Obtener los proveedores.
+             */
+            
+            String sql = ""
+                    + "SELECT "
+                    + "u.id_usr AS _external_id, '" + SExportDataAuthActor.ACTOR_TYPE_USER + "' AS _actor_type_id, 0 AS _is_vendor, 0 AS _is_customer, "
+                    + "'" + SExportDataAuthActor.ENTITY_TYPE_PER + "' AS _entity_type, "
+                    + userReferenceId + " AS _code, b.firstname AS _first_name, b.lastname AS _last_name, "
+                    + "b.bp AS _full_name, u.email AS _email, '' AS _phone, u.b_del OR b.b_del AS _is_deleted, "
+                    + "e.fk_pos AS _job_title_id "
+                    + "FROM "
+                    + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = u.fid_bp_n "
+                    + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = b.id_bp "
+                    + "WHERE ("
+                    + "((NOT u.b_del AND NOT b.b_del AND (e.b_del IS NULL OR NOT e.b_del)) "
+                    + "AND " + userReferenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AUTH_ACTOR, "") + "))"
+                    + (lastSyncDatetime == null ? "" : " OR (u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR (e.ts_usr_upd IS NOT NULL AND e.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
+                    + ") "
+                    + "AND u.sync_settings LIKE '%" + SSyncRoles.COMPRADOR + "%' AND u.email <> '' "
+                    + "UNION "
+                    + "SELECT "
+                    + "b.id_bp AS _external_id, '" + SExportDataAuthActor.ACTOR_TYPE_THIRD_PARTY + "' AS _actor_type_id, 1 AS _is_vendor, 0 AS _is_customer, "
+                    + "IF(b.fid_tp_bp_idy = " + SDataConstantsSys.BPSS_TP_BP_IDY_PER + ", '" + SExportDataAuthActor.ENTITY_TYPE_PER + "', '" + SExportDataAuthActor.ENTITY_TYPE_ORG + "') AS _entity_type, "
+                    + supplierReferenceId + " AS _code, b.firstname AS _first_name, b.lastname AS _last_name, "
+                    + "b.bp AS _full_name, bbc.email_01 AS _email, CONCAT(tel_area_code_01, tel_num_01) AS _phone, b.b_del OR bc.b_del AS _is_deleted, "
+                    + "NULL AS _job_title_id "
+                    + "FROM "
+                    + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_CON) + " AS bbc ON bbc.id_bpb = bb.id_bpb AND bbc.id_con = " + SUtilConsts.BRA_CON_ID + " "
+                    + "WHERE ("
+                    + "((NOT b.b_del AND NOT bc.b_del) "
+                    + "AND " + supplierReferenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AUTH_ACTOR, "") + "))"
+                    + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR (bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
+                    + ") "
+                    + "AND b.b_sup AND bbc.email_01 <> '' "
+                    + "ORDER BY "
+                    + "_external_id;";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                int externalId = resultSet.getInt("_external_id");
+                int actorTypeId = resultSet.getInt("_actor_type_id");
+                String code = SJsonUtils.sanitizeJson(resultSet.getString("_code"));
+                String fullName = SJsonUtils.sanitizeJson(resultSet.getString("_full_name"));
+                String email = resultSet.getString("_email");
+                String phone = resultSet.getString("_phone");
+                
+                // validar que el usuario tenga nombre y correo:
+                
+                if (fullName.isEmpty() || !SMailUtils.isValidEmail(email)) {
+                    Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
+                            "Actor omitido (nombre vacío o correo inválido): ID = {0}; tipo = {1}, código = {2}; full name = {3}; email = {4}.",
+                            new Object[] { externalId, actorTypeId, code, fullName, email });
+                    continue; // omitir usuario inválido
+                }
+                
+                // validar que el usuario tenga nombre(s) y apellido(s):
+                
+                String firstName = SJsonUtils.sanitizeJson(resultSet.getString("_first_name"));
+                String lastName = SJsonUtils.sanitizeJson(resultSet.getString("_last_name"));
+                
+                // crear e inicializar el objeto para exportación de datos:
+                
+                SExportDataAuthActor actor = new SExportDataAuthActor();
+                
+                actor.external_id = externalId;
+                actor.actor_type_id = actorTypeId;
+                actor.is_vendor = resultSet.getBoolean("_is_vendor");
+                actor.is_customer = resultSet.getBoolean("_is_customer");
+                actor.entity_type = resultSet.getString("_entity_type");
+                actor.code = !code.isEmpty() ? code : "" + externalId;
+                actor.first_name = firstName;
+                actor.last_name = lastName;
+                actor.full_name = fullName;
+                actor.email = email;
+                actor.phone = phone;
+                actor.is_deleted = resultSet.getBoolean("_is_deleted");
+                
+                actor.companies = null;
+                
+                int jobTitleId = resultSet.getInt("_job_title_id");
+                
+                if (!resultSet.wasNull()) {
+                    SExportDataAuthActor.OrgElement jobTitle = new SExportDataAuthActor.OrgElement();
+                    
+                    jobTitle.element_type_id = SExportDataAuthActor.ORG_ELEMENT_TYPE_JOB_TITLE;
+                    jobTitle.external_id = jobTitleId;
+                    
+                    actor.org_elements = new SExportDataAuthActor.OrgElement[] { jobTitle };
+                }
+
+                actors.add(actor);
+            }
+        }
+
+        return actors;
+    }
+
+    /**
+     * Consulta los puestos laborales, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de puesos laborales.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfAuthJobTitlesToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> functionalAreas = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String referenceId = "CONVERT(p.id_pos, CHAR)";
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AUTH_JOB_TITLE, "");
+
+            String sql = "SELECT "
+                    + "p.id_pos AS external_id, "
+                    + "p.code, p.name, p.b_del AS is_deleted "
+                    + "FROM "
+                    + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " AS p "
+                    + "WHERE ("
+                    + "((NOT p.b_del) "
+                    + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AUTH_JOB_TITLE, "") + "))"
+                    + (lastSyncDatetime == null ? "" : " OR (p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                    + ") "
+                    + "ORDER BY "
+                    + "p.id_pos";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                // crear e inicializar el objeto para exportación de datos:
+                
+                int externalId = resultSet.getInt("external_id");
+                String code = SJsonUtils.sanitizeJson(resultSet.getString("code"));
+                String name = SJsonUtils.sanitizeJson(resultSet.getString("name"));
+
+                SExportDataAuthOrgElement orgElement = new SExportDataAuthOrgElement();
+
+                orgElement.code = !code.isEmpty() ? code : "" + externalId;
+                orgElement.name = name;
+                orgElement.org_element_type = SExportDataAuthActor.ORG_ELEMENT_TYPE_JOB_TITLE;
+                orgElement.is_deleted = resultSet.getBoolean("is_deleted");
+                orgElement.external_id = externalId;
+
+                functionalAreas.add(orgElement);
+            }
+        }
+        
+        return functionalAreas;
     }
 
     /**
@@ -1109,6 +1304,17 @@ public abstract class SExportDataUtils {
                 else {
                     data = getListOfPartnerSuppliersToExport(session);
                 }
+                break;
+                
+            case PARTNER_CUSTOMER:
+                break;
+                
+            case AUTH_ACTOR:
+                data = getListOfAuthActorsToExport(session);
+                break;
+                
+            case AUTH_JOB_TITLE:
+                data = getListOfAuthJobTitlesToExport(session);
                 break;
                 
             case FUNCTIONAL_AREA:

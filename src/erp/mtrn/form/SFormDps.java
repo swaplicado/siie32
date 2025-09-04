@@ -313,6 +313,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldInitDateEnd;
     private erp.lib.form.SFormField moFieldInitBudget;
     private erp.lib.form.SFormField moFieldInitComBudget;
+    private erp.lib.form.SFormField moFieldInitSpendableBudget;
     private erp.lib.form.SFormField moFieldInitSpentBudget;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     
@@ -984,17 +985,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel148 = new javax.swing.JPanel();
         jlInitPeriod = new javax.swing.JLabel();
         jtfInitPeriod = new javax.swing.JTextField();
+        jPanel143 = new javax.swing.JPanel();
+        jlInitFuncArea = new javax.swing.JLabel();
+        jtfInitFuncArea = new javax.swing.JTextField();
         jPanel154 = new javax.swing.JPanel();
+        jPanel155 = new javax.swing.JPanel();
         jPanel144 = new javax.swing.JPanel();
         jlInitDateStart = new javax.swing.JLabel();
         jftInitDateStart = new javax.swing.JFormattedTextField();
         jPanel147 = new javax.swing.JPanel();
         jlInitDateEnd = new javax.swing.JLabel();
         jftInitDateEnd = new javax.swing.JFormattedTextField();
-        jPanel143 = new javax.swing.JPanel();
-        jlInitFunc = new javax.swing.JLabel();
-        jtfInitFunc = new javax.swing.JTextField();
-        jPanel155 = new javax.swing.JPanel();
         jPanel149 = new javax.swing.JPanel();
         jlInitBudget = new javax.swing.JLabel();
         jtfInitBudget = new javax.swing.JTextField();
@@ -1005,10 +1006,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfInitComBudget = new javax.swing.JTextField();
         jtfInitComBudgetCur = new javax.swing.JTextField();
         jlComBudgetHint = new javax.swing.JLabel();
+        jPanel156 = new javax.swing.JPanel();
+        jlInitSpendableBudget = new javax.swing.JLabel();
+        jtfInitSpendableBudget = new javax.swing.JTextField();
+        jtfInitSpendableBudgetCur = new javax.swing.JTextField();
+        jlSpentBudgetHint1 = new javax.swing.JLabel();
         jPanel151 = new javax.swing.JPanel();
         jlInitSpentBudget = new javax.swing.JLabel();
         jtfInitSpentBudget = new javax.swing.JTextField();
-        jtfInitSpentBusgetCur = new javax.swing.JTextField();
+        jtfInitSpentBudgetCur = new javax.swing.JTextField();
         jlSpentBudgetHint = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
         jpControlsPk = new javax.swing.JPanel();
@@ -3453,7 +3459,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel152.setLayout(new java.awt.BorderLayout());
 
-        jPanel153.setLayout(new java.awt.GridLayout(3, 0, 0, 2));
+        jPanel153.setLayout(new java.awt.GridLayout(6, 0, 0, 2));
 
         jPanel146.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -3462,7 +3468,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel146.add(jlInitInitiative);
 
         jcbInitInitiative.setToolTipText("Uso CFDI del receptor");
-        jcbInitInitiative.setPreferredSize(new java.awt.Dimension(200, 23));
+        jcbInitInitiative.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel146.add(jcbInitInitiative);
 
         jPanel153.add(jPanel146);
@@ -3493,14 +3499,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel153.add(jPanel148);
 
+        jPanel143.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlInitFuncArea.setText("Área funcional:");
+        jlInitFuncArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel143.add(jlInitFuncArea);
+
+        jtfInitFuncArea.setEnabled(false);
+        jtfInitFuncArea.setFocusable(false);
+        jtfInitFuncArea.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel143.add(jtfInitFuncArea);
+
+        jPanel153.add(jPanel143);
+
         jPanel152.add(jPanel153, java.awt.BorderLayout.WEST);
 
-        jPanel154.setLayout(new java.awt.GridLayout(3, 0, 0, 2));
+        jPanel154.setLayout(new java.awt.GridLayout(5, 0, 0, 2));
+        jPanel152.add(jPanel154, java.awt.BorderLayout.CENTER);
+
+        jPanel155.setLayout(new java.awt.GridLayout(6, 0, 0, 2));
 
         jPanel144.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInitDateStart.setText("Fecha inicial:");
-        jlInitDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlInitDateStart.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel144.add(jlInitDateStart);
 
         jftInitDateStart.setText("yyyy/mm/dd");
@@ -3508,12 +3530,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftInitDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel144.add(jftInitDateStart);
 
-        jPanel154.add(jPanel144);
+        jPanel155.add(jPanel144);
 
         jPanel147.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInitDateEnd.setText("Fecha final:");
-        jlInitDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlInitDateEnd.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel147.add(jlInitDateEnd);
 
         jftInitDateEnd.setText("yyyy/mm/dd");
@@ -3521,29 +3543,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftInitDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel147.add(jftInitDateEnd);
 
-        jPanel154.add(jPanel147);
-
-        jPanel143.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlInitFunc.setText("Área funcional:");
-        jlInitFunc.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel143.add(jlInitFunc);
-
-        jtfInitFunc.setEnabled(false);
-        jtfInitFunc.setFocusable(false);
-        jtfInitFunc.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel143.add(jtfInitFunc);
-
-        jPanel154.add(jPanel143);
-
-        jPanel152.add(jPanel154, java.awt.BorderLayout.CENTER);
-
-        jPanel155.setLayout(new java.awt.GridLayout(3, 0, 0, 2));
+        jPanel155.add(jPanel147);
 
         jPanel149.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInitBudget.setText("Presupuesto estimado:");
-        jlInitBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlInitBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel149.add(jlInitBudget);
 
         jtfInitBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -3570,7 +3575,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel150.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInitComBudget.setText("Presupuesto comprometido:");
-        jlInitComBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlInitComBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel150.add(jlInitComBudget);
 
         jtfInitComBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -3594,10 +3599,37 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel155.add(jPanel150);
 
+        jPanel156.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlInitSpendableBudget.setText("Presupuesto por ejercer:");
+        jlInitSpendableBudget.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel156.add(jlInitSpendableBudget);
+
+        jtfInitSpendableBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfInitSpendableBudget.setText("0.0000");
+        jtfInitSpendableBudget.setEnabled(false);
+        jtfInitSpendableBudget.setFocusable(false);
+        jtfInitSpendableBudget.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel156.add(jtfInitSpendableBudget);
+
+        jtfInitSpendableBudgetCur.setText("MXN");
+        jtfInitSpendableBudgetCur.setEnabled(false);
+        jtfInitSpendableBudgetCur.setFocusable(false);
+        jtfInitSpendableBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel156.add(jtfInitSpendableBudgetCur);
+
+        jlSpentBudgetHint1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlSpentBudgetHint1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlSpentBudgetHint1.setToolTipText("Presupuesto estimado menos el comprometido");
+        jlSpentBudgetHint1.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel156.add(jlSpentBudgetHint1);
+
+        jPanel155.add(jPanel156);
+
         jPanel151.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInitSpentBudget.setText("Presupuesto ejercido:");
-        jlInitSpentBudget.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlInitSpentBudget.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel151.add(jlInitSpentBudget);
 
         jtfInitSpentBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -3607,11 +3639,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfInitSpentBudget.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel151.add(jtfInitSpentBudget);
 
-        jtfInitSpentBusgetCur.setText("MXN");
-        jtfInitSpentBusgetCur.setEnabled(false);
-        jtfInitSpentBusgetCur.setFocusable(false);
-        jtfInitSpentBusgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel151.add(jtfInitSpentBusgetCur);
+        jtfInitSpentBudgetCur.setText("MXN");
+        jtfInitSpentBudgetCur.setEnabled(false);
+        jtfInitSpentBudgetCur.setFocusable(false);
+        jtfInitSpentBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel151.add(jtfInitSpentBudgetCur);
 
         jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
@@ -3976,6 +4008,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldInitBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         moFieldInitComBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitComBudget, jlInitComBudget);
         moFieldInitComBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
+        moFieldInitSpendableBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitSpendableBudget, jlInitSpendableBudget);
+        moFieldInitSpendableBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         moFieldInitSpentBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitSpentBudget, jlInitSpentBudget);
         moFieldInitSpentBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         
@@ -10683,12 +10717,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (jcbInitInitiative.getSelectedIndex() > 0) {
                 SDbInitiative initiative = new SDbInitiative();
                 initiative.read(miClient.getSession(), moFieldInitInitiative.getKeyAsIntArray());
+                
                 jtfInitType.setText(initiative.getDbmsType());
                 jtfInitPeriod.setText(initiative.getDbmsPeriod());
+                jtfInitFuncArea.setText(initiative.getDbmsFuncArea());
                 moFieldInitDateStart.setFieldValue(initiative.getDateStart_n());
                 moFieldInitDateEnd.setFieldValue(initiative.getDateEnd_n());
-                jtfInitFunc.setText(initiative.getDbmsFuncArea());
+                
                 moFieldInitBudget.setFieldValue(initiative.getBudget());
+                
                 int typeId = 0;
                 for (int i = 1; i <= SModSysConsts.TRNX_TP_PERIOD_CODES.size(); i++) {
                     if (SModSysConsts.TRNX_TP_PERIOD_CODES.get(i).equals(initiative.getType())) {
@@ -10696,27 +10733,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         break;
                     }
                 }
+                
                 if (typeId == SModSysConsts.TRNX_TP_PERIOD_EVENT_ID){
                     moFieldInitComBudget.setFieldValue(STrnUtilities.getInitiativeComBudget(miClient, initiative.getPkInitiativeId()));
+                    moFieldInitSpendableBudget.setFieldValue(SLibUtils.roundAmount(moFieldInitBudget.getDouble() - moFieldInitComBudget.getDouble()));
                     moFieldInitSpentBudget.setFieldValue(STrnUtilities.getInitiativeSpentBudget(miClient, initiative.getPkInitiativeId()));
                 }
                 else {
                     moFieldInitComBudget.setFieldValue(0d);
+                    moFieldInitSpendableBudget.setFieldValue(0d);
                     moFieldInitSpentBudget.setFieldValue(0d);
                 }
             }
             else {
                 jtfInitType.setText("");
                 jtfInitPeriod.setText("");
+                jtfInitFuncArea.setText("");
                 moFieldInitDateStart.setFieldValue(null);
                 moFieldInitDateEnd.setFieldValue(null);
-                jtfInitFunc.setText("");
                 moFieldInitBudget.setFieldValue(0d);
                 moFieldInitComBudget.setFieldValue(0d);
+                moFieldInitSpendableBudget.setFieldValue(0d);
                 moFieldInitSpentBudget.setFieldValue(0d);
             }
         }
-        catch (Exception e) {}
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
     
     private void stateChangedTabbedPane() {
@@ -11196,6 +11239,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel153;
     private javax.swing.JPanel jPanel154;
     private javax.swing.JPanel jPanel155;
+    private javax.swing.JPanel jPanel156;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
@@ -11542,9 +11586,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlInitComBudget;
     private javax.swing.JLabel jlInitDateEnd;
     private javax.swing.JLabel jlInitDateStart;
-    private javax.swing.JLabel jlInitFunc;
+    private javax.swing.JLabel jlInitFuncArea;
     private javax.swing.JLabel jlInitInitiative;
     private javax.swing.JLabel jlInitPeriod;
+    private javax.swing.JLabel jlInitSpendableBudget;
     private javax.swing.JLabel jlInitSpentBudget;
     private javax.swing.JLabel jlInitType;
     private javax.swing.JLabel jlNumber;
@@ -11559,6 +11604,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlSpace;
     private javax.swing.JLabel jlSpace1;
     private javax.swing.JLabel jlSpentBudgetHint;
+    private javax.swing.JLabel jlSpentBudgetHint1;
     private javax.swing.JLabel jlSubtotal;
     private javax.swing.JLabel jlSubtotalProvisional;
     private javax.swing.JLabel jlTaxCharged;
@@ -11683,10 +11729,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfInitBudgetCur;
     private javax.swing.JTextField jtfInitComBudget;
     private javax.swing.JTextField jtfInitComBudgetCur;
-    private javax.swing.JTextField jtfInitFunc;
+    private javax.swing.JTextField jtfInitFuncArea;
     private javax.swing.JTextField jtfInitPeriod;
+    private javax.swing.JTextField jtfInitSpendableBudget;
+    private javax.swing.JTextField jtfInitSpendableBudgetCur;
     private javax.swing.JTextField jtfInitSpentBudget;
-    private javax.swing.JTextField jtfInitSpentBusgetCur;
+    private javax.swing.JTextField jtfInitSpentBudgetCur;
     private javax.swing.JTextField jtfInitType;
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfNumberReference;

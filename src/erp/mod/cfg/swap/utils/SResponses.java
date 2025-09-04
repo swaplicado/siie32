@@ -5,7 +5,7 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import erp.mod.cfg.db.SSyncType;
+import erp.mod.cfg.swap.SSyncType;
 import java.util.ArrayList;
 
 /**
