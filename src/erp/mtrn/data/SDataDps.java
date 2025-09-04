@@ -100,7 +100,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Claudio Peña, Adrián Avilés, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -5056,11 +5056,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                            mtUserEditTs != change.getUserEditTs();
         }
 
-        if ((isEdited && (dps.getDbmsDpsEntries().get(0).getFkItemId() != dps.getDbmsDpsEntries().get(0).getAuxFkItemOld())) || (isEdited && isQtyEdited) || (isEdited && isUnitEdited)
-            || (isEdited && ((dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getOriginalPriceUnitaryCy() != dps.getDbmsDpsEntries().get(0).getPriceUnitary())) &&
-                mtUserEditTs != dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getUserEditTs())
-            || (isEdited && (dps.getDbmsDpsEntries().get(0).getAuxFkUnitOld() != dps.getDbmsDpsEntries().get(0).getAuxFkOriginalUnitOld()))) {
-        
+        if ((isEdited && (dps.getDbmsDpsEntries().get(0).getFkItemId() != dps.getDbmsDpsEntries().get(0).getAuxFkItemOld()))
+        || (isEdited && isQtyEdited) || (isEdited && isUnitEdited) || (isEdited && !dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().isEmpty()
+            && (dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getOriginalPriceUnitaryCy() != dps.getDbmsDpsEntries().get(0).getPriceUnitary())
+            && mtUserEditTs != dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getUserEditTs())
+        || (isEdited && (dps.getDbmsDpsEntries().get(0).getAuxFkUnitOld() != dps.getDbmsDpsEntries().get(0).getAuxFkOriginalUnitOld()))) {
+            
             for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                 try {
                     mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
