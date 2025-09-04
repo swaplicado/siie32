@@ -47,9 +47,11 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import erp.server.SSessionServer;
 import java.awt.Cursor;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -2041,11 +2043,11 @@ public abstract class STrnUtilities {
      * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
      * @param dpsKey DPS primary Key.
      */
-    private static void sendMailOrder(final SClientInterface client, SDataDps oDps) {
+    private static void sendMailOrder(final SClientInterface client, SDataDps oDps) throws IOException {
         String addressee = "";
         String msg = "";
         String userMail = "";
-        String bizPartnerMail;
+        String bizPartnerMail = "";
         boolean canSend = true;
         SMailSender sender;
         SMail mail;
@@ -2135,7 +2137,12 @@ public abstract class STrnUtilities {
             }
         }
         catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println(e.getMessage() + ": " + bizPartnerMail);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("logs/mails/SCliMailerLog.log", true))) {
+                writer.append(System.getProperty("line.separator"));
+                writer.append(e.getMessage() + ": " + bizPartnerMail);
+                writer.close();
+            }
         }
         finally {
             if (client.isGui()) {
