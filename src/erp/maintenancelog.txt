@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 286.2/ 2025-09-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de envío de actores y puestos laborales al Sistema de Autorizaciones de SWAP Services.
+2) Implementación de configuración de roles de usuario del Portal de Compras en permisos de usuariio. 2) Rediseño de campos de captura en iniciativas.
+
+================================================================================
 SIIE 3.2 286.1/ 2025-09-02
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
