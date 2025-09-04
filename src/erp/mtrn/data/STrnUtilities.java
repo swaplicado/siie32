@@ -2135,7 +2135,7 @@ public abstract class STrnUtilities {
             }
         }
         catch (Exception e) {
-            SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+            System.err.println(e.getMessage());
         }
         finally {
             if (client.isGui()) {
@@ -2916,7 +2916,7 @@ public abstract class STrnUtilities {
             }
         }
         catch (Exception e) {
-            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            System.err.println(e.getMessage());
         }
         finally {
             if (client.isGui()) {
