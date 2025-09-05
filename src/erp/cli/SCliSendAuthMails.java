@@ -11,7 +11,6 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
 import java.sql.ResultSet;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 import sa.lib.gui.SGuiSession;
@@ -42,7 +41,7 @@ public class SCliSendAuthMails {
             dbCompany.disconnect();
         }
         catch (Exception e) {
-            SLibUtils.printException(SCliSendAuthMails.class.getName(), e);
+            System.err.println(e.getMessage());
             System.exit(-1);
         }
     }
@@ -72,7 +71,9 @@ public class SCliSendAuthMails {
         
         ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
         while (resultSet.next()) {
-            SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+            try {
+                SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+            }catch (Exception e) {}
         }
     }
     
