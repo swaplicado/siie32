@@ -61,7 +61,7 @@ public abstract class SExportUtils {
     public static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
     
     private static final int SEC_PSWD_LEN = 10;
-    private static final int TIME_60_SEC = 180 * 1000; // 60 segundos en milisegundos
+    private static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
 
     /**
      * Genera una contraseña segura de 10 caracteres aleatorios.
@@ -93,12 +93,12 @@ public abstract class SExportUtils {
      * @throws Exception
      */
     private static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey) throws Exception {
-        String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-        HttpURLConnection connection = null;
         String responseBody = "";
+        HttpURLConnection connection = null;
 
         try {
             URL url;
+            String charset = java.nio.charset.StandardCharsets.UTF_8.name();
             
             if (SHttpConsts.METHOD_GET.equalsIgnoreCase(method) && queryUrl != null && !queryUrl.isEmpty()) {
                 url = new URL(serviceUrl + "?" + queryUrl);
@@ -108,8 +108,8 @@ public abstract class SExportUtils {
             }
 
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(TIME_60_SEC); // 30 segundos para conectar
-            connection.setReadTimeout(TIME_60_SEC);    // 30 segundos para leer respuesta
+            connection.setConnectTimeout(TIME_180_SEC); // timeout para conectar
+            connection.setReadTimeout(TIME_180_SEC); // timeout para leer la respuesta
             connection.setRequestMethod(method.toUpperCase());
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");

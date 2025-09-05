@@ -3593,7 +3593,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlComBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlComBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlComBudgetHint.setToolTipText("Suma del total de pedidos de la propuesta");
+        jlComBudgetHint.setToolTipText("Suma de los subtotales de pedidos de la propuesta");
         jlComBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel150.add(jlComBudgetHint);
 
@@ -3647,7 +3647,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint.setToolTipText("Suma del total de facturas de la propuesta");
+        jlSpentBudgetHint.setToolTipText("Suma de los totales de facturas de la propuesta");
         jlSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel151.add(jlSpentBudgetHint);
 
