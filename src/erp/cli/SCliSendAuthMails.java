@@ -10,7 +10,11 @@ import erp.SParamsApp;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
+import java.io.File;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 import sa.lib.gui.SGuiSession;
@@ -46,7 +50,7 @@ public class SCliSendAuthMails {
         }
     }
     
-    private static void run(SDbDatabase dbCompany) throws Exception {
+    private static void run(SDbDatabase dbCompany) throws SQLException {
         SGuiSession session = new SGuiSession(null);
         session.setDatabase(dbCompany);
         
@@ -70,11 +74,23 @@ public class SCliSendAuthMails {
                 "AND (d.ts_authorn > l.ts OR l.ts IS NULL);";
         
         ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+//        HashMap<SFileData, File> mFiles = new HashMap<>();
         while (resultSet.next()) {
             try {
-                SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            }catch (Exception e) {}
+                int idYear = resultSet.getInt("d.id_year");
+                int idDoc = resultSet.getInt("d.id_doc");
+                File oPdf = SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { idYear, idDoc });
+                // Se comentan estas líneas para funcionalidad posterior de envío de archivos a Google Cloud
+//                String fileName = "OC_" + dbCompany.getDbName() + "_" + idYear + "_" + idDoc + ".pdf";
+//                SFileData oFileData = new SFileData(idYear, idDoc, fileName);
+//                mFiles.put(oFileData, oPdf);
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SCliSendAuthMails.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
+//        SDpsGoogleCloudUtils.uploadFiles(mFiles);
     }
     
     private static SClientApi createClientApi(SGuiSession session, int userId) {

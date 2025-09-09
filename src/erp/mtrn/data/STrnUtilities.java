@@ -4,6 +4,8 @@
  */
 package erp.mtrn.data;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
@@ -25,6 +27,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mbps.data.SDataEmployee;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
@@ -36,6 +39,8 @@ import erp.mmfg.data.SDataProductionOrderChargeEntryLot;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
@@ -2015,11 +2020,14 @@ public abstract class STrnUtilities {
      * @param client ERP Client interface.
      * @param dpsKey DPS primary Key.
      * @param confirmSending Confirm sending required.
+     * @param bReturnFile if true, returns pdf file of dpsOrder
+     * @return 
      * @throws java.lang.Exception
      */
-    public static void sendDpsOrder(final SClientInterface client, final int[] dpsKey, boolean confirmSending) throws Exception {
+    public static File sendDpsOrder(final SClientInterface client, final int[] dpsKey, boolean confirmSending, boolean bReturnFile) throws Exception {
         SDataDps dps = new SDataDps();
         dps.read(dpsKey, client.getSession().getStatement());
+        File oPdf = null;
         
         if (dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN &&
                 dps.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
@@ -2032,9 +2040,14 @@ public abstract class STrnUtilities {
                 send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
             }
             if (send) {
-                sendMailOrder(client, dps);
+                oPdf = sendMailOrder(client, dps, bReturnFile);
+                if (! bReturnFile) {
+                    return null;
+                }
             }
         }
+        
+        return oPdf;
     }
     
     /**
@@ -2043,16 +2056,18 @@ public abstract class STrnUtilities {
      * @param dpsCategory DPS category. Supported options: SDataConstantsSys.TRNS_CT_DPS_PUR or SDataConstantsSys.TRNS_CT_DPS_SAL.
      * @param dpsKey DPS primary Key.
      */
-    private static void sendMailOrder(final SClientInterface client, SDataDps oDps) throws IOException {
+    private static File sendMailOrder(final SClientInterface client, SDataDps oDps, boolean bReturnFile) throws IOException {
         String addressee = "";
         String msg = "";
         String userMail = "";
+        int nUserId = 0;
         String bizPartnerMail = "";
         boolean canSend = true;
         SMailSender sender;
         SMail mail;
         ArrayList<String> toRecipients;
-        File pdf;
+        ArrayList<String> toRecipientsCc = new ArrayList<>();
+        File pdf = null;
         SDbMms mms;     
         SDataBizPartner bizPartnerUserSend;
 
@@ -2069,15 +2084,19 @@ public abstract class STrnUtilities {
             }
             else {
                 //Si es un pedido 
-                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
+                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] 
+                    && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] 
+                        && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
                     //Si viene de la interfaz, se valida si hay correo del usuario de la sesion
                     if (client.isGui()) {
                         userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        nUserId = client.getSession().getUser().getPkUserId();
                     }
                     //Si no hay correo entonces se busca el del creador de la OC
                     if (userMail.isEmpty()) {
                         SDataUser user = new SDataUser();
                         user.read(new int[] { oDps.getFkUserNewId() }, client.getSession().getStatement());
+                        nUserId = oDps.getFkUserNewId();
                         userMail = user.getEmail();
                     }
                     //Si no hay correo se usa el institucional
@@ -2094,7 +2113,29 @@ public abstract class STrnUtilities {
                 }
                 
                 sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
-                sender.setMailReplyTo(mms.getXtaMailReplyTo());
+                if (mms.getMmsCase() == 5) {
+                    sender.setMailReplyTo(userMail);
+                    
+                    String sCfg = SCfgUtils.getParamValue(client.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+                    if (! sCfg.isEmpty() && nUserId > 0) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode rootNode = mapper.readTree(sCfg);
+                        List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", nUserId);
+                        if (toUsers.isEmpty()) {
+                            toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", nUserId);
+                            if (toUsers.isEmpty()) {
+                                toUsers.add(nUserId);
+                            }
+                        }
+                        
+                        if (! toUsers.isEmpty()) {
+                            toRecipientsCc.addAll(SAuthorizationUtils.getMailsOfUsers(client.getSession().getStatement().getConnection().createStatement(), new ArrayList<>(toUsers)).values());
+                        }
+                    }
+                }
+                else {
+                    sender.setMailReplyTo(mms.getXtaMailReplyTo());
+                }
                 toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
 
                 if (toRecipients.isEmpty()) {
@@ -2108,7 +2149,7 @@ public abstract class STrnUtilities {
                         mms.setTextBody(body);
                     }
                 }
-                mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients);
+                mail = new SMail(sender, "PRUEBA " + mms.getTextSubject(), mms.getTextBody(), toRecipients, toRecipientsCc);
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {
@@ -2118,15 +2159,20 @@ public abstract class STrnUtilities {
 
                     mail.getAttachments().add(pdf);
                     mail.send();
-
+                    
+                    toRecipients.addAll(toRecipientsCc);
                     for (String recipient : toRecipients) {
                         addressee += (addressee.isEmpty() ? "" : ";") + recipient;
                     }
 
                     if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, true)) {
                     }
-
-                    pdf.delete();
+                    
+                    if (! bReturnFile) {
+                        pdf.delete();
+                        pdf = null;
+                    }
+                    
                     if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                         client.showMsgBoxInformation("La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e");
                     }
@@ -2137,18 +2183,22 @@ public abstract class STrnUtilities {
             }
         }
         catch (Exception e) {
+            Logger.getLogger(STrnUtilities.class.getName()).log(Level.SEVERE, null, e);
             System.err.println(e.getMessage() + ": " + bizPartnerMail);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("logs/mails/SCliMailerLog.log", true))) {
                 writer.append(System.getProperty("line.separator"));
                 writer.append(e.getMessage() + ": " + bizPartnerMail);
                 writer.close();
             }
+            pdf = null;
         }
         finally {
             if (client.isGui()) {
                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
+        
+        return pdf;
     }
 
     /**
