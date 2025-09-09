@@ -1682,30 +1682,36 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) throws Exception {
-        SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
-        fileProcess.read(client.getSession(), pk);
-        if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
-                fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
-            if (canSendAuthornAppWeb(client, fileProcess)) {
-                SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
-                dialog.setVisible(true);
-                if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                    new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
+    public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) {
+        try {
+            SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+            fileProcess.read(client.getSession(), pk);
+            if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
+                    fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                if (canSendAuthornAppWeb(client, fileProcess)) {
+                    SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
+                    dialog.setVisible(true);
+                    if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
+                    }
+                    else {
+                        return false;
+                    }
                 }
                 else {
                     return false;
                 }
             }
             else {
+                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
                 return false;
             }
+            return true;
         }
-        else {
-            client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+        catch (Exception e) {
+            client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
             return false;
         }
-        return true;
     }
     
     public static boolean canSendAuthornAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {

@@ -14,7 +14,7 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Isabel Servín
  */
-public class SRowSupplierFileDpsEntry implements  SGridRow, Serializable {
+public class SRowSupplierFileDpsEntry implements SGridRow, Serializable {
 
     protected final SDbDpsEntry moDpsEty;
     
