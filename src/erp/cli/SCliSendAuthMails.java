@@ -64,7 +64,7 @@ public class SCliSendAuthMails {
                 "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
                 "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
                 "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " " +
-                "AND d.fid_st_dps_authorn IN (" + SModSysConsts.TRNS_ST_DPS_AUTHORN_REJECT + ", " + SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN + ") " +
+                "AND d.fid_st_dps_authorn IN (" + SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN + ") " +
                 "AND d.ts_authorn >= NOW() - INTERVAL 24 HOUR " +
                 "AND NOT d.b_del " +
                 "AND (d.ts_authorn > l.ts OR l.ts IS NULL);";
