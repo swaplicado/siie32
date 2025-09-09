@@ -13,7 +13,7 @@ import sa.lib.gui.SGuiClient;
 /**
  * Abstraction of a grid row when paying (doing the accounting of) bank layouts.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Alfredo Pérez, Isabel Servín, Sergio Flores
  */
 public class SLayoutBankPaymentRow implements SGridRow {
 
@@ -227,6 +227,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 break;
             default:
         }
+        
         return value;
     }
 

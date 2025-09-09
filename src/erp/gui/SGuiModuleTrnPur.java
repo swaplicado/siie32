@@ -32,6 +32,8 @@ import erp.mfin.form.SFormCostCenterItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.form.SDialogImportDocuments;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
@@ -150,9 +152,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsPriceHist;
     private javax.swing.JMenuItem jmiDpsDocRemission;
     private javax.swing.JMenuItem jmiDpsDocTankCar;
-    private javax.swing.JMenuItem jmiCfdiMassiveValidation;
-    private javax.swing.JMenuItem jmiSearchCfdiByUuid;
-    private javax.swing.JMenuItem jmiSearchDps;
+    private javax.swing.JMenuItem jmiDpsCfdiMassiveValidation;
+    private javax.swing.JMenuItem jmiDpsSearchCfdiByUuid;
+    private javax.swing.JMenuItem jmiDpsSearchDps;
+    private javax.swing.JMenuItem jmiDpsImportDocuments;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmiDpsAdjEntry;
@@ -252,6 +255,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDps;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDiog;
     private erp.mfin.form.SFormCostCenterItem moFormCostCenterItem;
+    private erp.mod.cfg.swap.form.SDialogImportDocuments moDialogImportDocuments;
     private erp.mtrn.form.SDialogRepDpsList moDialogRepDpsList;
     private erp.mtrn.form.SDialogRepDpsBizPartner moDialogRepDpsBizPartner;
     private erp.mtrn.form.SDialogRepDpsWithBalance moDialogRepDpsWithBalance;
@@ -309,7 +313,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatViewIntegralSuppliers = new JMenuItem("Vista integral de proveedores");
         jmCatCfg = new JMenu("Contabilización automática");
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
-        jmiCatSendingDpsLog = new JMenuItem("Bitácora de envíos de docs.");
+        jmiCatSendingDpsLog = new JMenuItem("Bitácora de envío de documentos por correo-e");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
         jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
@@ -450,9 +454,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
         jmiDpsDocTankCar = new JMenuItem("Facturas vs. carrotanques");
-        jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
-        jmiSearchCfdiByUuid = new JMenuItem("Búsqueda de CFDI por UUID...");
-        jmiSearchDps = new JMenuItem("Búsqueda de documentos...");
+        jmiDpsCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
+        jmiDpsSearchCfdiByUuid = new JMenuItem("Búsqueda de CFDI por UUID...");
+        jmiDpsSearchDps = new JMenuItem("Búsqueda de documentos...");
+        jmiDpsImportDocuments = new JMenuItem("Importar documentos...");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -481,10 +486,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsDocRemission);
         jmDps.add(jmiDpsDocTankCar);
         jmDps.addSeparator();
-        jmDps.add(jmiCfdiMassiveValidation);
+        jmDps.add(jmiDpsCfdiMassiveValidation);
         jmDps.addSeparator();
-        jmDps.add(jmiSearchCfdiByUuid);
-        jmDps.add(jmiSearchDps);
+        jmDps.add(jmiDpsSearchCfdiByUuid);
+        jmDps.add(jmiDpsSearchDps);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsImportDocuments);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
@@ -757,9 +764,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
         jmiDpsDocTankCar.addActionListener(this);
-        jmiCfdiMassiveValidation.addActionListener(this);
-        jmiSearchCfdiByUuid.addActionListener(this);
-        jmiSearchDps.addActionListener(this);
+        jmiDpsCfdiMassiveValidation.addActionListener(this);
+        jmiDpsSearchCfdiByUuid.addActionListener(this);
+        jmiDpsSearchDps.addActionListener(this);
+        jmiDpsImportDocuments.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
@@ -923,9 +931,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocTankCar.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR && hasConfTankCar);
-        jmiCfdiMassiveValidation.setEnabled(true);
-        jmiSearchCfdiByUuid.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
-        jmiSearchDps.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsCfdiMassiveValidation.setEnabled(true);
+        jmiDpsSearchCfdiByUuid.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsSearchDps.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsImportDocuments.setEnabled((Boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP) && (hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_CAPTURE));
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -1319,8 +1328,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     break;
 
                 case SDataConstants.TRN_DPS_SND_LOG:
-                    oViewClass = erp.mtrn.view.SViewDpsSendingLog.class;
-                    sViewTitle = "CPA - bitácora envíos docs.";
+                    oViewClass = erp.mtrn.view.SViewDpsSendLog.class;
+                    sViewTitle = "CPA - Bitácora envío docs. correo-e";
                     break;
                 
                 case SDataConstants.TRN_BP_BLOCK:
@@ -1398,10 +1407,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
                     break;
                     
-//                case SDataConstants.TRNX_DPS_SUPPLY:
-//                    oViewClass = erp.mtrn.view.SViewDpsPendAuthorizedSupply.class;
-//                    sViewTitle = getViewTitle(auxType01);
-//                    break;
+                //case SDataConstants.TRNX_DPS_SUPPLY:
+                //    oViewClass = erp.mtrn.view.SViewDpsPendAuthorizedSupply.class;
+                //    sViewTitle = getViewTitle(auxType01);
+                //    break;
                 
                 case SDataConstants.TRNU_TP_DPS_ANN:
                     oViewClass = erp.mtrn.view.SViewDpsAnnulled.class;
@@ -1873,14 +1882,21 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiDpsDocTankCar) {
                 miClient.getSession().showView(SModConsts.TRNX_DPS_TANK_CAR, SModConsts.MOD_TRN_PUR_N, null);
             }
-            else if(item == jmiCfdiMassiveValidation){
+            else if(item == jmiDpsCfdiMassiveValidation) {
                 new SFormCfdiMassiveValidation(miClient, SDataConstants.MOD_PUR, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
-            else if(item == jmiSearchCfdiByUuid){
+            else if(item == jmiDpsSearchCfdiByUuid) {
                 new SDialogSearchCfdiByUuid((SGuiClient) miClient, SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
-            else if(item == jmiSearchDps){
+            else if(item == jmiDpsSearchDps) {
                 new SDialogSearchDps((SGuiClient) miClient, SDataConstantsSys.TRNS_CT_DPS_PUR, "Búsqueda de documentos de compras").setVisible(true);
+            }
+            else if(item == jmiDpsImportDocuments) {
+                if (moDialogImportDocuments == null) {
+                    moDialogImportDocuments = new SDialogImportDocuments((SGuiClient) miClient);
+                }
+                moDialogImportDocuments.resetForm();
+                moDialogImportDocuments.setVisible(true);
             }
             else if (item == jmiOrdersFunctionalArea) {
                  miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));

@@ -967,12 +967,14 @@ public abstract class SExportDataUtils {
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
 
                 String sql = "SELECT "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
+                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, "
+                        + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_authorn, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked "
                         + "FROM ("
                         + "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty, "
                         + "COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _qty_linked, "
@@ -989,11 +991,13 @@ public abstract class SExportDataUtils {
                         + "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                         + "/*AND NOT d.b_link */" // bloque comentado para incluir pedidos enlazados forzadamente (para "eliminar" referencias en subsecuentes exportaciones)
                         + "GROUP BY "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
                         + "ORDER BY "
-                        + "d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, d.id_year, d.id_doc, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_link, "
+                        + "d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty "
                         + ") AS t "
@@ -1002,9 +1006,11 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "WHERE ("
-                        + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND NOT t.b_link) "
+                        + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND t.b_authorn AND NOT t.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
                         + "GROUP BY "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
@@ -1034,7 +1040,7 @@ public abstract class SExportDataUtils {
                     reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
                     reference.currency_code = resultSet.getString("c.cur_key");
                     reference.amount = resultSet.getDouble("t.tot_cur_r");
-                    reference.is_deleted = resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    reference.is_deleted = !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
                     references.add(reference);
                 }

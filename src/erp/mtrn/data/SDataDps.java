@@ -86,6 +86,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -545,10 +546,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     private void updateAuthorizationStatus(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
-        boolean isAutPurContract = false;
+        boolean isAutPurCont = false;
         boolean isAutPurOrd = false;
         boolean isAutPurDps = false;
-        boolean isAutSalContract = false;
+        boolean isAutSalCont = false;
         boolean isAutSalOrd = false;
         boolean isAutSalDps = false;
         String sql = "";
@@ -560,34 +561,36 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             // XXX It is needed a "session" object in SDataRegistry objects in order to know current company, company branch, current entities, decimal an date format objects, etc.
 
-            sql = "SELECT fid_bp FROM erp.bpsu_bpb WHERE id_bpb = " + mnFkCompanyBranchId + " ";
+            sql = "SELECT fid_bp "
+                    + "FROM erp.bpsu_bpb "
+                    + "WHERE id_bpb = " + mnFkCompanyBranchId + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
             }
             else {
-                sql = "SELECT b_authorn_pur_con, b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_sal_con, b_authorn_sal_ord, b_authorn_sal_doc FROM cfg_param_co WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
+                sql = "SELECT b_authorn_pur_con, b_authorn_pur_ord, b_authorn_pur_doc, b_authorn_sal_con, b_authorn_sal_ord, b_authorn_sal_doc "
+                        + "FROM cfg_param_co "
+                        + "WHERE id_co = " + resultSet.getInt("fid_bp") + " ";
                 resultSet = statement.executeQuery(sql);
                 if (!resultSet.next()) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
-                    isAutPurContract = resultSet.getBoolean("b_authorn_pur_con");
+                    isAutPurCont = resultSet.getBoolean("b_authorn_pur_con");
                     isAutPurOrd = resultSet.getBoolean("b_authorn_pur_ord");
                     isAutPurDps = resultSet.getBoolean("b_authorn_pur_doc");
-                    isAutSalContract = resultSet.getBoolean("b_authorn_sal_con");
+                    isAutSalCont = resultSet.getBoolean("b_authorn_sal_con");
                     isAutSalOrd = resultSet.getBoolean("b_authorn_sal_ord");
                     isAutSalDps = resultSet.getBoolean("b_authorn_sal_doc");
                 }
             }
 
-            if (isDpsTypeContractPur() && isAutPurContract || isDpsTypeContractSal() && isAutSalContract || isOrderPur() && isAutPurOrd || isDocumentPur() && isAutPurDps || 
-                    isOrderSal() && isAutSalOrd || isDocumentSal() && isAutSalDps) {
-                boolean hasComAuthAppWeb = true;
-                try {
-                    hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
-                } 
-                catch (Exception e) {}
+            if ((isDpsTypeContractPur() && isAutPurCont) || (isDpsTypeContractSal() && isAutSalCont) ||
+                    (isOrderPur() && isAutPurOrd) || (isDocumentPur() && isAutPurDps) || 
+                    (isOrderSal() && isAutSalOrd) || (isDocumentSal() && isAutSalDps)) {
+                
+                boolean hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(connection.createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
                 
                 if (hasComAuthAppWeb) {
                     mbIsAuthorized = false;
@@ -604,7 +607,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
 
-                mnFkUserAuthorizedId = mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId;
+                if (!SLibUtils.belongsTo(mnFkDpsAuthorizationStatusId, new int[] { SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA, SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING }) && (mnFkUserAuthorizedId == SUtilConsts.USR_NA_ID)) {
+                    mnFkUserAuthorizedId = mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId;
+                }
             }
         }
     }

@@ -23,7 +23,7 @@ import erp.table.STabFilterFunctionalArea;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SViewDpsSendingLog extends erp.lib.table.STableTab {
+public class SViewDpsSendLog extends erp.lib.table.STableTab {
 
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
@@ -36,7 +36,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
      * @param tabTitle View tab title.
      * @param auxType01
      */
-    public SViewDpsSendingLog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
+    public SViewDpsSendLog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRN_DPS_SND_LOG, auxType01);
         initComponents();
     }
@@ -65,7 +65,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[14];
+        aoTableColumns = new STableColumn[17];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
@@ -92,8 +92,11 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bb.bpb", "Sucursal " + (isDpsPurchases() ? "proveedor" : "cliente"), 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_authorn", "Autorizado", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "snd.id_snd", "# envío", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "snd.dt", "Fecha envío", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "snd.snd_to", "Receptor", 150);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "snd.snd_to", "Receptor", 250);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "snd.b_snd", "Enviado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "us.usr", "Usr. envío", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "snd.ts", "Envío", STableConstants.WIDTH_DATE_TIME);
 
@@ -140,15 +143,15 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlDocFunctArea += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlDocFunctArea += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
         
-        msSql = "SELECT d.id_year, d.id_doc, d.dt AS f_dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
+        msSql = "SELECT d.id_year, d.id_doc, d.dt AS f_dt, d.dt_doc_delivery_n, d.b_authorn, d.b_del, d.ts_close, " +
                 "d.num_ser, d.num, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, dt.code, " +
                 "d.ts_audit, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code AS f_cob_code, ua.usr, " +
-                "snd.dt, snd.snd_to, snd.ts, us.usr " +
+                "snd.id_snd, snd.dt, snd.snd_to, snd.b_snd, snd.ts, us.usr " +
                 "FROM trn_dps_snd_log AS snd " +
                 "INNER JOIN trn_dps AS d ON d.id_year = snd.id_year AND d.id_doc = snd.id_doc " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +

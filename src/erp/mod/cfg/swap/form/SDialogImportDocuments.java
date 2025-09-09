@@ -5,14 +5,35 @@
  */
 package erp.mod.cfg.swap.form;
 
-import erp.mod.SModConsts;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import sa.lib.SLibConsts;
+import java.util.Collections;
+import java.util.Vector;
+import java.util.stream.Collectors;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
+import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
@@ -21,14 +42,17 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Sergio Flores
  */
-public class SDialogImportDocuments extends SBeanFormDialog {
+public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener {
     
     protected SGridPaneForm moDocumentsGrid;
+    protected JLabel jlStatus;
 
     /**
      * Creates new form SDialogImportDocuments
+     * @param client GUI client.
      */
-    public SDialogImportDocuments() {
+    public SDialogImportDocuments(SGuiClient client) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Descarga de documentos");
         initComponents();
         initComponentsCustom();
     }
@@ -45,16 +69,23 @@ public class SDialogImportDocuments extends SBeanFormDialog {
         jpDownload = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        sBeanFieldDate1 = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateStart = new javax.swing.JLabel();
+        moDateStart = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel3 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        sBeanFieldDate2 = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateEnd = new javax.swing.JLabel();
+        moDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel5 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        jbShow = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jbSelectAll = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        jbClear = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jbDeselectAll = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jbDownload = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -70,19 +101,19 @@ public class SDialogImportDocuments extends SBeanFormDialog {
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setText("Fecha inicial:*");
-        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel2.add(jLabel1);
-        jPanel2.add(sBeanFieldDate1);
+        jlDateStart.setText("Fecha inicial:*");
+        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jlDateStart);
+        jPanel2.add(moDateStart);
 
         jPanel1.add(jPanel2);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel2.setText("Fecha final:*");
-        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jLabel2);
-        jPanel3.add(sBeanFieldDate2);
+        jlDateEnd.setText("Fecha final:*");
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlDateEnd);
+        jPanel3.add(moDateEnd);
 
         jPanel1.add(jPanel3);
 
@@ -92,17 +123,41 @@ public class SDialogImportDocuments extends SBeanFormDialog {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jButton1.setText("Mostrar");
-        jButton1.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jButton1);
+        jbShow.setText("Mostrar documentos");
+        jbShow.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jbShow);
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel4.add(jLabel1);
+
+        jbSelectAll.setText("Seleccionar todos");
+        jbSelectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jbSelectAll);
+
+        jLabel3.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel4.add(jLabel3);
 
         jPanel5.add(jPanel4);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jButton2.setText("Limpiar");
-        jButton2.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jButton2);
+        jbClear.setText("Limpiar documentos");
+        jbClear.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jbClear);
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel6.add(jLabel2);
+
+        jbDeselectAll.setText("Deseleccionar todos");
+        jbDeselectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jbDeselectAll);
+
+        jLabel4.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel6.add(jLabel4);
+
+        jbDownload.setText("Descargar seleccionados");
+        jbDownload.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jbDownload);
 
         jPanel5.add(jPanel6);
 
@@ -121,26 +176,47 @@ public class SDialogImportDocuments extends SBeanFormDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JButton jbClear;
+    private javax.swing.JButton jbDeselectAll;
+    private javax.swing.JButton jbDownload;
+    private javax.swing.JButton jbSelectAll;
+    private javax.swing.JButton jbShow;
+    private javax.swing.JLabel jlDateEnd;
+    private javax.swing.JLabel jlDateStart;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDownload;
-    private sa.lib.gui.bean.SBeanFieldDate sBeanFieldDate1;
-    private sa.lib.gui.bean.SBeanFieldDate sBeanFieldDate2;
+    private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
+    private sa.lib.gui.bean.SBeanFieldDate moDateStart;
     // End of variables declaration//GEN-END:variables
 
-    protected void initComponentsCustom() {
+    /*
+     * Private methods.
+     */
+    
+    private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
-        moDocumentsGrid = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EMP, SLibConsts.UNDEFINED, "Empleados disponibles", null) {
+        moDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
+        moDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd), true);
+        
+        jbSave.setEnabled(false);
+        jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
+        
+        moFields.addField(moDateStart);
+        moFields.addField(moDateEnd);
+        moFields.setFormButton(jbShow);
+        
+        moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Documentos", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -154,18 +230,19 @@ public class SDialogImportDocuments extends SBeanFormDialog {
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Proveedor", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 100));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción", 200));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Subárea funcional"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_3D, "% requerido pago"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus"));
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Descargar");
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Descargar", moDocumentsGrid.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 gridColumnsForm.add(column);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_3D, "% requerido pago"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento"));
 
                 return gridColumnsForm;
             }
@@ -174,21 +251,334 @@ public class SDialogImportDocuments extends SBeanFormDialog {
         moDocumentsGrid.setForm(null);
         moDocumentsGrid.setPaneFormOwner(null);
         jpDocuments.add(moDocumentsGrid, BorderLayout.CENTER);
+        
+        jlStatus = new JLabel();
+        jpCommandLeft.add(jlStatus);
+    }
+    
+    /*
+     * Protected methods.
+     */
+    
+    protected void enableFields(boolean forANewShowRequest) {
+        moDateStart.setEditable(forANewShowRequest);
+        moDateEnd.setEditable(forANewShowRequest);
+        
+        jbShow.setEnabled(forANewShowRequest);
+        jbClear.setEnabled(!forANewShowRequest);
+        
+        jbSelectAll.setEnabled(!forANewShowRequest);
+        jbDeselectAll.setEnabled(!forANewShowRequest);
+        
+        jbDownload.setEnabled(!forANewShowRequest);
+    }
+    
+    protected void actionPerformedShow() {
+        SGuiValidation validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
+        
+        if (SGuiUtils.computeValidation(miClient, validation)) {
+            enableFields(false);
+            
+            ArrayList<SRowDocument> documents = new ArrayList<>();
+            int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+
+            try {
+                String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+
+                String urlString = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=11";
+
+                URL url = new URL(urlString);
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                connection.setConnectTimeout(30 * 1000); // timeout para conectar
+                connection.setReadTimeout(30 * 1000); // timeout para leer la respuesta
+                connection.setRequestMethod("GET");
+
+                connection.setRequestProperty("Accept-Charset", charset);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+
+                /*
+                if (token != null && !token.isEmpty()) {
+                    connection.setRequestProperty("Authorization", token);
+                }
+                if (apiKey != null && !apiKey.isEmpty()) {
+                    connection.setRequestProperty("x-api-key", apiKey);
+                }
+                */
+
+                connection.setDoInput(true); // true is already the default value!
+
+                try (InputStream is = connection.getInputStream()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(is);
+
+                    if (root.isArray()) {
+                        for (JsonNode docNode : root) {
+                            JsonNode companyNode = docNode.path("company");
+
+                            if (companyNode.get("external_id").asInt() == companyId &&
+                                    docNode.get("transaction_class").asInt() == 1 &&
+                                    docNode.get("document_type").asInt() == 11) { // XXX parametrizar este valor mágico!
+
+                                SRowDocument document = new SRowDocument();
+                                
+                                document.ExternalDocumentId = docNode.get("id").asInt();
+
+                                JsonNode partnerNode = docNode.path("partner");
+                                document.BizPartnerId = partnerNode.get("external_id").asInt();
+                                document.BizPartner = partnerNode.get("full_name").asText();
+
+                                JsonNode functionalAreaNode = docNode.path("functional_area");
+                                document.FunctionalSubAreaId = functionalAreaNode.get("external_id").asInt();
+                                document.FunctionalSubArea = functionalAreaNode.get("name").asText();
+
+                                JsonNode currencyNode = docNode.path("currency");
+                                document.CurrencyId = currencyNode.get("id").asInt();
+                                document.CurrencyCode = currencyNode.get("code").asText();
+
+                                JsonNode referencesNode = docNode.path("references");
+                                if (referencesNode.isArray()) {
+                                    ArrayList<SRowDocument.Reference> references = new ArrayList<>();
+                                    for (JsonNode referenceNode : referencesNode) {
+                                        SRowDocument.Reference reference = document.new Reference();
+                                        reference.ReferenceType = referenceNode.get("document_ref_type").asInt();
+                                        reference.Reference = referenceNode.get("reference").asText();
+                                        references.add(reference);
+                                    }
+
+                                    if (!references.isEmpty()) {
+                                        SRowDocument.Reference reference = references.get(0);
+                                        document.ReferenceType = reference.ReferenceType;
+                                        document.Reference = reference.Reference;
+
+                                        document.References = references.toArray(new SRowDocument.Reference[0]);
+                                    }
+                                }
+
+                                document.NumberSeries = docNode.get("series").asText();
+                                document.Number = docNode.get("number").asText();
+                                document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
+                                document.Description = docNode.get("notes").asText();
+                                document.FiscalUseCode = docNode.get("fiscal_use").asText();
+                                document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
+                                String requiredPaymentDate = docNode.get("payment_date").asText();
+                                document.RequiredPaymentDate = requiredPaymentDate == null || requiredPaymentDate.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDate);
+                                document.RequiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
+                                document.StatusId = 0;
+                                document.Status = "";
+                                document.Download = false;
+
+                                documents.add(document);
+                            }
+                        }
+                    }
+
+                    Collections.sort(documents);
+                    moDocumentsGrid.populateGrid(new Vector<>(documents));
+                    jlStatus.setText("Documentos mostrados: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
+                }
+            }
+            catch (MalformedURLException e) {
+                System.err.println(e);
+            }
+            catch (Exception e) {
+                System.err.println(e);
+            }
+        }
+    }
+    
+    protected void actionPerformedClear() {
+        moDocumentsGrid.populateGrid(new Vector<>());
+        
+        enableFields(true);
+        
+        moDateStart.getComponent().requestFocusInWindow();
+        jlStatus.setText("");
+    }
+    
+    protected void actionPerformedSelectAll() {
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            ((SRowDocument) row).Download = true;
+        }
+        
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
+    }
+    
+    protected void actionPerformedDeselectAll() {
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            ((SRowDocument) row).Download = false;
+        }
+        
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
+    }
+    
+    protected void actionPerformedDownload() {
+        ArrayList<Integer> documents = new ArrayList<>();
+        
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            if (((SRowDocument) row).Download) {
+                documents.add(((SRowDocument) row).ExternalDocumentId);
+            }
+        }
+        
+        if (documents.isEmpty()) {
+            miClient.showMsgBoxWarning("Se debe seleccionar al menos un documento para realizar la descarga.");
+        }
+        else {
+            String ids = documents.stream().map(String::valueOf).collect(Collectors.joining(", "));
+            String urlStr = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/download-docs-zip/";
+
+            try {
+                // Open connection
+                URL url = new URL(urlStr);
+                String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+                
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(180 * 1000); // timeout para conectar
+                conn.setReadTimeout(180 * 1000); // timeout para leer la respuesta
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Accept-Charset", charset);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setDoOutput(true);
+                //conn.setDoInput(true);
+
+                // Optional: send JSON body if required by API
+                String requestBody = "{\"document_ids\": [" + ids + "]}"; // example payload
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(requestBody.getBytes("UTF-8"));
+                }
+
+                // --- 1) Parse custom header ---
+                String summaryHeader = conn.getHeaderField("x-download-summary");
+                if (summaryHeader != null) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode summaryJson = mapper.readTree(summaryHeader);
+
+                    System.out.println("Download summary from header:");
+                    System.out.println(summaryJson.toPrettyString());
+                }
+
+                // --- 2) Save the ZIP file locally ---
+                
+                // Create file chooser
+                JFileChooser fileChooser = new JFileChooser();
+
+                // Set filter: only ZIP files
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo ZIP (*.zip)", "zip");
+                fileChooser.setFileFilter(filter);
+
+                // Set dialog title
+                fileChooser.setDialogTitle("Guardar como... (ZIP)");
+
+                // Show Save dialog
+                int userSelection = fileChooser.showSaveDialog(null);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File chosenFile = fileChooser.getSelectedFile();
+
+                    // Ensure file ends with ".zip"
+                    if (!chosenFile.getName().toLowerCase().endsWith(".zip")) {
+                        chosenFile = new File(chosenFile.getAbsolutePath() + ".zip");
+                    }
+
+                    System.out.println("Saving file as: " + chosenFile.getAbsolutePath());
+                    
+                    //String zipPath = "documents.zip";
+                    String zipPath = chosenFile.getAbsolutePath();
+
+                    try (InputStream in = conn.getInputStream();
+                            FileOutputStream out = new FileOutputStream(zipPath)) {
+
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        while ((bytesRead = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    
+                    System.out.println("ZIP saved to: " + zipPath);
+                    
+                    miClient.showMsgBoxInformation("Los documentos fueron descargados en:\n" + zipPath);
+                    
+                    /*
+                    // --- 3) Extract the ZIP contents ---
+                    try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                        ZipEntry entry;
+                        while ((entry = zis.getNextEntry()) != null) {
+                            System.out.println("Extracting: " + entry.getName());
+
+                            File newFile = new File("output", entry.getName());
+                            newFile.getParentFile().mkdirs();
+
+                            try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                                byte[] buffer = new byte[8192];
+                                int len;
+                                while ((len = zis.read(buffer)) > 0) {
+                                    fos.write(buffer, 0, len);
+                                }
+                            }
+                            zis.closeEntry();
+                        }
+                    }
+                    */
+                }
+
+                conn.disconnect();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    /*
+     * Overriden methods.
+     */
+
+    @Override
+    public void resetForm() {
+        removeAllListeners();
+        
+        mnFormResult = 0;
+        mbFirstActivation = false;
+        
+        moDateStart.setValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
+        moDateEnd.setValue(SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
+        
+        actionPerformedClear();
+        
+        addAllListeners();
     }
     
     @Override
     public void addAllListeners() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        jbShow.addActionListener(this);
+        jbClear.addActionListener(this);
+        jbSelectAll.addActionListener(this);
+        jbDeselectAll.addActionListener(this);
+        jbDownload.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        jbShow.removeActionListener(this);
+        jbClear.removeActionListener(this);
+        jbSelectAll.removeActionListener(this);
+        jbDeselectAll.removeActionListener(this);
+        jbDownload.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     @Override
@@ -204,5 +594,28 @@ public class SDialogImportDocuments extends SBeanFormDialog {
     @Override
     public SGuiValidation validateForm() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbShow) {
+                actionPerformedShow();
+            }
+            else if (button == jbClear) {
+                actionPerformedClear();
+            }
+            else if (button == jbSelectAll) {
+                actionPerformedSelectAll();
+            }
+            else if (button == jbDeselectAll) {
+                actionPerformedDeselectAll();
+            }
+            else if (button == jbDownload) {
+                actionPerformedDownload();
+            }
+        }
     }
 }

@@ -566,8 +566,11 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     public SDbRegistry getRegistry() throws Exception {
         SDbInitiative registry = moRegistry.clone();
         
-        if (registry.isRegistryNew()) { }
+        if (registry.isRegistryNew()) {
+            
+        }
         
+        registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
         registry.setPurpose(jtaPurpose.getText());
         registry.setGoals(jtaGoals.getText());

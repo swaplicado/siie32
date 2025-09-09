@@ -5,6 +5,7 @@
 
 package erp.mtrn.view;
 
+import cfd.ver4.DCfdVer4Consts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -37,7 +38,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Isabel Servín, Sergio Flores
  */
 public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -53,6 +54,8 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.table.STabFilterDnsDps moTabFilterDnsDps;
+    private String msBizPartner;
+    private boolean mbIsSortKeyName;
 
     /**
      * View to send documents.
@@ -94,7 +97,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         mjbViewDps.setToolTipText("Ver documento");
         mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
-        mjbSend.setToolTipText("Enviar comprobante");
+        mjbSend.setToolTipText("Enviar documento");
 
         if (isDpsSendPending()) {
             moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
@@ -104,6 +107,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
             moTabFilterDateCutOff = null;
             moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         }
+        
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
@@ -140,7 +144,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterDnsDps.setVisible(mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD);
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[isDpsSendPending() ? 11 : 12];
+        aoTableColumns = new STableColumn[12];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
@@ -150,27 +154,38 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         }
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "code_bpb", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_type_code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE);
 
-        if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave cliente", 50);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", 200);
+        msBizPartner = "";
+        mbIsSortKeyName = false;
+        
+        if (isDpsPurchases()) {
+            msBizPartner = "Proveedor";
+            mbIsSortKeyName = miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME;
         }
         else {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", 200);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave cliente", 50);
+            msBizPartner = "Cliente";
+            mbIsSortKeyName = miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME;
         }
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb", "Sucursal cliente", 75);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        if (!isDpsSendPending()) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_count_snd", "Envíos", STableConstants.WIDTH_CURRENCY_KEY);
+        
+        if (mbIsSortKeyName) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave " + msBizPartner.toLowerCase(), 50);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", msBizPartner, 250);
         }
+        else {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", msBizPartner, 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave " + msBizPartner.toLowerCase(), 50);
+        }
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bb.bpb", "Sucursal " + msBizPartner.toLowerCase(), 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_count", "Envíos", 50);
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
@@ -200,7 +215,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
     }
     
     private boolean isCfd() {
-        return mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC || mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ;
+        return !isDpsPurchases() && (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_DOC || mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ADJ);
     }
 
     @Override
@@ -210,7 +225,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
         String sqlDocNature = "";
-        String sqlDocFunctArea = "";
+        String sqlDocFuncArea = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -218,136 +233,114 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
 
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 if (isDpsSendPending()) {
-                    sqlDatePeriod += setting.getSetting() == null ? "" : " AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
+                    sqlDatePeriod = setting.getSetting() == null ? "" : " AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
                 }
                 else {
                     sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
-                sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
+                sqlCompanyBranch = ((Integer) setting.getSetting() == 0 ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
-                sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+                sqlBizPartner = ((Integer) setting.getSetting() == 0 ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
-                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlDocNature += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_dps_nat = " + (Integer) setting.getSetting() + " ");
+                if (((Integer) setting.getSetting()) != 0) {
+                    sqlDocNature = ((Integer) setting.getSetting() == 0 ? "" : "AND d.fid_dps_nat = " + (Integer) setting.getSetting() + " ");
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlDocFunctArea += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlDocFuncArea = " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
         
-        String sqlSeries = "";
-        boolean dnsRight = false; 
+        String sqlDocSeries = "";
+        boolean hasRightAllDns = false;
+        
         if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
-            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
+            if (isDpsPurchases()) {
+                hasRightAllDns = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
             }
-            else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_ALL_DNS).HasRight;
+            else {
+                hasRightAllDns = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_ALL_DNS).HasRight;
             }
-            if (!dnsRight) {
+            
+            if (!hasRightAllDns) {
                 ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
+                
                 if (!usrDnsDpss.isEmpty()) {
                     for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
-                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
-                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
+                        sqlDocSeries += sqlDocSeries.isEmpty() ? "(" : "OR ";
+                        sqlDocSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
                     }
-                    sqlSeries += ") ";
+                    
+                    sqlDocSeries += ") ";
                 }
             }
         }
-
-        msSql = "SELECT DISTINCT(id_year), id_doc, dt, dt_doc_delivery_n, b_close, b_del, ts_close, " +
-                "num_ser, num, num_ref, CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num) AS f_num, " +
-                "ts_audit, tot_cur_r, code, cur_key, id_bp, bp, bp_key, id_bpb, bpb, code_bpb, usr, " +
-                "f_count_snd FROM(";
-
-        msSql += "(SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
-                    "d.num_ser, d.num, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                    "d.ts_audit, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code AS code_bpb, ua.usr, " +
-                    (isCfd() ? "(SELECT COUNT(*) FROM trn_cfd_snd_log WHERE id_cfd = x.id_cfd " :
-                                "(SELECT COUNT(*) FROM trn_dps_snd_log  WHERE id_year = d.id_year AND id_doc = d.id_doc ") + (isDpsSendPending() ? " " : " AND b_snd = 0 ") + ") AS f_count_snd " +
-                    "FROM trn_dps AS d " +
-                    "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
-
-                switch (mnTabTypeAux02) {
-                    case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " ";
-                        break;
-                    case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " ";
-                        break;
-
-                    case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " ";
-                        break;
-                    default:
-                }
-
-                msSql +=
-                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature + sqlDocFunctArea +
-                    "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                    "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
-                    "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + (isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
-                    "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
-                    "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
-                    "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
-                    (isCfd() ? "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED :
-                               "") + " " +
-                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
-                    (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
-                    (isDpsSendPending() ? "HAVING f_count_snd = 0 " : "HAVING f_count_snd > 0 ") +
-                    "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
-
-        if (!isDpsSendPending()) {
-            msSql += "UNION ";
-
-            msSql += "(SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.b_close, d.b_del, d.ts_close, " +
-                    "d.num_ser, d.num, d.num_ref, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                    "d.ts_audit, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code AS code_bpb, ua.usr, " +
-                    "0 AS f_count_snd " +
-                    "FROM trn_dps AS d " +
-                    "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
-
-                 switch (mnTabTypeAux02) {
-                    case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[2]) + " ";
-                        break;
-                    case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " ";
-                        break;
-
-                    case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                        msSql += "d.fid_ct_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0]) + " AND d.fid_cl_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1]) + " AND d.fid_tp_dps = " + (isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2]) + " ";
-                        break;
-                    default:
-                }
-
-                msSql +=
-                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
-                    "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                    "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
-                    "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " " +
-                    "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
-                    "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
-                    "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
-                    (isCfd() ? "INNER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n AND x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
-                               "INNER JOIN trn_cfd_snd_log AS s ON s.id_cfd = x.id_cfd AND s.b_snd = 1 " :
-                               "INNER JOIN trn_dps_snd_log AS s ON s.id_year = d.id_year AND s.id_doc = d.id_doc AND s.b_snd = 1 ") + " " +
-                    "WHERE d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + (isDpsPurchases() && mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD ? " AND d.b_authorn = 1 " : "") + " " +
-                    (sqlSeries.isEmpty() ? "" : "AND " + sqlSeries) +
-                    "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb) ";
+        
+        int[] dpsTypeKey = null;
+        
+        switch (mnTabTypeAux02) {
+            case SDataConstantsSys.TRNX_TP_DPS_ORD:
+                dpsTypeKey = isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                dpsTypeKey = isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                dpsTypeKey = isDpsPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN : SDataConstantsSys.TRNU_TP_DPS_SAL_CN;
+                break;
+            default:
+        }
+        
+        String sqlDocType = "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " ";
+        String sqlWhere = "NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " " +
+                sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocNature + sqlDocFuncArea + sqlDocType;
+        
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+            sqlWhere += "AND d.b_authorn ";
         }
 
-        msSql += ") AS t ";
-
-        msSql += (!isDpsSendPending() ? "GROUP BY id_year, id_doc " : " ");
+        msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, "
+                + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _num, d.num_ref AS _num_ref, "
+                + "d.tot_cur_r, dt.code AS _type_code, cob.code AS _cob_code, c.cur_key, "
+                + "b.bp, bc.bp_key, bb.bpb, SUM(COALESCE(xsl.b_snd, 0)) AS _count "
+                + "FROM trn_dps AS d "
+                + "INNER JOIN erp.trnu_tp_dps AS dt ON dt.id_ct_dps = d.fid_ct_dps AND dt.id_cl_dps = d.fid_cl_dps AND dt.id_tp_dps = d.fid_tp_dps "
+                + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
+                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_bp_r "
+                + "INNER JOIN erp.bpsu_bp_ct AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + (isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " "
+                + "INNER JOIN erp.bpsu_bpb AS bb ON bb.id_bpb = d.fid_bpb "
+                + "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = d.fid_cob ";
+        
+        if (isCfd()) {
+            msSql += "INNER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc AND cfd.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
+                    + "LEFT OUTER JOIN trn_cfd_snd_log AS xsl ON xsl.id_cfd = cfd.id_cfd AND xsl.b_snd ";
+        }
+        else {
+            msSql += "LEFT OUTER JOIN trn_dps_snd_log AS xsl ON xsl.id_year = d.id_year AND xsl.id_doc = d.id_doc AND xsl.b_snd ";
+        }
+        
+        msSql += "WHERE " + sqlWhere
+                + "GROUP BY d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, "
+                + "d.num_ser, d.num, d.num_ref, "
+                + "d.tot_cur_r, dt.code, cob.code, c.cur_key, "
+                + "b.bp, bc.bp_key, bb.bpb "
+                + "HAVING SUM(COALESCE(xsl.b_snd, 0)) " + (isDpsSendPending() ? "=" : "<>") + " 0 "
+                + "ORDER BY dt.code, d.num_ser, LPAD(d.num, " + DCfdVer4Consts.LEN_UUID + ", '0'), d.num, d.num_ref, d.dt, d.dt_doc_delivery_n, ";
+                
+        if (mbIsSortKeyName) {
+            msSql += "bc.bp_key, b.bp, ";
+        }
+        else {
+            msSql += "b.bp, bc.bp_key, ";
+        }
+        
+        msSql += "b.id_bp, d.id_year, d.id_doc ";
     }
 
     @Override
