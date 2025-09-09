@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 286.5/ 2025-09-09
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a las consultas de la vista de control de documentos enviados y por enviar por correo.
+2) Mejoramiento al control del usuario autorizador en la actualización de documentos.
+3) Mejoramiento a la obtención de referencias de óredes de compras para considerar el cambio de estatus de autorización.
+4) Versión preliminar de descarga de facturas de compras autorizadas desde el Portal de Compras.
+
+================================================================================
 SIIE 3.2 286.4/ 2025-09-09
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
