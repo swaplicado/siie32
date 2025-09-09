@@ -80,6 +80,7 @@ public class SCliSendAuthMails {
                 int idYear = resultSet.getInt("d.id_year");
                 int idDoc = resultSet.getInt("d.id_doc");
                 File oPdf = SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { idYear, idDoc });
+                oPdf.delete();
                 // Se comentan estas líneas para funcionalidad posterior de envío de archivos a Google Cloud
 //                String fileName = "OC_" + dbCompany.getDbName() + "_" + idYear + "_" + idDoc + ".pdf";
 //                SFileData oFileData = new SFileData(idYear, idDoc, fileName);
