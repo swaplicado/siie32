@@ -2149,7 +2149,7 @@ public abstract class STrnUtilities {
                         mms.setTextBody(body);
                     }
                 }
-                mail = new SMail(sender, "PRUEBA " + mms.getTextSubject(), mms.getTextBody(), toRecipients, toRecipientsCc);
+                mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients, toRecipientsCc);
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {
