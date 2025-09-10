@@ -1014,7 +1014,7 @@ public class SCliRepInvoices {
         body += composeHtmlMailBodyAccum();
         body += composeHtmlSalesBackorder();
         
-        body += STrnUtilities.composeMailFooter("warning");
+        body += STrnUtilities.composeMailFooter("warning", 0);
         
         body += "</body>\n";
         

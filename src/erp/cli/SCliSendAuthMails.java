@@ -8,11 +8,14 @@ package erp.cli;
 import erp.SClientApi;
 import erp.SParamsApp;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.swap.utils.SDpsGoogleCloudUtils;
+import erp.mod.cfg.swap.utils.SFileData;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.db.SDbConsts;
@@ -60,7 +63,7 @@ public class SCliSendAuthMails {
         
         SClientApi client = createClientApi(session , 1);
         
-        String sql = "SELECT d.id_year, d.id_doc " +
+        String sql = "SELECT d.id_year, d.id_doc, d.ts_edit " +
                 "FROM trn_dps AS d " +
                 "LEFT JOIN trn_dps_snd_log AS l ON " +
                 "d.id_year = l.id_year AND d.id_doc = l.id_doc AND l.b_snd AND l.id_snd = " +
@@ -74,24 +77,22 @@ public class SCliSendAuthMails {
                 "AND (d.ts_authorn > l.ts OR l.ts IS NULL);";
         
         ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
-//        HashMap<SFileData, File> mFiles = new HashMap<>();
+        HashMap<SFileData, File> mFiles = new HashMap<>();
         while (resultSet.next()) {
             try {
                 int idYear = resultSet.getInt("d.id_year");
                 int idDoc = resultSet.getInt("d.id_doc");
                 File oPdf = SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { idYear, idDoc });
-                oPdf.delete();
-                // Se comentan estas líneas para funcionalidad posterior de envío de archivos a Google Cloud
-//                String fileName = "OC_" + dbCompany.getDbName() + "_" + idYear + "_" + idDoc + ".pdf";
-//                SFileData oFileData = new SFileData(idYear, idDoc, fileName);
-//                mFiles.put(oFileData, oPdf);
+                SFileData oFileData = new SFileData(idYear, idDoc, dbCompany.getDbName(), resultSet.getTimestamp("d.ts_edit"));
+                mFiles.put(oFileData, oPdf);
             }
             catch (Exception ex) {
                 Logger.getLogger(SCliSendAuthMails.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-//        SDpsGoogleCloudUtils.uploadFiles(mFiles);
+        
+        // Envío de PDF de OCs a Google Cloud Storage
+        SDpsGoogleCloudUtils.uploadFiles(session, mFiles);
     }
     
     private static SClientApi createClientApi(SGuiSession session, int userId) {

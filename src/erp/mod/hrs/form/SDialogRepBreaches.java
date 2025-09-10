@@ -590,7 +590,7 @@ public class SDialogRepBreaches extends JDialog implements ActionListener, ItemL
         html += "<h2>" + SLibUtils.textToHtml("Reporte de sanciones GH.") + "</h2>\n";
         html += "<p>Fecha de corte del archivo Excel: " + SLibUtils.textToHtml(SLibUtils.DateFormatDate.format(cutOff)) + "</p>\n";
         
-        html += STrnUtilities.composeMailFooter("warning");
+        html += STrnUtilities.composeMailFooter("warning", 0);
         
         html += "</body>\n";
         

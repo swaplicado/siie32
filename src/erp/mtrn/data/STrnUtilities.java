@@ -2145,7 +2145,7 @@ public abstract class STrnUtilities {
                 else {
                     if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                         String body = "Le informamos que la orden de compra adjunta ha sido " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + 
-                                ".<br>Atentamente,<br>" + client.getSessionXXX().getCurrentCompanyName() + "." + "<br>" + composeMailFooter("");
+                                ".<br>Atentamente,<br>" + client.getSessionXXX().getCurrentCompanyName() + "." + "<br>" + composeMailFooter("", mms.getMmsCase());
                         mms.setTextBody(body);
                     }
                 }
@@ -3703,15 +3703,15 @@ public abstract class STrnUtilities {
                 + "<br>"
                 + "<br>"
                 + "<hr>"
-                + composeMailFooter("")
+                + composeMailFooter("", 0)
                 + "</body>"
                 + "</html>";
     }
     
-    public static String composeMailFooter(final String htmlClass) {
+    public static String composeMailFooter(final String htmlClass, final int caseMms) {
         return "<p" + (htmlClass.isEmpty() ? "" : " class=\"" +  htmlClass+ "\"") + ">"
-                + "<b>Favor de no responder a este correo-e.</b><br>"
-                + "Fue generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
+                + (caseMms != 5 ? "<b>Favor de no responder a este correo-e.</b><br>" : "")
+                + "Generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
                 + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE + "<br>"
                 + SClient.APP_RELEASE
                 + "</p>";
