@@ -567,7 +567,7 @@ public class SDialogRepScaleTicketsMovements extends JDialog implements ActionLi
         html += "</table>";
         html += "<br>" +
                 "<hr>" +
-                STrnUtilities.composeMailFooter("warning") +
+                STrnUtilities.composeMailFooter("warning", 0) +
                 "</body></html>" +
                 "</html>";
         return html;   

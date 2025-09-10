@@ -269,7 +269,7 @@ public class SCliRepInvoicesMultiCompanies {
                 
                 moCompanyDatabase.disconnect();
             }
-            msHtml += STrnUtilities.composeMailFooter("warning");
+            msHtml += STrnUtilities.composeMailFooter("warning", 0);
             msHtml += "</body>\n";
             msHtml += "</html>";
         }

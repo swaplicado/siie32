@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 287.0/ 2025-09-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Carga de archivos PDF de orden de compra en funcionalidad de envío automático de correos.
+2) Se modifica método para armar footer de correos para eliminar parte de la leyenda no necesaria cuando sí se responderán los correos.
+3) Se agrega valor al enumerado de tipos de sincronización.
+
+================================================================================
 SIIE 3.2 286.5/ 2025-09-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

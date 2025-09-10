@@ -322,7 +322,7 @@ public class SCliRepSalesPurchasesMonthly {
         return "<html><body>" +
                 //"<b>" + msBody + "</b>" + 
                 //"<br>" + 
-                STrnUtilities.composeMailFooter("warning") +
+                STrnUtilities.composeMailFooter("warning", 0) +
                 "</body></html>";
     }
 }
