@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 288.0/ 2025-09-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la gestión de configuraciones de proveedores vs. insumos.
+2) Implementación de la gestión de configuraciones de clientes vs. productos.
+
+================================================================================
 SIIE 3.2 286.5/ 2025-09-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
