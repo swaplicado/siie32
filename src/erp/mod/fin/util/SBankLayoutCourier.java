@@ -129,7 +129,7 @@ public class SBankLayoutCourier extends Thread {
                 + "</small>"
                 + "</p>";
         
-        mailBody += STrnUtilities.composeMailFooter("warning");
+        mailBody += STrnUtilities.composeMailFooter("warning", 0);
         
         mailBody += "</div>"
                 + "</body>"

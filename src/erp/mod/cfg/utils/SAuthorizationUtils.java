@@ -21,6 +21,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
 import erp.siieapp.SUserResource;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1918,6 +1919,9 @@ public abstract class SAuthorizationUtils {
                 default:
                     throw new IllegalArgumentException("Tipo de mail desconocido: " + mailType);
             }
+            
+            // Initialize email configuration
+            SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
 
             // Append common email footer
             body.append("<p>").append(SLibUtils.textToHtml("También")).append(" puedes accesar al portal introduciendo esta ")
@@ -1925,11 +1929,8 @@ public abstract class SAuthorizationUtils {
                     .append("<a href=\"https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex\">https://aeth.siieapp.com/portal-autorizaciones/public/dpsindex</a>")
                     .append("<p>Recuerda: tu usuario y ").append(SLibUtils.textToHtml("contraseña"))
                     .append(" del portal son los mismos que tu cuenta SIIE.</p>")
-                    .append("<span style='font-size:10px'>").append(STrnUtilities.composeMailFooter("")).append("</span>")
+                    .append("<span style='font-size:10px'>").append(STrnUtilities.composeMailFooter("", mms.getMmsCase())).append("</span>")
                     .append("</body></html>");
-            
-            // Initialize email configuration
-            SDbMms mms = STrnUtilities.getMms(session, SModSysConsts.CFGS_TP_MMS_DPS_ORD_PUR_AUTH_APP);
             
             // Configure and send email
             SMailSender mailSender = new SMailSender(
@@ -1986,12 +1987,16 @@ public abstract class SAuthorizationUtils {
      * 
      * @param client
      * @param pkDps
+     * @return File, archivo PDF de la orden de compra, depende del programador eliminarlo después
      * @throws Exception 
      */
-    public static void sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
+    public static File sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
         if (SLibUtils.parseInt(SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT) {
-            STrnUtilities.sendDpsOrder(client, pkDps, false);
+            boolean returnPdfFile = true;
+            return STrnUtilities.sendDpsOrder(client, pkDps, false, returnPdfFile);
         }
+        
+        return null;
     }
     
     public static void sendNotificationsOnSend(final SGuiSession session, final int authorizationType, int[] pkDps) {

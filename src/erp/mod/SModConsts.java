@@ -238,6 +238,8 @@ public abstract class SModConsts {
     public static final int ITMU_EMT = 1052511;
     public static final int ITMU_TP_MAT = 1052512;
     public static final int ITMU_MAT_ATT = 1052513;
+    public static final int ITMU_ITEM_SUP = 1052551;
+    public static final int ITMU_ITEM_CUS = 1052552;
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
     public static final int ITMU_PRICE_COMM_LOG = 1052122;
@@ -1133,6 +1135,8 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_EMT, "erp.itmu_emt");
         TablesMap.put(ITMU_TP_MAT, "erp.itmu_tp_mat");
         TablesMap.put(ITMU_MAT_ATT, "erp.itmu_mat_att");
+        TablesMap.put(ITMU_ITEM_SUP, "erp.itmu_item_sup");
+        TablesMap.put(ITMU_ITEM_CUS, "erp.itmu_item_cus");
 
         TablesMap.put(ITMU_MATCH_ITEM_CPT_BP_COMP, "itmu_match_item_cpt_bp_comp");
         TablesMap.put(ITMU_PRICE_COMM_LOG, "itmu_price_comm_log");
