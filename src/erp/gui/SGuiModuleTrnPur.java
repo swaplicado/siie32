@@ -92,6 +92,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatPriceCommercialLog;
     private javax.swing.JMenuItem jmiCatBizPartherUpdate;
     private javax.swing.JMenuItem jmiCatBizPartherUpdateLog;
+    private javax.swing.JMenuItem jmiCatItemBizParther;
     private javax.swing.JMenuItem jmiCatInitiatives;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates; 
@@ -298,6 +299,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasConfAccTag = false;
         boolean hasConfAciPer = false;
         boolean hasConfTankCar = false;
+        boolean isSupplyChainEnabled = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
@@ -318,6 +320,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
         jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
+        jmiCatItemBizParther = new JMenuItem("Configuración de proveedores vs. insumos");
         jmiCatInitiatives = new JMenuItem("Propuestas");
         
         jmCatCfg.add(jmiCatCfgCostCenterItem);
@@ -337,6 +340,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.addSeparator();
         jmCat.add(jmiCatBizPartherUpdate);
         jmCat.add(jmiCatBizPartherUpdateLog);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatItemBizParther);
         jmCat.addSeparator();
         jmCat.add(jmiCatInitiatives);
         
@@ -708,6 +713,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatPriceCommercialLog.addActionListener(this);
         jmiCatBizPartherUpdate.addActionListener(this);
         jmiCatBizPartherUpdateLog.addActionListener(this);
+        jmiCatItemBizParther.addActionListener(this);
         jmiCatInitiatives.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesDetail.addActionListener(this);        
@@ -874,10 +880,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         try {
             hasComAuthAppWeb = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
             hasConfAccTag = !SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty();
+            isSupplyChainEnabled = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SUP_CHAIN_SETTINGS)) == 1;
         } 
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
+        
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
@@ -899,7 +907,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCatCfg.setEnabled(hasRightItemConfig);
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmiCatFunctionalAreaBudgets.setEnabled(hasRightCreditConfig && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
+        jmiCatItemBizParther.setEnabled(isSupplyChainEnabled);
         jmiCatInitiatives.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
+        
         jmEst.setEnabled(hasRightDocEstimate);
 
         jmCon.setEnabled(hasRightDocEstimate);
@@ -1725,6 +1735,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatBizPartherUpdateLog) {      
                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSU_BP_UPD_LOG, SDataConstantsSys.BPSS_CT_BP_SUP);
+            }
+            else if (item == jmiCatItemBizParther) {      
+               miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMU_ITEM_SUP);
             }
             else if (item == jmiCatInitiatives) {
                 miClient.getSession().showView(SModConsts.TRN_INIT, SLibConstants.UNDEFINED, null);

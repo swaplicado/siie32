@@ -282,6 +282,9 @@ public abstract class SDataConstants {
     public static final int ITMU_EMT = 205021;
     public static final int ITMU_TP_MAT = 205027;
     public static final int ITMU_MAT_ATT = 205028;
+    public static final int ITMU_ITEM_SUP = 205061;
+    public static final int ITMU_ITEM_CUS = 205062;
+    
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 205151;
 
     public static final int ITMX_ITEM_BY_KEY = 205501;

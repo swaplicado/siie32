@@ -111,6 +111,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatCfdiStampSignPending;
     private javax.swing.JMenuItem jmiCatCfdiSendingLog;
     private javax.swing.JMenuItem jmiCatItemComposition;
+    private javax.swing.JMenuItem jmiCatItemBizParther;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates;
     private javax.swing.JMenuItem jmiEstimatesLinkPend;
@@ -338,6 +339,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasConfAccTag = false;
         boolean hasConfAciPer = false;
         boolean hasConfTankCar = false;
+        boolean isSupplyChainEnabled = false;
         int levelRightDocOrder = SDataConstantsSys.UNDEFINED;
         int levelRightDocTransaction = SDataConstantsSys.UNDEFINED;
         int levelRightScaleTic = SDataConstantsSys.UNDEFINED;
@@ -358,6 +360,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfdiStampSignPending = new JMenuItem("CFDI por timbrar");
         jmiCatCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI");
         jmiCatItemComposition = new JMenuItem("Configuración de ítems con composición");
+        jmiCatItemBizParther = new JMenuItem("Configuración de clientes vs. productos");
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
@@ -374,6 +377,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.add(jmCatCfdi);
         jmCat.addSeparator();
         jmCat.add(jmiCatItemComposition);
+        jmCat.addSeparator();
+        jmCat.add(jmiCatItemBizParther);
 
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de ventas");
@@ -793,6 +798,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfdiStampSignPending.addActionListener(this);
         jmiCatCfdiSendingLog.addActionListener(this);
         jmiCatItemComposition.addActionListener(this);
+        jmiCatItemBizParther.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesLinkPend.addActionListener(this);
         jmiEstimatesLinked.addActionListener(this);
@@ -972,10 +978,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         
         try {
             hasConfAccTag = !SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ACC_TAGS).isEmpty();
+            isSupplyChainEnabled = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SUP_CHAIN_SETTINGS)) == 1;
         } 
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
+        
         try {
             ObjectMapper mapper = new ObjectMapper();
             String sItemAcidity = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_ACIDITY);
@@ -995,6 +1003,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatBizPartnerBlocking.setEnabled(hasRightBizPartnerBlocking);
         jmiCatViewIntegralCustomers.setEnabled(true);
         jmCatCfg.setEnabled(hasRightItemConfig);
+        jmiCatItemBizParther.setEnabled(isSupplyChainEnabled);
 
         jmEst.setEnabled(hasRightDocEstimate);
 
@@ -2024,6 +2033,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatItemComposition) {
                 miClient.getSession().showView(SModConsts.ITMU_ITEM_COMP, SLibConsts.UNDEFINED, null);                
+            }
+            else if (item == jmiCatItemBizParther) {      
+               miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMU_ITEM_CUS);
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

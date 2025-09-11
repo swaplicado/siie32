@@ -121,7 +121,6 @@ public abstract class SExportDataUtils {
         boolean sortAsUnsigned = syncType == SSyncType.USER || 
                 syncType == SSyncType.PARTNER_SUPPLIER || 
                 syncType == SSyncType.PARTNER_CUSTOMER || 
-                syncType == SSyncType.AUTH_ACTOR || 
                 syncType == SSyncType.AUTH_JOB_TITLE || 
                 syncType == SSyncType.AUTH_DEPARTMENT || 
                 syncType == SSyncType.AUTH_FUNCTIONAL_AREA || 
