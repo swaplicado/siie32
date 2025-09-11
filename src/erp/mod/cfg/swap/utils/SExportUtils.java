@@ -374,7 +374,7 @@ public abstract class SExportUtils {
      * @param syncLogEntries Lista de entradas de log generadas.
      * @throws SQLException Si ocurre un error en las actualizaciones.
      */
-    private static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
+    protected static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
         int entriesLogged = 0;
         String fileNameRequestBody = "";
         String fileNameResponseBody = "";
@@ -404,6 +404,7 @@ public abstract class SExportUtils {
 
                         case FUNCTIONAL_AREA:
                         case PUR_REF_ORDER:
+                        case PUR_ORDER_FILE:
                             log = new SDbComSyncLog();
                             break;
 
@@ -451,6 +452,7 @@ public abstract class SExportUtils {
 
                             case FUNCTIONAL_AREA:
                             case PUR_REF_ORDER:
+                            case PUR_ORDER_FILE:
                                 log = new SDbComSyncLog();
                                 break;
 

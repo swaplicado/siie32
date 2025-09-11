@@ -42,3 +42,5 @@ config*.xml
 src/.tmp.driveupload/
 .tmp.driveupload/
 .vscode/
+/lib
+lib/nblibraries.properties

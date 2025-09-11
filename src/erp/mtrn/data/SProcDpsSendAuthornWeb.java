@@ -180,7 +180,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
                         // Leer en memoria el archivo de la requisición
                         String name = miClient.getSession().getDatabase().getDbName() + "-REQ-" + mat.getPkMatRequestId() + ".pdf";
 
-                        if(!CloudStorageManager.storagedFileExists(name)) {
+                        if (!CloudStorageManager.storagedFileExists(name)) {
                             // Guardar en el log la requisición que se subió
                             HashMap<String, Object> params = SMaterialRequestUtils.createMatReqParamsMapPdf((SGuiClient) miClient, mat.getPkMatRequestId());
                             SGuiReport report = new SGuiReport("reps/trn_mat_req.jasper", "Requisición");

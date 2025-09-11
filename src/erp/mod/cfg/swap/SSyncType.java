@@ -26,6 +26,7 @@ public enum SSyncType {
     PUR_QUOTE_REQ,
     PUR_ORDER,
     PUR_ORDER_AUTH,
+    PUR_ORDER_FILE,
     PUR_REF_ORDER,
     PUR_REF_SCALE_TICKET,
     PUR_INVOICE,

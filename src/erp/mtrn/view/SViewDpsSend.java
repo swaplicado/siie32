@@ -458,7 +458,8 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
                             break;
                             
                         case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                            STrnUtilities.sendDpsOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true);
+                            boolean returnPfdFile = false;
+                            STrnUtilities.sendDpsOrder(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), true, returnPfdFile);
                             send = true;
                             break;
                             

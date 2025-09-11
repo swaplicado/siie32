@@ -241,7 +241,7 @@ public class SCliRepBalenceAge {
                 SLibUtils.textToHtml("Antigüedad de saldos de clientes de AETH con corte al " + localDate + " a las " + formattedTime ) +
                 "<body>" +
                 "<br>" + 
-                STrnUtilities.composeMailFooter("warning") +
+                STrnUtilities.composeMailFooter("warning", 0) +
                 "</body></html>";
     }
 }
