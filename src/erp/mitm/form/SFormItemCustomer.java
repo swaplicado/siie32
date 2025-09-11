@@ -111,12 +111,13 @@ public class SFormItemCustomer extends javax.swing.JDialog implements erp.lib.fo
 
         jpRegistry11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlPkBizPartnerId.setForeground(java.awt.Color.blue);
         jlPkBizPartnerId.setText("Cliente: *");
         jlPkBizPartnerId.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry11.add(jlPkBizPartnerId);
 
         jcbPkBizPartnerId.setMaximumRowCount(16);
-        jcbPkBizPartnerId.setPreferredSize(new java.awt.Dimension(350, 23));
+        jcbPkBizPartnerId.setPreferredSize(new java.awt.Dimension(450, 23));
         jpRegistry11.add(jcbPkBizPartnerId);
 
         jbPkBizPartnerId.setText("jButton1");
@@ -129,6 +130,7 @@ public class SFormItemCustomer extends javax.swing.JDialog implements erp.lib.fo
 
         jpRegistry12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlPkItemId.setForeground(java.awt.Color.blue);
         jlPkItemId.setText("Producto: *");
         jlPkItemId.setPreferredSize(new java.awt.Dimension(100, 23));
         jpRegistry12.add(jlPkItemId);
@@ -272,7 +274,13 @@ public class SFormItemCustomer extends javax.swing.JDialog implements erp.lib.fo
     private void windowActivate() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jcbPkBizPartnerId.requestFocus();
+            
+            if (jcbPkBizPartnerId.isEnabled()) {
+                jcbPkBizPartnerId.requestFocusInWindow();
+            }
+            else {
+                jtfNumberOfStores.requestFocusInWindow();
+            }
         }
     }
 
@@ -355,6 +363,10 @@ public class SFormItemCustomer extends javax.swing.JDialog implements erp.lib.fo
 
         jtfPkItemBizPartnerId_Ro.setText("");
         
+        jcbPkBizPartnerId.setEnabled(true);
+        jbPkBizPartnerId.setEnabled(true);
+        jcbPkItemId.setEnabled(true);
+        jbPkItemId.setEnabled(true);
         jckIsDeleted.setEnabled(false);
     }
 
@@ -411,6 +423,10 @@ public class SFormItemCustomer extends javax.swing.JDialog implements erp.lib.fo
         moFieldIsDeleted.setFieldValue(moItemCustomer.getIsDeleted());
         jtfPkItemBizPartnerId_Ro.setText(SLibUtils.textKey((int[]) moItemCustomer.getPrimaryKey()));
 
+        jcbPkBizPartnerId.setEnabled(false);
+        jbPkBizPartnerId.setEnabled(false);
+        jcbPkItemId.setEnabled(false);
+        jbPkItemId.setEnabled(false);
         jckIsDeleted.setEnabled(true);
     }
 

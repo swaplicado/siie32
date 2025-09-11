@@ -23,6 +23,7 @@ hs_err_pid*
 /build/
 /dist/
 /firmas/
+/lib
 /logs/
 /nbproject/
 /cfd/
@@ -33,14 +34,13 @@ hs_err_pid*
 /vales/
 /store/
 build.xml
+lib/nblibraries.properties
 manifest.mf
 Thumbs.db
 *.swa
-sa*.xml
 config*.xml
-*.jrxml
+sa*.xml
 src/.tmp.driveupload/
+*.jrxml
 .tmp.driveupload/
 .vscode/
-/lib
-lib/nblibraries.properties
