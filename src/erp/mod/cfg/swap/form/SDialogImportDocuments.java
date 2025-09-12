@@ -268,7 +268,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         try {
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG + "_DEV"));
+            //JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG + "_DEV"));
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
             
             msSyncUrl = "";
             msSyncToken = "";
