@@ -32,26 +32,31 @@ public abstract class SSwapConsts {
     public static final String CFG_NVP_COMPANIES = "companies";
 
     /**
-     * JSON name/value pair for ID of SWAP-Services instance. ("NVP" =
-     * name/value pair.)
+     * JSON name/value pair for ID of SWAP-Services instance. ("NVP" = name/value pair.)
      */
     public static final String CFG_NVP_INSTANCE = "instance";
 
-    /**
+    /*
      * JSON object for request attributes of users service.
      */
-    public static final String CFG_OBJ_USERS_SRV = "users-srv";
+    
+    public static final String CFG_OBJ_USER_SRV = "user-srv";
+    public static final String CFG_OBJ_USER_USER = "user";
+    public static final String CFG_OBJ_USER_AREA = "area";
 
-    /**
-     * JSON object for request attributes of functional-areas service.
+    /*
+     * JSON object for request attributes of transaction-references service.
      */
-    public static final String CFG_OBJ_AREAS_SRV = "areas-srv";
-
-    /**
-     * JSON object for request attributes of transaction-references service
-     * (e.g., purchase-orders references).
-     */
-    public static final String CFG_OBJ_TXN_REFS_SRV = "txn-refs-srv";
+    
+    public static final String CFG_OBJ_TXN_SRV = "txn-srv";
+    public static final String CFG_OBJ_TXN_PUR_REF = "pur-ref";
+    public static final String CFG_OBJ_TXN_PUR_DOC = "pur-doc";
+    
+    public static final String QRY_START_DATE = "start_date";
+    public static final String QRY_END_DATE = "end_date";
+    public static final String QRY_DOCUMENT_TYPE = "document_type";
+    
+    public static final int DOC_TYPE_INVOICE = 41;
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";

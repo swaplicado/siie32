@@ -610,22 +610,32 @@ public abstract class SExportUtils {
             case PARTNER_SUPPLIER:
             case PARTNER_CUSTOMER:
             case FUNCTIONAL_AREA:
-            case PUR_REF_ORDER:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
+                jsonBaseKey = SSwapConsts.CFG_OBJ_USER_SRV;
                 
                 switch (syncType) {
                     case USER:
                     case PARTNER_SUPPLIER:
                     case PARTNER_CUSTOMER:
-                        jsonConfigKey = SSwapConsts.CFG_OBJ_USERS_SRV;
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_USER_USER;
                         break;
 
                     case FUNCTIONAL_AREA:
-                        jsonConfigKey = SSwapConsts.CFG_OBJ_AREAS_SRV;
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_USER_AREA;
                         break;
 
+                    default:
+                        // nothing
+                }
+                break;
+                
+            case PUR_REF_ORDER:
+                cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
+                jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
+                
+                switch (syncType) {
                     case PUR_REF_ORDER:
-                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_REFS_SRV;
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_REF;
                         break;
 
                     default:
@@ -659,10 +669,10 @@ public abstract class SExportUtils {
             default:
                 throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
         }
-
+        
         ObjectMapper mapper = new ObjectMapper();
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
-
+        
         String syncUrl = "";
         String syncToken = "";
         String syncApiKey = "";

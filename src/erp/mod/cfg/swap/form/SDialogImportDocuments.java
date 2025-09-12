@@ -7,6 +7,10 @@ package erp.mod.cfg.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,13 +43,20 @@ import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
- *
+ * Importación de documentos desde el Portal de Compras.
+ * Ejemplo de la URL de consulta de documentos:
+ * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=41"
+ * 
  * @author Sergio Flores
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener {
     
     protected SGridPaneForm moDocumentsGrid;
     protected JLabel jlStatus;
+    protected String msSyncUrl = "";
+    protected String msSyncToken = "";
+    protected String msSyncApiKey = "";
+    protected int mnSyncLimit = 0;
 
     /**
      * Creates new form SDialogImportDocuments
@@ -254,6 +265,37 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         jlStatus = new JLabel();
         jpCommandLeft.add(jlStatus);
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG + "_DEV"));
+            
+            msSyncUrl = "";
+            msSyncToken = "";
+            msSyncApiKey = "";
+            mnSyncLimit = 0;
+
+            // Recuperar la configuración base:
+
+            msSyncUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+            msSyncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_TOKEN);
+            msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
+            
+            msSyncUrl += SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+
+            if (msSyncToken.isEmpty()) {
+                msSyncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico
+            }
+
+            if (msSyncApiKey.isEmpty()) {
+                msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_API_KEY); // recuperar API key específica
+            }
+
+            mnSyncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_LIMIT));
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     /*
@@ -284,10 +326,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
             try {
                 String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+                String urlQuery = msSyncUrl;
+                
+                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDateStart.getValue()));
+                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDateEnd.getValue()));
+                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.DOC_TYPE_INVOICE);
 
-                String urlString = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=11";
-
-                URL url = new URL(urlString);
+                URL url = new URL(urlQuery);
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -299,14 +344,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
 
-                /*
-                if (token != null && !token.isEmpty()) {
-                    connection.setRequestProperty("Authorization", token);
+                if (msSyncToken != null && !msSyncToken.isEmpty()) {
+                    connection.setRequestProperty("Authorization", msSyncToken);
                 }
-                if (apiKey != null && !apiKey.isEmpty()) {
-                    connection.setRequestProperty("x-api-key", apiKey);
+                if (msSyncApiKey != null && !msSyncApiKey.isEmpty()) {
+                    connection.setRequestProperty("x-api-key", msSyncApiKey);
                 }
-                */
 
                 connection.setDoInput(true); // true is already the default value!
 
