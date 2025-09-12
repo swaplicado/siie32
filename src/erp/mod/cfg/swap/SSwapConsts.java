@@ -56,7 +56,6 @@ public abstract class SSwapConsts {
     public static final String QRY_END_DATE = "end_date";
     public static final String QRY_DOCUMENT_TYPE = "document_type";
     
-    public static final int DOC_TYPE_INVOICE = 41;
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
@@ -66,7 +65,8 @@ public abstract class SSwapConsts {
 
     // SWAP Services constants:
     public static final int TXN_CAT_PURCHASE = 1;
-    public static final int TXN_DOC_REF_TYPE_ORDER = 22;
+    public static final int TXN_DOC_TYPE_ORDER = 22;
+    public static final int TXN_DOC_TYPE_INVOICE = 41;
     public static final String TXN_DOC_REF_TYPE_ORDER_CODE = "OC";
     
     /*

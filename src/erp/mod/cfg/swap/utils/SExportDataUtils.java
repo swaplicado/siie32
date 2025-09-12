@@ -1033,7 +1033,7 @@ public abstract class SExportDataUtils {
                     reference.external_company_id = companyId;
                     reference.external_functional_area_id = resultSet.getInt("t.fid_func_sub");
                     reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
-                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_REF_TYPE_ORDER;
+                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_TYPE_ORDER;
                     reference.external_partner_id = resultSet.getInt("t.fid_bp_r");
                     reference.reference = txnReference;
                     reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
@@ -1270,7 +1270,7 @@ public abstract class SExportDataUtils {
                     reference.external_company_id = companyId;
                     reference.external_functional_area_id = resultSet.getInt("t.fid_func");
                     reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
-                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_REF_TYPE_ORDER;
+                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_TYPE_ORDER;
                     reference.external_partner_id = resultSet.getInt("t.fid_bp_r");
                     reference.reference = txnReference;
                     reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd

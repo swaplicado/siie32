@@ -331,7 +331,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDateStart.getValue()));
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDateEnd.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.DOC_TYPE_INVOICE);
+                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
 
                 URL url = new URL(urlQuery);
 
@@ -363,8 +363,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             JsonNode companyNode = docNode.path("company");
 
                             if (companyNode.get("external_id").asInt() == companyId &&
-                                    docNode.get("transaction_class").asInt() == 1 &&
-                                    docNode.get("document_type").asInt() == 11) { // XXX parametrizar este valor mágico!
+                                    docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
+                                    docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
 
                                 SRowDocument document = new SRowDocument();
                                 
