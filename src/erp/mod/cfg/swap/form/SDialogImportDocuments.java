@@ -54,6 +54,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected SGridPaneForm moDocumentsGrid;
     protected JLabel jlStatus;
     protected String msSyncUrl = "";
+    protected String msSyncUrlDownload = "";
     protected String msSyncToken = "";
     protected String msSyncApiKey = "";
     protected int mnSyncLimit = 0;
@@ -282,6 +283,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             msSyncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_TOKEN);
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
             
+            msSyncUrlDownload = msSyncUrl + "/api/documents/download-docs-zip/";
+            
             msSyncUrl += SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
 
             if (msSyncToken.isEmpty()) {
@@ -476,7 +479,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         else {
             String ids = documents.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            String urlStr = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/download-docs-zip/";
+            //String urlStr = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/download-docs-zip/";
+            String urlStr = msSyncUrlDownload;
 
             try {
                 // Open connection
