@@ -7,6 +7,8 @@ package erp.mod.cfg.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
@@ -19,7 +21,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbFunctionalSubArea extends SDbRegistryUser {
     
-    public static final String SEPARATOR = "/ "; // blank included!
+    public static final String SEPARATOR = "/ "; // blank space is included!
 
     protected int mnPkFunctionalSubAreaId;
     protected String msCode;
@@ -211,5 +213,67 @@ public class SDbFunctionalSubArea extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    /**
+     * Create list of functional sub-areas of current user.
+     * @param session GUI session.
+     * @return List of functional sub-areas.
+     * @throws Exception 
+     */
+    public static ArrayList<SDbFunctionalSubArea> readUserFunctionalSubArea(final SGuiSession session) throws Exception {
+        return readUserFunctionalSubArea(session, session.getUser().getPkUserId());
+    }
+    
+    /**
+     * Create list of functional sub-areas of given user.
+     * @param session GUI session.
+     * @param userId ID of required user.
+     * @return List of functional sub-areas.
+     * @throws Exception 
+     */
+    public static ArrayList<SDbFunctionalSubArea> readUserFunctionalSubArea(final SGuiSession session, final int userId) throws Exception {
+        ArrayList<SDbFunctionalSubArea> functionalSubAreas = new ArrayList<>();
+        
+        String sql = "SELECT fs.id_func_sub "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.fk_func = f.id_func "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON ufs.id_func_sub = fs.id_func_sub "
+                + "WHERE NOT f.b_del AND NOT fs.b_del AND ufs.id_usr = " + userId + " "
+                + "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub;";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { resultSet.getInt(1) });
+                functionalSubAreas.add(functionalSubArea);
+            }
+        }
+        
+        return functionalSubAreas;
+    }
+    
+    public static String composeFunctionalSubAreasCodes(final ArrayList<SDbFunctionalSubArea> functionalSubAreas) {
+        String codes = "";
+        
+        for (SDbFunctionalSubArea functionalSubArea : functionalSubAreas) {
+            codes += (codes.isEmpty() ? "" : ", ") + functionalSubArea.getCode();
+        }
+        
+        return codes;
+    }
+    
+    public static boolean belongsToFunctionalSubAreas(final ArrayList<SDbFunctionalSubArea> functionalSubAreas, final int functionalSubAreaId) {
+        boolean belongsTo = false;
+        
+        for (SDbFunctionalSubArea functionalSubArea : functionalSubAreas) {
+            if (functionalSubAreaId == functionalSubArea.getPkFunctionalSubAreaId()) {
+                belongsTo = true;
+                break;
+            }
+        }
+        
+        return belongsTo;
     }
 }

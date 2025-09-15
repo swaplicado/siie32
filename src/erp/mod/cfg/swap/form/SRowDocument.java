@@ -35,6 +35,8 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
     public int StatusId;
     public String Status;
     public boolean Download;
+    public boolean AlreadyDownloaded;
+    public boolean AlreadyRecorded;
     
     public Reference[] References;
     
@@ -76,21 +78,27 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
                 value = Download;
                 break;
             case 8:
-                value = Status;
+                value = AlreadyDownloaded;
                 break;
             case 9:
-                value = FunctionalSubArea;
+                value = AlreadyRecorded;
                 break;
             case 10:
-                value = FiscalUseCode;
+                value = Status;
                 break;
             case 11:
-                value = RequiredPaymentDate;
+                value = FunctionalSubArea;
                 break;
             case 12:
-                value = RequiredPaymentPct;
+                value = FiscalUseCode;
                 break;
             case 13:
+                value = RequiredPaymentDate;
+                break;
+            case 14:
+                value = RequiredPaymentPct;
+                break;
+            case 15:
                 value = ExternalDocumentId;
                 break;
             default:

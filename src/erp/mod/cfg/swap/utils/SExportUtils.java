@@ -73,10 +73,12 @@ public abstract class SExportUtils {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.!?@#$%^&*()-_=+";
         StringBuilder password = new StringBuilder();
         SecureRandom random = new SecureRandom();
+        
         for (int i = 0; i < SEC_PSWD_LEN; i++) {
             int index = random.nextInt(chars.length());
             password.append(chars.charAt(index));
         }
+        
         return password.toString();
     }
     
