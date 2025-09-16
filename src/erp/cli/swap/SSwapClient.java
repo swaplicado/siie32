@@ -44,13 +44,16 @@ import sa.lib.gui.SGuiYearPicker;
  */
 public class SSwapClient implements SClientInterface, SGuiClient {
     
+    private boolean mbIsDev;
     private SGuiSession moSession;
     
     private boolean mbSwapServicesLinkUp;
     private int[] manSwapServicesCompanies;
     private int mnSwapServicesInstance;
     
-    public SSwapClient(final String dbHost, final int dbPort, final String dbName) throws Exception {
+    public SSwapClient(final String dbHost, final int dbPort, final String dbName, final boolean isDev) throws Exception {
+        mbIsDev = isDev;
+        
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
 
         database.connect(dbHost, "" + dbPort, dbName, "root", "msroot");
@@ -81,7 +84,7 @@ public class SSwapClient implements SClientInterface, SGuiClient {
 
     @Override
     public boolean isDev() {
-        return true;
+        return mbIsDev;
     }
 
     @Override

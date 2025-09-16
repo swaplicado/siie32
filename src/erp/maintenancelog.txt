@@ -1,8 +1,17 @@
 ================================================================================
-SIIE 3.2 288.4/ 2025-09-16
+SIIE 3.2 288.5/ 2025-09-16
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Exportación de documentos (OC) a bucket de cloud storage
+
+================================================================================
+SIIE 3.2 288.4/ 2025-09-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la exportación de datos a SWAP Services:
+- solo proveedores con ID fiscal;
+- solo referencias de pedidos de compras (OC) de proveedores con ID fiscal;
+- inclusión del Uso de CFDI en las referencias de pedidos de compras (OC).
 
 ================================================================================
 SIIE 3.2 288.3/ 2025-09-15

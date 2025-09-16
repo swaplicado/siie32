@@ -29,27 +29,29 @@ public class SSwapServices {
             String port = DEF_PORT;
             String db = DEF_DB;
             
-            if (args.length == 3) {
+            if (args.length >= 3) {
                 host = args[0];
                 port = args[1];
                 db = args[2];
             }
             
             SResponses responses;
-            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db);
+            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false);
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.USER);
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.USER, true);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_SUPPLIER);
-            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
-            
-            /* Not implemented yet!
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_CUSTOMER);
+            /* Invoked within SSyncType.PUR_REF_ORDER!
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_SUPPLIER, false);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
             */
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_REF_ORDER);
+            /* Not implemented yet!
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_CUSTOMER, false);
+            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
+            */
+            
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_REF_ORDER, false);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
         }
         catch (Exception e) {
