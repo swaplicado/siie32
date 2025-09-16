@@ -1128,7 +1128,6 @@ public abstract class SExportDataUtils {
                         + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                         + ")"
                         + "AND d.id_year = 2025 "
-                        + "AND MONTH(d.dt) = 8"
                         + ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
