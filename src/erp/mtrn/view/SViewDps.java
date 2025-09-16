@@ -3087,6 +3087,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_REF_ORDER);
                 SExportUtils.processResponses(miClient.getSession(), responses, mnModule, mnTabType);
+                SResponses responsesOrder = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_ORDER);
+                SExportUtils.processResponses(miClient.getSession(), responsesOrder, mnModule, mnTabType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);

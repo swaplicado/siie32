@@ -339,6 +339,35 @@ public abstract class SExportUtils {
                             }
                         }
                         break;
+                        
+                    case PUR_ORDER:
+                        for (JsonNode result : results) {
+                            boolean entriesFound = false;
+
+                            if (result.has("document_id")) {
+                                JsonNode documentId = result.path("document_id");
+                                
+                                SDbComSyncLogEntry entry = new SDbComSyncLogEntry();
+                                entry.setResponseCode(result.path("status_code").asText());
+                                if (Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_OK && 
+                                    Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_CREATED) {
+                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()) +
+                                            SJsonUtils.sanitizeJson(result.path("error").toPrettyString()));
+                                }
+                                else {
+                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
+                                }
+                                entry.setReferenceId(documentId.asText());
+                                entries.add(entry);
+
+                                entriesFound = true;
+                            }
+
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
+                            }
+                        }
+                        break;
 
                     default:
                         throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
@@ -405,6 +434,7 @@ public abstract class SExportUtils {
                         case FUNCTIONAL_AREA:
                         case PUR_REF_ORDER:
                         case PUR_ORDER_FILE:
+                        case PUR_ORDER:
                             log = new SDbComSyncLog();
                             break;
 
@@ -453,6 +483,7 @@ public abstract class SExportUtils {
                             case FUNCTIONAL_AREA:
                             case PUR_REF_ORDER:
                             case PUR_ORDER_FILE:
+                            case PUR_ORDER:
                                 log = new SDbComSyncLog();
                                 break;
 
@@ -536,6 +567,7 @@ public abstract class SExportUtils {
 
             case FUNCTIONAL_AREA:
             case PUR_REF_ORDER:
+            case PUR_ORDER:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -630,12 +662,17 @@ public abstract class SExportUtils {
                 break;
                 
             case PUR_REF_ORDER:
+            case PUR_ORDER:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
                 
                 switch (syncType) {
                     case PUR_REF_ORDER:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_REF;
+                        break;
+                        
+                    case PUR_ORDER:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_DOC;
                         break;
 
                     default:
@@ -761,6 +798,13 @@ public abstract class SExportUtils {
                     referencesBody.references = (SExportDataReference[]) currentExportDatas.toArray(new SExportDataReference[0]);
                     requestBody = mapper.writeValueAsString(referencesBody);
                     break;
+                    
+                case PUR_ORDER:
+                    SRequestDpsBody purchaseOrderBody = new SRequestDpsBody();
+                    purchaseOrderBody.work_instance = instanceArray;
+                    purchaseOrderBody.documents = (SExportDataDpsContainer[]) currentExportDatas.toArray(new SExportDataDpsContainer[0]);
+                    requestBody = mapper.writeValueAsString(purchaseOrderBody);
+                    break;
 
                 default:
                     // nada
@@ -879,6 +923,21 @@ public abstract class SExportUtils {
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }
+                        }
+                        break;
+                        
+                        
+                    case PUR_ORDER:
+                        // exportar antes áreas funcionales:
+                        syncTypeInProgress = SSyncType.PUR_ORDER;
+                        info = computeRequest(session, syncTypeInProgress);
+                        responses.getInfos().add(info);
+                        
+                        if (info.isResponseOk()) {
+                            // exportar pedidos de compras:
+                            syncTypeInProgress = syncType;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
                         }
                         break;
 
