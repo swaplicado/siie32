@@ -61,6 +61,11 @@ public class SExportDataReference implements SExportData {
     public double amount;
     
     /**
+     * Uso fiscal de la referencia (Uso de CFDI).
+     */
+    public String fiscal_use;
+    
+    /**
      * Indicador de borrada de la referencia.
      */
     public boolean is_deleted;

@@ -5,8 +5,8 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -113,8 +113,8 @@ public class SResponseInfo {
     public String toString() {
         String string = "Tipo de sincronización: '" + SSwapUtils.translateSyncType(meSyncType, SLibConsts.LAN_ISO639_ES) + "'.\n"
                 + "- Registros: obtenidos = " + mnRegistriesRetrieved + "; procesados = " + mnRegistriesProcessed + "; sincronizados = " + mnRegistriesSynced + "; iteraciones = " + mnIterations + ".\n"
-                + (isSyncComplete() ? "" : "- IMPORTANTE: ¡Aún quedan registros por sincronizar!\n")
-                + (mbResponseOk && msResponseMessage.isEmpty() ? "- ¡Esta sincronización fue exitosa!" : "- Mensaje de respuesta: '" + msResponseMessage + "'.");
+                + (isProcessingComplete() ? (isSyncComplete() ? "" : "- IMPORTANTE: ¡Aún quedan registros por sincronizar!\n") : "")
+                + (isProcessingComplete() ? mbResponseOk && msResponseMessage.isEmpty() ? "- ¡La sincronización terminó correctamente!" : "- Mensaje de respuesta: '" + msResponseMessage + "'." : "- Sincronización en proceso...");
 
         return string;
     }

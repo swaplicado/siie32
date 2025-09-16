@@ -255,7 +255,7 @@ public abstract class SExportDataUtils {
                 
                 if (username.isEmpty() || !SMailUtils.isValidEmail(email)) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
-                            "Usuario omitido (nombre de usuariio vacío o correo inválido): ID = {0}; username = {1}; email = {2}.",
+                            "Usuario omitido (nombre de usuario vacío o correo inválido): ID = {0}; username = {1}; email = {2}.",
                             new Object[] { userId, username, email });
                     continue; // omitir usuario inválido
                 }
@@ -466,7 +466,7 @@ public abstract class SExportDataUtils {
                         + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
-                    + "AND b.b_sup AND b.fiscal_id <> '' AND b.fiscal_id <> '" + DCfdConsts.RFC_GEN_NAC + "' "
+                    + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
                     + "ORDER BY "
                     + "b.id_bp;";
             
@@ -768,7 +768,8 @@ public abstract class SExportDataUtils {
                 int actorTypeId = resultSet.getInt("_actor_type_id");
                 String code = SJsonUtils.sanitizeJson(resultSet.getString("_code"));
                 String fullName = SJsonUtils.sanitizeJson(resultSet.getString("_full_name"));
-                String email = resultSet.getString("_email");
+                String[] emails = SMailUtils.sanitizeEmails(resultSet.getString("_email")).split(";");
+                String email = emails.length > 0 ? emails[0] : "";
                 String phone = resultSet.getString("_phone");
                 
                 // validar que el usuario tenga nombre y correo:
@@ -968,7 +969,7 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, "
                         + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_authorn, t.ts_link, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_bp_r, b.bp, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked "
                         + "FROM ("
                         + "SELECT "
@@ -1004,6 +1005,7 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = t.id_year AND dcfd.id_doc = t.id_doc "
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND t.b_authorn AND NOT t.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
@@ -1011,13 +1013,14 @@ public abstract class SExportDataUtils {
                         + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
+                        + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
                         + "GROUP BY "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, dcfd.cfd_use "
                         + "HAVING _entries_linked < _entries "
                         + "ORDER BY "
                         + "t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, t.ts_link, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp;";
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, dcfd.cfd_use;";
 
                 ResultSet resultSet = statement.executeQuery(sql);
 
@@ -1039,6 +1042,7 @@ public abstract class SExportDataUtils {
                     reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
                     reference.currency_code = resultSet.getString("c.cur_key");
                     reference.amount = resultSet.getDouble("t.tot_cur_r");
+                    reference.fiscal_use = resultSet.getString("_cfd_use");
                     reference.is_deleted = !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
                     references.add(reference);
@@ -1078,7 +1082,7 @@ public abstract class SExportDataUtils {
                 
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name, t.fid_bp_r, b.bp "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name AS _func_sub, t.fid_bp_r, b.bp "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS t "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "

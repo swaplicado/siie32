@@ -597,9 +597,12 @@ public abstract class SExportUtils {
 
         // Si no hay datos para exportar, registrar el intento y retornar:
         if (allExportDatas == null || allExportDatas.isEmpty()) {
-            String message = "No hay registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' para exportar.";
+            String message = "No hay registros nuevos o modificados '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' para exportar.";
             logEmptySync(session, syncType, message);
-            return new SResponseInfo(syncType, message, true);
+            
+            SResponseInfo responseInfo = new SResponseInfo(syncType, message, true);
+            responseInfo.setRegistriesRetrieved(0);
+            return responseInfo;
         }
 
         // Leer la configuración de la sincronización:
@@ -810,6 +813,7 @@ public abstract class SExportUtils {
         
         syncUrl += SSwapConsts.API_WAKE_UP;
         
+        System.out.println("Waking-up Services...");
         String response = requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, TIME_60_SEC);
         System.out.println("Wake-up Services Response:\n" + response);
     }
@@ -824,11 +828,30 @@ public abstract class SExportUtils {
      * @throws SQLException Si ocurre un error en la consulta.
      */
     public static SResponses exportData(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
+        return exportData(session, syncType, true);
+    }
+    
+    /**
+     * Ejecuta una consulta para obtener datos y generar un JSON.
+     * Con período para filtrar los datos a exportar.
+     * 
+     * @param session Sesión de usuario.
+     * @param syncType Tipo de sincronización.
+     * @param wakeUpServices Indicador para despertar todos los SWAP Services.
+     * @return <code>SResponses</code> con la información de laS peticiones a SWAP Services.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static SResponses exportData(final SGuiSession session, final SSyncType syncType, final boolean wakeUpServices) throws SQLException, Exception {
         SResponses responses = new SResponses(syncType);
         
         if (!((SClientInterface) session.getClient()).isGui() || session.getClient().showMsgBoxConfirm("La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-            // despertar todos los servicios, para evitar excepciones por esperas excesivas:
-            wakeUpServices(session);
+            System.out.println(SLibUtils.textRepeat("=", 80));
+            System.out.println("Exporting " + syncType + "...");
+            
+            if (wakeUpServices) {
+                // despertar todos los servicios, para evitar excepciones por esperas excesivas:
+                wakeUpServices(session);
+            }
             
             SSyncType syncTypeInProgress = null;
             SResponseInfo info = null;
