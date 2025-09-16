@@ -7,8 +7,6 @@ package erp.mod.cfg.db;
 
 import erp.mod.SModConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,11 +18,13 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
- * Clase para registrar la sincronización de datos con servicios externos.
+ * Clase para registrar la importación de datos de servicios externos.
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Sergio Flores
  */
-public class SDbSyncLog extends SDbRegistryUser {
+public class SDbComImportLog extends SDbRegistryUser {
+    
+    public static final String SYNC_TYPE_PUR_INV = "PUR_INV";
     
     protected static final String SUFIX_REQUEST_BODY = "_request_body";
     protected static final String SUFIX_RESPONSE_BODY = "_response_body";
@@ -39,20 +39,10 @@ public class SDbSyncLog extends SDbRegistryUser {
     protected int mnFkUserId;
     protected Date mtTsUser;
     
-    protected ArrayList<SDbSyncLogEntry> moEntries;
+    protected ArrayList<SDbComImportLogEntry> moEntries;
     
-    protected String msAuxDatabase;
-    
-    protected Class moClass;
-    protected Class moChildClass;
-    protected int mnChildType;
-    
-    public SDbSyncLog() {
-        super(SModConsts.CFG_SYNC_LOG);
-        
-        moClass = getClass();
-        moChildClass = SDbSyncLogEntry.class;
-        mnChildType = SModConsts.CFG_SYNC_LOG_ETY;
+    public SDbComImportLog() {
+        super(SModConsts.CFG_COM_IMP_LOG);
     }
 
     public void setPkSyncLogId(int n) { mnPkSyncLogId = n; }
@@ -75,12 +65,8 @@ public class SDbSyncLog extends SDbRegistryUser {
     public int getFkUserId() { return mnFkUserId; }
     public Date getTsUser() { return mtTsUser; }
 
-    public ArrayList<SDbSyncLogEntry> getEntries() { return moEntries; }
+    public ArrayList<SDbComImportLogEntry> getEntries() { return moEntries; }
 
-    public void setAuxDatabase(String s) { msAuxDatabase = s; }
-    
-    public String getAuxDatabase() { return msAuxDatabase; }
-    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkSyncLogId = pk[0];
@@ -106,13 +92,11 @@ public class SDbSyncLog extends SDbRegistryUser {
         mtTsUser = null;
 
         moEntries = new ArrayList<>();
-        
-        msAuxDatabase = "";
     }
 
     @Override
     public String getSqlTable() {
-        return (msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
+        return SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
@@ -168,16 +152,13 @@ public class SDbSyncLog extends SDbRegistryUser {
             moEntries.clear();
             
             msSql = "SELECT id_ety "
-                    + "FROM " + SModConsts.TablesMap.get(mnChildType) + " "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG_ETY) + " "
                     + "WHERE id_sync_log = " + mnPkSyncLogId + " "
                     + "ORDER BY id_ety;";
             
             try (ResultSet resultSetEntries = session.getStatement().executeQuery(msSql)) {
-                Constructor<?> constructor = moChildClass.getConstructor();
-                
                 while (resultSetEntries.next()) {
-                    SDbSyncLogEntry entry = (SDbSyncLogEntry) constructor.newInstance(new Object[] {});
-                    entry.setAuxDatabase(msAuxDatabase);
+                    SDbComImportLogEntry entry = new SDbComImportLogEntry();
                     entry.read(session, new int[] { mnPkSyncLogId, resultSetEntries.getInt("id_ety") });
                     moEntries.add(entry);
                 }
@@ -245,10 +226,9 @@ public class SDbSyncLog extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
 
-        for (SDbSyncLogEntry entry : moEntries) {
+        for (SDbComImportLogEntry entry : moEntries) {
             entry.setPkSyncLogId(mnPkSyncLogId);
             entry.setTsSync(mtTsUser); // sync as well the sync entry!
-            entry.setAuxDatabase(msAuxDatabase);
             entry.save(session);
         }
 
@@ -259,35 +239,20 @@ public class SDbSyncLog extends SDbRegistryUser {
     @Override
     @SuppressWarnings("unchecked")
     public SDbRegistry clone() throws CloneNotSupportedException {
-        SDbSyncLog registry = null;
+        SDbComImportLog registry = new SDbComImportLog();
         
-        try {
-            Constructor<?> constructor = moClass.getConstructor();
-            
-            registry = (SDbSyncLog) constructor.newInstance(new Object[] {});
-
-            registry.setPkSyncLogId(this.getPkSyncLogId());
-            registry.setSyncType(this.getSyncType());
-            registry.msRequestBodyFileName = this.getRequestBodyFileName();
-            registry.setRequestTimestamp(this.getRequestTimestamp());
-            registry.setResponseCode(this.getResponseCode());
-            registry.msResponseBodyFileName = this.getResponseBodyFileName();
-            registry.setResponseTimestamp(this.getResponseTimestamp());
-            registry.mnFkUserId = this.getFkUserId();
-            registry.mtTsUser = this.getTsUser();
-
-            for (SDbSyncLogEntry entry : this.moEntries) {
-                registry.getEntries().add((SDbSyncLogEntry) entry.clone());
-            }
-            
-            registry.setAuxDatabase(this.getAuxDatabase());
-            
-            registry.moClass = this.moClass;
-            registry.moChildClass = this.moChildClass;
-            registry.mnChildType = this.mnChildType;
-        }
-        catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            SLibUtils.printException(this, e);
+        registry.setPkSyncLogId(this.getPkSyncLogId());
+        registry.setSyncType(this.getSyncType());
+        registry.msRequestBodyFileName = this.getRequestBodyFileName();
+        registry.mtRequestTimestamp = this.getRequestTimestamp();
+        registry.setResponseCode(this.getResponseCode());
+        registry.msResponseBodyFileName = this.getResponseBodyFileName();
+        registry.mtResponseTimestamp = this.getResponseTimestamp();
+        registry.mnFkUserId = this.getFkUserId();
+        registry.mtTsUser = this.getTsUser();
+        
+        for (SDbComImportLogEntry entry : this.moEntries) {
+            registry.getEntries().add((SDbComImportLogEntry) entry.clone());
         }
         
         return registry;

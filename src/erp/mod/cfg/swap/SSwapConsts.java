@@ -18,6 +18,8 @@ public abstract class SSwapConsts {
     /*
      * SWAP Services.
      */
+    
+    public static final String API_WAKE_UP = "/api/wake-up-every-one";
 
     /**
      * JSON name/value pair for link-up status (enabled/disabled) of SWAP
@@ -51,6 +53,7 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_TXN_SRV = "txn-srv";
     public static final String CFG_OBJ_TXN_PUR_REF = "pur-ref";
     public static final String CFG_OBJ_TXN_PUR_DOC = "pur-doc";
+    public static final String CFG_OBJ_TXN_PUR_DOC_DWNLD = "pur-doc-dwnld";
     
     public static final String QRY_START_DATE = "start_date";
     public static final String QRY_END_DATE = "end_date";
@@ -152,5 +155,4 @@ public abstract class SSwapConsts {
      * Tipo de entidad organización (persona moral).
      */
     public static final String PURCHASER_AGENT = "PURCHASER_AGENT";
-    
 }

@@ -5,6 +5,18 @@ Edwin Omar CARMONA FIGUEROA
 1) Exportación de documentos (OC) a bucket de cloud storage
 
 ================================================================================
+SIIE 3.2 288.3/ 2025-09-15
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de clase CLI para permitir la sincronización automática de todos los SWAP Services.
+
+================================================================================
+SIIE 3.2 288.2/ 2025-09-15
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de descarga de facturas autorizadas de compras desde SWAP Services, con control individual de descarga por usuario.
+
+================================================================================
 SIIE 3.2 288.1/ 2025-09-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
