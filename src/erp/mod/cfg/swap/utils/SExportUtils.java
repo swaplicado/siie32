@@ -57,12 +57,13 @@ public abstract class SExportUtils {
     
     public static final DecimalFormat FormatSyncLogId = new DecimalFormat("000000"); // 6 positions
     public static final SimpleDateFormat FormatSyncLogDatetime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-
+    
     public static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
     
     private static final int SEC_PSWD_LEN = 10;
+    private static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
     private static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
-
+    
     /**
      * Genera una contraseña segura de 10 caracteres aleatorios.
      * Incluye letras ASCII mayúsculas, minúsculas, números y carácteres especiales.
@@ -94,7 +95,7 @@ public abstract class SExportUtils {
      * @return Respuesta del servicio en formato JSON.
      * @throws Exception
      */
-    private static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey) throws Exception {
+    private static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey, final int timeout) throws Exception {
         String responseBody = "";
         HttpURLConnection connection = null;
 
@@ -110,8 +111,8 @@ public abstract class SExportUtils {
             }
 
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(TIME_180_SEC); // timeout para conectar
-            connection.setReadTimeout(TIME_180_SEC); // timeout para leer la respuesta
+            connection.setConnectTimeout(timeout); // timeout para conectar
+            connection.setReadTimeout(timeout); // timeout para leer la respuesta
             connection.setRequestMethod(method.toUpperCase());
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");
@@ -771,7 +772,7 @@ public abstract class SExportUtils {
             // Realizar la petición HTTP a SWAP Services:
             
             Date requestDatetime = new Date();
-            String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey);
+            String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, TIME_180_SEC);
             Date responseDatetime = new Date();
 
             if (firstRequestDatetime == null) {
@@ -795,6 +796,25 @@ public abstract class SExportUtils {
     }
     
     /**
+     * Despierta todos los SWAP Services, para asegurar su disponibilidad al requerirse servicios específicos.
+     * @param session
+     * @throws Exceptio 
+     */
+    private static void wakeUpServices(final SGuiSession session) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+        
+        String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_USER_SRV, SSwapConsts.CFG_ATT_URL);
+        String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_USER_SRV, SSwapConsts.CFG_ATT_TOKEN);
+        String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_USER_SRV, SSwapConsts.CFG_ATT_API_KEY);
+        
+        syncUrl += SSwapConsts.API_WAKE_UP;
+        
+        String response = requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, TIME_60_SEC);
+        System.out.println("Wake-up Services Response:\n" + response);
+    }
+    
+    /**
      * Ejecuta una consulta para obtener datos y generar un JSON.
      * Con período para filtrar los datos a exportar.
      * 
@@ -807,6 +827,9 @@ public abstract class SExportUtils {
         SResponses responses = new SResponses(syncType);
         
         if (!((SClientInterface) session.getClient()).isGui() || session.getClient().showMsgBoxConfirm("La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+            // despertar todos los servicios, para evitar excepciones por esperas excesivas:
+            wakeUpServices(session);
+            
             SSyncType syncTypeInProgress = null;
             SResponseInfo info = null;
 

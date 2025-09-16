@@ -18,6 +18,8 @@ public abstract class SSwapConsts {
     /*
      * SWAP Services.
      */
+    
+    public static final String API_WAKE_UP = "/api/wake-up-every-one";
 
     /**
      * JSON name/value pair for link-up status (enabled/disabled) of SWAP
