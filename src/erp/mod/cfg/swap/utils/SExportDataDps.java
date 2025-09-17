@@ -71,6 +71,16 @@ public class SExportDataDps implements SExportData {
     public int functional_area;
     
     /**
+     * Uso de CFDI
+     */
+    public String fiscal_use;
+    
+    /**
+     * Método de pago
+     */
+    public String payment_method;
+    
+    /**
      * Notas del documento a nivel encabezado.
      */
     public String notes;

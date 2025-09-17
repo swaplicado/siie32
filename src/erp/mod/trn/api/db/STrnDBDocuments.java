@@ -68,7 +68,7 @@ public class STrnDBDocuments {
         try {
             Connection conn;
             Statement st;
-            if (oStatement != null) {
+            if (oStatement == null) {
                 conn = getConnection();
 
                 if (conn == null) {

@@ -980,13 +980,6 @@ public abstract class SExportUtils {
                         syncTypeInProgress = SSyncType.PUR_ORDER;
                         info = computeRequest(session, syncTypeInProgress);
                         responses.getInfos().add(info);
-                        
-                        if (info.isResponseOk()) {
-                            // exportar pedidos de compras:
-                            syncTypeInProgress = syncType;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-                        }
                         break;
 
                     default:

@@ -164,6 +164,9 @@ public class SMySqlClass {
         Statement st;
         try {
             String ruta = "jdbc:mysql://";
+            if (this.gserverHost == null || this.gserverHost.isEmpty()) {
+                return null;
+            }
             String servidor = this.gserverHost + ":" + this.gdbPort + "/";
 
             Class.forName("com.mysql.jdbc.Driver");

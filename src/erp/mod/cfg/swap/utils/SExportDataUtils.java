@@ -1082,7 +1082,7 @@ public abstract class SExportDataUtils {
             
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
             // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
-            SMySqlClass.setJsonConn("{\"dbHost\":\"dummy\",\""
+            SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
                                     + "dbName\":\"erp\",\""
                                     + "dbPort\":\"3306\",\""
                                     + "dbUser\":\"dummy\",\""
@@ -1101,6 +1101,7 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
                         + "(SELECT  "
                         + "            GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "        FROM "
@@ -1123,18 +1124,26 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
+                        + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
                         + "WHERE "
-                        + "NOT d.b_del "
-                        + "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
-                        + "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "AND (" + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + ")"
-                        + (lastSyncDatetime == null ? "" : 
-                        " OR ((d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
-                        + ")"
-                        + "AND d.id_year = 2025 "
-                        + ";";
+                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                        + "AND YEAR(d.ts_authorn) = 2025 "
+                        + "AND ";
+                if (lastSyncDatetime != null) {
+                    sql += "((" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + ") "
+                            + "AND (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) "
+                            + "OR ";
+                }
+                sql += "(" + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + ") "
+                        + "AND NOT d.b_del "
+                        + "AND d.b_authorn "
+                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
+                        + (lastSyncDatetime != null ? ")" : "");
+                sql += ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
 
@@ -1155,6 +1164,8 @@ public abstract class SExportDataUtils {
                     oDpsExport.exchange_rate = resultSet.getDouble("d.exc_rate");
                     oDpsExport.notes = resultSet.getString("_notes");
                     oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
+                    oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
+                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
                     oDpsExport.is_deleted = !resultSet.getBoolean("d.b_authorn") || 
                                             resultSet.getBoolean("d.b_del") || 
                                             resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
@@ -1174,6 +1185,7 @@ public abstract class SExportDataUtils {
                             Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
                         }
                         else {
+                            oFile.filename_original = oFile.filename_storage;
                             oFile.title = "PDF de la OC";
                             oFile.bucket_name = oFd.getBucketName();
                             oFile.project_id = oFd.getProjectId();
@@ -1201,7 +1213,8 @@ public abstract class SExportDataUtils {
                         }
                         else {
                             oDpsFileExport.title = "Evidencia de cotización";
-                            oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName();
+                            oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName() != null && !oDpsFile.getoWebFile().getUserFileName().isEmpty()
+                                                                ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
                             oDpsFileExport.bucket_name = sBucketName;
                             oDpsFileExport.project_id = sProjectID;
 
@@ -1227,6 +1240,7 @@ public abstract class SExportDataUtils {
                                     Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de RM vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
                                 }
                                 else {
+                                    oRmFile.filename_original = oRmFile.filename_storage;
                                     oRmFile.title = "PDF de la Requisición";
                                     oRmFile.bucket_name = sBucketName;
                                     oRmFile.project_id = sProjectID;

@@ -33,7 +33,7 @@ public class SExportDpsFileUtils {
      * 
      * @return null si no ha sido sincronizado, objeto Date si ya lo está.
      */
-    public static Date isResourceCompanySinchronized(Statement statement, final SSyncType syncType, final String sReference) {
+    public static Date isResourceCompanySinchronized(final Statement statement, final SSyncType syncType, final String sReference) {
         try {
             ResultSet resultSet;
             
@@ -73,7 +73,7 @@ public class SExportDpsFileUtils {
      * 
      * @return null si no hay coincidencia
      */
-    public static SDbComSyncLogEntry getLastSynchronization(SGuiSession session, final SSyncType syncType, final String sReference, final String dbName) {
+    public static SDbComSyncLogEntry getLastSynchronization(final SGuiSession session, final SSyncType syncType, final String sReference, final String dbName) {
         try {
             ResultSet resultSet;
             
