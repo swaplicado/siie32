@@ -21,6 +21,8 @@ public class SFileData {
     private String bucketName;
     private String projectId;
 
+    public SFileData() { }
+    
     public SFileData(int idYear, int idDoc, String companyName, Date lastUpdate) {
         this.idYear = idYear;
         this.idDoc = idDoc;

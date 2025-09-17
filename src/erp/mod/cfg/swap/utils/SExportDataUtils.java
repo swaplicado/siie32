@@ -7,14 +7,20 @@ package erp.mod.cfg.swap.utils;
 
 import cfd.DCfdConsts;
 import cfd.ver40.DCfdi40Catalogs;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebDpsFile;
+import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,6 +73,7 @@ public abstract class SExportDataUtils {
                 
             case FUNCTIONAL_AREA:
             case PUR_REF_ORDER:
+            case PUR_ORDER:
             case PUR_REF_SCALE_TICKET:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
@@ -1054,6 +1061,200 @@ public abstract class SExportDataUtils {
 
         return references;
     }
+    
+    /**
+     * Obtiene una lista de ordenes de compra que no se hayan exportado
+     * 
+     * @param session
+     * @return ArrayList<SExportData> 
+     * 
+     * @throws SQLException
+     * @throws Exception 
+     */
+    private static ArrayList<SExportData> getListOfDpsToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> lDps = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        String sBucketName = "";
+        String sProjectID = "";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
+            // XXX Edwin Carmona, 2025-09-17: Mejorar este código. Introducirlo en el constructor del objeto involucrado para que se invoque en automático, y no por fuera de manera manual.
+            SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
+                                    + "dbName\":\"erp\",\""
+                                    + "dbPort\":\"3306\",\""
+                                    + "dbUser\":\"dummy\",\""
+                                    + "dbPass\":\"dummy\",\""
+                                    + "dbMainId\":\"1\"}");
+            STrnDBDocuments oDocCore = new STrnDBDocuments();
+            
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            for (Integer companyId : databasesMap.keySet()) {
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // código de tipo de referencia + '/' + referencia
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER, database);
+
+                String sql = "SELECT "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
+                        + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
+                        + "(SELECT  "
+                        + "            GROUP_CONCAT(DISTINCT fid_mat_req) "
+                        + "        FROM "
+                        + "            " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
+                        + "        WHERE "
+                        + "            fid_dps_year = d.id_year "
+                        + "                AND fid_dps_doc = d.id_doc) AS _rms, "
+                        + "    COALESCE((SELECT  "
+                        + "                    GROUP_CONCAT(nts, '. ') "
+                        + "                FROM "
+                        + "                    " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS dn "
+                        + "                WHERE "
+                        + "                    dn.id_year = d.id_year "
+                        + "                        AND dn.id_doc = d.id_doc "
+                        + "                        AND NOT dn.b_del), "
+                        + "            '') AS _notes "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
+                        + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
+                        + "WHERE "
+                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                        + "AND YEAR(d.ts_authorn) >= " + SSwapConsts.SINCE_YEAR + " "
+                        + "AND ("
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn) "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + ")";
+                sql += ";";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    SExportDataDpsContainer oContainer = new SExportDataDpsContainer();
+                    SExportDataDps oDpsExport = new SExportDataDps();
+
+                    oDpsExport.company = companyId;
+                    oDpsExport.id_year = resultSet.getInt("d.id_year");
+                    oDpsExport.id_doc = resultSet.getInt("d.id_doc");
+                    oDpsExport.transaction_class = SSwapConsts.TXN_CAT_PURCHASE;
+                    oDpsExport.partner = resultSet.getInt("d.fid_bp_r");
+                    oDpsExport.series = resultSet.getString("d.num_ser");
+                    oDpsExport.number = resultSet.getInt("d.num");
+                    oDpsExport.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("d.dt")); // yyyy-mm-dd
+                    oDpsExport.currency = resultSet.getString("c.cur_key");
+                    oDpsExport.amount = resultSet.getDouble("d.tot_cur_r");
+                    oDpsExport.exchange_rate = resultSet.getDouble("d.exc_rate");
+                    oDpsExport.notes = resultSet.getString("_notes");
+                    oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
+                    oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
+                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    oDpsExport.is_deleted = !resultSet.getBoolean("d.b_authorn") || 
+                                            resultSet.getBoolean("d.b_del") || 
+                                            resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    
+                    /**
+                     * PDF de la OC
+                     */
+                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(session, 
+                                                                        SSyncType.PUR_ORDER_FILE, 
+                                                                        oDpsExport.id_year + "_" + oDpsExport.id_doc,
+                                                                        database);
+                    if (oLogEty != null) {
+                        SExportDataDpsFile oFile = new SExportDataDpsFile();
+                        SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                        oFile.filename_storage = oFd.getFileName();
+                        if (oFile.filename_storage.isEmpty()) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        }
+                        else {
+                            oFile.filename_original = oFile.filename_storage;
+                            oFile.title = "PDF de la OC";
+                            oFile.bucket_name = oFd.getBucketName();
+                            oFile.project_id = oFd.getProjectId();
+                            oContainer.file.add(oFile);
+                        }
+
+                        sBucketName = oFile.bucket_name;
+                        sProjectID = oFile.project_id;
+                    }
+                    else {
+                        sBucketName = CloudStorageManager.getBucketName();
+                        sProjectID = CloudStorageManager.getProjectID();
+                    }
+                    
+                    /**
+                     * Documentos (Archivos de cotizaciones)
+                     */
+                    boolean withUrl = false;
+                    ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement());
+                    for (SWebDpsFile oDpsFile : lDpsFiles) {
+                        SExportDataDpsFile oDpsFileExport = new SExportDataDpsFile();
+                        oDpsFileExport.filename_storage = oDpsFile.getoWebFile().getCloudStorageName();
+                        if (oDpsFileExport.filename_storage.isEmpty()) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de COT vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        }
+                        else {
+                            oDpsFileExport.title = "Evidencia de cotización";
+                            oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName() != null && !oDpsFile.getoWebFile().getUserFileName().isEmpty()
+                                                                ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
+                            oDpsFileExport.bucket_name = sBucketName;
+                            oDpsFileExport.project_id = sProjectID;
+
+                            oContainer.file.add(oDpsFileExport);
+                        }
+                    }
+                    
+                    /**
+                    * RM
+                    */
+                    String rms = resultSet.getString("_rms");
+                    String fileName;
+                    String[] idsRms;
+                    SExportDataDpsFile oRmFile;
+                    if (rms != null && !rms.isEmpty()) {
+                        idsRms = rms.split(",");
+                        for (String sId : idsRms) {
+                            fileName = database + "-" + "REQ" + "-" + sId + ".pdf";
+                            if (CloudStorageManager.storagedFileExists(fileName)) {
+                                oRmFile = new SExportDataDpsFile();
+                                oRmFile.filename_storage = fileName;
+                                if (oRmFile.filename_storage.isEmpty()) {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de RM vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                                }
+                                else {
+                                    oRmFile.filename_original = oRmFile.filename_storage;
+                                    oRmFile.title = "PDF de la requisición";
+                                    oRmFile.bucket_name = sBucketName;
+                                    oRmFile.project_id = sProjectID;
+
+                                    oContainer.file.add(oRmFile);
+                                }
+                            }
+                        }
+                    }
+                   
+                    oContainer.document = oDpsExport;
+                    
+                    lDps.add(oContainer);
+                }
+            }
+        }
+
+        return lDps;
+    }
 
     /**
      * Consulta las referencias de pedidos de compras del Portal de Proveedores de AETH, y las prepara para la exportación.
@@ -1339,6 +1540,10 @@ public abstract class SExportDataUtils {
                 else {
                     data = getListOfPurchaseOrderRefsToExport(session);
                 }
+                break;
+                
+            case PUR_ORDER:
+                data = getListOfDpsToExport(session);
                 break;
                 
             default:

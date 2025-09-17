@@ -41,7 +41,6 @@ import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.data.SWebDpsNote;
 import erp.mod.trn.api.data.SWebDpsRow;
 import erp.mod.trn.api.data.SWebMaterialRequest;
-import erp.mod.trn.api.data.SWebMaterialRequestEty;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.mod.trn.api.db.STrnDBMaterialRequest;
 
@@ -329,7 +328,9 @@ public class SShareData {
         /**
          * Documentos
          */
-        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc);
+        boolean withUrl = true;
+        // se manda el statement en null para que tome la conexión del JSON
+        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc, withUrl, null);
         oWebDocument.getlFiles().clear();
         oWebDocument.getlFiles().addAll(lDpsFiles);
         
