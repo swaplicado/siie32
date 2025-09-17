@@ -5,11 +5,6 @@
 
 package erp.mod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import sa.lib.SLibConsts;
-import sa.lib.gui.SGuiItem;
-
 /**
  *
  * @author Sergio Flores, Sergio Flores, Claudio Peña, Isabel Servín
@@ -815,13 +810,6 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_RECLASS = 107; // reclasificación contable
     //public static final int TRNX_MAT_REQ_FOLL_PUR_CLOSED = 100; // Seguimiento // se cambia por la constante SUtilConsts.ACTION_CLOSE
     
-    public static final int TRNX_TP_PERIOD_EVENT_ID = 1; 
-    public static final int TRNX_TP_PERIOD_REC_ID = 2; 
-    public static final String TRNX_TP_PERIOD_EVENT_DESC = "POR EVENTO"; 
-    public static final String TRNX_TP_PERIOD_REC_DESC = "RECURRENTE"; 
-    public static final ArrayList<SGuiItem> TRNX_TP_PERIOD_CATALOG;
-    public static final HashMap<Integer, String> TRNX_TP_PERIOD_CODES;
-    
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
     public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";
     public static final String TXT_TRNX_MAINT_TOOL_AVL = "Herramientas disponibles";
@@ -1159,15 +1147,4 @@ public abstract class SModSysConsts {
     public static final int HRSX_REC_SCHE_CAT_NA = 0;           // Not applicable
     public static final int HRSX_REC_SCHE_CAT_WAGES = 1;        // Wages & salaries, retirees and others
     public static final int HRSX_REC_SCHE_CAT_ASSIMILATED = 2;  // All assimilated types
-    
-    static {
-        TRNX_TP_PERIOD_CATALOG = new ArrayList<>();
-        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- Tipo propuesta -"));
-        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_EVENT_ID }, TRNX_TP_PERIOD_EVENT_DESC));
-        TRNX_TP_PERIOD_CATALOG.add(new SGuiItem(new int[] { TRNX_TP_PERIOD_REC_ID }, TRNX_TP_PERIOD_REC_DESC));
-        
-        TRNX_TP_PERIOD_CODES = new HashMap<>();
-        TRNX_TP_PERIOD_CODES.put(TRNX_TP_PERIOD_EVENT_ID, "E");
-        TRNX_TP_PERIOD_CODES.put(TRNX_TP_PERIOD_REC_ID, "R");
-    }
 }

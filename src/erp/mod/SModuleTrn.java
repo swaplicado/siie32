@@ -589,7 +589,7 @@ public class SModuleTrn extends SGuiModule {
                 }
                 break;
             case SModConsts.TRN_INIT:
-                view = new SViewInitiative(miClient, "Propuestas");
+                view = new SViewInitiative(miClient, "Proyectos-iniciativas");
                 break;
             case SModConsts.TRN_CFD:
                 switch (subtype) {
@@ -1038,7 +1038,7 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormMmsConfiguration;
                 break;
             case SModConsts.TRN_INIT:
-                if (moFormInitiative == null) moFormInitiative = new SFormInitiative(miClient, "Propuesta");
+                if (moFormInitiative == null) moFormInitiative = new SFormInitiative(miClient, "Proyecto-iniciativa");
                 form = moFormInitiative;
                 break;
             case SModConsts.TRN_DVY:

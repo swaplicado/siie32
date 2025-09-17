@@ -1654,15 +1654,15 @@ public abstract class SDataReadComponentItems {
                             text = "serie folios de compras-ventas";
                     }
                 }
-
                 break;
             case SDataConstants.TRN_INIT:
                 lenPk = 1;
                 sql = "SELECT i.id_init AS f_id_1, CONCAT(i.name, ' (', i.code, ')') AS f_item " +
                         "FROM trn_init AS i " +
-                        "WHERE NOT b_del " + 
-                        "ORDER BY i.name, i.id_init";
-                text = "propuesta";
+                        (pk == null ? "" : "INNER JOIN usr_usr_func AS uf ON uf.id_func = i.fk_func AND uf.id_usr = " + ((int[]) pk)[0] + " ") +
+                        "WHERE NOT i.b_del " + 
+                        "ORDER BY i.name, i.id_init ";
+                text = "proyecto-iniciativa";
                 break;
             case SDataConstants.TRN_DNS_DIOG:
                 lenPk = 1;

@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.cfg.db.SDbComImportLog;
@@ -372,9 +373,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
             // Recuperar la configuración base:
 
-            String syncUrl = "http://192.168.7.92:8004"; // entorno César Orozco
-            //String syncUrl = "https://transaction-backend-test-515680676790.europe-west1.run.app"; // entorno testing
-            //String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+            String syncUrl;
+            
+            if (((SClientInterface) miClient).isDev()) {
+                //syncUrl = "http://192.168.7.92:8004"; // entorno César Orozco
+                syncUrl = "https://transaction-backend-test-515680676790.europe-west1.run.app"; // entorno testing
+            }
+            else {
+                syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+            }
             
             msSyncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_TOKEN);
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);

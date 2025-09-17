@@ -11,6 +11,8 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbInitiative;
 import erp.mtrn.data.STrnUtilities;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
@@ -21,15 +23,18 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldDecimal;
 import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SFormInitiative extends SBeanForm implements ItemListener {
+public class SFormInitiative extends SBeanForm implements ItemListener, FocusListener {
     
     private SDbInitiative moRegistry;
+    private double mdCompBudget;
+    private double mdSpentBudget;
 
     /**
      * Creates new form SFormInitiative
@@ -54,61 +59,64 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         jpRegistry = new javax.swing.JPanel();
         jpNorth = new javax.swing.JPanel();
         jpNorthWest = new javax.swing.JPanel();
-        jpRow1 = new javax.swing.JPanel();
+        jpNorthWest1 = new javax.swing.JPanel();
         jlTextCode = new javax.swing.JLabel();
         moTextCode = new sa.lib.gui.bean.SBeanFieldText();
-        jpRow2 = new javax.swing.JPanel();
+        jpNorthWest2 = new javax.swing.JPanel();
         jlTextName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
-        jpRow3 = new javax.swing.JPanel();
+        jpNorthWest3 = new javax.swing.JPanel();
         jlKeyType = new javax.swing.JLabel();
         moKeyType = new sa.lib.gui.bean.SBeanFieldKey();
-        jpRow4 = new javax.swing.JPanel();
-        jlKeyPeriod = new javax.swing.JLabel();
-        moKeyPeriod = new sa.lib.gui.bean.SBeanFieldKey();
-        jpRow7 = new javax.swing.JPanel();
+        jpNorthWest4 = new javax.swing.JPanel();
+        jlKeyPeriodicityType = new javax.swing.JLabel();
+        moKeyPeriodicityType = new sa.lib.gui.bean.SBeanFieldKey();
+        jpNorthWest5 = new javax.swing.JPanel();
         jlKeyFuncArea = new javax.swing.JLabel();
         moKeyFuncArea = new sa.lib.gui.bean.SBeanFieldKey();
         jpNorthEast = new javax.swing.JPanel();
-        jpRow5 = new javax.swing.JPanel();
+        jpNorthEast1 = new javax.swing.JPanel();
         jlDateDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
-        jpRow6 = new javax.swing.JPanel();
+        jpNorthEast2 = new javax.swing.JPanel();
         jlDateDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jpRow8 = new javax.swing.JPanel();
+        jpNorthEast3 = new javax.swing.JPanel();
         jlCurBudget = new javax.swing.JLabel();
         moCurBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jlBudgetHint = new javax.swing.JLabel();
-        jpRow9 = new javax.swing.JPanel();
-        jlCurComBudget = new javax.swing.JLabel();
-        moCurComBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jlComBudgetHint = new javax.swing.JLabel();
-        jpRow10 = new javax.swing.JPanel();
+        jpNorthEast4 = new javax.swing.JPanel();
+        jlCurCompBudget = new javax.swing.JLabel();
+        moCurCompBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlCompBudgetHint = new javax.swing.JLabel();
+        jpNorthEast5 = new javax.swing.JPanel();
+        jlCurSpendableBudget = new javax.swing.JLabel();
+        moCurSpendableBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlSpendableBudgetHint = new javax.swing.JLabel();
+        jpNorthEast6 = new javax.swing.JPanel();
         jlCurSpentBudget = new javax.swing.JLabel();
         moCurSpentBudget = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jlSpentBudgetHint = new javax.swing.JLabel();
         jpCenter = new javax.swing.JPanel();
-        jpPurpose = new javax.swing.JPanel();
-        jpPurRow1 = new javax.swing.JPanel();
+        jpCenter1 = new javax.swing.JPanel();
+        jpCenter11 = new javax.swing.JPanel();
         jlPurpose = new javax.swing.JLabel();
         jlPurposeHint = new javax.swing.JLabel();
-        jpPurRow2 = new javax.swing.JPanel();
+        jpCenter12 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtaPurpose = new javax.swing.JTextArea();
-        jpCenterCenter = new javax.swing.JPanel();
-        jpDescription = new javax.swing.JPanel();
-        jpPurRow3 = new javax.swing.JPanel();
+        jpCenter2 = new javax.swing.JPanel();
+        jpCenter21 = new javax.swing.JPanel();
         jlDescription = new javax.swing.JLabel();
         jlDescriptionHint = new javax.swing.JLabel();
-        jpPurRow4 = new javax.swing.JPanel();
+        jpCenter22 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jtaDescription = new javax.swing.JTextArea();
-        jpGoals = new javax.swing.JPanel();
-        jpPurRow5 = new javax.swing.JPanel();
+        jpCenter3 = new javax.swing.JPanel();
+        jpCenter31 = new javax.swing.JPanel();
         jlGoals = new javax.swing.JLabel();
         jlGoalsHint = new javax.swing.JLabel();
-        jpPurRow6 = new javax.swing.JPanel();
+        jpCenter32 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jtaGoals = new javax.swing.JTextArea();
 
@@ -119,233 +127,250 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
 
         jpNorth.setLayout(new java.awt.BorderLayout());
 
-        jpNorthWest.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
+        jpNorthWest.setLayout(new java.awt.GridLayout(6, 0, 0, 5));
 
-        jpRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthWest1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTextCode.setText("Código:*");
         jlTextCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow1.add(jlTextCode);
+        jpNorthWest1.add(jlTextCode);
 
         moTextCode.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpRow1.add(moTextCode);
+        jpNorthWest1.add(moTextCode);
 
-        jpNorthWest.add(jpRow1);
+        jpNorthWest.add(jpNorthWest1);
 
-        jpRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthWest2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTextName.setText("Nombre:*");
         jlTextName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow2.add(jlTextName);
+        jpNorthWest2.add(jlTextName);
 
         moTextName.setPreferredSize(new java.awt.Dimension(400, 23));
-        jpRow2.add(moTextName);
+        jpNorthWest2.add(moTextName);
 
-        jpNorthWest.add(jpRow2);
+        jpNorthWest.add(jpNorthWest2);
 
-        jpRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthWest3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlKeyType.setText("Tipo propuesta:*");
+        jlKeyType.setText("Tipo iniciativa:*");
         jlKeyType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow3.add(jlKeyType);
+        jpNorthWest3.add(jlKeyType);
 
         moKeyType.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpRow3.add(moKeyType);
+        jpNorthWest3.add(moKeyType);
 
-        jpNorthWest.add(jpRow3);
+        jpNorthWest.add(jpNorthWest3);
 
-        jpRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthWest4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlKeyPeriod.setText("Periodicidad:*");
-        jlKeyPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow4.add(jlKeyPeriod);
+        jlKeyPeriodicityType.setText("Periodicidad:*");
+        jlKeyPeriodicityType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpNorthWest4.add(jlKeyPeriodicityType);
 
-        moKeyPeriod.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpRow4.add(moKeyPeriod);
+        moKeyPeriodicityType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpNorthWest4.add(moKeyPeriodicityType);
 
-        jpNorthWest.add(jpRow4);
+        jpNorthWest.add(jpNorthWest4);
 
-        jpRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthWest5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlKeyFuncArea.setText("Aréa funcional:*");
         jlKeyFuncArea.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpRow7.add(jlKeyFuncArea);
+        jpNorthWest5.add(jlKeyFuncArea);
 
         moKeyFuncArea.setPreferredSize(new java.awt.Dimension(400, 23));
-        jpRow7.add(moKeyFuncArea);
+        jpNorthWest5.add(moKeyFuncArea);
 
-        jpNorthWest.add(jpRow7);
+        jpNorthWest.add(jpNorthWest5);
 
         jpNorth.add(jpNorthWest, java.awt.BorderLayout.WEST);
 
-        jpNorthEast.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
+        jpNorthEast.setLayout(new java.awt.GridLayout(6, 0, 0, 5));
 
-        jpRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthEast1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateDateStart.setText("Fecha inicial:");
         jlDateDateStart.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpRow5.add(jlDateDateStart);
-        jpRow5.add(moDateDateStart);
+        jpNorthEast1.add(jlDateDateStart);
+        jpNorthEast1.add(moDateDateStart);
 
-        jpNorthEast.add(jpRow5);
+        jpNorthEast.add(jpNorthEast1);
 
-        jpRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthEast2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateDateEnd.setText("Fecha final:");
         jlDateDateEnd.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpRow6.add(jlDateDateEnd);
-        jpRow6.add(moDateDateEnd);
+        jpNorthEast2.add(jlDateDateEnd);
+        jpNorthEast2.add(moDateDateEnd);
 
-        jpNorthEast.add(jpRow6);
+        jpNorthEast.add(jpNorthEast2);
 
-        jpRow8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthEast3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurBudget.setText("Presupuesto estimado:*");
         jlCurBudget.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpRow8.add(jlCurBudget);
-        jpRow8.add(moCurBudget);
+        jpNorthEast3.add(jlCurBudget);
+        jpNorthEast3.add(moCurBudget);
 
         jlBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlBudgetHint.setToolTipText("Presupuesto que requerirá la propuesta");
+        jlBudgetHint.setToolTipText("Presupuesto que requiere el proyecto-iniciativa");
         jlBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpRow8.add(jlBudgetHint);
+        jpNorthEast3.add(jlBudgetHint);
 
-        jpNorthEast.add(jpRow8);
+        jpNorthEast.add(jpNorthEast3);
 
-        jpRow9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthEast4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurComBudget.setText("Presupuesto comprometido:");
-        jlCurComBudget.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpRow9.add(jlCurComBudget);
+        jlCurCompBudget.setText("Presupuesto comprometido:");
+        jlCurCompBudget.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpNorthEast4.add(jlCurCompBudget);
 
-        moCurComBudget.setEnabled(false);
-        jpRow9.add(moCurComBudget);
+        moCurCompBudget.setEnabled(false);
+        jpNorthEast4.add(moCurCompBudget);
 
-        jlComBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlComBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlComBudgetHint.setToolTipText("Suma de los subtotales de pedidos de la propuesta");
-        jlComBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpRow9.add(jlComBudgetHint);
+        jlCompBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlCompBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlCompBudgetHint.setToolTipText("Suma de subtotales de los pedidos del proyecto-iniciativa");
+        jlCompBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpNorthEast4.add(jlCompBudgetHint);
 
-        jpNorthEast.add(jpRow9);
+        jpNorthEast.add(jpNorthEast4);
 
-        jpRow10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthEast5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCurSpendableBudget.setText("Presupuesto por ejercer:");
+        jlCurSpendableBudget.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpNorthEast5.add(jlCurSpendableBudget);
+
+        moCurSpendableBudget.setEnabled(false);
+        jpNorthEast5.add(moCurSpendableBudget);
+
+        jlSpendableBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlSpendableBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlSpendableBudgetHint.setToolTipText("Presupuesto estimado menos el comprometido del proyecto-iniciativa");
+        jlSpendableBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpNorthEast5.add(jlSpendableBudgetHint);
+
+        jpNorthEast.add(jpNorthEast5);
+
+        jpNorthEast6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurSpentBudget.setText("Presupuesto ejercido:");
         jlCurSpentBudget.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpRow10.add(jlCurSpentBudget);
+        jpNorthEast6.add(jlCurSpentBudget);
 
         moCurSpentBudget.setEnabled(false);
-        jpRow10.add(moCurSpentBudget);
+        jpNorthEast6.add(moCurSpentBudget);
 
         jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint.setToolTipText("Suma de los subtotales de facturas de la propuesta");
+        jlSpentBudgetHint.setToolTipText("Suma de subtotales de las facturas del proyecto-iniciativa");
         jlSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpRow10.add(jlSpentBudgetHint);
+        jpNorthEast6.add(jlSpentBudgetHint);
 
-        jpNorthEast.add(jpRow10);
+        jpNorthEast.add(jpNorthEast6);
 
         jpNorth.add(jpNorthEast, java.awt.BorderLayout.EAST);
 
         jpRegistry.add(jpNorth, java.awt.BorderLayout.NORTH);
 
-        jpCenter.setLayout(new java.awt.BorderLayout());
+        jpCenter.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jpPurpose.setLayout(new java.awt.BorderLayout());
+        jpCenter1.setLayout(new java.awt.BorderLayout());
 
-        jpPurRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpCenter11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPurpose.setText("Proposito de la propuesta:");
-        jlPurpose.setPreferredSize(new java.awt.Dimension(175, 23));
-        jpPurRow1.add(jlPurpose);
+        jlPurpose.setText("Proposito del proyecto-iniciativa:");
+        jlPurpose.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpCenter11.add(jlPurpose);
 
         jlPurposeHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPurposeHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlPurposeHint.setToolTipText("Especifica la razón de ser o por qué es importante la propuesta.");
         jlPurposeHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpPurRow1.add(jlPurposeHint);
+        jpCenter11.add(jlPurposeHint);
 
-        jpPurpose.add(jpPurRow1, java.awt.BorderLayout.NORTH);
+        jpCenter1.add(jpCenter11, java.awt.BorderLayout.NORTH);
 
-        jpPurRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(900, 100));
+        jpCenter12.setLayout(new java.awt.BorderLayout());
 
         jtaPurpose.setColumns(20);
+        jtaPurpose.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jtaPurpose.setRows(5);
+        jtaPurpose.setText("TEXT");
         jScrollPane1.setViewportView(jtaPurpose);
 
-        jpPurRow2.add(jScrollPane1);
+        jpCenter12.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jpPurpose.add(jpPurRow2, java.awt.BorderLayout.CENTER);
+        jpCenter1.add(jpCenter12, java.awt.BorderLayout.CENTER);
 
-        jpCenter.add(jpPurpose, java.awt.BorderLayout.NORTH);
+        jpCenter.add(jpCenter1);
 
-        jpCenterCenter.setLayout(new java.awt.BorderLayout());
+        jpCenter2.setLayout(new java.awt.BorderLayout());
 
-        jpDescription.setLayout(new java.awt.BorderLayout());
+        jpCenter21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jpPurRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDescription.setText("Descripción de la propuesta:");
-        jlDescription.setPreferredSize(new java.awt.Dimension(175, 23));
-        jpPurRow3.add(jlDescription);
+        jlDescription.setText("Descripción del proyecto-iniciativa:");
+        jlDescription.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpCenter21.add(jlDescription);
 
         jlDescriptionHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlDescriptionHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlDescriptionHint.setToolTipText("Especifica a detalle en qué consiste la propuesta.");
         jlDescriptionHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpPurRow3.add(jlDescriptionHint);
+        jpCenter21.add(jlDescriptionHint);
 
-        jpDescription.add(jpPurRow3, java.awt.BorderLayout.NORTH);
+        jpCenter2.add(jpCenter21, java.awt.BorderLayout.NORTH);
 
-        jpPurRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpCenter22.setLayout(new java.awt.BorderLayout());
 
         jScrollPane4.setPreferredSize(new java.awt.Dimension(900, 100));
 
         jtaDescription.setColumns(20);
+        jtaDescription.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jtaDescription.setRows(5);
+        jtaDescription.setText("TEXT");
         jScrollPane4.setViewportView(jtaDescription);
 
-        jpPurRow4.add(jScrollPane4);
+        jpCenter22.add(jScrollPane4, java.awt.BorderLayout.CENTER);
 
-        jpDescription.add(jpPurRow4, java.awt.BorderLayout.CENTER);
+        jpCenter2.add(jpCenter22, java.awt.BorderLayout.CENTER);
 
-        jpCenterCenter.add(jpDescription, java.awt.BorderLayout.NORTH);
+        jpCenter.add(jpCenter2);
 
-        jpGoals.setLayout(new java.awt.BorderLayout());
+        jpCenter3.setLayout(new java.awt.BorderLayout());
 
-        jpPurRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpCenter31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlGoals.setText("Objetivos de la propuesta:");
-        jlGoals.setPreferredSize(new java.awt.Dimension(175, 23));
-        jpPurRow5.add(jlGoals);
+        jlGoals.setText("Objetivos del proyecto-iniciativa:");
+        jlGoals.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpCenter31.add(jlGoals);
 
         jlGoalsHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlGoalsHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlGoalsHint.setToolTipText("Especifica cuáles son los resultados especificos a lograr con la propuesta.");
         jlGoalsHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jpPurRow5.add(jlGoalsHint);
+        jpCenter31.add(jlGoalsHint);
 
-        jpGoals.add(jpPurRow5, java.awt.BorderLayout.NORTH);
+        jpCenter3.add(jpCenter31, java.awt.BorderLayout.NORTH);
 
-        jpPurRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpCenter32.setLayout(new java.awt.BorderLayout());
 
         jScrollPane5.setPreferredSize(new java.awt.Dimension(900, 100));
 
         jtaGoals.setColumns(20);
+        jtaGoals.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jtaGoals.setRows(5);
+        jtaGoals.setText("TEXT");
         jScrollPane5.setViewportView(jtaGoals);
 
-        jpPurRow6.add(jScrollPane5);
+        jpCenter32.add(jScrollPane5, java.awt.BorderLayout.CENTER);
 
-        jpGoals.add(jpPurRow6, java.awt.BorderLayout.CENTER);
+        jpCenter3.add(jpCenter32, java.awt.BorderLayout.CENTER);
 
-        jpCenterCenter.add(jpGoals, java.awt.BorderLayout.CENTER);
-
-        jpCenter.add(jpCenterCenter, java.awt.BorderLayout.CENTER);
+        jpCenter.add(jpCenter3);
 
         jpRegistry.add(jpCenter, java.awt.BorderLayout.CENTER);
 
@@ -359,9 +384,10 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel jlBudgetHint;
-    private javax.swing.JLabel jlComBudgetHint;
+    private javax.swing.JLabel jlCompBudgetHint;
     private javax.swing.JLabel jlCurBudget;
-    private javax.swing.JLabel jlCurComBudget;
+    private javax.swing.JLabel jlCurCompBudget;
+    private javax.swing.JLabel jlCurSpendableBudget;
     private javax.swing.JLabel jlCurSpentBudget;
     private javax.swing.JLabel jlDateDateEnd;
     private javax.swing.JLabel jlDateDateStart;
@@ -370,138 +396,151 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     private javax.swing.JLabel jlGoals;
     private javax.swing.JLabel jlGoalsHint;
     private javax.swing.JLabel jlKeyFuncArea;
-    private javax.swing.JLabel jlKeyPeriod;
+    private javax.swing.JLabel jlKeyPeriodicityType;
     private javax.swing.JLabel jlKeyType;
     private javax.swing.JLabel jlPurpose;
     private javax.swing.JLabel jlPurposeHint;
+    private javax.swing.JLabel jlSpendableBudgetHint;
     private javax.swing.JLabel jlSpentBudgetHint;
     private javax.swing.JLabel jlTextCode;
     private javax.swing.JLabel jlTextName;
     private javax.swing.JPanel jpCenter;
-    private javax.swing.JPanel jpCenterCenter;
-    private javax.swing.JPanel jpDescription;
-    private javax.swing.JPanel jpGoals;
+    private javax.swing.JPanel jpCenter1;
+    private javax.swing.JPanel jpCenter11;
+    private javax.swing.JPanel jpCenter12;
+    private javax.swing.JPanel jpCenter2;
+    private javax.swing.JPanel jpCenter21;
+    private javax.swing.JPanel jpCenter22;
+    private javax.swing.JPanel jpCenter3;
+    private javax.swing.JPanel jpCenter31;
+    private javax.swing.JPanel jpCenter32;
     private javax.swing.JPanel jpNorth;
     private javax.swing.JPanel jpNorthEast;
+    private javax.swing.JPanel jpNorthEast1;
+    private javax.swing.JPanel jpNorthEast2;
+    private javax.swing.JPanel jpNorthEast3;
+    private javax.swing.JPanel jpNorthEast4;
+    private javax.swing.JPanel jpNorthEast5;
+    private javax.swing.JPanel jpNorthEast6;
     private javax.swing.JPanel jpNorthWest;
-    private javax.swing.JPanel jpPurRow1;
-    private javax.swing.JPanel jpPurRow2;
-    private javax.swing.JPanel jpPurRow3;
-    private javax.swing.JPanel jpPurRow4;
-    private javax.swing.JPanel jpPurRow5;
-    private javax.swing.JPanel jpPurRow6;
-    private javax.swing.JPanel jpPurpose;
+    private javax.swing.JPanel jpNorthWest1;
+    private javax.swing.JPanel jpNorthWest2;
+    private javax.swing.JPanel jpNorthWest3;
+    private javax.swing.JPanel jpNorthWest4;
+    private javax.swing.JPanel jpNorthWest5;
     private javax.swing.JPanel jpRegistry;
-    private javax.swing.JPanel jpRow1;
-    private javax.swing.JPanel jpRow10;
-    private javax.swing.JPanel jpRow2;
-    private javax.swing.JPanel jpRow3;
-    private javax.swing.JPanel jpRow4;
-    private javax.swing.JPanel jpRow5;
-    private javax.swing.JPanel jpRow6;
-    private javax.swing.JPanel jpRow7;
-    private javax.swing.JPanel jpRow8;
-    private javax.swing.JPanel jpRow9;
     private javax.swing.JTextArea jtaDescription;
     private javax.swing.JTextArea jtaGoals;
     private javax.swing.JTextArea jtaPurpose;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurBudget;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurComBudget;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurCompBudget;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurSpendableBudget;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurSpentBudget;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldKey moKeyFuncArea;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyPeriod;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPeriodicityType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyType;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlTextCode), 25);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlTextName), 250);
         moKeyType.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyType), true);
-        moKeyPeriod.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyPeriod), true);
+        moKeyPeriodicityType.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyPeriodicityType), true);
         moKeyFuncArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyFuncArea), true);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateStart), false);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateEnd), false);
         moCurBudget.setCompoundFieldSettings(miClient);
         moCurBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurBudget), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moCurComBudget.setCompoundFieldSettings(miClient);
-        moCurComBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurComBudget), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurCompBudget.setCompoundFieldSettings(miClient);
+        moCurCompBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurCompBudget), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurSpendableBudget.setCompoundFieldSettings(miClient);
+        moCurSpendableBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurSpendableBudget), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moCurSpentBudget.setCompoundFieldSettings(miClient);
         moCurSpentBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurSpentBudget), SGuiConsts.GUI_TYPE_DEC_AMT, false);
        
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
         moFields.addField(moKeyType);
-        moFields.addField(moKeyPeriod);
+        moFields.addField(moKeyPeriodicityType);
         moFields.addField(moKeyFuncArea);
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
         moFields.addField(moCurBudget.getField());
-        moFields.addField(moCurComBudget.getField());
+        moFields.addField(moCurCompBudget.getField());
+        moFields.addField(moCurSpendableBudget.getField());
         moFields.addField(moCurSpentBudget.getField());
         
         moFields.setFormButton(jbSave);
         
         jbEdit.setVisible(false);
         jbReadInfo.setVisible(false);
+        
+        moKeyType.removeAllItems();
+        SDbInitiative.createTypesGuiItem().forEach((item) -> {
+            moKeyType.addItem(item);
+        });
+    }
+    
+    private void updateSpendableBudget() {
+        double budget = moCurBudget.getField().getValue();
+        moCurSpendableBudget.getField().setValue(budget - mdCompBudget);
     }
     
     private boolean isApplingFunctionalAreas() {
         return ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
     
-    private double getComBudget() {
-        if (moKeyType.getValue()[0] == SModSysConsts.TRNX_TP_PERIOD_EVENT_ID){
-            return STrnUtilities.getInitiativeComBudget((SClientInterface) miClient, moRegistry.getPkInitiativeId());
-        }
-        return 0d;
+    private void enablePeriodicityType() {
+        moKeyPeriodicityType.setEnabled(moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_R);
     }
     
-    private double getSpentBudget() {
-        if (moKeyType.getValue()[0] == SModSysConsts.TRNX_TP_PERIOD_EVENT_ID){
-            return STrnUtilities.getInitiativeSpentBudget((SClientInterface) miClient, moRegistry.getPkInitiativeId());
-        }
-        return 0d;
-    }
-    
-    private void stateChangeKeyType() {
-        if (moKeyType.getValue()[0] == SModSysConsts.TRNX_TP_PERIOD_REC_ID) {
-            moKeyPeriod.setEnabled(true);
+    private void itemStateChangedType() {
+        enablePeriodicityType();
+        
+        if (moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_R) {
+            moCurCompBudget.getField().setValue(0d);
+            moCurSpentBudget.getField().setValue(0d);
+            updateSpendableBudget();
         } 
         else {
-            moKeyPeriod.setEnabled(false);
-            moKeyPeriod.setValue(new int[] { 0 });
+            moKeyPeriodicityType.setValue(new int[] { SModSysConsts.TRNS_TP_PERIOD_NA });
+            
+            moCurCompBudget.getField().setValue(mdCompBudget);
+            moCurSpentBudget.getField().setValue(mdSpentBudget);
+            updateSpendableBudget();
         }
+    }
+    
+    private void focusLostBudget() {
+        updateSpendableBudget();
     }
     
     @Override
     public void addAllListeners() {
-        moKeyType.addItemListener(this);    
+        moKeyType.addItemListener(this);
+        moCurBudget.getField().getComponent().addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         moKeyType.removeItemListener(this);
+        moCurBudget.getField().getComponent().removeFocusListener(this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
-        moKeyType.removeAllItems();
-        SModSysConsts.TRNX_TP_PERIOD_CATALOG.forEach((item) -> {
-            moKeyType.addItem(item);
-        });
-        moKeyType.setSelectedIndex(0);
-        
-        miClient.getSession().populateCatalogue(moKeyPeriod, SModConsts.TRNS_TP_PERIOD, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPeriodicityType, SModConsts.TRNS_TP_PERIOD, 0, null);
         
         if (!isApplingFunctionalAreas()) {
-            miClient.getSession().populateCatalogue(moKeyFuncArea, SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, null);
+            miClient.getSession().populateCatalogue(moKeyFuncArea, SModConsts.CFGU_FUNC, 0, null);
         }
         else {
             miClient.getSession().populateCatalogue(moKeyFuncArea, SModConsts.CFGU_FUNC, miClient.getSession().getUser().getPkUserId(), null);
@@ -523,33 +562,45 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
-            moKeyPeriod.setSelectedIndex(0);
+            
+            moRegistry.setType(SDbInitiative.TYPE_E);
+            
             if (!isApplingFunctionalAreas()) {
                 moKeyFuncArea.setValue(new int[] { SModSysConsts.CFGU_FUNC_NA });
             }
             else if ((moKeyFuncArea.getItemCount() - 1) == 1) {
                 moKeyFuncArea.setSelectedIndex(1);
             }
+            
+            mdCompBudget = 0;
+            mdSpentBudget = 0;
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-            moKeyPeriod.setValue(new int[] { moRegistry.getFkTypePeriodId() });
-            moKeyFuncArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId() });
+            
+            if (moRegistry.getType().equals(SDbInitiative.TYPE_E)) {
+                mdCompBudget = STrnUtilities.getInitiativeCompBudget((SClientInterface) miClient, moRegistry.getPkInitiativeId());
+                mdSpentBudget = STrnUtilities.getInitiativeSpentBudget((SClientInterface) miClient, moRegistry.getPkInitiativeId());;
+            }
+            else {
+                mdCompBudget = 0;
+                mdSpentBudget = 0;
+            }
         }
         
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
-        for (int i = 1; i <= SModSysConsts.TRNX_TP_PERIOD_CODES.size(); i++) {
-            if (SModSysConsts.TRNX_TP_PERIOD_CODES.get(i).equals(moRegistry.getType())) {
-                moKeyType.setValue(new int[] { i });
-                break;
-            }
-        }
+        moKeyType.setValue(new int[] { SDbInitiative.TypeIdsMap.get(moRegistry.getType()) });
+        itemStateChangedType();
+        moKeyPeriodicityType.setValue(new int[] { moRegistry.getFkPeriodicityTypeId()});
+        moKeyFuncArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId() });
+        
         moDateDateStart.setValue(moRegistry.getDateStart_n());
         moDateDateEnd.setValue(moRegistry.getDateEnd_n());
         moCurBudget.getField().setValue(moRegistry.getBudget());
-        moCurComBudget.getField().setValue(getComBudget());
-        moCurSpentBudget.getField().setValue(getSpentBudget());
+        moCurCompBudget.getField().setValue(mdCompBudget);
+        moCurSpentBudget.getField().setValue(mdSpentBudget);
+        updateSpendableBudget();
         
         jtaPurpose.setText(moRegistry.getPurpose());
         jtaDescription.setText(moRegistry.getDescription());
@@ -557,29 +608,27 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
         
         setFormEditable(true);
         
-        addAllListeners();
+        enablePeriodicityType();
         
-        stateChangeKeyType();
+        addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbInitiative registry = moRegistry.clone();
         
-        if (registry.isRegistryNew()) {
-            
-        }
+        if (registry.isRegistryNew()) { }
         
         registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
         registry.setPurpose(jtaPurpose.getText());
         registry.setGoals(jtaGoals.getText());
         registry.setDescription(jtaDescription.getText());
-        registry.setType(SModSysConsts.TRNX_TP_PERIOD_CODES.get(moKeyType.getValue()[0]));
+        registry.setType((String) moKeyType.getSelectedItem().getComplement());
         registry.setBudget(moCurBudget.getField().getValue());
         registry.setDateStart_n(moDateDateStart.getValue());
         registry.setDateEnd_n(moDateDateEnd.getValue());
-        registry.setFkTypePeriodId(moKeyPeriod.getValue()[0]);
+        registry.setFkPeriodicityTypeId(moKeyPeriodicityType.getValue()[0]);
         registry.setFkFunctionalAreaId(moKeyFuncArea.getValue()[0]);
         
         return registry;
@@ -589,9 +638,9 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (moKeyPeriod.isEnabled() && moKeyPeriod.getValue()[0] == SModSysConsts.TRNS_TP_PERIOD_NA) {
-            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + moKeyPeriod.getFieldName());
-            validation.setComponent(moKeyPeriod);
+        if (moKeyPeriodicityType.isEnabled() && moKeyPeriodicityType.getValue()[0] == SModSysConsts.TRNS_TP_PERIOD_NA) {
+            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + moKeyPeriodicityType.getFieldName());
+            validation.setComponent(moKeyPeriodicityType);
         }
         
         return validation;
@@ -603,7 +652,23 @@ public class SFormInitiative extends SBeanForm implements ItemListener {
             JComboBox comboBox = (JComboBox) e.getSource();
             
             if (comboBox == moKeyType) {
-                stateChangeKeyType();
+                itemStateChangedType();
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof SBeanFieldDecimal) {
+            SBeanFieldDecimal field = (SBeanFieldDecimal) e.getSource();
+            
+            if (field == moCurBudget.getField()) {
+                focusLostBudget();
             }
         }
     }
