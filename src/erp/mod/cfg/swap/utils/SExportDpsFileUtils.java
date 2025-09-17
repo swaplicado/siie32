@@ -7,8 +7,8 @@ package erp.mod.cfg.swap.utils;
 
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
-import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.swap.SSyncType;
+import java.net.HttpURLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -38,13 +38,13 @@ public class SExportDpsFileUtils {
             ResultSet resultSet;
             
             String sql = "SELECT  " +
-                    "    l.*, le.* " +
+                    "    le.ts_sync " +
                     "FROM " +
                     "    " + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS l " +
                     "        INNER JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS le ON l.id_sync_log = le.id_sync_log " +
                     "WHERE " +
-                    "    le.response_code IN (200 , 201) " +
+                    "    le.response_code IN (" + HttpURLConnection.HTTP_OK + " , " + HttpURLConnection.HTTP_CREATED + ") " +
                     "        AND l.sync_type = '" + syncType + "' " +
                     "        AND le.reference_id = '" + sReference + "' " +
                     "ORDER BY le.ts_sync DESC;";
@@ -78,7 +78,7 @@ public class SExportDpsFileUtils {
             ResultSet resultSet;
             
             String sql = "SELECT  " +
-                    "    le.* " +
+                    "    le.id_sync_log, le.id_ety " +
                     "FROM " +
                     "    " + (dbName == null || dbName.isEmpty() ? "" : (dbName + ".")) + 
                         SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS l " +
@@ -86,7 +86,7 @@ public class SExportDpsFileUtils {
                     "    " + (dbName == null || dbName.isEmpty() ? "" : (dbName + ".")) + 
                         SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS le ON l.id_sync_log = le.id_sync_log " +
                     "WHERE " +
-                    "    le.response_code IN (200 , 201) " +
+                    "    le.response_code IN (" + HttpURLConnection.HTTP_OK + " , " + HttpURLConnection.HTTP_CREATED + ") " +
                     "        AND l.sync_type = '" + syncType + "' " +
                     "        AND le.reference_id = '" + sReference + "' " +
                     "ORDER BY le.ts_sync DESC " +

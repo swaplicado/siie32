@@ -974,7 +974,6 @@ public abstract class SExportUtils {
                         }
                         break;
                         
-                        
                     case PUR_ORDER:
                         // exportar antes áreas funcionales:
                         syncTypeInProgress = SSyncType.PUR_ORDER;

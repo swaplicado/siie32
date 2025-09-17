@@ -1129,20 +1129,14 @@ public abstract class SExportDataUtils {
                         + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                         + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                         + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                        + "AND YEAR(d.ts_authorn) = 2025 "
-                        + "AND ";
-                if (lastSyncDatetime != null) {
-                    sql += "((" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + ") "
-                            + "AND (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                            + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                            + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) "
-                            + "OR ";
-                }
-                sql += "(" + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + ") "
-                        + "AND NOT d.b_del "
-                        + "AND d.b_authorn "
-                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") "
-                        + (lastSyncDatetime != null ? ")" : "");
+                        + "AND YEAR(d.ts_authorn) >= " + SSwapConsts.SINCE_YEAR + " "
+                        + "AND ("
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn) "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + ")";
                 sql += ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -1241,7 +1235,7 @@ public abstract class SExportDataUtils {
                                 }
                                 else {
                                     oRmFile.filename_original = oRmFile.filename_storage;
-                                    oRmFile.title = "PDF de la Requisición";
+                                    oRmFile.title = "PDF de la requisición";
                                     oRmFile.bucket_name = sBucketName;
                                     oRmFile.project_id = sProjectID;
 
