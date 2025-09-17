@@ -1082,6 +1082,7 @@ public abstract class SExportDataUtils {
             
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
             // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
+            // XXX Edwin Carmona, 2025-09-17: Mejorar este código. Introducirlo en el constructor del objeto involucrado para que se invoque en automático, y no por fuera de manera manual.
             SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
                                     + "dbName\":\"erp\",\""
                                     + "dbPort\":\"3306\",\""
