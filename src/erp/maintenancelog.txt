@@ -2,9 +2,9 @@
 SIIE 3.2 288.5/ 2025-09-17
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Inclusión del métodod de pago y el ID externo con el PK del documento en la exportación de referencias de órdenes de compras a SWAP Services.
+1) Inclusión del método de pago y el ID externo con el PK del documento en la exportación de referencias de órdenes de compras a SWAP Services.
 2) Definición de la URL base de importación de facturas de compras autorizadas dependiendo del tipo de entorno de SIIE Client (development o estándar).
-3) Refactorización al manejo del campo "tipo" en CRUD de iniciativas, y renombramiento de su gestión en la UI de "propuestas" a "proyectos-iniciativas".
+3) Refactorización al manejo del campo "tipo" en el CRUD de iniciativas, y renombramiento de su gestión en la UI de "propuestas" a "proyectos-iniciativas".
 
 ================================================================================
 SIIE 3.2 288.4/ 2025-09-16
