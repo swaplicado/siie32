@@ -16,6 +16,11 @@ package erp.mod.cfg.swap.utils;
 public class SExportDataReference implements SExportData {
 
     /**
+     * ID de la referencia en el sistema externo.
+     */
+    public String external_id;
+
+    /**
      * ID de la empresa de la referencia en el sistema externo.
      */
     public int external_company_id;
@@ -64,6 +69,11 @@ public class SExportDataReference implements SExportData {
      * Uso fiscal de la referencia (Uso de CFDI).
      */
     public String fiscal_use;
+    
+    /**
+     * Método de pago de la referencia.
+     */
+    public String payment_method;
     
     /**
      * Indicador de borrada de la referencia.

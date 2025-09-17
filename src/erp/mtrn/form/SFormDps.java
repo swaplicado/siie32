@@ -983,8 +983,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlInitType = new javax.swing.JLabel();
         jtfInitType = new javax.swing.JTextField();
         jPanel148 = new javax.swing.JPanel();
-        jlInitPeriod = new javax.swing.JLabel();
-        jtfInitPeriod = new javax.swing.JTextField();
+        jlInitPeriodicityType = new javax.swing.JLabel();
+        jtfInitPeriodicityType = new javax.swing.JTextField();
         jPanel143 = new javax.swing.JPanel();
         jlInitFuncArea = new javax.swing.JLabel();
         jtfInitFuncArea = new javax.swing.JTextField();
@@ -1000,22 +1000,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlInitBudget = new javax.swing.JLabel();
         jtfInitBudget = new javax.swing.JTextField();
         jtfInitBudgetCur = new javax.swing.JTextField();
-        jlBudgetHint = new javax.swing.JLabel();
+        jlInitBudgetHint = new javax.swing.JLabel();
         jPanel150 = new javax.swing.JPanel();
-        jlInitComBudget = new javax.swing.JLabel();
-        jtfInitComBudget = new javax.swing.JTextField();
-        jtfInitComBudgetCur = new javax.swing.JTextField();
-        jlComBudgetHint = new javax.swing.JLabel();
+        jlInitCompBudget = new javax.swing.JLabel();
+        jtfInitCompBudget = new javax.swing.JTextField();
+        jtfInitCompBudgetCur = new javax.swing.JTextField();
+        jlInitCompBudgetHint = new javax.swing.JLabel();
         jPanel156 = new javax.swing.JPanel();
         jlInitSpendableBudget = new javax.swing.JLabel();
         jtfInitSpendableBudget = new javax.swing.JTextField();
         jtfInitSpendableBudgetCur = new javax.swing.JTextField();
-        jlSpentBudgetHint1 = new javax.swing.JLabel();
+        jlInitSpentBudgetHint1 = new javax.swing.JLabel();
         jPanel151 = new javax.swing.JPanel();
         jlInitSpentBudget = new javax.swing.JLabel();
         jtfInitSpentBudget = new javax.swing.JTextField();
         jtfInitSpentBudgetCur = new javax.swing.JTextField();
-        jlSpentBudgetHint = new javax.swing.JLabel();
+        jlInitSpentBudgetHint = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
         jpControlsPk = new javax.swing.JPanel();
         jtfPkRo = new javax.swing.JTextField();
@@ -3463,7 +3463,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel146.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitInitiative.setText("Propuesta:");
+        jlInitInitiative.setText("Proyecto-iniciativa:");
         jlInitInitiative.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel146.add(jlInitInitiative);
 
@@ -3475,7 +3475,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel141.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitType.setText("Tipo propuesta:");
+        jlInitType.setText("Tipo iniciativa:");
         jlInitType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel141.add(jlInitType);
 
@@ -3488,14 +3488,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel148.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitPeriod.setText("Periodicidad:");
-        jlInitPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel148.add(jlInitPeriod);
+        jlInitPeriodicityType.setText("Periodicidad:");
+        jlInitPeriodicityType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel148.add(jlInitPeriodicityType);
 
-        jtfInitPeriod.setEnabled(false);
-        jtfInitPeriod.setFocusable(false);
-        jtfInitPeriod.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel148.add(jtfInitPeriod);
+        jtfInitPeriodicityType.setEnabled(false);
+        jtfInitPeriodicityType.setFocusable(false);
+        jtfInitPeriodicityType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel148.add(jtfInitPeriodicityType);
 
         jPanel153.add(jPanel148);
 
@@ -3564,38 +3564,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfInitBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel149.add(jtfInitBudgetCur);
 
-        jlBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlBudgetHint.setToolTipText("Presupuesto que requerirá la propuesta");
-        jlBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel149.add(jlBudgetHint);
+        jlInitBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlInitBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlInitBudgetHint.setToolTipText("Presupuesto que requiere el proyecto-iniciativa");
+        jlInitBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel149.add(jlInitBudgetHint);
 
         jPanel155.add(jPanel149);
 
         jPanel150.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInitComBudget.setText("Presupuesto comprometido:");
-        jlInitComBudget.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel150.add(jlInitComBudget);
+        jlInitCompBudget.setText("Presupuesto comprometido:");
+        jlInitCompBudget.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel150.add(jlInitCompBudget);
 
-        jtfInitComBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfInitComBudget.setText("0.0000");
-        jtfInitComBudget.setEnabled(false);
-        jtfInitComBudget.setFocusable(false);
-        jtfInitComBudget.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel150.add(jtfInitComBudget);
+        jtfInitCompBudget.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfInitCompBudget.setText("0.0000");
+        jtfInitCompBudget.setEnabled(false);
+        jtfInitCompBudget.setFocusable(false);
+        jtfInitCompBudget.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel150.add(jtfInitCompBudget);
 
-        jtfInitComBudgetCur.setText("MXN");
-        jtfInitComBudgetCur.setEnabled(false);
-        jtfInitComBudgetCur.setFocusable(false);
-        jtfInitComBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel150.add(jtfInitComBudgetCur);
+        jtfInitCompBudgetCur.setText("MXN");
+        jtfInitCompBudgetCur.setEnabled(false);
+        jtfInitCompBudgetCur.setFocusable(false);
+        jtfInitCompBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel150.add(jtfInitCompBudgetCur);
 
-        jlComBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlComBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlComBudgetHint.setToolTipText("Suma de los subtotales de pedidos de la propuesta");
-        jlComBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel150.add(jlComBudgetHint);
+        jlInitCompBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlInitCompBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlInitCompBudgetHint.setToolTipText("Suma de subtotales de los pedidos del proyecto-iniciativa");
+        jlInitCompBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel150.add(jlInitCompBudgetHint);
 
         jPanel155.add(jPanel150);
 
@@ -3618,11 +3618,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfInitSpendableBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel156.add(jtfInitSpendableBudgetCur);
 
-        jlSpentBudgetHint1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlSpentBudgetHint1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint1.setToolTipText("Presupuesto estimado menos el comprometido");
-        jlSpentBudgetHint1.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel156.add(jlSpentBudgetHint1);
+        jlInitSpentBudgetHint1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlInitSpentBudgetHint1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlInitSpentBudgetHint1.setToolTipText("Presupuesto estimado menos el comprometido del proyecto-iniciativa");
+        jlInitSpentBudgetHint1.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel156.add(jlInitSpentBudgetHint1);
 
         jPanel155.add(jPanel156);
 
@@ -3645,11 +3645,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfInitSpentBudgetCur.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel151.add(jtfInitSpentBudgetCur);
 
-        jlSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlSpentBudgetHint.setToolTipText("Suma de los totales de facturas de la propuesta");
-        jlSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel151.add(jlSpentBudgetHint);
+        jlInitSpentBudgetHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlInitSpentBudgetHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlInitSpentBudgetHint.setToolTipText("Suma de subtotales de las facturas del proyecto-iniciativa");
+        jlInitSpentBudgetHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel151.add(jlInitSpentBudgetHint);
 
         jPanel155.add(jPanel151);
 
@@ -3659,7 +3659,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpInitiatives.add(jPanel135, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane.addTab("Propuesta", jpInitiatives);
+        jTabbedPane.addTab("Proyecto-iniciativa", jpInitiatives);
 
         jpDocument.add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -4006,7 +4006,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldInitDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftInitDateEnd, jlInitDateEnd);
         moFieldInitBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitBudget, jlInitBudget);
         moFieldInitBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
-        moFieldInitComBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitComBudget, jlInitComBudget);
+        moFieldInitComBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitCompBudget, jlInitCompBudget);
         moFieldInitComBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         moFieldInitSpendableBudget = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfInitSpendableBudget, jlInitSpendableBudget);
         moFieldInitSpendableBudget.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
@@ -10712,30 +10712,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void itemStateChangeInitInitiative() {
+    private void itemStateChangedInitInitiative() {
         try {
             if (jcbInitInitiative.getSelectedIndex() > 0) {
-                SDbInitiative initiative = new SDbInitiative();
-                initiative.read(miClient.getSession(), moFieldInitInitiative.getKeyAsIntArray());
+                SDbInitiative initiative = (SDbInitiative) miClient.getSession().readRegistry(SModConsts.TRN_INIT, moFieldInitInitiative.getKeyAsIntArray());
                 
                 jtfInitType.setText(initiative.getDbmsType());
-                jtfInitPeriod.setText(initiative.getDbmsPeriod());
+                jtfInitPeriodicityType.setText(initiative.getDbmsPeriodicityType());
                 jtfInitFuncArea.setText(initiative.getDbmsFuncArea());
                 moFieldInitDateStart.setFieldValue(initiative.getDateStart_n());
                 moFieldInitDateEnd.setFieldValue(initiative.getDateEnd_n());
                 
                 moFieldInitBudget.setFieldValue(initiative.getBudget());
                 
-                int typeId = 0;
-                for (int i = 1; i <= SModSysConsts.TRNX_TP_PERIOD_CODES.size(); i++) {
-                    if (SModSysConsts.TRNX_TP_PERIOD_CODES.get(i).equals(initiative.getType())) {
-                        typeId = i;
-                        break;
-                    }
-                }
-                
-                if (typeId == SModSysConsts.TRNX_TP_PERIOD_EVENT_ID){
-                    moFieldInitComBudget.setFieldValue(STrnUtilities.getInitiativeComBudget(miClient, initiative.getPkInitiativeId()));
+                if (initiative.getType().equals(SDbInitiative.TYPE_E)) {
+                    moFieldInitComBudget.setFieldValue(STrnUtilities.getInitiativeCompBudget(miClient, initiative.getPkInitiativeId()));
                     moFieldInitSpendableBudget.setFieldValue(SLibUtils.roundAmount(moFieldInitBudget.getDouble() - moFieldInitComBudget.getDouble()));
                     moFieldInitSpentBudget.setFieldValue(STrnUtilities.getInitiativeSpentBudget(miClient, initiative.getPkInitiativeId()));
                 }
@@ -10747,7 +10738,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else {
                 jtfInitType.setText("");
-                jtfInitPeriod.setText("");
+                jtfInitPeriodicityType.setText("");
                 jtfInitFuncArea.setText("");
                 moFieldInitDateStart.setFieldValue(null);
                 moFieldInitDateEnd.setFieldValue(null);
@@ -11516,7 +11507,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlBizPartnerBranchAddress01;
     private javax.swing.JLabel jlBizPartnerBranchAddressMain01;
     private javax.swing.JLabel jlBizPartnerBranchAddressMain02;
-    private javax.swing.JLabel jlBudgetHint;
     private javax.swing.JLabel jlCfdCceAddresseeBizPartner;
     private javax.swing.JLabel jlCfdCceCertificateOrigin;
     private javax.swing.JLabel jlCfdCceExchangeRateUsd;
@@ -11536,7 +11526,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlCfdiPaymentWay;
     private javax.swing.JLabel jlCfdiTaxRegimeIssuing;
     private javax.swing.JLabel jlCfdiTaxRegimeReceptor;
-    private javax.swing.JLabel jlComBudgetHint;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlConditionsPayment;
     private javax.swing.JLabel jlCurrency;
@@ -11583,14 +11572,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlGblYear;
     private javax.swing.JLabel jlGlobalInf;
     private javax.swing.JLabel jlInitBudget;
-    private javax.swing.JLabel jlInitComBudget;
+    private javax.swing.JLabel jlInitBudgetHint;
+    private javax.swing.JLabel jlInitCompBudget;
+    private javax.swing.JLabel jlInitCompBudgetHint;
     private javax.swing.JLabel jlInitDateEnd;
     private javax.swing.JLabel jlInitDateStart;
     private javax.swing.JLabel jlInitFuncArea;
     private javax.swing.JLabel jlInitInitiative;
-    private javax.swing.JLabel jlInitPeriod;
+    private javax.swing.JLabel jlInitPeriodicityType;
     private javax.swing.JLabel jlInitSpendableBudget;
     private javax.swing.JLabel jlInitSpentBudget;
+    private javax.swing.JLabel jlInitSpentBudgetHint;
+    private javax.swing.JLabel jlInitSpentBudgetHint1;
     private javax.swing.JLabel jlInitType;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlPrepaymentsCy;
@@ -11603,8 +11596,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlSalesSupervisorBizPartner;
     private javax.swing.JLabel jlSpace;
     private javax.swing.JLabel jlSpace1;
-    private javax.swing.JLabel jlSpentBudgetHint;
-    private javax.swing.JLabel jlSpentBudgetHint1;
     private javax.swing.JLabel jlSubtotal;
     private javax.swing.JLabel jlSubtotalProvisional;
     private javax.swing.JLabel jlTaxCharged;
@@ -11727,10 +11718,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfGblYear;
     private javax.swing.JTextField jtfInitBudget;
     private javax.swing.JTextField jtfInitBudgetCur;
-    private javax.swing.JTextField jtfInitComBudget;
-    private javax.swing.JTextField jtfInitComBudgetCur;
+    private javax.swing.JTextField jtfInitCompBudget;
+    private javax.swing.JTextField jtfInitCompBudgetCur;
     private javax.swing.JTextField jtfInitFuncArea;
-    private javax.swing.JTextField jtfInitPeriod;
+    private javax.swing.JTextField jtfInitPeriodicityType;
     private javax.swing.JTextField jtfInitSpendableBudget;
     private javax.swing.JTextField jtfInitSpendableBudgetCur;
     private javax.swing.JTextField jtfInitSpentBudget;
@@ -12058,7 +12049,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // Propuestas:
         
-        SFormUtilities.populateComboBox(miClient, jcbInitInitiative, SDataConstants.TRN_INIT);
+        if (!isApplingFunctionalAreas()) {
+            SFormUtilities.populateComboBox(miClient, jcbInitInitiative, SDataConstants.TRN_INIT); // load initiatives for all functional areas
+        }
+        else {
+            SFormUtilities.populateComboBox(miClient, jcbInitInitiative, SDataConstants.TRN_INIT, new int[] { miClient.getSessionXXX().getUser().getPkUserId() }); // load only initiatives of user-asigned functional areas
+        }
         
         moComboBoxGroupCfdCceGroupAddressee.clear();
         moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbCfdCceFkAddresseeBizPartner);
@@ -13335,7 +13331,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             jcbInitInitiative.setSelectedIndex(0);
         }
-        itemStateChangeInitInitiative();
+        itemStateChangedInitInitiative();
         
         updateDpsFieldsStatus(false);
 
@@ -14199,7 +14195,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         itemStateChangedAccEntryItem(true);
                     }
                     else if (comboBox == jcbInitInitiative) {
-                        itemStateChangeInitInitiative();
+                        itemStateChangedInitInitiative();
                     }
                 }
             }

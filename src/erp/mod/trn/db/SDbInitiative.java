@@ -6,21 +6,39 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbInitiative extends SDbRegistryUser{
+    
+    public static final int ID_TYPE_E = 1; // per Event
+    public static final int ID_TYPE_R = 2; // Recurrent
+    
+    public static final String TYPE_E = "E"; // per Event
+    public static final String TYPE_R = "R"; // Recurrent
+    
+    public static final String TYPE_PER_EVENT = "Por evemto"; // per Event
+    public static final String TYPE_RECURRENT = "Recurrente"; // Recurrent
+    
+    public static HashMap<String, Integer> TypeIdsMap = new HashMap<>();
+    
+    static {
+        TypeIdsMap.put(TYPE_E, ID_TYPE_E);
+        TypeIdsMap.put(TYPE_R, ID_TYPE_R);
+    }
     
     protected int mnPkInitiativeId;
     protected String msCode;
@@ -33,7 +51,7 @@ public class SDbInitiative extends SDbRegistryUser{
     protected Date mtDateStart_n;
     protected Date mtDateEnd_n;
     //protected boolean mbDeleted;
-    protected int mnFkTypePeriodId;
+    protected int mnFkPeriodicityTypeId;
     protected int mnFkFunctionalAreaId;
     /*
     protected int mnFkUserInsertId;
@@ -43,7 +61,7 @@ public class SDbInitiative extends SDbRegistryUser{
     */
     
     protected String msDbmsType;
-    protected String msDbmsPeriod;
+    protected String msDbmsPeriodicityType;
     protected String msDbmsFuncArea;
 
     public SDbInitiative() {
@@ -61,7 +79,7 @@ public class SDbInitiative extends SDbRegistryUser{
     public void setDateStart_n(Date t) { mtDateStart_n = t; }
     public void setDateEnd_n(Date t) { mtDateEnd_n = t; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkTypePeriodId(int n) { mnFkTypePeriodId = n; }
+    public void setFkPeriodicityTypeId(int n) { mnFkPeriodicityTypeId = n; }
     public void setFkFunctionalAreaId(int n) { mnFkFunctionalAreaId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -69,7 +87,7 @@ public class SDbInitiative extends SDbRegistryUser{
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
     public void setDbmsType(String s) { msDbmsType = s; }
-    public void setDbmsPeriod(String s) { msDbmsPeriod = s; }
+    public void setDbmsPeriodicityType(String s) { msDbmsPeriodicityType = s; }
     public void setDbmsFuncArea(String s) { msDbmsFuncArea = s; }
 
     public int getPkInitiativeId() { return mnPkInitiativeId; }
@@ -83,7 +101,7 @@ public class SDbInitiative extends SDbRegistryUser{
     public Date getDateStart_n() { return mtDateStart_n; }
     public Date getDateEnd_n() { return mtDateEnd_n; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkTypePeriodId() { return mnFkTypePeriodId; }
+    public int getFkPeriodicityTypeId() { return mnFkPeriodicityTypeId; }
     public int getFkFunctionalAreaId() { return mnFkFunctionalAreaId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -91,7 +109,7 @@ public class SDbInitiative extends SDbRegistryUser{
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public String getDbmsType() { return msDbmsType; }
-    public String getDbmsPeriod() { return msDbmsPeriod; }
+    public String getDbmsPeriodicityType() { return msDbmsPeriodicityType; }
     public String getDbmsFuncArea() { return msDbmsFuncArea; }
 
     @Override
@@ -119,7 +137,7 @@ public class SDbInitiative extends SDbRegistryUser{
         mtDateStart_n = null;
         mtDateEnd_n = null;
         mbDeleted = false;
-        mnFkTypePeriodId = 0;
+        mnFkPeriodicityTypeId = 0;
         mnFkFunctionalAreaId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -127,7 +145,7 @@ public class SDbInitiative extends SDbRegistryUser{
         mtTsUserUpdate = null;
         
         msDbmsType = "";
-        msDbmsPeriod = "";
+        msDbmsPeriodicityType = "";
         msDbmsFuncArea = "";
     }
 
@@ -166,14 +184,12 @@ public class SDbInitiative extends SDbRegistryUser{
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
 
-        msSql = "SELECT i.*, " +
-                "IF(i.type = 'E', '" + SModSysConsts.TRNX_TP_PERIOD_EVENT_DESC + "', '" + SModSysConsts.TRNX_TP_PERIOD_REC_DESC + "') AS type_desc, " +
-                "tp.name AS period, f.name AS func " +
-                "FROM trn_init AS i " +
-                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_PERIOD) + " AS tp " + 
-                "ON i.fk_tp_period = tp.id_tp_period " +
-                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f " + 
-                "ON i.fk_func = f.id_func " +
+        msSql = "SELECT i.*, "
+                + "CASE WHEN i.type = '" + TYPE_E + "' THEN '" + TYPE_PER_EVENT + "' WHEN i.type = '" + TYPE_R + "' THEN '" + TYPE_RECURRENT + "' ELSE '?' END AS _type, "
+                + "tp.name AS _periodicity_type, f.name AS _func "
+                + "FROM trn_init AS i "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_PERIOD) + " AS tp ON i.fk_tp_period = tp.id_tp_period "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON i.fk_func = f.id_func " +
                 getSqlWhere(pk);
         resultSet = session.getStatement().executeQuery(msSql);
         if (!resultSet.next()) {
@@ -191,16 +207,16 @@ public class SDbInitiative extends SDbRegistryUser{
             mtDateStart_n = resultSet.getDate("dt_sta_n");
             mtDateEnd_n = resultSet.getDate("dt_end_n");
             mbDeleted = resultSet.getBoolean("b_del");
-            mnFkTypePeriodId = resultSet.getInt("fk_tp_period");
+            mnFkPeriodicityTypeId = resultSet.getInt("fk_tp_period");
             mnFkFunctionalAreaId = resultSet.getInt("fk_func");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            msDbmsType = resultSet.getString("type_desc");
-            msDbmsPeriod = resultSet.getString("period");
-            msDbmsFuncArea = resultSet.getString("func");
+            msDbmsType = resultSet.getString("_type");
+            msDbmsPeriodicityType = resultSet.getString("_periodicity_type");
+            msDbmsFuncArea = resultSet.getString("_func");
 
             mbRegistryNew = false;
         }
@@ -232,7 +248,7 @@ public class SDbInitiative extends SDbRegistryUser{
                     (mtDateStart_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart_n) + "', ") + 
                     (mtDateEnd_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd_n) + "', ") + 
                     (mbDeleted ? 1 : 0) + ", " + 
-                    mnFkTypePeriodId + ", " + 
+                    mnFkPeriodicityTypeId + ", " + 
                     mnFkFunctionalAreaId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -255,7 +271,7 @@ public class SDbInitiative extends SDbRegistryUser{
                     "dt_sta_n = " + (mtDateStart_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart_n) + "', ") +
                     "dt_end_n = " + (mtDateEnd_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd_n) + "', ") +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "fk_tp_period = " + mnFkTypePeriodId + ", " +
+                    "fk_tp_period = " + mnFkPeriodicityTypeId + ", " +
                     "fk_func = " + mnFkFunctionalAreaId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -285,7 +301,7 @@ public class SDbInitiative extends SDbRegistryUser{
         registry.setDateStart_n(this.getDateStart_n());
         registry.setDateEnd_n(this.getDateEnd_n());
         registry.setDeleted(this.isDeleted());
-        registry.setFkTypePeriodId(this.getFkTypePeriodId());
+        registry.setFkPeriodicityTypeId(this.getFkPeriodicityTypeId());
         registry.setFkFunctionalAreaId(this.getFkFunctionalAreaId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
@@ -293,11 +309,20 @@ public class SDbInitiative extends SDbRegistryUser{
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setDbmsType(this.getDbmsType());
-        registry.setDbmsPeriod(this.getDbmsPeriod());
+        registry.setDbmsPeriodicityType(this.getDbmsPeriodicityType());
         registry.setDbmsFuncArea(this.getDbmsFuncArea());
 
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+    
+    public static ArrayList<SGuiItem> createTypesGuiItem() {
+        ArrayList<SGuiItem> guiItems = new ArrayList<>();
+        
+        guiItems.add(new SGuiItem(new int[] { ID_TYPE_E }, TYPE_PER_EVENT, TYPE_E ));
+        guiItems.add(new SGuiItem(new int[] { ID_TYPE_R }, TYPE_RECURRENT, TYPE_R ));
+        
+        return guiItems;
     }
 }

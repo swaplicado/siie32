@@ -8,7 +8,7 @@ package erp.mod.trn.view;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbInitiative;
 import erp.mod.view.SViewFilter;
 import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
@@ -87,13 +87,13 @@ public class SViewInitiative extends SGridPaneView {
                 + "v.purpose, "
                 + "v.goals, "
                 + "v.description, "
-                + "IF(v.type = 'E', '" + SModSysConsts.TRNX_TP_PERIOD_EVENT_DESC + "', '" + SModSysConsts.TRNX_TP_PERIOD_REC_DESC + "') AS type, "
+                + "CASE WHEN v.type = '" + SDbInitiative.TYPE_E + "' THEN '" + SDbInitiative.TYPE_PER_EVENT + "' WHEN v.type = '" + SDbInitiative.TYPE_R + "' THEN '" + SDbInitiative.TYPE_RECURRENT + "' ELSE '?' END AS _type, "
                 + "v.budget, "
                 + "v.dt_sta_n, "
                 + "v.dt_end_n, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "tp.name AS period, "
-                + "f.name AS func, "
+                + "tp.name AS _periodicity_type, "
+                + "f.name AS _func, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -119,9 +119,9 @@ public class SViewInitiative extends SGridPaneView {
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE, 125));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "type", "Tipo propuesta"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "period", "Periodicidad"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "func", "Área funcional"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_type", "Tipo iniciativa"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_periodicity_type", "Periodicidad"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta_n", "Fecha inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end_n", "Fecha final"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "budget", "Presupuesto estimado $"));

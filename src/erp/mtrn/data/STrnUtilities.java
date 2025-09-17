@@ -4940,7 +4940,7 @@ public abstract class STrnUtilities {
         return null;
     }
     
-    public static double getInitiativeComBudget(SClientInterface client, int pk) {
+    public static double getInitiativeCompBudget(SClientInterface client, int pk) {
         try {
             String sql = "SELECT COALESCE(SUM(d.stot_r), 0) FROM trn_dps AS d " +
                     "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc " +

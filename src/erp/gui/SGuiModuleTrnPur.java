@@ -321,7 +321,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
         jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
         jmiCatItemBizParther = new JMenuItem("Configuración de proveedores vs. insumos");
-        jmiCatInitiatives = new JMenuItem("Propuestas");
+        jmiCatInitiatives = new JMenuItem("Proyectos-iniciativas");
         
         jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
