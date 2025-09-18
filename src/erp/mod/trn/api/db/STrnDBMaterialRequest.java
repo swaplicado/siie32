@@ -263,6 +263,13 @@ public class STrnDBMaterialRequest {
                         oMatReq.setMrStorageCloudUrl(CloudStorageManager.generatePresignedUrl(fileName));
                         System.out.println(fileName);
                     }
+                    else {
+                        fileName = this.msMainDatabase + "-" + "RM" + "-" + oMatReq.getIdMaterialRequest() + ".pdf";
+                        if (CloudStorageManager.storagedFileExists(fileName)) {
+                            oMatReq.setMrStorageCloudUrl(CloudStorageManager.generatePresignedUrl(fileName));
+                            System.out.println(fileName);
+                        }
+                    }
                 }
                 catch (StorageManagerException ex) {
                     Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
