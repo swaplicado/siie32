@@ -201,12 +201,12 @@ public class SModuleCfg extends SGuiModule {
                         "ORDER BY f.name, f.code, f.id_func ";
                 break;
             case SModConsts.CFGU_FUNC_SUB:
-                settings = new SGuiCatalogueSettings("Subárea funcional", 1, 0, SLibConsts.DATA_TYPE_TEXT);
-                sql = "SELECT fs.id_func_sub AS " + SDbConsts.FIELD_ID + "1, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS " + SDbConsts.FIELD_ITEM + ", fs.code AS " + SDbConsts.FIELD_COMP + " " +
+                settings = new SGuiCatalogueSettings("Subárea funcional", 2, 0, SLibConsts.DATA_TYPE_TEXT);
+                sql = "SELECT fs.fk_func AS " + SDbConsts.FIELD_ID + "1, fs.id_func_sub AS " + SDbConsts.FIELD_ID + "2, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS " + SDbConsts.FIELD_ITEM + ", fs.code AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM " + SModConsts.TablesMap.get(type) + " AS fs " +
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func ";
                 if (subtype != 0) {
-                    sql += "INNER JOIN " + SModConsts.TablesMap.get(type) + " AS ufs ON " +
+                    sql += "INNER JOIN usr_usr_func_sub AS ufs ON " +
                             "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + subtype + " ";
                 }
                 sql += "WHERE NOT fs.b_del AND NOT f.b_del " +

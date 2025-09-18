@@ -146,7 +146,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
                 try {
                     // Obtener bytes del archivo y generar un nombre único para el almacenamiento en la nube
                     byte[] fileBytes = SDocUtils.getFileBytes(miClient.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
-                    String name = SDocUtils.generateFileName(miClient.getSession().getDatabase().getDbName(),
+                    String name = SDocUtils.generateDpsFileName(miClient.getSession().getDatabase().getDbName(),
                             moSuppFileProc.getPkYearId(),
                             moSuppFileProc.getPkDocId(),
                             oFile.getPkSupplierFileId(),
@@ -181,23 +181,26 @@ public class SProcDpsSendAuthornWeb extends Thread {
                         String name = miClient.getSession().getDatabase().getDbName() + "-REQ-" + mat.getPkMatRequestId() + ".pdf";
 
                         if (!CloudStorageManager.storagedFileExists(name)) {
-                            // Guardar en el log la requisición que se subió
                             HashMap<String, Object> params = SMaterialRequestUtils.createMatReqParamsMapPdf((SGuiClient) miClient, mat.getPkMatRequestId());
                             SGuiReport report = new SGuiReport("reps/trn_mat_req.jasper", "Requisición");
                             File matReqFile = new File(report.getFileName());
                             JasperReport jasperReport = (JasperReport) JRLoader.loadObject(matReqFile);
                             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, miClient.getSession().getStatement().getConnection());
                             byte[] fileBytes = JasperExportManager.exportReportToPdf(jasperPrint);
-                            SDbMaterialRequestExternalStorageLog extStoLog = new SDbMaterialRequestExternalStorageLog();
-                            extStoLog.setPkMatRequestId(mat.getPkMatRequestId());
-                            extStoLog.save(miClient.getSession());
 
                             // Subir los formato de impresión de la requisición a la nube
                             CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
+                            
                             if (oGcsFile == null) {
                                 hasError = true; // Marcar error si falla la subida
                                 msError += "Error al enviar los archivos de la requisición, intente de nuevo o contacte a soporte técnico.";
                                 break;
+                            }
+                            // Guardar en el log la requisición que se subió
+                            else {
+                                SDbMaterialRequestExternalStorageLog extStoLog = new SDbMaterialRequestExternalStorageLog();
+                                extStoLog.setPkMatRequestId(mat.getPkMatRequestId());
+                                extStoLog.save(miClient.getSession());
                             }
                         }
                     }

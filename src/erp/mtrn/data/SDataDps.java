@@ -332,7 +332,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     /*
      * Private functions
      */
-
+    
     /**
      * Check if purchases transaction is authorized in an event basis, according to current user.
      * @param userConfigTxn User Configuration Transaction for current user.
@@ -1844,7 +1844,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         return false;
     }
-
+    
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
     public int[] getDpsClassKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId }; }
     public int[] getDpsTypeKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId }; }

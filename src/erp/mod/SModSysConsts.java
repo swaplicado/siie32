@@ -527,6 +527,15 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_ISR = 1;
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
+    
+    public static final int FINS_ST_PAY_NEW = 1; //Nuevo
+    public static final int FINS_ST_PAY_PRC_AUTH = 2; //En autorización
+    public static final int FINS_ST_PAY_REJ = 3; //Rechazado
+    public static final int FINS_ST_PAY_SCHED = 4; //Programado
+    public static final int FINS_ST_PAY_EXEC = 5; //Ejecutado
+    public static final int FINS_ST_PAY_NTFD = 6; //Notificado
+    public static final int FINS_ST_PAY_RCPT = 7; //Comprobado
+    public static final int FINS_ST_PAY_CAN = 9; //Cancelado
 
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
@@ -562,6 +571,13 @@ public abstract class SModSysConsts {
     public static final int FINX_LAY_BANK_TRN_TP_OWN_TRANSFER = 11;
     /** Used only as grid identifier! */
     public static final int FINX_LAY_BANK_QRY = 21;
+    
+    public static final String FINX_PAY_ETY_TP_A = "A"; //Anticipo
+    public static final String FINX_PAY_ETY_TP_P = "P"; //Pago a documento
+    
+    public static final String FINX_PAY_FILES_TP_EF = "EF"; //Evidencia fotográfica
+    public static final String FINX_PAY_FILES_TP_RA = "RA"; //Reporte de avance
+    public static final String FINX_PAY_FILES_TP_FS = "FS"; //Finiquito servicio
 
     /*
      * Transactions
