@@ -16,6 +16,7 @@ import sa.lib.grid.SGridRow;
 public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
     
     public int ExternalDocumentId;
+    public String ExternalDocumentUuid;
     public int BizPartnerId;
     public String BizPartner;
     public String NumberSeries;
@@ -100,6 +101,9 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
                 break;
             case 15:
                 value = ExternalDocumentId;
+                break;
+            case 16:
+                value = ExternalDocumentUuid;
                 break;
             default:
                 // nothing
