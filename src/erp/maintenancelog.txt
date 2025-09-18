@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 288.9/ 2025-09-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la no modificación de registros de proyectos-iniciativas en las vistas de seguimiento.
+2) Incorporación de funcionalidades de visualización de documentos y consulta de notas y vínculos de documentos en las vistas de seguimiento de proyectos-iniciativas.
+
+================================================================================
 SIIE 3.2 288.8/ 2025-09-18
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
