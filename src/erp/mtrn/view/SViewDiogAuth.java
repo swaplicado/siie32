@@ -84,7 +84,7 @@ public class SViewDiogAuth extends erp.lib.table.STableTab implements java.awt.e
         mjbAuthYes.setToolTipText("Marcar como autorizado");
         mjbAuthNo.setToolTipText("Desmarcar como autorizado");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
 
         mbHasRightAuthor = levelDoc == SUtilConsts.LEV_AUTHOR;
 

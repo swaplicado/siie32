@@ -119,7 +119,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         mjbClose.setToolTipText("Cerrar para devolución");
         mjbOpen.setToolTipText("Abrir para devolución");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
 
         if (isViewForReturn()) {

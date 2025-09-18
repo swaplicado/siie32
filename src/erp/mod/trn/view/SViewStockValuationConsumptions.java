@@ -100,7 +100,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);

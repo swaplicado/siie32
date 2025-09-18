@@ -102,7 +102,7 @@ public class SViewDpsAudit extends erp.lib.table.STableTab implements java.awt.e
         mjbAuditYes.setToolTipText("Marcar como auditado");
         mjbAuditNo.setToolTipText("Desmarcar como auditado");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
 
         mbHasRightAuthor = levelDoc == SUtilConsts.LEV_AUTHOR;

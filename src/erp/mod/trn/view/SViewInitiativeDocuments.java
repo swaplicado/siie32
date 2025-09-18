@@ -6,11 +6,19 @@
 package erp.mod.trn.view;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.gui.SModuleUtilities;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.SDbInitiative;
 import erp.mod.view.SViewFilter;
+import erp.mtrn.data.SDataDps;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
@@ -22,6 +30,7 @@ import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -32,12 +41,16 @@ import sa.lib.gui.SGuiParams;
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SViewInitiativeDocuments extends SGridPaneView {
+public class SViewInitiativeDocuments extends SGridPaneView implements ActionListener {
     
+    private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterUser;
-    private SGridFilterDatePeriod moFilterDatePeriod;
 
+    private javax.swing.JButton mjbViewDps;
+    private javax.swing.JButton mjbViewNotes;
+    private javax.swing.JButton mjbViewLinks;
+    
     /**
      * Creates view SViewInitiativeDocuments.
      * @param client GUI Client.
@@ -52,16 +65,10 @@ public class SViewInitiativeDocuments extends SGridPaneView {
     }
     
     private void initComponentsCustom() {
-        setRowButtonsEnabled(false);
-        
         int levelRightInitiatives = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight(((SClientInterface) miClient), SDataConstantsSys.PRV_PUR_INIT).Level;
-        setRowButtonsEnabled(
-                levelRightInitiatives > SUtilConsts.LEV_READ, 
-                levelRightInitiatives > SUtilConsts.LEV_READ, 
-                levelRightInitiatives > SUtilConsts.LEV_READ, 
-                false, 
-                levelRightInitiatives == SUtilConsts.LEV_MANAGER
-        );
+        
+        setRowButtonsEnabled(false);
+        jtbFilterDeleted.setEnabled(false);
         
         if (mnGridSubtype == SUtilConsts.PROC) {
             moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
@@ -76,8 +83,57 @@ public class SViewInitiativeDocuments extends SGridPaneView {
         moFilterUser = new SViewFilter(miClient, this, SModConsts.USRU_USR);
         moFilterUser.initFilter(levelRightInitiatives <= SUtilConsts.LEV_AUTHOR ? SViewFilter.SUBTYPE_USER_SESSION : SViewFilter.SUBTYPE_USERS_ALL_INIT);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterUser);
+        
+        if (mnGridMode == SUtilConsts.QRY_DET) {
+            mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
+            mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas del documento", this);
+            mjbViewLinks = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LINK), "Ver vínculos del documento", this);
+
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewLinks);
+        }
     }
 
+    private void actionViewDps() {
+        if (mjbViewDps.isEnabled()) {
+            if (getSelectedGridRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int gui = SDataConstants.MOD_PUR;
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(((SClientInterface) miClient), SDataConstants.TRN_DPS, ((SGridRowView) getSelectedGridRow()).getRowRegistryTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
+
+                if (dps != null) {
+                    ((SClientInterface) miClient).getGuiModule(gui).setFormComplement(dps.getDpsTypeKey());
+                    ((SClientInterface) miClient).getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, dps.getPrimaryKey());
+                }
+            }
+        }
+    }
+
+    private void actionViewNotes() {
+        if (mjbViewNotes.isEnabled()) {
+            if (getSelectedGridRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showDocumentNotes((SClientInterface) miClient, SDataConstants.TRN_DPS, ((SGridRowView) getSelectedGridRow()).getRowRegistryTypeKey());
+            }
+        }
+    }
+
+    private void actionViewLinks() {
+        if (mjbViewLinks.isEnabled()) {
+            if (getSelectedGridRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SModuleUtilities.showDocumentLinks((SClientInterface) miClient, ((SGridRowView) getSelectedGridRow()).getRowRegistryTypeKey());
+            }
+        }
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String where = "";
@@ -85,6 +141,10 @@ public class SViewInitiativeDocuments extends SGridPaneView {
         Object filter;
 
         moPaneSettings = new SGridPaneSettings(1);
+        
+        if (mnGridMode == SUtilConsts.QRY_DET) {
+            moPaneSettings.setTypeKeyLength(2);
+        }
 
         if (mnGridSubtype == SUtilConsts.PROC) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
@@ -113,7 +173,7 @@ public class SViewInitiativeDocuments extends SGridPaneView {
                 + "f.name AS _func"
                 + (mnGridMode == SUtilConsts.QRY_SUM ?
                     ", SUM(if(d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] + ", d.stot_r, 0.0)) AS _comp_budget, SUM(if(d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", d.stot_r, 0.0)) AS _spent_budget" :
-                    ", td.code, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _folio, d.dt, d.stot_r, d.exc_rate, d.stot_cur_r, c.cur_key, b.bp, bc.bp_key") + " "
+                    ", td.code, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _folio, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS " + SDbConsts.FIELD_TYPE + ", d.dt, d.id_year AS " + SDbConsts.FIELD_TYPE_ID + "1, d.id_doc AS " + SDbConsts.FIELD_TYPE_ID + "2, d.stot_r, d.exc_rate, d.stot_cur_r, c.cur_key, b.bp, bc.bp_key") + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INIT) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_PERIOD) + " AS tp ON "
                 + "v.fk_tp_period = tp.id_tp_period "
@@ -196,5 +256,22 @@ public class SViewInitiativeDocuments extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.TRNS_TP_PERIOD);
         moSuscriptionsSet.add(SModConsts.CFGU_FUNC);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == mjbViewDps) {
+                actionViewDps();
+            }
+            else if (button == mjbViewNotes) {
+                actionViewNotes();
+            }
+            else if (button == mjbViewLinks) {
+                actionViewLinks();
+            }
+        }
     }
 }

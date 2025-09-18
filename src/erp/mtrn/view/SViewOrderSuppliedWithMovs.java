@@ -62,7 +62,7 @@ public class SViewOrderSuppliedWithMovs extends erp.lib.table.STableTab implemen
         mjbSupply = SGridUtils.createButton(new ImageIcon(getClass().getResource(isViewForPurchases() ? "/erp/img/icon_std_dps_supply.gif" : "/erp/img/icon_std_dps_supply.gif")), "Surtir", this);
         
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
-        mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
+        mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas del documento", this);
         mjbViewLinks = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LINK), "Ver vínculos del documento", this);
         
         moFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);

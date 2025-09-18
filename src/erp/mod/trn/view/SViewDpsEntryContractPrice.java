@@ -73,7 +73,7 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
         }
         
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
-        mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
+        mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas del documento", this);
         jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver entregas mensuales", this);
         
         moDialogContractPriceCardex = new SDialogContractPriceCardex(miClient, "Entregas mensuales partida del contrato");

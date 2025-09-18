@@ -93,7 +93,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewNotes.addActionListener(this);
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
 
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));

@@ -84,7 +84,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         mjbOpen.setToolTipText("Abrir para pago comisiones");
         mjbChangeAgentSupervisor.setToolTipText("Cambiar agente/supervisor");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);

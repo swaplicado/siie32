@@ -66,7 +66,7 @@ public class SViewDpsAccountTag extends SGridPaneView implements ActionListener,
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
         
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         
         mjbViewDps.setPreferredSize(new java.awt.Dimension(23, 23));

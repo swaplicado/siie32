@@ -154,7 +154,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         mjbAuthorize.setToolTipText("Autorizar documento");
         mjbReject.setToolTipText("Rechazar documento");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         mjPrint.setToolTipText("Imprimir documento");
 

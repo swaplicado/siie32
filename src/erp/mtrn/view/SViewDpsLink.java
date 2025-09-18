@@ -150,7 +150,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         mjbClose.setToolTipText("Cerrar documento");
         mjbOpen.setToolTipText("Abrir documento");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         mjbViewContractAnalysis.setToolTipText("Ver detalles de vínculos");
         mjbPrintContractMoves.setToolTipText("Imprimir movimientos de contrato");

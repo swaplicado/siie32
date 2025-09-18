@@ -31,9 +31,9 @@ import sa.lib.gui.SGuiDate;
  */
 public class SViewInitiative extends SGridPaneView {
     
+    private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterUser;
-    private SGridFilterDatePeriod moFilterDatePeriod;
 
     public SViewInitiative(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_INIT, SLibConsts.UNDEFINED, title);
@@ -42,6 +42,7 @@ public class SViewInitiative extends SGridPaneView {
     
     private void initComponentsCustom() {
         int levelRightInitiatives = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight(((SClientInterface) miClient), SDataConstantsSys.PRV_PUR_INIT).Level;
+        
         setRowButtonsEnabled(
                 levelRightInitiatives > SUtilConsts.LEV_READ, 
                 levelRightInitiatives > SUtilConsts.LEV_READ, 

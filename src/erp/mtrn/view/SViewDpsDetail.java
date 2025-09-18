@@ -109,7 +109,7 @@ public class SViewDpsDetail extends erp.lib.table.STableTab implements java.awt.
         mjbViewLinks.addActionListener(this);
 
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
 
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);

@@ -51,31 +51,33 @@ public abstract class SModuleUtilities {
      * @param documentKey Document's primary key.
      */
     public static void showDocumentNotes(final SClientInterface client, final int documentType, final Object documentKey) {
-        int notes = 0;
-        SDataDps dps = null;
-        SDataDiog diog = null;
-        SDialogShowDocumentNotes dialog = null;
-        
-        switch (documentType) {
-            case SDataConstants.TRN_DPS:
-                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
-                notes = dps.getDbmsDpsNotes().size();
-                break;
-            case SDataConstants.TRN_DIOG:
-                diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
-                notes = diog.getDbmsNotes().size();
-                break;
-            default:
-        }
+        if (documentKey != null) {
+            int notes = 0;
+            SDataDps dps = null;
+            SDataDiog diog = null;
+            SDialogShowDocumentNotes dialog = null;
 
-        if (notes == 0) {
-            client.showMsgBoxInformation(SLibConstants.MSG_INF_NO_NOTES_DPS);
-        }
-        else {
-            dialog = new SDialogShowDocumentNotes(client, documentType);
-            dialog.formReset();
-            dialog.setParamDocumentKey(documentKey);
-            dialog.setFormVisible(true);
+            switch (documentType) {
+                case SDataConstants.TRN_DPS:
+                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
+                    notes = dps.getDbmsDpsNotes().size();
+                    break;
+                case SDataConstants.TRN_DIOG:
+                    diog = (SDataDiog) SDataUtilities.readRegistry(client, SDataConstants.TRN_DIOG, documentKey, SLibConstants.EXEC_MODE_VERBOSE);
+                    notes = diog.getDbmsNotes().size();
+                    break;
+                default:
+            }
+
+            if (notes == 0) {
+                client.showMsgBoxInformation(SLibConstants.MSG_INF_NO_NOTES_DPS);
+            }
+            else {
+                dialog = new SDialogShowDocumentNotes(client, documentType);
+                dialog.formReset();
+                dialog.setParamDocumentKey(documentKey);
+                dialog.setFormVisible(true);
+            }
         }
     }
     
@@ -85,26 +87,28 @@ public abstract class SModuleUtilities {
      * @param dpsKey Primary key of desired document.
      */
     public static void showDocumentLinks(final SClientInterface client, final Object dpsKey) {
-        int links = 0;
-        SDataDps dps = null;
-        SDialogShowDocumentLinks dialog = null;
+        if (dpsKey != null) {
+            int links = 0;
+            SDataDps dps = null;
+            SDialogShowDocumentLinks dialog = null;
 
-        if (dpsKey == null) {
-            client.showMsgBoxInformation(SGuiConsts.ERR_MSG_UNDEF_REG);
-        }
-        else {
-            dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
-
-            dialog = new SDialogShowDocumentLinks(client);
-            dialog.formReset();
-            dialog.setValue(SDataConstants.TRN_DPS, dps);
-            links = dialog.readLinks();
-
-            if (links == 0) {
-                client.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS);
+            if (dpsKey == null) {
+                client.showMsgBoxInformation(SGuiConsts.ERR_MSG_UNDEF_REG);
             }
             else {
-                dialog.setFormVisible(true);
+                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
+
+                dialog = new SDialogShowDocumentLinks(client);
+                dialog.formReset();
+                dialog.setValue(SDataConstants.TRN_DPS, dps);
+                links = dialog.readLinks();
+
+                if (links == 0) {
+                    client.showMsgBoxInformation(SLibConstants.MSG_INF_NO_LINK_DPS);
+                }
+                else {
+                    dialog.setFormVisible(true);
+                }
             }
         }
     }

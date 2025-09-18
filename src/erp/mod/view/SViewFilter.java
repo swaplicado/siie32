@@ -129,6 +129,7 @@ public class SViewFilter extends JPanel implements SGridFilter {
         }
         
         jtfValue.setToolTipText(msFilterName);
+        jbPickOption.setToolTipText("Filtrar " + msFilterName.toLowerCase());
     }
     
     private void renderValue() {
