@@ -58,16 +58,27 @@ public class STrnDBDocuments {
      * 
      * @param idYear
      * @param idDoc
+     * @param withFileURL
+     * @param oStatement
      * 
      * 
      * @return ArrayList<SWebDpsFile> 
      */
-    public ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc) {
+    public ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc, final boolean withFileURL, Statement oStatement) {
         try {
-            Connection conn = getConnection();
+            Connection conn;
+            Statement st;
+            if (oStatement == null) {
+                conn = getConnection();
 
-            if (conn == null) {
-                return null;
+                if (conn == null) {
+                    return null;
+                }
+                
+                st = conn.createStatement();
+            }
+            else {
+                st = oStatement;
             }
 
             String query = "SELECT  " +
@@ -109,8 +120,10 @@ public class STrnDBDocuments {
                     "   AND fdps.id_year = " + idYear + " " +
                     "   AND fdps.id_doc = " + idDoc + ";";
 
-            Statement st = conn.createStatement();
             Logger.getLogger(STrnDBDocuments.class.getName()).log(Level.INFO, query);
+            if (st == null) {
+                return null;
+            }
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsFile> lWebDpsFiles = new ArrayList<>();
             String sqlEty = "";
@@ -142,7 +155,7 @@ public class STrnDBDocuments {
                 oFile.setFileExtension(res.getString("f.file_type"));
                 oFile.setExternalBpName(res.getString("bp_name"));
                 oFile.setFkCurQuot(res.getInt("f.fk_cur_quot"));
-                if (oFile.getCloudStorageName() != null && !oFile.getCloudStorageName().isEmpty()) {
+                if (oFile.getCloudStorageName() != null && !oFile.getCloudStorageName().isEmpty() && withFileURL) {
                     Logger.getLogger(STrnDBDocuments.class.getName()).log(Level.INFO, "Storage name: {0}", oFile.getCloudStorageName());
                     try {
                         oFile.setCloudFileUrl(CloudStorageManager.generatePresignedUrl(oFile.getCloudStorageName()));

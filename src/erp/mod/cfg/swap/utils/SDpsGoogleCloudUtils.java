@@ -68,7 +68,7 @@ public class SDpsGoogleCloudUtils {
                    }
                    else {
                        // 2. Si ya existe, verificar sincronización en la BD
-                       Date lastSync = SExportDpsFileUtils.isResourceSinchronized(
+                       Date lastSync = SExportDpsFileUtils.isResourceCompanySinchronized(
                                session.getStatement().getConnection().createStatement(), 
                                SSyncType.PUR_ORDER_FILE, 
                                fileData.getIdYear() + "_" + fileData.getIdDoc()
