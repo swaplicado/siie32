@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 288.7/ 2025-09-17
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de vistas de seguimiento a proyectos-iniciativas.
+2) Cambio de filtro a vista de bitácora de envío de documentos por fecha de envío.
+
+================================================================================
 SIIE 3.2 288.6/ 2025-09-16
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -59,8 +66,8 @@ SIIE 3.2 286.5/ 2025-09-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a las consultas de la vista de control de documentos enviados y por enviar por correo.
-2) Mejoramiento al control del usuario autorizador en la actualización de documentos.
-3) Mejoramiento a la obtención de referencias de óredes de compras para considerar el cambio de estatus de autorización.
+2) Mejoramiento al control del usuario autorizador en la actualización de documentos (DPS en general.)
+3) Mejoramiento a la obtención de referencias de órdenes de compras para considerar el cambio de estatus de autorización.
 4) Versión preliminar de descarga de facturas de compras autorizadas desde el Portal de Compras.
 
 ================================================================================
@@ -81,7 +88,8 @@ SIIE 3.2 286.2/ 2025-09-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Habilitación de envío de actores y puestos laborales al Sistema de Autorizaciones de SWAP Services.
-2) Implementación de configuración de roles de usuario del Portal de Compras en permisos de usuariio. 2) Rediseño de campos de captura en iniciativas.
+2) Implementación de configuración de roles de usuario del Portal de Compras en permisos de usuariio.
+3) Rediseño de campos de captura en iniciativas.
 
 ================================================================================
 SIIE 3.2 286.1/ 2025-09-02
