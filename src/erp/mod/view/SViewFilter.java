@@ -32,29 +32,35 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewFilter extends JPanel implements SGridFilter {
     
-    public static final int FILTER_STP_CUR_USER = 1; // para filtros de usuario, mostrar sólo el usuario actual
-    public static final int FILTER_STP_INIT_USER = 2; // para filtros de usuario, mostrar sólo los que han creado propuestas
-    public static final int FILTER_STP_ALL_USER = 3; // para filtros de usuario, todos los usuarios
+    public static final int SUBTYPE_USER_SESSION = 1; // solo el usuario actual
+    public static final int SUBTYPE_USERS_ALL_INIT = 2; // solo usuarios creadores de iniciativas
+    public static final int SUBTYPE_USERS_ALL = 3; // todos los usuarios
 
     protected SGuiClient miClient;
     protected SGridPaneView moPaneView;
     protected SBeanOptionPicker moPicker;
+    protected String msFilterName;
     protected String msValue;
     
     protected int mnFilterType;
     protected int mnFilterSubtype;
 
-    /** Creates new form SViewFilter
-     * @param client
-     * @param paneView */
-    public SViewFilter(SGuiClient client, SGridPaneView paneView) {
+    /**
+     * Creates new SViewFilter.
+     * @param client GUI client.
+     * @param paneView GUI view.
+     * @param filterType SModConsts.CFGU_FUNC or SModConsts.USRU_USR.
+     */
+    public SViewFilter(SGuiClient client, SGridPaneView paneView, int filterType) {
         miClient = client;
         moPaneView = paneView;
+        mnFilterType = filterType;
         mnFilterSubtype = 0;
+        
         initComponents();
         initComponentsCustom();
     }
@@ -69,7 +75,7 @@ public class SViewFilter extends JPanel implements SGridFilter {
     private void initComponents() {
 
         jtfValue = new javax.swing.JTextField();
-        jbPicker = new javax.swing.JButton();
+        jbPickOption = new javax.swing.JButton();
         jbDeleteFilter = new javax.swing.JButton();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -81,15 +87,15 @@ public class SViewFilter extends JPanel implements SGridFilter {
         jtfValue.setPreferredSize(new java.awt.Dimension(70, 23));
         add(jtfValue);
 
-        jbPicker.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_func.gif"))); // NOI18N
-        jbPicker.setToolTipText("Filtrar");
-        jbPicker.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbPicker.addActionListener(new java.awt.event.ActionListener() {
+        jbPickOption.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_filter_func.gif"))); // NOI18N
+        jbPickOption.setToolTipText("Filtrar");
+        jbPickOption.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbPickOption.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbPickerActionPerformed(evt);
+                jbPickOptionActionPerformed(evt);
             }
         });
-        add(jbPicker);
+        add(jbPickOption);
 
         jbDeleteFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
         jbDeleteFilter.setToolTipText("Quitar filtro");
@@ -102,31 +108,27 @@ public class SViewFilter extends JPanel implements SGridFilter {
         add(jbDeleteFilter);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jbPickerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbPickerActionPerformed
-        moPicker.resetPicker();
-        moPicker.setPickerVisible(true);
-        
-        String texts[] = {"", "ND"};
-        if (moPicker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            switch (mnFilterType) {
-                case SModConsts.CFGU_FUNC:
-                    texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, ((int[]) moPicker.getOption())[0]);
-                    break;
-                case SModConsts.USRU_USR:
-                    texts = getTextFilterOfUsers(((int[]) moPicker.getOption())[0]);
-                    break;
-            }
-            moPaneView.putFilter(mnFilterType, new SGridFilterValue(mnFilterType, SGridConsts.FILTER_DATA_TYPE_TEXT, texts[0]));
-            setValue(texts[1]);
-        }
-    }//GEN-LAST:event_jbPickerActionPerformed
+    private void jbPickOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbPickOptionActionPerformed
+        pickOption();
+    }//GEN-LAST:event_jbPickOptionActionPerformed
 
     private void jbDeleteFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDeleteFilterActionPerformed
        resetFilter(true);
     }//GEN-LAST:event_jbDeleteFilterActionPerformed
 
     private void initComponentsCustom() {
-        moPicker = new SBeanOptionPicker();
+        switch (mnFilterType) {
+            case SModConsts.CFGU_FUNC:
+                msFilterName = "Área funcional";
+                break;
+            case SModConsts.USRU_USR:
+                msFilterName = "Usuario";
+                break;
+            default:
+                msFilterName = "?";
+        }
+        
+        jtfValue.setToolTipText(msFilterName);
     }
     
     private void renderValue() {
@@ -138,79 +140,121 @@ public class SViewFilter extends JPanel implements SGridFilter {
         renderValue();
     }
     
-    private SBeanOptionPicker getFilterPicker() {
+    private SBeanOptionPicker createFilterPicker() {
         String sql = "";
-        String desc = "";
-        ArrayList<SGridColumnForm> gridColums = new ArrayList<>();
-        SGuiOptionPickerSettings settings;
-        SBeanOptionPicker picker = new SBeanOptionPicker();
         
         switch(mnFilterType) {
             case SModConsts.CFGU_FUNC:
-                desc = "Área funcional";
                 sql = "SELECT fa.id_func AS " + SDbConsts.FIELD_ID + "1, "
                         + "fa.name AS " + SDbConsts.FIELD_PICK + "1 "
                         + "FROM cfgu_func AS fa "
-                        + "INNER JOIN usr_usr_func AS fau ON "
-                        + "fa.id_func = fau.id_func AND fau.id_usr = " + miClient.getSession().getUser().getPkUserId() + " "
-                        + "WHERE NOT b_del "
-                        + "ORDER BY fa.name";
+                        + "INNER JOIN usr_usr_func AS fau ON fa.id_func = fau.id_func AND fau.id_usr = " + miClient.getSession().getUser().getPkUserId() + " "
+                        + "WHERE NOT fa.b_del "
+                        + "ORDER BY fa.name, fa.id_func";
                 break;
+                
             case SModConsts.USRU_USR:
-                desc = "Usuario";
                 switch (mnFilterSubtype) {
-                    case FILTER_STP_INIT_USER:
+                    case SUBTYPE_USERS_ALL_INIT:
                         sql = "SELECT DISTINCT u.id_usr AS " + SDbConsts.FIELD_ID + "1, "
                                 + "u.usr AS " + SDbConsts.FIELD_PICK + "1 "
                                 + "FROM erp.usru_usr AS u "
-                                + "INNER JOIN trn_init AS i ON "
-                                + "u.id_usr = i.fk_usr_ins "
-                                + "ORDER BY usr";
+                                + "INNER JOIN trn_init AS i ON u.id_usr = i.fk_usr_ins "
+                                + "ORDER BY u.usr, u.id_usr";
                         break;
-                    case FILTER_STP_ALL_USER:
+                        
+                    case SUBTYPE_USERS_ALL:
                         sql = "SELECT id_usr AS " + SDbConsts.FIELD_ID + "1, "
                                 + "usr AS " + SDbConsts.FIELD_PICK + "1 "
                                 + "FROM erp.usru_usr "
-                                + "WHERE NOT u.b_del AND b_act "
-                                + "ORDER BY usr";
-                    break;    
+                                + "WHERE NOT b_del AND b_act "
+                                + "ORDER BY usr, id_usr";
+                        break;
+                        
+                    default:
+                        // nothing
                 }
                 break;
+                
+            default:
+                // nothing
         }
-        gridColums.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nombre", 300));
-        settings = new SGuiOptionPickerSettings(desc, sql, gridColums, 1);
         
+        ArrayList<SGridColumnForm> gridColums = new ArrayList<>();
+        gridColums.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, SGridConsts.COL_TITLE_NAME, 300));
+        
+        SGuiOptionPickerSettings settings = new SGuiOptionPickerSettings(msFilterName, sql, gridColums, 1);
+        
+        SBeanOptionPicker picker = new SBeanOptionPicker();
         picker.setPickerSettings(miClient, mnFilterType, SLibConsts.UNDEFINED, settings);
         
         return picker;
     }
     
+    private void pickOption() {
+        if (moPicker == null) {
+            moPicker = createFilterPicker();
+        }
+        
+        moPicker.resetPicker();
+        moPicker.setPickerVisible(true);
+        
+        String[] texts = {"", "ND"};
+        
+        if (moPicker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            switch (mnFilterType) {
+                case SModConsts.CFGU_FUNC:
+                    texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, ((int[]) moPicker.getOption())[0]);
+                    break;
+                    
+                case SModConsts.USRU_USR:
+                    texts = getTextFilterOfUsers(((int[]) moPicker.getOption())[0]);
+                    break;
+                    
+                default:
+                    // nothing
+            }
+            
+            moPaneView.putFilter(mnFilterType, new SGridFilterValue(mnFilterType, SGridConsts.FILTER_DATA_TYPE_TEXT, texts[0]));
+            setValue(texts[1]);
+        }
+    }
+    
     private void resetFilter(boolean reload) {
-        String texts[] = {"", "ND"};
+        String[] texts = {"", "ND"};
+        
         switch (mnFilterType) {
             case SModConsts.CFGU_FUNC:
-                texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, SLibConsts.UNDEFINED);
-                String ids[] = texts[0].split(",");
+                texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, 0);
+                String[] ids = texts[0].split(",");
+                
                 if (ids.length <= 1) {
-                    jbPicker.setVisible(false);
-                    jbDeleteFilter.setVisible(false);
+                    jbPickOption.setEnabled(false);
+                    jbDeleteFilter.setEnabled(false);
                 }
                 break;
+                
             case SModConsts.USRU_USR:
-                texts = getTextFilterOfUsers(SLibConsts.UNDEFINED);
+                texts = getTextFilterOfUsers(0);
                 ids = texts[0].split(",");
+                
                 if (!texts[1].equals("(TODOS)") && ids.length <= 1) {
-                    jbPicker.setVisible(false);
-                    jbDeleteFilter.setVisible(false);
+                    jbPickOption.setEnabled(false);
+                    jbDeleteFilter.setEnabled(false);
                 }
                 break;
+                
+            default:
+                // nothing
         }
+        
         if (reload) {
             moPaneView.putFilter(mnFilterType, new SGridFilterValue(mnFilterType, SGridConsts.FILTER_DATA_TYPE_TEXT, texts[0]));
         }
         else {
             moPaneView.getFiltersMap().put(mnFilterType, new SGridFilterValue(mnFilterType, SGridConsts.FILTER_DATA_TYPE_TEXT, texts[0]));
         }
+        
         setValue(texts[1]);
     }
     
@@ -219,40 +263,45 @@ public class SViewFilter extends JPanel implements SGridFilter {
         String names = "";
         String sql;
         ResultSet resultSet;
+        
         try {
-            if (id == SLibConsts.UNDEFINED) {
+            if (id == 0) {
                 switch (mnFilterSubtype) {
-                    case FILTER_STP_CUR_USER:
-                        return new String[] { miClient.getSession().getUser().getPkUserId() + "", miClient.getSession().getUser().getName() };
-                    case FILTER_STP_INIT_USER:
-                        sql = "SELECT DISTINCT u.id_usr, u.usr FROM erp.usru_usr AS u "
-                                + "INNER JOIN trn_init AS i ON "
-                                + "u.id_usr = i.fk_usr_ins "
-                                + "ORDER BY u.usr";
+                    case SUBTYPE_USER_SESSION:
+                        return new String[] { "" + miClient.getSession().getUser().getPkUserId(), miClient.getSession().getUser().getName() };
+                        
+                    case SUBTYPE_USERS_ALL_INIT:
+                        sql = "SELECT DISTINCT u.id_usr, u.usr "
+                                + "FROM erp.usru_usr AS u "
+                                + "INNER JOIN trn_init AS i ON u.id_usr = i.fk_usr_ins "
+                                + "ORDER BY u.usr, u.id_usr;";
                         resultSet = miClient.getSession().getStatement().executeQuery(sql);
                         while (resultSet.next()) {
                             ids += (ids.isEmpty() ? "" : ", ") + resultSet.getInt(1);
                         }   
                         names = "(TODOS)";
                         break;
-                    case FILTER_STP_ALL_USER:
-                        sql = "SELECT u.id_usr, u.usr FROM erp.usru_usr AS u "
+                        
+                    case SUBTYPE_USERS_ALL:
+                        sql = "SELECT id_usr, usr "
+                                + "FROM erp.usru_usr "
                                 + "WHERE NOT b_del AND b_act "
-                                + "ORDER BY u.usr";
+                                + "ORDER BY usr, id_usr;";
                         resultSet = miClient.getSession().getStatement().executeQuery(sql);
                         while (resultSet.next()) {
                             ids += (ids.isEmpty() ? "" : ", ") + resultSet.getInt(1);
                         }   
                         names = "(TODOS)";
                         break;
+                        
                     default:
-                        break;
+                        // nothing
                 }
             }
             else {
-                sql = "SELECT u.id_usr, u.usr FROM erp.usru_usr AS u "
-                        + "WHERE id_usr = " + id + " "
-                        + "ORDER BY u.usr";
+                sql = "SELECT id_usr, usr "
+                        + "FROM erp.usru_usr "
+                        + "WHERE id_usr = " + id + ";";
                 resultSet = miClient.getSession().getStatement().executeQuery(sql);
                 if (resultSet.next()) {
                     ids = resultSet.getString(1);
@@ -263,12 +312,13 @@ public class SViewFilter extends JPanel implements SGridFilter {
         catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
+        
         return new String[] {ids, names};
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jbDeleteFilter;
-    private javax.swing.JButton jbPicker;
+    private javax.swing.JButton jbPickOption;
     private javax.swing.JTextField jtfValue;
     // End of variables declaration//GEN-END:variables
 
@@ -280,12 +330,10 @@ public class SViewFilter extends JPanel implements SGridFilter {
      */
     @Override
     public void initFilter(Object value) {
-        mnFilterType = ((int[]) value)[0];
-        if (((int[]) value).length > 1) {
-            mnFilterSubtype = ((int[]) value)[1];
+        if (value != null && value instanceof Integer) {
+            mnFilterSubtype = (int) value;
         }
-        moPicker = getFilterPicker();
+        
         resetFilter(false);
-        jtfValue.setToolTipText(mnFilterType == SModConsts.CFGU_FUNC ? "Área funcional" : "Usuario");
     }
 }

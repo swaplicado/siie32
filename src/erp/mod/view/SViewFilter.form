@@ -30,7 +30,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jbPicker">
+    <Component class="javax.swing.JButton" name="jbPickOption">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/erp/img/icon_std_filter_func.gif"/>
@@ -41,7 +41,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbPickerActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbPickOptionActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jbDeleteFilter">

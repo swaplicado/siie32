@@ -133,7 +133,7 @@ public class SViewDpsSendLog extends erp.lib.table.STableTab {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
 
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+                sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "snd.dt");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");

@@ -4940,41 +4940,55 @@ public abstract class STrnUtilities {
         return null;
     }
     
-    public static double getInitiativeCompBudget(SClientInterface client, int pk) {
+    public static double getInitiativeCompBudget(SClientInterface client, int initiativeId) {
+        double compBudget = 0;
+        
         try {
-            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) FROM trn_dps AS d " +
-                    "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc " +
-                    "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
-                    "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
-                    "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " " +
-                    "AND id.id_init = " + pk;
-            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                return resultSet.getDouble(1);
+            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) "
+                    + "FROM trn_dps AS d "
+                    + "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc "
+                    + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                    + "AND d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                    + "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                    + "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                    + "AND id.id_init = " + initiativeId + ";";
+            
+            try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    compBudget = resultSet.getDouble(1);
+                }
             }
         }
         catch (SQLException e) { 
             client.showMsgBoxWarning(e.getMessage());
         }
-        return 0d;
+        
+        return compBudget;
     }
     
-    public static double getInitiativeSpentBudget(SClientInterface client, int pk) {
+    public static double getInitiativeSpentBudget(SClientInterface client, int initiativeId) {
+        double spentBudget = 0;
+        
         try {
-            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) FROM trn_dps AS d " +
-                    "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc " +
-                    "WHERE d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
-                    "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
-                    "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " " +
-                    "AND id.id_init = " + pk;
-            ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                return resultSet.getDouble(1);
+            String sql = "SELECT COALESCE(SUM(d.stot_r), 0) "
+                    + "FROM trn_dps AS d "
+                    + "INNER JOIN trn_init_dps AS id ON d.id_year = id.id_dps_year AND d.id_doc = id.id_dps_doc "
+                    + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                    + "AND d.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                    + "AND d.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                    + "AND d.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                    + "AND id.id_init = " + initiativeId + ";";
+            
+            try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    spentBudget = resultSet.getDouble(1);
+                }
             }
         }
         catch (SQLException e) {
             client.showMsgBoxWarning(e.getMessage());
         }
-        return 0d;
+        
+        return spentBudget;
     }
 }

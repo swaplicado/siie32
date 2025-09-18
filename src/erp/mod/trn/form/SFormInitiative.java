@@ -190,7 +190,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener, FocusLis
 
         jpNorthEast1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateDateStart.setText("Fecha inicial:");
+        jlDateDateStart.setText("Fecha inicial:*");
         jlDateDateStart.setPreferredSize(new java.awt.Dimension(150, 23));
         jpNorthEast1.add(jlDateDateStart);
         jpNorthEast1.add(moDateDateStart);
@@ -454,7 +454,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener, FocusLis
         moKeyType.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyType), true);
         moKeyPeriodicityType.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyPeriodicityType), true);
         moKeyFuncArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlKeyFuncArea), true);
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateStart), false);
+        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateStart), true);
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDateEnd), false);
         moCurBudget.setCompoundFieldSettings(miClient);
         moCurBudget.getField().setDecimalSettings(SGuiUtils.getLabelName(jlCurBudget), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -571,6 +571,8 @@ public class SFormInitiative extends SBeanForm implements ItemListener, FocusLis
             else if ((moKeyFuncArea.getItemCount() - 1) == 1) {
                 moKeyFuncArea.setSelectedIndex(1);
             }
+            
+            moRegistry.setDateStart_n(miClient.getSession().getCurrentDate());
             
             mdCompBudget = 0;
             mdSpentBudget = 0;

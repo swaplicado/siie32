@@ -93,7 +93,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatBizPartherUpdate;
     private javax.swing.JMenuItem jmiCatBizPartherUpdateLog;
     private javax.swing.JMenuItem jmiCatItemBizParther;
-    private javax.swing.JMenuItem jmiCatInitiatives;
+    private javax.swing.JMenu jmCatInit;
+    private javax.swing.JMenuItem jmiCatInitInitiatives;
+    private javax.swing.JMenuItem jmiCatInitInitiativesProcPend;
+    private javax.swing.JMenuItem jmiCatInitInitiativesProcPendDet;
+    private javax.swing.JMenuItem jmiCatInitInitiativesProc;
+    private javax.swing.JMenuItem jmiCatInitInitiativesProcDet;
     private javax.swing.JMenu jmEst;
     private javax.swing.JMenuItem jmiEstimates; 
     private javax.swing.JMenuItem jmiEstimatesDetail;
@@ -321,15 +326,20 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
         jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
         jmiCatItemBizParther = new JMenuItem("Configuración de proveedores vs. insumos");
-        jmiCatInitiatives = new JMenuItem("Proyectos-iniciativas");
-        
-        jmCatCfg.add(jmiCatCfgCostCenterItem);
+        jmCatInit = new JMenu("Proyectos-iniciativas");
+        jmiCatInitInitiatives = new JMenuItem("Proyectos-iniciativas");
+        jmiCatInitInitiativesProcPend = new JMenuItem("Proyectos-iniciativas por ejercer");
+        jmiCatInitInitiativesProcPendDet = new JMenuItem("Proyectos-iniciativas por ejercer a detalle");
+        jmiCatInitInitiativesProc = new JMenuItem("Proyectos-iniciativas ejercidas");
+        jmiCatInitInitiativesProcDet = new JMenuItem("Proyectos-iniciativas ejercidas a detalle");
+
         jmCat.add(jmiCatDpsDncDocumentNumberSeries);
         jmCat.add(jmiCatDiogDncDocumentNumberSeries);
         jmCat.addSeparator();
         jmCat.add(jmiCatBizPartnerBlocking);
         jmCat.add(jmiCatViewIntegralSuppliers);
         jmCat.addSeparator();
+        jmCatCfg.add(jmiCatCfgCostCenterItem);
         jmCat.add(jmCatCfg);
         jmCat.addSeparator();
         jmCat.add(jmiCatSendingDpsLog);
@@ -343,7 +353,14 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.addSeparator();
         jmCat.add(jmiCatItemBizParther);
         jmCat.addSeparator();
-        jmCat.add(jmiCatInitiatives);
+        jmCatInit.add(jmiCatInitInitiatives);
+        jmCatInit.addSeparator();
+        jmCatInit.add(jmiCatInitInitiativesProcPend);
+        jmCatInit.add(jmiCatInitInitiativesProcPendDet);
+        jmCatInit.addSeparator();
+        jmCatInit.add(jmiCatInitInitiativesProc);
+        jmCatInit.add(jmiCatInitInitiativesProcDet);
+        jmCat.add(jmCatInit);
         
         jmEst = new JMenu("Cotizaciones");
         jmiEstimates = new JMenuItem("Cotizaciones de compras");
@@ -714,7 +731,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatBizPartherUpdate.addActionListener(this);
         jmiCatBizPartherUpdateLog.addActionListener(this);
         jmiCatItemBizParther.addActionListener(this);
-        jmiCatInitiatives.addActionListener(this);
+        jmiCatInitInitiatives.addActionListener(this);
+        jmiCatInitInitiativesProcPend.addActionListener(this);
+        jmiCatInitInitiativesProcPendDet.addActionListener(this);
+        jmiCatInitInitiativesProc.addActionListener(this);
+        jmiCatInitInitiativesProcDet.addActionListener(this);
         jmiEstimates.addActionListener(this);
         jmiEstimatesDetail.addActionListener(this);        
         jmiEstimatesLinkPend.addActionListener(this);
@@ -908,7 +929,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatSendingDpsLog.setEnabled(hasRightDocOrder);
         jmiCatFunctionalAreaBudgets.setEnabled(hasRightCreditConfig && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         jmiCatItemBizParther.setEnabled(isSupplyChainEnabled);
-        jmiCatInitiatives.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
+        jmCatInit.setEnabled(levelRightInitiatives >= SUtilConsts.LEV_READ);
         
         jmEst.setEnabled(hasRightDocEstimate);
 
@@ -1739,8 +1760,20 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiCatItemBizParther) {      
                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showView(SDataConstants.ITMU_ITEM_SUP);
             }
-            else if (item == jmiCatInitiatives) {
-                miClient.getSession().showView(SModConsts.TRN_INIT, SLibConstants.UNDEFINED, null);
+            else if (item == jmiCatInitInitiatives) {
+                miClient.getSession().showView(SModConsts.TRN_INIT, 0, null);
+            }
+            else if (item == jmiCatInitInitiativesProcPend) {
+                miClient.getSession().showView(SModConsts.TRN_INIT_DPS, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_SUM));
+            }
+            else if (item == jmiCatInitInitiativesProcPendDet) {
+                miClient.getSession().showView(SModConsts.TRN_INIT_DPS, SUtilConsts.PROC_PEND, new SGuiParams(SUtilConsts.QRY_DET));
+            }
+            else if (item == jmiCatInitInitiativesProc) {
+                miClient.getSession().showView(SModConsts.TRN_INIT_DPS, SUtilConsts.PROC, new SGuiParams(SUtilConsts.QRY_SUM));
+            }
+            else if (item == jmiCatInitInitiativesProcDet) {
+                miClient.getSession().showView(SModConsts.TRN_INIT_DPS, SUtilConsts.PROC, new SGuiParams(SUtilConsts.QRY_DET));
             }
             else if (item == jmiEstimates) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_EST);

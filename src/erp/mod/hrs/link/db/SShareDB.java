@@ -6,23 +6,6 @@
 package erp.mod.hrs.link.db;
 
 import erp.lib.SLibUtilities;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import sa.lib.SLibTimeUtils;
-import sa.lib.SLibUtils;
-import sun.misc.BASE64Encoder;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.SModUtils;
@@ -31,23 +14,40 @@ import erp.mod.hrs.db.SDbAbsence;
 import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_CONSUME;
 import static erp.mod.hrs.link.db.SCancelResponse.RESPONSE_OK_CAN;
 import static erp.mod.hrs.link.db.SEarningResponse.RESPONSE_OK;
+import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_AVA;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OK_INS;
-import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_ERROR;
 import static erp.mod.hrs.link.db.SIncidentResponse.RESPONSE_OTHER_INC;
 import erp.musr.data.SDataUser;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import org.bouncycastle.util.encoders.Base64;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 import sa.lib.gui.SGuiClient;
@@ -883,8 +883,11 @@ public class SShareDB {
             ImageIO.write(image, type, bos);
             byte[] imageBytes = bos.toByteArray();
 
-            BASE64Encoder encoder = new BASE64Encoder();
+            /* Sergio Flores, 2025-09-17: Código comentado para reemplazar funcionalidad con una clase Base64 distinta (la de BouncyCastle).
+            sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
             imageString = encoder.encode(imageBytes);
+            */
+            imageString = new String(Base64.encode(imageBytes));
 
             bos.close();
         } catch (IOException e) {

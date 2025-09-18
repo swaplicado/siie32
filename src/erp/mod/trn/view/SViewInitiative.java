@@ -16,11 +16,14 @@ import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
+import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDate;
 
 /**
  *
@@ -28,8 +31,9 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewInitiative extends SGridPaneView {
     
-    private SViewFilter moFilterFunc;
-    private SViewFilter moFilterUsr;
+    private SViewFilter moFilterFuncArea;
+    private SViewFilter moFilterUser;
+    private SGridFilterDatePeriod moFilterDatePeriod;
 
     public SViewInitiative(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRN_INIT, SLibConsts.UNDEFINED, title);
@@ -46,14 +50,17 @@ public class SViewInitiative extends SGridPaneView {
                 levelRightInitiatives == SUtilConsts.LEV_MANAGER
         );
         
-        moFilterFunc = new SViewFilter(miClient, this);
-        moFilterFunc.initFilter(new int[] { SModConsts.CFGU_FUNC });
+        moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
+        moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
-        moFilterUsr = new SViewFilter(miClient, this);
-        moFilterUsr.initFilter(new int[] { SModConsts.USRU_USR, levelRightInitiatives <= SUtilConsts.LEV_AUTHOR ? SViewFilter.FILTER_STP_CUR_USER : SViewFilter.FILTER_STP_INIT_USER });
+        moFilterFuncArea = new SViewFilter(miClient, this, SModConsts.CFGU_FUNC);
+        moFilterFuncArea.initFilter(null);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
         
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunc);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterUsr);
+        moFilterUser = new SViewFilter(miClient, this, SModConsts.USRU_USR);
+        moFilterUser.initFilter(levelRightInitiatives <= SUtilConsts.LEV_AUTHOR ? SViewFilter.SUBTYPE_USER_SESSION : SViewFilter.SUBTYPE_USERS_ALL_INIT);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterUser);
     }
 
     @Override
@@ -69,6 +76,9 @@ public class SViewInitiative extends SGridPaneView {
         if ((Boolean) filter) {
             where += (where.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
+        
+        filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+        where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_sta_n", (SGuiDate) filter);
         
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue();
         if (filter != null && !((String) filter).isEmpty()) {
@@ -124,7 +134,7 @@ public class SViewInitiative extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta_n", "Fecha inicial"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end_n", "Fecha final"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "budget", "Presupuesto estimado $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "budget", "Presup. estimado $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "purpose", "Propósito"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "description", "Descripción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "goals", "Objetivos"));

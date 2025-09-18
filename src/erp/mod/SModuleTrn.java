@@ -105,6 +105,7 @@ import erp.mod.trn.view.SViewFunctionalAreaBudgets;
 import erp.mod.trn.view.SViewFunctionalAreaExpenses;
 import erp.mod.trn.view.SViewIdentifiedCostCalculation;
 import erp.mod.trn.view.SViewInitiative;
+import erp.mod.trn.view.SViewInitiativeDocuments;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
@@ -590,6 +591,24 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_INIT:
                 view = new SViewInitiative(miClient, "Proyectos-iniciativas");
+                break;
+            case SModConsts.TRN_INIT_DPS:
+                String subtypeText = "";
+                String modeText = "";
+                switch (subtype) {
+                    case SUtilConsts.PROC_PEND:
+                        subtypeText = " x ejercer";
+                        break;
+                    case SUtilConsts.PROC:
+                        subtypeText = " ejercidos";
+                        break;
+                    default:
+                        // nothing
+                }
+                if (params != null && params.getType() == SUtilConsts.QRY_DET) {
+                    modeText = " (a detalle)";
+                }
+                view = new SViewInitiativeDocuments(miClient, "Proyectos-iniciativas" + subtypeText + modeText, subtype, params);
                 break;
             case SModConsts.TRN_CFD:
                 switch (subtype) {

@@ -59,7 +59,6 @@ public abstract class SSwapConsts {
     public static final String QRY_END_DATE = "end_date";
     public static final String QRY_DOCUMENT_TYPE = "document_type";
     
-    
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";
