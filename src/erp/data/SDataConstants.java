@@ -385,7 +385,7 @@ public abstract class SDataConstants {
     public static final int FINS_FISCAL_BANK = 206073;
     public static final int FINS_FISCAL_PAY_MET = 206074;
     public static final int FIN_LAY_BANK = 206075;
-
+    
     public static final int FINX_REC_CASH = 206101;
     public static final int FINX_MOVES_ACC = 206501;
     public static final int FINX_ACC_MAJOR = 206502;

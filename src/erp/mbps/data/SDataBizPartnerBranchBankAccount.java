@@ -50,6 +50,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
 
     protected java.lang.String msDbmsAccountCashType;
     protected java.lang.String msDbmsBank;
+    protected java.lang.String msDbmsBankFiscalId;
     protected java.lang.String msDbmsCurrencyKey;
     protected java.lang.String msDbmsCardIssuer;
     protected java.lang.String msDbmsUserNew;
@@ -122,6 +123,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
 
     public void setDbmsAccountCashType(java.lang.String s) { msDbmsAccountCashType = s; }
     public void setDbmsBank(java.lang.String s) { msDbmsBank = s; }
+    public void setDbmsBankFiscalId(java.lang.String s) { msDbmsBankFiscalId = s; }
     public void setDbmsCurrencyKey(java.lang.String s) { msDbmsCurrencyKey = s; }
     public void setDbmsCardIssuer(java.lang.String s) { msDbmsCardIssuer = s; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
@@ -131,6 +133,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
     public int getDbmsPkBizPartnerId() { return mnDbmsFkBizPartnerId; }
     public java.lang.String getDbmsAccountCashType() { return msDbmsAccountCashType; }
     public java.lang.String getDbmsBank() { return msDbmsBank; }
+    public java.lang.String getDbmsBankFiscalId() { return msDbmsBankFiscalId; }
     public java.lang.String getDbmsCurrencyKey() { return msDbmsCurrencyKey; }
     public java.lang.String getDbmsCardIssuer() { return msDbmsCardIssuer; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
@@ -198,7 +201,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
         reset();
 
         try {
-            sql = "SELECT bank_acc.*, bpb.fid_bp, tp.tp_acc_cash, bp.bp_comm, cur.cur_key, iss.card_iss, un.usr, ue.usr, ud.usr " +
+            sql = "SELECT bank_acc.*, bpb.fid_bp, tp.tp_acc_cash, bp.bp_comm, bp.fiscal_id, cur.cur_key, iss.card_iss, un.usr, ue.usr, ud.usr " +
                     "FROM erp.bpsu_bank_acc AS bank_acc " +
                     "INNER JOIN erp.bpsu_bpb AS bpb ON bank_acc.id_bpb = bpb.id_bpb " +
                     "INNER JOIN erp.fins_tp_acc_cash AS tp ON bank_acc.fid_ct_acc_cash = tp.id_ct_acc_cash AND bank_acc.fid_tp_acc_cash = tp.id_tp_acc_cash " +
@@ -244,6 +247,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
                 mnDbmsFkBizPartnerId = resultSet.getInt("bpb.fid_bp");
                 msDbmsAccountCashType = resultSet.getString("tp.tp_acc_cash");
                 msDbmsBank = resultSet.getString("bp.bp_comm");
+                msDbmsBankFiscalId = resultSet.getString("bp.fiscal_id");
                 msDbmsCurrencyKey = resultSet.getString("cur.cur_key");
                 msDbmsCardIssuer = resultSet.getString("iss.card_iss");
                 msDbmsUserNew = resultSet.getString("un.usr");

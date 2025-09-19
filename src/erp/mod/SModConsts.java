@@ -284,6 +284,7 @@ public abstract class SModConsts {
     public static final int FINS_FISCAL_PAY_MET = 2011111;
     public static final int FINS_TP_FISCAL_ACC_LINK = 2011121;
     public static final int FINS_CFD_TAX = 2011201;
+    public static final int FINS_ST_PAY = 2011151;
 
     public static final int FINU_TAX_REG = 2012001;
     public static final int FINU_TAX_IDY = 2012002;
@@ -352,13 +353,17 @@ public abstract class SModConsts {
     public static final int FIN_REP_CUS_ACC_ACC = 2013492;
     public static final int FIN_REP_CUS_ACC_CC = 2013493;
     public static final int FIN_REP_CUS_ACC_USR = 2013494;
-
+    public static final int FIN_PAY = 2013496;
+    public static final int FIN_PAY_ETY = 2013497;
+    public static final int FIN_PAY_LAY_BANK = 2013498;
+    public static final int FIN_PAY_FILE = 2013499;
 
     public static final int FIN_BKC = 2013501;
 
     public static final int FINX_REC_CASH = 2014001;
     public static final int FINX_ACC_CASH_BANK = 2014002;
     public static final int FINX_REP_CUS_ACC = 2014003;
+    public static final int FINX_ACC_CASH_PAY = 2014004;
     public static final int FINX_CUST_REPS_EXPS = 2014100; // custom reports expenses
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
@@ -1177,7 +1182,8 @@ public abstract class SModConsts {
         TablesMap.put(FINS_FISCAL_PAY_MET, "erp.fins_fiscal_pay_met");
         TablesMap.put(FINS_TP_FISCAL_ACC_LINK, "erp.fins_tp_fiscal_acc_link");
         TablesMap.put(FINS_CFD_TAX, "erp.fins_cfd_tax");
-
+        TablesMap.put(FINS_ST_PAY, "erp.fins_st_pay");
+        
         TablesMap.put(FINU_TAX_REG, "erp.finu_tax_reg");
         TablesMap.put(FINU_TAX_IDY, "erp.finu_tax_idy");
         TablesMap.put(FINU_TAX_BAS, "erp.finu_tax_bas");
@@ -1245,6 +1251,10 @@ public abstract class SModConsts {
         TablesMap.put(FIN_REP_CUS_ACC_ACC, "fin_rep_cus_acc_acc");
         TablesMap.put(FIN_REP_CUS_ACC_CC, "fin_rep_cus_acc_cc");
         TablesMap.put(FIN_REP_CUS_ACC_USR, "fin_rep_cus_acc_usr");
+        TablesMap.put(FIN_PAY, "fin_pay");
+        TablesMap.put(FIN_PAY_ETY, "fin_pay_ety");
+        TablesMap.put(FIN_PAY_LAY_BANK, "fin_pay_lay_bank");
+        TablesMap.put(FIN_PAY_FILE, "fin_pay_file");
 
         TablesMap.put(FIN_BKC, "fin_bkc");
 

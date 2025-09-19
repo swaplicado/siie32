@@ -2275,6 +2275,7 @@ public abstract class SDataReadTableRows {
                         (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") +
                         "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                         "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
+                        (((Object[]) filterKey).length != 5 ? "" : "AND d.fid_func = " + ((int[]) ((Object[]) filterKey)[4])[0] + " AND d.fid_func_sub = " + ((int[]) ((Object[]) filterKey)[4])[1] + " ") +
                         "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                         "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                         "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +

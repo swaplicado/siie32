@@ -45,6 +45,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
     private int mnYear;
     private int[] manDpsClassPk;
     private int[] manBizPartnerPk;
+    private int[] manFunc;
     private int mnCfdType;
     private String msRfcRec;
     private java.lang.Object moFilterKey;
@@ -413,6 +414,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         mnYear = 0;
         manDpsClassPk = null;
         manBizPartnerPk = null;
+        manFunc = null;
         mnCfdType = SLibConstants.UNDEFINED;
         msRfcRec = "";
         moFilterKey = null;
@@ -498,6 +500,12 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                         mnYear = (Integer) ((Object[]) moFilterKey)[0];
                         manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
                         manBizPartnerPk = (int[]) ((Object[]) moFilterKey)[2];
+                        break;
+                    case 5:
+                        mnYear = (Integer) ((Object[]) moFilterKey)[0];
+                        manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
+                        manBizPartnerPk = (int[]) ((Object[]) moFilterKey)[2];
+                        manFunc = (int[]) ((Object[]) moFilterKey)[4];
                         break;
                     default:
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
