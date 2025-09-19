@@ -80,6 +80,11 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_AUTH_ORG_ELEMENT = "org-element";
     public static final String CFG_OBJ_AUTH_START_AUTH = "start-auth";
     
+    public static final int AUTHZ_STATUS_PENDING = 1;
+    public static final int AUTHZ_STATUS_IN_PROGRESS = 2;
+    public static final int AUTHZ_STATUS_REJECTED = 8;
+    public static final int AUTHZ_STATUS_OK = 9;
+    
     public static final int RESOURCE_TYPE_PUR_INVOICE = 4;
     public static final int RESOURCE_TYPE_PUR_PAYMENT = 11;
 

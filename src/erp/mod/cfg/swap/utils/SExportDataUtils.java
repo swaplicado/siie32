@@ -1591,33 +1591,37 @@ public abstract class SExportDataUtils {
                                                             final String resourceId, 
                                                             final int authStatusId, 
                                                             final int userId) {
-        SResourceStatusResponse oResponse = new SResourceStatusResponse();
-        String sTable = "";
-        String sWhere = "";
-        String sUpdate = "";
-        switch (resourceType) {
-            case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
-                sTable = SModConsts.TablesMap.get(SModConsts.TRN_PAY);
-                sUpdate = "fk_st_pay = " + (authStatusId == 8 ? 3 : 4) + ","
-                        + "fk_usr_upd = " + userId + ","
-                        + "ts_usr_upd = NOW() ";
-                sWhere = "WHERE id_pay = " + resourceId;
-                break;
+        SResourceStatusResponse oResponse;
+        try {
+            oResponse = new SResourceStatusResponse();
+            String sTable = "";
+            String sWhere = "";
+            String sUpdate = "";
+            switch (resourceType) {
+                case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+    //                sTable = SModConsts.TablesMap.get(SModConsts.FIN_PAY);
+                    sTable = "fin_pay";
+                    sUpdate = "fk_st_pay = " + (authStatusId == SSwapConsts.AUTHZ_STATUS_REJECTED ? 3 : 4) + ", "
+                            + "fk_usr_upd = " + userId + ", "
+                            + "ts_usr_upd = NOW() ";
+                    sWhere = "WHERE id_pay = " + resourceId;
+                    break;
 
-            default:
-                oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
-                oResponse.message = "No se encontró tipo de recurso";
-                oResponse.error = "No se encontró tipo de recurso";
-                
-                return oResponse;
-        }
+                default:
+                    oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
+                    oResponse.message = "No se encontró tipo de recurso";
+                    oResponse.error = "No se encontró tipo de recurso";
 
-        String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
+                    return oResponse;
+            }
+
+            String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
+            int res = statement.executeUpdate(sql);
             oResponse.status_code = HttpURLConnection.HTTP_OK;
             oResponse.message = "OK";
         }
         catch (SQLException ex) {
+            oResponse = new SResourceStatusResponse();
             oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
             oResponse.message = "Error al actualizar el estatus del recurso ";
             oResponse.error = ex.getMessage();
