@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
 import erp.mod.cfg.swap.SPublicInterface;
 import erp.mod.cfg.swap.utils.SExportDataUser;
+import erp.mod.cfg.swap.utils.SResourceStatusResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
@@ -55,7 +56,10 @@ public class SShareData {
     public static String PATH_JSON_DESP_DIR = "vales/";
     public static String PATH_CSV_DESP_DIR = "vales/";
     
+    private String msJsonConfig;
+    
     public void setJsonConn(String sjon) {
+        this.msJsonConfig = sjon;
         SMySqlClass.setJsonConn(sjon);
     }
     
@@ -370,7 +374,7 @@ public class SShareData {
     }
     
     public SExportDataUser getSupplierByFiscalId(String fiscalId) {
-        SPublicInterface oInterface = new SPublicInterface();
+        SPublicInterface oInterface = new SPublicInterface(this.msJsonConfig);
         
         return oInterface.getSupplierByFiscalId(fiscalId);
     }
