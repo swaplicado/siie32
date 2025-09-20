@@ -22,6 +22,7 @@ import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
+import java.net.HttpURLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -1582,5 +1583,51 @@ public abstract class SExportDataUtils {
         }
         
         return user;
+    }
+    
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, 
+                                                            final int companyId, 
+                                                            final int resourceType, 
+                                                            final String resourceId, 
+                                                            final int authStatusId, 
+                                                            final int userId) {
+        SResourceStatusResponse oResponse;
+        try {
+            oResponse = new SResourceStatusResponse();
+            String sTable = "";
+            String sWhere = "";
+            String sUpdate = "";
+            switch (resourceType) {
+                case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+    //                sTable = SModConsts.TablesMap.get(SModConsts.FIN_PAY);
+                    sTable = "fin_pay";
+                    sUpdate = "fk_st_pay = " + (authStatusId == SSwapConsts.AUTHZ_STATUS_REJECTED ? 3 : 4) + ", "
+                            + "fk_usr_upd = " + userId + ", "
+                            + "ts_usr_upd = NOW() ";
+                    sWhere = "WHERE id_pay = " + resourceId;
+                    break;
+
+                default:
+                    oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
+                    oResponse.message = "No se encontró tipo de recurso";
+                    oResponse.error = "No se encontró tipo de recurso";
+
+                    return oResponse;
+            }
+
+            String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
+            int res = statement.executeUpdate(sql);
+            oResponse.status_code = HttpURLConnection.HTTP_OK;
+            oResponse.message = "OK";
+        }
+        catch (SQLException ex) {
+            oResponse = new SResourceStatusResponse();
+            oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
+            oResponse.message = "Error al actualizar el estatus del recurso ";
+            oResponse.error = ex.getMessage();
+            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return oResponse;
     }
 }

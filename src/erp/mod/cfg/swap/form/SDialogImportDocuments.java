@@ -334,6 +334,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_3D, "% requerido pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID documento"));
 
                 return gridColumnsForm;
             }
@@ -527,6 +528,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     SRowDocument document = new SRowDocument();
 
                                     document.ExternalDocumentId = externalDocumentId;
+                                    
+                                    if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
+                                        document.ExternalDocumentUuid = docNode.path("uuid").asText();
+                                    }
+                                    else {
+                                        document.ExternalDocumentUuid = "";
+                                    }
 
                                     JsonNode partnerNode = docNode.path("partner");
                                     document.BizPartnerId = partnerNode.get("external_id").asInt();
