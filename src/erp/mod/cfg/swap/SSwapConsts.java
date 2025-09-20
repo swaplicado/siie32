@@ -54,6 +54,7 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_TXN_PUR_REF = "pur-ref";
     public static final String CFG_OBJ_TXN_PUR_DOC = "pur-doc";
     public static final String CFG_OBJ_TXN_PUR_DOC_DWNLD = "pur-doc-dwnld";
+    public static final String CFG_OBJ_TXN_PUR_PAY = "pur-pay";
     
     public static final String QRY_START_DATE = "start_date";
     public static final String QRY_END_DATE = "end_date";

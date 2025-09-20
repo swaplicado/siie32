@@ -331,8 +331,8 @@ public class SDbPaymentFile extends SDbRegistryUser implements SGridRow, Seriali
         
         switch (col) {
             case 0: value = mnSortingPos; break;
-            case 1: value = msPaymentFileType.equals(SModSysConsts.FINX_PAY_FILES_TP_EF) ? "Evidencia fotográfica" : 
-                    msPaymentFileType.equals(SModSysConsts.FINX_PAY_FILES_TP_RA) ? "Reporte de avance" : "Finiquito servicio";
+            case 1: value = msPaymentFileType.equals(SModSysConsts.FIN_PAY_FILE_TP_EF) ? "Evidencia fotográfica" : 
+                    msPaymentFileType.equals(SModSysConsts.FIN_PAY_FILE_TP_RA) ? "Reporte de avance" : "Finiquito servicio";
                 break;
             case 2: value = msFileName; break;
             case 3: value = msFileDescription; break;

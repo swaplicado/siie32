@@ -81,6 +81,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunc);
         if (mnGridSubtype == SLibConstants.UNDEFINED) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebLoadFiles);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebStartAuth);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebDownloadFiles);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebClearFiles);
         }
@@ -137,7 +138,14 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                     else {
                         SDbPayment payment = new SDbPayment();
                         payment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
-                        new SProcSendPaymentsWeb(miClient, payment).start();
+                        if (payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
+                            miClient.showMsgBoxInformation("No se puede enviar la solicitud de pago porque ya fue enviado anteriormente.");
+                        }
+                        else {
+                            if (miClient.showMsgBoxConfirm("Se enviará la solicitud de pago a un proceso de autorización.\n¿Desea continuar?")== JOptionPane.OK_OPTION) {
+                                new SProcSendPaymentsWeb(miClient, payment).start();
+                            }
+                        }
                     }
                 }
             }
@@ -289,7 +297,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + " AS doc, "
                 : "")
                 + (mnGridSubtype == SModConsts.FIN_PAY_ETY 
-                ? "IF(ve.ety_tp = '" + SModSysConsts.FINX_PAY_ETY_TP_A + "' , 'PAGO SIMPLE', 'PAGO A DOCUMENTO') AS ety_tp, "
+                ? "IF(ve.ety_tp = '" + SModSysConsts.FIN_PAY_ETY_TP_A + "' , 'PAGO SIMPLE', 'PAGO A DOCUMENTO') AS ety_tp, "
                 + "ve.ety_pay_cur, "
                 + "ve.ety_pay_app, "
                 + "ve.conv_rate_app, "

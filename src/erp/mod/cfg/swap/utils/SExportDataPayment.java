@@ -17,7 +17,7 @@ public class SExportDataPayment implements SExportData {
     
     public int pay_id;
     
-    public int funcional_area;
+    public int functional_area;
     
     public int benef;
     
@@ -35,7 +35,7 @@ public class SExportDataPayment implements SExportData {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String exec_date_n;
     
-    public int currency;
+    public String currency;
     
     public String amount;
     
@@ -94,8 +94,4 @@ public class SExportDataPayment implements SExportData {
     //public String deleted_at;
     
     public int user_id;
-    
-    public SExportDataPaymentEntry[] entries;
-    
-    public SExportDataFile[] files;
 }

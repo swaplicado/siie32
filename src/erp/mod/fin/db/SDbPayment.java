@@ -155,6 +155,13 @@ public class SDbPayment extends SDbRegistryUser {
         }
     }
     
+    public void updatePaymentStatus(SGuiSession session, int status) throws Exception {
+        msSql = "UPDATE " + getSqlTable() + " SET " +
+                "fk_st_pay = " + status + " " + 
+                getSqlWhere();
+        session.getStatement().execute(msSql);
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkPaymentId = pk[0];

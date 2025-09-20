@@ -33,24 +33,29 @@ public class SExportDataPaymentEntry implements SExportData {
     
     public int installment;
     
-    public double document_bal_prev_app;
+    public String document_bal_prev_app;
     
-    public double document_bal_unpd_app;
+    public String document_bal_unpd_app;
     
-    public double document_bal_prev_exec;
+    public String document_bal_prev_exec;
     
-    public double document_bal_unpd_exec;
+    public String document_bal_unpd_exec;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public double document_id_n;
+    public Integer document_id_n;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_uuid;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_folio;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_date;
     
-    public int document_currency_id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String document_currency_id;
     
-    public double document_amount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String document_amount;
 }
