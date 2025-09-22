@@ -2733,8 +2733,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             "FROM trn_dps_rec WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
 
                     // Query for attempts 2 and 3:
-                    sSql = "SELECT DISTINCT id_year AS f_year, id_per AS f_per, id_bkc AS f_bkc, id_tp_rec AS f_tp_rec, id_num AS f_num " +
-                            "FROM fin_rec_ety WHERE " +
+                    sSql = "SELECT DISTINCT id_year AS f_year, id_per AS f_per, id_bkc AS f_bkc, id_tp_rec AS f_tp_rec, id_num AS f_num FROM fin_rec_ety WHERE " +
                             "fid_tp_acc_mov = " + anMoveSubclassKey[0] + " AND fid_cl_acc_mov = " + anMoveSubclassKey[1] + " AND fid_cls_acc_mov = " + anMoveSubclassKey[2] + " AND " +
                             (isDocument() ? "fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " " : "fid_dps_adj_year_n = " + mnPkYearId + " AND fid_dps_adj_doc_n = " + mnPkDocId + " ");
                     asSql[1] = sSql + "AND b_del = 0 ORDER BY id_ety DESC ";
@@ -2786,7 +2785,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     else {
                         sSql += "re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " ";
                     }
-                    
                     oResultSet = statement.executeQuery(sSql);
                     if (oResultSet.next()) {
                         moDbmsDataBookkeepingNumber = new SDataBookkeepingNumber();

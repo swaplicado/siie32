@@ -20,17 +20,20 @@ public class SThinDps implements Serializable, SThinData {
     protected String msNumberSeries;
     protected String msNumber;
     protected Date mtDate;
-    protected double mdTotalCy;
-    protected double mdTotal;
+    protected double mdTotalCy_r;
+    protected double mdTotal_r;
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
     protected int mnFkDpsTypeId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
+    protected int mnFkFunctionalAreaId;
+    protected int mnFkFunctionalSubAreaId;
     protected int mnFkCurrencyId;
     
     protected String msDbmsCurrency;
     protected String msDbmsCurrencyKey;
+    protected Object moDbmsRecordKey;
     protected int mnDbmsCfdId;
     
     protected SThinDpsCfd moThinDpsCfd;
@@ -47,17 +50,20 @@ public class SThinDps implements Serializable, SThinData {
         msNumberSeries = "";
         msNumber = "";
         mtDate = null;
-        mdTotalCy = 0;
-        mdTotal = 0;
+        mdTotalCy_r = 0;
+        mdTotal_r = 0;
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
         mnFkDpsTypeId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
+        mnFkFunctionalAreaId = 0;
+        mnFkFunctionalSubAreaId = 0;
         mnFkCurrencyId = 0;
         
         msDbmsCurrency = "";
         msDbmsCurrencyKey = "";
+        moDbmsRecordKey = null;
         mnDbmsCfdId = 0;
         
         moThinDpsCfd = null;
@@ -84,12 +90,12 @@ public class SThinDps implements Serializable, SThinData {
         return mtDate;
     }
     
-    public double getTotalCy() {
-        return mdTotalCy;
+    public double getTotalCy_r() {
+        return mdTotalCy_r;
     }
 
-    public double getTotal() {
-        return mdTotal;
+    public double getTotal_r() {
+        return mdTotal_r;
     }
     
     public int getFkDpsCategoryId() {
@@ -112,6 +118,14 @@ public class SThinDps implements Serializable, SThinData {
         return mnFkBizPartnerBranchId;
     }
     
+    public int getFkFunctionalAreaId() {
+        return mnFkFunctionalAreaId;
+    }
+    
+    public int getFkFunctionalSubAreaId() {
+        return mnFkFunctionalSubAreaId;
+    }
+    
     public int getFkCurrencyId() {
         return mnFkCurrencyId;
     }
@@ -122,6 +136,10 @@ public class SThinDps implements Serializable, SThinData {
 
     public String getDbmsCurrencyKey() {
         return msDbmsCurrencyKey;
+    }
+    
+    public Object getDbmsRecordKey() {
+        return moDbmsRecordKey;
     }
     
     public int getDbmsCfdId() {
@@ -159,9 +177,11 @@ public class SThinDps implements Serializable, SThinData {
         int[] key = (int[]) primaryKey;
         String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.tot_r, "
                 + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
-                + "d.fid_bp_r, d.fid_bpb, d.fid_cur, c.cur, c.cur_key "
+                + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, "
+                + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
+                + "LEFT OUTER JOIN trn_dps_rec AS dr ON dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
                 + "WHERE d.id_year = " + key[0] + " AND d.id_doc = " + key[1] + ";";
         
         try (ResultSet resultSetDps = statement.executeQuery(sql)) {
@@ -174,17 +194,29 @@ public class SThinDps implements Serializable, SThinData {
                 msNumberSeries = resultSetDps.getString("d.num_ser");
                 msNumber = resultSetDps.getString("d.num");
                 mtDate = resultSetDps.getDate("d.dt");
-                mdTotalCy = resultSetDps.getDouble("d.tot_cur_r");
-                mdTotal = resultSetDps.getDouble("d.tot_r");
+                mdTotalCy_r = resultSetDps.getDouble("d.tot_cur_r");
+                mdTotal_r = resultSetDps.getDouble("d.tot_r");
                 mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");
                 mnFkDpsClassId = resultSetDps.getInt("d.fid_cl_dps");
                 mnFkDpsTypeId = resultSetDps.getInt("d.fid_tp_dps");
                 mnFkBizPartnerId_r = resultSetDps.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = resultSetDps.getInt("d.fid_bpb");
+                mnFkFunctionalAreaId = resultSetDps.getInt("d.fid_func");
+                mnFkFunctionalSubAreaId = resultSetDps.getInt("d.fid_func_sub");
                 mnFkCurrencyId = resultSetDps.getInt("d.fid_cur");
                 
                 msDbmsCurrency = resultSetDps.getString("c.cur");
                 msDbmsCurrencyKey = resultSetDps.getString("c.cur_key");
+                
+                int recYearId = resultSetDps.getInt("dr.fid_rec_year");
+                int recPeriodId = resultSetDps.getInt("dr.fid_rec_per");
+                int recBokkeepingCenterId = resultSetDps.getInt("dr.fid_rec_bkc");
+                String recRecordTypeId = resultSetDps.getString("dr.fid_rec_tp_rec");
+                int recNumberId = resultSetDps.getInt("dr.fid_rec_num");
+                
+                if (recYearId != 0 && recPeriodId != 0) {
+                    moDbmsRecordKey = new Object[] { recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId };
+                }
                 
                 sql = "SELECT id_cfd "
                         + "FROM trn_cfd "

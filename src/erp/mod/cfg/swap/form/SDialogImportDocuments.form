@@ -383,7 +383,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbLink">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Vincular a factura"/>
+                        <Property name="text" type="java.lang.String" value="Vincular factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -403,7 +403,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbUnlink">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Desvincular de factura"/>
+                        <Property name="text" type="java.lang.String" value="Desvincular factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -442,6 +442,7 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="2001-01 SUC TP-000000"/>
+                        <Property name="toolTipText" type="java.lang.String" value="P&#xf3;liza contable"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[155, 23]"/>
@@ -479,6 +480,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="000,000,000.00 MXN"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Pago requerido"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[110, 23]"/>
@@ -490,6 +492,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="100%"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Porcentaje de pago requerido"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[40, 23]"/>
@@ -510,6 +513,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="01/01/2001"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Fecha requerida de pago"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -546,6 +550,7 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="P-000000"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Folio de solicitud"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -557,6 +562,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="01/01/2001"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Fecha de solicitud"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -576,6 +582,7 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="STATUS"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Estatus de solicitud"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[155, 23]"/>
@@ -613,6 +620,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="01/01/2001"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Fecha de programaci&#xf3;n"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -650,6 +658,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="horizontalAlignment" type="int" value="11"/>
                         <Property name="text" type="java.lang.String" value="01/01/2001"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Fecha de operaci&#xf3;n"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>

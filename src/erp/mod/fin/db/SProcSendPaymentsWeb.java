@@ -111,10 +111,10 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.number = moPayment.getNumber() + "";
         payment.app_date = SLibUtils.DbmsDateFormatDate.format(moPayment.getDateApplication());
         payment.req_date = SLibUtils.DbmsDateFormatDate.format(moPayment.getDateRequired());
-        payment.sched_date_n = moPayment.getDateScheduler_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateScheduler_n());
-        payment.exec_date_n = moPayment.getDateExecute_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateExecute_n());
-        payment.currency = moPayment.getCurrency().getKey();
-        payment.amount = amountFormat.format(SLibUtils.roundAmount(moPayment.getPaymentCurrency()));
+        payment.sched_date_n = moPayment.getDateSchedule_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateSchedule_n());
+        payment.exec_date_n = moPayment.getDateExecution_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateExecution_n());
+        payment.currency = moPayment.getDbmsCurrency().getKey();
+        payment.amount = amountFormat.format(SLibUtils.roundAmount(moPayment.getPaymentCy()));
         payment.exchange_rate_app = excRateFormat.format(SLibUtils.round(moPayment.getPaymentExchangeRateApplication(), excRateDecimals));
         payment.amount_loc_app = amountFormat.format(SLibUtils.roundAmount(moPayment.getPaymentApplication()));
         payment.exchange_rate_exec = excRateFormat.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), excRateDecimals));
@@ -144,7 +144,7 @@ public class SProcSendPaymentsWeb extends Thread {
         for (SDbPaymentEntry paymentEty : moPayment.getChildEntries()) {
             SExportDataPaymentEntry entry = new SExportDataPaymentEntry();
             entry.entry_type = paymentEty.getEntryType();
-            entry.amount = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentCurrency()));
+            entry.amount = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentCy()));
             entry.amount_loc_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentApplication()));
             entry.entry_currency = paymentEty.moEntryCurrency.getKey();
             entry.conv_rate_app = excRateFormat.format(SLibUtils.round(paymentEty.getConversionRateApplication(), excRateDecimals));
@@ -157,7 +157,7 @@ public class SProcSendPaymentsWeb extends Thread {
             entry.document_bal_unpd_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidApplicationCy_r()));
             entry.document_bal_prev_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousCy()));
             entry.document_bal_unpd_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidCy_r()));
-            if (entry.entry_type.equals(SModSysConsts.FIN_PAY_ETY_TP_P)) {
+            if (entry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
                 int docId = getDocumentId(paymentEty);
                 if (docId != 0) {
                     entry.document_id_n = docId;
@@ -170,7 +170,7 @@ public class SProcSendPaymentsWeb extends Thread {
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());
                     entry.document_currency_id = dps.getDbmsCurrencyKey();
-                    entry.document_amount = amountFormat.format(SLibUtils.roundAmount(dps.getTotalCy()));
+                    entry.document_amount = amountFormat.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
                 }
             }
             entries.add(entry);

@@ -545,9 +545,6 @@ public abstract class SModSysConsts {
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
     
-    public static final String FIN_PAY_ETY_TP_A = "A"; //Anticipo
-    public static final String FIN_PAY_ETY_TP_P = "P"; //Pago a documento
-    
     public static final String FIN_PAY_FILE_TP_EF = "EF"; //Evidencia fotográfica
     public static final String FIN_PAY_FILE_TP_RA = "RA"; //Reporte de avance
     public static final String FIN_PAY_FILE_TP_FS = "FS"; //Finiquito servicio

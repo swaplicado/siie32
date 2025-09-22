@@ -15,23 +15,27 @@ import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbRegistry;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbPayment extends SDbRegistryUser {
+    
+    public static final int PRIORITY_NORMAL = 0;
+    public static final int PRIORITY_URGENT = 1;
 
     protected int mnPkPaymentId;
     protected String msSeries;
     protected int mnNumber;
     protected Date mtDateApplication;
     protected Date mtDateRequired;
-    protected Date mtDateScheduler_n;
-    protected Date mtDateExecute_n;
-    protected double mdPaymentCurrency;
+    protected Date mtDateSchedule_n;
+    protected Date mtDateExecution_n;
+    protected double mdPaymentCy;
     protected double mdPaymentExchangeRateApplication;
     protected double mdPaymentApplication;
     protected double mdPaymentExchangeRate;
@@ -40,6 +44,7 @@ public class SDbPayment extends SDbRegistryUser {
     protected int mnPriority;
     protected String msNotes;
     //protected boolean mbDeleted;
+    //protected boolean mbSystem;
     protected int mnFkStatusPaymentId;
     protected int mnFkCurrencyId;
     protected int mnFkBeneficiaryId;
@@ -65,7 +70,9 @@ public class SDbPayment extends SDbRegistryUser {
     protected ArrayList<SDbPaymentEntry> maChildEntries;
     protected ArrayList<SDbPaymentFile> maFiles;
     protected ArrayList<SDbPaymentFile> maFilesDeleted;
-    protected SDataCurrency moCurrency;
+    
+    protected String msDbmsStatus;
+    protected SDataCurrency moDbmsCurrency;
     
     protected boolean mbAuxReloadEntries;
     
@@ -73,14 +80,26 @@ public class SDbPayment extends SDbRegistryUser {
         super(SModConsts.FIN_PAY);
     }
     
+    public void computeNextNumber(final SGuiSession session) throws Exception {
+        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
+                + "FROM " + getSqlTable() + " "
+                + "WHERE ser = '" + msSeries + "' AND NOT b_del;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                mnNumber = resultSet.getInt(1);
+            }
+        }
+    }
+    
     public void setPkPaymentId(int n) { mnPkPaymentId = n; }
     public void setSeries(String s) { msSeries = s; }
     public void setNumber(int n) { mnNumber = n; }
     public void setDateApplication(Date t) { mtDateApplication = t; }
     public void setDateRequired(Date t) { mtDateRequired = t; }
-    public void setDateScheduler_n(Date t) { mtDateScheduler_n = t; }
-    public void setDateExecute_n(Date t) { mtDateExecute_n = t; }
-    public void setPaymentCurrency(double d) { mdPaymentCurrency = d; }
+    public void setDateSchedule_n(Date t) { mtDateSchedule_n = t; }
+    public void setDateExecution_n(Date t) { mtDateExecution_n = t; }
+    public void setPaymentCy(double d) { mdPaymentCy = d; }
     public void setPaymentExchangeRateApplication(double d) { mdPaymentExchangeRateApplication = d; }
     public void setPaymentApplication(double d) { mdPaymentApplication = d; }
     public void setPaymentExchangeRate(double d) { mdPaymentExchangeRate = d; }
@@ -89,6 +108,7 @@ public class SDbPayment extends SDbRegistryUser {
     public void setPriority(int n) { mnPriority = n; }
     public void setNotes(String s) { msNotes = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
+    public void setSystem(boolean b) { mbSystem = b; }
     public void setFkStatusPaymentId(int n) { mnFkStatusPaymentId = n; }
     public void setFkCurrencyId(int n) { mnFkCurrencyId = n; }
     public void setFkBeneficiaryId(int n) { mnFkBeneficiaryId = n; }
@@ -107,16 +127,14 @@ public class SDbPayment extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxReloadEntries(boolean b) { mbAuxReloadEntries = b; }
-    
     public int getPkPaymentId() { return mnPkPaymentId; }
     public String getSeries() { return msSeries; }
     public int getNumber() { return mnNumber; }
     public Date getDateApplication() { return mtDateApplication; }
     public Date getDateRequired() { return mtDateRequired; }
-    public Date getDateScheduler_n() { return mtDateScheduler_n; }
-    public Date getDateExecute_n() { return mtDateExecute_n; }
-    public double getPaymentCurrency() { return mdPaymentCurrency; }
+    public Date getDateSchedule_n() { return mtDateSchedule_n; }
+    public Date getDateExecution_n() { return mtDateExecution_n; }
+    public double getPaymentCy() { return mdPaymentCy; }
     public double getPaymentExchangeRateApplication() { return mdPaymentExchangeRateApplication; }
     public double getPaymentApplication() { return mdPaymentApplication; }
     public double getPaymentExchangeRate() { return mdPaymentExchangeRate; }
@@ -125,6 +143,7 @@ public class SDbPayment extends SDbRegistryUser {
     public int getPriority() { return mnPriority; }
     public String getNotes() { return msNotes; }
     public boolean isDeleted() { return mbDeleted; }
+    public boolean isSystem() { return mbSystem; }
     public int getFkStatusPaymentId() { return mnFkStatusPaymentId; }
     public int getFkCurrencyId() { return mnFkCurrencyId; }
     public int getFkBeneficiaryId() { return mnFkBeneficiaryId; }
@@ -146,8 +165,20 @@ public class SDbPayment extends SDbRegistryUser {
     public ArrayList<SDbPaymentEntry> getChildEntries() { return maChildEntries; }
     public ArrayList<SDbPaymentFile> getFiles() { return maFiles; }
     public ArrayList<SDbPaymentFile> getFilesDeleted() { return maFilesDeleted; }
-    public SDataCurrency getCurrency() { return moCurrency; }
+    
+    public void setDbmsStatus(String s) { msDbmsStatus = s; }
+    public void setDbmsCurrency(SDataCurrency o) { moDbmsCurrency = o; }
+    
+    public String getDbmsStatus() { return msDbmsStatus; }
+    public SDataCurrency getDbmsCurrency() { return moDbmsCurrency; }
+    
+    public void setAuxReloadEntries(boolean b) { mbAuxReloadEntries = b; }
+    
     public boolean getAuxReloadEntries() { return mbAuxReloadEntries; }
+    
+    public String getFolio() {
+        return msSeries + (msSeries.isEmpty() ? "" : "-") + mnNumber;
+    }
     
     public void deleteFiles(SGuiSession session) throws Exception {
         for (SDbPaymentFile file : maFiles) {
@@ -181,17 +212,18 @@ public class SDbPayment extends SDbRegistryUser {
         mnNumber = 0;
         mtDateApplication = null;
         mtDateRequired = null;
-        mtDateScheduler_n = null;
-        mtDateExecute_n = null;
-        mdPaymentCurrency = 0;
+        mtDateSchedule_n = null;
+        mtDateExecution_n = null;
+        mdPaymentCy = 0;
         mdPaymentExchangeRateApplication = 0;
         mdPaymentApplication = 0;
         mdPaymentExchangeRate = 0;
         mdPayment = 0;
         msPaymentWay = "";
-        mnPriority = 0;
+        mnPriority = PRIORITY_NORMAL;
         msNotes = "";
         mbDeleted = false;
+        mbSystem = false;
         mnFkStatusPaymentId = 0;
         mnFkCurrencyId = 0;
         mnFkBeneficiaryId = 0;
@@ -213,7 +245,8 @@ public class SDbPayment extends SDbRegistryUser {
         maChildEntries = new ArrayList<>();
         maFiles = new ArrayList<>();
         maFilesDeleted = new ArrayList<>();
-        moCurrency = null;
+        msDbmsStatus = "";
+        moDbmsCurrency = null;
         
         mbAuxReloadEntries = false;
     }
@@ -239,7 +272,8 @@ public class SDbPayment extends SDbRegistryUser {
         
         mnPkPaymentId = 0;
         
-        msSql = "SELECT COALESCE(MAX(id_pay), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_pay), 0) + 1 "
+                + "FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkPaymentId = resultSet.getInt(1);
@@ -268,9 +302,9 @@ public class SDbPayment extends SDbRegistryUser {
             mnNumber = resultSet.getInt("num");
             mtDateApplication = resultSet.getDate("dt_app");
             mtDateRequired = resultSet.getDate("dt_req");
-            mtDateScheduler_n = resultSet.getDate("dt_sched_n");
-            mtDateExecute_n = resultSet.getDate("dt_exec_n");
-            mdPaymentCurrency = resultSet.getDouble("pay_cur");
+            mtDateSchedule_n = resultSet.getDate("dt_sched_n");
+            mtDateExecution_n = resultSet.getDate("dt_exec_n");
+            mdPaymentCy = resultSet.getDouble("pay_cur");
             mdPaymentExchangeRateApplication = resultSet.getDouble("pay_exc_rate_app");
             mdPaymentApplication = resultSet.getDouble("pay_app");
             mdPaymentExchangeRate = resultSet.getDouble("pay_exc_rate");
@@ -279,6 +313,7 @@ public class SDbPayment extends SDbRegistryUser {
             mnPriority = resultSet.getInt("priority");
             msNotes = resultSet.getString("nts");
             mbDeleted = resultSet.getBoolean("b_del");
+            mbSystem = resultSet.getBoolean("b_sys");
             mnFkStatusPaymentId = resultSet.getInt("fk_st_pay");
             mnFkCurrencyId = resultSet.getInt("fk_cur");
             mnFkBeneficiaryId = resultSet.getInt("fk_ben");
@@ -299,10 +334,12 @@ public class SDbPayment extends SDbRegistryUser {
             
             // Read aswell document entries:
             
+            msDbmsStatus = (String) session.readField(SModConsts.FINS_ST_PAY, new int[] { mnFkStatusPaymentId }, SDbRegistry.FIELD_NAME);
+            
             statement = session.getStatement().getConnection().createStatement();
             
-            moCurrency = new SDataCurrency();
-            moCurrency.read(new int[] { mnFkCurrencyId }, statement);
+            moDbmsCurrency = new SDataCurrency();
+            moDbmsCurrency.read(new int[] { mnFkCurrencyId }, statement);
             
             msSql = "SELECT id_ety " + 
                     "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " " + 
@@ -313,7 +350,7 @@ public class SDbPayment extends SDbRegistryUser {
             while (resultSet.next()) {
                 entry = new SDbPaymentEntry();
                 entry.read(session, new int[] { mnPkPaymentId, resultSet.getInt(1) });
-                entry.setPayCurrency(moCurrency);
+                entry.setPayCurrency(moDbmsCurrency);
                 maChildEntries.add(entry);
             }
             
@@ -342,6 +379,7 @@ public class SDbPayment extends SDbRegistryUser {
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
+            computeNextNumber(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
@@ -354,9 +392,9 @@ public class SDbPayment extends SDbRegistryUser {
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateApplication) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateRequired) + "', " + 
-                    (mtDateScheduler_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateScheduler_n) + "', ") + 
-                    (mtDateExecute_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateExecute_n) + "', ") + 
-                    mdPaymentCurrency + ", " + 
+                    (mtDateSchedule_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSchedule_n) + "', ") + 
+                    (mtDateExecution_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateExecution_n) + "', ") + 
+                    mdPaymentCy + ", " + 
                     mdPaymentExchangeRateApplication + ", " + 
                     mdPaymentApplication + ", " + 
                     mdPaymentExchangeRate + ", " + 
@@ -365,6 +403,7 @@ public class SDbPayment extends SDbRegistryUser {
                     mnPriority + ", " + 
                     "'" + msNotes + "', " + 
                     (mbDeleted ? 1 : 0) + ", " + 
+                    (mbSystem ? 1 : 0) + ", " + 
                     mnFkStatusPaymentId + ", " + 
                     mnFkCurrencyId + ", " + 
                     mnFkBeneficiaryId + ", " + 
@@ -393,9 +432,9 @@ public class SDbPayment extends SDbRegistryUser {
                     "num = " + mnNumber + ", " +
                     "dt_app = '" + SLibUtils.DbmsDateFormatDate.format(mtDateApplication) + "', " +
                     "dt_req = '" + SLibUtils.DbmsDateFormatDate.format(mtDateRequired) + "', " +
-                    "dt_sched_n = " + (mtDateScheduler_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateScheduler_n) + "', ") +
-                    "dt_exec_n = " + (mtDateExecute_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateExecute_n) + "', ") +
-                    "pay_cur = " + mdPaymentCurrency + ", " +
+                    "dt_sched_n = " + (mtDateSchedule_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSchedule_n) + "', ") +
+                    "dt_exec_n = " + (mtDateExecution_n == null ? "NULL, " : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateExecution_n) + "', ") +
+                    "pay_cur = " + mdPaymentCy + ", " +
                     "pay_exc_rate_app = " + mdPaymentExchangeRateApplication + ", " +
                     "pay_app = " + mdPaymentApplication + ", " +
                     "pay_exc_rate = " + mdPaymentExchangeRate + ", " +
@@ -404,6 +443,7 @@ public class SDbPayment extends SDbRegistryUser {
                     "priority = " + mnPriority + ", " +
                     "nts = '" + msNotes + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_st_pay = " + mnFkStatusPaymentId + ", " +
                     "fk_cur = " + mnFkCurrencyId + ", " +
                     "fk_ben = " + mnFkBeneficiaryId + ", " +
@@ -426,11 +466,12 @@ public class SDbPayment extends SDbRegistryUser {
         
         session.getStatement().execute(msSql);
         
-        if (mbAuxReloadEntries) {
+        if (mbRegistryNew || mbAuxReloadEntries) {
             msSql = "DELETE " +
                     "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " " + 
                     "WHERE id_pay = " + mnPkPaymentId + " ";
             session.getStatement().execute(msSql);
+            
             for (SDbPaymentEntry entry : maChildEntries) {
                 entry.setPkPaymentId(mnPkPaymentId);
                 entry.setRegistryNew(true);
@@ -460,9 +501,9 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setNumber(this.getNumber());
         registry.setDateApplication(this.getDateApplication());
         registry.setDateRequired(this.getDateRequired());
-        registry.setDateScheduler_n(this.getDateScheduler_n());
-        registry.setDateExecute_n(this.getDateExecute_n());
-        registry.setPaymentCurrency(this.getPaymentCurrency());
+        registry.setDateSchedule_n(this.getDateSchedule_n());
+        registry.setDateExecution_n(this.getDateExecution_n());
+        registry.setPaymentCy(this.getPaymentCy());
         registry.setPaymentExchangeRateApplication(this.getPaymentExchangeRateApplication());
         registry.setPaymentApplication(this.getPaymentApplication());
         registry.setPaymentExchangeRate(this.getPaymentExchangeRate());
@@ -471,6 +512,7 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setPriority(this.getPriority());
         registry.setNotes(this.getNotes());
         registry.setDeleted(this.isDeleted());
+        registry.setSystem(this.isSystem());
         registry.setFkStatusPaymentId(this.getFkStatusPaymentId());
         registry.setFkCurrencyId(this.getFkCurrencyId());
         registry.setFkBeneficiaryId(this.getFkBeneficiaryId());
@@ -500,6 +542,9 @@ public class SDbPayment extends SDbRegistryUser {
         for (SDbPaymentFile file : this.getFilesDeleted()) {
             registry.getFilesDeleted().add(file);
         }
+        
+        registry.setDbmsStatus(this.getDbmsStatus());
+        registry.setDbmsCurrency(this.getDbmsCurrency());
         
         registry.setAuxReloadEntries(this.getAuxReloadEntries());
         

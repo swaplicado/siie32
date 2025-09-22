@@ -5,6 +5,7 @@
  */
 package erp.mod.cfg.swap;
 
+import erp.mod.SModSysConsts;
 import sa.lib.SLibConsts;
 
 /**
@@ -70,5 +71,28 @@ public abstract class SSwapUtils {
         }
         
         return sanitized;
+    }
+    
+    public static int getCurrencyId(final int swapServicesCurrencyId) {
+        int currencyId = 0;
+        
+        switch (swapServicesCurrencyId) {
+            case 102:
+                currencyId = SModSysConsts.CFGU_CUR_MXN;
+                break;
+            case 152:
+                currencyId = SModSysConsts.CFGU_CUR_USD;
+                break;
+            case 51:
+                currencyId = SModSysConsts.CFGU_CUR_EUR;
+                break;
+            case 54:
+                currencyId = SModSysConsts.CFGU_CUR_GBP;
+                break;
+            default:
+                // nothing
+        }
+        
+        return currencyId;
     }
 }

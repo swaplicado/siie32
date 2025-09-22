@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbComImportLog;
@@ -17,11 +16,13 @@ import erp.mod.cfg.db.SDbComImportLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SExportLogsUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.fin.db.SDbPayment;
 import erp.mod.trn.db.swap.SDbSwapDataProcessing;
-import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -89,7 +90,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
      * @param client GUI client.
      */
     public SDialogImportDocuments(SGuiClient client) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Descarga de documentos");
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Importación de documentos");
         initComponents();
         initComponentsCustom();
     }
@@ -321,7 +322,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbLink.setText("Vincular a factura");
+        jbLink.setText("Vincular factura");
         jbLink.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbLink.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN4.add(jbLink);
@@ -330,7 +331,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbUnlink.setText("Desvincular de factura");
+        jbUnlink.setText("Desvincular factura");
         jbUnlink.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbUnlink.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN5.add(jbUnlink);
@@ -349,6 +350,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jtfRecord.setEditable(false);
         jtfRecord.setText("2001-01 SUC TP-000000");
+        jtfRecord.setToolTipText("Póliza contable");
         jtfRecord.setFocusable(false);
         jtfRecord.setPreferredSize(new java.awt.Dimension(155, 23));
         jpProcessingN7.add(jtfRecord);
@@ -368,6 +370,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayRecAmount.setEditable(false);
         jtfPayRecAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayRecAmount.setText("000,000,000.00 MXN");
+        jtfPayRecAmount.setToolTipText("Pago requerido");
         jtfPayRecAmount.setFocusable(false);
         jtfPayRecAmount.setPreferredSize(new java.awt.Dimension(110, 23));
         jpProcessingN9.add(jtfPayRecAmount);
@@ -375,6 +378,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayRecAmountPct.setEditable(false);
         jtfPayRecAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayRecAmountPct.setText("100%");
+        jtfPayRecAmountPct.setToolTipText("Porcentaje de pago requerido");
         jtfPayRecAmountPct.setFocusable(false);
         jtfPayRecAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
         jpProcessingN9.add(jtfPayRecAmountPct);
@@ -386,6 +390,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayRecDate.setEditable(false);
         jtfPayRecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayRecDate.setText("01/01/2001");
+        jtfPayRecDate.setToolTipText("Fecha requerida de pago");
         jtfPayRecDate.setFocusable(false);
         jtfPayRecDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jpProcessingN10.add(jtfPayRecDate);
@@ -404,6 +409,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jtfPayFolio.setEditable(false);
         jtfPayFolio.setText("P-000000");
+        jtfPayFolio.setToolTipText("Folio de solicitud");
         jtfPayFolio.setFocusable(false);
         jtfPayFolio.setPreferredSize(new java.awt.Dimension(75, 23));
         jpProcessingN12.add(jtfPayFolio);
@@ -411,6 +417,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayDate.setEditable(false);
         jtfPayDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayDate.setText("01/01/2001");
+        jtfPayDate.setToolTipText("Fecha de solicitud");
         jtfPayDate.setFocusable(false);
         jtfPayDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jpProcessingN12.add(jtfPayDate);
@@ -421,6 +428,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jtfPayStatus.setEditable(false);
         jtfPayStatus.setText("STATUS");
+        jtfPayStatus.setToolTipText("Estatus de solicitud");
         jtfPayStatus.setFocusable(false);
         jtfPayStatus.setPreferredSize(new java.awt.Dimension(155, 23));
         jpProcessingN13.add(jtfPayStatus);
@@ -440,6 +448,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPaySchedDate.setEditable(false);
         jtfPaySchedDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPaySchedDate.setText("01/01/2001");
+        jtfPaySchedDate.setToolTipText("Fecha de programación");
         jtfPaySchedDate.setFocusable(false);
         jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jpProcessingN15.add(jtfPaySchedDate);
@@ -459,6 +468,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayExecDate.setEditable(false);
         jtfPayExecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayExecDate.setText("01/01/2001");
+        jtfPayExecDate.setToolTipText("Fecha de operación");
         jtfPayExecDate.setFocusable(false);
         jtfPayExecDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jpProcessingN17.add(jtfPayExecDate);
@@ -588,6 +598,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(column);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizado"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI"));
@@ -724,6 +735,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbDeselectAll.setEnabled(!isNewShowRequest);
         
         jbDownload.setEnabled(!isNewShowRequest);
+        
+        jbLinkAll.setEnabled(!isNewShowRequest);
     }
     
     private void renderCurrentDocument() {
@@ -753,7 +766,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbLink.setEnabled(true);
             jbUnlink.setEnabled(true);
             
-            jtfRecord.setText("");
+            if (document.ProcessedDps == null) {
+                jtfRecord.setText("");
+            }
+            else {
+                jtfRecord.setText(document.ProcessedDps.composeRecord());
+                
+                jtfRecord.setCaretPosition(0);
+            }
             
             if (document.RequiredPaymentPct == 0 || document.RequiredPaymentDate == null) {
                 jtfPayRecAmount.setText("");
@@ -764,13 +784,32 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 jtfPayRecAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
                 jtfPayRecAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
                 jtfPayRecDate.setText(SLibUtils.DateFormatDate.format(document.RequiredPaymentDate));
+                
+                jtfPayRecAmount.setCaretPosition(0);
+                jtfPayRecAmountPct.setCaretPosition(0);
+                jtfPayRecDate.setCaretPosition(0);
             }
             
-            jtfPayFolio.setText("");
-            jtfPayDate.setText("");
-            jtfPayStatus.setText("");
-            jtfPaySchedDate.setText("");
-            jtfPayExecDate.setText("");
+            if (document.Payment == null) {
+                jtfPayFolio.setText("");
+                jtfPayDate.setText("");
+                jtfPayStatus.setText("");
+                jtfPaySchedDate.setText("");
+                jtfPayExecDate.setText("");
+            }
+            else {
+                jtfPayFolio.setText(document.Payment.getFolio());
+                jtfPayDate.setText(SLibUtils.DateFormatDate.format(document.Payment.getDateApplication()));
+                jtfPayStatus.setText(document.Payment.getDbmsStatus());
+                jtfPaySchedDate.setText(document.Payment.getDateSchedule_n() == null ? "" : SLibUtils.DateFormatDate.format(document.Payment.getDateSchedule_n()));
+                jtfPayExecDate.setText(document.Payment.getDateExecution_n() == null ? "" : SLibUtils.DateFormatDate.format(document.Payment.getDateExecution_n()));
+                
+                jtfPayFolio.setCaretPosition(0);
+                jtfPayDate.setCaretPosition(0);
+                jtfPayStatus.setCaretPosition(0);
+                jtfPaySchedDate.setCaretPosition(0);
+                jtfPayExecDate.setCaretPosition(0);
+            }
         }
     }
     
@@ -855,7 +894,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.FunctionalSubArea = functionalAreaNode.get("name").asText();
 
                                     JsonNode currencyNode = docNode.path("currency");
-                                    document.CurrencyId = currencyNode.get("id").asInt();
+                                    document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
                                     document.CurrencyCode = currencyNode.get("code").asText();
 
                                     JsonNode referencesNode = docNode.path("references");
@@ -890,7 +929,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.Status = "";
                                     document.Download = false;
                                     document.AlreadyDownloaded = countOfImports > 0;
+                                    
                                     document.ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByByExternalId(prepStatToGetProcessedDps, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
+                                    
+                                    if (document.ProcessedDps != null && document.ProcessedDps.SwapDataProcessingId != 0) {
+                                        document.SwapDataProcessing = (SDbSwapDataProcessing) miClient.getSession().readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { document.ProcessedDps.SwapDataProcessingId });
+                                        
+                                        if (document.SwapDataProcessing.getFkPaymentId_n() != 0) {
+                                            document.Payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, new int[] { document.SwapDataProcessing.getFkPaymentId_n() });
+                                        }
+                                    }
 
                                     documents.add(document);
                                 }
@@ -1136,11 +1184,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     if (document.ProcessedDps == null) {
                         unlinked++;
-                        SDbSwapDataProcessing.ProcessedDps processedDps = SDbSwapDataProcessing.getProcessedDpsByDocData(preparedStatement, document.BizPartnerId, document.Date, document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+                        int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(preparedStatement, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
-                        if (processedDps != null) {
+                        if (dpsKey != null) {
+                            SThinDps dps = new SThinDps();
+                            dps.read(dpsKey, miClient.getSession().getStatement());
+                            document.link(miClient.getSession(), dps);
                             newlyLinked++;
-                            document.ProcessedDps = processedDps;
                         }
                     }
                 }
@@ -1218,17 +1268,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                         int[] dpsKey = (int[]) picker.getOption();
-                        SDataDps dps = new SDataDps();
-
-                        if (dps.read(dpsKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception("Error al vincular el documento:\n" + dps.getDbmsError());
-                        }
-                        else {
-                            if (document.link(miClient.getSession(), dps)) {
-                                int index = moDocumentsGrid.getTable().getSelectedRow();
-                                moDocumentsGrid.renderGridRows();
-                                moDocumentsGrid.setSelectedGridRow(index);
-                            }
+                        SThinDps dps = new SThinDps();
+                        dps.read(dpsKey, miClient.getSession().getStatement());
+                        
+                        if (document.link(miClient.getSession(), dps)) {
+                            int index = moDocumentsGrid.getTable().getSelectedRow();
+                            moDocumentsGrid.renderGridRows();
+                            moDocumentsGrid.setSelectedGridRow(index);
                         }
                     }
                 }
@@ -1240,7 +1286,42 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void actionPerformedUnlink() {
-        
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SRowDocument document = (SRowDocument) row;
+                
+                if (document.ProcessedDps == null) {
+                    throw new Exception("Este documento no está vinculado.");
+                }
+                else if (document.ProcessedDps.SwapDataProcessingId == 0) {
+                    throw new Exception("La factura vinculada de este documento carece de registro de procesamiento.");
+                }
+                else {
+                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea desvincular la factura de este documento?") == JOptionPane.YES_OPTION) {
+                        SDbSwapDataProcessing swapDataProcessing = (SDbSwapDataProcessing) miClient.getSession().readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { document.ProcessedDps.SwapDataProcessingId });
+                        
+                        if (!swapDataProcessing.isDeleted()) {
+                            swapDataProcessing.setDeleted(true);
+                            swapDataProcessing.save(miClient.getSession());
+                        }
+                        
+                        document.ProcessedDps = null;
+                        
+                        int index = moDocumentsGrid.getTable().getSelectedRow();
+                        moDocumentsGrid.renderGridRows();
+                        moDocumentsGrid.setSelectedGridRow(index);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     /*
@@ -1270,6 +1351,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAll.addActionListener(this);
         jbDeselectAll.addActionListener(this);
         jbDownload.addActionListener(this);
+        jbLinkAll.addActionListener(this);
         jbRecord.addActionListener(this);
         jbLink.addActionListener(this);
         jbUnlink.addActionListener(this);
@@ -1283,6 +1365,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAll.removeActionListener(this);
         jbDeselectAll.removeActionListener(this);
         jbDownload.removeActionListener(this);
+        jbLinkAll.removeActionListener(this);
         jbRecord.removeActionListener(this);
         jbLink.removeActionListener(this);
         jbUnlink.removeActionListener(this);

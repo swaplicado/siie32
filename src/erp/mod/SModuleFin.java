@@ -25,6 +25,8 @@ import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SDbCheckWallet;
 import erp.mod.fin.db.SDbCostCenter;
 import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.db.SDbTaxItemLink;
 import erp.mod.fin.form.SFormAbpBizPartner;
 import erp.mod.fin.form.SFormAbpBizPartnerLink;
@@ -232,6 +234,13 @@ public class SModuleFin extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_pay_met = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.FINS_ST_PAY:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_st_pay = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.FIN_ACC:
                 registry = new SDbAccount();
                 break;
@@ -290,8 +299,13 @@ public class SModuleFin extends SGuiModule {
                 registry = new SDbAccountingCustomizableReportUser();
                 break;
             case SModConsts.FIN_PAY:
-            case SModConsts.FIN_PAY_FILE:
                 registry = new SDbPayment();
+                break;
+            case SModConsts.FIN_PAY_ETY:
+                registry = new SDbPaymentEntry();
+                break;
+            case SModConsts.FIN_PAY_FILE:
+                registry = new SDbPaymentFile();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

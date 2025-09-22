@@ -318,24 +318,17 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      * @throws Exception 
      */
     public static PreparedStatement createPrepStatementToGetProcessedDpsByDocData(final SGuiSession session, final int[] dpsTypeKey) throws Exception {
-        String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc, "
-                + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code "
+        String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON "
-                + "dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON "
-                + "r.id_year = dr.fid_rec_year AND r.id_per = dr.fid_rec_per AND r.id_bkc = dr.fid_rec_bkc AND r.id_tp_rec = dr.fid_rec_tp_rec AND r.id_num = dr.fid_rec_num "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON "
-                + "cob.id_bpb = r.fid_cob "
                 + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
-                + "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[0] + " AND d.fid_tp_dps = " + dpsTypeKey[0] + " "
+                + "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " "
                 + "AND d.fid_bp_r = ? AND d.dt = ? AND d.num_ser = ? AND d.num = ? AND d.tot_cur_r = ? AND d.fid_cur = ?;";
         
         return session.getStatement().getConnection().prepareStatement(sql);
     }
     
     /**
-     * Get Processed DPS from Payable or Receivable Accounts, if any, by its own document data.
+     * Get DPS primary key from Payable or Receivable Accounts, if any, by its own document data.
      * @param preparedStatement Prepared statement.
      * @param bizPartnerId Document's ID of business partner.
      * @param date Document's date.
@@ -343,27 +336,26 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      * @param number Document's folio number.
      * @param total Document's net total.
      * @param currencyId Document's ID of currency.
-     * @return A Processed DPS if found, otherwise <code>null</code>.
+     * @return A DPS primary key if found, otherwise <code>null</code>.
      * @throws Exception 
      */
-    public static ProcessedDps getProcessedDpsByDocData(final PreparedStatement preparedStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
-        ProcessedDps processedDps = null;
+    public static int[] getDpsKeyByDocData(final PreparedStatement preparedStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
+        int[] dpsKey = null;
         
         preparedStatement.setInt(1, bizPartnerId);
         preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
         preparedStatement.setString(3, numberSeries);
         preparedStatement.setString(4, number);
         preparedStatement.setDouble(5, total);
-        preparedStatement.setInt(5, currencyId);
+        preparedStatement.setInt(6, currencyId);
         
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
-                processedDps = new ProcessedDps(0, resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), 
-                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"));
+                dpsKey = new int[] { resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc") };
             }
         }
         
-        return processedDps;
+        return dpsKey;
     }
     
     /**

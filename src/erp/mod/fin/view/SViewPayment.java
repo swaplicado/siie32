@@ -9,6 +9,7 @@ import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.db.SProcSendPaymentsWeb;
 import erp.mod.hrs.utils.SDocUtils;
@@ -297,7 +298,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + " AS doc, "
                 : "")
                 + (mnGridSubtype == SModConsts.FIN_PAY_ETY 
-                ? "IF(ve.ety_tp = '" + SModSysConsts.FIN_PAY_ETY_TP_A + "' , 'PAGO SIMPLE', 'PAGO A DOCUMENTO') AS ety_tp, "
+                ? "IF(ve.ety_tp = '" + SDbPaymentEntry.ENTRY_TYPE_ADVANCE + "' , 'PAGO SIMPLE', 'PAGO A DOCUMENTO') AS ety_tp, "
                 + "ve.ety_pay_cur, "
                 + "ve.ety_pay_app, "
                 + "ve.conv_rate_app, "

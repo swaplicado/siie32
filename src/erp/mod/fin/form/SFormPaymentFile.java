@@ -98,9 +98,9 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moTextSerie = new sa.lib.gui.bean.SBeanFieldText();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
         jpNorthPayRow4 = new javax.swing.JPanel();
-        jlPaymentCurrency = new javax.swing.JLabel();
-        moDecPaymentCurrency = new sa.lib.gui.bean.SBeanFieldDecimal();
-        moTextPaymentCurrencyCy = new sa.lib.gui.bean.SBeanFieldText();
+        jlPaymentCy = new javax.swing.JLabel();
+        moDecPaymentCy = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moTextPaymentCyCur = new sa.lib.gui.bean.SBeanFieldText();
         jpNorthPayRow5 = new javax.swing.JPanel();
         jlDateRequired = new javax.swing.JLabel();
         moDateRequired = new sa.lib.gui.bean.SBeanFieldDate();
@@ -190,17 +190,17 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorthPayRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentCurrency.setText("Monto de pago:*");
-        jlPaymentCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpNorthPayRow4.add(jlPaymentCurrency);
+        jlPaymentCy.setText("Monto de pago:*");
+        jlPaymentCy.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpNorthPayRow4.add(jlPaymentCy);
 
-        moDecPaymentCurrency.setEnabled(false);
-        jpNorthPayRow4.add(moDecPaymentCurrency);
+        moDecPaymentCy.setEnabled(false);
+        jpNorthPayRow4.add(moDecPaymentCy);
 
-        moTextPaymentCurrencyCy.setText("CUR");
-        moTextPaymentCurrencyCy.setEnabled(false);
-        moTextPaymentCurrencyCy.setPreferredSize(new java.awt.Dimension(35, 23));
-        jpNorthPayRow4.add(moTextPaymentCurrencyCy);
+        moTextPaymentCyCur.setText("CUR");
+        moTextPaymentCyCur.setEnabled(false);
+        moTextPaymentCyCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpNorthPayRow4.add(moTextPaymentCyCur);
 
         jpNorthPay.add(jpNorthPayRow4);
 
@@ -373,7 +373,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private javax.swing.JLabel jlDescription;
     private javax.swing.JLabel jlFile;
     private javax.swing.JLabel jlFunctionalArea;
-    private javax.swing.JLabel jlPaymentCurrency;
+    private javax.swing.JLabel jlPaymentCy;
     private javax.swing.JLabel jlSerieNumber;
     private javax.swing.JPanel jpGridPayFiles;
     private javax.swing.JPanel jpNorth;
@@ -401,7 +401,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private javax.swing.JTextField jtfFile;
     private sa.lib.gui.bean.SBeanFieldDate moDateApplication;
     private sa.lib.gui.bean.SBeanFieldDate moDateRequired;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentCurrency;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentCy;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBeneficiary;
     private sa.lib.gui.bean.SBeanFieldKey moKeyFunctionalArea;
@@ -409,7 +409,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private sa.lib.gui.bean.SBeanFieldRadio moRadPhoto;
     private sa.lib.gui.bean.SBeanFieldRadio moRadService;
     private sa.lib.gui.bean.SBeanFieldText moTextDescription;
-    private sa.lib.gui.bean.SBeanFieldText moTextPaymentCurrencyCy;
+    private sa.lib.gui.bean.SBeanFieldText moTextPaymentCyCur;
     private sa.lib.gui.bean.SBeanFieldText moTextSerie;
     // End of variables declaration//GEN-END:variables
 
@@ -426,7 +426,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moDateApplication.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateApplication), true);
         moTextSerie.setTextSettings(SGuiUtils.getLabelName(jlSerieNumber), 5, 0);
         moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlSerieNumber), SGuiConsts.GUI_TYPE_INT, true);
-        moDecPaymentCurrency.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCurrency), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecPaymentCy.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDateRequired.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateRequired), true);
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
         
@@ -439,7 +439,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moFields.addField(moDateApplication);
         moFields.addField(moTextSerie);
         moFields.addField(moIntNumber);
-        moFields.addField(moDecPaymentCurrency);
+        moFields.addField(moDecPaymentCy);
         moFields.addField(moDateRequired);
         moFields.addField(moKeyFunctionalArea);
         
@@ -750,8 +750,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moIntNumber.setValue(moRegistry.getNumber());
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextSerie.setValue(moRegistry.getSeries());
-        moDecPaymentCurrency.setValue(moRegistry.getPaymentCurrency());
-        moTextPaymentCurrencyCy.setValue(moRegistry.getCurrency().getKey());
+        moDecPaymentCy.setValue(moRegistry.getPaymentCy());
+        moTextPaymentCyCur.setValue(moRegistry.getDbmsCurrency().getKey());
         moDateRequired.setValue(moRegistry.getDateRequired());
         moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId(), moRegistry.getFkFunctionalSubareaId() });
         

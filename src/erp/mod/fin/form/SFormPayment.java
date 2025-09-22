@@ -119,8 +119,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moTextSerie = new sa.lib.gui.bean.SBeanFieldText();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
         jpPayWestRow4 = new javax.swing.JPanel();
-        jlPaymentCurrency = new javax.swing.JLabel();
-        moDecPaymentCurrency = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlPaymentCy = new javax.swing.JLabel();
+        moDecPaymentCy = new sa.lib.gui.bean.SBeanFieldDecimal();
         jpPayWestRow5 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         moKeyCurrency = new sa.lib.gui.bean.SBeanFieldKey();
@@ -137,11 +137,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenter = new javax.swing.JPanel();
         jpPayCenterWest = new javax.swing.JPanel();
         jpPayCenterWestRow1 = new javax.swing.JPanel();
-        jlDateScheduler = new javax.swing.JLabel();
-        moDateScheduler = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateSchedule = new javax.swing.JLabel();
+        moDateSchedule = new sa.lib.gui.bean.SBeanFieldDate();
         jpPayCenterWestRow2 = new javax.swing.JPanel();
-        jlDateExecuted = new javax.swing.JLabel();
-        moDateExecuted = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateExecution = new javax.swing.JLabel();
+        moDateExecution = new sa.lib.gui.bean.SBeanFieldDate();
         jpPayCenterWestRow3 = new javax.swing.JPanel();
         jlPaymentWay = new javax.swing.JLabel();
         moTextPaymentWay = new sa.lib.gui.bean.SBeanFieldText();
@@ -184,9 +184,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlEntryCurrency = new javax.swing.JLabel();
         moKeyEntryCurrency = new sa.lib.gui.bean.SBeanFieldKey();
         jpPayEntriesNorthWestRow4 = new javax.swing.JPanel();
-        jlEntryPayCurrency = new javax.swing.JLabel();
-        moDecEntryPayCurrency = new sa.lib.gui.bean.SBeanFieldDecimal();
-        moTextEntryPayCurrencyCur = new sa.lib.gui.bean.SBeanFieldText();
+        jlEntryPaymentCy = new javax.swing.JLabel();
+        moDecEntryPaymentCy = new sa.lib.gui.bean.SBeanFieldDecimal();
+        moTextEntryPaymentCyCur = new sa.lib.gui.bean.SBeanFieldText();
         jpPayEntriesNorthWestRow5 = new javax.swing.JPanel();
         jlConvertionRateApp = new javax.swing.JLabel();
         moDecConvertionRateApp = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -292,10 +292,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayWestRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentCurrency.setText("Monto de pago:*");
-        jlPaymentCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpPayWestRow4.add(jlPaymentCurrency);
-        jpPayWestRow4.add(moDecPaymentCurrency);
+        jlPaymentCy.setText("Monto de pago:*");
+        jlPaymentCy.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpPayWestRow4.add(jlPaymentCy);
+        jpPayWestRow4.add(moDecPaymentCy);
 
         jpPayWest.add(jpPayWestRow4);
 
@@ -354,23 +354,23 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayCenterWestRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateScheduler.setText("Fecha programada de pago:");
-        jlDateScheduler.setPreferredSize(new java.awt.Dimension(165, 23));
-        jpPayCenterWestRow1.add(jlDateScheduler);
+        jlDateSchedule.setText("Fecha programada de pago:");
+        jlDateSchedule.setPreferredSize(new java.awt.Dimension(165, 23));
+        jpPayCenterWestRow1.add(jlDateSchedule);
 
-        moDateScheduler.setEnabled(false);
-        jpPayCenterWestRow1.add(moDateScheduler);
+        moDateSchedule.setEnabled(false);
+        jpPayCenterWestRow1.add(moDateSchedule);
 
         jpPayCenterWest.add(jpPayCenterWestRow1);
 
         jpPayCenterWestRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateExecuted.setText("Fecha ejecución de pago:");
-        jlDateExecuted.setPreferredSize(new java.awt.Dimension(165, 23));
-        jpPayCenterWestRow2.add(jlDateExecuted);
+        jlDateExecution.setText("Fecha ejecución de pago:");
+        jlDateExecution.setPreferredSize(new java.awt.Dimension(165, 23));
+        jpPayCenterWestRow2.add(jlDateExecution);
 
-        moDateExecuted.setEnabled(false);
-        jpPayCenterWestRow2.add(moDateExecuted);
+        moDateExecution.setEnabled(false);
+        jpPayCenterWestRow2.add(moDateExecution);
 
         jpPayCenterWest.add(jpPayCenterWestRow2);
 
@@ -536,15 +536,15 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayEntriesNorthWestRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEntryPayCurrency.setText("Monto de la partida (mon. pago):*");
-        jlEntryPayCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
-        jpPayEntriesNorthWestRow4.add(jlEntryPayCurrency);
-        jpPayEntriesNorthWestRow4.add(moDecEntryPayCurrency);
+        jlEntryPaymentCy.setText("Monto de la partida (mon. pago):*");
+        jlEntryPaymentCy.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpPayEntriesNorthWestRow4.add(jlEntryPaymentCy);
+        jpPayEntriesNorthWestRow4.add(moDecEntryPaymentCy);
 
-        moTextEntryPayCurrencyCur.setText("CUR");
-        moTextEntryPayCurrencyCur.setEnabled(false);
-        moTextEntryPayCurrencyCur.setPreferredSize(new java.awt.Dimension(35, 23));
-        jpPayEntriesNorthWestRow4.add(moTextEntryPayCurrencyCur);
+        moTextEntryPaymentCyCur.setText("CUR");
+        moTextEntryPaymentCyCur.setEnabled(false);
+        moTextEntryPaymentCyCur.setPreferredSize(new java.awt.Dimension(35, 23));
+        jpPayEntriesNorthWestRow4.add(moTextEntryPaymentCyCur);
 
         jpPayEntriesNorthWest.add(jpPayEntriesNorthWestRow4);
 
@@ -788,9 +788,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlConvertionRateApp;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDateApplication;
-    private javax.swing.JLabel jlDateExecuted;
+    private javax.swing.JLabel jlDateExecution;
     private javax.swing.JLabel jlDateRequired;
-    private javax.swing.JLabel jlDateScheduler;
+    private javax.swing.JLabel jlDateSchedule;
     private javax.swing.JLabel jlDesPaymentAppEntryCurrency;
     private javax.swing.JLabel jlDocumentBalPreviousAppCurrency;
     private javax.swing.JLabel jlDocumentBalPreviousCurrency;
@@ -798,7 +798,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlDocumentBalUnpayedCurrency;
     private javax.swing.JLabel jlDps;
     private javax.swing.JLabel jlEntryCurrency;
-    private javax.swing.JLabel jlEntryPayCurrency;
+    private javax.swing.JLabel jlEntryPaymentCy;
     private javax.swing.JLabel jlFunctionalArea;
     private javax.swing.JLabel jlInfo;
     private javax.swing.JLabel jlInfo1;
@@ -806,7 +806,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlPayerCashAccount;
     private javax.swing.JLabel jlPaymentApplication;
-    private javax.swing.JLabel jlPaymentCurrency;
+    private javax.swing.JLabel jlPaymentCy;
     private javax.swing.JLabel jlPaymentExcRate;
     private javax.swing.JLabel jlPaymentExcRateApp;
     private javax.swing.JLabel jlPaymentLoc;
@@ -863,9 +863,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jpPayWestRow8;
     private javax.swing.JPanel jpRegistry;
     private sa.lib.gui.bean.SBeanFieldDate moDateApplication;
-    private sa.lib.gui.bean.SBeanFieldDate moDateExecuted;
+    private sa.lib.gui.bean.SBeanFieldDate moDateExecution;
     private sa.lib.gui.bean.SBeanFieldDate moDateRequired;
-    private sa.lib.gui.bean.SBeanFieldDate moDateScheduler;
+    private sa.lib.gui.bean.SBeanFieldDate moDateSchedule;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecConvertionRate;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecConvertionRateApp;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDesPaymentAppEntryCurrency;
@@ -873,9 +873,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDocumentBalPreviousCurrency;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDocumentBalUnpayedAppCurrency;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDocumentBalUnpayedCurrency;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecEntryPayCurrency;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecEntryPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentApplication;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentCurrency;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentExcRate;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentExcRateApp;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentLoc;
@@ -896,7 +896,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldText moTextDocumentBalUnpayedAppCurrencyCur;
     private sa.lib.gui.bean.SBeanFieldText moTextDocumentBalUnpayedCurrencyCur;
     private sa.lib.gui.bean.SBeanFieldText moTextDps;
-    private sa.lib.gui.bean.SBeanFieldText moTextEntryPayCurrencyCur;
+    private sa.lib.gui.bean.SBeanFieldText moTextEntryPaymentCyCur;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentApplicationCur;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentLocCur;
@@ -915,13 +915,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moDateApplication.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateApplication), true);
         moTextSerie.setTextSettings(SGuiUtils.getLabelName(jlSerieNumber), 5, 0);
         moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlSerieNumber), SGuiConsts.GUI_TYPE_INT, true);
-        moDecPaymentCurrency.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCurrency), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecPaymentCy.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency), true);
         moDecPaymentExcRateApp.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentExcRateApp), SGuiConsts.GUI_TYPE_DEC_EXC_RATE, false);
         moDecPaymentApplication.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentApplication), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDateRequired.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateRequired), true);
-        moDateScheduler.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateScheduler), false);
-        moDateExecuted.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateExecuted), false);
+        moDateSchedule.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateSchedule), false);
+        moDateExecution.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateExecution), false);
         moDecPaymentExcRate.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentExcRate), SGuiConsts.GUI_TYPE_DEC_EXC_RATE, false);
         moDecPaymentLoc.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentApplication), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
@@ -934,7 +934,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadDocPayment.setBooleanSettings(SGuiUtils.getLabelName(moRadDocPayment.getText()), true);
         moRadSimplePayment.setBooleanSettings(SGuiUtils.getLabelName(moRadSimplePayment.getText()), false);
         moKeyEntryCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlEntryCurrency), true);
-        moDecEntryPayCurrency.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCurrency), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecEntryPaymentCy.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecConvertionRateApp.setDecimalSettings(SGuiUtils.getLabelName(jlConvertionRateApp), SGuiConsts.GUI_TYPE_DEC_EXC_RATE, true);
         moDecDesPaymentAppEntryCurrency.setDecimalSettings(SGuiUtils.getLabelName(jlDesPaymentAppEntryCurrency), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecDocumentBalPreviousAppCurrency.setDecimalSettings(SGuiUtils.getLabelName(jlDocumentBalPreviousAppCurrency), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -947,7 +947,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moDateApplication);
         moFields.addField(moTextSerie);
         moFields.addField(moIntNumber);
-        moFields.addField(moDecPaymentCurrency);
+        moFields.addField(moDecPaymentCy);
         moFields.addField(moKeyCurrency);
         moFields.addField(moDecPaymentExcRateApp);
         moFields.addField(moDecPaymentApplication);
@@ -960,7 +960,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moFieldsEty.addField(moRadDocPayment);
         moFieldsEty.addField(moRadSimplePayment);
         moFieldsEty.addField(moKeyEntryCurrency);
-        moFieldsEty.addField(moDecEntryPayCurrency);
+        moFieldsEty.addField(moDecEntryPaymentCy);
         
         moFieldsEty.setFormButton(jbEtyAdd);
         
@@ -1004,13 +1004,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 vRows.addAll(maPaymentEntries);
                 moKeyBeneficiary.setEnabled(false);
                 moKeyCurrency.setEnabled(false);
-                moDecPaymentCurrency.setEnabled(false);
+                moDecPaymentCy.setEnabled(false);
                 moKeyFunctionalArea.setEnabled(false);
             }
             else {
                 moKeyBeneficiary.setEnabled(true);
                 moKeyCurrency.setEnabled(true);
-                moDecPaymentCurrency.setEnabled(true);
+                moDecPaymentCy.setEnabled(true);
                 moKeyFunctionalArea.setEnabled(true);
             }
             moGridEntries.populateGrid(vRows, this);
@@ -1036,7 +1036,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadDocPayment.setSelected(true);
         moTextDps.setValue("");
         moKeyEntryCurrency.setSelectedIndex(0);
-        moDecEntryPayCurrency.setValue(0d);
+        moDecEntryPaymentCy.setValue(0d);
         moDecConvertionRateApp.setValue(0d);
         moDecDesPaymentAppEntryCurrency.setValue(0d);
         moTextDesPaymentAppEntryCurrencyCur.setValue("");
@@ -1057,7 +1057,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadSimplePayment.setEnabled(mbCanCapture && enable);
         jbDpsPicker.setEnabled(mbCanCapture && enable);
         moKeyEntryCurrency.setEnabled(false);
-        moDecEntryPayCurrency.setEnabled(mbCanCapture && enable);
+        moDecEntryPaymentCy.setEnabled(mbCanCapture && enable);
         moDecConvertionRateApp.setEnabled(false);
         jbEtyNew.setEnabled(mbCanCapture && !enable);
         jbEtyEdit.setEnabled(mbCanCapture && !enable);
@@ -1070,7 +1070,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         if (ety != null) {
             moPayEtyDps = ety.getDpsRelated();
 
-            if (ety.getEntryType().equals(SModSysConsts.FIN_PAY_ETY_TP_P)) {
+            if (ety.getEntryType().equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
                 moRadDocPayment.setSelected(true);
             }
             else {
@@ -1083,8 +1083,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 moTextDps.setValue("");
             }
             moKeyEntryCurrency.setValue(new int[] { ety.getFkEntryCurrencyId() });
-            moDecEntryPayCurrency.setValue(ety.getEntryPaymentCurrency());
-            moTextEntryPayCurrencyCur.setValue(moPayCurrency.getKey());
+            moDecEntryPaymentCy.setValue(ety.getEntryPaymentCy());
+            moTextEntryPaymentCyCur.setValue(moPayCurrency.getKey());
             moDecConvertionRateApp.setValue(ety.getConversionRateApplication());
             moDecDesPaymentAppEntryCurrency.setValue(ety.getDestinyPaymentApplicationEntryCy());
             moTextDesPaymentAppEntryCurrencyCur.setValue(ety.getEntryCurrency().getKey());
@@ -1142,7 +1142,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     
     private void calculatePaymentApplication() {
         if (moKeyCurrency.getSelectedIndex() > 0) {
-            moDecPaymentApplication.setValue(SLibUtils.roundAmount(moDecPaymentCurrency.getValue() * moDecPaymentExcRateApp.getValue()));            
+            moDecPaymentApplication.setValue(SLibUtils.roundAmount(moDecPaymentCy.getValue() * moDecPaymentExcRateApp.getValue()));            
         }
         else {
             moDecPaymentApplication.setValue(0d);
@@ -1151,7 +1151,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     
     private void calculatePaymentApplicationEntry() {
         if (moKeyEntryCurrency.getSelectedIndex() > 0) {
-            moDecDesPaymentAppEntryCurrency.setValue(SLibUtils.roundAmount(moDecEntryPayCurrency.getValue() * moDecConvertionRateApp.getValue()));            
+            moDecDesPaymentAppEntryCurrency.setValue(SLibUtils.roundAmount(moDecEntryPaymentCy.getValue() * moDecConvertionRateApp.getValue()));            
         }
         else {
             moDecDesPaymentAppEntryCurrency.setValue(0d);            
@@ -1182,7 +1182,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private void calculateTotalPayments() {
         double payments = 0d;
         for (SDbPaymentEntry ety : maPaymentEntries) {
-            payments += SLibUtils.roundAmount(ety.getEntryPaymentCurrency());
+            payments += SLibUtils.roundAmount(ety.getEntryPaymentCy());
         }
         moTotal.setValue(payments);
         moTextTotalCur.setValue(moPayCurrency == null ? "" : moPayCurrency.getKey());
@@ -1194,7 +1194,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             miClient.showMsgBoxInformation("Debe especificar una moneda de pago");
             ready = false;
         }
-        else if (moDecPaymentCurrency.getValue() == 0d) {
+        else if (moDecPaymentCy.getValue() == 0d) {
             miClient.showMsgBoxInformation("Debe especificar un monto de pago.");
             ready = false;
         }
@@ -1221,10 +1221,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
         
         if (validation.isValid()) {
-            double totalPayments = SLibUtils.roundAmount(moDecEntryPayCurrency.getValue() + moTotal.getValue());
-            if (totalPayments > moDecPaymentCurrency.getValue()) {
-                validation.setMessage("El total de los pagos (" + totalPayments + ") no puede ser mayor al monto de pago (" + moDecPaymentCurrency.getValue() + ")");
-                validation.setComponent(moDecEntryPayCurrency);
+            double totalPayments = SLibUtils.roundAmount(moDecEntryPaymentCy.getValue() + moTotal.getValue());
+            if (totalPayments > moDecPaymentCy.getValue()) {
+                validation.setMessage("El total de los pagos (" + totalPayments + ") no puede ser mayor al monto de pago (" + moDecPaymentCy.getValue() + ")");
+                validation.setComponent(moDecEntryPaymentCy);
             }
         }
         
@@ -1245,7 +1245,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 enableEntryControls(true);
                 moKeyBeneficiary.setEnabled(false);
                 moKeyCurrency.setEnabled(false);
-                moDecPaymentCurrency.setEnabled(false);
+                moDecPaymentCy.setEnabled(false);
                 moKeyFunctionalArea.setEnabled(false);
             }
         }
@@ -1290,9 +1290,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             if (validation.isValid()) {
                 enableEntryControls(false);
                 SDbPaymentEntry ety = new SDbPaymentEntry();
-                ety.setEntryType(moRadDocPayment.isSelected() ? SModSysConsts.FIN_PAY_ETY_TP_P : SModSysConsts.FIN_PAY_ETY_TP_A);
-                ety.setEntryPaymentCurrency(moDecEntryPayCurrency.getValue());
-                ety.setEntryPaymentApplication(SLibUtils.roundAmount(moDecEntryPayCurrency.getValue() * moDecPaymentExcRateApp.getValue()));
+                ety.setEntryType(moRadDocPayment.isSelected() ? SDbPaymentEntry.ENTRY_TYPE_PAYMENT : SDbPaymentEntry.ENTRY_TYPE_ADVANCE);
+                ety.setEntryPaymentCy(moDecEntryPaymentCy.getValue());
+                ety.setEntryPaymentApplication(SLibUtils.roundAmount(moDecEntryPaymentCy.getValue() * moDecPaymentExcRateApp.getValue()));
                 ety.setConversionRateApplication(moDecConvertionRateApp.getValue());
                 ety.setDestinyPaymentApplicationEntryCy(moDecDesPaymentAppEntryCurrency.getValue());
                 ety.setFkDocYearId_n(moPayEtyDps == null ? 0 : moPayEtyDps.getPkYearId());
@@ -1394,7 +1394,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
     }
 
-    private void focusPaymentCurrency() {
+    private void focusPaymentCy() {
         calculatePaymentApplication();
     }
 
@@ -1441,12 +1441,12 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 moDecPaymentExcRateApp.setEnabled(excRate == 0);
                 moDecPaymentExcRateApp.setValue(excRate);
             }
-            moTextEntryPayCurrencyCur.setValue(moPayCurrency.getKey());
+            moTextEntryPaymentCyCur.setValue(moPayCurrency.getKey());
             moTextTotalCur.setValue(moPayCurrency.getKey());
         }
         else {
             moPayCurrency = null;
-            moTextEntryPayCurrencyCur.setValue("");
+            moTextEntryPaymentCyCur.setValue("");
             moTextTotalCur.setValue("");
             moDecPaymentExcRateApp.setEnabled(false);
             moDecPaymentExcRateApp.setValue(0d);
@@ -1505,8 +1505,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadDocPayment.addItemListener(this);
         moRadSimplePayment.addItemListener(this);
         
-        moDecPaymentCurrency.addFocusListener(this);
-        moDecEntryPayCurrency.addFocusListener(this);
+        moDecPaymentCy.addFocusListener(this);
+        moDecEntryPaymentCy.addFocusListener(this);
         moDecPaymentExcRateApp.addFocusListener(this);
         moDecConvertionRateApp.addFocusListener(this);
     }
@@ -1526,8 +1526,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadDocPayment.removeItemListener(this);
         moRadSimplePayment.removeItemListener(this);
         
-        moDecPaymentCurrency.removeFocusListener(this);
-        moDecEntryPayCurrency.removeFocusListener(this);
+        moDecPaymentCy.removeFocusListener(this);
+        moDecEntryPaymentCy.removeFocusListener(this);
         moDecPaymentExcRateApp.removeFocusListener(this);
         moDecConvertionRateApp.removeFocusListener(this);
     }
@@ -1547,8 +1547,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
         
         moKeyPriority.removeAllItems();
-        moKeyPriority.addItem(new SGuiItem(new int[] { 0 }, "NORMAL"));
-        moKeyPriority.addItem(new SGuiItem(new int[] { 1 }, "URGENTE"));
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_NORMAL }, "NORMAL"));
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_URGENT }, "URGENTE"));
     }
 
     @Override
@@ -1565,7 +1565,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         removeAllListeners();
         reloadCatalogues();
         
-        moPayCurrency = moRegistry.getCurrency();
+        moPayCurrency = moRegistry.getDbmsCurrency();
         
         if (moRegistry.isRegistryNew()) {
             moIntNumber.setValue(getNextNumber());
@@ -1580,13 +1580,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextSerie.setValue(moRegistry.getSeries());
-        moDecPaymentCurrency.setValue(moRegistry.getPaymentCurrency());
+        moDecPaymentCy.setValue(moRegistry.getPaymentCy());
         moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
         moDecPaymentExcRateApp.setValue(moRegistry.getPaymentExchangeRateApplication());
         moDecPaymentApplication.setValue(moRegistry.getPaymentApplication());
         moDateRequired.setValue(moRegistry.getDateRequired());
-        moDateScheduler.setValue(moRegistry.getDateScheduler_n());
-        moDateExecuted.setValue(moRegistry.getDateExecute_n());
+        moDateSchedule.setValue(moRegistry.getDateSchedule_n());
+        moDateExecution.setValue(moRegistry.getDateExecution_n());
         moTextPaymentWay.setValue(moRegistry.getPaymentWay());
         moDecPaymentExcRate.setValue(moRegistry.getPaymentExchangeRate());
         moDecPaymentLoc.setValue(moRegistry.getPayment());
@@ -1613,7 +1613,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             enablePayComponets(false);
         }
         
-        moTextEntryPayCurrencyCur.setValue("");
+        moTextEntryPaymentCyCur.setValue("");
         
         calculateTotalPayments();
         clearEntryControls();
@@ -1630,11 +1630,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setNumber(moIntNumber.getValue());
         registry.setDateApplication(moDateApplication.getValue());
         registry.setDateRequired(moDateRequired.getValue());
-        registry.setPaymentCurrency(moDecPaymentCurrency.getValue());
+        registry.setPaymentCy(moDecPaymentCy.getValue());
         registry.setPaymentExchangeRateApplication(moDecPaymentExcRateApp.getValue());
         registry.setPaymentApplication(moDecPaymentApplication.getValue());
         registry.setPriority(moKeyPriority.getValue()[0]);
         registry.setNotes(moTextNotes.getValue());
+        registry.setDeleted(false);
+        registry.setSystem(false);
         registry.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
         registry.setFkBeneficiaryId(moKeyBeneficiary.getValue()[0]);
         registry.setFkFunctionalAreaId(moKeyFunctionalArea.getValue()[0]);
@@ -1662,9 +1664,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (!Objects.equals(moDecPaymentCurrency.getValue(), moTotal.getValue())) {
+            if (!Objects.equals(moDecPaymentCy.getValue(), moTotal.getValue())) {
                 validation.setMessage("El monto del pago debe coincidir con el total de los pagos.");
-                validation.setComponent(moDecPaymentCurrency);
+                validation.setComponent(moDecPaymentCy);
             }
         }
         
@@ -1705,10 +1707,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
             
-            if (textField == moDecPaymentCurrency) {
-                focusPaymentCurrency();
+            if (textField == moDecPaymentCy) {
+                focusPaymentCy();
             }
-            else if (textField == moDecEntryPayCurrency) {
+            else if (textField == moDecEntryPaymentCy) {
                 focusEntryPayCurrency();
             }
             else if (textField == moDecPaymentExcRateApp) {

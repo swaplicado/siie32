@@ -126,7 +126,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 288.10"; // release date: 2025-09-19
+    public static final String APP_RELEASE = "3.2 290.1"; // release date: 2025-09-21
 
     public static final String APP_COPYRIGHT = "2007-2025";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
@@ -717,7 +717,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
 
         setJMenuBar(jMenuBar);
 
-        setSize(new java.awt.Dimension(1000, 725));
+        setSize(new java.awt.Dimension(1040, 709));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

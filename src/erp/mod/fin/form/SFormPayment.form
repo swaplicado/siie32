@@ -155,7 +155,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlPaymentCurrency">
+                    <Component class="javax.swing.JLabel" name="jlPaymentCy">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Monto de pago:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -163,7 +163,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentCurrency">
+                    <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecPaymentCy">
                     </Component>
                   </SubComponents>
                 </Container>
@@ -294,7 +294,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlDateScheduler">
+                        <Component class="javax.swing.JLabel" name="jlDateSchedule">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fecha programada de pago:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -302,7 +302,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateScheduler">
+                        <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateSchedule">
                           <Properties>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
@@ -316,7 +316,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlDateExecuted">
+                        <Component class="javax.swing.JLabel" name="jlDateExecution">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fecha ejecuci&#xf3;n de pago:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -324,7 +324,7 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateExecuted">
+                        <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateExecution">
                           <Properties>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
@@ -700,7 +700,7 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlEntryPayCurrency">
+                        <Component class="javax.swing.JLabel" name="jlEntryPaymentCy">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Monto de la partida (mon. pago):*"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -708,9 +708,9 @@
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecEntryPayCurrency">
+                        <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecEntryPaymentCy">
                         </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextEntryPayCurrencyCur">
+                        <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextEntryPaymentCyCur">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="CUR"/>
                             <Property name="enabled" type="boolean" value="false"/>
