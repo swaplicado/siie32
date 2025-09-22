@@ -11,5 +11,13 @@ package erp.mod.cfg.swap.utils;
  */
 public class SRequestPaymentsBody implements SExportData {
     
-    public SExportDataPayment[] payments;
+    public Payments[] payments;
+    
+    public static class Payments {
+        public SExportDataPayment payment;
+        
+        public SExportDataPaymentEntry[] entries;
+    
+        public SExportDataFile[] files;
+    }
 }

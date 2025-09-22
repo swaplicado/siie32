@@ -95,7 +95,7 @@ public abstract class SExportUtils {
      * @return Respuesta del servicio en formato JSON.
      * @throws Exception
      */
-    private static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey, final int timeout) throws Exception {
+    public static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey, final int timeout) throws Exception {
         String responseBody = "";
         HttpURLConnection connection = null;
 

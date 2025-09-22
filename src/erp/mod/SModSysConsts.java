@@ -536,9 +536,21 @@ public abstract class SModSysConsts {
     public static final int FINS_ST_PAY_NTFD = 6; //Notificado
     public static final int FINS_ST_PAY_RCPT = 7; //Comprobado
     public static final int FINS_ST_PAY_CAN = 9; //Cancelado
+    public static final int FINS_ST_PAY_REJ_P = 13; //Rechazado en proceso
+    public static final int FINS_ST_PAY_SCHED_P = 14; //Programado en proceso
+    public static final int FINS_ST_PAY_EXEC_P = 15; //Ejecutado en proceso
+    public static final int FINS_ST_PAY_NTFD_P = 16; //Notificado en proceso
+    public static final int FINS_ST_PAY_RCPT_P = 17; //Comprobado en proceso
 
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
+    
+    public static final String FIN_PAY_ETY_TP_A = "A"; //Anticipo
+    public static final String FIN_PAY_ETY_TP_P = "P"; //Pago a documento
+    
+    public static final String FIN_PAY_FILE_TP_EF = "EF"; //Evidencia fotográfica
+    public static final String FIN_PAY_FILE_TP_RA = "RA"; //Reporte de avance
+    public static final String FIN_PAY_FILE_TP_FS = "FS"; //Finiquito servicio
 
     public static final String FINU_TP_REC_FY_OPEN = "EA";
     public static final String FINU_TP_REC_FY_END = "EC";
@@ -572,13 +584,6 @@ public abstract class SModSysConsts {
     /** Used only as grid identifier! */
     public static final int FINX_LAY_BANK_QRY = 21;
     
-    public static final String FINX_PAY_ETY_TP_A = "A"; //Anticipo
-    public static final String FINX_PAY_ETY_TP_P = "P"; //Pago a documento
-    
-    public static final String FINX_PAY_FILES_TP_EF = "EF"; //Evidencia fotográfica
-    public static final String FINX_PAY_FILES_TP_RA = "RA"; //Reporte de avance
-    public static final String FINX_PAY_FILES_TP_FS = "FS"; //Finiquito servicio
-
     /*
      * Transactions
      */

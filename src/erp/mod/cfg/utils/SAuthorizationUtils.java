@@ -17,6 +17,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.cfg.swap.utils.SExportDataFile;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.hrs.utils.SDocUtils;
@@ -1721,7 +1722,8 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static boolean sendPaymentFilesToCloud(SGuiClient client, SDbPayment payment) {
+    public static Object[] sendPaymentFilesToCloud(SGuiClient client, SDbPayment payment) {
+        ArrayList<SExportDataFile> expFiles = new ArrayList<>();
         boolean hasError = false;
         
         try {
@@ -1746,9 +1748,16 @@ public abstract class SAuthorizationUtils {
                     // Subir archivo a la nube
                     CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
                     if (oGcsFile != null) {
+                        SExportDataFile expFile = new SExportDataFile();
                         oFile.setFileStorageName(oGcsFile.getFileName());
                         oFile.save(client.getSession());
                         lFileNamesToUpload.add(oFile);
+                        expFile.filename_storage = oFile.getFileStorageName();
+                        expFile.filename_original = oFile.getFileName();
+                        expFile.url_storage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.url_database = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.bucket_name = oGcsFile.getBucketName();
+                        expFiles.add(expFile);
                     }
                     else {
                         hasError = true;
@@ -1783,11 +1792,11 @@ public abstract class SAuthorizationUtils {
                 catch (Exception e) {
                     client.showMsgBoxError(e.getMessage());
                 }
-                return false;
+                return new Object[] { false, null };
             }
         }
         
-        return true;
+        return new Object[] { true, expFiles };
     }
     
     public static boolean canSendAuthornAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {

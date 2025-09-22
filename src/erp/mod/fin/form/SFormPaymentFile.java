@@ -474,9 +474,9 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moGridFiles.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).removeAll();
         jpGridPayFiles.add(moGridFiles, BorderLayout.CENTER);
         
-        jpCommandRight.remove(jbCancel);
-        jpCommandRight.add(jbSaveAndSend);
-        jpCommandRight.add(jbCancel);
+        //jpCommandRight.remove(jbCancel);
+        //jpCommandRight.add(jbSaveAndSend);
+        //jpCommandRight.add(jbCancel);
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
@@ -532,13 +532,13 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private void setComponetsFileData(SDbPaymentFile file) {
         if (file != null) {
             switch (file.getPaymentFileType()) {
-                case SModSysConsts.FINX_PAY_FILES_TP_EF:
+                case SModSysConsts.FIN_PAY_FILE_TP_EF:
                     moRadPhoto.setSelected(true);
                     break;
-                case SModSysConsts.FINX_PAY_FILES_TP_RA:
+                case SModSysConsts.FIN_PAY_FILE_TP_RA:
                     moRadAdvance.setSelected(true);
                     break;
-                case SModSysConsts.FINX_PAY_FILES_TP_FS:
+                case SModSysConsts.FIN_PAY_FILE_TP_FS:
                     moRadService.setSelected(true);
                     break;
             }
@@ -599,7 +599,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             if (validation.isValid()) {
                 enableFileControls(false);
                 SDbPaymentFile file = new SDbPaymentFile();
-                file.setPaymentFileType(moRadPhoto.isSelected() ? SModSysConsts.FINX_PAY_FILES_TP_EF : moRadAdvance.isSelected() ? SModSysConsts.FINX_PAY_FILES_TP_RA : SModSysConsts.FINX_PAY_FILES_TP_FS);
+                file.setPaymentFileType(moRadPhoto.isSelected() ? SModSysConsts.FIN_PAY_FILE_TP_EF : moRadAdvance.isSelected() ? SModSysConsts.FIN_PAY_FILE_TP_RA : SModSysConsts.FIN_PAY_FILE_TP_FS);
                 file.setAuxFile(moFile);
                 file.setFileName(moFile.getName());
                 file.setFileDescription(moTextDescription.getValue());

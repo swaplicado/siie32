@@ -350,7 +350,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         Object value = null;
         
         switch (col) {
-            case 0: value = msEntryType.equals(SModSysConsts.FINX_PAY_ETY_TP_P) ? "Pago a documento" : "Pago simple"; break;
+            case 0: value = msEntryType.equals(SModSysConsts.FIN_PAY_ETY_TP_P) ? "Pago a documento" : "Pago simple"; break;
             case 1: value = moDpsRelated == null ? "" : moDpsRelated.getDpsNumber(); break;
             case 2: value = mdEntryPaymentCurrency; break;
             case 3: value = moPayCurrency.getKey(); break;

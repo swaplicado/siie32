@@ -927,7 +927,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
         moKeyPayerCashAccount.setKeySettings(miClient, SGuiUtils.getLabelName(jlPayerCashAccount), false);
         moKeyBeneficiaryBankAccount.setKeySettings(miClient, SGuiUtils.getLabelName(jlBeneficiaryBankAccount), false);
-        moKeyPriority.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriority), true);
+        moKeyPriority.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriority), false);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes), 100, 0);
         moTotal.setDecimalSettings(SGuiUtils.getLabelName(jlTotalPayments), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
@@ -1002,6 +1002,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             Vector<SGridRow> vRows = new Vector<>();
             if (maPaymentEntries.size() > 0) {
                 vRows.addAll(maPaymentEntries);
+                moKeyBeneficiary.setEnabled(false);
+                moKeyCurrency.setEnabled(false);
+                moDecPaymentCurrency.setEnabled(false);
+                moKeyFunctionalArea.setEnabled(false);
             }
             else {
                 moKeyBeneficiary.setEnabled(true);
@@ -1017,15 +1021,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void enablePayComponets(boolean enable) {
-        moKeyBeneficiary.setEnabled(mbCanCapture && enable);
         moDateApplication.setEnabled(mbCanCapture && enable);
         moTextSerie.setEnabled(false);
         moIntNumber.setEnabled(false);
-        moDecPaymentCurrency.setEnabled(mbCanCapture && enable);
-        moKeyCurrency.setEnabled(mbCanCapture && enable);
         moDecPaymentExcRateApp.setEnabled(false);
         moDateRequired.setEnabled(mbCanCapture && enable);
-        moKeyFunctionalArea.setEnabled(mbCanCapture && enable);
         moKeyBeneficiaryBankAccount.setEnabled(mbCanCapture && enable);
         moTextNotes.setEnabled(mbCanCapture && enable);
     }
@@ -1070,7 +1070,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         if (ety != null) {
             moPayEtyDps = ety.getDpsRelated();
 
-            if (ety.getEntryType().equals(SModSysConsts.FINX_PAY_ETY_TP_P)) {
+            if (ety.getEntryType().equals(SModSysConsts.FIN_PAY_ETY_TP_P)) {
                 moRadDocPayment.setSelected(true);
             }
             else {
@@ -1078,6 +1078,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             }
             if (moPayEtyDps != null) {
                 moTextDps.setValue(moPayEtyDps.getDpsNumber());
+            }
+            else {
+                moTextDps.setValue("");
             }
             moKeyEntryCurrency.setValue(new int[] { ety.getFkEntryCurrencyId() });
             moDecEntryPayCurrency.setValue(ety.getEntryPaymentCurrency());
@@ -1287,7 +1290,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             if (validation.isValid()) {
                 enableEntryControls(false);
                 SDbPaymentEntry ety = new SDbPaymentEntry();
-                ety.setEntryType(moRadDocPayment.isSelected() ? SModSysConsts.FINX_PAY_ETY_TP_P : SModSysConsts.FINX_PAY_ETY_TP_A);
+                ety.setEntryType(moRadDocPayment.isSelected() ? SModSysConsts.FIN_PAY_ETY_TP_P : SModSysConsts.FIN_PAY_ETY_TP_A);
                 ety.setEntryPaymentCurrency(moDecEntryPayCurrency.getValue());
                 ety.setEntryPaymentApplication(SLibUtils.roundAmount(moDecEntryPayCurrency.getValue() * moDecPaymentExcRateApp.getValue()));
                 ety.setConversionRateApplication(moDecConvertionRateApp.getValue());

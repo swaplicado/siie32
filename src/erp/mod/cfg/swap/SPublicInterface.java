@@ -7,6 +7,7 @@ package erp.mod.cfg.swap;
 
 import erp.mod.cfg.swap.utils.SExportDataUser;
 import erp.mod.cfg.swap.utils.SExportDataUtils;
+import erp.mod.cfg.swap.utils.SResourceStatusResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.db.STrnDBCore;
@@ -26,8 +27,9 @@ public class SPublicInterface {
     SMySqlClass oDbObj;
     String msMainDatabase;
 
-    public SPublicInterface() {
+    public SPublicInterface(String sjon) {
         try {
+            SMySqlClass.setJsonConn(sjon);
             this.oDbObj = new SMySqlClass();
             this.msMainDatabase = this.oDbObj.getMainDatabaseName();
         }
@@ -73,6 +75,32 @@ public class SPublicInterface {
             }
 
             return SExportDataUtils.getSupplierByFiscalId(conn.createStatement(), fiscalId);
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
+    }
+    
+    public SResourceStatusResponse updateResourceStatus(final int companyId, 
+                                                            final int resourceType, 
+                                                            final String resourceId, 
+                                                            final int authStatusId, 
+                                                            final int userId) {
+        try {
+            Connection conn = this.getConnection();
+
+            if (conn == null) {
+                return null;
+            }
+
+            return SExportDataUtils.updateResourceStatus(conn.createStatement(), 
+                                                        companyId, 
+                                                        resourceType, 
+                                                        resourceId, 
+                                                        authStatusId,
+                                                        userId);
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
