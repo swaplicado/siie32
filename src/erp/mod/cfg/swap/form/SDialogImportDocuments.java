@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
+import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbComImportLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -18,6 +20,8 @@ import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportLogsUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.trn.db.swap.SDbSwapDataProcessing;
+import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -39,6 +43,10 @@ import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -49,6 +57,8 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiOptionPicker;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
@@ -62,7 +72,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * 
  * @author Sergio Flores
  */
-public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener {
+public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener {
     
     protected SGridPaneForm moDocumentsGrid;
     protected JLabel jlStatus;
@@ -94,35 +104,72 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private void initComponents() {
 
         jpDownload = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        jpDownloadW = new javax.swing.JPanel();
+        jpDownloadW1 = new javax.swing.JPanel();
         jlUser = new javax.swing.JLabel();
         jtfUserName = new javax.swing.JTextField();
         jtfUserFuncSubAreas = new javax.swing.JTextField();
-        jPanel2 = new javax.swing.JPanel();
+        jpDownloadW2 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moDateStart = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel3 = new javax.swing.JPanel();
+        jpDownloadW3 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
+        jpDownloadE = new javax.swing.JPanel();
+        jpDownloadE1 = new javax.swing.JPanel();
         jbShow = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jbSelectRemaining = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
+        jpDownloadE2 = new javax.swing.JPanel();
         jbClear = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jbSelectAll = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jPanel8 = new javax.swing.JPanel();
+        jpDownloadE3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jbDeselectAll = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jbDownload = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
+        jpProcessing = new javax.swing.JPanel();
+        jpProcessingN = new javax.swing.JPanel();
+        jpProcessingN1 = new javax.swing.JPanel();
+        jbLinkAll = new javax.swing.JButton();
+        jpProcessingN2 = new javax.swing.JPanel();
+        jpProcessingN3 = new javax.swing.JPanel();
+        jbRecord = new javax.swing.JButton();
+        jpProcessingN4 = new javax.swing.JPanel();
+        jbLink = new javax.swing.JButton();
+        jpProcessingN5 = new javax.swing.JPanel();
+        jbUnlink = new javax.swing.JButton();
+        jpProcessingN6 = new javax.swing.JPanel();
+        jlRecord = new javax.swing.JLabel();
+        jpProcessingN7 = new javax.swing.JPanel();
+        jtfRecord = new javax.swing.JTextField();
+        jpProcessingN8 = new javax.swing.JPanel();
+        jlPayRec = new javax.swing.JLabel();
+        jpProcessingN9 = new javax.swing.JPanel();
+        jtfPayRecAmount = new javax.swing.JTextField();
+        jtfPayRecAmountPct = new javax.swing.JTextField();
+        jpProcessingN10 = new javax.swing.JPanel();
+        jtfPayRecDate = new javax.swing.JTextField();
+        jpProcessingN11 = new javax.swing.JPanel();
+        jlPay = new javax.swing.JLabel();
+        jpProcessingN12 = new javax.swing.JPanel();
+        jtfPayFolio = new javax.swing.JTextField();
+        jtfPayDate = new javax.swing.JTextField();
+        jpProcessingN13 = new javax.swing.JPanel();
+        jtfPayStatus = new javax.swing.JTextField();
+        jpProcessingN14 = new javax.swing.JPanel();
+        jlPaySched = new javax.swing.JLabel();
+        jpProcessingN15 = new javax.swing.JPanel();
+        jtfPaySchedDate = new javax.swing.JTextField();
+        jpProcessingN16 = new javax.swing.JPanel();
+        jlPayExec = new javax.swing.JLabel();
+        jpProcessingN17 = new javax.swing.JPanel();
+        jtfPayExecDate = new javax.swing.JTextField();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -133,119 +180,295 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Descarga de documentos:"));
         jpDownload.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDownloadW.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadW1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUser.setText("Usuario:");
         jlUser.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlUser);
+        jpDownloadW1.add(jlUser);
 
         jtfUserName.setEditable(false);
         jtfUserName.setText("user.name");
         jtfUserName.setFocusable(false);
         jtfUserName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jtfUserName);
+        jpDownloadW1.add(jtfUserName);
 
         jtfUserFuncSubAreas.setEditable(false);
         jtfUserFuncSubAreas.setText("FUNC. AREAS");
         jtfUserFuncSubAreas.setFocusable(false);
         jtfUserFuncSubAreas.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel7.add(jtfUserFuncSubAreas);
+        jpDownloadW1.add(jtfUserFuncSubAreas);
 
-        jPanel1.add(jPanel7);
+        jpDownloadW.add(jpDownloadW1);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadW2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel2.add(jlDateStart);
-        jPanel2.add(moDateStart);
+        jpDownloadW2.add(jlDateStart);
+        jpDownloadW2.add(moDateStart);
 
-        jPanel1.add(jPanel2);
+        jpDownloadW.add(jpDownloadW2);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadW3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final:*");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jlDateEnd);
-        jPanel3.add(moDateEnd);
+        jpDownloadW3.add(jlDateEnd);
+        jpDownloadW3.add(moDateEnd);
 
-        jPanel1.add(jPanel3);
+        jpDownloadW.add(jpDownloadW3);
 
-        jpDownload.add(jPanel1, java.awt.BorderLayout.WEST);
+        jpDownload.add(jpDownloadW, java.awt.BorderLayout.WEST);
 
-        jPanel5.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jpDownloadE.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbShow.setText("Mostrar documentos");
         jbShow.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbShow.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel4.add(jbShow);
+        jpDownloadE1.add(jbShow);
 
         jLabel1.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel4.add(jLabel1);
+        jpDownloadE1.add(jLabel1);
 
         jbSelectRemaining.setText("Seleccionar restantes");
         jbSelectRemaining.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbSelectRemaining.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel4.add(jbSelectRemaining);
+        jpDownloadE1.add(jbSelectRemaining);
 
         jLabel3.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel4.add(jLabel3);
+        jpDownloadE1.add(jLabel3);
 
-        jPanel5.add(jPanel4);
+        jpDownloadE.add(jpDownloadE1);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbClear.setText("Limpiar documentos");
         jbClear.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbClear.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel6.add(jbClear);
+        jpDownloadE2.add(jbClear);
 
         jLabel2.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel6.add(jLabel2);
+        jpDownloadE2.add(jLabel2);
 
         jbSelectAll.setText("Seleccionar todos");
         jbSelectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbSelectAll.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel6.add(jbSelectAll);
+        jpDownloadE2.add(jbSelectAll);
 
         jLabel4.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel6.add(jLabel4);
+        jpDownloadE2.add(jLabel4);
 
-        jPanel5.add(jPanel6);
+        jpDownloadE.add(jpDownloadE2);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jLabel5.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jLabel5);
+        jpDownloadE3.add(jLabel5);
 
         jLabel6.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel8.add(jLabel6);
+        jpDownloadE3.add(jLabel6);
 
         jbDeselectAll.setText("Deseleccionar todos");
         jbDeselectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbDeselectAll.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jbDeselectAll);
+        jpDownloadE3.add(jbDeselectAll);
 
         jLabel7.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel8.add(jLabel7);
+        jpDownloadE3.add(jLabel7);
 
         jbDownload.setText("Descargar seleccionados");
         jbDownload.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbDownload.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jbDownload);
+        jpDownloadE3.add(jbDownload);
 
-        jPanel5.add(jPanel8);
+        jpDownloadE.add(jpDownloadE3);
 
-        jpDownload.add(jPanel5, java.awt.BorderLayout.EAST);
+        jpDownload.add(jpDownloadE, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jpDownload, java.awt.BorderLayout.NORTH);
 
         jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos:"));
-        jpDocuments.setLayout(new java.awt.BorderLayout());
+        jpDocuments.setLayout(new java.awt.BorderLayout(5, 0));
+
+        jpProcessing.setLayout(new java.awt.BorderLayout());
+
+        jpProcessingN.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
+
+        jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbLinkAll.setText("Vincular todos");
+        jbLinkAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbLinkAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN1.add(jbLinkAll);
+
+        jpProcessingN.add(jpProcessingN1);
+
+        jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN.add(jpProcessingN2);
+
+        jpProcessingN3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbRecord.setText("Capturar factura");
+        jbRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRecord.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN3.add(jbRecord);
+
+        jpProcessingN.add(jpProcessingN3);
+
+        jpProcessingN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbLink.setText("Vincular a factura");
+        jbLink.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbLink.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN4.add(jbLink);
+
+        jpProcessingN.add(jpProcessingN4);
+
+        jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbUnlink.setText("Desvincular de factura");
+        jbUnlink.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbUnlink.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN5.add(jbUnlink);
+
+        jpProcessingN.add(jpProcessingN5);
+
+        jpProcessingN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecord.setText("Póliza contable:");
+        jlRecord.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpProcessingN6.add(jlRecord);
+
+        jpProcessingN.add(jpProcessingN6);
+
+        jpProcessingN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfRecord.setEditable(false);
+        jtfRecord.setText("2001-01 SUC TP-000000");
+        jtfRecord.setFocusable(false);
+        jtfRecord.setPreferredSize(new java.awt.Dimension(155, 23));
+        jpProcessingN7.add(jtfRecord);
+
+        jpProcessingN.add(jpProcessingN7);
+
+        jpProcessingN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayRec.setText("Pago requerido:");
+        jlPayRec.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpProcessingN8.add(jlPayRec);
+
+        jpProcessingN.add(jpProcessingN8);
+
+        jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPayRecAmount.setEditable(false);
+        jtfPayRecAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayRecAmount.setText("000,000,000.00 MXN");
+        jtfPayRecAmount.setFocusable(false);
+        jtfPayRecAmount.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpProcessingN9.add(jtfPayRecAmount);
+
+        jtfPayRecAmountPct.setEditable(false);
+        jtfPayRecAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayRecAmountPct.setText("100%");
+        jtfPayRecAmountPct.setFocusable(false);
+        jtfPayRecAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
+        jpProcessingN9.add(jtfPayRecAmountPct);
+
+        jpProcessingN.add(jpProcessingN9);
+
+        jpProcessingN10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPayRecDate.setEditable(false);
+        jtfPayRecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayRecDate.setText("01/01/2001");
+        jtfPayRecDate.setFocusable(false);
+        jtfPayRecDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN10.add(jtfPayRecDate);
+
+        jpProcessingN.add(jpProcessingN10);
+
+        jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPay.setText("Solicitud de pago:");
+        jlPay.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpProcessingN11.add(jlPay);
+
+        jpProcessingN.add(jpProcessingN11);
+
+        jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPayFolio.setEditable(false);
+        jtfPayFolio.setText("P-000000");
+        jtfPayFolio.setFocusable(false);
+        jtfPayFolio.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN12.add(jtfPayFolio);
+
+        jtfPayDate.setEditable(false);
+        jtfPayDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayDate.setText("01/01/2001");
+        jtfPayDate.setFocusable(false);
+        jtfPayDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN12.add(jtfPayDate);
+
+        jpProcessingN.add(jpProcessingN12);
+
+        jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPayStatus.setEditable(false);
+        jtfPayStatus.setText("STATUS");
+        jtfPayStatus.setFocusable(false);
+        jtfPayStatus.setPreferredSize(new java.awt.Dimension(155, 23));
+        jpProcessingN13.add(jtfPayStatus);
+
+        jpProcessingN.add(jpProcessingN13);
+
+        jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPaySched.setText("Programación del pago:");
+        jlPaySched.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpProcessingN14.add(jlPaySched);
+
+        jpProcessingN.add(jpProcessingN14);
+
+        jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPaySchedDate.setEditable(false);
+        jtfPaySchedDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPaySchedDate.setText("01/01/2001");
+        jtfPaySchedDate.setFocusable(false);
+        jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN15.add(jtfPaySchedDate);
+
+        jpProcessingN.add(jpProcessingN15);
+
+        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayExec.setText("Operación del pago:");
+        jlPayExec.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpProcessingN16.add(jlPayExec);
+
+        jpProcessingN.add(jpProcessingN16);
+
+        jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfPayExecDate.setEditable(false);
+        jtfPayExecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayExecDate.setText("01/01/2001");
+        jtfPayExecDate.setFocusable(false);
+        jtfPayExecDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN17.add(jtfPayExecDate);
+
+        jpProcessingN.add(jpProcessingN17);
+
+        jpProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
+
+        jpDocuments.add(jpProcessing, java.awt.BorderLayout.EAST);
+
         getContentPane().add(jpDocuments, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -262,25 +485,62 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbClear;
     private javax.swing.JButton jbDeselectAll;
     private javax.swing.JButton jbDownload;
+    private javax.swing.JButton jbLink;
+    private javax.swing.JButton jbLinkAll;
+    private javax.swing.JButton jbRecord;
     private javax.swing.JButton jbSelectAll;
     private javax.swing.JButton jbSelectRemaining;
     private javax.swing.JButton jbShow;
+    private javax.swing.JButton jbUnlink;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlPay;
+    private javax.swing.JLabel jlPayExec;
+    private javax.swing.JLabel jlPayRec;
+    private javax.swing.JLabel jlPaySched;
+    private javax.swing.JLabel jlRecord;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDownload;
+    private javax.swing.JPanel jpDownloadE;
+    private javax.swing.JPanel jpDownloadE1;
+    private javax.swing.JPanel jpDownloadE2;
+    private javax.swing.JPanel jpDownloadE3;
+    private javax.swing.JPanel jpDownloadW;
+    private javax.swing.JPanel jpDownloadW1;
+    private javax.swing.JPanel jpDownloadW2;
+    private javax.swing.JPanel jpDownloadW3;
+    private javax.swing.JPanel jpProcessing;
+    private javax.swing.JPanel jpProcessingN;
+    private javax.swing.JPanel jpProcessingN1;
+    private javax.swing.JPanel jpProcessingN10;
+    private javax.swing.JPanel jpProcessingN11;
+    private javax.swing.JPanel jpProcessingN12;
+    private javax.swing.JPanel jpProcessingN13;
+    private javax.swing.JPanel jpProcessingN14;
+    private javax.swing.JPanel jpProcessingN15;
+    private javax.swing.JPanel jpProcessingN16;
+    private javax.swing.JPanel jpProcessingN17;
+    private javax.swing.JPanel jpProcessingN2;
+    private javax.swing.JPanel jpProcessingN3;
+    private javax.swing.JPanel jpProcessingN4;
+    private javax.swing.JPanel jpProcessingN5;
+    private javax.swing.JPanel jpProcessingN6;
+    private javax.swing.JPanel jpProcessingN7;
+    private javax.swing.JPanel jpProcessingN8;
+    private javax.swing.JPanel jpProcessingN9;
+    private javax.swing.JTextField jtfPayDate;
+    private javax.swing.JTextField jtfPayExecDate;
+    private javax.swing.JTextField jtfPayFolio;
+    private javax.swing.JTextField jtfPayRecAmount;
+    private javax.swing.JTextField jtfPayRecAmountPct;
+    private javax.swing.JTextField jtfPayRecDate;
+    private javax.swing.JTextField jtfPaySchedDate;
+    private javax.swing.JTextField jtfPayStatus;
+    private javax.swing.JTextField jtfRecord;
     private javax.swing.JTextField jtfUserFuncSubAreas;
     private javax.swing.JTextField jtfUserName;
     private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
@@ -292,7 +552,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
      */
     
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 960, 600);
+        SGuiUtils.setWindowBounds(this, 1024, 670);
         
         moDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
         moDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd), true);
@@ -316,10 +576,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SGridColumnForm column;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Proveedor", 200));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio", 100));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
@@ -331,10 +591,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_3D, "% requerido pago"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID documento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento externo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID documento externo"));
 
                 return gridColumnsForm;
             }
@@ -409,6 +671,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
      * Protected methods.
      */
     
+    protected void handleShowException(final Exception e) {
+        System.err.println(e);
+        SLibUtils.showException(this, e);
+        actionPerformedClear();
+        jbShow.requestFocusInWindow();
+    }
+    
     protected void logDownloads(final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documents) throws Exception {
         SDbComImportLog log = new SDbComImportLog();
         
@@ -443,7 +712,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
     }
     
-    protected void enableFields(final boolean isNewShowRequest) {
+    protected void enableDownloadFields(final boolean isNewShowRequest) {
         moDateStart.setEditable(isNewShowRequest);
         moDateEnd.setEditable(isNewShowRequest);
         
@@ -457,18 +726,59 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbDownload.setEnabled(!isNewShowRequest);
     }
     
-    protected void handleShowException(final Exception e) {
-        System.err.println(e);
-        SLibUtils.showException(this, e);
-        actionPerformedClear();
-        jbShow.requestFocusInWindow();
+    private void renderCurrentDocument() {
+        SGridRow row = moDocumentsGrid.getSelectedGridRow();
+        
+        if (row == null) {
+            jbRecord.setEnabled(false);
+            jbLink.setEnabled(false);
+            jbUnlink.setEnabled(false);
+            
+            jtfRecord.setText("");
+            
+            jtfPayRecAmount.setText("");
+            jtfPayRecAmountPct.setText("");
+            jtfPayRecDate.setText("");
+            
+            jtfPayFolio.setText("");
+            jtfPayDate.setText("");
+            jtfPayStatus.setText("");
+            jtfPaySchedDate.setText("");
+            jtfPayExecDate.setText("");
+        }
+        else {
+            SRowDocument document = (SRowDocument) row;
+            
+            jbRecord.setEnabled(false);
+            jbLink.setEnabled(true);
+            jbUnlink.setEnabled(true);
+            
+            jtfRecord.setText("");
+            
+            if (document.RequiredPaymentPct == 0 || document.RequiredPaymentDate == null) {
+                jtfPayRecAmount.setText("");
+                jtfPayRecAmountPct.setText("");
+                jtfPayRecDate.setText("");
+            }
+            else {
+                jtfPayRecAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
+                jtfPayRecAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
+                jtfPayRecDate.setText(SLibUtils.DateFormatDate.format(document.RequiredPaymentDate));
+            }
+            
+            jtfPayFolio.setText("");
+            jtfPayDate.setText("");
+            jtfPayStatus.setText("");
+            jtfPaySchedDate.setText("");
+            jtfPayExecDate.setText("");
+        }
     }
     
     protected void actionPerformedShow() {
         SGuiValidation validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
         
         if (SGuiUtils.computeValidation(miClient, validation)) {
-            enableFields(false);
+            enableDownloadFields(false);
             
             ArrayList<SRowDocument> documents = new ArrayList<>();
             int companyId = miClient.getSession().getConfigCompany().getCompanyId();
@@ -509,7 +819,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     JsonNode root = mapper.readTree(is);
 
                     if (root.isArray()) {
-                        PreparedStatement preparedStatement = SImportUtils.createPreparedStatementToCountImports(miClient.getSession());
+                        PreparedStatement prepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession());
+                        PreparedStatement prepStatToGetProcessedDps = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession());
                         
                         for (JsonNode docNode : root) {
                             JsonNode companyNode = docNode.path("company");
@@ -523,7 +834,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 
                                 if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
                                     int externalDocumentId = docNode.get("id").asInt();
-                                    int countOfImports = SImportUtils.countImports(preparedStatement, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
+                                    int countOfImports = SImportUtils.countImports(prepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
 
                                     SRowDocument document = new SRowDocument();
 
@@ -579,7 +890,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.Status = "";
                                     document.Download = false;
                                     document.AlreadyDownloaded = countOfImports > 0;
-                                    document.AlreadyRecorded = false;
+                                    document.ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByByExternalId(prepStatToGetProcessedDps, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
 
                                     documents.add(document);
                                 }
@@ -588,7 +899,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
 
                     Collections.sort(documents);
-                    moDocumentsGrid.populateGrid(new Vector<>(documents));
+                    moDocumentsGrid.populateGrid(new Vector<>(documents), this);
+                    moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+                    moDocumentsGrid.setSelectedGridRow(0);
                     jlStatus.setText("Documentos mostrados: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
                 }
             }
@@ -606,8 +919,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     protected void actionPerformedClear() {
         moDocumentsGrid.populateGrid(new Vector<>());
+        renderCurrentDocument();
         
-        enableFields(true);
+        enableDownloadFields(true);
         
         moDateStart.getComponent().requestFocusInWindow();
         jlStatus.setText("");
@@ -807,6 +1121,128 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void actionPerformedLinkAll() {
+        try {
+            if (moDocumentsGrid.getModel().getRowCount() == 0) {
+                miClient.showMsgBoxInformation("No hay documentos.");
+            }
+            else if (miClient.showMsgBoxConfirm("¿Está seguro que desea vincular todos los documentos faltantes con sus respectivas facturas?") == JOptionPane.YES_OPTION) {
+                int unlinked = 0;
+                int newlyLinked = 0;
+                PreparedStatement preparedStatement = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByDocData(miClient.getSession(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
+
+                for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                    SRowDocument document = (SRowDocument) row;
+
+                    if (document.ProcessedDps == null) {
+                        unlinked++;
+                        SDbSwapDataProcessing.ProcessedDps processedDps = SDbSwapDataProcessing.getProcessedDpsByDocData(preparedStatement, document.BizPartnerId, document.Date, document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+
+                        if (processedDps != null) {
+                            newlyLinked++;
+                            document.ProcessedDps = processedDps;
+                        }
+                    }
+                }
+
+                if (unlinked == 0) {
+                    miClient.showMsgBoxInformation("No hay documentos sin vincular.");
+                }
+                else if (unlinked == newlyLinked) {
+                    if (unlinked == 1) {
+                        miClient.showMsgBoxInformation("Se vinculó el único documento que faltaba.");
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("Se vincularon todos los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltaban.");
+                    }
+                }
+                else {
+                    if (unlinked == 1) {
+                        miClient.showMsgBoxInformation("El único documento que falta no se pudo vincular.");
+                    }
+                    else {
+                        if (newlyLinked == 0) {
+                            miClient.showMsgBoxInformation("Todos los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltan no se pudieron vincular.");
+                        }
+                        else {
+                            String message = "De los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltan solo se ";
+                            
+                            if (newlyLinked == 1) {
+                                message += "pudo vincular 1.";
+                            }
+                            else {
+                                message += "pudieron vincular " + SLibUtils.DecimalFormatInteger.format(newlyLinked) + ".";
+                            }
+                            
+                            miClient.showMsgBoxInformation(message);
+                        }
+                    }
+                }
+                
+                if (newlyLinked > 0) {
+                    moDocumentsGrid.renderGridRows();
+                    moDocumentsGrid.setSelectedGridRow(0);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedRecord() {
+        
+    }
+    
+    private void actionPerformedLink() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SRowDocument document = (SRowDocument) row;
+                
+                if (document.ProcessedDps != null) {
+                    throw new Exception("Este documento ya está vinculado.");
+                }
+                else {
+                    SGuiParams params = new SGuiParams();
+                    params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDateEnd.getValue())[0]);
+                    params.getParamsMap().put(SGuiConsts.PARAM_BPR, document.BizPartnerId);
+
+                    SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_TRN_N, SModConsts.MOD_TRN_PUR_N).getOptionPicker(SModConsts.TRN_DPS, SDataConstantsSys.TRNX_TP_DPS_DOC, params);
+                    picker.resetPicker();
+                    picker.setPickerVisible(true);
+
+                    if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                        int[] dpsKey = (int[]) picker.getOption();
+                        SDataDps dps = new SDataDps();
+
+                        if (dps.read(dpsKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception("Error al vincular el documento:\n" + dps.getDbmsError());
+                        }
+                        else {
+                            if (document.link(miClient.getSession(), dps)) {
+                                int index = moDocumentsGrid.getTable().getSelectedRow();
+                                moDocumentsGrid.renderGridRows();
+                                moDocumentsGrid.setSelectedGridRow(index);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedUnlink() {
+        
+    }
+    
     /*
      * Overriden methods.
      */
@@ -834,6 +1270,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAll.addActionListener(this);
         jbDeselectAll.addActionListener(this);
         jbDownload.addActionListener(this);
+        jbRecord.addActionListener(this);
+        jbLink.addActionListener(this);
+        jbUnlink.addActionListener(this);
     }
 
     @Override
@@ -844,6 +1283,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAll.removeActionListener(this);
         jbDeselectAll.removeActionListener(this);
         jbDownload.removeActionListener(this);
+        jbRecord.removeActionListener(this);
+        jbLink.removeActionListener(this);
+        jbUnlink.removeActionListener(this);
     }
 
     @Override
@@ -889,6 +1331,25 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbDownload) {
                 actionPerformedDownload();
             }
+            else if (button == jbLinkAll) {
+                actionPerformedLinkAll();
+            }
+            else if (button == jbRecord) {
+                actionPerformedRecord();
+            }
+            else if (button == jbLink) {
+                actionPerformedLink();
+            }
+            else if (button == jbUnlink) {
+                actionPerformedUnlink();
+            }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (!e.getValueIsAdjusting()) {
+            renderCurrentDocument();
         }
     }
 }

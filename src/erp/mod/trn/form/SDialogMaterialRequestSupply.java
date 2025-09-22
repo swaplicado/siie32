@@ -93,7 +93,7 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
      * @param title
      */
     public SDialogMaterialRequestSupply(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_STK_SEG_X, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_STK_SEG, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }

@@ -342,11 +342,13 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
-        mnPkYearId = (Integer) ((Object[]) pk)[0];
-        mnPkPeriodId = (Integer) ((Object[]) pk)[1];
-        mnPkBookkeepingCenterId = (Integer) ((Object[]) pk)[2];
-        msPkRecordTypeId = (String) ((Object[]) pk)[3];
-        mnPkNumberId = (Integer) ((Object[]) pk)[4];
+        Object[] key = (Object[]) pk;
+        
+        mnPkYearId = (Integer) key[0];
+        mnPkPeriodId = (Integer) key[1];
+        mnPkBookkeepingCenterId = (Integer) key[2];
+        msPkRecordTypeId = (String) key[3];
+        mnPkNumberId = (Integer) key[4];
     }
 
     @Override
@@ -834,5 +836,29 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         // mark this record as recovered!
         
         mbTempDataJustRecovered = true;
+    }
+    
+    public static String getCompanyBranchCode(java.lang.Object pk, java.sql.Statement statement) throws Exception {
+        Object[] key = (Object[]) pk;
+        
+        int yearId = (Integer) key[0];
+        int periodId = (Integer) key[1];
+        int bookkeepingCenterId = (Integer) key[2];
+        String recordTypeId = (String) key[3];
+        int numberId = (Integer) key[4];
+        String companyBranchCode = "";
+        
+        String sql = "SELECT cob.code "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN erp.bpsu_bp AS cob ON cob.id_bpb = r.fid_cob "
+                + "WHERE r.id_year = " + yearId + " AND r.id_per = " + periodId + " AND r.id_bkc = " + bookkeepingCenterId + " AND id_tp_rec = '" + recordTypeId + "' AND id_num = " + numberId +  ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                companyBranchCode = resultSet.getString("cob.code");
+            }
+        }
+        
+        return companyBranchCode;
     }
 }

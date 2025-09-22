@@ -436,6 +436,10 @@ public abstract class SModConsts {
     public static final int TRN_DPS_EVT = 2023016;
     public static final int TRN_DPS_NTS = 2023017;
     public static final int TRN_DPS_ACK = 2023061;
+    public static final int TRN_DPS_UPD_DT_LOG = 2023093;
+    public static final int TRN_DPS_CFD_PAY = 2023096;
+    public static final int TRN_DPS_CFD_PAY_DONE = 2023097;
+    public static final int TRN_DPS_AUTHORN = 2023505;
     public static final int TRN_DPS_ETY = 2023018;
     public static final int TRN_DPS_ETY_NTS = 2023019;
     public static final int TRN_DPS_ETY_PRC = 2023015;
@@ -484,7 +488,6 @@ public abstract class SModConsts {
     public static final int TRN_STK_SEG = 2023061;
     public static final int TRN_STK_SEG_WHS = 2023062;
     public static final int TRN_STK_SEG_WHS_ETY = 2023063;
-    public static final int TRN_STK_SEG_X = 2023065;
     public static final int TRN_STK_VAL = 2023086;
     public static final int TRN_STK_VAL_MVT = 2023087;
     public static final int TRN_STK_VAL_ACC = 2023088;
@@ -500,6 +503,7 @@ public abstract class SModConsts {
     public static final int TRN_CFD_SIGN_LOG_MSG = 2023053;
     public static final int TRN_CFD_SND_LOG = 2023054;
     public static final int TRN_CFD_FIN_REC = 2023058;
+    public static final int TRN_CFD_PAY = 2023091;
     public static final int TRN_PAY = 2023401;
     public static final int TRN_PAY_PAY = 2023402;
     public static final int TRN_PAY_PAY_TAX = 2023403;
@@ -543,10 +547,7 @@ public abstract class SModConsts {
     public static final int TRN_EST_REQ = 2023352;
     public static final int TRN_EST_REQ_ETY = 2023353;
     public static final int TRN_EST_REQ_REC = 2023354;
-    public static final int TRN_DPS_CFD_PAY = 2023096;
-    public static final int TRN_DPS_CFD_PAY_DONE = 2023097;
-    public static final int TRN_CFD_PAY = 2023091;
-    public static final int TRN_DPS_AUTHORN = 2023505;
+    public static final int TRN_SWAP_DATA_PRC = 2023451;
     
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -614,6 +615,7 @@ public abstract class SModConsts {
     public static final int TRNX_DPS_ACC_TAG = 2024097;
     public static final int TRNX_STK_VAL_UPD = 2024098;
     public static final int TRNX_STK_VAL_IN_CARDEX = 2024099;
+    public static final int TRNX_STK_SEG = 2024100;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1316,6 +1318,11 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_ADD_ETY, "trn_dps_add_ety");
         TablesMap.put(TRN_DPS_EVT, "trn_dps_evt");
         TablesMap.put(TRN_DPS_NTS, "trn_dps_nts");
+        TablesMap.put(TRN_DPS_ACK, "trn_dps_ack");
+        TablesMap.put(TRN_DPS_UPD_DT_LOG, "trn_dps_upd_dt_log");
+        TablesMap.put(TRN_DPS_CFD_PAY, "trn_dps_cfd_pay");
+        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
+        TablesMap.put(TRN_DPS_AUTHORN, "trn_dps_authorn");
         TablesMap.put(TRN_DPS_ETY, "trn_dps_ety");
         TablesMap.put(TRN_DPS_ETY_NTS, "trn_dps_ety_nts");
         TablesMap.put(TRN_DPS_ETY_PRC, "trn_dps_ety_prc");
@@ -1379,6 +1386,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_CFD_SIGN_LOG_MSG, "trn_cfd_sign_log_msg");
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
         TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
+        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
         TablesMap.put(TRN_PAY, "trn_pay");
         TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
         TablesMap.put(TRN_PAY_PAY_TAX, "trn_pay_pay_tax");
@@ -1422,10 +1430,8 @@ public abstract class SModConsts {
         TablesMap.put(TRN_EST_REQ, "trn_est_req");
         TablesMap.put(TRN_EST_REQ_ETY, "trn_est_req_ety");
         TablesMap.put(TRN_EST_REQ_REC, "trn_est_req_rec");
-        TablesMap.put(TRN_DPS_CFD_PAY_DONE, "trn_dps_cfd_pay_done");
-        TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
-        TablesMap.put(TRN_DPS_AUTHORN, "trn_dps_authorn");
-
+        TablesMap.put(TRN_SWAP_DATA_PRC, "trn_swap_data_prc");
+        
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");
         TablesMap.put(TRN_DNC_DIOG, "trn_dnc_diog");
