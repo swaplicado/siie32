@@ -43,6 +43,7 @@ public class SDbPayment extends SDbRegistryUser {
     protected String msPaymentWay;
     protected int mnPriority;
     protected String msNotes;
+    protected boolean mbReceiptPaymentRequired;
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
     protected int mnFkStatusPaymentId;
@@ -107,6 +108,7 @@ public class SDbPayment extends SDbRegistryUser {
     public void setPaymentWay(String s) { msPaymentWay = s; }
     public void setPriority(int n) { mnPriority = n; }
     public void setNotes(String s) { msNotes = s; }
+    public void setReceiptPaymentRequired(boolean b) { mbReceiptPaymentRequired = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkStatusPaymentId(int n) { mnFkStatusPaymentId = n; }
@@ -142,6 +144,7 @@ public class SDbPayment extends SDbRegistryUser {
     public String getPaymentWay() { return msPaymentWay; }
     public int getPriority() { return mnPriority; }
     public String getNotes() { return msNotes; }
+    public boolean isReceiptPaymentRequired() { return mbReceiptPaymentRequired; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkStatusPaymentId() { return mnFkStatusPaymentId; }
@@ -222,6 +225,7 @@ public class SDbPayment extends SDbRegistryUser {
         msPaymentWay = "";
         mnPriority = PRIORITY_NORMAL;
         msNotes = "";
+        mbReceiptPaymentRequired = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkStatusPaymentId = 0;
@@ -312,6 +316,7 @@ public class SDbPayment extends SDbRegistryUser {
             msPaymentWay = resultSet.getString("pay_way");
             mnPriority = resultSet.getInt("priority");
             msNotes = resultSet.getString("nts");
+            mbReceiptPaymentRequired = resultSet.getBoolean("b_rcpt_pay_req");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkStatusPaymentId = resultSet.getInt("fk_st_pay");
@@ -402,6 +407,7 @@ public class SDbPayment extends SDbRegistryUser {
                     "'" + msPaymentWay + "', " + 
                     mnPriority + ", " + 
                     "'" + msNotes + "', " + 
+                    (mbReceiptPaymentRequired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkStatusPaymentId + ", " + 
@@ -442,6 +448,7 @@ public class SDbPayment extends SDbRegistryUser {
                     "pay_way = '" + msPaymentWay + "', " +
                     "priority = " + mnPriority + ", " +
                     "nts = '" + msNotes + "', " +
+                    "b_rcpt_pay_req = " + (mbReceiptPaymentRequired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_st_pay = " + mnFkStatusPaymentId + ", " +
@@ -511,6 +518,7 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setPaymentWay(this.getPaymentWay());
         registry.setPriority(this.getPriority());
         registry.setNotes(this.getNotes());
+        registry.setReceiptPaymentRequired(this.isReceiptPaymentRequired());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkStatusPaymentId(this.getFkStatusPaymentId());
