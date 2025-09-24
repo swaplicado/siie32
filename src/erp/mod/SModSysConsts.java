@@ -527,9 +527,27 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_ISR = 1;
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
+    
+    public static final int FINS_ST_PAY_NEW = 1; //Nuevo
+    public static final int FINS_ST_PAY_PRC_AUTH = 2; //En autorización
+    public static final int FINS_ST_PAY_REJ = 3; //Rechazado
+    public static final int FINS_ST_PAY_SCHED = 4; //Programado
+    public static final int FINS_ST_PAY_EXEC = 5; //Ejecutado
+    public static final int FINS_ST_PAY_NTFD = 6; //Notificado
+    public static final int FINS_ST_PAY_RCPT = 7; //Comprobado
+    public static final int FINS_ST_PAY_CAN = 9; //Cancelado
+    public static final int FINS_ST_PAY_REJ_P = 13; //Rechazado en proceso
+    public static final int FINS_ST_PAY_SCHED_P = 14; //Programado en proceso
+    public static final int FINS_ST_PAY_EXEC_P = 15; //Ejecutado en proceso
+    public static final int FINS_ST_PAY_NTFD_P = 16; //Notificado en proceso
+    public static final int FINS_ST_PAY_RCPT_P = 17; //Comprobado en proceso
 
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
+    
+    public static final String FIN_PAY_FILE_TP_EF = "EF"; //Evidencia fotográfica
+    public static final String FIN_PAY_FILE_TP_RA = "RA"; //Reporte de avance
+    public static final String FIN_PAY_FILE_TP_FS = "FS"; //Finiquito servicio
 
     public static final String FINU_TP_REC_FY_OPEN = "EA";
     public static final String FINU_TP_REC_FY_END = "EC";
@@ -562,7 +580,7 @@ public abstract class SModSysConsts {
     public static final int FINX_LAY_BANK_TRN_TP_OWN_TRANSFER = 11;
     /** Used only as grid identifier! */
     public static final int FINX_LAY_BANK_QRY = 21;
-
+    
     /*
      * Transactions
      */

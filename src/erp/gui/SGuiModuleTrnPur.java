@@ -188,6 +188,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiScaItDetMap;
     private javax.swing.JMenu jmAccPend;
     private javax.swing.JMenuItem jmiAccPend;
+    private javax.swing.JMenuItem jmiAccPendPay;
+    private javax.swing.JMenuItem jmiAccPendPayEty;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepQueries;
@@ -479,7 +481,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         jmiDpsSearchCfdiByUuid = new JMenuItem("Búsqueda de CFDI por UUID...");
         jmiDpsSearchDps = new JMenuItem("Búsqueda de documentos...");
-        jmiDpsImportDocuments = new JMenuItem("Importar documentos...");
+        jmiDpsImportDocuments = new JMenuItem("Importación de documentos...");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -573,7 +575,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
 
         jmAccPend = new JMenu("CXP");
         jmiAccPend = new JMenuItem("Cuentas por pagar");
+        jmiAccPendPay = new JMenuItem("Solicitudes de pago");
+        jmiAccPendPayEty = new JMenuItem("Solicitudes de pago a detalle");
         jmAccPend.add(jmiAccPend);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPendPay);
+        jmAccPend.add(jmiAccPendPayEty);
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
@@ -816,6 +823,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiScaItMap.addActionListener(this);
         jmiScaItDetMap.addActionListener(this);
         jmiAccPend.addActionListener(this);
+        jmiAccPendPay.addActionListener(this);
+        jmiAccPendPayEty.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -2009,6 +2018,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiAccPend) {
                 miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_SUP, null);
+            }
+            else if (item == jmiAccPendPay) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiAccPendPayEty) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModConsts.FIN_PAY_ETY, null);
             }
             else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT);

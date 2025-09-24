@@ -7,6 +7,8 @@ package erp.mod.cfg.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
+import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -15,6 +17,10 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.cfg.swap.utils.SExportDataFile;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentFile;
+import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.form.SDialogSelectAuthornPath;
 import erp.mtrn.data.SDataDps;
@@ -33,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.swing.JOptionPane;
@@ -1713,6 +1720,83 @@ public abstract class SAuthorizationUtils {
             client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
             return false;
         }
+    }
+    
+    public static Object[] sendPaymentFilesToCloud(SGuiClient client, SDbPayment payment) {
+        ArrayList<SExportDataFile> expFiles = new ArrayList<>();
+        boolean hasError = false;
+        
+        try {
+            SDocUtils.deleteFilesToCloud(client.getSession(), payment);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            hasError = true;
+            client.showMsgBoxError("Error al eliminar los archivos anteriores, intente de nuevo o contacte a soporte técnico. " + e.getMessage());
+        }
+        
+        if (!hasError) {
+            ArrayList<SDbPaymentFile> lFileNamesToUpload = new ArrayList<>();
+            
+            for (SDbPaymentFile oFile : payment.getFiles()) {
+                try {
+                    // Obtener bytes del archivo y generar un nombrfe único para el amacenamiento en la nube
+                    byte[] fileBytes = SDocUtils.getFileBytes(client.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
+                    String name = SDocUtils.generatePaymentFileName(client.getSession().getDatabase().getDbName(), 
+                            payment.getPkPaymentId(), oFile.getPkFileId(), oFile.getFileType());
+                    
+                    // Subir archivo a la nube
+                    CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
+                    if (oGcsFile != null) {
+                        SExportDataFile expFile = new SExportDataFile();
+                        oFile.setFileStorageName(oGcsFile.getFileName());
+                        oFile.save(client.getSession());
+                        lFileNamesToUpload.add(oFile);
+                        expFile.filename_storage = oFile.getFileStorageName();
+                        expFile.filename_original = oFile.getFileName();
+                        expFile.url_storage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.url_database = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.bucket_name = oGcsFile.getBucketName();
+                        expFiles.add(expFile);
+                    }
+                    else {
+                        hasError = true;
+                        break;
+                    }
+                }
+                catch (Exception e) {
+                    hasError = true;
+                    e.printStackTrace();
+                    client.showMsgBoxError("Error al enviar los archivos, intente de nuevo o contacte a soporte técnico.");
+                }
+            }
+            // manejo de errores
+            if (hasError) {
+                try {
+                    // Si ocurrió un error, eliminar los archivos subidos previamente
+                    ArrayList<String> lNames = lFileNamesToUpload.stream()
+                            .map(SDbPaymentFile::getFileStorageName) // Extraer nombres de archivo
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    String resultOfUpload = CloudStorageManager.deleteFiles(lNames);
+
+                    for (SDbPaymentFile oFile : lFileNamesToUpload) {
+                        oFile.setFileStorageName("");
+                        try {
+                            oFile.save(client.getSession());
+                        }
+                        catch(Exception ex) {
+                            client.showMsgBoxError(ex.getMessage());
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    client.showMsgBoxError(e.getMessage());
+                }
+                return new Object[] { false, null };
+            }
+        }
+        
+        return new Object[] { true, expFiles };
     }
     
     public static boolean canSendAuthornAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {

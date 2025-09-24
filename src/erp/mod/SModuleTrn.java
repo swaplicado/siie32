@@ -45,6 +45,7 @@ import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.db.swap.SDbSwapDataProcessing;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
 import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
@@ -164,6 +165,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
  */
 public class SModuleTrn extends SGuiModule {
 
+    private SBeanOptionPicker moPickerDps;
     private SBeanOptionPicker moPickerSuppFile;
     private SBeanOptionPicker moPickerMatReq;
     
@@ -338,6 +340,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_STK_VAL:
                 registry = new SDbStockValuation();
+                break;
+            case SModConsts.TRN_SWAP_DATA_PRC:
+                registry = new SDbSwapDataProcessing();
                 break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 registry = new SDbFunctionalAreaBudgets();
@@ -964,16 +969,80 @@ public class SModuleTrn extends SGuiModule {
         SGuiOptionPicker picker = null;
         
         switch (type) {
+            case SModConsts.TRN_DPS:
+                int[] dpsKey = null;
+                
+                switch (subtype) {
+                    case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                        dpsKey = SDataConstantsSys.TRNU_TP_DPS_PUR_INV;
+                        break;
+                    case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                        dpsKey = SDataConstantsSys.TRNU_TP_DPS_PUR_CN;
+                        break;
+                    default:
+                        // nothing
+                }
+                
+                int year = (int) params.getParamsMap().get(SGuiConsts.PARAM_YEAR);
+                int bizPartnerId = (int) params.getParamsMap().get(SGuiConsts.PARAM_BPR);
+                
+                sql = "SELECT d.id_year AS " + SDbConsts.FIELD_ID + "1, "
+                        + "d.id_doc AS " + SDbConsts.FIELD_ID + "2, "
+                        + "td.code AS " + SDbConsts.FIELD_PICK + "1, "
+                        + "d.dt AS " + SDbConsts.FIELD_PICK + "2, "
+                        + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS " + SDbConsts.FIELD_PICK + "3, "
+                        + "d.num_ref AS " + SDbConsts.FIELD_PICK + "4, "
+                        + "cob.code AS " + SDbConsts.FIELD_PICK + "5, "
+                        + "d.tot_cur_r AS " + SDbConsts.FIELD_PICK + "6, "
+                        + "c.cur_key AS " + SDbConsts.FIELD_PICK + "7, "
+                        + "cfd.uuid IS NOT NULL AS " + SDbConsts.FIELD_PICK + "8, "
+                        + "cfd.uuid AS " + SDbConsts.FIELD_PICK + "9, "
+                        + "sdp.ext_data_id IS NOT NULL AS " + SDbConsts.FIELD_PICK + "10, "
+                        + "sdp.ext_data_id AS " + SDbConsts.FIELD_PICK + "11, "
+                        + "sdp.ext_data_uuid AS " + SDbConsts.FIELD_PICK + "12 "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " d "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS td ON td.id_ct_dps = d.fid_ct_dps AND td.id_cl_dps = d.fid_cl_dps AND td.id_tp_dps = d.fid_tp_dps "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON cob.id_bpb = d.fid_cob "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fid_dps_year_n = d.id_year AND sdp.fid_dps_doc_n = d.id_doc "
+                        + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "AND d.fid_ct_dps = " + dpsKey[0] + " AND d.fid_cl_dps = " + dpsKey[1] + " AND d.fid_tp_dps = " + dpsKey[2] + " "
+                        + "AND YEAR(d.dt) BETWEEN " + (year - 1) + " AND " + year + " AND d.fid_bp_r = " + bizPartnerId + " "
+                        + "ORDER BY td.code, d.dt DESC, d.num_ser, d.num, d.num_ref, d.id_year, d.id_doc, cob.code;";
+                
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Tipo documento"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha documento"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio documento", 75));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia documento", 75));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Sucursal empresa"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total $"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "CFD"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID CFD", 200));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Documento externo"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento externo"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID documento externo", 200));
+                
+                settings = new SGuiOptionPickerSettings("Selecciona un documento", sql, gridColumns, 2);
+                
+                moPickerDps = new SBeanOptionPicker();
+                moPickerDps.setPickerSettings(miClient, type, 0, settings);
+                picker = moPickerDps;
+                break;
+                
             case SModConsts.TRN_SUP_FILE:
                 sql = "SELECT f.id_sup_file AS " + SDbConsts.FIELD_ID + "1, "
                         + "num AS " + SDbConsts.FIELD_PICK + "1, b.bp AS " + SDbConsts.FIELD_PICK + "2 "
-                        + "FROM trn_sup_file f " 
-                        + "LEFT JOIN erp.bpsu_bp b ON f.fid_bp_n = b.id_bp " 
+                        + "FROM trn_sup_file f "
+                        + "LEFT JOIN erp.bpsu_bp b ON f.fid_bp_n = b.id_bp "
                         + "WHERE f.fid_bp_n = " + params.getKey()[0] + " "
                         + "ORDER BY f.sup_file_type, f.num DESC, f.id_sup_file DESC;";
+                
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Asociado de negocios"));
-                settings = new SGuiOptionPickerSettings("Selecciona archivo de soporte", sql, gridColumns, 1);
+                
+                settings = new SGuiOptionPickerSettings("Selecciona un archivo de soporte", sql, gridColumns, 1);
                 moPickerSuppFile = new SBeanOptionPicker();
                 moPickerSuppFile.setPickerSettings(miClient, type, SModConsts.TRNX_SUP_FILE_DPS_PROC, settings);
                 picker = moPickerSuppFile;
@@ -982,6 +1051,7 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAT_REQ:
                 int[] date = SLibTimeUtils.digestDate(miClient.getSession().getCurrentDate());
                 Date beginDate = SLibTimeUtils.createDate(date[0] - 1, date[1], 1);
+                
                 sql = "SELECT r.id_mat_req AS " + SDbConsts.FIELD_ID + "1, "
                         + "pe.code AS " + SDbConsts.FIELD_PICK + "1, "
                         + "LPAD(r.num, 6, 0) AS " + SDbConsts.FIELD_PICK + "2, "
@@ -1002,6 +1072,7 @@ public class SModuleTrn extends SGuiModule {
                         + "WHERE r.fk_usr_req = " + params.getType() + " "
                         + "AND NOT r.b_del AND dt >= '" + SLibUtils.DbmsDateFormatDate.format(beginDate) + "' "
                         + "ORDER BY r.num DESC, dt DESC";
+                
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cto suministro"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha"));
@@ -1009,9 +1080,11 @@ public class SModuleTrn extends SGuiModule {
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo requisición", 20));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Concepto/gasto"));
                 gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Estatus"));
-                settings = new SGuiOptionPickerSettings("Selecciona una Requisiciones para copiar", sql, gridColumns, 1);
+                
+                settings = new SGuiOptionPickerSettings("Selecciona una requisición para copiar", sql, gridColumns, 1);
+                
                 moPickerMatReq = new SBeanOptionPicker();
-                moPickerMatReq.setPickerSettings(miClient, type, SLibConsts.UNDEFINED, settings);
+                moPickerMatReq.setPickerSettings(miClient, type, 0, settings);
                 picker = moPickerMatReq;
                 break;
                 

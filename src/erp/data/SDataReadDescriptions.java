@@ -77,6 +77,9 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.CFGU_CUR:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "cur_key" : "cur") + " AS descrip FROM erp.cfgu_cur WHERE id_cur = " + ((int[]) pk)[0] + " ";
                 break;
+            case SDataConstants.CFGU_CO:
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "co_key" : "co") + " AS descrip FROM erp.cfgu_co WHERE id_co = " + ((int[]) pk)[0] + " ";
+                break;
             case SDataConstants.CFGU_COB_ENT:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "ent") + " AS descrip FROM erp.cfgu_cob_ent WHERE id_cob = " + ((int[]) pk)[0] + " AND id_ent = " + ((int[]) pk)[1] + " ";
                 break;

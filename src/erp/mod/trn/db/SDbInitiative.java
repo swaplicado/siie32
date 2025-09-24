@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SDbInitiative extends SDbRegistryUser{
+public class SDbInitiative extends SDbRegistryUser {
     
     public static final int ID_TYPE_E = 1; // per Event
     public static final int ID_TYPE_R = 2; // Recurrent
@@ -30,7 +30,7 @@ public class SDbInitiative extends SDbRegistryUser{
     public static final String TYPE_E = "E"; // per Event
     public static final String TYPE_R = "R"; // Recurrent
     
-    public static final String TYPE_PER_EVENT = "Por evemto"; // per Event
+    public static final String TYPE_PER_EVENT = "Por evento"; // per Event
     public static final String TYPE_RECURRENT = "Recurrente"; // Recurrent
     
     public static HashMap<String, Integer> TypeIdsMap = new HashMap<>();
@@ -187,7 +187,7 @@ public class SDbInitiative extends SDbRegistryUser{
         msSql = "SELECT i.*, "
                 + "CASE WHEN i.type = '" + TYPE_E + "' THEN '" + TYPE_PER_EVENT + "' WHEN i.type = '" + TYPE_R + "' THEN '" + TYPE_RECURRENT + "' ELSE '?' END AS _type, "
                 + "tp.name AS _periodicity_type, f.name AS _func "
-                + "FROM trn_init AS i "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_INIT) + " AS i "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_PERIOD) + " AS tp ON i.fk_tp_period = tp.id_tp_period "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON i.fk_func = f.id_func " +
                 getSqlWhere(pk);
@@ -231,7 +231,6 @@ public class SDbInitiative extends SDbRegistryUser{
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
-            msCode = mnPkInitiativeId + "";
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;

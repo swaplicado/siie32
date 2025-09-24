@@ -64,7 +64,7 @@ public class SDialogMaterialRequestSegregation extends SBeanFormDialog implement
      * @param title
      */
     public SDialogMaterialRequestSegregation(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_STK_SEG_X, SLibConsts.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRNX_STK_SEG, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }

@@ -1,8 +1,30 @@
 ================================================================================
-SIIE AppLink 3.2 288.10/ 2025-09-19
+SIIE 3.2 290.2/ 2025-09-24
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Primera liberación de la funcionalidad de importación de documentos autorizados en Portal de Compras.
+
+================================================================================
+SIIE 3.2 290.1/ 2025-09-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de constantes de control de tipos de pagos.
+2) Implementación de vinculación de documentos descargados vs. facturas contabilizadas de compras.
+3) Generación automática de pagos a manera de solicitud de pagos en base a la información proporcionada en SWAP Services por el comprador.
+
+================================================================================
+SIIE 3.2 290.0/ 2025-09-21
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Creación del CRUD para solicitudes de pago de compras.
+2) Adición de archivos a las solicitudes de pago y su guardado en la BD de mongo.
+3) Envío de solicitudes de autorización de pagos de compra. 
+
+================================================================================
+SIIE 3.2 288.10/ 2025-09-19
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Funcionalidad para actualizar el estatus del recurso autorizado o rechazado desde servicio externo
+1) Funcionalidad AppLink para actualizar el estatus del recurso autorizado o rechazado desde servicio externo.
 
 ================================================================================
 SIIE 3.2 288.9/ 2025-09-18

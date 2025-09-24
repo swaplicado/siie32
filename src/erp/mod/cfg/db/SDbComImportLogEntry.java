@@ -33,6 +33,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
     protected String msResponseCode;
     protected String msResponseBody;
     protected String msReferenceId;
+    protected String msReferenceUuid;
     protected int mnFkDpsYearId_n;
     protected int mnFkDpsDocumentId_n;
     protected Date mtTsSync;
@@ -46,6 +47,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
     public void setResponseCode(String s) { msResponseCode = s; }
     public void setResponseBody(String s) { msResponseBody = s; }
     public void setReferenceId(String s) { msReferenceId = s; }
+    public void setReferenceUuid(String s) { msReferenceUuid = s; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
     public void setFkDpsDocumentId_n(int n) { mnFkDpsDocumentId_n = n; }
     public void setTsSync(Date t) { mtTsSync = t; }
@@ -55,6 +57,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
     public String getResponseCode() { return msResponseCode; }
     public String getResponseBody() { return msResponseBody; }
     public String getReferenceId() { return msReferenceId; }
+    public String getReferenceUuid() { return msReferenceUuid; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
     public int getFkDpsDocumentId_n() { return mnFkDpsDocumentId_n; }
     public Date getTsSync() { return mtTsSync; }
@@ -78,6 +81,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
         msResponseCode = "";
         msResponseBody = "";
         msReferenceId = "";
+        msReferenceUuid = "";
         mnFkDpsYearId_n = 0;
         mnFkDpsDocumentId_n = 0;
         mtTsSync = null;
@@ -135,6 +139,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
             msResponseCode = resultSet.getString("response_code");
             msResponseBody = resultSet.getString("response_body");
             msReferenceId = resultSet.getString("reference_id");
+            msReferenceUuid = resultSet.getString("reference_uuid");
             mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
             mnFkDpsDocumentId_n = resultSet.getInt("fid_dps_doc_n");
             mtTsSync = resultSet.getTimestamp("ts_sync");
@@ -164,6 +169,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
                     "'" + msResponseCode + "', " + 
                     "'" + msResponseBody + "', " + 
                     "'" + msReferenceId + "', " + 
+                    "'" + msReferenceUuid + "', " + 
                     (mnFkDpsYearId_n != 0 ? mnFkDpsYearId_n : "NULL") + ", " + 
                     (mnFkDpsDocumentId_n != 0 ? mnFkDpsDocumentId_n : "NULL") + ", " + 
                     (mtTsSync == null ? "NOW()" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtTsSync) + "'") + ");";
@@ -187,6 +193,7 @@ public class SDbComImportLogEntry extends SDbRegistryUser {
         registry.setResponseCode(this.getResponseCode());
         registry.setResponseBody(this.getResponseBody());
         registry.setReferenceId(this.getReferenceId());
+        registry.setReferenceUuid(this.getReferenceUuid());
         registry.setFkDpsYearId_n(this.getFkDpsYearId_n());
         registry.setFkDpsDocumentId_n(this.getFkDpsDocumentId_n());
         registry.setTsSync(this.getTsSync());

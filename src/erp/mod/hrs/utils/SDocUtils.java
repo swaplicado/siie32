@@ -21,6 +21,8 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbDocument;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.hrs.db.SRowPreceptSubsection;
 import erp.mod.hrs.form.SDialogDocImage;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -620,10 +622,18 @@ public abstract class SDocUtils {
      * @param extension
      * @return 
      */
-    public static String generateFileName(String dbCom, int idYear, int idDoc, int idSupFile, String extension) {
+    public static String generateDpsFileName(String dbCom, int idYear, int idDoc, int idSupFile, String extension) {
         String fileName = "";
         
         fileName += dbCom + "-" + idYear + "-" + idDoc + "-" + idSupFile + "." + extension;
+        
+        return fileName;
+    }
+    
+    public static String generatePaymentFileName(String dbCom, int idPayment, int idFile, String extension) {
+        String fileName = "";
+        
+        fileName += dbCom + "-pay-" + idPayment + "-" + idFile + "." + extension;
         
         return fileName;
     }
@@ -665,6 +675,48 @@ public abstract class SDocUtils {
 
         // Actualizar los archivos locales eliminados
         for (SDbSupplierFile oFile : lFilesToDelete) {
+            oFile.setFileStorageName("");
+            oFile.save(session);
+        }
+    }
+    
+    /**
+     * Eliminar archivos de cloud storage
+     * @param session
+     * @param payment
+     * @throws java.lang.Exception
+     */
+    public static void deleteFilesToCloud(SGuiSession session, SDbPayment payment) throws Exception {
+        // 1. Eliminar archivos existentes en la nube
+        ArrayList<SDbPaymentFile> lFilesToDelete = new ArrayList<>();
+
+        // Agregar archivos actuales con nombre de almacenamiento para eliminar
+        for (SDbPaymentFile oFile : payment.getFiles()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Agregar archivos marcados como eliminados
+        for (SDbPaymentFile oFile : payment.getFilesDeleted()) {
+            if (oFile.getFileStorageName() != null && !oFile.getFileStorageName().isEmpty()) {
+                lFilesToDelete.add(oFile);
+            }
+        }
+
+        // Crear lista de nombres de archivos a eliminar y llamar al gestor de almacenamiento
+        ArrayList<String> lNames = lFilesToDelete.stream()
+                .map(SDbPaymentFile::getFileStorageName) // Extraer nombres de archivo
+                .collect(Collectors.toCollection(ArrayList::new));
+        try {
+            String resultDeleted = CloudStorageManager.deleteFiles(lNames);
+        }
+        catch(Exception e) {
+            System.err.println("Error al eliminar archivos en el cloud storage");
+        }
+
+        // Actualizar los archivos locales eliminados
+        for (SDbPaymentFile oFile : lFilesToDelete) {
             oFile.setFileStorageName("");
             oFile.save(session);
         }
