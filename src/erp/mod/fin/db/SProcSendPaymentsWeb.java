@@ -134,7 +134,7 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserScheduledId());
         payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecuted());
         payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
-        payment.user_id = 181; //miClient.getSession().getUser().getPkUserId(); descomentar antes de subir
+        payment.user_id = miClient.getSession().getUser().getPkUserId(); 
         
         return payment;
     }
