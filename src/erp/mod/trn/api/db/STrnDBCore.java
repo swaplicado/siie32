@@ -122,6 +122,8 @@ public class STrnDBCore {
             + "    dusr.usr AS dps_user, "
             + "    dusr.id_usr AS dps_user_id,"
             + "    aust.id_st_authorn, "
+            + "    " + SAuthsUtils.getSubquerySentAuth(SAuthorizationUtils.AUTH_TYPE_DPS, "dps.id_year", "dps.id_doc", SAuthsUtils.FIELD_TS) + " AS _ts_sent_auth, "
+            + "    " + SAuthsUtils.getSubquerySentAuth(SAuthorizationUtils.AUTH_TYPE_DPS, "dps.id_year", "dps.id_doc", SAuthsUtils.FIELD_USER_NAME) + " AS _user_sent_auth, "
             + "    (IF(dps.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
             + "        COALESCE((SELECT  "
             + "                        GROUP_CONCAT(usr "
