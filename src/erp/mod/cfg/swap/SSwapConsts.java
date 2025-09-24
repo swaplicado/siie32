@@ -12,6 +12,7 @@ package erp.mod.cfg.swap;
 public abstract class SSwapConsts {
 
     public static final String SWAP_SERVICES = "SWAP Services";
+    public static final String PURCHASE_PORTAL = "Portal de Compras";
     
     public static int SIIE = 1;
     
