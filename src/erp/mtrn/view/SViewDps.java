@@ -35,9 +35,9 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -3272,27 +3272,21 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         miClient.showMsgBoxInformation("No se puede anular la autorización porque el estatus de autorización de la orden seleccionada es '" + fileProcess.getDpsStatus() + "'.");
                     }
                     else {
-                        if (SAuthorizationUtils.hasAuthornStatus(miClient.getSession(), fileProcess.getPrimaryKey())
-                                || SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey())) {
-                            if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
-                                fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
-                                
-                                // Eliminar archivos de la nube:
-                                SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
+                        if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
+                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
 
-                                // Eliminar pasos de autorización:
-                                SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+                            // Eliminar archivos de la nube:
+                            SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
 
-                                // Actualizar estatus de autorización:
-                                String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
-                                miClient.getSession().getStatement().execute(sql);
+                            // Eliminar pasos de autorización:
+                            SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
 
-                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
-                                miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
-                            }
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("El documento no tiene un proceso de autorización para anular.");
+                            // Actualizar estatus de autorización:
+                            String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
+                            miClient.getSession().getStatement().execute(sql);
+
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                            miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
                         }
                     }
                 }
