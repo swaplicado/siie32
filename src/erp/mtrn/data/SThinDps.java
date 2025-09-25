@@ -25,6 +25,7 @@ public class SThinDps implements Serializable, SThinData {
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
     protected int mnFkDpsTypeId;
+    protected int mnFkPaymentTypeId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
     protected int mnFkFunctionalAreaId;
@@ -55,6 +56,7 @@ public class SThinDps implements Serializable, SThinData {
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
         mnFkDpsTypeId = 0;
+        mnFkPaymentTypeId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
         mnFkFunctionalAreaId = 0;
@@ -108,6 +110,10 @@ public class SThinDps implements Serializable, SThinData {
 
     public int getFkDpsTypeId() {
         return mnFkDpsTypeId;
+    }
+    
+    public int getFkPaymentTypeId() {
+        return mnFkPaymentTypeId;
     }
 
     public int getFkBizPartnerId_r() {
@@ -176,7 +182,7 @@ public class SThinDps implements Serializable, SThinData {
         
         int[] key = (int[]) primaryKey;
         String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.tot_r, "
-                + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
+                + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.fid_tp_pay, "
                 + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, "
                 + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num "
                 + "FROM trn_dps AS d "
@@ -199,6 +205,7 @@ public class SThinDps implements Serializable, SThinData {
                 mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");
                 mnFkDpsClassId = resultSetDps.getInt("d.fid_cl_dps");
                 mnFkDpsTypeId = resultSetDps.getInt("d.fid_tp_dps");
+                mnFkPaymentTypeId = resultSetDps.getInt("d.fid_tp_pay");
                 mnFkBizPartnerId_r = resultSetDps.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = resultSetDps.getInt("d.fid_bpb");
                 mnFkFunctionalAreaId = resultSetDps.getInt("d.fid_func");

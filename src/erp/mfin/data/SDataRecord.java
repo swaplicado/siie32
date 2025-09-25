@@ -850,7 +850,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         
         String sql = "SELECT cob.code "
                 + "FROM fin_rec AS r "
-                + "INNER JOIN erp.bpsu_bp AS cob ON cob.id_bpb = r.fid_cob "
+                + "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = r.fid_cob "
                 + "WHERE r.id_year = " + yearId + " AND r.id_per = " + periodId + " AND r.id_bkc = " + bookkeepingCenterId + " AND id_tp_rec = '" + recordTypeId + "' AND id_num = " + numberId +  ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {

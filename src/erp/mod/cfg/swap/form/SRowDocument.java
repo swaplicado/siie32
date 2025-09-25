@@ -126,6 +126,7 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
             payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
             payment.setPriority(SDbPayment.PRIORITY_NORMAL);
             payment.setNotes("Solicitud de pago generada en base a lo indicado por el comprador.");
+            payment.setReceiptPaymentRequired(dps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT);
             payment.setDeleted(false);
             payment.setSystem(true);
             payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);

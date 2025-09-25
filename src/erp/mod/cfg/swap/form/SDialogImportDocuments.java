@@ -8,7 +8,9 @@ package erp.mod.cfg.swap.form;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbComImportLog;
@@ -75,15 +77,17 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener {
     
+    protected String msCompanyName;
     protected SGridPaneForm moDocumentsGrid;
-    protected JLabel jlStatus;
-    protected String msSyncUrl = "";
-    protected String msSyncUrlDownload = "";
-    protected String msSyncToken = "";
-    protected String msSyncApiKey = "";
-    protected int mnSyncLimit = 0;
-    protected SimpleDateFormat moFormatDatetime;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
+    protected String msUserFunctionalSubAreasCodes;
+    protected JLabel jlStatus;
+    protected String msSyncUrl;
+    protected String msSyncUrlDownload;
+    protected String msSyncToken;
+    protected String msSyncApiKey;
+    protected int mnSyncLimit;
+    protected SimpleDateFormat moFormatDatetime;
     
     /**
      * Creates new form SDialogImportDocuments
@@ -575,6 +579,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moFields.addField(moDateEnd);
         moFields.setFormButton(jbShow);
         
+        msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
+        
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Documentos", null) {
             @Override
             public void initGrid() {
@@ -627,15 +633,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         try {
             maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubArea(miClient.getSession());
-            String functionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
+            msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
             
-            if (functionalSubAreasCodes.isEmpty()) {
-                functionalSubAreasCodes = "¡NINGUNA!";
+            if (msUserFunctionalSubAreasCodes.isEmpty()) {
+                msUserFunctionalSubAreasCodes = "¡NINGUNA!";
             }
             
-            jtfUserFuncSubAreas.setText(functionalSubAreasCodes);
+            jtfUserFuncSubAreas.setText(msUserFunctionalSubAreasCodes);
             jtfUserFuncSubAreas.setCaretPosition(0);
-            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + functionalSubAreasCodes);
+            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreasCodes);
             
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
@@ -710,6 +716,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             entry.setResponseCode("" + SHttpConsts.RSC_SUCC_OK);
             entry.setResponseBody("");
             entry.setReferenceId("" + document);
+            entry.setReferenceUuid("" + document);
             //entry.setFkDpsYearId_n(...);
             //entry.setFkDpsDocumentId_n(...);
             //entry.setTsSync(...);
@@ -852,6 +859,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
 
                 connection.setDoInput(true); // true is already the default value!
+                
+                int countRetreived = 0;
+                int countElegible = 0;
+                int countShown = 0;
 
                 try (InputStream is = connection.getInputStream()) {
                     ObjectMapper mapper = new ObjectMapper();
@@ -862,11 +873,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         PreparedStatement prepStatToGetProcessedDps = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession());
                         
                         for (JsonNode docNode : root) {
+                            countRetreived++;
                             JsonNode companyNode = docNode.path("company");
 
                             if (companyNode.get("external_id").asInt() == companyId &&
                                     docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
                                     docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+                                countElegible++;
                                 
                                 JsonNode functionalAreaNode = docNode.path("functional_area");
                                 int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
@@ -941,9 +954,26 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     }
 
                                     documents.add(document);
+                                    countShown++;
                                 }
                             }
                         }
+                    }
+                    
+                    String message = "Resumen de la búsqueda de documentos en " + SSwapConsts.PURCHASE_PORTAL + ":\n"
+                            + "Empresa: " + msCompanyName + ";\n"
+                            + "Áreas funcionales: " + msUserFunctionalSubAreasCodes + ";\n"
+                            + (SLibTimeUtils.isSameDate(moDateStart.getValue(), moDateEnd.getValue()) ?
+                            ("Día: " + SLibUtils.DateFormatDate.format(moDateStart.getValue())) :
+                            ("Período: del " + SLibUtils.DateFormatDate.format(moDateStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDateEnd.getValue()))) + ";\n";
+                    
+                    if (countRetreived == 0) {
+                        miClient.showMsgBoxWarning(message + "No se encontraron documentos autorizados.");
+                    }
+                    else {
+                        miClient.showMsgBoxInformation(message + "Documentos encontrados: " + countRetreived + ";\n"
+                                + "Documentos elegibles para el usuario actual: " + countElegible + ";\n"
+                                + "Documentos mostrados: " + countShown + ".");
                     }
 
                     Collections.sort(documents);
@@ -1215,7 +1245,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             miClient.showMsgBoxInformation("Todos los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltan no se pudieron vincular.");
                         }
                         else {
-                            String message = "De los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltan solo se ";
+                            String message = "De los " + SLibUtils.DecimalFormatInteger.format(unlinked) + " documentos que faltan se ";
                             
                             if (newlyLinked == 1) {
                                 message += "pudo vincular 1.";
