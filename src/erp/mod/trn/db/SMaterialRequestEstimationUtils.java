@@ -28,7 +28,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Claudio Peña
  */
 public abstract class SMaterialRequestEstimationUtils {
     
@@ -134,10 +134,16 @@ public abstract class SMaterialRequestEstimationUtils {
             
             String body = "<!DOCTYPE html>" +
                             "<html lang=\"es\">" +
+                            "<head><meta charset=\"UTF-8\"></head>" +
                             "<body>";
             
             body += "<p>" + SLibUtils.textToHtmlIgnoreWhiteSpace(oProviderRow.getBody()).replaceAll("\n", "<br>") + "</p>";
 
+            body += "<br><br><b>Favor de registrarse en nuestro nuevo portal de proveedores</b>"
+            + "<br>En el siguiente enlace: "
+            + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a>"
+            + "<br><br>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, facturas, pagos y comprobantes de pago."
+            + "<br><br>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, fuera de esta fecha no se pueden recibir.";
             // Firma
             body += "<img src=\"cid:AbcXyz123\">";
             body += "</body>" +
