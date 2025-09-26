@@ -5,6 +5,7 @@
 
 package erp.lib.table;
 
+import erp.SFileUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.io.BufferedWriter;
@@ -396,9 +397,9 @@ public abstract class STableUtilities {
         java.lang.String buffer = "";
         java.util.Vector values = null;
 
-        client.getFileChooser().setSelectedFile(new File(title + " " + client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + ".csv"));
+        client.getFileChooser().setSelectedFile(new File(title + " " + client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + "." + SFileUtilities.CSV));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath() + (client.getFileChooser().getSelectedFile().getAbsolutePath().endsWith(".csv") ? "" : ".csv"));
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath() + (client.getFileChooser().getSelectedFile().getAbsolutePath().endsWith("." + SFileUtilities.CSV) ? "" : "." + SFileUtilities.CSV));
 
             try {
                 // Prepare apostrophe control for strings:

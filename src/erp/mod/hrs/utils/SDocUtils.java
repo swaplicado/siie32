@@ -16,6 +16,7 @@ import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -39,7 +40,6 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -729,8 +729,8 @@ public abstract class SDocUtils {
     public static JFileChooser createFileChooserForUpload() {
         JFileChooser moFileChooserUpload = new JFileChooser();
         moFileChooserUpload.setAcceptAllFileFilterUsed(false);
-        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Documento PDF (*.pdf)", "pdf"));
-        moFileChooserUpload.addChoosableFileFilter(new FileNameExtensionFilter("Archivo de imagen (*.bpm, *.gif, *.png, *.jpg, *.jpeg)", "bmp", "gif", "png", "jpg", "jpeg"));
+        moFileChooserUpload.addChoosableFileFilter(SFileUtilities.createFileNameExtensionFilter(SFileUtilities.PDF));
+        moFileChooserUpload.addChoosableFileFilter(SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_ALL));
         moFileChooserUpload.setDialogTitle("Seleccionar archivo a cargar...");
         return moFileChooserUpload;
     }

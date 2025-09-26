@@ -4,6 +4,7 @@
  */
 package erp.mtrn.form;
 
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -408,7 +409,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         }
         else {
             try {
-                miClient.getFileChooser().setSelectedFile(new File(msFileName + " netas " + miClient.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + ".csv"));
+                miClient.getFileChooser().setSelectedFile(new File(msFileName + " netas " + miClient.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + "." + SFileUtilities.CSV));
                 if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
 

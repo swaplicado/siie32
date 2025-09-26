@@ -12,7 +12,7 @@ import sa.lib.db.SDbDatabase;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Floers
  */
 public abstract class SClientUtils {
     
@@ -64,4 +64,5 @@ public abstract class SClientUtils {
     public static String getComplementaryDdName(SClientInterface client) throws Exception {
         return getComplementaryDbName(client.getSession().getStatement().getConnection());
     }
+    
 }

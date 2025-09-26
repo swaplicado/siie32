@@ -7,12 +7,16 @@ package erp.mod.cfg.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbComImportLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -36,6 +40,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +49,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -77,6 +85,10 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener {
     
+    private static final int MODE_DOWNLOAD = 1;
+    private static final int MODE_IMPORT = 2;
+    
+    protected String msCompanyCode;
     protected String msCompanyName;
     protected SGridPaneForm moDocumentsGrid;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
@@ -88,6 +100,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected String msSyncApiKey;
     protected int mnSyncLimit;
     protected SimpleDateFormat moFormatDatetime;
+    protected JFileChooser moZipFileChooser;
     
     /**
      * Creates new form SDialogImportDocuments
@@ -579,7 +592,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moFields.addField(moDateEnd);
         moFields.setFormButton(jbShow);
         
-        msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() });
+        msCompanyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+        msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
         
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Documentos", null) {
             @Override
@@ -632,11 +646,20 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moFormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         
         try {
-            maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubArea(miClient.getSession());
-            msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
-            
-            if (msUserFunctionalSubAreasCodes.isEmpty()) {
-                msUserFunctionalSubAreasCodes = "¡NINGUNA!";
+            if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsFunctionalAreas()) {
+                maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubArea(miClient.getSession());
+                msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
+
+                if (msUserFunctionalSubAreasCodes.isEmpty()) {
+                    msUserFunctionalSubAreasCodes = "¡NINGUNA!";
+                    miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no podrá descargar documentos porque no tiene subáreas funcionales asignadas.");
+                }
+            }
+            else {
+                SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) miClient.getSession().readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
+                maFunctionalSubAreas = new ArrayList<>();
+                maFunctionalSubAreas.add(functionalSubArea);
+                msUserFunctionalSubAreasCodes = functionalSubArea.getCode();
             }
             
             jtfUserFuncSubAreas.setText(msUserFunctionalSubAreasCodes);
@@ -666,7 +689,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             msSyncToken = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_TOKEN);
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
             
+            // documents retreival service: /api/documents/filter-by-date-and-type/?start_date=<start_date>&end_date=<end_date>&document_type=<document_type>; date format: yyyy-mm-dd; document type format: 0 (raw integer)
             msSyncUrl = syncUrl + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            
+            // documents download service: /api/documents/download-docs-zip/
             msSyncUrlDownload = syncUrl + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC_DWNLD, SSwapConsts.CFG_ATT_URL); // complementar la URL
 
             if (msSyncToken.isEmpty()) {
@@ -746,7 +772,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAll.setEnabled(!isNewShowRequest);
     }
     
-    private void renderCurrentDocument() {
+    private void showCurrentDocument() {
         SGridRow row = moDocumentsGrid.getSelectedGridRow();
         
         if (row == null) {
@@ -960,20 +986,21 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         }
                     }
                     
-                    String message = "Resumen de la búsqueda de documentos en " + SSwapConsts.PURCHASE_PORTAL + ":\n"
-                            + "Empresa: " + msCompanyName + ";\n"
-                            + "Áreas funcionales: " + msUserFunctionalSubAreasCodes + ";\n"
+                    String message = "Resumen de la búsqueda de documentos en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
+                            + "- Empresa: " + msCompanyName + ";\n"
+                            + "- Áreas funcionales: " + msUserFunctionalSubAreasCodes + ";\n"
                             + (SLibTimeUtils.isSameDate(moDateStart.getValue(), moDateEnd.getValue()) ?
-                            ("Día: " + SLibUtils.DateFormatDate.format(moDateStart.getValue())) :
-                            ("Período: del " + SLibUtils.DateFormatDate.format(moDateStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDateEnd.getValue()))) + ";\n";
+                            ("- Día: " + SLibUtils.DateFormatDate.format(moDateStart.getValue())) :
+                            ("- Período: del " + SLibUtils.DateFormatDate.format(moDateStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDateEnd.getValue()))) + ".\n\n"
+                            + "Búsqueda de documentos:\n\n";
                     
                     if (countRetreived == 0) {
                         miClient.showMsgBoxWarning(message + "No se encontraron documentos autorizados.");
                     }
                     else {
-                        miClient.showMsgBoxInformation(message + "Documentos encontrados: " + countRetreived + ";\n"
-                                + "Documentos elegibles para el usuario actual: " + countElegible + ";\n"
-                                + "Documentos mostrados: " + countShown + ".");
+                        miClient.showMsgBoxInformation(message + "Documentos encontrados en total: " + countRetreived + ";\n"
+                                + "Documentos elegibles para la empresa actual: " + countElegible + ";\n"
+                                + "Documentos elegibles para el usuario actual: " + countShown + ".");
                     }
 
                     Collections.sort(documents);
@@ -997,7 +1024,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     protected void actionPerformedClear() {
         moDocumentsGrid.populateGrid(new Vector<>());
-        renderCurrentDocument();
+        showCurrentDocument();
         
         enableDownloadFields(true);
         
@@ -1054,15 +1081,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         else {
             String ids = documents.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            //String urlStr = "https://transaction-backend-test-515680676790.europe-west1.run.app/api/documents/download-docs-zip/";
             String urlStr = msSyncUrlDownload;
+            HttpURLConnection conn = null;
 
             try {
                 // Open connection
                 URL url = new URL(urlStr);
                 String charset = java.nio.charset.StandardCharsets.UTF_8.name();
                 
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(180 * 1000); // timeout para conectar
                 conn.setReadTimeout(180 * 1000); // timeout para leer la respuesta
                 conn.setRequestMethod("POST");
@@ -1075,7 +1102,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 // Optional: send JSON body if required by API
                 Date requestDatetime = new Date();
                 String requestBody = "{\"document_ids\": [" + ids + "]}"; // example payload
-                
+
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(requestBody.getBytes("UTF-8"));
                 }
@@ -1084,37 +1111,40 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 Date responseDatetime = null;
                 String responseBody = "";
                 String summaryHeader = conn.getHeaderField("x-download-summary");
-                
+
                 if (summaryHeader != null) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode summaryJson = mapper.readTree(summaryHeader);
-
+                    
                     responseDatetime = new Date();
                     responseBody = summaryJson.toPrettyString();
-                            
+                    
                     System.out.println("Download summary from header:");
                     System.out.println(responseBody);
                 }
 
                 // --- 2) Save the ZIP file locally ---
-                
+
                 // Create file chooser
-                JFileChooser fileChooser = new JFileChooser();
+                if (moZipFileChooser == null) {
+                    miClient.showMsgBoxInformation("Se creará el cuadro de diálogo 'Guardar como', espere un momento de favor...");
+                    moZipFileChooser = new JFileChooser();
+                }
 
                 // Set filter: only ZIP files
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo ZIP (*.zip)", "zip");
-                fileChooser.setFileFilter(filter);
+                FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.ZIP);
+                moZipFileChooser.setFileFilter(filter);
                 
-                fileChooser.setSelectedFile(new File("facturas compras " + moFormatDatetime.format(new Date()) + ".zip"));
+                moZipFileChooser.setSelectedFile(new File("facturas compras " + msCompanyCode + " " + moFormatDatetime.format(new Date()) + "." + SFileUtilities.ZIP));
 
                 // Set dialog title
-                fileChooser.setDialogTitle("Guardar como... (ZIP)");
+                moZipFileChooser.setDialogTitle("Guardar como... (ZIP)");
 
                 // Show Save dialog
-                int userSelection = fileChooser.showSaveDialog(miClient.getFrame());
+                int userSelection = moZipFileChooser.showSaveDialog(miClient.getFrame());
 
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    File chosenFile = fileChooser.getSelectedFile();
+                    File chosenFile = moZipFileChooser.getSelectedFile();
 
                     // Ensure file ends with ".zip"
                     if (!chosenFile.getName().toLowerCase().endsWith(".zip")) {
@@ -1123,7 +1153,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     System.out.println("Saving file as: " + chosenFile.getAbsolutePath());
                     
-                    //String zipPath = "documents.zip";
                     String zipPath = chosenFile.getAbsolutePath();
 
                     try (InputStream in = conn.getInputStream();
@@ -1167,10 +1196,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     
                     miClient.showMsgBoxInformation(message + zipPath);
                     
-                    /*
                     // --- 3) Extract the ZIP contents ---
                     try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
                         ZipEntry entry;
+                        
                         while ((entry = zis.getNextEntry()) != null) {
                             System.out.println("Extracting: " + entry.getName());
 
@@ -1187,14 +1216,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             zis.closeEntry();
                         }
                     }
-                    */
                 }
-
-                conn.disconnect();
             }
             catch (Exception e) {
                 e.printStackTrace();
                 SLibUtils.showException(this, e);
+            }
+            finally {
+                try {
+                    if (conn != null) {
+                        conn.disconnect();
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    SLibUtils.showException(this, e);
+                }
             }
         }
     }
@@ -1462,7 +1499,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            renderCurrentDocument();
+            showCurrentDocument();
         }
     }
 }

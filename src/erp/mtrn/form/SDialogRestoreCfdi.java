@@ -1,5 +1,6 @@
 package erp.mtrn.form;
 
+import erp.SFileUtilities;
 import erp.cfd.SCfdConsts;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -141,12 +142,12 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         }
         
         if (mnFormSubtype == SCfdConsts.CFDI_FILE_XML) {
-            msFileFilterDescription = "XML file";
-            msFileFilterExtensions = "xml";
+            msFileFilterDescription = SFileUtilities.XML_DESCRIP;
+            msFileFilterExtensions = SFileUtilities.XML;
         }
         else {
-            msFileFilterDescription = "PDF file";
-            msFileFilterExtensions = "pdf";
+            msFileFilterDescription = SFileUtilities.PDF_DESCRIP;
+            msFileFilterExtensions = SFileUtilities.PDF;
         }
         
         AbstractAction actionOk = new AbstractAction() {
@@ -173,7 +174,6 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
     private void actionLoadFile() {
         FileFilter filter = new FileNameExtensionFilter(msFileFilterDescription, msFileFilterExtensions);
         miClient.getFileChooser().repaint();
-        miClient.getFileChooser().addChoosableFileFilter(filter);
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
 
@@ -188,11 +188,13 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
                     moInputStream = new FileInputStream(miClient.getFileChooser().getSelectedFile());
                 }
             }
-            miClient.getFileChooser().resetChoosableFileFilters();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
     }
 

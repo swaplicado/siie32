@@ -7,6 +7,7 @@ package erp.mtrn.view;
 
 import cfd.DCfdConsts;
 import erp.SClientUtils;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -35,10 +36,11 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
@@ -87,7 +89,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -149,8 +150,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbSendByEmail;
     private javax.swing.JButton jbExportDataToSwapServices;
     private javax.swing.JButton jbResetPacFlags;
-    private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
-    private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
+    private javax.swing.JButton jbImportCfdiWithOutOrder;
+    private javax.swing.JButton jbImportCfdiWithOrder;
     private javax.swing.JButton jbImportMatRequest;
     private javax.swing.JButton jbChangeDpsEntryItem;
     private javax.swing.JButton jbRestoreCfdStamped;
@@ -300,15 +301,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImport.addActionListener(this);
         jbImport.setToolTipText("Importar documento");
         
-        jbImportCfdiWithOutPurchaseOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_CFD));
-        jbImportCfdiWithOutPurchaseOrder.setPreferredSize(new Dimension(23, 23));
-        jbImportCfdiWithOutPurchaseOrder.addActionListener(this);
-        jbImportCfdiWithOutPurchaseOrder.setToolTipText("Importar CFDI sin orden de compra");
+        jbImportCfdiWithOutOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_CFD));
+        jbImportCfdiWithOutOrder.setPreferredSize(new Dimension(23, 23));
+        jbImportCfdiWithOutOrder.addActionListener(this);
+        jbImportCfdiWithOutOrder.setToolTipText("Importar CFDI sin orden de compra");
         
-        jbImportCfdiWithPurchaseOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_CFD_ORD));
-        jbImportCfdiWithPurchaseOrder.setPreferredSize(new Dimension(23, 23));
-        jbImportCfdiWithPurchaseOrder.addActionListener(this);
-        jbImportCfdiWithPurchaseOrder.setToolTipText("Importar CFDI con orden de compra");
+        jbImportCfdiWithOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_CFD_ORD));
+        jbImportCfdiWithOrder.setPreferredSize(new Dimension(23, 23));
+        jbImportCfdiWithOrder.addActionListener(this);
+        jbImportCfdiWithOrder.setToolTipText("Importar CFDI con orden de compra");
         
         jbImportMatRequest = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_MAT_REQ));
         jbImportMatRequest.setPreferredSize(new Dimension(23, 23));
@@ -559,8 +560,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbCopy);
         addTaskBarUpperComponent(jbImport);
-        addTaskBarUpperComponent(jbImportCfdiWithOutPurchaseOrder);
-        addTaskBarUpperComponent(jbImportCfdiWithPurchaseOrder);
+        addTaskBarUpperComponent(jbImportCfdiWithOutOrder);
+        addTaskBarUpperComponent(jbImportCfdiWithOrder);
         addTaskBarUpperComponent(jbImportMatRequest);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbChangeDpsEntryItem);
@@ -636,8 +637,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbAnnul.setEnabled(mbHasRightAnnul && mbHasRightEdit && (mbIsDoc || mbIsDocAdj));
         jbCopy.setEnabled(mbHasRightNew && !mbIsDocAdj);
         jbImport.setEnabled(mbHasRightNew && createImportFinder);
-        jbImportCfdiWithOutPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
-        jbImportCfdiWithPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
+        jbImportCfdiWithOutOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
+        jbImportCfdiWithOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportMatRequest.setEnabled(mbIsCategoryPur);
         jbChangeDpsEntryItem.setEnabled(mbIsOrd);
         jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
@@ -1110,15 +1111,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionImportCfdi(boolean withPurchaseOrder) {
-        if (withPurchaseOrder ? jbImportCfdiWithPurchaseOrder.isEnabled() : jbImportCfdiWithOutPurchaseOrder.isEnabled()) {
-            SDataDps purchaseOrderDps = null; 
+    private void actionImportCfdi(boolean linkToOrder) {
+        if (linkToOrder ? jbImportCfdiWithOrder.isEnabled() : jbImportCfdiWithOutOrder.isEnabled()) {
+            try {
+                SImportUtils.importCfdi(miClient, mbIsCategoryPur, moDialogDpsFinder, null, linkToOrder, null);
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+            /*
             FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
             miClient.getFileChooser().repaint();
             miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
             miClient.getFileChooser().setFileFilter(filter);
+            
+            SDataDps purchaseOrderDps = null; 
 
-            if (withPurchaseOrder) {
+            if (linkToOrder) {
                 moDialogDpsFinder.formReset();
                 moDialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, getDpsClassPreviousKey());
                 moDialogDpsFinder.setVisible(true);
@@ -1129,14 +1138,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             try {
-                if (!withPurchaseOrder || (withPurchaseOrder && purchaseOrderDps != null)) {
+                if (!linkToOrder || (linkToOrder && purchaseOrderDps != null)) {
                     if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
+                        File file = miClient.getFileChooser().getSelectedFile();
+                        
+                        if (file.getName().toLowerCase().contains(".xml")) {
                             SCfdRenderer renderer = new SCfdRenderer(miClient);
-                            SDataDps dpsRendered = renderer.renderCfdi(miClient.getFileChooser().getSelectedFile(), purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-                            if (dpsRendered != null){
-                                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
+                            SDataDps dpsRendered = renderer.renderCfdi(file, purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                            
+                            if (dpsRendered != null) {
+                                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false }); // document type key, is imported
                                 miClient.getGuiModule(mnModule).setAuxRegistry(dpsRendered);
+                                
                                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                                     SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -1144,7 +1157,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             }
                         }
                         else {
-                            miClient.showMsgBoxInformation("El archivo solo puede ser XML.");
+                            miClient.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
+                                    + "(Archivo proporcionado: '" + file.getName() + "')");
                         }
                     }
                     
@@ -1154,6 +1168,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
+            */
         }
     }
     
@@ -1513,19 +1528,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private File getRouteImgReport() {
-        JFileChooser save = new JFileChooser();
-        save.setCurrentDirectory(new java.io.File("C:\\"));
-        save.setDialogTitle("Seleccionar imagen");
-        save.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        FileNameExtensionFilter filtro = new FileNameExtensionFilter("JPG y PNG","jpg","png");
-        save.setFileFilter(filtro);
-        save.setAcceptAllFileFilterUsed(false);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("C:\\"));
+        fileChooser.setDialogTitle("Seleccionar imagen");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_JPG_PNG);
+        fileChooser.setFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
-        if (save.showDialog(null, "Subir") == JFileChooser.APPROVE_OPTION) {
-            System.out.println("getSelectedFile() : " + save.getSelectedFile());
+        if (fileChooser.showDialog(null, "Subir") == JFileChooser.APPROVE_OPTION) {
+            System.out.println("getSelectedFile() : " + fileChooser.getSelectedFile());
         }
         
-        return save.getSelectedFile();
+        return fileChooser.getSelectedFile();
     }
     
     private String getUsQuantityFormat() throws Exception {
@@ -3595,10 +3610,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbImport) {
                     actionImport();
                 }
-                else if (button == jbImportCfdiWithOutPurchaseOrder){
+                else if (button == jbImportCfdiWithOutOrder){
                     actionImportCfdi(false);
                 }
-                else if (button == jbImportCfdiWithPurchaseOrder){
+                else if (button == jbImportCfdiWithOrder){
                     actionImportCfdi(true);
                 }
                 else if (button == jbImportMatRequest){

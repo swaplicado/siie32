@@ -12,6 +12,7 @@ import cfd.ver33.DCfdi33Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DCfdi40Consts;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
@@ -139,7 +140,6 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibMethod;
@@ -3165,7 +3165,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jtaCfdiRelatedDocs.setEditable(false);
         jtaCfdiRelatedDocs.setColumns(20);
-        jtaCfdiRelatedDocs.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        jtaCfdiRelatedDocs.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jtaCfdiRelatedDocs.setRows(5);
         jtaCfdiRelatedDocs.setFocusable(false);
         jspCfdiRelatedDocs.setViewportView(jtaCfdiRelatedDocs);
@@ -9322,14 +9322,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     @SuppressWarnings("deprecation")
     private void actionLoadFileXml() {
-        FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
        
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.XML)) {
                     String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     
                     if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, absolutePath)) {
@@ -9398,22 +9398,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     miClient.showMsgBoxInformation("El archivo sólo puede ser XML.");
                 }
             }
-            miClient.getFileChooser().resetChoosableFileFilters();
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        }
     }
     
     private void actionLoadFilePdf() {
-        FileFilter filter = new FileNameExtensionFilter("PDF file", "pdf");
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.PDF);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
        
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".pdf")) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.PDF)) {
                     moFieldCfdiPdfFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     moFilePdfJustLoaded = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                 }

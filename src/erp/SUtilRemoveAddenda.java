@@ -11,8 +11,8 @@
 
 package erp;
 
-import erp.mtrn.data.SCfdUtils;
 import erp.lib.SLibConstants;
+import erp.mtrn.data.SCfdUtils;
 import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -160,7 +160,7 @@ public class SUtilRemoveAddenda extends javax.swing.JFrame {
     private void initComponentsExtra() {
         jtfXml.setText("");
         moFileChooser = new JFileChooser();
-        moFileFilter = new FileNameExtensionFilter("XML archivo", "xml");
+        moFileFilter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
         moFileChooser.setAcceptAllFileFilterUsed(false);
         moFileChooser.setFileFilter(moFileFilter);
     }

@@ -2182,7 +2182,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     @Override
     public JFileChooser getFileChooser() {
         if (moFileChooser == null) {
-            showMsgBoxInformation("Se creará el diálogo Abrir, espere un momento de favor...");
+            showMsgBoxInformation("Se creará el cuadro de diálogo 'Abrir', espere un momento de favor...");
             try {
                 getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 moFileChooser = new JFileChooser();

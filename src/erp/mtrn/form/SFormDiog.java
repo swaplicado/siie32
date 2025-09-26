@@ -12,6 +12,7 @@
 package erp.mtrn.form;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -85,7 +86,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -3063,16 +3063,18 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 String warning = "Advertencias:\n";
                 int warnings = 0;
                 Statement statement  = miClient.getSession().getDatabase().getConnection().createStatement();
-                FileFilter filter = new FileNameExtensionFilter("CSV file", "csv");
+                
+                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
                 miClient.getFileChooser().repaint();
                 miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
                 miClient.getFileChooser().setFileFilter(filter);
             
                 if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".csv")) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.CSV)) {
                         String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                         BufferedReader br = new BufferedReader(new FileReader(absolutePath));
                         String line = br.readLine();
+                        
                         while (line != null) {
                             String[] fields = line.split(separador);
                             boolean item = false;
@@ -3092,6 +3094,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         error += errors + "- El ítem con la clave " + fields[0].toUpperCase() + " no existe en la base de datos.\n";
                                     }
                                 }
+                                
                                 if (item) {
                                     sql = "SELECT id_unit FROM erp.itmu_unit WHERE lower(symbol) = '" + fields[3].toLowerCase() + "'";
                                     try (ResultSet resultSet = statement.executeQuery(sql)) {
@@ -3114,6 +3117,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                             error += errors + "- La unidad " + fields[3].toLowerCase() + " no existe en la base de datos.\n";
                                         }
                                     }
+                                    
                                     if (validateAppropriateWarehousesItem(moEntryItem.getPkItemId())) {
                                         if (moEntryItem.getIsLotApplying() && fields[4].toUpperCase().isEmpty()) {
                                             errors++;
@@ -3171,16 +3175,19 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                         }
                         else {
                             int ans = 0;
+                            
                             if (warnings > 0) {
                                 er.setVisible(true);
                                 ans = miClient.showMsgBoxConfirm("¿Desea continuar con la inserción a pesar de las advertencias?");
                             }
+                            
                             if (ans == JOptionPane.OK_OPTION) {
                                 mbImportExternalDoc = true;
                                 // Volver a leer para agregar
                                 br = new BufferedReader(new FileReader(absolutePath));
                                 line = br.readLine();
                                 int exc = 0;
+                                
                                 while (line != null) {
                                     moStockMoveEntry = null;
                                     String[] fields = line.split(separador);
@@ -3191,6 +3198,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                         }
                                         else {     
                                             String sql = "SELECT id_item FROM erp.itmu_item WHERE item_key = '" + fields[0].toUpperCase() + "'";
+                                            
                                             try (ResultSet resultSet = statement.executeQuery(sql)) {
                                                 if (resultSet.next()) {
                                                     moEntryItem = new SDataItem();
@@ -3198,9 +3206,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                                     moFieldEntryQuantity.setDouble(SLibUtilities.parseDouble(fields[2]));
                                                     moFieldEntryValueUnitary.setDouble(SLibUtilities.parseDouble(fields[6]));
                                                     moFieldEntryValue.setDouble(SLibUtilities.parseDouble(fields[7]));
+                                                    
                                                     if (moEntryItem.getIsLotApplying()) {
-                                                        sql = "SELECT id_lot FROM trn_lot WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + moEntryItem.getFkUnitId() + " AND lot = '" + fields[4].toUpperCase() + "'";
+                                                        sql = "SELECT id_lot "
+                                                                + "FROM trn_lot "
+                                                                + "WHERE id_item = " + moEntryItem.getPkItemId() + " AND id_unit = " + moEntryItem.getFkUnitId() + " AND lot = '" + fields[4].toUpperCase() + "'";
                                                         ResultSet resultSetlot = miClient.getSession().getStatement().executeQuery(sql);
+                                                        
                                                         if (resultSetlot.next()) {
                                                             int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
                                                             int[] moveKey = new int[] { 
@@ -3233,6 +3245,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                                             moStockMoveEntry.setFkMaintUserSupervisorId(1);
                                                         }
                                                     }
+                                                    
                                                     actionEntryAdd();
                                                 }
                                             }
@@ -3254,6 +3267,10 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
             }
             catch (Exception e) {
                 miClient.showMsgBoxWarning(e.getMessage());            
+            }
+            finally {
+                miClient.getFileChooser().resetChoosableFileFilters();
+                miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
             }
         }
     }

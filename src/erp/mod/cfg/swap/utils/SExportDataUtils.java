@@ -475,7 +475,7 @@ public abstract class SExportDataUtils {
                         + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
-                    + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
+                    + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) " // exclude general public and non established partners
                     + "ORDER BY "
                     + "b.id_bp;";
             
@@ -747,7 +747,7 @@ public abstract class SExportDataUtils {
                         + "OR b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR (e.ts_usr_upd IS NOT NULL AND e.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
-                    + "AND u.sync_settings LIKE '%" + SSyncRoles.COMPRADOR + "%' AND u.email <> '' "
+                    + "AND u.sync_settings LIKE '%" + SSyncRoles.COMPRADOR + "%' AND u.usr <> '' AND u.email <> '' "
                     + "UNION "
                     + "SELECT "
                     + "b.id_bp AS _external_id, '" + SExportDataAuthActor.ACTOR_TYPE_THIRD_PARTY + "' AS _actor_type_id, 1 AS _is_vendor, 0 AS _is_customer, "
@@ -766,7 +766,7 @@ public abstract class SExportDataUtils {
                     + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR (bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
-                    + "AND b.b_sup AND bbc.email_01 <> '' "
+                    + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) AND bbc.email_01 <> '' " // exclude general public and non established partners and partners without email
                     + "ORDER BY "
                     + "_external_id;";
 
@@ -1018,11 +1018,12 @@ public abstract class SExportDataUtils {
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND t.b_authorn AND NOT t.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + (lastSyncDatetime == null ? "" : " OR ("
+                        + "(t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (t.b_del OR t.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
                         + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                         + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
-                        + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
+                        + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) " // exclude orders from general public and non established partners
                         + "GROUP BY "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, dcfd.cfd_use "
@@ -1054,7 +1055,7 @@ public abstract class SExportDataUtils {
                     reference.amount = resultSet.getDouble("t.tot_cur_r");
                     reference.fiscal_use = resultSet.getString("_cfd_use");
                     reference.payment_method = resultSet.getInt("t.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    reference.is_deleted = !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link") || resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
 
                     references.add(reference);
                 }
@@ -1342,22 +1343,16 @@ public abstract class SExportDataUtils {
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
-                        + "(SELECT  "
-                        + "            GROUP_CONCAT(DISTINCT fid_mat_req) "
-                        + "        FROM "
-                        + "            " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
-                        + "        WHERE "
-                        + "            fid_dps_year = d.id_year "
-                        + "                AND fid_dps_doc = d.id_doc) AS _rms, "
-                        + "    COALESCE((SELECT  "
-                        + "                    GROUP_CONCAT(nts, '. ') "
-                        + "                FROM "
-                        + "                    " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS dn "
-                        + "                WHERE "
-                        + "                    dn.id_year = d.id_year "
-                        + "                        AND dn.id_doc = d.id_doc "
-                        + "                        AND NOT dn.b_del), "
-                        + "            '') AS _notes "
+                        + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
+                        + "WHERE "
+                        + "fid_dps_year = d.id_year AND fid_dps_doc = d.id_doc) AS _rms, "
+                        + "COALESCE((SELECT GROUP_CONCAT(nts, '. ') "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS dn "
+                        + "WHERE "
+                        + "dn.id_year = d.id_year AND dn.id_doc = d.id_doc AND NOT dn.b_del), '') AS _notes "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
@@ -1371,11 +1366,12 @@ public abstract class SExportDataUtils {
                         + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                         + "AND YEAR(d.ts_authorn) >= " + SSwapConsts.SINCE_YEAR + " "
                         + "AND ("
-                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn) "
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn AND NOT d.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + (lastSyncDatetime == null ? "" : " OR ("
+                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ")";
                 sql += ";";
 
@@ -1400,17 +1396,13 @@ public abstract class SExportDataUtils {
                     oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
                     oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
                     oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    oDpsExport.is_deleted = !resultSet.getBoolean("d.b_authorn") || 
-                                            resultSet.getBoolean("d.b_del") || 
-                                            resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("d.b_authorn") || resultSet.getBoolean("d.b_link");
                     
-                    /**
-                     * PDF de la OC
-                     */
-                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(session, 
-                                                                        SSyncType.PUR_ORDER_FILE, 
-                                                                        oDpsExport.id_year + "_" + oDpsExport.id_doc,
-                                                                        database);
+                    // PDF de la OC:
+                    
+                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
+                            session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
+                    
                     if (oLogEty != null) {
                         SExportDataDpsFile oFile = new SExportDataDpsFile();
                         SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
@@ -1434,9 +1426,8 @@ public abstract class SExportDataUtils {
                         sProjectID = CloudStorageManager.getProjectID();
                     }
                     
-                    /**
-                     * Documentos (Archivos de cotizaciones)
-                     */
+                    // documentos (archivos de cotizaciones)
+                    
                     boolean withUrl = false;
                     ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement());
                     for (SWebDpsFile oDpsFile : lDpsFiles) {
@@ -1456,9 +1447,8 @@ public abstract class SExportDataUtils {
                         }
                     }
                     
-                    /**
-                    * RM
-                    */
+                    // documentos (archivos de requisiciones)
+                    
                     String rms = resultSet.getString("_rms");
                     String fileName;
                     String[] idsRms;

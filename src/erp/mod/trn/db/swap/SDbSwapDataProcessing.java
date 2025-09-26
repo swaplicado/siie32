@@ -39,6 +39,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     protected int mnTransactionCategory;
     protected int mnExternalDataId;
     protected String msExternalDataUuid;
+    protected String msDpsReferences;
+    protected String msDpsDescription;
+    protected boolean mbDpsPaymentLocal;
     /*
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -62,6 +65,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public void setTransactionCategory(int n) { mnTransactionCategory = n; }
     public void setExternalDataId(int n) { mnExternalDataId = n; }
     public void setExternalDataUuid(String s) { msExternalDataUuid = s; }
+    public void setDpsReferences(String s) { msDpsReferences = s; }
+    public void setDpsDescription(String s) { msDpsDescription = s; }
+    public void setDpsPaymentLocal(boolean b) { mbDpsPaymentLocal = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
@@ -77,6 +83,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public int getTransactionCategory() { return mnTransactionCategory; }
     public int getExternalDataId() { return mnExternalDataId; }
     public String getExternalDataUuid() { return msExternalDataUuid; }
+    public String getDpsReferences() { return msDpsReferences; }
+    public String getDpsDescription() { return msDpsDescription; }
+    public boolean isDpsPaymentLocal() { return mbDpsPaymentLocal; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
@@ -106,6 +115,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         mnTransactionCategory = 0;
         mnExternalDataId = 0;
         msExternalDataUuid = "";
+        msDpsReferences = "";
+        msDpsDescription = "";
+        mbDpsPaymentLocal = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkDpsYearId_n = 0;
@@ -165,6 +177,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             mnTransactionCategory = resultSet.getInt("txn_cat");
             mnExternalDataId = resultSet.getInt("ext_data_id");
             msExternalDataUuid = resultSet.getString("ext_data_uuid");
+            msDpsReferences = resultSet.getString("dps_refs");
+            msDpsDescription = resultSet.getString("dps_descrip");
+            mbDpsPaymentLocal = resultSet.getBoolean("b_dps_pay_loc");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
@@ -198,6 +213,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     mnTransactionCategory + ", " + 
                     mnExternalDataId + ", " + 
                     "'" + msExternalDataUuid + "', " + 
+                    "'" + msDpsReferences + "', " + 
+                    "'" + msDpsDescription + "', " + 
+                    (mbDpsPaymentLocal ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " + 
@@ -218,6 +236,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "txn_cat = " + mnTransactionCategory + ", " +
                     "ext_data_id = " + mnExternalDataId + ", " +
                     "ext_data_uuid = '" + msExternalDataUuid + "', " +
+                    "dps_refs = '" + msDpsReferences + "', " +
+                    "dps_descrip = '" + msDpsDescription + "', " +
+                    "b_dps_pay_loc = " + (mbDpsPaymentLocal ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fid_dps_year_n = " + (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " +
@@ -245,6 +266,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         registry.setTransactionCategory(this.getTransactionCategory());
         registry.setExternalDataId(this.getExternalDataId());
         registry.setExternalDataUuid(this.getExternalDataUuid());
+        registry.setDpsReferences(this.getDpsReferences());
+        registry.setDpsDescription(this.getDpsDescription());
+        registry.setDpsPaymentLocal(this.isDpsPaymentLocal());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkDpsYearId_n(this.getFkDpsYearId_n());

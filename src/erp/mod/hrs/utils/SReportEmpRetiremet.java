@@ -1,20 +1,21 @@
 package erp.mod.hrs.utils;
 
+import erp.SFileUtilities;
 import erp.mod.hrs.db.SHrsConsts;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.Normalizer;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.Normalizer;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibTimeUtils;
@@ -196,8 +197,8 @@ public class SReportEmpRetiremet {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            fileChooser.setSelectedFile(new File("CuotasPatronales_" + currentYear + "_" + monthName + ".csv"));
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos CSV (*.csv)", "csv");
+            fileChooser.setSelectedFile(new File("CuotasPatronales_" + currentYear + "_" + monthName + "." + SFileUtilities.CSV));
+            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
             fileChooser.setFileFilter(filter);
             fileChooser.setDialogTitle("Guardar archivo CSV");
 

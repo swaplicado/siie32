@@ -6,6 +6,7 @@
 package erp.mfin.form;
 
 import cfd.DCfdConsts;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -57,7 +58,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
@@ -2157,7 +2157,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionLoadFileXml() {
-        FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
@@ -2170,12 +2170,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
                 }
             }
+            
             updateFilesXmlInfo();
-            miClient.getFileChooser().resetChoosableFileFilters();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
     }
 

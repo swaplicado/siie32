@@ -4,6 +4,7 @@
  */
 package erp.cfd.utils;
 
+import erp.SFileUtilities;
 import erp.mod.SModConsts;
 import erp.mod.hrs.utils.SCsvFileManager;
 import erp.mod.hrs.utils.SInputData;
@@ -341,7 +342,7 @@ public class SDialogReissueCfdis extends SBeanFormDialog implements java.awt.eve
      */
     private void actionLoadFile() {
         String path = null;
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Delimitado por comas .csv", "csv");
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
         
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(filter);
@@ -368,17 +369,17 @@ public class SDialogReissueCfdis extends SBeanFormDialog implements java.awt.eve
     }
     
     private void actionSaveFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("");
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //
         // disable the "All files" option.
         //
-        chooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setAcceptAllFileFilterUsed(false);
         
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            msCsvGenPath = chooser.getSelectedFile() + "";
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            msCsvGenPath = fileChooser.getSelectedFile() + "";
             jtfFileGenPath.setText(msCsvGenPath);
         }
         else {
