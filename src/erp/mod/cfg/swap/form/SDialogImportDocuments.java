@@ -1321,54 +1321,59 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
-                        // retrieve order, if available:
-                        
-                        SDataDps order = null;
-                        boolean linkToOrder = document.References != null && document.References.length > 0 && document.ReferencesType == SSwapConsts.TXN_DOC_TYPE_ORDER;
-                        
-                        if (linkToOrder) {
-                            int[] orderKey = null;
-                            SImportUtils.DpsKey orderDpsKey = document.References[0].createDpsKey();
-                            
-                            if (orderDpsKey != null) {
-                                orderKey = orderDpsKey.asKey();
-                            }
-                            else {
-                                SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(document.References[0].Reference, SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE);
-                                
-                                if (orderDpsFolio != null) {
-                                    orderKey = SDataUtilities.obtainDpsKey((SClientInterface) miClient, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+                        if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
+                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no company branch selected
+                        }
+                        else {
+                            // retrieve order, if available:
+
+                            SDataDps order = null;
+                            boolean linkToOrder = document.References != null && document.References.length > 0 && document.ReferencesType == SSwapConsts.TXN_DOC_TYPE_ORDER;
+
+                            if (linkToOrder) {
+                                int[] orderKey = null;
+                                SImportUtils.DpsKey orderDpsKey = document.References[0].createDpsKey();
+
+                                if (orderDpsKey != null) {
+                                    orderKey = orderDpsKey.asKey();
+                                }
+                                else {
+                                    SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(document.References[0].Reference, SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE);
+
+                                    if (orderDpsFolio != null) {
+                                        orderKey = SDataUtilities.obtainDpsKey((SClientInterface) miClient, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+                                    }
+                                }
+
+                                if (orderKey != null) {
+                                    order = new SDataDps();
+                                    order.read(orderKey, miClient.getSession().getStatement());
                                 }
                             }
-                            
-                            if (orderKey != null) {
-                                order = new SDataDps();
-                                order.read(orderKey, miClient.getSession().getStatement());
-                            }
-                        }
-                        
-                        // prepare DPS finder dialog:
-                        
-                        if (linkToOrder && moDialogDpsFinder == null) {
-                            moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-                        }
-                        
-                        // retrieve CFDI files:
-                        
-                        File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
-                        
-                        // import CFDI:
-                        
-                        int[] dpsKey = SImportUtils.importCfdi(miClient, true, moDialogDpsFinder, files[0], files[1], linkToOrder, order);
-                        
-                        if (dpsKey != null) {
-                            SThinDps dps = new SThinDps();
-                            dps.read(dpsKey, miClient.getSession().getStatement());
 
-                            if (document.link(miClient.getSession(), dps, true)) {
-                                int index = moDocumentsGrid.getTable().getSelectedRow();
-                                moDocumentsGrid.renderGridRows();
-                                moDocumentsGrid.setSelectedGridRow(index);
+                            // prepare DPS finder dialog:
+
+                            if (linkToOrder && moDialogDpsFinder == null) {
+                                moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
+                            }
+
+                            // retrieve CFDI files:
+
+                            File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
+
+                            // import CFDI:
+
+                            int[] dpsKey = SImportUtils.importCfdi(miClient, true, moDialogDpsFinder, files[0], files[1], linkToOrder, order);
+
+                            if (dpsKey != null) {
+                                SThinDps dps = new SThinDps();
+                                dps.read(dpsKey, miClient.getSession().getStatement());
+
+                                if (document.link(miClient.getSession(), dps, true)) {
+                                    int index = moDocumentsGrid.getTable().getSelectedRow();
+                                    moDocumentsGrid.renderGridRows();
+                                    moDocumentsGrid.setSelectedGridRow(index);
+                                }
                             }
                         }
                     }

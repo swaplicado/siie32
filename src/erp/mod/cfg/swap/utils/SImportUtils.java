@@ -36,6 +36,7 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -57,6 +58,26 @@ public abstract class SImportUtils {
     private static final String DownloadFilePrefix = "facturas compras "; // keep final blank space!
     
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+    
+    /**
+     * Get file name without extension.
+     * @param fileName File name.
+     * @param extension Estension.
+     * @return 
+     */
+    private static String getFileNameWithoutExtension(final String fileName, final String extension) {
+        String fileNameWithoutExtension;
+        int extensionIndex = fileName.toLowerCase().lastIndexOf(extension.toLowerCase());
+        
+        if (extensionIndex != -1) {
+            fileNameWithoutExtension = fileName.substring(0, extensionIndex);
+        }
+        else {
+            fileNameWithoutExtension = fileName;
+        }
+        
+        return fileNameWithoutExtension;
+    }
     
     /**
      * Import and create a new invoice.
@@ -304,7 +325,9 @@ public abstract class SImportUtils {
                         System.out.println("Extracting temporal files...");
                         
                         File xmlFile = null;
+                        String xmlFileName = "";
                         File pdfFile = null;
+                        HashMap<String, File> pdfFilesMap = new HashMap<>();
                         
                         try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
                             ZipEntry entry;
@@ -326,16 +349,28 @@ public abstract class SImportUtils {
 
                                 zis.closeEntry();
                                 
-                                if (newFile.getName().endsWith("." + SFileUtilities.XML)) {
+                                if (newFile.getName().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
+                                    // choose firts available XML:
                                     xmlFile = newFile;
+                                    xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.XML);
                                 }
                                 else if (newFile.getName().endsWith("." + SFileUtilities.PDF)) {
-                                    pdfFile = newFile;
+                                    // reserve all available PDF's:
+                                    pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.PDF), newFile);
+                                }
+                                
+                                if (!xmlFileName.isEmpty() && !pdfFilesMap.isEmpty() && pdfFile == null) {
+                                    pdfFile = pdfFilesMap.get(xmlFileName); // lookup the right PDF by same name as XML
                                 }
                                 
                                 if (xmlFile != null && pdfFile != null) {
                                     break; // no more files needed!
                                 }
+                            }
+                            
+                            if (xmlFile != null && pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                // last chance, choose firts available PDF:
+                                pdfFile = (File) pdfFilesMap.values().toArray()[0];
                             }
                         }
                         
